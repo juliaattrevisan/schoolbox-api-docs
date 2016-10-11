@@ -7,6 +7,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -70,14 +72,21 @@ class Controller extends Base
     protected $folderMapper;
 
     /**
+     * @var SubmissionFileMapper
+     */
+    protected $submissionFileMapper;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
+     * @param SubmissionFileMapper $submissionFileMapper
      */
-    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper)
+    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper, SubmissionFileMapper $submissionFileMapper)
     {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
+        $this->setSubmissionFileMapper($submissionFileMapper);
     }
 
     /**
@@ -955,11 +964,12 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/submit/:studentId
      * @level 165
-     * @param IAssessable $assessment
+     * @param IAssessable $project
+     * @param DueWork $assessment
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSubmitForm($assessment, User $student)
+    public function getSubmitForm($project, $assessment, User $student)
     {
         // TODO - generate data
 
@@ -970,15 +980,73 @@ class Controller extends Base
         //       eg /submission/submitOnline/56/219
 
         // ==================== test URLs: ======================
-        // http://192.168.36.10/learning/assessment/1/submit/230   - project with 1 quiz, 1 dueWork + 3 tasks
-        // http://192.168.36.10/learning/assessment/2/submit/230   - quiz
-        // http://192.168.36.10/learning/assessment/3/submit/230   - dueWork
-        // http://192.168.36.10/learning/assessment/4/submit/230   - task
+        // http://192.168.36.10/learning/assessment/7/1/submit/230
+
+        // Kludge to get assessable we are submitting from dummy object
+
+        $dummyAssessment = self::getDummyAssessment(7);
+
+        foreach ($dummyAssessment->getAssessables() as $assessable) {
+            if ($assessable->getId() == $assessment) {
+                $assessment = $assessable;
+                break;
+            }
+        }
+
+        // Kludge to get project object, should be pre-loaded
+
+        $project = $dummyAssessment;
+
+        // Retrieve the students responses
+
+        $responses = new Collection();
+
+        foreach ($assessment->getAllParticipants() as $participant) {
+            if ($participant->getUser()->getId() == $student->getId()) {
+                $responses = $participant->getAllResponses();
+            }
+        }
+
+        try {
+
+            // Try to load a draft submission if one exists
+
+            /** @var SubmissionFile $submission */
+            $submission = $this->getSubmissionFileMapper()->findOneByColumnList([
+                'draft' => 1,
+                'owner' => $student->getId(),
+                'box_id' => $assessment->getId()
+            ]);
+
+            try {
+                $draft = $submission->getStorage()->read();
+            } catch (\Exception $e) {
+                $draft = '';
+            }
+
+        } catch (MapperException $e) {
+
+            // No existing draft
+
+            $submission = new SubmissionFile();
+            $draft = '';
+        }
+
+        // Work out if we are going to accept submissions
+
+        $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/submitForm.twig', [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'assessment'  => self::getDummyAssessment($assessment),
+            'assessment'  => $assessment,
+            'responses'   => $responses,
+            'project'     => $project,
             'student'     => $student,
+            'user'        => $this->getUser(),
+            'attachzone'  => $this->getAttachZone(),
+            'submission'  => $submission,
+            'draft'       => $draft,
+            'acceptSubmission' => $acceptSubmission
         ]));
     }
 
@@ -1003,6 +1071,24 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
         return $this;
     }
+
+    /**
+     * @return SubmissionFileMapper
+     */
+    protected function getSubmissionFileMapper()
+    {
+        return $this->submissionFileMapper;
+    }
+
+    /**
+     * @param SubmissionFileMapper $submissionFileMapper
+     * @return static
+     */
+    protected function setSubmissionFileMapper(SubmissionFileMapper $submissionFileMapper)
+    {
+        $this->submissionFileMapper = $submissionFileMapper;
+        return $this;
+    }    
 
     /**
      * @return FolderMapper
@@ -2211,6 +2297,11 @@ class Controller extends Base
         $submission
             ->setId(553)
             ->setAssessable($dueWork)
+            ->setAllFiles(
+                (new Collection())->add(
+                    \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('4b50da92d887f9e05804f7425125b5064f5cb385')
+                )
+            )
             ->setSubmittedBy($hodes)
             ->setSubmittedOnBehalfOf($hodes)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -2440,6 +2531,31 @@ class Controller extends Base
         //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
         return $quiz;
+    }
+
+    /**
+     * Insert an attach zone into the template
+     *
+     * @param Collection $attachments|IStorage
+     * @return array
+     */
+    private function getAttachZone($attachments = null)
+    {
+        $zone = new Zone('attachment');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select attachment')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload attachment')
+            ->setMimeFilter('*/*')
+            ->setReadOnly(false)
+            ->setMulti(true);
+
+        if ($attachments != null)
+            foreach ($attachments as $attachment)
+                $zone->attachFiles(array($attachment->getHash()));
+
+        return $zone->getTwigContext();
     }
 }
 

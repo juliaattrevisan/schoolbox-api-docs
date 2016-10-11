@@ -1,1 +1,288 @@
-<h1>TODO - submitForm.twig</h1>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        // Autosave on type to ensure that change gets saved
+
+        var autosaveTimeout = null;
+        var textBoxContent = '';
+
+        // Method for setting up autosave - clears existing event, and creates new one.
+
+        var initAutosave = function () {
+            clearTimeout(autosaveTimeout);
+
+            autosaveTimeout = setTimeout(function () {
+                autosavePresubmit();
+            }, 5 * 1000);
+        };
+
+        // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
+
+        var autosavePresubmit = function () {
+
+            // Has the text box changed? If not check again later (re-init the autosave counter)
+            var currentContent = CKEDITOR.instances['editor-body'].getData();
+
+            if (currentContent === textBoxContent) {
+                initAutosave();
+            }
+            else {
+                textBoxContent = currentContent;
+                autosaveAjaxSubmit();
+            }
+        };
+
+        // The autosave submit method
+
+        var autosaveAjaxSubmit = function () {
+            var form = $('#editor-form');
+
+            // Change button's text, but keep its width the same.
+            // Change it back once done.
+            var formSaveLabel = form.find('[data-save-draft]');
+
+            // Submit form via AJAX
+            var formContents = form.serializeArray();
+            formContents.push({name: 'save_draft', value: '1'});
+            formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
+
+            formSaveLabel.toastActivate({
+                text: 'Autosaving'
+            });
+
+            $.ajax({
+                type: "POST",
+                url: '/submission/submitOnlineForm.php',
+                data: formContents,
+                complete: function () {
+                    // Re-init the autosave
+                    initAutosave();
+
+                },
+                success: function () {
+                    formSaveLabel.toastTimeout({
+                        text: 'Draft Saved',
+                        css: 'success'
+                    });
+                },
+                error: function () {
+                    formSaveLabel.toastTimeout({
+                        text: 'Error!',
+                        css: 'alert'
+                    });
+                },
+                dataType: 'json'
+            });
+        };
+
+        /* Spawn editors
+         */
+        $.fn.alaressEditor({
+            targetElements: $('textarea[name=body]'),
+            start: function (element) {
+                initAutosave(element);
+                autosavePresubmit(element);
+            }
+        });
+
+        var emptyDialog = $('#empty-dialog');
+        emptyDialog.on('click', '[data-interaction="close"]', function (e) {
+            e.preventDefault();
+            emptyDialog.foundation('reveal', 'close');
+        });
+
+        var confirmDialog = $('#confirm-dialog');
+
+        $("[data-action-save]").click(function (e) {
+            var form = $(this).closest('form'),
+                    dialog = confirmDialog,
+                    submit = form.find(':submit'),
+                    inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                    filesLen = $('#attachment-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+
+            if (!inlineLen && !filesLen) {
+                // prevent submission without SOMETHING to submit
+                e.preventDefault();
+                emptyDialog.foundation('reveal', 'open');
+            }
+            else if (dialog.length) {
+                // wait! display confirm modal
+                e.preventDefault();
+
+                dialog.find('[data-accept]').click(function (event) {
+                    event.preventDefault();
+
+                    submit.prop('disabled', true);
+                    form.submit();
+                });
+
+                dialog.find('[data-reject]').click(function (event) {
+                    event.preventDefault();
+
+                    dialog.foundation('reveal', 'close');
+                });
+
+                confirmDialog.foundation('reveal').foundation('reveal', 'open');
+            }
+            else {
+                // checks pass: go for broke
+                submit.prop('disabled', true);
+                form.submit();
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+{# TODO: Replace with real breadcrumbs #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Learning',    '#' ],
+[ 'Classname',   '#' ],
+[ student.fullName,   '#' ],
+[ project.title, routeLookup(user.role.isStudent ? 'learningAssessment.getSummaryStudent' : 'learningAssessment.getSummaryStaff', {assessmentId: project.id, studentId: student.id})],
+[ assessment.title,   '#' ],
+[ 'Submit Response', '#']
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+
+        <h1>{{ assessment.title }}</h1>
+
+        <h2 class="subheader">Description</h2>
+        <section>
+            <div class="content">
+                <p>{{ assessment.description }}</p>
+            </div>
+        </section>
+
+        <h2 class="subheader">Timeline</h2>
+        <div class="row">
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Open Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Due Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        {% if responses | length %}
+
+            <h2 class="subheader">Responses</h2>
+            {% for response in responses %}
+                {% if response.getAllFiles | length %}
+                    <section>
+                        <ul data-dz-previews="" class="az-list">
+                            {% for file in response.getAllFiles %}
+                                <li class="dz-success actions-small-1">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <img class="mime" src="/images/mime/60x60/{{ file.mimeType.getIconFile }}">
+                                            <p class="filename" data-dz-name="">
+                                                <a href="/storage/fetch.php?save=1&hash={{ file.hash }}">{{ file.filename }}</a>
+                                            </p>
+                                            <p class="meta">
+                                                {{ file.mimeType.description }}<br>
+                                                Submitted {{ file.createdAt.getRelativeTime }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        {% if response.allFeedback | length %}
+                                            <a href="/learning/assessment/feedback/{{ response.id }}" data-dz-remove="" title="View Feedback"
+                                               class="icon-view"></a>
+                                        {% endif %}
+                                        <a href="#" data-dz-remove="" title="Delete Response" class="icon-delete"></a>
+                                        <input type="hidden" name="attachment[]" value="store:{{ file.hash }}" data-az-attachment="">
+                                    </nav>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            {% endfor %}
+
+        {% endif %}
+
+        {% if acceptSubmission %}
+
+            <h2 class="subheader">Submit Response</h2>
+
+            <div class="row">
+
+                <div class="small-12 columns">
+                    <div class="alert-box">
+                        You can attach files and/or edit online for your submission.
+                        Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for
+                        Assessment.
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 island">
+                    <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+                        <input type="hidden" name="user_id" value="{{ student.id }}"/>
+                        <input type="hidden" name="box_id" value="{{ assessment.id }}"/>
+                        <input type="hidden" name="submission_id" value="{{ submission.id }}"/>
+                        <section class="content">
+                            <textarea id="editor-body" name="body" rows="20">{{ draft }}</textarea>
+                        </section>
+                        <section class="content">
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </section>
+                        <input type="submit" value="Submit for Assessment {% if user.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save/>
+                        <div class="toast" data-alert data-save-draft></div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
+                <h2 id="empty-dialog-title">Nothing To Submit</h2>
+                <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
+                <a class="button full-width" data-interaction="close">OK</a>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+
+        {% endif %}
+    </div>
+</div>

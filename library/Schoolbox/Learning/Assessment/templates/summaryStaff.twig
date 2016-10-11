@@ -26,6 +26,8 @@
     {% set totalClass = 'alert' %}
 {% endif %}
 
+{# TODO: Replace with real breadcrumbs #}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ 'Learning',    '#' ],
@@ -37,6 +39,8 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }} - {{ student.getFullName }}</h1>
+
+        <h2 class="subheader">Description</h2>
         <section>
             <div class="content">
                 <p class="meta">{{ summatorName }}</p>
@@ -214,7 +218,7 @@
 
         <h2 class="subheader">Assessables</h2>
 
-        {% if false and  assessment.assessables | length %}
+        {% if assessment.assessables | length %}
         <section>
             <ul class="information-list">
                 {% for assessable in assessment.assessables %}
@@ -222,7 +226,7 @@
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
                     {% if assessable.getTypeName == 'Quiz' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
+                        {% set url = '/assess/intro/' ~ assessable.id %}               {# Link to the quiz page #}
                     {% elseif assessable.getTypeName == 'Task' %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
@@ -241,10 +245,8 @@
                                 <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                                     Due {{ assessable.getDueAt.getRelativeTime }}
                                 </p>
-
                             </div>
                         </div>
-
                     </li>
 
                     {# Display list of all responses the student provided- this is a bit of an ugly technicolor label rainbow
@@ -257,7 +259,7 @@
                         {% if assessable.getParticipant(student).getAllResponses | length %}
                             {% for response in assessable.getParticipant(student).getAllResponses %}
 
-                                <li class="actions-small-2">
+                                <li class="actions-small-3">
                                     <div class="list-item">
                                         <div class="card small-12">
                                             <div class="row">
@@ -287,10 +289,30 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a href="#" class="icon-view" title="View Submission"></a>
-                                        <a href="#" class="icon-modify" title="Feedback"></a>
+
+                                        {# Display different actions depending on the type of assessment #}
+
+                                        {% if assessable.getTypeName == 'Quiz' %}
+
+                                            {# Quiz #}
+
+                                            <a href="#" class="icon-view" title="View Submission"></a>
+                                            <a href="#" class="icon-approve" title="Grade"></a>
+                                            <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz On Behalf Of Student"></a>
+
+                                        {% elseif assessable.getTypeName != 'Task' %}
+
+                                            {# Due Work #}
+
+                                            <a href="#" class="icon-view" title="View Submission"></a>
+                                            <a href="#" class="icon-approve" title="Grade"></a>
+                                            <a href="{{ routeLookup('learningAssessment.getSubmitForm', {projectId: assessment.id, assessmentId: assessable.id, studentId: student.id}) }}" class="icon-modify no-text" title="Submit Response On Behalf Of Student"></a>
+
+                                        {% endif %}
+
                                     </nav>
                                 </li>
+
                             {% endfor %}
 
                         {% else %}

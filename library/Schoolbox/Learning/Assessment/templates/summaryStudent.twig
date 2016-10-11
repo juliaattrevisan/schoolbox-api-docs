@@ -26,6 +26,8 @@
     {% set totalClass = 'alert' %}
 {% endif %}
 
+{# TODO: Replace with real breadcrumbs #}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ 'Learning',    '#' ],
@@ -36,53 +38,15 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
+
+        <h2 class="subheader">Description</h2>
         <section>
             <div class="content">
                 <p>{{ assessment.description }}</p>
             </div>
         </section>
 
-        <h2 class="subheader">Progress</h2>
-        <div class="row">
-            <div class="small-12 medium-6 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item">
-                                <div class="card wrap-down small-12" title="{{ assessment.getOpenAt.getLocal }}">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Project Open
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-            <div class="small-12 medium-6 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Project Due
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-        </div>
+        <h2 class="subheader">Timeline</h2>
         <div class="row">
             <div class="small-12 medium-3 island">
                 <section>
@@ -172,6 +136,48 @@
             {% endif %}
         </div>
 
+        <h2 class="subheader">Progress</h2>
+        <div class="row">
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12" title="{{ assessment.getOpenAt.getLocal }}">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Project Open
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Project Due
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
         <h2 class="subheader">Assessables</h2>
         <section>
             <ul class="information-list">
@@ -180,7 +186,7 @@
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
                     {% if assessable.getTypeName == 'Quiz' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
+                        {% set url = '/assess/intro/' ~ assessable.id %}               {# Link to the quiz page #}
                     {% elseif assessable.getTypeName == 'Task' %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
@@ -236,7 +242,7 @@
                                     {# Show upload link if multiple submissions are allowed, or the student hasn't submitted already #}
 
                                     {% if assessable.isAcceptMulti or (assessable.getParticipant(student).getAllResponses | length) == 0 %}
-                                        <a href="/learning/assessment/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
+                                        <a href="{{ routeLookup('learningAssessment.getSubmitForm', {projectId: assessment.id, assessmentId: assessable.id, studentId: student.id}) }}" class="icon-modify no-text" title="Submit Response"></a>
                                     {% endif %}
 
                                 {% endif %}

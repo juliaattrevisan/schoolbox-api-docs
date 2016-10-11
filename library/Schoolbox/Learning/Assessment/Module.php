@@ -55,7 +55,7 @@ class Module extends BaseModule
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary'             => 'getSummaryStudent',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummaryStaff',
-                '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
+                '/assessment/{projectId}/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
             'POST' => [
 
@@ -107,6 +107,7 @@ class Module extends BaseModule
 
                 // TODO. Hydrate specified IAssessable
                 $args['assessment'] = $params['assessmentId'];
+                $args['project'] = $params['projectId'];
 
                 if (array_key_exists('studentId', $params)) {
                     try {
@@ -166,7 +167,7 @@ class Module extends BaseModule
             )
         );
 
-        $ruleRegexp = '(?:getSummaryStaff|getSubmitForm)';
+        $ruleRegexp = '(?:getSubmitForm)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -176,6 +177,18 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                )
+            );
+
+        $ruleRegexp = '(?:getSummaryStaff)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                $ruleRegexp,
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
                 )
             );
     }
