@@ -30,11 +30,11 @@
     <tr data-group="{{ rubricId }}-{{ group.id }}">
         {# yay html tables... -_-; #}
         {% if rowspan %}
-            <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name|raw }}</span></th>
+            <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
             {% set rowspan = 0 %}
         {% endif %}
 
-        <th class="rb-criterion-name">{{ crit.name|raw }}</th>
+        <th class="rb-criterion-name">{{ crit.name }}</th>
 
             {% for levelIndex, level in rubric.levels %}
 
@@ -57,7 +57,7 @@
                         />
                         <label for="{{ inputId }}">
                             <span class=rb-description>
-                                {{- descriptor.text|nl2br|raw -}}
+                                {{- descriptor.text|nl2br -}}
                             </span>
                             {% if descriptor.value is not null %}
                             <span class="rb-value">

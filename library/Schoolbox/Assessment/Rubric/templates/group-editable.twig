@@ -1,7 +1,7 @@
 {# ensure these are set #}
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = rubricId ~ '-' ~ group.id -%}
-{%- set groupName = group.name ? group.name|raw : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
+{%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 

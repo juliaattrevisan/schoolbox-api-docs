@@ -29,7 +29,7 @@
                     <dd>{{ result.id }}</dd>
 
                     <dt>Description</dt>
-                    <dd>{{ result.description|raw }}</dd>
+                    <dd>{{ result.description|purify }}</dd>
 
                     <dt>Created</dt>
                     <dd>{{ result.createdAt.database }}</dd>

@@ -26,7 +26,7 @@
                 <div class="list-item">
                     <div class="small-12 columns">
                         <h4>{{ team.name }}{% if teamResult.status.id %} - {{ teamResult.status.name }}{% endif %}</h4>
-                        {{ teamResult.description|raw }}
+                        {{ teamResult.description|purify }}
                     </div>
                 </div>
 
