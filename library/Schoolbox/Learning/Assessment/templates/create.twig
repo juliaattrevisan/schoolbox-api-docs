@@ -3,7 +3,7 @@
 
 {{ bread.crumbs(
     [ folder.name, '/homepage/' ~ folder.id ],
-    [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
+    [ 'Create Assessment', '#' ]
 ) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
@@ -12,6 +12,71 @@
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
+
+        /**
+         * When you finish configuring a non-project assessment
+         */
+        function setupAssessmentEnd() {
+            $('input[data-mage-next="end"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+
+                onXhrDone: function (data) {
+
+                    /* TODO: Redirect somewhere upon success
+                     */
+                    console.log(data);
+                }
+            });
+        }
+
+        /**
+         * When you finish configuring a project
+         */
+        function setupProjectEnd() {
+            $('input[data-mage-next="part-3"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+                onXhrDone: function (data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                        .find('[data-project-contents]')
+                        .html(data);
+                }
+            });
+        }
+
+        {% if assessmentType|length %}
+
+        /* Save everything when Part 1 was already chosen in route
+         */
+        setupAssessmentEnd();
+
+        /* Or, proceed with project configuration if Part 1 was already chosen in route
+         */
+        setupProjectEnd();
+
+        {% else %}
 
         /**
          * Update new form action url
@@ -26,54 +91,16 @@
                     .find('[data-assessment-details]')
                     .html(data);
 
-                /* Save everything
+                /* Save everything when creating with Part 1
                  */
-                $('input[data-mage-next="end"]').mage({
-                    manipulateSerialized: function(data) {
-                        var newData = data;
+                setupAssessmentEnd();
 
-                        if (CKEDITOR.instances['description'] != undefined) {
-                            newData.push({
-                                name: 'description',
-                                value: CKEDITOR.instances['description'].getData()
-                            });
-                        }
-
-                        return newData;
-                    },
-
-                    onXhrDone: function (data) {
-
-                        /* TODO: Redirect somewhere upon success
-                         */
-                        console.log(data);
-                    }
-                });
-
-                /* Or, proceed with project configuration
+                /* Or, proceed with project configuration when creating with Part 1
                  */
-                $('input[data-mage-next="part-3"]').mage({
-                    manipulateSerialized: function(data) {
-                        var newData = data;
-
-                        if (CKEDITOR.instances['description'] != undefined) {
-                            newData.push({
-                                name: 'description',
-                                value: CKEDITOR.instances['description'].getData()
-                            });
-                        }
-
-                        return newData;
-                    },
-                    onXhrDone: function (data) {
-                        $('#assessmentForm')
-                            .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
-                            .find('[data-project-contents]')
-                            .html(data);
-                    }
-                });
+                setupProjectEnd();
             }
         });
+        {% endif %}
     });
 </script>
 
@@ -81,10 +108,17 @@
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
 </div>
 
+{% if assessmentType|length %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment') %}
+{% else %}
+    {% set formAction = routeLookup('learningAssessment.postSelectAssessment') %}
+{% endif %}
+
 <div class="row">
     <div class="small-12 columns island">
-        <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
+        <form action="{{ formAction }}" id="assessmentForm" method="post">
             <section>
+                {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
                     <legend>Choose Assessment Type</legend>
 
@@ -92,7 +126,10 @@
                         <div class="column small-12">
                             <input type="hidden" name="folderId" value="{{ folder.id }}" />
 
+                            {% if not hideProjectOption %}
                             <input type="radio" name="assessmentType" value="{{ types.getFromTitle('project') }}" id="project"><label for="project" class="radio-label">Project</label>
+                            {% endif %}
+
                             <input type="radio" name="assessmentType" value="{{ types.getFromTitle('dueWork') }}" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
                             <input type="radio" name="assessmentType" value="{{ types.getFromTitle('task') }}" id="task"><label for="task" class="radio-label">Task</label>
                             <input type="radio" name="assessmentType" value="{{ types.getFromTitle('quiz') }}" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
@@ -103,10 +140,22 @@
                         {{ mage.submitRow('Next', 'part-1', 'part-2', 'Working...') }}
                     </div>
                 </fieldset>
+                {% endif %}
 
-                <fieldset class="content" data-mage="part-2" disabled="disabled">
+                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
+                    <input type="hidden" name="contextId" value="{{ contextId }}" />
+                    <input type="hidden" name="contextType" value="{{ contextType }}" />
+
+                    {% if assessmentType|length %}
+                    <input type="hidden" name="assessmentType" value="{{ assessmentType}}" />
+                    {% endif %}
+
                     <legend>Assessment Details</legend>
-                    <div class="small-12 columns hide" data-mage-collapsed data-assessment-details></div>
+                    <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
+                        {% if assessmentTypeTitle|length %}
+                            {% include '@learningAssessment/fragments/'~assessmentTypeTitle~'/create.twig' %}
+                        {% endif %}
+                    </div>
                 </fieldset>
 
                 <fieldset class="content" data-mage="part-3" disabled="disabled">

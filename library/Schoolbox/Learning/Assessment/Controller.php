@@ -53,6 +53,26 @@ class Controller extends Base
 {
 
     /**
+     * Spawn in a Folder
+     */
+    const SPAWN_CONTEXT_FOLDER = 'folder';
+
+    /**
+     * Spawn in a Project
+     */
+    const SPAWN_CONTEXT_PROJECT = 'project';
+
+    /**
+     * Spawn in a Unit Implementation
+     */
+    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
+
+    /**
+     * Spawn in a Unit Specification
+     */
+    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
+
+    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -74,15 +94,12 @@ class Controller extends Base
     }
 
     /**
-     * Select an Assessment
+     * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
      *
-     * This is when you chooze what type of assessment it is, which
-     * returns you an appropriate fragment of common+assessmentType
-     * form inputs for you to fill out
-     *
-     * @param $folderId
+     * @param int $folderId
+     * @param string $assessmentTypeTitle
      */
-    public function getSelectAssessment($folderId)
+    public function getSelectAssessmentInFolder($folderId, $assessmentTypeTitle)
     {
         try {
             $folder = $this->getFolderMapper()->findById($folderId);
@@ -91,10 +108,156 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($folder->getId(), self::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Project $projectId
+     *
+     * @param int $projectId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInProject($projectId, $assessmentTypeTitle)
+    {
+        /* Die early if you're trying to ram a project into a project
+         * We specifically don't allow it
+         *
+         * Instead, redirect to a safe place
+         */
+        $types = new Types();
+
+        if ($types->isProject($types->getFromTitle($assessmentTypeTitle))) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', ['projectId' => $projectId]);
+
+            $this->getResponse()->redirect->to($redirect);
+        }
+
+        /* TODO: Get from db
+         */
+        $project = (new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce()))->setId($projectId);
+
+        /* TODO: Derive $folder from $projectId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($project->getId(), self::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     *
+     * @param int $unitId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInUnitImplementation($unitId, $assessmentTypeTitle)
+    {
+        /* TODO: Get from db
+         */
+        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
+
+        /* TODO: Derive $folder from $unitId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     *
+     * @param int $unitId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInUnitSpecification($unitId, $assessmentTypeTitle)
+    {
+        /* TODO: Get from db
+         */
+        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
+
+        /* TODO: Derive $folder from $unitId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * A macro for creating the standard data for all assessmentTypes
+     * for use in their Create screen
+     *
+     * @param int $contextId
+     * @param string $contextType e.g. one of "project", "folder", "unitimpl", "unitspec"
+     * @param \Schoolbox\Resource\Folder\Model $folder related to object that has $contextId
+     * @param string $assessmentTypeTitle e.g. one of "project", "dueWork", "task", "quiz"
+     */
+    private function getSelectAssessmentData($contextId, $contextType, \Schoolbox\Resource\Folder\Model $folder, $assessmentTypeTitle)
+    {
+        /* Check that $type is valid
+         */
+        $types = new Types();
+
+        $assessmentType = $types->getFromTitle($assessmentTypeTitle);
+
+        $zone = new Zone('files');
+        $zone->setMulti(true);
+
+        /* contextId, contextType:
+         *
+         * Both exist here so you know where the new Assessment should be spawned
+         * in the corresponding post request
+         */
+        $data = [
+            'contextId' => $contextId,
+            'contextType' => $contextType,
+
+            /* The usual info everything requires
+             */
+            'attachzone' => $zone->getTwigContext(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'assessmentTypeTitle' => $assessmentTypeTitle,
+            'assessmentType' => $assessmentType,
             'folder' => $folder,
-            'types' => new Types(),
-        ]));
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'types' => $types,
+        ];
+
+        /* Used to hide a ui element, preventing Projects being an option
+         * to spawn inside a Project context
+         */
+        if ($types->isProject($types->getFromTitle($contextType))) {
+            $data['hideProjectOption'] = true;
+        }
+
+        /* Special treatment for projects for now
+         */
+        if ($types->isProject($assessmentType)) {
+            $data['allSummators'] = new SummatorMapping();
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
 
     /**
@@ -102,6 +265,8 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
+        /* TODO: Check against ($contextId, $contextType) as well
+         */
         try {
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
         }
@@ -164,8 +329,10 @@ class Controller extends Base
     {
         $assessment = null;
 
+        /* TODO Everything magically happens here, correctly, based on $contextId and $contextType
+         */
         try {
-            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
         }
         catch (MapperException $e) {
             $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
@@ -204,10 +371,24 @@ class Controller extends Base
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
+         *
+         * Unless you tried to spawn nested projects, which we don't allow
          */
+        $types = new Types();
+
         if ($assessment instanceof Project) {
+
+            /* Check that you don't spawn a Project in a Project
+             */
+            if ($types->isProject($types->getFromTitle($this->getRequest()->post['contextType']))) {
+                $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+                return;
+            }
+
+            /* Continue as normal
+             */
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => new Types(),
+                'types' => $types,
                 'assessmentId' => $assessment->getId(),
                 'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
             ]));
@@ -519,7 +700,7 @@ class Controller extends Base
     /**
      * All the possible Mark Types to chooze from for this particular $assessmentType
      *
-     * @param $assessmentType
+     * @param int $assessmentType
      * @return array
      */
     private function getAllMarkTypes($assessmentType)

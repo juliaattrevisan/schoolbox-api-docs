@@ -5,7 +5,7 @@
     {{ bread.crumbs(
         [ folder.name, '/homepage/' ~ folder.id ],
         [ project.title, routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: project.id}) ],
-        [ 'Create Due Work', routeLookup('learningAssessment.getSelectAssessment') ]
+        [ 'Create Due Work', '#' ]
     ) }}
 {% endblock %}
 

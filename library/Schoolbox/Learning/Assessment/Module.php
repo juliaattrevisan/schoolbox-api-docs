@@ -39,7 +39,10 @@ class Module extends BaseModule
 
                 /* Select an assessment fragment to start with
                  */
-                '/assessment/select/{folderId}' => 'getSelectAssessment',
+                '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
+                '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
+                '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
+                '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
                 /* Edit an assessment with their type-specific data
                  */
@@ -80,7 +83,12 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($router, $alias, $basePath, $path)->addTokens([
+                'assessmentId' => '\d+',
+                'assessmentType' => '\d+',
+                'assessmentTypeTitle' => '(dueWork|task|quiz|project)',
+                'studentId' => '\d+',
+            ]);
         }
 
         foreach ($routes['POST'] as $path => $alias) {

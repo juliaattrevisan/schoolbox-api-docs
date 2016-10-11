@@ -16,10 +16,10 @@ class Types extends \Schoolbox\Collection
     /**
      * Assessable types
      */
-    const ASSESSMENT_PROJECT = 0;
-    const ASSESSMENT_DUE_WORK = 1;
-    const ASSESSMENT_TASK = 2;
-    const ASSESSMENT_QUIZ = 3;
+    const ASSESSMENT_PROJECT = 1;
+    const ASSESSMENT_DUE_WORK = 2;
+    const ASSESSMENT_TASK = 3;
+    const ASSESSMENT_QUIZ = 4;
 
     /**
      * Set of key-value pairs
@@ -70,9 +70,24 @@ class Types extends \Schoolbox\Collection
     }
 
     /**
+     * Is the $Key valid?
+     *
+     * @param $key
+     * @return bool
+     */
+    public function isValidKey($key)
+    {
+        if (strlen($key)) {
+            return in_array($key, array_keys($this->getTypes()));
+        }
+
+        return false;
+    }
+
+    /**
      * Is the $index valid?
      *
-     * @param $index
+     * @param int $index
      * @return bool
      */
     public function isValidIndex($index)
