@@ -519,7 +519,8 @@ class Bootstrap implements BootstrapInterface {
         );
 
         // Enable mappers to be injectable, but instantiated only when required
-        $di->set('mapperFactory', $di->lazyNew(MapperFactory::class, ['injector' => $di]));
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));
@@ -534,9 +535,7 @@ class Bootstrap implements BootstrapInterface {
             $di->lazyNew(
                 UnitSpecMapperProxy::class,
                 [
-                    'mapper' => $di->lazy(function () use ($di) {
-                        return $di->get('mapperFactory')->get(UnitSpecMapper::class);
-                    }),
+                    'mapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
                     'translator' => $di->lazyNew(UnitSpecTranslator::class),
                 ]
             )
@@ -546,13 +545,9 @@ class Bootstrap implements BootstrapInterface {
             $di->lazyNew(
                 CourseSpecMapperProxy::class,
                 [
-                    'mapper' => $di->lazy(function () use ($di) {
-                        return $di->get('mapperFactory')->get(CourseSpecMapper::class);
-                    }),
-                    'translator' => $di->lazyNew(CourseSpecTranslator::class),
-                    'unitMapper' => $di->lazy(function () use ($di) {
-                        return $di->get('mapperFactory')->get(UnitSpecMapper::class);
-                    }),
+                    'mapper'         => $mapperFactory->getLazy(CourseSpecMapper::class),
+                    'translator'     => $di->lazyNew(CourseSpecTranslator::class),
+                    'unitMapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
                     'unitTranslator' => $di->lazyNew(UnitSpecTranslator::class),
                 ]
             )
@@ -579,9 +574,7 @@ class Bootstrap implements BootstrapInterface {
             $di->lazyNew(
                 AssessmentMapperProxy::class,
                 [
-                    'baseMapper' => $di->lazy(function () use ($di) {
-                        return $di->get('mapperFactory')->get(AssessmentMapper::class);
-                    }),
+                    'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
                     'translator' => $di->lazyGet('assessmentTranslator'),
                 ]
             )
