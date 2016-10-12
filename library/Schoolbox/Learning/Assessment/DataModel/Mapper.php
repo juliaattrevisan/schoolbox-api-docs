@@ -186,9 +186,9 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Collection|Model[] $modelList */
-        $modelList  = $this->createCollection();
-        $dueWorkIds = [];
-        $projectIds = [];
+        $modelList         = $this->createCollection();
+        $dueWorkIds        = [];
+        $contextProjectIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
@@ -245,11 +245,10 @@ class Mapper extends BaseMapper
 
             } elseif ($row['pa.id']) {
                 // Project
-                /** @var ProjectModel $context */
                 $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
 
                 // Load context for this project itself
-                $context->setAssessmentModel($this->findById($row['pa.assessment_id']));
+                $contextProjectIds[] = $row['pa.assessment_id'];
 
             }
             $model->setAssessmentContext($context);
@@ -288,6 +287,23 @@ class Mapper extends BaseMapper
                 }
                 if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
                     $submodel->setAttachments($files[$submodel->getId()]);
+                }
+            }
+        }
+
+        // Load context for projects separately
+        // Attempt to do it all in one query
+        /** @var Model[] $contextProjects */
+        if (!empty($contextProjectIds)) {
+            $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
+            foreach ($modelList as $model) {
+                // This has to be a project
+                $context = $model->getAssessmentContext();
+                if ($context instanceof ProjectModel) {
+                    $contextId = $context->getAssessmentModel()->getId();
+                    if (isset($contextProjects[$contextId])) {
+                        $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
+                    }
                 }
             }
         }
