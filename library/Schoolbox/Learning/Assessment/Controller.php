@@ -562,6 +562,7 @@ class Controller extends Base
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
+                'contextType' => self::SPAWN_CONTEXT_PROJECT,
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
                 'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
@@ -581,35 +582,8 @@ class Controller extends Base
      */
     public function postCreateAssessmentWithinProject()
     {
-        /* TODO: Actually save data here then redirect back to project update screen
-         */
-        //        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
-
-        /* Figure out what kind of assessment was chosen
-         * and spawn a new instance of it to manipulate
-         */
-        try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                return;
-            }
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
+        // Persist within context of a project
+        $this->persistAssessment();
 
         $data = [
             'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
