@@ -510,10 +510,35 @@ class Controller extends Base
      */
     public function postUpdateAssessment($assessmentId)
     {
-        /* TODO: Actually save data here
-         * TODO: Save the attributes common among all assessables
-         */
-        new \Alaress_Probe($assessmentId, $this->getRequest()->post, "Redirect to <a href='".$this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId])."'>this url</a>");
+        // Use Steve's factory to update existing fields
+        try {
+            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))
+                ->produceFromExistingAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                return;
+            }
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+
+        // TODO figure out sequence
+        $this->assessmentDataSource->save($assessment, 1);
+
+        // Now what?
     }
 
     /**
