@@ -15,10 +15,12 @@
     var defaults = {
 
         submittable: 'fieldset',
+        currentStopClass: 'current-stop',
         reenablePrevious: false,
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
+        confirmRevert: $.noop,
         manipulateSerialized: function(formSerial) {
             return formSerial;
         },
@@ -33,6 +35,10 @@
         setOptions.call(this, options);
 
         var $elem = $(this.element);
+
+        this.thisPart = $elem.attr('name');
+        this.nextPart = $elem.data('mage-next');
+
         // non-negotiable selector
         var $form = $elem.closest('form');
 
