@@ -41,7 +41,8 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
                     "SELECT u.id, u.title, g.name gname
                      FROM `user` u
                      LEFT JOIN groups g ON u.group_id = g.id
-                     WHERE synergy_id = :sid
+                     WHERE synergy_id = :sid 
+                     AND u.deleted_at IS NULL
                      $groupFilter
                      AND u.id NOT IN (
                        SELECT u.id
@@ -86,6 +87,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
              LEFT JOIN `user` u ON u.id = ua.uid
              LEFT JOIN groups g ON u.group_id = g.id
              WHERE c.id = :cid
+             AND u.deleted_at IS NULL
              $groupFilter
              AND u.id NOT IN (
                  SELECT `user`
