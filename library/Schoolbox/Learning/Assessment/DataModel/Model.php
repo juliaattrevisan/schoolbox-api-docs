@@ -176,12 +176,15 @@ class Model implements ISoftDeletable
         $folder   = $this->getFolder();
         $unitSpec = $this->getUnitSpecification();
         $unitImpl = $this->getUnitImplementation();
+        $project  = $this->getProject();
         if (isset($folder)) {
             return $folder;
         } elseif (isset($unitSpec)) {
             return $unitSpec;
         } elseif (isset($unitImpl)) {
             return $unitImpl;
+        } elseif (isset($project)) {
+            return $project;
         }
         return null;
     }
@@ -197,19 +200,28 @@ class Model implements ISoftDeletable
         if ($context instanceof Folder) {
             return $this->setFolder($context)
                         ->setUnitImplementation(null)
-                        ->setUnitSpecification(null);
+                        ->setUnitSpecification(null)
+                        ->setProject(null);
         } elseif ($context instanceof UnitSpecification) {
             return $this->setFolder(null)
                         ->setUnitImplementation(null)
-                        ->setUnitSpecification($context);
+                        ->setUnitSpecification($context)
+                        ->setProject(null);
         } elseif ($context instanceof UnitImplementation) {
             return $this->setFolder(null)
                         ->setUnitImplementation($context)
-                        ->setUnitSpecification(null);
+                        ->setUnitSpecification(null)
+                        ->setProject(null);
+        } elseif ($context instanceof Project) {
+            return $this->setFolder(null)
+                        ->setUnitImplementation(null)
+                        ->setUnitSpecification(null)
+                        ->setProject($context);
         } else {
             return $this->setFolder(null)
                         ->setUnitImplementation(null)
-                        ->setUnitSpecification(null);
+                        ->setUnitSpecification(null)
+                        ->setProject(null);
         }
     }
 
