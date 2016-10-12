@@ -1,0 +1,20 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{##
+ # Show different breadcrumbs based on context.
+ #
+ # In Folder:
+ # [ folder.name, '/homepage/' ~ context.folder.id ]
+ #
+ #
+if context is project:
+    [ context.name, edit project URL ]
+    set context to project.context
+[ "Unit Specification", '/course/' ~ context.id ] if context is unit spec
+[ "Assessments in " ~ context.name, '/course/modify/' ~ context.id ] if context is unit impl
+[ 'Create Assessment', '#' ]
+
+#}
+{% macro crumbs(context) %}
+
+{% endmacro %}
