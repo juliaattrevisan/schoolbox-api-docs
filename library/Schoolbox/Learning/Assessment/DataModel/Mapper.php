@@ -47,12 +47,12 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        // Joins to:
+        // Type joins (what type of assessment is this?)
         // * task
         // * due work
         // * quiz
         // * project
-        // are defined without a related field, because they don't have a matching key in this mapper
+        // These are defined without a related field, because they don't have a matching key in this mapper
         // (that isn't this mapper's PK)
         $this->hasJoin(
             'task',
@@ -87,7 +87,11 @@ class Mapper extends BaseMapper
             ]
         );
 
-        // folder (by assessment_folder table)
+        // Context joins (where does this assessment live?)
+        // * folder (via assessment_folder)
+        // * unit specification (via assessment_course_unit_specification)
+        // * unit implementation (via assessment_course_unit_implementation)
+        // * project (via project_assessment)
         $this->joinsVia(
             'assessment_folder',
             FolderMapper::class,
@@ -99,8 +103,6 @@ class Mapper extends BaseMapper
             null,
             'folder'
         );
-
-        // unit specification (by assessment_course_unit_specification table)
         $this->joinsVia(
             'assessment_course_unit_specification',
             UnitSpecificationMapper::class,
@@ -112,8 +114,6 @@ class Mapper extends BaseMapper
             null,
             'unitSpecification'
         );
-
-        // unit implementation (by assessment_course_unit_implementation table)
         $this->joinsVia(
             'assessment_course_unit_implementation',
             UnitImplementationMapper::class,
@@ -124,6 +124,17 @@ class Mapper extends BaseMapper
             self::TYPE_MODEL,
             null,
             'unitImplementation'
+        );
+        $this->joinsVia(
+            'project_assessment',
+            ProjectMapper::class,
+            'id',
+            'project_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'project'
         );
     }
 
@@ -209,11 +220,16 @@ class Mapper extends BaseMapper
             // Context (whatever it might be)
             $context = null;
             if ($row['f.id']) {
+                // Folder
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
+
             } elseif ($row['us.id']) {
+                // Unit spec
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
                     ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
+
             } elseif ($row['ui.id']) {
+                // Unit impl
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui')
                     ->setCourse(
                         $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
@@ -221,6 +237,7 @@ class Mapper extends BaseMapper
                                  $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
                              )
                     );
+
             }
             $model->setAssessmentContext($context);
 
