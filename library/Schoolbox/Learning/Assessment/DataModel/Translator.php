@@ -11,8 +11,10 @@ use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
@@ -129,6 +131,11 @@ class Translator
             $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
         } elseif ($context instanceof UnitImplementation) {
             $assessmentModel->setAssessmentContext($this->unitImplementationTranslator->translateToDataModel($context));
+        } elseif ($context instanceof Project) {
+            // Can't use translator for projects - it will attempt to translate its sub-assessments,
+            // thus causing an infinite loop.
+            // Set a simplified version instead.
+            $assessmentModel->setAssessmentContext((new ProjectModel())->setId($context->getId()));
         } else {
             throw new UnexpectedValueException('$assessment has no context (folder, unit, unit spec or project)');
         }
@@ -191,7 +198,6 @@ class Translator
         ;
 
         // Translate assessment context
-        // TODO add project context
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
             $assessable->setContext($context);
@@ -199,6 +205,11 @@ class Translator
             $assessable->setContext($this->unitSpecificationTranslator->translateToDomainModel($context));
         } elseif ($context instanceof UnitImplementationModel) {
             $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
+        } elseif ($context instanceof ProjectModel) {
+            // Can't use translator for projects - it will attempt to translate its sub-assessments,
+            // thus causing an infinite loop.
+            // Set a simplified version instead.
+            $assessable->setContext(new Project());
         } else {
             throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
         }
