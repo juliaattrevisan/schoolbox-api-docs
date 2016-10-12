@@ -92,6 +92,135 @@
 
 
     /**
+     * Disable the fieldset to which this mage step applies.
+     * Does NOT automatically close the section.
+     *
+     * @return void
+     */
+    Mage.prototype.disableSection = function () {
+
+        var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        $t.attr('disabled', 'disabled');
+        $t.find('[data-mage-error]').slideUp(slideFast);
+
+        if ($e.data('mage-reset') === undefined) {
+            $e.data('mage-reset', $e.val());
+        }
+        $e.val($e.data('mage-working')).attr('readonly', 'readonly');
+    };
+
+    /**
+     * Enable the fieldset to which this mage step applies.
+     * If the section is closed, this will also open it.
+     *
+     * @return void
+     */
+    Mage.prototype.enableSection = function () {
+
+        var $e = $(this.element);
+
+        $e.closest(this.options.submittable).removeAttr('disabled');
+
+        if ($e.data('mage-reset')) {
+            // reset the submit button text and re-enable it
+            $e.val($e.data('mage-reset')).removeAttr('readonly');
+        }
+
+        // unset the 'submitted' flag
+        $e.removeData('mage-submitted');
+
+        // open this section if it's not already
+        this.openSection();
+    };
+
+    /**
+     * Close the section to which this mage step applies.
+     * If the section is enabled, this will also disable it.
+     *
+     * @return void
+     */
+    Mage.prototype.closeSection = function () {
+
+        this.disableSection();
+
+        var $e = $(this.element);
+
+        // slide away the submit for this section
+        $e.closest('[data-mage-submitrow]').slideUp(slideSlow);
+
+        // also slide away this section's helptext
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
+    };
+
+    /**
+     * Open the section to which this mage step applies.
+     * Does NOT automatically enable the section.
+     *
+     * @return void
+     */
+    Mage.prototype.openSection = function () {
+
+        var $e = $(this.element);
+
+        // slide out the main content wrapper
+        var $content = $e.closest('[data-mage-collapsed]');
+
+        if ($content.hasClass('hide')) {
+            // swap .hide for jQuery.hide()
+            $content.hide().removeClass('hide');
+        }
+
+        $e.closest('[data-mage-collapsed]').slideDown(slideSlow);
+
+        // slide out the submit for this section
+        $e.closest('[data-mage-submitrow]').slideDown(slideSlow);
+
+        // also out this section's helptext
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideDown(slideSlow);
+    };
+
+    /**
+     * Hide the section to which this mage step applies.
+     * This is the more aggressive form of ::closeSection(), hiding *all* the content except the legend
+     *
+     * @return void
+     */
+    Mage.prototype.hideSection = function () {
+
+        var $e = $(this.element);
+
+        var self = this;
+
+        $e.closest('[data-mage-collapsed]').slideUp(slideSlow, function () {
+
+            // at this point you might think "wait what??" - what we're doing is hiding the overall
+            // wrapper of this content, but preparing the content for the next time it's displayed
+            $e.closest('[data-mage-submitrow]').show();
+
+            // also out this section's helptext
+            $e.closest(self.options.submittable).find('[data-mage-helptext]').show();
+
+        });
+    };
+
+    /**
+     * Set the 'current stop' of the trainline to be this section.
+     *
+     * @return void
+     */
+    Mage.prototype.visitSection = function () {
+
+        var thisIsMyStop = $('[data-mage-trainstop=' + this.thisPart + ']');
+
+        var c = this.options.currentStopClass;
+
+        thisIsMyStop.addClass(c).siblings('.'+c).removeClass(c);
+    };
+
+
+    /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      *
      * @param {Object} opts
