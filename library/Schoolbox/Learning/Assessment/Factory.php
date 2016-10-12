@@ -190,6 +190,33 @@ class Factory
             default:
                 throw new \DomainException('select a valid assessment type');
         }
+
+        // Figure out which context it's in
+        // TODO make sure these are real
+        // TODO move these constants
+        $context = null;
+        switch ($this->getContextType()) {
+            case Controller::SPAWN_CONTEXT_FOLDER:
+                $context = new Folder();
+                break;
+
+            case Controller::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
+                $context = new UnitImplementation();
+                break;
+
+            case Controller::SPAWN_CONTEXT_UNIT_SPECIFICATION:
+                $context = new UnitSpecification();
+                break;
+
+            case Controller::SPAWN_CONTEXT_PROJECT:
+                $context = new Project();
+                break;
+
+            default:
+                throw new \DomainException('select a valid context');
+        }
+        $assessment->setContext($context->setId($this->getContextIdentifier()));
+
         return $this->produceFromExistingAssessment($assessment);
     }
 
@@ -293,32 +320,6 @@ class Factory
         /* Decorate with Assessable-specific data
          */
         $decorator->decorate($assessment);
-
-        // Figure out which context as well
-        // TODO make sure these are real
-        // TODO move these constants
-        $context = null;
-        switch ($this->getContextType()) {
-            case Controller::SPAWN_CONTEXT_FOLDER:
-                $context = new Folder();
-                break;
-
-            case Controller::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
-                $context = new UnitImplementation();
-                break;
-
-            case Controller::SPAWN_CONTEXT_UNIT_SPECIFICATION:
-                $context = new UnitSpecification();
-                break;
-
-            case Controller::SPAWN_CONTEXT_PROJECT:
-                $context = new Project();
-                break;
-
-            default:
-                throw new \DomainException('select a valid context');
-        }
-        $assessment->setContext($context->setId($this->getContextIdentifier()));
 
         return $assessment;
     }
