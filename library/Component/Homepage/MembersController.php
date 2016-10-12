@@ -61,6 +61,12 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         if (is_array($userList)) {
             $j = 0;
             foreach ($userList as $user) {
+
+                // Save the servers, kill the loop if we've reached 100
+                if ($j === 100) {
+                    break;
+                }
+
                 $name  = $userHandler->formatName($user);
                 $email = $emailObj->formatEmailFromArray($user);
                 $meta  = $userHandler->getByID($user['uid']);
