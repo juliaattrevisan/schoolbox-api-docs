@@ -40,7 +40,7 @@ class Module extends BaseModule
                 '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
                 '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
                 '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
-                '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
+                '/assessment/unitspec/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
                 /* Edit an assessment with their type-specific data
                  */
