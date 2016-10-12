@@ -156,6 +156,7 @@ class Factory
          */
         $this->setDurationHours(trim($post['durationHours']));
         $this->setDurationMinutes(trim($post['durationMinutes']));
+        $this->setMaxAttempts(intval($post['maxAttempts']));
     }
 
     /**
@@ -255,7 +256,8 @@ class Factory
         } elseif ($assessment instanceof Quiz) {
             $decorator = new QuizDecorator(
                 $this->getDurationHours(),
-                $this->getDurationMinutes()
+                $this->getDurationMinutes(),
+                $this->getMaxAttempts()
             );
 
         } else {
