@@ -490,8 +490,8 @@
         // apply the error text and slide into view
         target.find('[data-mage-error]').hide().html(error).slideDown();
 
-        // reopen this section
-        this.openSection();
+        // re-enable this section (which will implicitly reopen it if it's closed)
+        this.enableSection();
 
         // call the callback
         onXhrFail.call(this.element, error);
