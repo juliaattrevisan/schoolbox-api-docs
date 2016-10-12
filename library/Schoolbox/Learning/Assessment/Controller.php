@@ -889,6 +889,15 @@ class Controller extends Base
      */
     public function getSummaryStudent($assessmentId)
     {
+        // This page is only accessible by students as it relies on the logged in user ID, however a route based permission denied error
+        // doesn't seem appropriate- so just kick anyone else back to a 404 not found error
+
+        if (!$this->getUser()->getRole()->isStudent()) {
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildHtmlOutput("common/error/404.twig", []));
+            return;
+        }
+
         // Replaces /submission/submissionHistory/dueWorkId/studentId
         //       eg /submission/submissionHistory/56/219
 

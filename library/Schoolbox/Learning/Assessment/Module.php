@@ -163,7 +163,11 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, $ruleRegexp,
             new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\HasRole(Role::STUDENT)
+                new Rule\Any(
+                    new Rule\HasRole(Role::STUDENT),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsSuperuser()
+                )
             )
         );
 
