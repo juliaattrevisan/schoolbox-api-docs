@@ -220,7 +220,7 @@
                                 {# Display feedback #}
 
                                 {% if assessable.getParticipant(student).getAllFeedbacks | length %}
-                                    <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
+                                    <a href="{{ routeLookup('learningFeedback.getAssessmentFeedback', { assessmentId: assessable.id, studentId: student.id })" class="icon-view no-text" title="View Feedback"></a>
                                 {% endif %}
 
                                 {# Display attempt icon #}

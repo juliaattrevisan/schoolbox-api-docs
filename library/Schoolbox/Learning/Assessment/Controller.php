@@ -859,21 +859,11 @@ class Controller extends Base
             }
         }
 
-        // Get a friendly summator name
-
-        $summatorName =
-            $project->getSummator() instanceof Minimum ? 'Minimum' :
-                $project->getSummator() instanceof Maximum ? 'Maximum' :
-                    $project->getSummator() instanceof Average ? 'Average' :
-                        $project->getSummator() instanceof WeightedAverage ? 'Weighted Average' :
-                            'None';
-
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'student' => $student,
             'assessment' => $project,
-            'counts' => $counts,
-            'summatorName' => $summatorName
+            'counts' => $counts
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
@@ -949,20 +939,11 @@ class Controller extends Base
 
         // Get a friendly summator name
 
-        $summatorName =
-            $project->getSummator() instanceof Minimum ? 'Minimum' :
-                $project->getSummator() instanceof Maximum ? 'Maximum' :
-                    $project->getSummator() instanceof Average ? 'Average' :
-                        $project->getSummator() instanceof WeightedAverage ? 'Weighted Average' :
-                            'None';
-
-
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'student' => $this->getUser(),
             'assessment' => $project,
-            'counts' => $counts,
-            'summatorName' => $summatorName
+            'counts' => $counts
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
@@ -973,12 +954,11 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/submit/:studentId
      * @level 165
-     * @param IAssessable $project
      * @param DueWork $assessment
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSubmitForm($project, $assessment, User $student)
+    public function getSubmitForm($assessment, User $student)
     {
         // TODO - generate data
 
@@ -1001,10 +981,6 @@ class Controller extends Base
                 break;
             }
         }
-
-        // Kludge to get project object, should be pre-loaded
-
-        $project = $dummyAssessment;
 
         // Retrieve the students responses
 
@@ -1205,12 +1181,21 @@ class Controller extends Base
                 $project->setWeight(40);
                 $project->setCreator($creator);
 
+                $dueWork = self::spawnDueWork();
+                $dueWork->setContext($project);
+
+                $quiz = self::spawnQuiz();
+                $quiz->setContext($project);
+
+                $task = self::spawnTask();
+                $task->setContext($project);
+
                 $project->setAssessables((new Collection())
-                    ->add(self::spawnDueWork())
-                    ->add(self::spawnQuiz())
-                    ->add(self::spawnTask())
-                    ->add(self::spawnTask())
-                    ->add(self::spawnTask())
+                    ->add($dueWork)
+                    ->add($quiz)
+                    ->add($task)
+                    ->add($task)
+                    ->add($task)
                 );
 
                 return $project;
@@ -2288,10 +2273,10 @@ class Controller extends Base
                 ->setName($typeName))
             ->setCreator($somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($hodes))
-                ->add(new Participant($bsalem))
-                ->add(new Participant($sberryhill))
-                ->add(new Participant($asaxon)))
+                ->add(new Participant($hodes, $dueWork))
+                ->add(new Participant($bsalem, $dueWork))
+                ->add(new Participant($sberryhill, $dueWork))
+                ->add(new Participant($asaxon, $dueWork)))
             ->setWeight(5)
             ->setAcceptOnline(true)
             ->setAcceptsMultiple(true)
@@ -2399,9 +2384,9 @@ class Controller extends Base
             ->setDescription($description)
             ->setCreator($celia)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($hodes))
-                ->add(new Participant($sberryhill))
-                ->add(new Participant($asaxon)))
+                ->add(new Participant($hodes, $task))
+                ->add(new Participant($sberryhill, $task))
+                ->add(new Participant($asaxon, $task)))
             ->setWeight(4)
             ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
@@ -2497,13 +2482,13 @@ class Controller extends Base
         $dateFormat = 'Y-m-d H:i:s';
         $dateInit = '2016-09-08 11:30:00';
 
-        $quiz = (new Quiz())
-            ->setId($id)
+        $quiz = new Quiz();
+        $quiz->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($somodio)
             ->setWeight(8)
-            ->setAllParticipants((new Collection())->add(new Participant($hodes)))
+            ->setAllParticipants((new Collection())->add(new Participant($hodes, $quiz)))
             ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))

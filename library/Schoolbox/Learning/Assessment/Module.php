@@ -55,7 +55,7 @@ class Module extends BaseModule
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary'             => 'getSummaryStudent',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummaryStaff',
-                '/assessment/{projectId}/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
+                '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
             'POST' => [
 
