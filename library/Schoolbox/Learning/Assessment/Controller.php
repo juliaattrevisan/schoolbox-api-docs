@@ -357,13 +357,90 @@ class Controller extends Base
      */
     public function postCreateAssessment()
     {
-        $assessment = null;
+        $this->persistAssessment();
+    }
 
+    /**
+     * Update an existing Assessment's details
+     *
+     * @param int $assessmentId
+     */
+    public function getUpdateAssessment($assessmentId)
+    {
+        $assessmentType = null;
+        $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
+        $folder         = $assessment->getContext()->getFolder();
+        if ($assessment instanceof Task) {
+            $assessmentType = Types::ASSESSMENT_TASK;
+        } elseif ($assessment instanceof Quiz) {
+            $assessmentType = Types::ASSESSMENT_QUIZ;
+        } elseif ($assessment instanceof DueWork) {
+            $assessmentType = Types::ASSESSMENT_DUE_WORK;
+        } elseif ($assessment instanceof Project) {
+            $assessmentType = Types::ASSESSMENT_PROJECT;
+        }
+
+        /* Twig payload
+         */
+        $data = [
+            'assessment' => $assessment,
+            'assessmentType' => $assessmentType,
+            'folder' => $folder,
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+        ];
+
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+
+            /* Special treatment for projects for now
+             */
+            if ($types->isProject($assessmentType)) {
+                $data['types']         = $types;
+                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
+                $data['allSummators']  = new SummatorMapping();
+            }
+
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
+        }
+        else {
+            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            return;
+        }
+    }
+
+    /**
+     * Save the data when creating a specific kind of Assessment
+     *
+     * This happens after the common details are saved and after
+     * you've chosen one of project, due work, task, or quiz
+     *
+     * @param $assessmentId
+     */
+    public function postUpdateAssessment($assessmentId)
+    {
+        $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+    }
+
+    /**
+     * Generic method for create/update of an assessment.
+     *
+     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     */
+    protected function persistAssessment(IAssessable $assessment = null)
+    {
         /* Figure out what kind of assessment was chosen
          * and spawn a new instance of it to manipulate
          */
         try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+            $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
+
+            if ($assessment instanceof IAssessable) {
+                $assessment = $assessmentFactory->produceFromExistingAssessment($assessment);
+            } else {
+                $assessment = $assessmentFactory->produce();
+            }
 
             /* Manually do a check
              */
@@ -448,97 +525,6 @@ class Controller extends Base
         else {
             $this->getResponse()->redirect->to($returnUrl);
         }
-    }
-
-    /**
-     * Update an existing Assessment's details
-     *
-     * @param int $assessmentId
-     */
-    public function getUpdateAssessment($assessmentId)
-    {
-        $assessmentType = null;
-        $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
-        $folder         = $assessment->getContext()->getFolder();
-        if ($assessment instanceof Task) {
-            $assessmentType = Types::ASSESSMENT_TASK;
-        } elseif ($assessment instanceof Quiz) {
-            $assessmentType = Types::ASSESSMENT_QUIZ;
-        } elseif ($assessment instanceof DueWork) {
-            $assessmentType = Types::ASSESSMENT_DUE_WORK;
-        } elseif ($assessment instanceof Project) {
-            $assessmentType = Types::ASSESSMENT_PROJECT;
-        }
-
-        /* Twig payload
-         */
-        $data = [
-            'assessment' => $assessment,
-            'assessmentType' => $assessmentType,
-            'folder' => $folder,
-            'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
-        ];
-
-        $types = new Types();
-
-        if ($types->isValidIndex($assessmentType)) {
-
-            /* Special treatment for projects for now
-             */
-            if ($types->isProject($assessmentType)) {
-                $data['types']         = $types;
-                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
-                $data['allSummators']  = new SummatorMapping();
-            }
-
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
-        }
-        else {
-            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-            return;
-        }
-    }
-
-    /**
-     * Save the data when creating a specific kind of Assessment
-     *
-     * This happens after the common details are saved and after
-     * you've chosen one of project, due work, task, or quiz
-     *
-     * @param $assessmentId
-     */
-    public function postUpdateAssessment($assessmentId)
-    {
-        // Use Steve's factory to update existing fields
-        try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))
-                ->produceFromExistingAssessment($this->getAssessmentDataSource()->findById($assessmentId));
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                return;
-            }
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-
-        // TODO figure out sequence
-        $this->assessmentDataSource->save($assessment, 1);
-
-        // Now what?
     }
 
     /**
