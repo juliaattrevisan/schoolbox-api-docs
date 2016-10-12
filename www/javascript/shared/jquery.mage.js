@@ -466,7 +466,7 @@
         onXhrDone.call(this.element, data);
 
         // if this is not the final section, the submit for the next section should be available, albeit hidden
-        var nextMage = $(':submit[name="' + this.nextPart +  '"]');
+        var nextMage = $('[name="' + this.nextPart +  '"]');
 
         if (nextMage.length) {
             // enable and show the next section
