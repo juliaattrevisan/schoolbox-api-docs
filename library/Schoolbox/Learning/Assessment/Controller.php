@@ -486,6 +486,10 @@ class Controller extends Base
         try {
             if ($context instanceof Folder) {
 
+                /* TODO: Pass contextId as a param into this method
+                 * It should be obtained from the routes
+                 */
+
                 /* You only get contextId when you're Creating, not updating
                  */
                 if ($this->getRequest()->post['contextId']) {
