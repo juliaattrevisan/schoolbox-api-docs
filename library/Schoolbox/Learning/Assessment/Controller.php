@@ -873,7 +873,7 @@ class Controller extends Base
     /**
      * @param $assessmentId
      */
-    public function getSummaryList($assessmentId)
+    public function getSummaryParticipants($assessmentId)
     {
         $project = self::getDummyAssessment($assessmentId);
 
@@ -908,7 +908,7 @@ class Controller extends Base
             'assessment' => $project,
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaffList.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaffParticipants.twig", $twigData));
     }
 
     /**
@@ -923,7 +923,7 @@ class Controller extends Base
     {
         if (!$this->getUser()->getRole()->isStudent()) {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate("learningAssessment.getSummaryList", ['assessmentId' => $assessmentId])
+                $this->getRouter()->generate("learningAssessment.getSummaryParticipants", ['assessmentId' => $assessmentId])
             );
             return;
         }
@@ -960,10 +960,12 @@ class Controller extends Base
 
             $participant = $assessable->getParticipant($this->getUser());
 
-            switch ($assessable->getTypeName()) {
-                case 'Quiz': $type = "quiz"; break;
-                case 'Task': $type = "task"; break;
-                default: $type = "dueWork"; break;
+            if ($assessable instanceof Quiz) {
+                $type = "quiz";
+            } else if ($assessable instanceof Task) {
+                $type = "task";
+            } else {
+                $type = "dueWork";
             }
 
             $counts[$type]++;
@@ -2517,37 +2519,37 @@ class Controller extends Base
 
         $completion->getAllFeedback()->add($feedback);
 
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($hodes)->getAllResponses()->add($completion);
             $task->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($sberryhill)->getAllResponses()->add($completion);
             $task->getParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($sberryhill)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($slucier)->getAllResponses()->add($completion);
             $task->getParticipant($slucier)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($slucier)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($bsalem)->getAllResponses()->add($completion);
             $task->getParticipant($bsalem)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($bsalem)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($asaxon)->getAllResponses()->add($completion);
             $task->getParticipant($asaxon)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($asaxon)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($celia)->getAllResponses()->add($completion);
             $task->getParticipant($celia)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($celia)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1,2) <= 1) {
             $task->getParticipant($somodio)->getAllResponses()->add($completion);
             $task->getParticipant($somodio)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($somodio)->getAllFeedbacks()->add($floatingFeedback);

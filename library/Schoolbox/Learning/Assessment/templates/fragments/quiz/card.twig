@@ -1,0 +1,23 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<li class="actions-small-1">
+    <div class="list-item">
+        <div class="card wrap-down small-12">
+            <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+            <a href="{{ '/assess/intro/' ~ assessable.id }}">
+                <h3>
+                    {{ assessable.title }}
+                </h3>
+            </a>
+            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                Due {{ assessable.getDueAt.getRelativeTime }}
+            </p>
+        </div>
+    </div>
+    <nav>
+        {% if type == 'student' %}
+            <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
+        {% endif %}
+    </nav>
+</li>
+
