@@ -51,6 +51,27 @@
         // wrap the interceptor so we can clear and reset it for overloading
         var onclick = function (e) { clickIntercept(e, self, $elem, $form); };
 
+        var onrevert = function (e) {
+            e.preventDefault();
+
+            self.options.confirmRevert.call($(this).closest('[data-mage-trainstop]'), e, function () {
+                // if this callback is called by the confirmation, perform the reversion
+                var sectionToRestore = $(self.element).closest(self.options.submittable);
+                var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
+
+                sectionsToClear.find(':submit').mage('hide');
+
+                // enable this section (which will also open it)
+                self.enableSection();
+
+                // set the trainline to the correct stop
+                self.visitSection();
+            });
+        };
+
+        // prevent double-listen of reversion
+        $('[data-mage-trainstop=' + this.thisPart + '] a').off('click', onrevert).on('click', onrevert);
+
         // prevent submissions on click and prevent double-listen
         $elem.off('click', onclick).on('click', onclick);
     }
@@ -302,7 +323,7 @@
             target = elem.closest(self.options.submittable);
 
         // do the prep-work
-        xhrBefore.call(self, target);
+        xhrBefore.call(self);
 
         // send it off
         xhrSend.call(self, method, action, target)
@@ -354,7 +375,7 @@
                 xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
             })
             .always(function (/*xhrOrData, status, xhrOrError*/) {
-                xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
+                xhrAlways.call(mage, mage.options.onXhrAlways);
             });
     }
 
@@ -405,16 +426,9 @@
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
-     *
-     * @param {jQuery} target
      */
-    function xhrBefore(target) {
-        target.attr('disabled', 'disabled');
-        target.find('[data-mage-error]').slideUp(slideFast);
-
-        var $e = $(this.element);
-
-        $e.data('mage-reset', $e.val()).val($e.data('mage-working')).attr('readonly', 'readonly');
+    function xhrBefore() {
+        this.disableSection();
     }
 
 
@@ -430,15 +444,11 @@
         // ensure the error is slidden away (although onBefore should have handled it)
         target.find('[data-mage-error]').slideUp(slideSlow);
 
-        // slide away the submit for this section
-        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideSlow);
+        // mark this section as being submitted, preventing repeat submissions
+        $(this.element).data('mage-submitted', true);
 
-        // also slide away this section's helptext
-        $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
-
-        // slide out the target section
-        var next = $('[data-mage="' + $(this.element).data('mage-next') +  '"]');
-        next.removeAttr('disabled');
+        // close this section
+        this.closeSection();
 
         /* Enable the fieldset and then inject the dom fragment in
          * selectize (and perhaps other plugins) won't re-enable themselves if the
@@ -446,10 +456,21 @@
          * locked/unlocked state - but previously, instantiation was into a disabled
          * fieldset, so you have to manually re-enable them which is terrible
          */
+        $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
+
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
 
-        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(slideSlow);
+        // if this is not the final section, the submit for the next section should be available, albeit hidden
+        var nextMage = $(':submit[name="' + this.nextPart +  '"]');
+
+        if (nextMage.length) {
+            // enable and show the next section
+            nextMage.mage('enable');
+
+            // set the trainline to the next stop
+            nextMage.mage('visit');
+        }
     }
 
 
@@ -465,11 +486,8 @@
         // apply the error text and slide into view
         target.find('[data-mage-error]').hide().html(error).slideDown();
 
-        target.removeAttr('disabled');
-
-        var $e = $(this.element);
-
-        $e.val($e.data('mage-reset')).removeAttr('readonly');
+        // reopen this section
+        this.openSection();
 
         // call the callback
         onXhrFail.call(this.element, error);
@@ -480,13 +498,12 @@
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      *
      * @param {Function} onXhrAlways
-     * @param {jQuery} target
      */
-    function xhrAlways(onXhrAlways, target) {
+    function xhrAlways(onXhrAlways) {
 
         // re-enable if requested
         if (this.options.reenablePrevious) {
-            target.removeAttr('disabled');
+            this.enableSection();
         }
 
         // call the callback
