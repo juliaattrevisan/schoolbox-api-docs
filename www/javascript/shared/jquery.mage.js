@@ -75,17 +75,25 @@
 
         } else if (typeof options === 'string') {
             // if this is a function request
-            var mage = this.eq(0).data(plugin);
+            return this.each(function () {
+                var mage = $(this).data(plugin);
 
-            if (typeof mage === 'undefined') {
-                throw "Mage not initialised";
-            }
+                if (typeof mage === 'undefined') {
+                    throw "Mage not initialised";
+                }
 
-            // return the thing I'm pointing at
-            if (options === 'next' || options === 'target') {
-                return $('[data-mage="' + $(mage.element).data('mage-next') + '"]');
-            }
+                // return the thing I'm pointing at
+                if (options === 'next' || options === 'target') {
+                    return $('[data-mage="' + $(mage.element).data('mage-next') + '"]');
+                }
 
+                // attempt a method call
+                var method = options + 'Section';
+
+                if (method in mage) {
+                    return mage[method].call(mage);
+                }
+            });
         }
 
     };
