@@ -272,9 +272,10 @@
         // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
 
         var allValid = true;
-        $.each(getEventHandlers(e.target, 'validate'), function(idx, obj){
+
+        $.each(getEventHandlers(e.target, 'validate'), function (idx, obj) {
             // Quit as soon as we know data is invalid (don't merge errors)
-            if(allValid && undefined !== obj['type'] && 'validate' === obj['type']){
+            if (allValid && undefined !== obj['type'] && 'validate' === obj['type']) {
                 var validator = obj.handler.call(e.target);
                 if (validator !== undefined) {
                     if (!validator['result']) {
@@ -285,7 +286,8 @@
                 }
             }
         });
-        if(!allValid){
+
+        if (!allValid) {
             return;
         }
 
@@ -345,13 +347,13 @@
                 type: method,
                 data: formSerial
             })
-            .done(function (data, status, xhr) {
+            .done(function (data/*, status, xhr*/) {
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
-            .fail(function (xhr, status, error) {
+            .fail(function (xhr/*, status, error*/) {
                 xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
             })
-            .always(function (xhrOrData, status, xhrOrError) {
+            .always(function (/*xhrOrData, status, xhrOrError*/) {
                 xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
             });
     }
