@@ -1,12 +1,19 @@
 {# usage:
     {% import '@sub/breadcrumbs.twig' as bread  %}
     {{ bread.crumbs([ label, href ], ...) }} # note the variadic nature of this function
+    {{ bread.crumbsArray([[ label, href ], ...]) }} # note the non-variadic nature of this function
 #}
+
 {% macro crumbs() %}
-    {# preprocess varargs to strip blanks, in lieu of an array_filter |filter #}
+    {% import _self as self %}
+    {{ self.crumbsArray(varargs) }}
+{% endmacro %}
+
+{% macro crumbsArray(crumbsArray) %}
+    {# preprocess crumbsArray to strip blanks, in lieu of an array_filter |filter #}
     {% set crumbs = [] %}
 
-    {% for i in varargs if i[0] %}
+    {% for i in crumbsArray if i[0] %}
         {% set crumbs = crumbs|merge([ i ]) %}
     {% endfor %}
 
@@ -21,10 +28,15 @@
 
 {# Basic version of breadcrumbs #}
 {% macro basic() %}
-    {# preprocess varargs to strip blanks, in lieu of an array_filter |filter #}
+    {% import _self as self %}
+    {{ self.basicArray(varargs) }}
+{% endmacro %}
+
+{% macro basicArray(crumbsArray) %}
+    {# preprocess crumbsArray to strip blanks, in lieu of an array_filter |filter #}
     {% set crumbs = [] %}
 
-    {% for i in varargs if i[0] %}
+    {% for i in crumbsArray if i[0] %}
         {% set crumbs = crumbs|merge([ i ]) %}
     {% endfor %}
 
