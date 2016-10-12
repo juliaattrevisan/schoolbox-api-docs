@@ -19,6 +19,15 @@
             <li class="icon-info">Sections in this form are dependent on the sections before them.</li>
             <li class="icon-star">For the magically-inclined, a progressive form is <u><strong>almost</strong></u> a Wizard. So it's more like a Mage.</li>
         </ul>
+    </div>
+    <div class="small-12 island">
+        <ul class="train-line">
+            <li data-mage-trainstop="part-1"{% if not hashUsed %} class="current-stop"{% endif %}><a class="icon-anchor">First Fieldset</a></li>
+            <li data-mage-trainstop="part-2"><a class="icon-modify">Section Two</a></li>
+            <li data-mage-trainstop="part-3"><a class="icon-blog">Call and Response</a></li>
+            <li data-mage-trainstop="part-4"{% if hashUsed %} class="current-stop"{% endif %}><a class="icon-reply">Presume to Resume</a></li>
+            <li data-mage-trainstop="part-5"><a class="icon-undo">The First Amendment</a></li>
+        </ul>
         <h2 class="subheader">One Form, Many Fieldsets</h2>
         <form action="/pantry/formForm.php" method="post" data-mage-preventsubmit="true">
             <section>
@@ -118,12 +127,12 @@
                         <p>
                             There are times when you need to save a parent entity before allowing creation of sub-entities,
                             so that ID's exist and can be linked up. You can also <em>resume</em> partial forms,
-                            since every time you press a submit button (every section), you're saving data to the DB (or in this example, your session).
+                            since every time you press a submit button (every section), you have the option of saving data to the DB (or in this example, your session).
                         </p>
                         <p>
                             For example, your input to this form can be recovered by <a href="/pantry/form-progressive/{{ key }}">tacking '/{{ key }}' onto the URL</a>.<br/>
                             {% if hashUsed %}<strike>{% endif %}
-                            Go on, give it a try. It will, via a synchronous page load, restore you to this point in the form.
+                            Go on, give it a try. It will&mdash;via a synchronous page load&mdash;restore you to this point in the form.
                             {% if hashUsed %}
                                 </strike><br/>See? Easy peasy. (You probably wouldn't display different output like this, but it was a way to force you to see the effect.)
                             {% endif %}
@@ -137,26 +146,29 @@
                                 <input type="submit" name="part-4" value="Riiight" data-mage-next="part-5" data-mage-working="Working..." />
                             </div>
                         </div>
+                        {% else %}
+                            {# this is here so the js has something to hook onto #}
+                            <input type="hidden" data-mage-next="part-5" name="part-4" value="1" />
                         {% endif %}
                     </div>
                 </fieldset>
                 <fieldset data-mage="part-5" class="content" disabled="disabled">
-                    <legend>Backward in Going Forward</legend>
+                    <legend>The First Amendment</legend>
                     <input type="hidden" name="key" value="{{ key }}" />
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <p>Did you make a mistake in one of the inputs? Need to make a change?</p>
-                        <p>Right now, the only mechanism to 'revert' is via a resume-point, but future functionality could include the ability to restore a form section.</p>
+                        <p>Did you make a mistake in one of the inputs? Need to make a change? Click one of the stops on the trainline at the top, and you can revert back to that step.</p>
                         <p>In this final step, there's a callback that collapses all non-input content, so you get the final overview of what you're about to submit and save.</p>
                     </div>
                     <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                    <input type="hidden" data-mage-next="none" name="part-5" value="1" />
                 </fieldset>
             </section>
             <div class="row" data-mage="part-5">
                 <div class="small-12 column hide" data-mage-collapsed>
                     <ul class="meta">
-                        <li class="icon-info">This final submit isn't technically part of the progressive, so it doesn't strictly need a <code>[name]</code></li>
+                        <li class="icon-info">Even though this final submit isn't technically part of the progressive, it still needs the correct <code>[name]</code></li>
                     </ul>
-                    <input type="submit" value="Finish, Save, Done." />
+                    <input type="submit" data-mage-next="none" name="part-5" value="Finish, Save, Done." />
                 </div>
             </div>
         </form>
@@ -167,7 +179,15 @@
 <script type="text/javascript">
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        $('input[data-mage-next]').mage();
+        $('input[data-mage-next]').mage({
+            confirmRevert: function (e, revert) {
+                // verify that we aren't trying to go FORWARD
+                if (this.nextAll('.current-stop').length > 0) {
+                    $('fieldset[data-mage]').find('[data-mage-collapsefinal]').slideDown();
+                    revert();
+                }
+            }
+        });
 
         // overload with specific callbacks (or other config values)
         $('input[data-mage-next="part-3"]').mage({
@@ -180,8 +200,19 @@
         $('input[data-mage-next="part-5"]').mage({
             onXhrDone: function (data) {
                 $('fieldset[data-mage]').find('[data-mage-collapsefinal]').slideUp();
+                $('[data-mage="part-5"]').find('[data-mage-collapsed]').hide().removeClass('hide').slideDown();
                 $(this).closest('form').removeAttr('data-mage-preventsubmit');
             }
         });
+
+        $('input[data-mage-next="none').mage({
+            setFormData: function (formData) {
+                formData.push({ name: 'key', value: '{{ key }}' });
+            },
+            onXhrDone: function (data) {
+                // "refresh" the page
+                $('#content').html(data);
+            }
+        })
     });
 </script>
