@@ -101,6 +101,7 @@ class Controller extends BaseController
     /**
      * Display update folder screen
      *
+     * @api GET /resource/folder/modify/:folderId
      * @param $id
      * @throws SchoolboxException
      */
@@ -355,6 +356,7 @@ class Controller extends BaseController
     /**
      * Update a folders details
      *
+     * @api POST /resource/folder/update
      * @throws SchoolboxException
      */
     public function postUpdateFolder()
