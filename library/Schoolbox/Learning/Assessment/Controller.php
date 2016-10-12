@@ -383,7 +383,7 @@ class Controller extends Base
             ]));
         }
         else {
-            $this->getResponse()->redirect->to($assessmentInfo['redirect']);
+            $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
         }
     }
 
