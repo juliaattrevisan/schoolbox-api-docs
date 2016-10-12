@@ -1,47 +1,56 @@
 <?php
-error_reporting(E_ERROR);
-try{ini_set("memory_limit","255M");}catch(Exception $e){}
-//  Freeing up memory where available improoves performance on larger dictionaries.
-$token = "TINYMCE-SPELL.FP5ENHR5LUNMZA.RXKXD.5P791YVKK.LEXGM.LVFMF.1xOEMPRODUCT";
+// Nanospell, rewritten to use PHP pspell for its backend.
 $rawPostData = file_get_contents('php://input');
 $post        = json_decode($rawPostData);
-require('lib.php');
-require('spellcheck.php');
+
+$broker = enchant_broker_init();
+
+// Dictionaries, in order of preference
+// TODO figure out how dictionaries should be installed
+$dicts = [
+    enchant_broker_request_dict($broker, 'en_AU'),
+];
+
 if (!$post->id) {
-	die("JSON Data sent in unexpected format for Nanospell");
-} //!$post->id
+    die("JSON Data sent in unexpected format for Nanospell");
+}
 if ($post->method == 'spellcheck') {
-	echo '{"id":"' . protect($post->id) . '","result": {';
-	$first = true;
-	foreach ($post->params->words as $word) {
-		if (!$spellcheckObject->SpellCheckWord($word)) {
-			if ($first) {
-				$first = false;
-			} //$first
-			else {
-				echo ",";
-			}
-		 		$suggestions = $spellcheckObject->Suggestions($word);
-				$strsuggestions = "[";
-				for ($i = 0; $i < count($suggestions); $i++) {
-						if ($i > 0) {
-								$strsuggestions .= ",";
-						} //$i > 0
-						$strsuggestions .= '"' . protect($suggestions[$i]) . '"';
-				} //$i = 0; $i < count($suggestions) && $i < MAX_SUGGESTIONS; $i++
-				$strsuggestions .= "]";
-			$word = protect($word);
-			echo "\"$word\":$strsuggestions";
-		} //!$spellcheckObject->SpellCheckWord($word)
-	} //$post->params->words as $word
-	echo '}}';
-} //$post->method == 'spellcheck'
+    $structure = [
+        'id'     => $post->id,
+        'result' => []
+    ];
+    foreach ($post->params->words as $word) {
+        $correctInAnyLanguage = false;
+        $corrections          = [];
+
+        // Check each dictionary
+        foreach ($dicts as $dict) {
+            $suggestions = [];
+            if (!enchant_dict_quick_check($dict, $word, $suggestions)) {
+                // Only a small number of suggestions per dict
+                $suggestions = array_slice($suggestions, 10);
+                // Are there any suggestions for this word? Use only this dictionary
+                if (!empty($suggestions)) {
+                    $corrections = array_merge($corrections, $suggestions);
+                    break;
+                }
+            } else {
+                $correctInAnyLanguage = true;
+                break;
+            }
+        }
+
+        // If this word is correct in any language, then don't show corrections for other langs.
+        if (!$correctInAnyLanguage) {
+            $structure['result'][$word] = $corrections;
+        }
+
+    }
+    echo json_encode($structure);
+}
 if ($post->method == 'listdicts') {
-	echo '{"id":"' . $post->id . '","result": {';
-	$dictionaries = $spellcheckObject->ListDictionaries();
-	echo '"dicts": ["' . implode('","', $dictionaries) . '"]';
-	echo '}';
-	echo '}';
-} //$post->method == 'listdicts'
-
-
+    echo json_encode([
+        'id'    => $post->id,
+        'dicts' => ['en'],
+    ]);
+}

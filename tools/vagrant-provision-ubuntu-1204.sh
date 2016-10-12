@@ -160,7 +160,9 @@ sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/s
 sed -i 's/var\/log\/apache2/vagrant/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 a2ensite schoolbox-dav.conf
-#puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
+# ensure javascript-common is removed
+# ensure php5-enchant and myspell-en-au are installed
+puppet apply -e 'package { "javascript-common": ensure => absent } package { "php5-enchant": ensure => latest } package { "myspell-en-au": ensure => latest }' > /dev/null;
 
 echo "$vag Enabling Schoolbox nginx vhost";
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
