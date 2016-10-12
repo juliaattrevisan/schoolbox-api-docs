@@ -37,6 +37,7 @@ use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use UnexpectedValueException;
+use Schoolbox\Resource\Folder\Code\Mapper as ClassCodeMapper;
 
 class Controller extends BaseController
 {
@@ -65,8 +66,8 @@ class Controller extends BaseController
     /** @var Access */
     protected $access;
 
-    /** @var Code\Mapper */
-    protected $codeMapper;
+    /** @var ClassCodeMapper */
+    protected $classCodeMapper;
 
     /** @var Curriculum\Node\Mapper */
     protected $curriculumNodeMapper;
@@ -92,7 +93,7 @@ class Controller extends BaseController
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setAccess(Access::getInstance());
-        $this->setCodeMapper(Code\Mapper::getInstance());
+        $this->setClassCodeMapper(ClassCodeMapper::getInstance());
         $this->setCurriculumNodeMapper(Curriculum\Node\Mapper::getInstance());
         $this->setGroupMapper(GroupMapper::getInstance());
         $this->setFileMapper(FileMapper::getInstance());
@@ -396,7 +397,7 @@ class Controller extends BaseController
     public function persistFolder($postData, User $user)
     {
         $folderMapper     = $this->getFolderMapper();
-        $codeMapper       = $this->getCodeMapper();
+        $classCodeMapper  = $this->getClassCodeMapper();
         $userAccessMapper = $this->getUserAccessMapper();
         $roleAccessMapper = $this->getRoleAccessMapper();
         $access           = $this->getAccess();
@@ -431,7 +432,7 @@ class Controller extends BaseController
         if ($postData['inherit'] == 1) {
 
             // If inheriting permissions we need to remove any existing class codes...
-            $codeMapper->deleteByColumn('folder_id', $postData['categoryID']);
+            $classCodeMapper->deleteByColumn('folder_id', $postData['categoryID']);
 
             // ...and user access permissions...
             $userAccessMapper->deleteByColumnList([
@@ -443,7 +444,7 @@ class Controller extends BaseController
             $roleAccessMapper->deleteByColumn("cid", $postData["categoryID"]);
         }
 
-        // apply codes
+        // apply Class + Curriculum codes
         $this->setCodesOnFolder(
             $model,
             $postData['code'],
@@ -503,11 +504,11 @@ class Controller extends BaseController
      */
     protected function setCodesOnFolder(Model $model, $classCodeString, $curriculumCodes, User $user)
     {
-        $codeMapper           = $this->getCodeMapper();
+        $classCodeMapper      = $this->getClassCodeMapper();
         $curriculumNodeMapper = $this->getCurriculumNodeMapper();
         $folderMapper         = $this->getFolderMapper();
 
-        $codeCollection       = $codeMapper->createCollection();
+        $codeCollection       = $classCodeMapper->createCollection();
 
         $existingModel = $folderMapper->findById($model->getId());
 
@@ -517,7 +518,7 @@ class Controller extends BaseController
             foreach (explode(',', $classCodeString) as $code) {
                 $trimmedCode = trim($code);
                 if (strlen($trimmedCode)) {
-                    $codeModel = $codeMapper->createModel();
+                    $codeModel = $classCodeMapper->createModel();
                     $codeModel->setCode($trimmedCode);
                     $codeCollection->add($codeModel);
                 }
@@ -532,7 +533,7 @@ class Controller extends BaseController
         // (I'm not confident that deleting cat codes in the postSave method
         //  regardless of whether there are any won't break somewhere else)
         if ($user->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
-            $codeMapper->deleteByColumn('folder_id', $model->getId());
+            $classCodeMapper->deleteByColumn('folder_id', $model->getId());
         }
 
         // Only privileged users (teachers?) get to change curriculum codes?
@@ -923,21 +924,21 @@ class Controller extends BaseController
 
 
     /**
-     * @return Code\Mapper
+     * @return ClassCodeMapper
      */
-    protected function getCodeMapper()
+    protected function getClassCodeMapper()
     {
-        return $this->codeMapper;
+        return $this->classCodeMapper;
     }
 
 
     /**
-     * @param Code\Mapper $codeMapper
+     * @param ClassCodeMapper $classCodeMapper
      * @return static
      */
-    public function setCodeMapper($codeMapper)
+    public function setClassCodeMapper($classCodeMapper)
     {
-        $this->codeMapper = $codeMapper;
+        $this->classCodeMapper = $classCodeMapper;
         return $this;
     }
 
