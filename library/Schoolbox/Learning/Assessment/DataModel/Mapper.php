@@ -250,7 +250,12 @@ class Mapper extends BaseMapper
                 $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
             }
             foreach ($modelList as $model) {
-                $submodel = $model->getSubObject();
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
                 if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
                     $submodel->setAttachments($files[$submodel->getId()]);
                 }

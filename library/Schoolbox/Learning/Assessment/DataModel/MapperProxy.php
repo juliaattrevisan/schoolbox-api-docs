@@ -107,8 +107,7 @@ class MapperProxy
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->baseMapper->findByColumn('us.id', $unitSpecId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
     }
 
     /**
@@ -120,8 +119,7 @@ class MapperProxy
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->baseMapper->findByColumn('ui.id', $unitImplId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
     }
 
     /**
@@ -133,8 +131,7 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->baseMapper->findByColumn('f.id', $folderId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
     }
 
     /**
@@ -243,6 +240,30 @@ class MapperProxy
         $subModel->setAssessmentModel($model);
 
         return $this->translator->translateToDomainModel($subModel);
+    }
+
+    /**
+     * Translates a collection of data models to a domain object.
+     *
+     * Any broken data models just get skipped.
+     *
+     * @param Collection|Model[] $collection
+     * @return Collection|IAssessable[]
+     */
+    public function translateToDomainModelCollection(Collection $collection)
+    {
+        $newCollection = new Collection();
+        foreach ($collection as $model) {
+            if ($model instanceof Model) {
+                try {
+                    $newCollection->add($this->translateToDomainModel($model));
+                } catch (\UnexpectedValueException $e) {
+                    // Broken object from database - not much I can do but...
+                    continue;
+                }
+            }
+        }
+        return $newCollection;
     }
 
     /**
