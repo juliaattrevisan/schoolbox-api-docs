@@ -264,7 +264,7 @@
                                 <article>
                                     {# Content of article #}
                                     <p class="spaced">
-                                        {{ record.getBodyText() | cutSentence(375, true) | raw }}
+                                        {{ record.getBodyText() | purify | cutSentence(375, true)  }}
                                     </p>
                                     {% if record.getAttachmentList.count() > 0 %}
                                         <p class="spaced meta">
