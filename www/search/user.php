@@ -248,7 +248,6 @@ function renderStudent(
     // TODO make preg_replace available to Twig
     // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
     // TODO make $now available to Twig by default
-    $userObject = $userMapper->findById($user['uid']);
     $userObject->loadParents();
 
     $page->setFile(TEMPLATE_content, 'output.html');
