@@ -173,39 +173,64 @@ class Factory
         switch($this->getType()) {
             case Types::ASSESSMENT_PROJECT:
                 $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
-                $decorator = new ProjectDecorator();
                 break;
 
             case Types::ASSESSMENT_DUE_WORK:
                 $assessment = new DueWork();
-                $decorator = new DueWorkDecorator(
-                    $this->getAcceptOnline(),
-                    $this->getMarkType(),
-                    $this->getGradingScheme(),
-                    $this->getHasRubric(),
-                    $this->getHasMarkPerCapability(),
-                    $this->getMaxMark()
-                );
                 break;
 
             case Types::ASSESSMENT_TASK:
                 $assessment = new Task();
-                $decorator = new TaskDecorator(
-                    $this->getHasSelfAssessed(),
-                    $this->getUrl()
-                );
                 break;
 
             case Types::ASSESSMENT_QUIZ:
                 $assessment = new Quiz();
-                $decorator = new QuizDecorator(
-                    $this->getDurationHours(),
-                    $this->getDurationMinutes()
-                );
                 break;
 
             default:
                 throw new \DomainException('select a valid assessment type');
+        }
+        return $this->produceFromExistingAssessment($assessment);
+    }
+
+    /**
+     * Produce object from an existing assessment
+     *
+     * @param IAssessable $assessment
+     * @return DueWork|Project|Quiz|Task
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    public function produceFromExistingAssessment(IAssessable $assessment)
+    {
+        if ($assessment instanceof Project) {
+            $decorator = new ProjectDecorator();
+
+        } elseif ($assessment instanceof DueWork) {
+            $decorator = new DueWorkDecorator(
+                $this->getAcceptOnline(),
+                $this->getMarkType(),
+                $this->getGradingScheme(),
+                $this->getHasRubric(),
+                $this->getHasMarkPerCapability(),
+                $this->getMaxMark()
+            );
+
+        } elseif ($assessment instanceof Task) {
+            $decorator = new TaskDecorator(
+                $this->getHasSelfAssessed(),
+                $this->getUrl()
+            );
+
+        } elseif ($assessment instanceof Quiz) {
+            $decorator = new QuizDecorator(
+                $this->getDurationHours(),
+                $this->getDurationMinutes()
+            );
+
+        } else {
+            throw new \DomainException('select a valid assessment type');
         }
 
         /* Check required data
