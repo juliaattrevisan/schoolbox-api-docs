@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
@@ -216,10 +217,17 @@ class Translator
             $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
 
         } elseif ($context instanceof ProjectModel) {
-            // Can't use translator for projects - it will attempt to translate its sub-assessments,
-            // thus causing an infinite loop.
-            // Set a simplified version instead.
-            $assessable->setContext(new Project());
+            // Need to be careful when translating project:
+            // any constituent assessments need to be removed, otherwise they
+            // will attempt to hydrate their children, which will hydrate this
+            // again, and so on...
+            $context->setAssessments(new Collection());
+            $translatedContext = $this->translateToDomainModel($context);
+            if ($translatedContext instanceof Project) {
+                $assessable->setContext($translatedContext);
+            } else {
+                throw new UnexpectedValueException('$dataModel is a project, but its context is not for some reason!');
+            }
 
         } else {
             throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
