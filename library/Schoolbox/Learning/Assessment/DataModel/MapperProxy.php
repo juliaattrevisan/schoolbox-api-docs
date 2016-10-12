@@ -158,6 +158,15 @@ class MapperProxy
     {
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable, $sequence);
+
+        // Folder context translation:
+        // Look up the data model's assessment object ID, and translate to a project ID
+        $context = $dataModel->getAssessmentContext();
+        if ($context instanceof Project) {
+            $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
+            $context->setId($project->getId());
+        }
+
         $this->baseMapper->save($dataModel);
 
         // Set fields on the domain model object
