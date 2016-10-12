@@ -8,8 +8,7 @@ $broker = enchant_broker_init();
 // Dictionaries, in order of preference
 // TODO figure out how dictionaries should be installed
 $dicts = [
-    enchant_broker_request_dict($broker, 'en'),
-//    enchant_broker_request_dict($broker, 'fr'),
+    enchant_broker_request_dict($broker, 'en_AU'),
 ];
 
 if (!$post->id) {
@@ -42,13 +41,10 @@ if ($post->method == 'spellcheck') {
         }
 
         // If this word is correct in any language, then don't show corrections for other langs.
-        if ($correctInAnyLanguage) {
-            continue;
-        }
-
-        if (!empty($corrections)) {
+        if (!$correctInAnyLanguage) {
             $structure['result'][$word] = $corrections;
         }
+
     }
     echo json_encode($structure);
 }
