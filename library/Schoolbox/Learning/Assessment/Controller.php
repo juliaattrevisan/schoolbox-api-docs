@@ -357,7 +357,15 @@ class Controller extends Base
      */
     public function postCreateAssessment()
     {
-        $this->persistAssessment();
+        try {
+            $this->persistAssessment();
+        }
+        catch (\RuntimeException $e) {
+
+            /* Return Early to let mage deal with error messages
+             */
+            return;
+        }
     }
 
     /**
@@ -420,47 +428,35 @@ class Controller extends Base
      */
     public function postUpdateAssessment($assessmentId)
     {
-        $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+        try {
+            $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+        }
+        catch (\RuntimeException $e) {
+
+            /* Return Early to let mage deal with error messages
+             */
+            return;
+        }
     }
 
     /**
      * Generic method for create/update of an assessment.
      *
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by actual controller methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
+     *
      * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     * @return void
      */
     protected function persistAssessment(IAssessable $assessment = null)
     {
-        /* Figure out what kind of assessment was chosen
-         * and spawn a new instance of it to manipulate
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
          */
-        try {
-            $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
-
-            if ($assessment instanceof IAssessable) {
-                $assessment = $assessmentFactory->produceFromExistingAssessment($assessment);
-            } else {
-                $assessment = $assessmentFactory->produce();
-            }
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                return;
-            }
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
+        $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
 
         // Verify that the context of the assessment is valid
         // TODO replace returnUrl values once I know what they should actually be
@@ -526,11 +522,6 @@ class Controller extends Base
                 'assessmentId' => $assessment->getId(),
                 'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
             ]));
-
-            return;
-        }
-        else {
-            $this->getResponse()->redirect->to($returnUrl);
         }
     }
 
@@ -583,7 +574,12 @@ class Controller extends Base
     public function postCreateAssessmentWithinProject()
     {
         // Persist within context of a project
-        $this->persistAssessment();
+        try {
+            $this->persistAssessment();
+        }
+        catch (\RuntimeException $e) {
+            return;
+        }
 
         $data = [
             'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
@@ -613,6 +609,48 @@ class Controller extends Base
 
         $this->getResponse()->redirect->to($redirect);
         return;
+    }
+
+    /**
+     * Figure out what kind of assessment was chosen
+     * and spawn a new instance of it to manipulate
+     *
+     * @param $data
+     * @param IAssessable|null $assessment
+     * @return IAssessable $assessment
+     */
+    private function produceAssessment($data, IAssessable $assessment = null)
+    {
+        try {
+            $assessmentFactory = new Factory($this->getUser(), $data);
+
+            if ($assessment instanceof IAssessable) {
+                $assessment = $assessmentFactory->produceFromExistingAssessment($assessment);
+            } else {
+                $assessment = $assessmentFactory->produce();
+            }
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                throw new \RuntimeException;
+            }
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+
+        return $assessment;
     }
 
     /* Utility methods - these can probably be refactored elsewhere
