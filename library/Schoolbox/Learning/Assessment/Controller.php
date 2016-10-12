@@ -358,13 +358,32 @@ class Controller extends Base
     public function postCreateAssessment()
     {
         try {
-            $this->persistAssessment();
+            $assessmentInfo = $this->persistAssessment();
         }
         catch (\RuntimeException $e) {
 
             /* Return Early to let mage deal with error messages
              */
             return;
+        }
+
+        /* If it were a project, go back to the project's Update screen
+         * Otherwise return to the homepage
+         */
+        $types = new Types();
+
+        if ($assessmentInfo['assessment'] instanceof Project) {
+
+            /* Continue as normal
+             */
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
+                'types' => $types,
+                'assessmentId' => $assessmentInfo['assessment']->getId(),
+                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']->getId()),
+            ]));
+        }
+        else {
+            $this->getResponse()->redirect->to($assessmentInfo['redirect']);
         }
     }
 
@@ -429,7 +448,7 @@ class Controller extends Base
     public function postUpdateAssessment($assessmentId)
     {
         try {
-            $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+            $assessmentInfo = $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
         }
         catch (\RuntimeException $e) {
 
@@ -437,6 +456,8 @@ class Controller extends Base
              */
             return;
         }
+
+        $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
     }
 
     /**
@@ -447,7 +468,7 @@ class Controller extends Base
      * the returnUrl is manipulated by javascript in particular contexts
      *
      * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
-     * @return void
+     * @return array
      */
     protected function persistAssessment(IAssessable $assessment = null)
     {
@@ -461,39 +482,72 @@ class Controller extends Base
         // Verify that the context of the assessment is valid
         // TODO replace returnUrl values once I know what they should actually be
         $context = $assessment->getContext();
+
         try {
             if ($context instanceof Folder) {
-                $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
-                $returnUrl = "/homepage/{$context->getId()}";
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
 
             } elseif ($context instanceof UnitImplementation) {
-                $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
-                $returnUrl = "/homepage/{$context->getId()}";
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
 
             } elseif ($context instanceof UnitSpecification) {
-                $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
-                $returnUrl = "/homepage/{$context->getId()}";
 
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
             } elseif ($context instanceof Project) {
+
                 /* Check that you don't spawn a Project in a Project
                  */
                 if ($assessment instanceof Project) {
                     $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
-                    return;
+                    return [];
                 }
 
-                // TODO figure out what to do about this
-                $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
-                $returnUrl = "/homepage/{$context->getId()}";
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+
+                    // TODO figure out what to do about this
+                    $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
 
             } else {
                 $this->sendError('Could not create assessment', [ 'select a valid context' ]);
-                return;
+                return [];
             }
 
         } catch (MapperException $e) {
             $this->sendError('Could not create assessment', [ 'select a valid context' ]);
-            return;
+            return [];
         }
 
         // Don't change sequence if already in sequence - otherwise put at end
@@ -508,21 +562,10 @@ class Controller extends Base
         // And save
         $this->getAssessmentDataSource()->save($assessment, $sequence);
 
-        /* If it were a project, go back to the project's Update screen
-         * Otherwise return to the homepage
-         */
-        $types = new Types();
-
-        if ($assessment instanceof Project) {
-
-            /* Continue as normal
-             */
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => $types,
-                'assessmentId' => $assessment->getId(),
-                'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
-            ]));
-        }
+        return [
+            'assessment' => $assessment,
+            'returnUrl' => $returnUrl
+        ];
     }
 
     /**
@@ -581,6 +624,9 @@ class Controller extends Base
             return;
         }
 
+        /* Use the returnUrl specified in querystring instead
+         * TODO: Maybe can infer it based on output of $this->persistAssessment?
+         */
         $data = [
             'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
         ];
