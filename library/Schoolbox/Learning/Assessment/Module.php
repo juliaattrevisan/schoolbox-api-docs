@@ -53,6 +53,7 @@ class Module extends BaseModule
                 /* Temporary methods
                  */
                 '/assessment/{assessmentId}/status'              => 'getStatus',
+                '/assessment/{assessmentId}/list'                => 'getSummaryList',
                 '/assessment/{assessmentId}/summary'             => 'getSummaryStudent',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummaryStaff',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',

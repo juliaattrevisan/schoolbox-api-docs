@@ -4,15 +4,14 @@
 {{ bread.crumbs(
 [ 'Learning',    '#' ],
 [ 'Classname',   '#' ],
-[ student.getFullName,   '#' ],
-[ assessment.title,   '#' ]
+[ assessment.title,   routeLookup('learningAssessment.getSummaryList', {assessmentId: assessment.id}) ],
+[ student.getFullName,   '#' ]
 ) }}
 
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }} - {{ student.getFullName }}</h1>
 
-        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, type: 'staff'} %}
         {% include '@learningAssessment/fragments/project/timeline.twig' with {assessment: assessment, type: 'staff'} %}
         {% include '@learningAssessment/fragments/project/progress.twig' with {counts: counts} %}
 

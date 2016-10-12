@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use Guzzle\Common\Exception\UnexpectedValueException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
@@ -870,6 +871,47 @@ class Controller extends Base
     }
 
     /**
+     * @param $assessmentId
+     */
+    public function getSummaryList($assessmentId)
+    {
+        $project = self::getDummyAssessment($assessmentId);
+
+        // Calculate summary totals for display purposes
+
+        $participants = $project->getAllParticipants();
+
+        $counts = [];
+
+        foreach ($participants as $participant) {
+            $counts[$participant->getId()] = [
+                'total' => 0,
+                'totalCompleted' => 0,
+            ];
+        }
+
+        $assessables = $project->getAssessables();
+
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
+            foreach ($assessable->getAllParticipants() as $participant) {
+                $counts[$participant->getUser()->getId()]['total']++;
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                }
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'counts' => $counts,
+            'assessment' => $project,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaffList.twig", $twigData));
+    }
+
+    /**
      * Displays specified student's progress in relation to a specified assessable
      *
      * @api   GET /learning/assessment/:assessmentId/summary/:studentId
@@ -879,12 +921,10 @@ class Controller extends Base
      */
     public function getSummaryStudent($assessmentId)
     {
-        // This page is only accessible by students as it relies on the logged in user ID, however a route based permission denied error
-        // doesn't seem appropriate- so just kick anyone else back to a 404 not found error
-
         if (!$this->getUser()->getRole()->isStudent()) {
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildHtmlOutput("common/error/404.twig", []));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate("learningAssessment.getSummaryList", ['assessmentId' => $assessmentId])
+            );
             return;
         }
 
@@ -936,8 +976,6 @@ class Controller extends Base
                 $counts['totalCompleted']++;
             }
         }
-
-        // Get a friendly summator name
 
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
@@ -1167,6 +1205,14 @@ class Controller extends Base
         switch($assessmentId){
             case 7: // project (object)
 
+                $hodes = UserMapper::getInstance()->findById(230);
+                $sberryhill = UserMapper::getInstance()->findById(15);
+                $slucier = UserMapper::getInstance()->findById(16);
+                $bsalem = UserMapper::getInstance()->findById(32);
+                $asaxon = UserMapper::getInstance()->findById(17);
+                $celia = UserMapper::getInstance()->findById(3);
+                $somodio = UserMapper::getInstance()->findById(150);
+
                 $summatorTest = new \Schoolbox\Learning\Assessment\Test\SummatorTest();
 
                 $project = new Project(new Minimum());
@@ -1180,6 +1226,16 @@ class Controller extends Base
                 $project->setCloseAt(new Alaress_Date_Format('2016/11/09','Y/m/d'));
                 $project->setWeight(40);
                 $project->setCreator($creator);
+
+                $project->setAllParticipants((new Collection())
+                    ->add($hodes)
+                    ->add($sberryhill)
+                    ->add($slucier)
+                    ->add($bsalem)
+                    ->add($asaxon)
+                    ->add($celia)
+                    ->add($somodio)
+                );
 
                 $dueWork = self::spawnDueWork();
                 $dueWork->setContext($project);
@@ -2274,9 +2330,13 @@ class Controller extends Base
             ->setCreator($somodio)
             ->setAllParticipants((new Collection())
                 ->add(new Participant($hodes, $dueWork))
-                ->add(new Participant($bsalem, $dueWork))
                 ->add(new Participant($sberryhill, $dueWork))
-                ->add(new Participant($asaxon, $dueWork)))
+                ->add(new Participant($slucier, $dueWork))
+                ->add(new Participant($bsalem, $dueWork))
+                ->add(new Participant($asaxon, $dueWork))
+                ->add(new Participant($celia, $dueWork))
+                ->add(new Participant($somodio, $dueWork))
+            )
             ->setWeight(5)
             ->setAcceptOnline(true)
             ->setAcceptsMultiple(true)
@@ -2310,8 +2370,35 @@ class Controller extends Base
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($hodes)->getAllResponses()->add($submission);
-        $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($hodes)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($sberryhill)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($slucier)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($slucier)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($bsalem)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($asaxon)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($celia)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($celia)->getAllFeedbacks()->add($feedback);
+        }
+        if (rand(1,3) <= 1) {
+            $dueWork->getParticipant($somodio)->getAllResponses()->add($submission);
+            $dueWork->getParticipant($somodio)->getAllFeedbacks()->add($feedback);
+        }
+
 
         $submission->getAllFeedback()->add($feedback);
 
@@ -2386,8 +2473,12 @@ class Controller extends Base
             ->setAllParticipants((new Collection())
                 ->add(new Participant($hodes, $task))
                 ->add(new Participant($sberryhill, $task))
-                ->add(new Participant($asaxon, $task)))
-            ->setWeight(4)
+                ->add(new Participant($slucier, $task))
+                ->add(new Participant($bsalem, $task))
+                ->add(new Participant($asaxon, $task))
+                ->add(new Participant($celia, $task))
+                ->add(new Participant($somodio, $task))
+            )->setWeight(4)
             ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
@@ -2426,9 +2517,41 @@ class Controller extends Base
 
         $completion->getAllFeedback()->add($feedback);
 
-        $task->getParticipant($hodes)->getAllResponses()->add($completion);
-        $task->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
-        $task->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($hodes)->getAllResponses()->add($completion);
+            $task->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($sberryhill)->getAllResponses()->add($completion);
+            $task->getParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($sberryhill)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($slucier)->getAllResponses()->add($completion);
+            $task->getParticipant($slucier)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($slucier)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($bsalem)->getAllResponses()->add($completion);
+            $task->getParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($bsalem)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($asaxon)->getAllResponses()->add($completion);
+            $task->getParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($asaxon)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($celia)->getAllResponses()->add($completion);
+            $task->getParticipant($celia)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($celia)->getAllFeedbacks()->add($floatingFeedback);
+        }
+        if (rand(1,3) <= 1) {
+            $task->getParticipant($somodio)->getAllResponses()->add($completion);
+            $task->getParticipant($somodio)->getAllFeedbacks()->add($feedback);
+            $task->getParticipant($somodio)->getAllFeedbacks()->add($floatingFeedback);
+        }
 
         return $task;
     }
@@ -2488,7 +2611,18 @@ class Controller extends Base
             ->setDescription($description)
             ->setCreator($somodio)
             ->setWeight(8)
-            ->setAllParticipants((new Collection())->add(new Participant($hodes, $quiz)))
+
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($hodes, $quiz))
+                ->add(new Participant($sberryhill, $quiz))
+                ->add(new Participant($slucier, $quiz))
+                ->add(new Participant($bsalem, $quiz))
+                ->add(new Participant($asaxon, $quiz))
+                ->add(new Participant($celia, $quiz))
+                ->add(new Participant($somodio, $quiz))
+            )
+
+
             ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
@@ -2521,7 +2655,22 @@ class Controller extends Base
 
         $attempt->getAllFeedback()->add($feedback);
 */
+        if (rand(1,2) <= 1)
         $quiz->getParticipant($hodes)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($sberryhill)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($slucier)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($bsalem)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($asaxon)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($celia)->getAllResponses()->add($attempt);
+        if (rand(1,2) <= 1)
+        $quiz->getParticipant($somodio)->getAllResponses()->add($attempt);
+
+
         //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
         return $quiz;
