@@ -96,7 +96,9 @@
 
         } else if (typeof options === 'string') {
             // if this is a function request
-            return this.each(function () {
+            var rtn = [];
+
+            this.each(function () {
                 var mage = $(this).data(plugin);
 
                 if (typeof mage === 'undefined') {
@@ -105,16 +107,18 @@
 
                 // return the thing I'm pointing at
                 if (options === 'next' || options === 'target') {
-                    return $('[data-mage="' + $(mage.element).data('mage-next') + '"]');
+                    rtn.push($('[data-mage="' + $(mage.element).data('mage-next') + '"]'));
                 }
 
                 // attempt a method call
                 var method = options + 'Section';
 
                 if (method in mage) {
-                    return mage[method].call(mage);
+                    rtn.push(mage[method].call(mage));
                 }
             });
+
+            return $($.map(rtn, function (el) { return $.makeArray(el) } ));
         }
 
     };
