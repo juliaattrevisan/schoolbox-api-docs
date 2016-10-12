@@ -232,7 +232,9 @@ class Factory
     public function produceFromExistingAssessment(IAssessable $assessment)
     {
         if ($assessment instanceof Project) {
-            $decorator = new ProjectDecorator();
+            $decorator = new ProjectDecorator(
+                $this->getMarkType()
+            );
 
         } elseif ($assessment instanceof DueWork) {
             $decorator = new DueWorkDecorator(
