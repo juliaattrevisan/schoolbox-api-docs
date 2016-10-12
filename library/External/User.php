@@ -141,7 +141,7 @@ class External_User implements External_UserInterface {
 	/**
 	 * Retrieves a teacher or student's subject list
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @return Array
 	 */
 	function getSubjectList (User $user) {
