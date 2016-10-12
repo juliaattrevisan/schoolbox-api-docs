@@ -8,6 +8,7 @@
  */
 
 use Alaress\Redis;
+use Schoolbox\User;
 
 class External_User implements External_UserInterface {
 
@@ -140,11 +141,10 @@ class External_User implements External_UserInterface {
 	/**
 	 * Retrieves a teacher or student's subject list
 	 *
-	 * @param Integer $externalUserId
-	 * @param Integer $userID
+	 * @param \Schoolbox\User $user
 	 * @return Array
 	 */
-	function getSubjectList ($externalUserId, $userID) {
+	function getSubjectList (User $user) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 

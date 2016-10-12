@@ -7,6 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+use Schoolbox\User;
+
 interface External_UserInterface {
 
     /* Student-specific
@@ -415,11 +417,10 @@ interface External_UserInterface {
      * @importance high - used on student profile page, and for determining a
      *             student's memberships.
      *
-     * @param $externalUserId
-     * @param $userId
+     * @param User $user
      * @return array
      */
-    public function getSubjectList($externalUserId, $userId);
+    public function getSubjectList(User $user);
 
     /**
      * Get all the enrolled students belonging to $externalUserId

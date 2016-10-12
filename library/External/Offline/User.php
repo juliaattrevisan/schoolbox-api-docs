@@ -7,6 +7,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\User;
+
 class External_Offline_User implements External_UserInterface
 {
 
@@ -55,7 +57,7 @@ class External_Offline_User implements External_UserInterface
         return null;
     }
 
-    public function getSubjectList($externalUserId, $userId)
+    public function getSubjectList(User $user)
     {
         return array();
     }

@@ -443,7 +443,7 @@ class Session
                         $subjectIDList = array();
 
                         if ($portal['uid']) {
-                            $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
+                            $subjectList = $synUser->getSubjectList($_SESSION['user']);
 
                             if (is_array($subjectList)) {
                                 foreach ($subjectList as $subject) {
@@ -495,7 +495,7 @@ class Session
                 }
             } else {
                 //user is not parent so get timetable information
-                $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
+                $subjectList = $synUser->getSubjectList($_SESSION['user']);
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {

@@ -8,6 +8,9 @@
 /**
  * HumanEdge implementation of user retrieve methods.
  */
+
+use Schoolbox\User;
+
 class External_Humanedge_User implements External_UserInterface
 {
     use External_Humanedge_APlusDatabaseTrait;
@@ -324,17 +327,20 @@ class External_Humanedge_User implements External_UserInterface
     }
 
     /**
-     * @inheritDoc
+     * Returns list of subjects the user is enrolled in
+     *
+     * @param User $user
+     * @return array
      */
-    public function getSubjectList($externalUserId, $userId)
+    public function getSubjectList(User $user)
     {
-        try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
 
-        $quotedId = $this->getDatabase()->smartQuote($externalUserId);
+        $quotedId = $this->getDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives

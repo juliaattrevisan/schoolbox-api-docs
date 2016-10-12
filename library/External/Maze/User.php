@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\User;
+
 class External_Maze_User implements External_UserInterface {
 
 	/**
@@ -633,14 +635,20 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Get a list of subjects for a particular user
 	 *
-	 * @param $externalUserId
-	 * @param $userId
-	 * @return array|bool
+	 * @param User $user
+	 * @return array
 	 */
-	public function getSubjectList($externalUserId, $userId) {
+	public function getSubjectList(User $user)
+    {
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
+        }
+
         $allSubjects = array();
 
-		if ($this->getGroup()->isStudent($userId)) {
+		if ($user->getRole()->isStudent()) {
 
 			/* Get roll groups
 			 */
@@ -655,7 +663,7 @@ class External_Maze_User implements External_UserInterface {
 					KGC.DESCRIPTION AS name
 				FROM ST
 				LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
-				WHERE ST.STKEY = '{$externalUserId}'
+				WHERE ST.STKEY = '{$externalId}'
 			";
 
 			$part1 = $this->getDb()->getAll($query);
@@ -675,7 +683,7 @@ class External_Maze_User implements External_UserInterface {
 					'' AS ClassCampus
 				FROM STMA
 				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
-				WHERE SKEY = '{$externalUserId}'
+				WHERE SKEY = '{$externalId}'
 				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPERIOD()}'
 			";
 
@@ -687,7 +695,7 @@ class External_Maze_User implements External_UserInterface {
 
 			$allSubjects = array_merge($part1, $part2);
 		}
-		else if ($this->getGroup()->isStaff($userId)) {
+		else if ($user->getRole()->isStaff()) {
 			$query = "
 				SELECT
 					KGC.ROLL_GROUP AS ClassCode,
@@ -696,7 +704,7 @@ class External_Maze_User implements External_UserInterface {
 					'' AS ClassCampus,
 					KGC.DESCRIPTION AS name
 				FROM KGC
-				WHERE TEACHER = '{$externalUserId}'
+				WHERE TEACHER = '{$externalId}'
 			";
 
 			$part1 = $this->getDb()->getAll($query);
@@ -715,7 +723,7 @@ class External_Maze_User implements External_UserInterface {
 				FROM THTQ
 				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
 				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-				AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
+				AND (THTQ.T1TEACH = '{$externalId}' OR THTQ.T2TEACH = '{$externalId}')
 			";
 
 			$part2 = $this->getDb()->getAll($query);
@@ -725,7 +733,9 @@ class External_Maze_User implements External_UserInterface {
 			}
 
 			$allSubjects = array_merge($part1, $part2);
-		}
+		} else {
+		    return [];
+        }
 
 		/* Return structure
 		 */

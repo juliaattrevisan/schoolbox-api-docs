@@ -7,6 +7,8 @@
 *                                                           *
 ************************************************************/
 
+use Schoolbox\User;
+
 class External_Tass_User implements External_UserInterface
 {
     /**
@@ -189,33 +191,43 @@ class External_Tass_User implements External_UserInterface
         return $this->getDatabase()->getOne($query);
     }
 
-    function getSubjectList($tassCode, $userID)
+    /**
+     *
+     *
+     * @param User $user
+     * @return array
+     */
+    function getSubjectList(User $user)
     {
-        if (empty($tassCode)) {
-            return false;
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
         }
-        if ($this->groupHandler->isStudent($userID)) {
+
+        if ($user->getRole()->isStudent()) {
             $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, student.year_grp, sub_desc, sub_type
 					FROM studsub
 					JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
 					JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
-					WHERE studsub.stud_code = '$tassCode'
-					AND semester = '{$this->database->quote($this->getCurrentSemester($tassCode))}'
-					AND yr_study = '{$this->database->quote($this->getCurrentYear($tassCode))}'
+					WHERE studsub.stud_code = '$externalId'
+					AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
+					AND yr_study = '{$this->database->quote($this->getCurrentYear($externalId))}'
 					ORDER BY studsub.sub_code ASC, studsub.class ASC
 			";
-        } else if ($this->groupHandler->isStaff($userID)) {
+        } else if ($user->getRole()->isStaff()) {
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, tchsub.year_grp, sub_desc, sub_type
 					FROM tchsub
 					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
-					WHERE tch_code = '$tassCode'
-					AND semester = '{$this->database->quote($this->getCurrentSemester($tassCode))}'
-					AND year_num = '{$this->database->quote($this->getCurrentYear($tassCode))}'
+					WHERE tch_code = '$externalId'
+					AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
+					AND year_num = '{$this->database->quote($this->getCurrentYear($externalId))}'
 					ORDER BY tchsub.sub_code ASC, tchsub.class ASC
 			";
         } else {
-            return false;
+            return [];
         }
+
         $this->getDatabase()->query($sql);
         $subjectList = array();
         while ($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray())) {
@@ -224,10 +236,11 @@ class External_Tass_User implements External_UserInterface
             }
             $subjectList[] = array('code'=>$subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class'], 'name'=>trim($subject['sub_desc']));
         }
+
         if (is_array($subjectList)) {
             return $subjectList;
         } else {
-            return false;
+            return [];
         }
     }
 

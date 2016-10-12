@@ -984,7 +984,7 @@ class User implements JsonSerializable, ISoftDeletable
         // Get all of the students subjects
 
         $found = [];
-        $subjects = $externalUser->getSubjectList($this->getExternalId(), $this->getId());
+        $subjects = $externalUser->getSubjectList(new Schoolbox\User);
 
         // Iterate and find teachers associated with each subject
 

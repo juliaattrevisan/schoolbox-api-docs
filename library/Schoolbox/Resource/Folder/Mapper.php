@@ -859,7 +859,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         if ($get_subjects) {
             $external_user = $this->getExternalUser();
             if ($external_user instanceof External_UserInterface) {
-                $subject_list = $external_user->getSubjectList($user->getExternalId(), $user->getId());
+                $subject_list = $external_user->getSubjectList($user);
                 if (is_array($subject_list) && !empty($subject_list)) {
                     $category_codes = array_map(
                         function ($row) {

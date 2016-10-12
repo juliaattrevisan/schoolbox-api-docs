@@ -7,6 +7,7 @@
  *    This file provides access to Schoolbox user info       *
  *                                                           *
  ************************************************************/
+
 class External_Schoolbox_User implements External_UserInterface
 {
     const RELATION_TYPE_PARENT = 1;
@@ -251,12 +252,21 @@ class External_Schoolbox_User implements External_UserInterface
         return date('Y');
     }
 
-    function getSubjectList($externalUserId, $userId)
+    /**
+     *
+     *
+     * @param User $user
+     * @return array
+     */
+    function getSubjectList(Schoolbox\User $user)
     {
-        if (empty($externalUserId)) {
-            return false;
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
         }
-        $params = array(':externalUserId' => $externalUserId,);
+
+        $params = array(':externalUserId' => $externalId,);
         // Subjects this user is a student in
         $statement = $this->getDatabase()->prepare(
             "

@@ -14,6 +14,9 @@
  * ------\     (__)
  *        `-----"
  */
+
+use Schoolbox\User;
+
 class External_Doublefirst_User implements External_UserInterface
 {
     /**
@@ -806,19 +809,20 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Get a list of subjects for a given student
      *
-     * @param $synergyID
-     * @param $userID
-     * @return array|bool
+     * @param User $user
+     * @return array
      */
-    public function getSubjectList($synergyID, $userID)
+    public function getSubjectList(User $user)
     {
-        if (empty($synergyID)) {
-            return false;
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
         }
 
         $year = $this->getCurrentYear();
 
-        if ($this->getGroup()->isStudent($userID)) {
+        if ($user->getRole()->isStudent()) {
             // Get student subjects
 
             $sql =
@@ -841,9 +845,9 @@ class External_Doublefirst_User implements External_UserInterface
               JOIN                TimetableMaster tn ON tn.TimetableName = tm.TimetableName AND tn.IsWorking = 1 
               JOIN                SubjectMaster sm ON sm.SubjectID = tcr.SubjectID 
               WHERE               tcr.AcademicYear = '{$year}' AND 
-                                  ps.PupilID = '{$synergyID}' 
+                                  ps.PupilID = '{$externalId}' 
             ";
-        } else if ($this->getGroup()->isStaff($userID)) {
+        } else if ($user->getRole()->isStaff()) {
             // Get staff subjects
 
             $sql =
@@ -887,10 +891,10 @@ class External_Doublefirst_User implements External_UserInterface
                 tn.IsWorking = 1
                 
                 WHERE tcr.AcademicYear = '{$year}'
-                AND tcs.StaffID = '{$synergyID}' ORDER BY name
+                AND tcs.StaffID = '{$externalId}' ORDER BY name
             ";
         } else {
-            return false;
+            return [];
         }
 
         $this->getDatabase()->query($sql);
@@ -908,7 +912,7 @@ class External_Doublefirst_User implements External_UserInterface
         if (is_array($subjectList)) {
             return $subjectList;
         } else {
-            return false;
+            return [];
         }
     }
 

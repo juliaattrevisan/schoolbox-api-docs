@@ -6,6 +6,9 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
+use Schoolbox\User;
+
 class External_Pcschools_User implements External_UserInterface
 {
     /**
@@ -824,16 +827,15 @@ class External_Pcschools_User implements External_UserInterface
      * @importance high - used on student profile page, and for determining a
      *             student's memberships.
      *
-     * @param $externalUserId
-     * @param $userId
+     * @param User $user
      *
      * @return array
      */
-    public function getSubjectList($externalUserId, $userId)
+    public function getSubjectList(User $user)
     {
-        try {
-            $user = $this->userMapper->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
 
@@ -846,9 +848,9 @@ class External_Pcschools_User implements External_UserInterface
         }
         foreach ($timePeriods as $timePeriod) {
             if ($user->getRole()->isStudent()) {
-                $studentExternalId = $user->getExternalId();
+                $studentExternalId = $externalId;
             } elseif ($user->getRole()->isStaff()) {
-                $teacherExternalId = $user->getExternalId();
+                $teacherExternalId = $externalId;
             } else {
                 return [];
             }

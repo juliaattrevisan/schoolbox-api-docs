@@ -7,6 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+
 class External_Schoolpro_User implements External_UserInterface
 {
 
@@ -292,21 +295,26 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Get a list of subjects for a particular user
      *
-     * @param $externalUserId
-     * @param $userId
-     * @return array|bool
+     * @param User $user
+     * @return array
      */
-    public function getSubjectList($externalUserId, $userId)
+    public function getSubjectList(User $user)
     {
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
+        }
+
         $groupHandler = new Group();
 
-        if ($groupHandler->isStudent($userId)) {
+        if ($user->getRole()->isStudent()) {
             $vars = array(
                 'sbGetStudentSubjectList',
                 array(
                     array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
                     array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
+                    array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
                 )
             );
 
@@ -326,13 +334,13 @@ class External_Schoolpro_User implements External_UserInterface
 
                 return $subjectList;
             }
-        } else if ($groupHandler->isStaff($userId)) {
+        } else if ($user->getRole()->isStaff()) {
             $vars = array(
                 'sbGetStaffSubjectList',
                 array(
                     array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
                     array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
+                    array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
                 )
             );
 
@@ -356,10 +364,10 @@ class External_Schoolpro_User implements External_UserInterface
                 return $subjectList;
             }
         } else {
-            return false;
+            return [];
         }
 
-        return false;
+        return [];
     }
 
     /**

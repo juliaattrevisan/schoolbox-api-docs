@@ -686,7 +686,7 @@ class Group extends DeprecatedModel
 
         if ($user->getExternalId()) {
             $externalUser = new External_User;
-            $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
+            $externalSubjectList = $externalUser->getSubjectList($user);
 
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {
