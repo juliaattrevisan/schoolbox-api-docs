@@ -61,6 +61,12 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         if (is_array($managerList)) {
             $j = 0;
             foreach ($managerList as $manager) {
+
+                // Save the servers, kill the loop if we've reached 100
+                if ($j === 100) {
+                    break;
+                }
+
                 $name  = $userHandler->formatName($manager);
                 $email = $emailObj->formatEmailFromArray($manager);
                 $meta  = $userHandler->getByID($manager['uid']);
