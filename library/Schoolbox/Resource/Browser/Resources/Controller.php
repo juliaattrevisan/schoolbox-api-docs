@@ -96,6 +96,12 @@ class Controller extends AbstractController
             $data['admin']->setFirstname('Nobody');
         }
 
+        // moving forward! log the folder view
+        $mapper = new \Schoolbox\Resource\Folder\Log\Mapper();
+        $mapper->incrementHitcount($_SESSION['user'], $folderId);
+        $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+        $folderMapper->logPageView($data['folder']);
+
         return $data;
     }
 
