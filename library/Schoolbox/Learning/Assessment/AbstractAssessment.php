@@ -583,6 +583,7 @@ abstract class AbstractAssessment implements IAssessable
     public function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        return $this;
     }
 
     /**

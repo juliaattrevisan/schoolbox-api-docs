@@ -1,0 +1,28 @@
+{# TODO: Replace with real breadcrumbs #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Learning',    '#' ],
+[ 'Classname',   '#' ],
+[ assessment.title,   '#' ]
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, type: 'student'} %}
+        {% include '@learningAssessment/fragments/project/timeline.twig' with {assessment: assessment, type: 'student'} %}
+        {% include '@learningAssessment/fragments/project/progress.twig' with {counts: counts} %}
+
+        <h2 class="subheader">Assessables</h2>
+
+        <section>
+            <ul class="information-list">
+                {% for assessable in assessment.assessables %}
+                    {% include '@learningAssessment/fragments/' ~ (assessable.typeName | lower) ~ '/card.twig' with {assessment: assessment, student: student, assessable: assessable, type: 'student'} %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+{# Set color classes depending on status #}
+
+{% if counts.taskCompleted == counts.task %}
+    {% set taskClass = 'success' %}
+{% elseif counts.taskCompleted < counts.task %}
+    {% set taskClass = 'alert' %}
+{% endif %}
+
+{% if counts.dueWorkCompleted == counts.dueWork %}
+    {% set dueWorkClass = 'success' %}
+{% elseif counts.dueWorkCompleted < counts.dueWork %}
+    {% set dueWorkClass = 'alert' %}
+{% endif %}
+
+{% if counts.quizCompleted == counts.quiz %}
+    {% set quizClass = 'success' %}
+{% elseif counts.quizCompleted < counts.quiz %}
+    {% set quizClass = 'alert' %}
+{% endif %}
+
+{% if counts.totalCompleted == counts.total %}
+    {% set totalClass = 'success' %}
+{% elseif counts.totalCompleted < counts.total %}
+    {% set totalClass = 'alert' %}
+{% endif %}
+
+<h2 class="subheader">Progress</h2>
+<div class="row">
+    <div class="small-12 medium-3 island">
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="list-item">
+                        <div class="card wrap-down small-12">
+                            <a href="#">
+                                <i class="icon-due-work icon-32"></i>
+                            </a>
+                            <p>
+                                Overall Completion
+                            </p>
+                            <p class="meta spaced {{ totalClass }}">{{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}%
+                                Completed</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+    {% if counts.dueWork > 0 %}
+        <div class="small-12 medium-3 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item">
+                            <div class="card wrap-down small-12">
+                                <a href="#">
+                                    <i class="icon-due-work icon-32"></i>
+                                </a>
+                                <p>
+                                    Due Work
+                                </p>
+                                <p class="meta spaced {{ dueWorkClass }}">{{ (counts.dueWorkCompleted / counts.dueWork * 100) | round(1, 'common') }}%
+                                    Submitted</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+    {% if counts.quiz > 0 %}
+        <div class="small-12 medium-3 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item">
+                            <div class="card wrap-down small-12">
+                                <a href="#">
+                                    <i class="icon-quiz icon-32"></i>
+                                </a>
+                                <p>
+                                    Quizzes
+                                </p>
+                                <p class="meta spaced {{ quizClass }}">{{ (counts.quizCompleted / counts.quiz * 100) | round(1, 'common') }}%
+                                    Attempted</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+    {% if counts.task > 0 %}
+        <div class="small-12 medium-3 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item">
+                            <div class="card wrap-down small-12">
+                                <a href="#">
+                                    <i class="icon-task icon-32"></i>
+                                </a>
+                                <p>
+                                    Tasks
+                                </p>
+                                <p class="meta spaced {{ taskClass }}">{{ (counts.taskCompleted / counts.task * 100) | round(1, 'common') }}%
+                                    Attempted</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+</div>

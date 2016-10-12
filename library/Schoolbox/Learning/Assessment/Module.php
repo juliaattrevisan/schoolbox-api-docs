@@ -53,7 +53,9 @@ class Module extends BaseModule
                 /* Temporary methods
                  */
                 '/assessment/{assessmentId}/status'              => 'getStatus',
-                '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
+                '/assessment/{assessmentId}/participants'        => 'getSummaryParticipants',
+                '/assessment/{assessmentId}/summary'             => 'getSummaryStudent',
+                '/assessment/{assessmentId}/summary/{studentId}' => 'getSummaryStaff',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
             'POST' => [
@@ -101,11 +103,12 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummary|getSubmitForm)',
+            '(?:getStatus|getSummaryStudent|getSummaryStaff|getSubmitForm)',
             function ($params) {
 
                 // TODO. Hydrate specified IAssessable
                 $args['assessment'] = $params['assessmentId'];
+                $args['project'] = $params['projectId'];
 
                 if (array_key_exists('studentId', $params)) {
                     try {
@@ -157,7 +160,19 @@ class Module extends BaseModule
         $ruleRegexp = '(?:getStatus)';
         $this->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 
-        $ruleRegexp = '(?:getSummary|getSubmitForm)';
+        $ruleRegexp = '(?:getSummaryStudent)';
+        $this->addRoutePermission($authorizer, $ruleRegexp,
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\HasRole(Role::STUDENT),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsSuperuser()
+                )
+            )
+        );
+
+        $ruleRegexp = '(?:getSubmitForm)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -167,6 +182,18 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                )
+            );
+
+        $ruleRegexp = '(?:getSummaryStaff)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                $ruleRegexp,
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
                 )
             );
     }
