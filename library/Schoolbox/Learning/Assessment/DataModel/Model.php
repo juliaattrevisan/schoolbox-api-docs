@@ -132,25 +132,40 @@ class Model implements ISoftDeletable
     protected $project;
 
     /**
-     * This assessment may be attached to a folder.
+     * This assessment may live within the context of a folder.
+     *
+     * An assessment may only be within a single context.
      *
      * @var Folder
      */
-    protected $folder;
+    protected $contextFolder;
 
     /**
-     * This assessment may be attached to a unit specification.
+     * This assessment may live within the context of a unit specification.
+     *
+     * An assessment may only be within a single context.
      *
      * @var UnitSpecification
      */
-    protected $unitSpecification;
+    protected $contextUnitSpecification;
 
     /**
-     * This assessment may be attached to a unit implementation.
+     * This assessment may live within the context of a unit implementation.
+     *
+     * An assessment may only be within a single context.
      *
      * @var UnitImplementation
      */
-    protected $unitImplementation;
+    protected $contextUnitImplementation;
+
+    /**
+     * This assessment may live within the context of a project.
+     *
+     * An assessment may only be within a single context.
+     *
+     * @var Project
+     */
+    protected $contextProject;
 
     /**
      * Constructor
@@ -173,10 +188,10 @@ class Model implements ISoftDeletable
      */
     public function getAssessmentContext()
     {
-        $folder   = $this->getFolder();
-        $unitSpec = $this->getUnitSpecification();
-        $unitImpl = $this->getUnitImplementation();
-        $project  = $this->getProject();
+        $folder   = $this->getContextFolder();
+        $unitSpec = $this->getContextUnitSpecification();
+        $unitImpl = $this->getContextUnitImplementation();
+        $project  = $this->getContextProject();
         if (isset($folder)) {
             return $folder;
         } elseif (isset($unitSpec)) {
@@ -198,30 +213,30 @@ class Model implements ISoftDeletable
     public function setAssessmentContext(IAssessmentContextDataModel $context = null)
     {
         if ($context instanceof Folder) {
-            return $this->setFolder($context)
-                        ->setUnitImplementation(null)
-                        ->setUnitSpecification(null)
-                        ->setProject(null);
+            return $this->setContextFolder($context)
+                        ->setContextUnitImplementation(null)
+                        ->setContextUnitSpecification(null)
+                        ->setContextProject(null);
         } elseif ($context instanceof UnitSpecification) {
-            return $this->setFolder(null)
-                        ->setUnitImplementation(null)
-                        ->setUnitSpecification($context)
-                        ->setProject(null);
+            return $this->setContextFolder(null)
+                        ->setContextUnitImplementation(null)
+                        ->setContextUnitSpecification($context)
+                        ->setContextProject(null);
         } elseif ($context instanceof UnitImplementation) {
-            return $this->setFolder(null)
-                        ->setUnitImplementation($context)
-                        ->setUnitSpecification(null)
-                        ->setProject(null);
+            return $this->setContextFolder(null)
+                        ->setContextUnitImplementation($context)
+                        ->setContextUnitSpecification(null)
+                        ->setContextProject(null);
         } elseif ($context instanceof Project) {
-            return $this->setFolder(null)
-                        ->setUnitImplementation(null)
-                        ->setUnitSpecification(null)
-                        ->setProject($context);
+            return $this->setContextFolder(null)
+                        ->setContextUnitImplementation(null)
+                        ->setContextUnitSpecification(null)
+                        ->setContextProject($context);
         } else {
-            return $this->setFolder(null)
-                        ->setUnitImplementation(null)
-                        ->setUnitSpecification(null)
-                        ->setProject(null);
+            return $this->setContextFolder(null)
+                        ->setContextUnitImplementation(null)
+                        ->setContextUnitSpecification(null)
+                        ->setContextProject(null);
         }
     }
 
@@ -257,6 +272,8 @@ class Model implements ISoftDeletable
 
     /**
      * Does this have a project?
+     *
+     * This is whether this is a project, not whether this is within the context of one.
      *
      * @return bool
      */
@@ -539,54 +556,72 @@ class Model implements ISoftDeletable
     /**
      * @return Folder
      */
-    public function getFolder()
+    public function getContextFolder()
     {
-        return $this->folder;
+        return $this->contextFolder;
     }
 
     /**
-     * @param Folder $folder
+     * @param Folder $contextFolder
      * @return static
      */
-    public function setFolder(Folder $folder = null)
+    public function setContextFolder(Folder $contextFolder = null)
     {
-        $this->folder = $folder;
+        $this->contextFolder = $contextFolder;
         return $this;
     }
 
     /**
      * @return UnitSpecification
      */
-    public function getUnitSpecification()
+    public function getContextUnitSpecification()
     {
-        return $this->unitSpecification;
+        return $this->contextUnitSpecification;
     }
 
     /**
-     * @param UnitSpecification $unitSpecification
+     * @param UnitSpecification $contextUnitSpecification
      * @return static
      */
-    public function setUnitSpecification(UnitSpecification $unitSpecification = null)
+    public function setContextUnitSpecification(UnitSpecification $contextUnitSpecification = null)
     {
-        $this->unitSpecification = $unitSpecification;
+        $this->contextUnitSpecification = $contextUnitSpecification;
         return $this;
     }
 
     /**
      * @return UnitImplementation
      */
-    public function getUnitImplementation()
+    public function getContextUnitImplementation()
     {
-        return $this->unitImplementation;
+        return $this->contextUnitImplementation;
     }
 
     /**
-     * @param UnitImplementation $unitImplementation
+     * @param UnitImplementation $contextUnitImplementation
      * @return static
      */
-    public function setUnitImplementation(UnitImplementation $unitImplementation = null)
+    public function setContextUnitImplementation(UnitImplementation $contextUnitImplementation = null)
     {
-        $this->unitImplementation = $unitImplementation;
+        $this->contextUnitImplementation = $contextUnitImplementation;
+        return $this;
+    }
+
+    /**
+     * @return Project
+     */
+    public function getContextProject()
+    {
+        return $this->contextProject;
+    }
+
+    /**
+     * @param Project $contextProject
+     * @return static
+     */
+    public function setContextProject(Project $contextProject = null)
+    {
+        $this->contextProject = $contextProject;
         return $this;
     }
 }

@@ -101,7 +101,7 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'folder'
+            'contextFolder'
         );
         $this->joinsVia(
             'assessment_course_unit_specification',
@@ -112,7 +112,7 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'unitSpecification'
+            'contextUnitSpecification'
         );
         $this->joinsVia(
             'assessment_course_unit_implementation',
@@ -123,7 +123,7 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'unitImplementation'
+            'contextUnitImplementation'
         );
         $this->joinsVia(
             'project_assessment',
@@ -134,7 +134,7 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'project'
+            'contextProject'
         );
     }
 
@@ -158,7 +158,9 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')}
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
+                {$this->getJoinColumnString('project_assessment', 'pa')}
+                -- May need to hydrate project's context too!
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd')}
@@ -170,6 +172,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
+            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
         ";
     }
 
@@ -237,6 +240,10 @@ class Mapper extends BaseMapper
                                  $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
                              )
                     );
+
+            } elseif ($row['pa.id']) {
+                // Project
+                $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
 
             }
             $model->setAssessmentContext($context);
