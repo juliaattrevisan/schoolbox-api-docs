@@ -80,7 +80,7 @@ class SubjectMapper extends Schoolbox\External\Mapper
     *
     * @return SubjectCollection
     */
-    public function findAllForStudent(Schoolbox\User $user)
+    public function findAllForStudent(\Schoolbox\User $user)
     {
         $subjects = $this->external_user->getSubjectList($user);
 
