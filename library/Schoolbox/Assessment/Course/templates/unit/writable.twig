@@ -34,9 +34,22 @@
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">
-            <li><a href="/task/create/{{ unit.id }}"        data-reveal-id="createTask-{{ reveals[unit.id].id }}" title="Create a new Task"     class="button icon-task"    >New Task</a></li>
-            <li><a href="/submission/createSubmission/new/{{ unit.id }}/task?return_url={{ returnUrl[unit.id] }}" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
-            <li><a href="/assess/create/{{ unit.id }}/task?return_url={{ returnUrl[unit.id] }}"                   title="Create a new Quiz"     class="button icon-quiz"    >New Quiz</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {folderId: unit.id, assessmentTypeTitle: 'project'}) }}"
+                   title="Create a new Project"
+                   class="button icon-project"
+                >New Project</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {folderId: unit.id, assessmentTypeTitle: 'task'}) }}"
+                   title="Create a new Task"
+                   class="button icon-task"
+                >New Task</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {folderId: unit.id, assessmentTypeTitle: 'dueWork'}) }}"
+                   title="Create a new Due Work"
+                   class="button icon-due-work"
+                >New Due Work</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {folderId: unit.id, assessmentTypeTitle: 'quiz'}) }}"
+                   title="Create a new Quiz"
+                   class="button icon-quiz"
+                >New Quiz</a></li>
         </ul>
     </div>
     <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
