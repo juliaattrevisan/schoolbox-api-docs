@@ -500,10 +500,17 @@ class Controller extends Base
             return;
         }
 
-        /* TODO: Figure out what the sequence# should be
-         * Likely it will be added to the end of the list of assessments
-         */
-        $this->getAssessmentDataSource()->save($assessment, 1);
+        // Don't change sequence if already in sequence - otherwise put at end
+        $sequence = 1;
+        foreach ($this->getAssessmentDataSource()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+            if ($otherAssessment->getId() == $assessment->getId()) {
+                break;
+            }
+            $sequence++;
+        }
+
+        // And save
+        $this->getAssessmentDataSource()->save($assessment, $sequence);
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
