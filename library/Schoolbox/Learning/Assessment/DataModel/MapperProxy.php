@@ -246,7 +246,11 @@ class MapperProxy
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
 
-        return $this->translator->translateToDomainModel($subModel);
+        $assessable = $this->translator->translateToDomainModel($subModel);
+        if ($assessable instanceof ProjectObject) {
+            $assessable->setAssessables($this->findAllForProjectId($subModel->getId()));
+        }
+        return $assessable;
     }
 
     /**
