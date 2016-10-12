@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -187,6 +188,7 @@ class Mapper extends BaseMapper
         /** @var Collection|Model[] $modelList */
         $modelList  = $this->createCollection();
         $dueWorkIds = [];
+        $projectIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
@@ -243,7 +245,11 @@ class Mapper extends BaseMapper
 
             } elseif ($row['pa.id']) {
                 // Project
+                /** @var ProjectModel $context */
                 $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
+
+                // Load context for this project itself
+                $context->setAssessmentModel($this->findById($row['pa.assessment_id']));
 
             }
             $model->setAssessmentContext($context);
