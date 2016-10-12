@@ -17,6 +17,8 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends AbstractController
 {
@@ -83,7 +85,7 @@ class Controller extends AbstractController
         // Redirect to this folder next time page gets reloaded
         $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
-        $data['parent'] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
+        $data['parent'] = FolderMapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
         $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
         $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
 
@@ -95,6 +97,10 @@ class Controller extends AbstractController
             $data['admin'] = new User();
             $data['admin']->setFirstname('Nobody');
         }
+
+        // moving forward! log the folder view
+        FolderLogMapper::getInstance()->incrementHitcount($this->getUser(), $folderId);
+        FolderMapper::getInstance()->logPageView($data['folder']);
 
         return $data;
     }
