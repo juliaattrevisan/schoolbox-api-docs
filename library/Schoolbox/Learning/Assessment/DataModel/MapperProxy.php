@@ -143,9 +143,7 @@ class MapperProxy
      */
     public function findAllForProjectId($projectId, $options = [])
     {
-        // TODO implement
-        // Requires 1..M join onto not yet existent project_assessment
-        return new Collection();
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.id', $projectId, $options));
     }
 
     /**
