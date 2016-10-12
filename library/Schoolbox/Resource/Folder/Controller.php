@@ -429,7 +429,7 @@ class Controller extends BaseController
             throw new OutOfBoundsException("I find your lack of access disturbing.");
         }
 
-        if ($postData['inherit'] == 1) {
+        if ($model->getInherit()) {
 
             // If inheriting permissions we need to remove any existing class codes...
             $classCodeMapper->deleteByColumn('folder_id', $postData['categoryID']);
@@ -476,7 +476,7 @@ class Controller extends BaseController
         // only allow recursive permissions to supers
         $recursive = $user->isSuperuser() && $postData['recursive'];
 
-        if ($postData["inherit"] == 0) {
+        if (!$model->getInherit()) {
             // If rolepermission collection is defined, reapply permissions (possibly recursively)
             $roleAccessMapper->savePermissions($model, $postData['group'], $recursive);
         }
