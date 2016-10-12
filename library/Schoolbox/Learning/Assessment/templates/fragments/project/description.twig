@@ -1,0 +1,9 @@
+<h2 class="subheader">Description</h2>
+<section>
+    <div class="content">
+        {% if type == 'staff' %}
+            <p class="meta">{{ assessment.summator.title }}</p>
+        {% endif %}
+        <p>{{ assessment.description }}</p>
+    </div>
+</section>

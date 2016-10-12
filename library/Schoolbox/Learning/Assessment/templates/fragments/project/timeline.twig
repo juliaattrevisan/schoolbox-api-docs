@@ -1,0 +1,93 @@
+{% if type == 'staff' %}
+    {% set width = 3 %}
+{% else %}
+    {% set width = 6 %}
+{% endif %}
+
+<h2 class="subheader">Timeline</h2>
+<div class="row">
+
+    {% if type == 'staff' %}
+        <div class="small-12 medium-3 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item">
+                            <div class="card wrap-down small-12" title="{{ assessment.getPublishAt.getLocal }}">
+                                <a href="#">
+                                    <i class="icon-clock icon-32"></i>
+                                </a>
+                                <p>
+                                    Published
+                                </p>
+                                <p class="meta spaced">{{ assessment.getPublishAt.getRelativeTime }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+
+    <div class="small-12 medium-{{ width }} island">
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="list-item">
+                        <div class="card wrap-down small-12" title="{{ assessment.getOpenAt.getLocal }}">
+                            <a href="#">
+                                <i class="icon-clock icon-32"></i>
+                            </a>
+                            <p>
+                                Project Open
+                            </p>
+                            <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <div class="small-12 medium-{{ width }} island">
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
+                        <div class="card wrap-down small-12">
+                            <a href="#">
+                                <i class="icon-clock icon-32"></i>
+                            </a>
+                            <p>
+                                Project Due
+                            </p>
+                            <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    {% if type == 'staff' %}
+        <div class="small-12 medium-3 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item" title="{{ assessment.getCloseAt.getLocal }}">
+                            <div class="card wrap-down small-12">
+                                <a href="#">
+                                    <i class="icon-clock icon-32"></i>
+                                </a>
+                                <p>
+                                    Closes
+                                </p>
+                                <p class="meta spaced">{{ assessment.getCloseAt.getRelativeTime }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+</div>

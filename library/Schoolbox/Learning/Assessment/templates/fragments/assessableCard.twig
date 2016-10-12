@@ -1,0 +1,120 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<li class="actions-small-1">
+    {# Work out where each assessables link should go to and pick an icon based on assessment type #}
+
+    {% if assessable is quiz %}
+        {% set url = '/assess/intro/' ~ assessable.id %}            {# Link to the quiz page #}
+    {% elseif assessable is task %}
+        {% set url = assessable.link %}                             {# Link to the task #}
+    {% else %}
+        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
+    {% endif %}
+
+    <div class="list-item">
+        <div class="card wrap-down small-12">
+            <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+            <a href="{{ url }}">
+                <h3>
+                    {{ assessable.title }}
+                </h3>
+            </a>
+            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                Due {{ assessable.getDueAt.getRelativeTime }}
+            </p>
+        </div>
+    </div>
+    <nav>
+        {% if assessable is quiz %}
+
+            {# Quiz #}
+
+            <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz{% if type == 'staff' %} On Behalf Of Student{% endif %}"></a>
+
+        {% elseif assessable is dueWork %}
+
+            {# Due Work #}
+
+            <a href="{{ routeLookup('learningAssessment.getSubmitForm', {projectId: assessment.id, assessmentId: assessable.id, studentId: student.id}) }}" class="icon-modify no-text" title="Submit Response{% if type == 'staff' %} On Behalf Of Student{% endif %}"></a>
+
+        {% endif %}
+    </nav>
+</li>
+
+{# Display list of all responses the student provided #}
+
+{% if assessable is dueWork %}
+
+    {# Check if there was a response #}
+
+    {% if assessable.getParticipant(student).getAllResponses | length %}
+        {% for response in assessable.getParticipant(student).getAllResponses %}
+
+            <li class="actions-small-2">
+                <div class="list-item">
+                    <div class="card small-12">
+                        <div class="row">
+                            <div class="small-12 columns no-pad">
+
+                                {# Check if submission was late and style appropriately #}
+
+                                {% if response.getCreatedAt < assessable.getDueAt %}
+                                    <span class="label status success"
+                                          title="{{ response.getCreatedAt.getLocal }}">Submission Received: {{ response.getCreatedAt.getRelativeTime }}</span>
+                                {% else %}
+                                    <span class="label status alert"
+                                          title="{{ response.getCreatedAt.getLocal }}">Submission Received Late: {{ response.getCreatedAt.getRelativeTime }}</span>
+                                {% endif %}
+
+                            </div>
+
+                            {# Indicate if feedback was provided #}
+
+                            <div class="small-12 columns no-pad">
+                                {% if response.getAllFeedback %}
+                                    <span class="label status success">Feedback Provided</span>
+                                {% else %}
+                                    <span class="label status alert">Feedback Pending</span>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <a href="#" class="icon-view" title="View Submission"></a>
+                </nav>
+            </li>
+
+        {% endfor %}
+
+    {% else %}
+
+        {# No submission was received #}
+
+        <li class="actions-small-2">
+            <div class="list-item">
+                <div class="card small-12">
+                    <div class="row">
+                        <div class="small-12 columns no-pad">
+
+                            {# Check if it is overdue and style appropriately#}
+
+                            {% if assessable.getDueAt.isFuture %}
+                                <span class="label status netural">
+                                    No Submission Received
+                                </span>
+                            {% else %}
+                                <span class="label status alert">
+                                    No Submission Received (Overdue)
+                                </span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+
+    {% endif %}
+{% endif %}
