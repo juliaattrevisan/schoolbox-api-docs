@@ -599,20 +599,19 @@ class Controller extends Base
      */
     public function postDeleteAssessment($assessmentId)
     {
-        /* TODO: soft-delete this assessment
-         */
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        $folder     = $assessment->getContext()->getFolder();
+        $this->getAssessmentDataSource()->delete($assessment);
 
-        /*
-        if ($assessment was inside a Project instance) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
+        // TODO abstract this redirection logic
+        if ($assessment) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
         }
         else {
             $redirect = "/homepage/{$folder->getId()}";
-
         }
 
         $this->getResponse()->redirect->to($redirect);
-        */
         return;
     }
 
