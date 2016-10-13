@@ -99,6 +99,12 @@
                         self.addItem(v[self.settings.valueField])
                     });
                     self.refreshOptions(false);
+                },
+                onOptionRemove: function() {
+                    // OptionRemove: clear loaded searches in case the user wants
+                    // to re-add the one they just deleted (it is removed from
+                    // the cached options when added).
+                    this.loadedSearches = {}
                 }
             },
             value: [],
