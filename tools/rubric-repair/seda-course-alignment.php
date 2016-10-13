@@ -495,7 +495,7 @@ $kernel->run
                 $db->commit();
 
             } catch (PDOException $e) {
-                $log->error('PDOException: ' . $e->getMessage());
+                $log->alert('PDOException: ' . $e->getMessage(), [ $e ]);
                 $log->debug("ABORT TX$instanceBoxId");
                 $db->rollBack();
             }
