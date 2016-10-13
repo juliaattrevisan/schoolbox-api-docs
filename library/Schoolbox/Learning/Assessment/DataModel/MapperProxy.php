@@ -177,29 +177,19 @@ class MapperProxy
 //            ->setDeletedAt($dataModel->getDeletedAt())
         ;
 
-        // Vestigial folder - for now, task/quiz/duework are linked to folders.
-        // This link will disappear eventually.
-        // TODO remove vestigial folder
-        $vestigialFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAll(['limit' => 1])->first();
-
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
         if ($subObject instanceof Task) {
-            $subObject->setCategory($vestigialFolder);
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
-            $subObject
-                ->setCategory($vestigialFolder)
-                ->setRubricResultSet(0)
-            ;
+            $subObject->setRubricResultSet(0);
             DueWorkMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Quiz) {
-            $subObject->setCategory($vestigialFolder);
             QuizMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Project) {
