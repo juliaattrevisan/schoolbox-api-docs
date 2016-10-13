@@ -415,10 +415,8 @@ class Controller extends BaseController
             // check this user has write access
             if ($access->getFolderAccess($user, [ $postData['categoryID'] ]) < UserAccess::ACCESS_WRITE) {
                 throw new OutOfBoundsException("I find your lack of access disturbing.");
-
             }
             $model->setId($postData['categoryID']);
-
         }
         // Or is action INSERT ?
         elseif ($access->getFolderAccess($user, [ $postData['parent'] ]) < UserAccess::ACCESS_WRITE) {
@@ -426,30 +424,21 @@ class Controller extends BaseController
             throw new OutOfBoundsException("I find your lack of access disturbing.");
         }
 
-        // Is this user able to alter permission-inheritance?
-        if($user->isSuperuser()){
-            $canChangePermissionInheritance = true;
-            $originalFolder = null;
+        // Is user SU or creating new Folder ?
+        if($user->isSuperuser() || !$model->getId()){
+            $existingFolder = null;
         } else {
-            // Not a SuperUser. Need to check whether folder already exists and has Class Codes
-            if(is_numeric($postData['categoryID'])) {
-                try {
-                    $originalFolder = $folderMapper->findById($postData['categoryID']);
-                } catch (MapperException\Deleted $e) {
-                    $originalFolder = $e->getDeletedObject();
-                } catch (MapperException $e) {
-                    $originalFolder = null;
-                }
-                // Non-SU can change if folder doesn't exist, or found but has no Class Codes
-                $canChangePermissionInheritance = !$originalFolder || !$originalFolder->getCodes()->count();
-            } else {
-                $canChangePermissionInheritance = true;
-                $originalFolder = null;
+            try {
+                $existingFolder = $folderMapper->findById($model->getId());
+            } catch (MapperException\Deleted $e) {
+                $existingFolder = $e->getDeletedObject();
+            } catch (MapperException $e) {
+                $existingFolder = null;
             }
         }
 
-        if($canChangePermissionInheritance){
-            // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
+        // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
+        if($user->isSuperuser() || !$existingFolder || !$existingFolder->getCodes()->count()){
             if (1 == $postData["inherit"]) {
                 $model->enableInherit();
             } else {
@@ -457,7 +446,7 @@ class Controller extends BaseController
             }
         } else {
             // Ignore form data, and use existing values.
-            if ($originalFolder->getInherit()) {
+            if ($existingFolder->getInherit()) {
                 $model->enableInherit();
             } else {
                 $model->disableInherit();
@@ -479,13 +468,13 @@ class Controller extends BaseController
         // apply Class Codes
         if($user->isSuperuser()){
             $this->setClassCodesOnFolder($model, $postData['code'], $user);
-        } elseif($originalFolder) {
-            $model->setCodes($originalFolder->getCodes());
+        } elseif($existingFolder) {
+            $model->setCodes($existingFolder->getCodes());
         }
 
         // apply Curriculum codes
         $curriculumCodes = (is_array($postData['curriculumCodes']) ? $postData['curriculumCodes'] : []);
-        $this->setCurriculumCodesOnFolder($model, $curriculumCodes, $user);
+        $this->setCurriculumCodesOnFolder($model, $curriculumCodes);
 
         // apply candy
         try {
@@ -540,9 +529,6 @@ class Controller extends BaseController
         $classCodeMapper = $this->getClassCodeMapper();
         $codeCollection  = $classCodeMapper->createCollection();
 
-        $existingModel = $folderMapper->findById($model->getId());
-
-
         // Only superusers get to change class codes
         if ($user->isSuperuser()) {
             foreach (explode(',', $classCodeString) as $code) {
@@ -554,9 +540,6 @@ class Controller extends BaseController
                 }
             }
             $model->setCodes($codeCollection);
-        }
-        else if($model->getId()) {
-            $model->setCodes($existingModel->getCodes());
         }
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
@@ -571,23 +554,17 @@ class Controller extends BaseController
      * Put the given Curriculum code lists onto the given folder
      *
      * @param Model $model
-     * @param array        $curriculumCodes
-     * @param User         $user
+     * @param array $curriculumCodes
      * @throws MapperException
      */
-    protected function setCurriculumCodesOnFolder(Model $model, $curriculumCodes, User $user)
+    protected function setCurriculumCodesOnFolder(Model $model, $curriculumCodes)
     {
         $curriculumNodeMapper = $this->getCurriculumNodeMapper();
-        $folderMapper         = $this->getFolderMapper();
 
-        // Only privileged users (teachers?) get to change curriculum codes?
         if (isset($curriculumCodes) && count($curriculumCodes)) {
             $model->setCurriculumNodes(
                 $curriculumNodeMapper->findByColumn('id', $curriculumCodes)
             );
-
-        } elseif ($model->getId()) {
-            $model->setCurriculumNodes($existingModel->getCurriculumNodes());
         }
     }
 
