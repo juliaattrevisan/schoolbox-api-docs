@@ -317,36 +317,36 @@ $kernel->run
             // find out the patch-difference between these two arrays
             $dd = doubleDiff($sourceBoxIndicators, $instanceBoxIndicators, $log);
 
-            if (empty($dd)) {
-                $log->debug("Indicators match between unit and class");
-                continue;
-            }
-
-            list ($add, $del) = $dd;
-
-            $log->warning(sprintf(
-                "Instance %d: indicators do not match between unit box %d and class box %d! Cleaning up difference [%d +%d/-%d = %d]",
-                $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
-            ));
-
             try {
                 $log->debug("BEGIN TX$instanceBoxId");
                 $db->beginTransaction();
 
-                foreach ($del as $deletion) {
-                    removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
-                }
+                if (empty($dd)) {
+                    $log->debug("Indicators match between unit and class");
 
-                try {
-                    foreach ($add as $addition) {
-                        insertIndicators(
-                            $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
-                            $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
-                            $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $db, $log
-                        );
+                } else {
+                    list ($add, $del) = $dd;
+
+                    $log->warning(sprintf(
+                        "Instance %d: indicators do not match between unit box %d and class box %d! Cleaning up difference [%d +%d/-%d = %d]",
+                        $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
+                    ));
+
+                    foreach ($del as $deletion) {
+                        removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
                     }
-                } catch (InvalidArgumentException $e) {
-                    throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
+
+                    try {
+                        foreach ($add as $addition) {
+                            insertIndicators(
+                                $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
+                                $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
+                                $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $db, $log
+                            );
+                        }
+                    } catch (InvalidArgumentException $e) {
+                        throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
+                    }
                 }
 
                 /** @var SubmissionBox\Rubric\Rubric $grid */
@@ -379,6 +379,8 @@ $kernel->run
 
                     // add to seen list so we don't parse them again
                     $userSeen[$studentId] = true;
+
+                    $log->debug("Checking marks for user $studentId");
 
                     // load into cache if absent
                     if (empty($userCache[$studentId])) {
