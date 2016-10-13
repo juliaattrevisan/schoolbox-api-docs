@@ -41,6 +41,9 @@ use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationMapperProxy;
