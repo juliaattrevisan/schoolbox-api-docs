@@ -436,6 +436,7 @@ $kernel->run
 
                     if ($marksToApply == 0) {
                         $log->debug("Rubric grid is fully marked; no marks to apply");
+                        continue;
                     }
 
                     $newDenom  = $grid->getTotal();
