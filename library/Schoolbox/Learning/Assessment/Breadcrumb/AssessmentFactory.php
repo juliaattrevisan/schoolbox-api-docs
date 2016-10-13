@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
+use \Schoolbox\Collection;
+
 use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Resource\Folder\Model as Folder;
 
@@ -38,29 +40,29 @@ class AssessmentFactory
     /**
      * Produce breadcrumb trail
      *
-     * @return array
+     * @return Collection
      */
     public function produce()
     {
-        $trail   = [];
-        $trail[] = ['Learning', '#'];
+        $trail = new Collection;
+        $trail->add(['Learning', '#']);
 
         $context = $this->getAssessment()->getContext();
 
         if ($context instanceof Folder) {
-            $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
+            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof UnitImplementation) {
-            $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof UnitSpecification) {
-            $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
+            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof Project) {
-            $trail[] = [$context->getTitle(), "/learning/assessment/{$context->getId()}"];
+            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
         }
 
         /* Additional project node, if you're creating within a project
          */
         if ($this->getAssessment() instanceof Project) {
-            $trail[] = [$this->getAssessment()->getTitle(), "/learning/assessment/{$this->getAssessment()->getId()}"];
+            $trail->add([$this->getAssessment()->getTitle(), "/learning/assessment/{$this->getAssessment()->getId()}"]);
         }
 
         return $trail;

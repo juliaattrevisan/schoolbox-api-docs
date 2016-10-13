@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
+use \Schoolbox\Collection;
+
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
@@ -74,30 +76,30 @@ class ContextFactory
     /**
      * Produce breadcrumb trail
      *
-     * @return array
+     * @return Collection
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function produce()
     {
-        $trail = [];
-        $trail[] = ['Learning', '#'];
+        $trail = new Collection();
+        $trail->add(['Learning', '#']);
 
         try {
             if ($this->getContextType() == 'folder') {
                 $context = $this->getFolderMapper()->findById($this->getContextId());
-                $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
+                $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
             } elseif ($this->getContextType() == 'unit') {
                 $context = $this->getUnitImplementationDataSource()->findById($this->getContextId());
-                $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
+                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
             } elseif ($this->getContextType() == 'unitspec') {
                 $context = $this->getUnitSpecificationDataSource()->findById($this->getContextId());
-                $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
+                $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
             } elseif ($this->getContextType() == 'project') {
                 $context = $this->getAssessmentDataSource()->findById($this->getContextId());
 
                 /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
                  */
-                $trail[] = [$context->getTitle(), "/learning/assessment/{$context->getId()}"];
+                $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
             }
         }
         catch (DeletedException $e) {
@@ -105,7 +107,7 @@ class ContextFactory
             // noop?
         }
 
-        $trail[] = ["Create Assessment", '#'];
+        $trail->add(["Create Assessment", '#']);
 
         return $trail;
     }
