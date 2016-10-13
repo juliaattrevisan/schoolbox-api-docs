@@ -4,7 +4,7 @@
 {{ bread.crumbs(
 [ 'Learning',    '#' ],
 [ 'Classname',   '#' ],
-[ assessment.title,   routeLookup('learningAssessment.getSummaryParticipants', {assessmentId: assessment.id}) ],
+[ assessment.title,   routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id}) ],
 [ student.getFullName,   '#' ]
 ) }}
 

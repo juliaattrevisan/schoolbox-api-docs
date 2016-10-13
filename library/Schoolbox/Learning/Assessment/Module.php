@@ -52,11 +52,10 @@ class Module extends BaseModule
 
                 /* Temporary methods
                  */
-                '/assessment/{assessmentId}/status'              => 'getStatus',
-                '/assessment/{assessmentId}/participants'        => 'getSummaryParticipants',
-                '/assessment/{assessmentId}/summary'             => 'getSummaryStudent',
-                '/assessment/{assessmentId}/summary/{studentId}' => 'getSummaryStaff',
-                '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
+                '/assessment/{assessmentId}'                    => 'getSummary',
+                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
+                '/assessment/{assessmentId}/status'             => 'getStatus',
+                '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
             ],
             'POST' => [
 
@@ -103,7 +102,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummaryStudent|getSummaryStaff|getSubmitForm)',
+            '(?:getStatus|getSummary|getStudentAssessment|getSubmitForm)',
             function ($params) {
 
                 // TODO. Hydrate specified IAssessable
@@ -160,7 +159,7 @@ class Module extends BaseModule
         $ruleRegexp = '(?:getStatus)';
         $this->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 
-        $ruleRegexp = '(?:getSummaryStudent)';
+        $ruleRegexp = '(?:getSummary)';
         $this->addRoutePermission($authorizer, $ruleRegexp,
             new Rule\All(
                 new Rule\IsLoggedIn(),

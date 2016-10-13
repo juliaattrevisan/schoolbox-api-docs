@@ -801,27 +801,17 @@ class Controller extends Base
     }
 
     /**
-     * Displays specified student's progress in relation to a specified assessable
+     * Staff member view that displays a specific student's progress in relation to a specified assessment
      *
-     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
+     * @api   GET /learning/assessment/:assessmentId/:studentId
      * @level 165
      * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSummaryStaff($assessmentId, User $student)
+    public function getStudentAssessment($assessmentId, User $student)
     {
-        // Replaces /submission/submissionHistory/dueWorkId/studentId
-        //       eg /submission/submissionHistory/56/219
-
-        // ==================== test URLs: ======================
-        // http://192.168.36.10/learning/assessment/1/summary/230   - project with 1 quiz, 1 dueWork + 3 tasks
-        // http://192.168.36.10/learning/assessment/2/summary/230   - quiz
-        // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
-        // http://192.168.36.10/learning/assessment/4/summary/230   - task
-
         $project = self::getDummyAssessment($assessmentId);
-        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
 
         // Calculate summary totals for display purposes
 
@@ -871,9 +861,10 @@ class Controller extends Base
     }
 
     /**
+     * Displays the teacher dashboard of an assessable with tracking and management details
      * @param $assessmentId
      */
-    public function getSummaryParticipants($assessmentId)
+    private function getSummaryProject($assessmentId)
     {
         $project = self::getDummyAssessment($assessmentId);
 
@@ -908,37 +899,16 @@ class Controller extends Base
             'assessment' => $project,
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaffParticipants.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
     }
 
     /**
-     * Displays specified student's progress in relation to a specified assessable
-     *
-     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
-     * @level 165
-     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
-     * @todo implement IAssessable interface
+     * Display the student dashboard for an assessable
+     * @param $assessmentId
      */
-    public function getSummaryStudent($assessmentId)
+    private function getSummaryStudent($assessmentId)
     {
-        if (!$this->getUser()->getRole()->isStudent()) {
-            $this->getResponse()->redirect->to(
-                $this->getRouter()->generate("learningAssessment.getSummaryParticipants", ['assessmentId' => $assessmentId])
-            );
-            return;
-        }
-
-        // Replaces /submission/submissionHistory/dueWorkId/studentId
-        //       eg /submission/submissionHistory/56/219
-
-        // ==================== test URLs: ======================
-        // http://192.168.36.10/learning/assessment/1/summary/230   - project with 1 quiz, 1 dueWork + 3 tasks
-        // http://192.168.36.10/learning/assessment/2/summary/230   - quiz
-        // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
-        // http://192.168.36.10/learning/assessment/4/summary/230   - task
-
         $project = self::getDummyAssessment($assessmentId);
-        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
 
         // Calculate summary totals for display purposes
 
@@ -990,6 +960,23 @@ class Controller extends Base
     }
 
     /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
+     * @level 165
+     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
+     * @todo implement IAssessable interface
+     */
+    public function getSummary($assessmentId)
+    {
+        if ($this->getUser()->getRole()->isStudent()) {
+            return $this->getSummaryStudent($assessmentId);
+        }
+
+        return $this->getSummaryProject($assessmentId);
+    }
+
+    /**
      * Displays a form enabling a student to submit items to an assessment
      *
      * @api   GET /learning/assessment/:assessmentId/submit/:studentId
@@ -1000,19 +987,6 @@ class Controller extends Base
      */
     public function getSubmitForm($assessment, User $student)
     {
-        // TODO - generate data
-
-        // just the submission_box (assessable) submit form
-        // just needs student object and assessable object
-
-        // Replaces /submission/submitOnline/:dueWorkId/:studentId
-        //       eg /submission/submitOnline/56/219
-
-        // ==================== test URLs: ======================
-        // http://192.168.36.10/learning/assessment/7/1/submit/230
-
-        // Kludge to get assessable we are submitting from dummy object
-
         $dummyAssessment = self::getDummyAssessment(7);
 
         foreach ($dummyAssessment->getAssessables() as $assessable) {

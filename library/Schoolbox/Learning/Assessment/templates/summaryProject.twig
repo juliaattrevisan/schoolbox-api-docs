@@ -1,0 +1,110 @@
+<script type="text/javascript">
+    $(function() {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y'
+        });
+    });
+</script>
+
+{# TODO: Replace with real breadcrumbs #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Learning',    '#' ],
+[ 'Classname',   '#' ],
+[ assessment.title,   '#' ]
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, type: 'staff'} %}
+
+        <div class="row">
+
+            <div class="small-6 island">
+                <h2 class="subheader">Assessables</h2>
+
+                {% if assessment.assessables | length %}
+
+                    <section>
+                        <ul class="information-list sortable-card ui-sortable" data-sortable>
+                            {% for assessable in assessment.assessables %}
+                                {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+                                <li class="actions-small-1">
+                                    <div class="grip">
+
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="card wrap-down small-12">
+                                            <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+                                            <a href="#{{ assessable.id }}">
+                                                <h3>
+                                                    {{ assessable.title }}
+                                                </h3>
+                                            </a>
+                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                                Due {{ assessable.getDueAt.getRelativeTime }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a href="#" class="icon-modify no-text" title="Modify"></a>
+                                    </nav>
+                                </li>
+
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                {% endif %}
+
+                <ul class="flex-list buttons">
+                    <li><a href="/task/create/15" data-reveal-id="createTask-component3428" title="Create a new Task" class="button icon-task">New Task</a></li>
+                    <li><a href="/submission/createSubmission/new/15/task?return_url=L2NvdXJzZS9tb2RpZnkvMyMxNQ%3D%3D" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
+                    <li><a href="/assess/create/15/task?return_url=L2NvdXJzZS9tb2RpZnkvMyMxNQ%3D%3D" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
+                </ul>
+
+            </div>
+
+            <div class="small-6 island">
+                <h2 class="subheader">Participants</h2>
+
+                {% if assessment.allParticipants | length %}
+                    <section>
+                        <ul class="information-list">
+                            {% for participant in assessment.allParticipants %}
+                                <li>
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.id}) }}">
+                                                <img src="/portrait.php?userId={{ participant.externalId }}&size=square64" width="48">
+                                                <h3>
+                                                    {{ participant.fullName }}
+                                                </h3>
+                                            </a>
+                                            <p class="meta">
+                                                {% if participant.year and participant.role.isStudent %}
+                                                    Year {{ participant.year }}
+                                                {% endif %}
+                                                {{ participant.role.name }}
+                                            </p>
+                                        </div>
+                                        <div class="progress">
+                                            <span class="meter"
+                                                  style="width:{{ counts[participant.id].totalCompleted / counts[participant.id].total * 100 }}%"></span>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
