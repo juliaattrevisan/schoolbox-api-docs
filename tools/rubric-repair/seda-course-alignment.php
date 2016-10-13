@@ -384,6 +384,14 @@ $kernel->run
                     // add to seen list so we don't parse them again
                     $userSeen[$studentId] = true;
 
+                    $hrMark = $return->getMark();
+
+                    // EXTREMELY SPECIFIC CASE: student returns with an submission state of 'RESUBMIT' need to be left alone
+                    if ($hrMark == 'RESUBMIT') {
+                        $log->debug("Student has been flagged for resubmission; skipping [box_id,student_id]($instanceBoxId,$studentId)");
+                        continue;
+                    }
+
                     $log->debug("Checking marks for user $studentId");
 
                     // load into cache if absent
