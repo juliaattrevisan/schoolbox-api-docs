@@ -1135,7 +1135,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * A budget version of findById
      *
-     * This only gives you the id and name of the folder
+     * This only gives you the id, name and permission-inherit of the folder
      * This was used to cheaply manufacture breadcrumb trails
      *
      * @param $folderId
