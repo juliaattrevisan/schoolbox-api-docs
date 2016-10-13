@@ -53,7 +53,7 @@ class Module extends BaseModule
                 /* Temporary methods
                  */
                 '/assessment/{assessmentId}'                    => 'getSummary',
-                '/assessment/{assessmentId}/{studentId}'        => 'getSummaryStaff',
+                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
                 '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
             ],
@@ -102,7 +102,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummary|getSummaryStaff|getSubmitForm)',
+            '(?:getStatus|getSummary|getStudentAssessment|getSubmitForm)',
             function ($params) {
 
                 // TODO. Hydrate specified IAssessable

@@ -801,7 +801,7 @@ class Controller extends Base
     }
 
     /**
-     * Displays specified student's progress in relation to a specified assessable
+     * Staff member view that displays a specific student's progress in relation to a specified assessment
      *
      * @api   GET /learning/assessment/:assessmentId/:studentId
      * @level 165
@@ -809,7 +809,7 @@ class Controller extends Base
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSummaryStaff($assessmentId, User $student)
+    public function getStudentAssessment($assessmentId, User $student)
     {
         $project = self::getDummyAssessment($assessmentId);
 
