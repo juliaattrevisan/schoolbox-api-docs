@@ -121,6 +121,7 @@ class Controller extends Base
         $this->setSubmissionFileMapper($submissionFileMapper);
         $this->setAssessmentDataSource($assessmentDataSource);
         $this->setUnitSpecificationDataSource($unitSpecificationDataSource);
+        $this->setUnitImplementationDataSource($unitImplementationDataSource);
     }
 
     /**
@@ -253,6 +254,8 @@ class Controller extends Base
             'contextId' => $contextId,
             'contextType' => $contextType,
 
+            'breadcrumbs' => $this->createBreadcrumbTrailFromContext($contextId, $contextType),
+
             /* The usual info everything requires
              */
             'attachzone' => $zone->getTwigContext(),
@@ -384,6 +387,7 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
+
         $assessmentType = null;
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
@@ -400,6 +404,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
+            'breadcrumbs' => $this->createBreadcrumbTrailFromAssessment($assessment),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'folder' => $folder,
@@ -572,6 +577,7 @@ class Controller extends Base
      */
     public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
     {
+
         try {
             $project = $this->getAssessmentDataSource()->findById($assessmentId);
             $folder  = $project->getContext()->getFolder();
@@ -589,6 +595,7 @@ class Controller extends Base
 
         if ($types->isValidIndex($assessmentType)) {
             $data = [
+                'breadcrumbs' => $this->createBreadcrumbTrailFromAssessment($project)->add(['Create Assessment', '#']),
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
@@ -693,6 +700,73 @@ class Controller extends Base
         }
 
         return $assessment;
+    }
+
+    /**
+     * Create a trail of crumbs for screens where you spawn Assessments
+     *
+     * @param $contextId
+     * @param $contextType
+     * @return Collection
+     * @throws MapperException\Deleted
+     */
+    private function createBreadcrumbTrailFromContext($contextId, $contextType)
+    {
+        $trail = new Collection();
+        $trail->add(['Learning', '#']);
+
+        if ($contextType == 'folder') {
+            $context   = $this->getFolderMapper()->findById($contextId);
+            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+        }
+        elseif ($contextType == 'unit') {
+            $context   = $this->getUnitImplementationDataSource()->findById($contextId);
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        }
+        elseif ($contextType == 'unitspec') {
+            $context   = $this->getUnitSpecificationDataSource()->findById($contextId);
+            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+        }
+        elseif ($contextType == 'project') {
+            $context   = $this->getAssessmentDataSource()->findById($contextId);
+            $trail->add([$context->getTitle(), "/project/{$context->getId()}"]);
+        }
+
+        $trail->add(["Create Assessment", '#']);
+
+        return $trail;
+    }
+
+    /**
+     * Create a trail of crumbs for a particular assessment based
+     *
+     * @param $assessment
+     * @return Collection
+     */
+    private function createBreadcrumbTrailFromAssessment(IAssessable $assessment)
+    {
+        $trail = new Collection();
+        $trail->add(['Learning', '#']);
+
+        $context = $assessment->getContext();
+
+        if ($context instanceof Folder) {
+            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitImplementation) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitSpecification) {
+            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof Project) {
+            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
+        }
+
+        /* Additional project node, if you're creating within a project
+         */
+        if ($assessment instanceof Project) {
+            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"]);
+        }
+
+        return $trail;
     }
 
     /* Utility methods - these can probably be refactored elsewhere
