@@ -64,7 +64,9 @@ if (isset($_POST['part-1'])) {
 
 } else {
     // this is it: the final submit. ALL the formdata should be available here.
-    echo "<h1>Progressive Form</h1><h2>Final Submission Successful!</h2><p>Your data:</p>";
+    echo "<div class='row'><div class='small-12 island'><h1>Progressive Form</h1><h2 class='subheader'>Final Submission Successful!</h2><p>Your data:</p>";
+
+    echo "<section class='content'>";
 
     echo "<dl>";
 
@@ -73,6 +75,8 @@ if (isset($_POST['part-1'])) {
     }
 
     echo "</dl><a href='/pantry/form-progressive'>Go back to the form</a>";
+
+    echo "</section></div></div>";
 
     exit;
 

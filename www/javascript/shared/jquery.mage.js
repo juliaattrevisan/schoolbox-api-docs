@@ -7,15 +7,20 @@
  */
 ;(function ($, window, document, undefined) {
 
+    var slideSlow = 600;
+    var slideFast = 100;
+
     var pluginName = 'mage';
 
     var defaults = {
 
         submittable: 'fieldset',
+        currentStopClass: 'current-stop',
         reenablePrevious: false,
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
+        confirmRevert: $.noop,
         manipulateSerialized: function(formSerial) {
             return formSerial;
         },
@@ -30,6 +35,10 @@
         setOptions.call(this, options);
 
         var $elem = $(this.element);
+
+        this.thisPart = $elem.attr('name');
+        this.nextPart = $elem.data('mage-next');
+
         // non-negotiable selector
         var $form = $elem.closest('form');
 
@@ -41,6 +50,27 @@
 
         // wrap the interceptor so we can clear and reset it for overloading
         var onclick = function (e) { clickIntercept(e, self, $elem, $form); };
+
+        var onrevert = function (e) {
+            e.preventDefault();
+
+            self.options.confirmRevert.call($(this).closest('[data-mage-trainstop]'), e, function () {
+                // if this callback is called by the confirmation, perform the reversion
+                var sectionToRestore = $(self.element).closest(self.options.submittable);
+                var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
+
+                sectionsToClear.find(':submit').mage('hide');
+
+                // enable this section (which will also open it)
+                self.enableSection();
+
+                // set the trainline to the correct stop
+                self.visitSection();
+            });
+        };
+
+        // prevent double-listen of reversion
+        $('[data-mage-trainstop=' + this.thisPart + '] a').off('click', onrevert).on('click', onrevert);
 
         // prevent submissions on click and prevent double-listen
         $elem.off('click', onclick).on('click', onclick);
@@ -66,19 +96,160 @@
 
         } else if (typeof options === 'string') {
             // if this is a function request
-            var mage = this.eq(0).data(plugin);
+            var rtn = [];
 
-            if (typeof mage === 'undefined') {
-                throw "Mage not initialised";
-            }
+            this.each(function () {
+                var mage = $(this).data(plugin);
 
-            // return the thing I'm pointing at
-            if (options === 'next' || options === 'target') {
-                return $('[data-mage="' + $(mage.element).data('mage-next') + '"]');
-            }
+                if (typeof mage === 'undefined') {
+                    throw "Mage not initialised";
+                }
 
+                // return the thing I'm pointing at
+                if (options === 'next' || options === 'target') {
+                    rtn.push($('[data-mage="' + $(mage.element).data('mage-next') + '"]'));
+                }
+
+                // attempt a method call
+                var method = options + 'Section';
+
+                if (method in mage) {
+                    rtn.push(mage[method].call(mage));
+                }
+            });
+
+            return $($.map(rtn, function (el) { return $.makeArray(el) } ));
         }
 
+    };
+
+
+    /**
+     * Disable the fieldset to which this mage step applies.
+     * Does NOT automatically close the section.
+     *
+     * @return void
+     */
+    Mage.prototype.disableSection = function () {
+
+        var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        $t.attr('disabled', 'disabled');
+        $t.find('[data-mage-error]').slideUp(slideFast);
+
+        if ($e.data('mage-reset') === undefined) {
+            $e.data('mage-reset', $e.val());
+        }
+        $e.val($e.data('mage-working')).attr('readonly', 'readonly');
+    };
+
+    /**
+     * Enable the fieldset to which this mage step applies.
+     * If the section is closed, this will also open it.
+     *
+     * @return void
+     */
+    Mage.prototype.enableSection = function () {
+
+        var $e = $(this.element);
+
+        $e.closest(this.options.submittable).removeAttr('disabled');
+
+        if ($e.data('mage-reset')) {
+            // reset the submit button text and re-enable it
+            $e.val($e.data('mage-reset')).removeAttr('readonly');
+        }
+
+        // unset the 'submitted' flag
+        $e.removeData('mage-submitted');
+
+        // open this section if it's not already
+        this.openSection();
+    };
+
+    /**
+     * Close the section to which this mage step applies.
+     * If the section is enabled, this will also disable it.
+     *
+     * @return void
+     */
+    Mage.prototype.closeSection = function () {
+
+        this.disableSection();
+
+        var $e = $(this.element);
+
+        // slide away the submit for this section
+        $e.closest('[data-mage-submitrow]').slideUp(slideSlow);
+
+        // also slide away this section's helptext
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
+    };
+
+    /**
+     * Open the section to which this mage step applies.
+     * Does NOT automatically enable the section.
+     *
+     * @return void
+     */
+    Mage.prototype.openSection = function () {
+
+        var $e = $(this.element);
+
+        // slide out the main content wrapper
+        var $content = $e.closest('[data-mage-collapsed]');
+
+        if ($content.hasClass('hide')) {
+            // swap .hide for jQuery.hide()
+            $content.hide().removeClass('hide');
+        }
+
+        $e.closest('[data-mage-collapsed]').slideDown(slideSlow);
+
+        // slide out the submit for this section
+        $e.closest('[data-mage-submitrow]').slideDown(slideSlow);
+
+        // also out this section's helptext
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideDown(slideSlow);
+    };
+
+    /**
+     * Hide the section to which this mage step applies.
+     * This is the more aggressive form of ::closeSection(), hiding *all* the content except the legend
+     *
+     * @return void
+     */
+    Mage.prototype.hideSection = function () {
+
+        var $e = $(this.element);
+
+        var self = this;
+
+        $e.closest('[data-mage-collapsed]').slideUp(slideSlow, function () {
+
+            // at this point you might think "wait what??" - what we're doing is hiding the overall
+            // wrapper of this content, but preparing the content for the next time it's displayed
+            $e.closest('[data-mage-submitrow]').show();
+
+            // also out this section's helptext
+            $e.closest(self.options.submittable).find('[data-mage-helptext]').show();
+
+        });
+    };
+
+    /**
+     * Set the 'current stop' of the trainline to be this section.
+     *
+     * @return void
+     */
+    Mage.prototype.visitSection = function () {
+
+        var thisIsMyStop = $('[data-mage-trainstop=' + this.thisPart + ']');
+
+        var c = this.options.currentStopClass;
+
+        thisIsMyStop.addClass(c).siblings('.'+c).removeClass(c);
     };
 
 
@@ -100,7 +271,7 @@
     /**
      * Prevent the form from submitting itself
      *
-     * @param {Event} e
+     * @param {event} e
      */
     function submitIntercept(e) {
         if ($(this).data('mage-preventsubmit')) {
@@ -110,7 +281,7 @@
 
     /**
      *
-     * @param {Event} e
+     * @param {event} e
      * @param {Mage} self
      * @param {jQuery} elem
      * @param {jQuery} [form] optional
@@ -126,9 +297,10 @@
         // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
 
         var allValid = true;
-        $.each(getEventHandlers(e.target, 'validate'), function(idx, obj){
+
+        $.each(getEventHandlers(e.target, 'validate'), function (idx, obj) {
             // Quit as soon as we know data is invalid (don't merge errors)
-            if(allValid && undefined !== obj['type'] && 'validate' === obj['type']){
+            if (allValid && undefined !== obj['type'] && 'validate' === obj['type']) {
                 var validator = obj.handler.call(e.target);
                 if (validator !== undefined) {
                     if (!validator['result']) {
@@ -139,7 +311,8 @@
                 }
             }
         });
-        if(!allValid){
+
+        if (!allValid) {
             return;
         }
 
@@ -154,7 +327,7 @@
             target = elem.closest(self.options.submittable);
 
         // do the prep-work
-        xhrBefore.call(self, target);
+        xhrBefore.call(self);
 
         // send it off
         xhrSend.call(self, method, action, target)
@@ -199,14 +372,14 @@
                 type: method,
                 data: formSerial
             })
-            .done(function (data, status, xhr) {
+            .done(function (data/*, status, xhr*/) {
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
-            .fail(function (xhr, status, error) {
+            .fail(function (xhr/*, status, error*/) {
                 xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
             })
-            .always(function (xhrOrData, status, xhrOrError) {
-                xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
+            .always(function (/*xhrOrData, status, xhrOrError*/) {
+                xhrAlways.call(mage, mage.options.onXhrAlways);
             });
     }
 
@@ -257,16 +430,9 @@
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
-     *
-     * @param {jQuery} target
      */
-    function xhrBefore(target) {
-        target.attr('disabled', 'disabled');
-        target.find('[data-mage-error]').slideUp(100);
-
-        var $e = $(this.element);
-
-        $e.data('mage-reset', $e.val()).val($e.data('mage-working')).attr('readonly', 'readonly');
+    function xhrBefore() {
+        this.disableSection();
     }
 
 
@@ -279,20 +445,14 @@
      */
     function xhrDone(onXhrDone, target, data) {
 
-        var slideDuration = 600;
-
         // ensure the error is slidden away (although onBefore should have handled it)
-        target.find('[data-mage-error]').slideUp(slideDuration);
+        target.find('[data-mage-error]').slideUp(slideSlow);
 
-        // slide away the submit for this section
-        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideDuration);
+        // mark this section as being submitted, preventing repeat submissions
+        $(this.element).data('mage-submitted', true);
 
-        // also slide away this section's helptext
-        $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideDuration);
-
-        // slide out the target section
-        var next = $('[data-mage="' + $(this.element).data('mage-next') +  '"]');
-        next.removeAttr('disabled');
+        // close this section
+        this.closeSection();
 
         /* Enable the fieldset and then inject the dom fragment in
          * selectize (and perhaps other plugins) won't re-enable themselves if the
@@ -300,10 +460,21 @@
          * locked/unlocked state - but previously, instantiation was into a disabled
          * fieldset, so you have to manually re-enable them which is terrible
          */
+        $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
+
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
 
-        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(slideDuration);
+        // if this is not the final section, the submit for the next section should be available, albeit hidden
+        var nextMage = $('[name="' + this.nextPart +  '"]');
+
+        if (nextMage.length) {
+            // enable and show the next section
+            nextMage.mage('enable');
+
+            // set the trainline to the next stop
+            nextMage.mage('visit');
+        }
     }
 
 
@@ -319,11 +490,8 @@
         // apply the error text and slide into view
         target.find('[data-mage-error]').hide().html(error).slideDown();
 
-        target.removeAttr('disabled');
-
-        var $e = $(this.element);
-
-        $e.val($e.data('mage-reset')).removeAttr('readonly');
+        // re-enable this section (which will implicitly reopen it if it's closed)
+        this.enableSection();
 
         // call the callback
         onXhrFail.call(this.element, error);
@@ -334,13 +502,12 @@
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      *
      * @param {Function} onXhrAlways
-     * @param {jQuery} target
      */
-    function xhrAlways(onXhrAlways, target) {
+    function xhrAlways(onXhrAlways) {
 
         // re-enable if requested
         if (this.options.reenablePrevious) {
-            target.removeAttr('disabled');
+            this.enableSection();
         }
 
         // call the callback
