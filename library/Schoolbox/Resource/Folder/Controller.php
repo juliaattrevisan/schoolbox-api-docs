@@ -468,7 +468,8 @@ class Controller extends BaseController
 
         // apply Class Codes
         if($user->isSuperuser()){
-            $this->setClassCodesOnFolder($model, $postData['code'], $user);
+            $classCodes = $model->getInherit() ? '' : $postData['code'];
+            $this->setClassCodesOnFolder($model, $classCodes, $user);
         } elseif($existingFolder) {
             $model->setCodes($existingFolder->getCodes());
         }
