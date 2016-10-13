@@ -128,7 +128,7 @@ class Controller extends Base
 
     /**
      * Update import progress in log table
-     * @param string Result (success/error)
+     * @param string $result (success/error)
      * @param \Schoolbox\Resource\Storage\Model $file File currently being processed
      * @param int $line Line number
      * @param int $column Column number
@@ -618,6 +618,7 @@ class Controller extends Base
 
                 } else {
                     try {
+                        /** @var Season $season */
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
@@ -974,6 +975,7 @@ class Controller extends Base
                     $error = true;
                 } else {
                     try {
+                        /** @var Season $season */
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED TEAM: Season not found in database ({$row[1]})");
@@ -1103,6 +1105,7 @@ class Controller extends Base
                     $error = true;
                 } else {
                     try {
+                        /** @var Season $season */
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED COACH: Season not found in database ({$row[1]})");
@@ -1242,6 +1245,7 @@ class Controller extends Base
                     $error = true;
                 } else {
                     try {
+                        /** @var Season $season */
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED FIXTURE: Season not found in database ({$row[1]})");
