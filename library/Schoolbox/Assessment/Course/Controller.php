@@ -320,20 +320,20 @@ class Controller extends Base\Base
                 /** @var UnitSpecification $unit */
                 $unitFolder = $unit->getFolder();
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unitFolder);
+                $data['tasks'][$unit->getId()] = $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($unit->getId());
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
                 $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
-                // obtain the Course Builder Component Instance from the homepage.
-                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
-
-                foreach ($data['tasks'][$unit->getId()] as $task) {
-                    /** @var Task $task */
-                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
-                }
-
-                // set reference to this reveal instance
-                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
+//                // obtain the Course Builder Component Instance from the homepage.
+//                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
+//
+//                foreach ($data['tasks'][$unit->getId()] as $task) {
+//                    /** @var Task $task */
+//                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
+//                }
+//
+//                // set reference to this reveal instance
+//                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
             }
         }
 
