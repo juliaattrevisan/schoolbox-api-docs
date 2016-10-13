@@ -10,6 +10,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
+use Guzzle\Common\Exception\UnexpectedValueException;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
@@ -35,6 +37,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
@@ -199,7 +202,7 @@ class Controller extends Base
     private function getSelectAssessmentData(AssessmentContext $context, IAssessable $assessment = null)
     {
         $zoneFactory = new ZoneFactory();
-        $zone = $zoneFactory->buildForAssessmentType($assessment);
+        $dueWorkFileZone = $zoneFactory->buildForAssessmentType($assessment);
 
         /* Set defaults */
         if($assessment != null && empty($assessment->getId())) {
@@ -218,7 +221,7 @@ class Controller extends Base
             'contextType'     => AssessmentContextType::objectToString($context),
             'baseContextType' => AssessmentContextType::objectToString($context->getBaseContext()),
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromContext($context, $assessment),
-            'attachzone'      => $zone->getTwigContext(),
+            'attachzone'      => $dueWorkFileZone->getTwigContext(),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
             'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
@@ -258,6 +261,19 @@ class Controller extends Base
          */
         if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
+        }
+
+        if(Types::ASSESSMENT_DUE_WORK == $assessmentType){
+            $rubricMapper = RubricMapper::getInstance();
+            $submissionBoxMapper = SubmissionBoxMapper::getInstance();
+            // Collect all the criteria for the folder the DueWork is about to be created in
+            $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
+            $data['rubric'] = $grid->toContext();
+
+            $rubricZone = new Zone('rubric');
+            // JS file.type isn't set reliably enough to use text/csv mime filter
+            $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
+            $data['rubricAttachZone'] = $rubricZone->getTwigContext();
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
