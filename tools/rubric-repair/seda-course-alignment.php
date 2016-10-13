@@ -144,6 +144,10 @@ $kernel->run
         INSERT INTO rubric_usage VALUES (:crit_id, :box_id, :seq)
     ");
 
+    $insertRubricLevelStmt = $db->prepare("
+        INSERT INTO rubric_level (box_id, name, sequence) VALUES (:box_id, '', :seq)
+    ");
+
     $findUnmarkedCriteriaStmt = $db->prepare("
         SELECT DISTINCT criterion_id
         FROM rubric_descriptor d
@@ -341,7 +345,7 @@ $kernel->run
                             insertIndicators(
                                 $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
                                 $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
-                                $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $db, $log
+                                $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $insertRubricLevelStmt, $db, $log
                             );
                         }
                     } catch (InvalidArgumentException $e) {
@@ -694,9 +698,9 @@ function removeIndicators(
  * @param PDOStatement    $insertDescriptorStmt
  * @param PDOStatement    $findNextAvailableSequenceStmt
  * @param PDOStatement    $insertRubricUsageStmt
+ * @param PDOStatement    $insertRubricLevelStmt
  * @param Database        $db
  * @param LoggerInterface $log
- * @throws InvalidArgumentException
  */
 function insertIndicators(
     array $addition,
@@ -709,6 +713,7 @@ function insertIndicators(
     PDOStatement $insertDescriptorStmt,
     PDOStatement $findNextAvailableSequenceStmt,
     PDOStatement $insertRubricUsageStmt,
+    PDOStatement $insertRubricLevelStmt,
     Database $db,
     LoggerInterface $log
 ) {
@@ -750,7 +755,11 @@ function insertIndicators(
         $levelId = $findLevelIdStmt->fetchColumn();
 
         if ($levelId == 0) {
-            throw new InvalidArgumentException("Level ID cannot be zero: failed to retrieve an ID for [box,desc,seq]($instanceBoxId,$id,$levelSequence)");
+            $log->warning("Failed to retrieve an ID for [box_id,desc_id,seq]($instanceBoxId,$id,$levelSequence) - generating new level");
+
+            $insertRubricLevelStmt->execute([ 'box_id' => $instanceBoxId, 'seq' => $levelSequence ]);
+
+            $levelId = $db->lastInsertId();
         }
 
         $insertDescriptorStmt->execute([
