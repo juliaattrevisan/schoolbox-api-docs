@@ -11,6 +11,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Guzzle\Common\Exception\UnexpectedValueException;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
@@ -263,7 +265,7 @@ class Controller extends Base
             $data['allSummators'] = new SummatorMapping();
         }
 
-        if(Types::ASSESSMENT_DUE_WORK == $assessmentType){
+        if($types->isDueWork($assessmentType)){
             $rubricMapper = RubricMapper::getInstance();
             $submissionBoxMapper = SubmissionBoxMapper::getInstance();
             // Collect all the criteria for the folder the DueWork is about to be created in
@@ -274,6 +276,17 @@ class Controller extends Base
             // JS file.type isn't set reliably enough to use text/csv mime filter
             $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
             $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+            /** @var RubricResult[] $resultSets */
+            $resultSets = ResultMapper::getInstance()->findAll();
+            $rs = new Collection();
+            foreach($resultSets as $result){
+                if(!$rs[$result->getResultSetId()] instanceof Collection){
+                    $rs[$result->getResultSetId()] = new Collection();
+                }
+                $rs[$result->getResultSetId()][$result->getValue()] = $result;
+            }
+            $data['rubricResultSets'] = $rs;
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));

@@ -1,14 +1,18 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
+{% include 'sub/rubricResultSet.twig' with {'resultSets': rubricResultSets } only %}
+
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function () {
 
-        /* Description
+        /* Description only
          */
-        $.fn.alaressEditor();
+        $.fn.alaressEditor(
+            {targetElements: $('[name=description]')}
+        );
     });
 </script>
 
@@ -143,13 +147,13 @@
              */
             $markTypeDropdown.on('change', function(event) {
 
-                if(hasRubric() || $(this).val() == {{ markTypeTotalMark }}){
+                if($(this).val() == {{ markTypeTotalMark }}){
                     showMaxMark();
                 } else {
                     hideMaxMark();
                 }
 
-                if(hasRubric()){
+                if(hasRubric() && $(this).val() == {{ markTypeTotalMark }}){
                     disableMaxMark();
                 } else {
                     enableMaxMark();
@@ -167,22 +171,86 @@
             $hasRubricSwitch.on('click', function (event) {
                 var $element = $(this);
 
-                if($element.is(':checked')){
+                if($element.is(':checked') && $markTypeDropdown.val() == {{ markTypeTotalMark }}){
                     disableMaxMark();
                 } else {
                     enableMaxMark();
-                }
-
-                if($element.is(':checked') || $markTypeDropdown.val() == {{ markTypeTotalMark }}){
-                    showMaxMark();
-                } else {
-                    hideMaxMark();
                 }
             });
 
             // Initiate
             $markTypeDropdown.trigger('change');
             $hasRubricSwitch.trigger('click');
+
+
+
+
+            // Rubric ResultSets Modal
+
+            var $rsReveal     = $('#reveal-resultset');
+            var $interactions = $rsReveal.find('input,a');
+            var $overlay      = $rsReveal.find('[data-overlay]');
+
+            $rsReveal.on('closed.fndtn.reveal', function () {
+                // uncheck the selected radio
+                $rsReveal.find('[type=radio]').prop('checked', false);
+
+                // re-enable all inputs and links
+                $interactions.prop('disabled', false);
+
+                $overlay.addClass('hide');
+
+            });
+
+            $('#apply-resultset').on('click', function (e) {
+                e.preventDefault();
+                $rsReveal.foundation('reveal', 'open');
+            });
+
+            $rsReveal.on('click', 'a', function (e) {
+                e.preventDefault();
+
+                var $button = $(this), rubricEditable, value, $input, $label, options ;
+
+                switch ($button.data('action')) {
+                    case 'applyResultSet':
+
+                        rubricEditable = $('table[data-rubric]').data('plugin_rubricEditable');
+
+                        if (rubricEditable) {
+
+                            $input = $rsReveal.find('input:checked');
+
+                            if ($input.length) {
+                                value  = $input.val();
+                                $label = $input.siblings('[for=' + $input.attr('id') + ']');
+
+                                // ensure value
+                                if (value > 0) {
+                                    // get the list of options we're going to populate
+                                    options = $label.text().split(',').map(function (v) { return v.trim(); });
+
+                                    // prevent multi-submit
+                                    $interactions.prop('disabled', true);
+                                    $overlay.removeClass('hide');
+
+                                    // break this out of main execution
+                                    setTimeout(function () {
+                                        // apply the set
+                                        rubricEditable.applyResultSet(options);
+                                        $rsReveal.foundation('reveal', 'close');
+                                    }, 100);
+                                }
+                            }
+                        }
+
+                        break;
+                    default:
+                        // only other known option is 'close'
+                        $rsReveal.foundation('reveal', 'close');
+                        break;
+                }
+            });
 
         });
     </script>
@@ -227,13 +295,15 @@
             </div>
         </div>
     </div>
+    </div>
 </div>
 
-<div class="row" id="rubric">
-    <div class="small-12 columns">
-        <div class="rubrics">
-            <!--Rubric Here-->
-        </div>
+<div id="rubric-section" class="small-12 columns{% if not assessment.hasRubric %} hide{% endif %}" data-hide-watch="#hasRubric">
+    <div class="small-12 columns no-pad">
+        <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
+    </div>
+    <div class="small-12 columns no-pad">
+        {% include '@rubric/grid-csv.twig' with {'rubric': rubric, 'attachzone': rubricAttachZone } only %}
     </div>
 </div>
 
