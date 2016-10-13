@@ -221,9 +221,15 @@
 
                 <fieldset class="content">
 
+                    {% if not user.isSuperuser and folder.getCodeString %}
+                        {% set inheritTitle = 'Only SuperUsers may alter permission inheritance for folders with Class Codes' %}
+                    {% else %}
+                        {% set inheritTitle = 'Select user roles which have access to this folder' %}
+                    {% endif %}
+
                     <div class="small-12 columns">
                         <label>Access Permissions
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select user roles which have access to this folder">?</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ inheritTitle }}">?</span>
                         </label>
                     </div>
 
@@ -231,8 +237,10 @@
 
                     {% if parent.getId != 0 %}
 
+                        {% set disabled = (not user.isSuperuser and folder.getCodeString) ? ' disabled' : '' %}
+
                         <div class="small-12 columns">
-                            <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {% if folder.getInherit %}checked{% endif %} />
+                            <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {% if folder.getInherit %}checked{% endif %}{{ disabled }}/>
                             <label for="inherit" class="checkbox-label">Inherit permissions from '<a href="/homepage/{{ parent.getId }}">{{ parent.getName }}</a>' folder</label>
                         </div>
 
@@ -305,7 +313,7 @@
                         <label>
                             {{ database }} Subject Codes
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ codeTitle }}">?</span>
-                            <input type="text" name="code" size="40" value="{{ folder.getCodeString }}"{% if not user.isSuperuser %} readonly{% endif %}/>
+                            <input type="text" name="code" size="40" value="{{ folder.getCodeString }}"{% if not user.isSuperuser %} disabled{% endif %}/>
                         </label>
                     </div>
                 </fieldset>
