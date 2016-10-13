@@ -2,6 +2,7 @@
 
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -79,32 +80,40 @@
     <script type="text/javascript">
         $(function() {
 
+            var $markTypeDropdown = $('#markType');
+            var $assessmentForm   = $('#assessmentForm');
+            var $maxMarkWrap      = $assessmentForm.find('[data-max-mark]');
+            var $maxMarkInput     = $maxMarkWrap.find('#maxMark');
+            var $gradeSchemeDiv   = $assessmentForm.find('[data-grading-scheme]');
+            var $hasRubricSwitch  = $('#hasRubric');
+
+
             /**
              * Show max mark
              */
             function showMaxMark() {
-                $('#assessmentForm').find('[data-max-mark]').show();
+                $maxMarkWrap.show();
             }
 
             /**
              * Hide max mark
              */
             function hideMaxMark() {
-                $('#assessmentForm').find('[data-max-mark]').hide();
+                $maxMarkWrap.hide();
             }
 
             /**
              * Show grading scheme
              */
             function showGradingScheme() {
-                $('#assessmentForm').find('[data-grading-scheme]').show();
+                $gradeSchemeDiv.show();
             }
 
             /**
              * Hide grading scheme
              */
             function hideGradingScheme() {
-                $('#assessmentForm').find('[data-grading-scheme]').hide();
+                $gradeSchemeDiv.hide();
             }
 
             /**
@@ -119,80 +128,61 @@
              * which will be programmatically generated
              */
             function disableMaxMark() {
-                $('#maxMark').prop('disabled', true);
+                $maxMarkInput.prop('disabled', true);
             }
 
             /**
              * Enable the field for humans to change its value
              */
             function enableMaxMark() {
-                $('#maxMark').prop('disabled', false);
+                $maxMarkInput.prop('disabled', false);
             }
 
-            /* Disable everything initially
-             */
-            disableMaxMark();
-            hideMaxMark();
-            hideGradingScheme();
 
             /* Mark Type switcher
              */
-            $('#assessmentForm').on('change', '#markType', function(event) {
-                if ($(this).val() == {{ markTypeLetterGrade }}) {
-                    hideMaxMark();
-                    showGradingScheme();
-                }
-                else if ($(this).val() == {{ markTypeTotalMark }}) {
-                    hideGradingScheme();
-                    showMaxMark();
+            $markTypeDropdown.on('change', function(event) {
 
-                    /* Disable maxmark field if rubrics is selected
-                     * Dynamically alter value according to rubric grid
-                     */
-                    if (hasRubric()) {
-                        disableMaxMark();
-                    }
-                    else {
-                        enableMaxMark();
-                    }
-                }
-                else {
-                    disableMaxMark();
+                if(hasRubric() || $(this).val() == {{ markTypeTotalMark }}){
+                    showMaxMark();
+                } else {
                     hideMaxMark();
+                }
+
+                if(hasRubric()){
+                    disableMaxMark();
+                } else {
+                    enableMaxMark();
+                }
+
+                if($(this).val() == {{ markTypeLetterGrade }}){
+                    showGradingScheme();
+                } else {
                     hideGradingScheme();
                 }
             });
-
-            /**
-             * Determine which fields to show when Rubrics is activated
-             */
-            function determineRubricSetting(element) {
-                if (element.is(':checked')) {
-                    $('#hasMarkPerCapabilityPanel').removeClass('hide');
-                    disableMaxMark();
-                    showMaxMark();
-                }
-                else {
-                    $('#hasMarkPerCapabilityPanel').addClass('hide');
-                    enableMaxMark();
-
-                    if( $('#markType').val() != {{ markTypeTotalMark }} ){
-                        hideMaxMark();
-                    }
-                }
-
-
-            }
 
             /* Rubrics switcher
              */
-            if ($('#hasRubric').is(':checked')) {
-                determineRubricSetting($('#hasRubric'));
-            }
+            $hasRubricSwitch.on('click', function (event) {
+                var $element = $(this);
 
-            $('#hasRubric').click(function(event) {
-                determineRubricSetting($(this));
+                if($element.is(':checked')){
+                    disableMaxMark();
+                } else {
+                    enableMaxMark();
+                }
+
+                if($element.is(':checked') || $markTypeDropdown.val() == {{ markTypeTotalMark }}){
+                    showMaxMark();
+                } else {
+                    hideMaxMark();
+                }
             });
+
+            // Initiate
+            $markTypeDropdown.trigger('change');
+            $hasRubricSwitch.trigger('click');
 
         });
     </script>
@@ -226,7 +216,7 @@
         </div>
     </div>
     <div class="small-12 medium-6 columns">
-        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}">
+        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}" data-hide-watch="#hasRubric">
             <label for="hasMarkPerCapability">Mark Per-Capability</label>
             <div class="switch round">
                 <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
@@ -239,7 +229,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" id="rubric">
     <div class="small-12 columns">
         <div class="rubrics">
             <!--Rubric Here-->
