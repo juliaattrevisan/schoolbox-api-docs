@@ -15,6 +15,7 @@ use Homepage;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use RangeException;
+use DomainException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Curriculum;
@@ -526,26 +527,28 @@ class Controller extends BaseController
      */
     protected function setClassCodesOnFolder(Model $model, $classCodeString, User $user)
     {
+        // Only superusers get to change class codes
+        if(!$user->isSuperuser()){
+            throw new DomainException("Only SuperUsers may set Class Codes");
+        }
+
         $classCodeMapper = $this->getClassCodeMapper();
         $codeCollection  = $classCodeMapper->createCollection();
 
-        // Only superusers get to change class codes
-        if ($user->isSuperuser()) {
-            foreach (explode(',', $classCodeString) as $code) {
-                $trimmedCode = trim($code);
-                if (strlen($trimmedCode)) {
-                    $codeModel = $classCodeMapper->createModel();
-                    $codeModel->setCode($trimmedCode);
-                    $codeCollection->add($codeModel);
-                }
+        foreach (explode(',', $classCodeString) as $code) {
+            $trimmedCode = trim($code);
+            if (strlen($trimmedCode)) {
+                $codeModel = $classCodeMapper->createModel();
+                $codeModel->setCode($trimmedCode);
+                $codeCollection->add($codeModel);
             }
-            $model->setCodes($codeCollection);
         }
+        $model->setCodes($codeCollection);
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
         // (I'm not confident that deleting cat codes in the postSave method
         //  regardless of whether there are any won't break somewhere else)
-        if ($user->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
+        if ($model->getId() && count($codeCollection) === 0) {
             $classCodeMapper->deleteByColumn('folder_id', $model->getId());
         }
     }
