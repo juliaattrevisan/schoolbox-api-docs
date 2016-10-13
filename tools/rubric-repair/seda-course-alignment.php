@@ -297,15 +297,6 @@ $kernel->run
                 ]
             ]);
 
-            // return count check
-            if ($instanceReturns->count() == 0) {
-                $log->debug(sprintf(
-                    "[class.instance.box](%d.%d.%d): no returns exist; skipping",
-                    $class->getId(), $classTaskInstance->getId(), $instanceBoxId
-                ));
-                continue;
-            }
-
             $log->debug(sprintf(
                 "[class.instance.box](%d.%d.%d): %d returns exist",
                 $class->getId(), $classTaskInstance->getId(), $instanceBoxId, $instanceReturns->count()
@@ -358,9 +349,21 @@ $kernel->run
                     throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
                 }
 
-                $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
+                /** @var SubmissionBox\Rubric\Rubric $grid */
+                $grid = null;
 
-                $log->debug("Verifying integrity of returns");
+                // return count check
+                if ($instanceReturns->count() == 0) {
+                    $log->debug(sprintf(
+                        "[class.instance.box](%d.%d.%d): no returns exist; no further work to do",
+                        $class->getId(), $classTaskInstance->getId(), $instanceBoxId
+                    ));
+
+                } else {
+                    $log->debug("Verifying integrity of returns");
+                    $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
+
+                }
 
                 $userSeen = [];
 
