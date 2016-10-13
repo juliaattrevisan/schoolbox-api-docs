@@ -120,7 +120,7 @@ $kernel->run
         INNER JOIN rubric_level l ON d.level_id = l.id
         RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
         WHERE c.id = :source_crit_id 
-        AND d.submission_box_id = :source_box_id
+        ORDER BY l.sequence ASC
     ");
 
     $findLevelIdStmt = $db->prepare("
@@ -137,7 +137,7 @@ $kernel->run
     ");
 
     $findNextAvailableSequenceStmt = $db->prepare("
-      SELECT MAX(sequence) + 1 FROM rubric_usage WHERE submission_box_id = :box_id
+      SELECT COALESCE(MAX(sequence) + 1, 1) FROM rubric_usage WHERE submission_box_id = :box_id
     ");
 
     $insertRubricUsageStmt = $db->prepare("
@@ -708,17 +708,25 @@ function insertIndicators(
     // TRANSPOSE the rubric_descriptor records from the unit indicator to the class indicator, compensating for criterion_id, submission_box_id and level_id
     $log->info("TRANSPOSE rubric_descriptor (criterion_id,submission_box_id)[{$addition['id']},$sourceBoxId] into submission_box [id]($instanceBoxId)");
     // step 1: retrieve value, description, and the SEQUENCE of the level of the source descriptors
-    $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'], 'source_box_id' => $sourceBoxId ]);
+    $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'] ]);
+
+    $minus = 1;
+    $first = true;
 
     // step 2: iterate results and insert with new criterion, box and level values
     while ($r = $findSourceDescriptors->fetch(PDO::FETCH_NUM)) {
         list ($id, $value, $description, $levelSequence) = $r;
 
         if ($levelSequence == 0) {
-            throw new InvalidArgumentException("Level sequence cannot be zero: failed to retrieve sequence for [descriptor_id]($id)");
+            if ($first) {
+                $log->warning("Encountered a sequence value of zero for [descriptor_id]($id); assuming zero-indexed rather than one-indexed");
+                $minus = 0;
+            } else {
+                throw new InvalidArgumentException("Level sequence cannot be zero in non-zero-indexed set: failed to retrieve sequence for [descriptor_id]($id)");
+            }
         }
 
-        $offset = $levelSequence - 1;
+        $offset = $levelSequence - $minus;
 
         $findLevelIdStmt->bindValue(':nth', $offset, PDO::PARAM_INT);
         $findLevelIdStmt->bindValue(':box_id', $instanceBoxId);
@@ -737,6 +745,8 @@ function insertIndicators(
             'val'      => $value,
             'des'      => $description
         ]);
+
+        $first = false;
     }
 
     // find the next available sequence
