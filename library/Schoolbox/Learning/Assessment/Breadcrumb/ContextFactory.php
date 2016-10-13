@@ -94,7 +94,10 @@ class ContextFactory
                 $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
             } elseif ($this->getContextType() == 'project') {
                 $context = $this->getAssessmentDataSource()->findById($this->getContextId());
-                $trail[] = [$context->getTitle(), "/project/{$context->getId()}"];
+
+                /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
+                 */
+                $trail[] = [$context->getTitle(), "/learning/assessment/{$context->getId()}"];
             }
         }
         catch (DeletedException $e) {
