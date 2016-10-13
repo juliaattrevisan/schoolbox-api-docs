@@ -425,6 +425,7 @@ $kernel->run
 
                     if ($markedDenominator == 0) {
                         // div by zero, no marks given: skip!
+                        $log->debug("No marks have been given, nothing to extrapolate");
                         continue;
                     }
 
@@ -432,6 +433,10 @@ $kernel->run
 
                     $marksToApply = round($averageGiven * $unmarkedDenominator);
 //                    $log->debug("Marks to apply: $marksToApply");
+
+                    if ($marksToApply == 0) {
+                        $log->debug("Rubric grid is fully marked; no marks to apply");
+                    }
 
                     $newDenom  = $grid->getTotal();
                     $newNum    = $grid->getSum() + $marksToApply;
@@ -460,6 +465,11 @@ $kernel->run
 
                     $avg = findClosestMatch($set, $marksToApply);
 
+                    if (empty($avg)) {
+                        $log->warning("Could not apply $marksToApply marks to rubric [box_id,student_id]($instanceBoxId,$studentId)");
+                        continue;
+                    }
+
                     $getLatestStampStmt->execute([
                         'box_id' => $instanceBoxId,
                         'student_id' => $studentId
@@ -476,7 +486,9 @@ $kernel->run
                         ]);
                     }
 
-                    $log->debug(json_encode($avg));
+                    $adjustment = json_encode($avg);
+
+                    $log->debug("Mark adjustment: $adjustment [box_id,student_id]($instanceBoxId,$studentId)");
 
                     $getLatestReturnStmt->execute([
                         'student_id' => $studentId,
