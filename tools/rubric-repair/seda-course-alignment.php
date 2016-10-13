@@ -741,6 +741,7 @@ function insertIndicators(
 
     $minus = 1;
     $first = true;
+    $errors = [];
 
     // step 2: iterate results and insert with new criterion, box and level values
     while ($r = $findSourceDescriptors->fetch(PDO::FETCH_NUM)) {
@@ -771,15 +772,36 @@ function insertIndicators(
             $levelId = $db->lastInsertId();
         }
 
-        $insertDescriptorStmt->execute([
+        $payload = [
             'crit_id'  => $newCriterionId,
             'box_id'   => $instanceBoxId,
             'level_id' => $levelId,
             'val'      => $value,
             'des'      => $description
-        ]);
+        ];
+
+        $paystring = json_encode($payload);
+
+        try {
+            $log->debug("Attempting insertion of $paystring");
+            $insertDescriptorStmt->execute($payload);
+
+        } catch (PDOException $e) {
+
+            $message = "Could not insert descriptor $paystring";
+
+            if (preg_match('`^SQLSTATE\[\d+\]: (.+)$`', $e->getMessage(), $matches)) {
+                $message .= ": " . $matches[1];
+            }
+
+            $errors[] = $message;
+        }
 
         $first = false;
+    }
+
+    if (count($errors)) {
+        throw new PDOException("Errors encountered: \n" . implode("\n   ", $errors));
     }
 
     // find the next available sequence
