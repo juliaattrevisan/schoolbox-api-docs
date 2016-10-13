@@ -77,7 +77,7 @@ if (!$submission_box->getAcceptMultiple()) {
     ])->count();
 
     if ($submitCount) {
-        error(19);
+        error(184);
     }
 }
 
