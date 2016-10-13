@@ -305,7 +305,7 @@
                         {# Only superusers can change subject codes#}
 
                         {% if user.isSuperuser %}
-                            {% set codeTitle = 'If you want this category to be a subject enter its code here. You may enter multiple codes by separating them with a comma' %}
+                            {% set codeTitle = 'If you want this folder to be a subject enter its code here. You may enter multiple codes by separating them with a comma' %}
                         {% else %}
                             {% set codeTitle = 'Only SuperUsers may adminster Subject Codes' %}
                         {% endif %}
