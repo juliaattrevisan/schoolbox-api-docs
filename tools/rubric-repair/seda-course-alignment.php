@@ -120,6 +120,7 @@ $kernel->run
         INNER JOIN rubric_level l ON d.level_id = l.id
         RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
         WHERE c.id = :source_crit_id 
+        AND d.submission_box_id = :source_box_id
         ORDER BY l.sequence ASC
     ");
 
@@ -736,7 +737,7 @@ function insertIndicators(
     // TRANSPOSE the rubric_descriptor records from the unit indicator to the class indicator, compensating for criterion_id, submission_box_id and level_id
     $log->info("TRANSPOSE rubric_descriptor (criterion_id,submission_box_id)[{$addition['id']},$sourceBoxId] into submission_box [id]($instanceBoxId)");
     // step 1: retrieve value, description, and the SEQUENCE of the level of the source descriptors
-    $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'] ]);
+    $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'], 'source_box_id' => $sourceBoxId ]);
 
     $minus = 1;
     $first = true;
