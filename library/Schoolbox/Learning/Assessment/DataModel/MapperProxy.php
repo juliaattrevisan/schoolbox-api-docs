@@ -137,13 +137,13 @@ class MapperProxy
     /**
      * Finds all assessables that are part of the given project
      *
-     * @param int   $projectId
+     * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
      * @return Collection|IAssessable[]
      */
     public function findAllForProjectId($projectId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.id', $projectId, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
     }
 
     /**
@@ -249,7 +249,7 @@ class MapperProxy
         // Retrieve sub-projects
         $assessable = $this->translator->translateToDomainModel($subModel);
         if ($assessable instanceof ProjectObject) {
-            $assessable->setAssessables($this->findAllForProjectId($subModel->getId()));
+            $assessable->setAssessables($this->findAllForProjectId($assessable->getId()));
         }
         return $assessable;
     }
