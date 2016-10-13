@@ -5,7 +5,12 @@
 .evaluation-correct-answer-icon {
     @extend .icon-tick;
     font-size: rem-calc(($base-font-size + 14));
-    position: absolute;
+    padding: 0;
+    margin: 0;
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+    overflow: visible;
+    position: absolute!important;
     right: 1.25rem;
     color: $success-color;
 }
@@ -15,7 +20,12 @@
 .evaluation-incorrect-answer-icon {
     @extend .icon-close;
     font-size: rem-calc(($base-font-size + 14));
-    position: absolute;
+    padding: 0;
+    margin: 0;
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+    overflow: visible;
+    position: absolute!important;
     right: 1.25rem;
     color: $alert-color;
 }
@@ -25,7 +35,12 @@
 .evaluation-unselected-answer-icon {
     @extend .icon-previous;
     font-size: rem-calc(($base-font-size + 14));
-    position: absolute;
+    padding: 0;
+    margin: 0;
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+    overflow: visible;
+    position: absolute!important;
     right: 1.25rem;
     color: $warning-color;
 }
