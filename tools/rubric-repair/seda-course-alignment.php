@@ -318,7 +318,7 @@ $kernel->run
             $dd = doubleDiff($sourceBoxIndicators, $instanceBoxIndicators, $log);
 
             try {
-                $log->debug("BEGIN TX$instanceBoxId");
+                $log->info("BEGIN TX$instanceBoxId", [ 'char' => '>' ]);
                 $db->beginTransaction();
 
                 if (empty($dd)) {
@@ -493,12 +493,12 @@ $kernel->run
                     ]);
 
                 }
-                $log->debug("COMMIT TX$instanceBoxId");
+                $log->info("COMMIT TX$instanceBoxId", [ 'char' => '+' ]);
                 $db->commit();
 
             } catch (PDOException $e) {
                 $log->alert('PDOException: ' . $e->getMessage(), [ $e ]);
-                $log->debug("ABORT TX$instanceBoxId");
+                $log->info("ABORT TX$instanceBoxId", [ 'char' => '~' ]);
                 $db->rollBack();
             }
         }
