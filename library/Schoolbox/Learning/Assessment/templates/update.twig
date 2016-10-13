@@ -1,10 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{{ bread.crumbs(
-[ folder.name, '/homepage/' ~ folder.id ],
-[ 'Update ' ~ assessment.title, routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessment.id}) ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row">
     <div class="small-12 columns">

@@ -413,7 +413,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => (new BreadcrumbAssessmentFactory($assessment))->produce(),
+            'breadcrumbs' => (new BreadcrumbAssessmentFactory($assessment))->produce()->add(['Update', '#']),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'folder' => $folder,
