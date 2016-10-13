@@ -133,11 +133,11 @@ class Descriptor implements Calculable, Twiggable
     /**
      * Return the calculated sum value of this Calculable (NOT the total possible value)
      *
-     * @return float
+     * @return float|null
      */
     public function getSum()
     {
-        return $this->isSelected() ? $this->value : 0;
+        return $this->isSelected() ? $this->value : null;
     }
 
 
