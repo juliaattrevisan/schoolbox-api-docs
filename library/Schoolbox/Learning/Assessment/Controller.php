@@ -712,27 +712,27 @@ class Controller extends Base
      */
     private function createBreadcrumbTrailFromContext($contextId, $contextType)
     {
-        $trail = new Collection();
-        $trail->add(['Learning', '#']);
+        $trail = [];
+        $trail[] = ['Learning', '#'];
 
         if ($contextType == 'folder') {
             $context   = $this->getFolderMapper()->findById($contextId);
-            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
         }
         elseif ($contextType == 'unit') {
             $context   = $this->getUnitImplementationDataSource()->findById($contextId);
-            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
         }
         elseif ($contextType == 'unitspec') {
             $context   = $this->getUnitSpecificationDataSource()->findById($contextId);
-            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
         }
         elseif ($contextType == 'project') {
             $context   = $this->getAssessmentDataSource()->findById($contextId);
-            $trail->add([$context->getTitle(), "/project/{$context->getId()}"]);
+            $trail[] = [$context->getTitle(), "/project/{$context->getId()}"];
         }
 
-        $trail->add(["Create Assessment", '#']);
+        $trail[] = ["Create Assessment", '#'];
 
         return $trail;
     }
@@ -745,25 +745,25 @@ class Controller extends Base
      */
     private function createBreadcrumbTrailFromAssessment(IAssessable $assessment)
     {
-        $trail = new Collection();
-        $trail->add(['Learning', '#']);
+        $trail = [];
+        $trail[] = ['Learning', '#'];
 
         $context = $assessment->getContext();
 
         if ($context instanceof Folder) {
-            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
         } elseif ($context instanceof UnitImplementation) {
-            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
         } elseif ($context instanceof UnitSpecification) {
-            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+            $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
         } elseif ($context instanceof Project) {
-            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
+            $trail[] = [$context->getTitle(), "/learning/assessment/{$context->getId()}"];
         }
 
         /* Additional project node, if you're creating within a project
          */
         if ($assessment instanceof Project) {
-            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"]);
+            $trail[] = [$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"];
         }
 
         return $trail;

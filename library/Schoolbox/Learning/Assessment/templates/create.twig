@@ -1,10 +1,7 @@
-{% import '@learningAssessment/fragments/macro/contextualBreadcrumbs.twig' as bread %}
+{% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{{ bread.crumbs(
-    folder,
-    [ 'Create Assessment', '#' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
