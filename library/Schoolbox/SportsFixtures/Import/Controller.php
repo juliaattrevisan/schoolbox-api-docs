@@ -183,9 +183,9 @@ class Controller extends Base
 
             readfile($filename);
             exit;
-        } else {
-            throw new \Exception('Requested template does not exist');
         }
+
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 
     /**
