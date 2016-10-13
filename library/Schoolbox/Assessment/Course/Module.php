@@ -127,7 +127,14 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'assessmentDataSource'          => $injector->lazyGet('assessmentDataSource'),
+                    'courseSpecificationDataSource' => $injector->lazyGet('courseSpecificationDataSource'),
+                    'unitSpecificationDataSource'   => $injector->lazyGet('unitSpecificationDataSource'),
+                ]
+            )
         );
     }
 }
