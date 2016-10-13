@@ -46,6 +46,7 @@ use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementati
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
+use Schoolbox\Learning\Assessment\Breadcrumb\AssessmentFactory as BreadcrumbAssessmentFactory;
 use Schoolbox\Learning\Assessment\Breadcrumb\ContextFactory as BreadcrumbContextFactory;
 
 class Controller extends Base
@@ -412,7 +413,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => $this->createBreadcrumbTrailFromAssessment($assessment),
+            'breadcrumbs' => (new BreadcrumbAssessmentFactory($assessment))->produce(),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'folder' => $folder,
@@ -603,7 +604,7 @@ class Controller extends Base
 
         if ($types->isValidIndex($assessmentType)) {
             $data = [
-                'breadcrumbs' => $this->createBreadcrumbTrailFromAssessment($project)->add(['Create Assessment', '#']),
+                'breadcrumbs' => (new BreadcrumbAssessmentFactory($project))->produce()->add(['Create Assessment', '#']),
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
@@ -708,38 +709,6 @@ class Controller extends Base
         }
 
         return $assessment;
-    }
-
-    /**
-     * Create a trail of crumbs for a particular assessment based
-     *
-     * @param $assessment
-     * @return Collection
-     */
-    private function createBreadcrumbTrailFromAssessment(IAssessable $assessment)
-    {
-        $trail = [];
-        $trail[] = ['Learning', '#'];
-
-        $context = $assessment->getContext();
-
-        if ($context instanceof Folder) {
-            $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
-        } elseif ($context instanceof UnitImplementation) {
-            $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
-        } elseif ($context instanceof UnitSpecification) {
-            $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
-        } elseif ($context instanceof Project) {
-            $trail[] = [$context->getTitle(), "/learning/assessment/{$context->getId()}"];
-        }
-
-        /* Additional project node, if you're creating within a project
-         */
-        if ($assessment instanceof Project) {
-            $trail[] = [$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"];
-        }
-
-        return $trail;
     }
 
     /* Utility methods - these can probably be refactored elsewhere

@@ -17,6 +17,8 @@ use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
+use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
+
 class ContextFactory
 {
     /**
@@ -95,7 +97,7 @@ class ContextFactory
                 $trail[] = [$context->getTitle(), "/project/{$context->getId()}"];
             }
         }
-        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        catch (DeletedException $e) {
 
             // noop?
         }
@@ -118,10 +120,12 @@ class ContextFactory
 
     /**
      * @param FolderMapper $folderMapper
+     * @return $this;
      */
     protected function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+        return $this;
     }
 
     /**
@@ -134,10 +138,12 @@ class ContextFactory
 
     /**
      * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @return $this;
      */
     protected function setUnitImplementationDataSource($unitImplementationDataSource)
     {
         $this->unitImplementationDataSource = $unitImplementationDataSource;
+        return $this;
     }
 
     /**
@@ -150,10 +156,12 @@ class ContextFactory
 
     /**
      * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     * @return $this;
      */
     protected function setUnitSpecificationDataSource($unitSpecificationDataSource)
     {
         $this->unitSpecificationDataSource = $unitSpecificationDataSource;
+        return $this;
     }
 
     /**
@@ -166,10 +174,12 @@ class ContextFactory
 
     /**
      * @param AssessmentDataSource $assessmentDataSource
+     * @return $this;
      */
     protected function setAssessmentDataSource($assessmentDataSource)
     {
         $this->assessmentDataSource = $assessmentDataSource;
+        return $this;
     }
 
     /**
@@ -182,10 +192,12 @@ class ContextFactory
 
     /**
      * @param int $contextId
+     * @return $this;
      */
     protected function setContextId($contextId)
     {
         $this->contextId = $contextId;
+        return $this;
     }
 
     /**
@@ -198,9 +210,11 @@ class ContextFactory
 
     /**
      * @param string $contextType
+     * @return $this;
      */
     protected function setContextType($contextType)
     {
         $this->contextType = $contextType;
+        return $this;
     }
 }
