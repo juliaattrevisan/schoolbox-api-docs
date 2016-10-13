@@ -64,19 +64,23 @@ class Translator
             ->setUpdatedAt($unitDataModel->getUpdatedAt())
             ->setDeletedAt($unitDataModel->getDeletedAt());
 
+        // Allow translate if folder is empty, for now.
+        if ($unitDataModel->getFolder() instanceof FolderModel) {
+            $unitSpecification->setFolder($unitDataModel->getFolder());
+        }
+
         // Basic translation of course spec
         $unitSpecification->setCourse(
             (new CourseSpecification())
                 ->setId($unitDataModel->getCourse()->getId())
-                ->setFolder($unitDataModel->getCourse()->getFolder())
                 ->setCreatedAt($unitDataModel->getCourse()->getCreatedAt())
                 ->setUpdatedAt($unitDataModel->getCourse()->getUpdatedAt())
                 ->setDeletedAt($unitDataModel->getCourse()->getDeletedAt())
         );
 
-        // Allow translate if folder is empty, for now.
-        if ($unitDataModel->getFolder() instanceof FolderModel) {
-            $unitSpecification->setFolder($unitDataModel->getFolder());
+        // Allow translate if course folder is empty
+        if ($unitDataModel->getCourse()->getFolder() instanceof FolderModel) {
+            $unitSpecification->getCourse()->setFolder($unitDataModel->getCourse()->getFolder());
         }
 
         // Set assessables directly is okay for now
