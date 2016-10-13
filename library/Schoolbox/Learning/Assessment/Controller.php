@@ -507,8 +507,10 @@ class Controller extends Base
                 /* You only get contextId when you're Creating, not updating
                  */
                 if ($this->getRequest()->post['contextId']) {
+                    // The unit spec doesn't contain a reference back to its course spec.
+                    // It should, or I should be able to find one.
                     $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
+                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
                 }
                 else {
                     $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
