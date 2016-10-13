@@ -406,12 +406,16 @@ class Controller extends Base
             $assessmentType = Types::ASSESSMENT_PROJECT;
         }
 
+        $zone = new Zone('files');
+        $zone->setMulti(true);
+
         /* Twig payload
          */
         $data = [
             'breadcrumbs' => (new BreadcrumbAssessmentFactory($assessment))->produce()->add(['Update', '#']),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
+            'attachzone' => $zone->getTwigContext(),
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
