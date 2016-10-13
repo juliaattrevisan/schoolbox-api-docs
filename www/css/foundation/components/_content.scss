@@ -1425,62 +1425,79 @@ dl {
 	}
 }
 
-$train-line-segment-length: 10rem;
+$train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
 $train-line-visited-color: $content-ui-foreground;
+$train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 
 .train-line {
-	text-align: center;
-	margin: 1rem 0 3rem;
+	display: flex;
+	justify-content: center;
+	flex-flow: row wrap;
+	list-style: none;
+	padding: 0;
+	margin: $train-line-stop-size 0 0;
 	li {
-		width: $train-line-stop-size;
-		height: $train-line-stop-size;
-		text-align: center;
-		line-height: $train-line-stop-size;
-		border-radius: $train-line-stop-size / 2;
-		background: $train-line-visited-color;
-		margin: 0 (($train-line-segment-length - $train-line-stop-size) / 2);
-		display: inline-block;
-		color: white;
+		padding: 0;
+		margin: 0;
+		flex: 1;
 		position: relative;
-		@include easy-transition(all 600ms ease-out);
-		&:before {
-			content: '';
-			position: absolute;
-			top: (($train-line-stop-size - $train-line-segment-width) / 2);
-			left: (-1 * $train-line-segment-length);
-			width: $train-line-segment-length;
-			height: $train-line-segment-width;
-			background: $train-line-visited-color;
-			z-index: -1;
-		}
-		&:first-child:before {
-			display: none;
-		}
-	}
-	a {
-		position: absolute;
 		text-align: center;
-		top: $train-line-stop-size;
-		width: $train-line-segment-length;
-		left: 50%;
-		@include transform(translateX(-50%));
-		&:before {
+		max-width: $train-line-segment-maxlength;
+		min-width: 3 * $train-line-stop-size;
+		&:before, &:after {
+			content: "";
+			display: block;
+			height: $train-line-segment-width;
+			flex: 1;
+			width: 50%;
 			position: absolute;
-			left: (($train-line-segment-length - $train-line-stop-size) / 2) + 0.5rem;
-			top: -1 * ($train-line-stop-size);
-			color: white;
+			top: 0;
+			background: $content-ui-foreground;
 		}
-	}
-	.current-stop {
-		background: $train-line-visited-color;
-		box-shadow: 0 0 0.5rem $train-line-visited-color;
-		~ li {
-			background: $train-line-unvisited-color;
-			&:before {
-				background: $train-line-unvisited-color;
+		&:before {
+			left: 0;
+		}
+		&:after {
+			right: 0;
+		}
+		&:first-child:before,
+		&:last-child:after {
+			content: none;
+		}
+		&.current-stop {
+			&:after {
+				background: $content-ui-background;
+			}
+			~ li {
+				&:before, &:after {
+					background: $content-ui-background;
+				}
+				a span {
+					background: $content-ui-background;
+				}
+			}
+			a span {
+				box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
+			}
+		}
+		a {
+			display: block;
+			margin: $train-line-stop-size 0.5rem;
+			span {
+				position: absolute;
+				top: -1 * (($train-line-stop-size - $train-line-segment-width) / 2);
+				left: calc(50% - (#{$train-line-stop-size / 2}));
+				background: $content-ui-foreground;
+				color: calc-text-color($content-ui-foreground);
+				border-radius: $train-line-stop-size / 2;
+				width: $train-line-stop-size;
+				height: $train-line-stop-size;
+				z-index: 1;
+				padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2) (($train-line-stop-size - rem-calc($base-font-size)) / 2);
+				@include easy-transition(all 200ms ease-out);
 			}
 		}
 	}

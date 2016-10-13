@@ -22,11 +22,31 @@
     </div>
     <div class="small-12 island">
         <ul class="train-line">
-            <li data-mage-trainstop="part-1"{% if not hashUsed %} class="current-stop"{% endif %}><a class="icon-anchor">First Fieldset</a></li>
-            <li data-mage-trainstop="part-2"><a class="icon-modify">Section Two</a></li>
-            <li data-mage-trainstop="part-3"><a class="icon-blog">Call and Response</a></li>
-            <li data-mage-trainstop="part-4"{% if hashUsed %} class="current-stop"{% endif %}><a class="icon-reply">Presume to Resume</a></li>
-            <li data-mage-trainstop="part-5"><a class="icon-undo">The First Amendment</a></li>
+            <li data-mage-trainstop="part-1"{% if not hashUsed %} class="current-stop"{% endif %}>
+                <a>
+                    <span class="icon-anchor"></span>First Fieldset
+                </a>
+            </li>
+            <li data-mage-trainstop="part-2">
+                <a>
+                    <span class="icon-modify"></span>Section Two
+                </a>
+            </li>
+            <li data-mage-trainstop="part-3">
+                <a>
+                    <span class="icon-blog"></span>Call and Response
+                </a>
+            </li>
+            <li data-mage-trainstop="part-4"{% if hashUsed %} class="current-stop"{% endif %}>
+                <a>
+                    <span class="icon-reply"></span>Presume to Resume
+                </a>
+            </li>
+            <li data-mage-trainstop="part-5">
+                <a>
+                    <span class="icon-undo"></span>The First Amendment
+                </a>
+            </li>
         </ul>
         <h2 class="subheader">One Form, Many Fieldsets</h2>
         <form action="/pantry/formForm.php" method="post" data-mage-preventsubmit="true">
