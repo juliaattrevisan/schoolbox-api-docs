@@ -64,6 +64,19 @@ $kernel->run
     // prepare statements
     $db = Database::getInstance();
 
+    $selectNonInnoDbRubricTablesStmt = $db->prepare("
+        SELECT `TABLE_NAME`
+        FROM `information_schema`.`TABLES`
+        WHERE `TABLE_SCHEMA` = :db
+        AND `TABLE_NAME` LIKE 'rubric_%'
+        AND `ENGINE` != 'InnoDB'
+    ");
+
+    $updateTableToInnoDbTemplate = "
+        ALTER TABLE %s.%s
+        ENGINE=INNODB
+    ";
+
     $selectedIndicatorStmt = $db->prepare("
         SELECT DISTINCT CONCAT_WS(' :: ', c.grouping, c.name) fullname, c.* 
         FROM rubric_descriptor d
@@ -172,6 +185,21 @@ $kernel->run
         SET mark = :visibleMark
         WHERE id = :return_id
     ");
+
+
+    // verify that the tables are all in InnoDB format
+    $selectNonInnoDbRubricTablesStmt->execute([ 'db' => SQL_db ]);
+
+    while ($tableName = $selectNonInnoDbRubricTablesStmt->fetch(\PDO::FETCH_COLUMN)) {
+        try {
+            $log->warning("WARNING: $tableName changed to InnoDB");
+            $db->query(sprintf($updateTableToInnoDbTemplate, SQL_db, $tableName));
+
+        } catch (PDOException $e) {
+            $log->emergency($e->getMessage(), [ $e ]);
+            exit(1);
+        }
+    }
 
     $searchStmt = $db->query("
         SELECT COUNT(t.box_id) unit_boxes, COUNT(ti.box_id) class_boxes, ui.* 
