@@ -479,7 +479,7 @@ $kernel->run
                     $avg = findClosestMatch($set, $marksToApply);
 
                     if (empty($avg)) {
-                        $log->warning("Could not apply $marksToApply marks to rubric [box_id,student_id]($instanceBoxId,$studentId)");
+                        $log->error("Could not apply $marksToApply marks to rubric [box_id,student_id]($instanceBoxId,$studentId)");
                         continue;
                     }
 
