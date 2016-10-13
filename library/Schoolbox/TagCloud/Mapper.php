@@ -149,7 +149,11 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 
         try {
             /** @var Model $row */
-            $row = self::findOneByColumn($this->fieldName, $string);
+            $row = self::findOneByColumnList(
+                array(
+                    $this->fieldName => $string,
+                    'deleted_at' => NULL,
+                ));
             return $row->getId();
         } catch (MapperException $e) {
             if ($create) {
