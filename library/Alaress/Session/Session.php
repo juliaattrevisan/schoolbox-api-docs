@@ -56,6 +56,17 @@ class Session extends BaseSession {
         parent::__construct($segment_factory, $csrf_token_factory, $phpfunc, $cookies);
         $this->setConfig($config);
         $this->setRequestTime($requestTime);
+        $this->configureCookie();
+    }
+
+    /**
+     * Set up this session's cookie based on its config.
+     */
+    protected function configureCookie()
+    {
+        $this->setCookieParams([
+            'lifetime' => $this->getConfig()->get('session_length'),
+        ]);
     }
 
     /**
