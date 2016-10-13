@@ -12,6 +12,9 @@ FOREIGN KEY (`assessment_id`)
 REFERENCES `assessment` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+-- No folder required any more
+ALTER TABLE `assess`
+  CHANGE COLUMN `category_id` `category_id` INT(11) NULL DEFAULT NULL;
 
 
 /**
@@ -28,6 +31,9 @@ FOREIGN KEY (`assessment_id`)
 REFERENCES `assessment` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+-- No folder required any more
+ALTER TABLE `submission_box`
+  CHANGE COLUMN `category` `category` INT(5) UNSIGNED NULL DEFAULT NULL;
 
 
 /**
@@ -42,3 +48,6 @@ FOREIGN KEY (`assessment_id`)
 REFERENCES `assessment` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+-- No folder required any more
+ALTER TABLE `task`
+  CHANGE COLUMN `category_id` `category_id` INT(11) NULL DEFAULT NULL;
