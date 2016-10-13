@@ -46,6 +46,8 @@ use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementati
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
+use Schoolbox\Learning\Assessment\Breadcrumb\ContextFactory as BreadcrumbContextFactory;
+
 class Controller extends Base
 {
 
@@ -254,7 +256,13 @@ class Controller extends Base
             'contextId' => $contextId,
             'contextType' => $contextType,
 
-            'breadcrumbs' => $this->createBreadcrumbTrailFromContext($contextId, $contextType),
+            'breadcrumbs' => (new BreadcrumbContextFactory(
+                $contextId, $contextType,
+                $this->getFolderMapper(),
+                $this->getUnitImplementationDataSource(),
+                $this->getUnitSpecificationDataSource(),
+                $this->getAssessmentDataSource()
+            ))->produce(),
 
             /* The usual info everything requires
              */
@@ -700,41 +708,6 @@ class Controller extends Base
         }
 
         return $assessment;
-    }
-
-    /**
-     * Create a trail of crumbs for screens where you spawn Assessments
-     *
-     * @param $contextId
-     * @param $contextType
-     * @return Collection
-     * @throws MapperException\Deleted
-     */
-    private function createBreadcrumbTrailFromContext($contextId, $contextType)
-    {
-        $trail = [];
-        $trail[] = ['Learning', '#'];
-
-        if ($contextType == 'folder') {
-            $context   = $this->getFolderMapper()->findById($contextId);
-            $trail[] = [$context->getName(), "/homepage/{$context->getId()}"];
-        }
-        elseif ($contextType == 'unit') {
-            $context   = $this->getUnitImplementationDataSource()->findById($contextId);
-            $trail[] = [$context->getTitle(), "/homepage/{$context->getId()}"];
-        }
-        elseif ($contextType == 'unitspec') {
-            $context   = $this->getUnitSpecificationDataSource()->findById($contextId);
-            $trail[] = [$context->getFolder()->getName(), "/homepage/{$context->getId()}"];
-        }
-        elseif ($contextType == 'project') {
-            $context   = $this->getAssessmentDataSource()->findById($contextId);
-            $trail[] = [$context->getTitle(), "/project/{$context->getId()}"];
-        }
-
-        $trail[] = ["Create Assessment", '#'];
-
-        return $trail;
     }
 
     /**
