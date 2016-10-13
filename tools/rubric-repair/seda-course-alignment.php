@@ -404,7 +404,7 @@ $kernel->run
 //                            $log->debug("TEST Criterion $critId");
 
                             $critMax    = $criterion['total'];
-                            $critMarked = $criterion['sum'] > 0;
+                            $critMarked = !is_null($criterion['sum']);
 
                             if ($critMarked) {
 
