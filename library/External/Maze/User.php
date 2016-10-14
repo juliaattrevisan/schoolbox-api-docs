@@ -643,6 +643,10 @@ class External_Maze_User implements External_UserInterface {
         $externalId = $user->getExternalId();
         $allSubjects = array();
 
+        if (empty($externalId)) {
+            return [];
+        }
+
 		if ($user->getRole()->isStudent()) {
 
 			/* Get roll groups
