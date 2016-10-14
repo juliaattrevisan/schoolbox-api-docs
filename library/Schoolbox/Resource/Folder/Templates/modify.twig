@@ -222,7 +222,7 @@
                 <fieldset class="content">
 
                     {% if not user.isSuperuser and folder.getCodeString %}
-                        {% set inheritTitle = 'Only SuperUsers may alter permission inheritance for folders with Class Codes' %}
+                        {% set inheritTitle = 'Only superusers may alter permission inheritance for folders with Class Codes' %}
                     {% else %}
                         {% set inheritTitle = 'Select user roles which have access to this folder' %}
                     {% endif %}
@@ -307,7 +307,7 @@
                         {% if user.isSuperuser %}
                             {% set codeTitle = 'If you want this folder to be a subject enter its code here. You may enter multiple codes by separating them with a comma' %}
                         {% else %}
-                            {% set codeTitle = 'Only SuperUsers may adminster Subject Codes' %}
+                            {% set codeTitle = 'Only superusers may adminster Subject Codes' %}
                         {% endif %}
 
                         <label>
