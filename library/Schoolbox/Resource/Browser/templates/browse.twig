@@ -36,6 +36,7 @@
 
         tree.resourceTree({
             data: {
+                {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
                 cache: {{ treedata | raw }},
                 ajaxParams: {
                     url: '{{ routeLookup(namespace ~ '.listNodes') }}',

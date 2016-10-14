@@ -14,6 +14,7 @@
         {% if group.name %}
             <label>
                 {%- if group.used -%}
+                    {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. Maybe use |nl2br filter? #}
                     {{ groupName | raw }}
                     <span data-tooltip
                           class="hint has-tip tip-right"
@@ -26,6 +27,7 @@
                 {% endif %}
             </label>
         {% else %}
+            {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. Maybe use |nl2br filter? #}
             <label class="meta">{{ groupName | raw }}</label>
             <input type="hidden" value="" name="{{ groupInput }}[name]" />
         {% endif %}

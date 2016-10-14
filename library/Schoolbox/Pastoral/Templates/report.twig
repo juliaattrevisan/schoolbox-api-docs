@@ -20,6 +20,7 @@
 
         $("[data-print]").click(function() {
             popupCenter(
+                    {# raw HTML NOT sanctioned - this can be escaped as JS #}
                     '{{ routeLookup('pastoral.getReportPrint') }}?{{ filters | raw }}',
                     'Print Pastoral Record',
                     900,

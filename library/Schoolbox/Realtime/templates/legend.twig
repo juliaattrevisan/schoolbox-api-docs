@@ -26,6 +26,7 @@
                                 Digest
                             </p>
                             <p class="meta">
+                                {# raw HTML NOT sanctioned - this can easily be changed to non-raw #}
                                 This message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest | raw }}</strong>{% endif %}.<br/>
                                 It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                             </p>

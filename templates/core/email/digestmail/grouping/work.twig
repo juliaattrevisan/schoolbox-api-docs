@@ -23,6 +23,7 @@
         <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
         {% for msg in row.messages %}
             <tr>
+                {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
                 <td><p>{{ msg.title | raw }}</p></td>
             </tr>
         {% endfor %}
