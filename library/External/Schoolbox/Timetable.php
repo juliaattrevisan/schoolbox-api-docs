@@ -18,11 +18,94 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $this->setdatabase(Database::getInstance());
     }
 
+    /**
+     * This function returns a list of periods on for the day
+     *
+     * @param string $externalUserId
+     * @param \Schoolbox\Campus $campus
+     * @param int $day
+     * @param null $date
+     * @return array
+     */
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
-        return $this->getTimetableDefinitionFromDatabase($this->getDatabase(), $campus);
+
+        $timetableDef = array();
+
+        $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->getDatabase(), $campus);
+
+        /* Must get at least one day */
+        if($day == 0) {
+            $day = 1;
+        }
+
+        $periodList = $this->getPeriodList($campus, $day);
+
+
+        $periodCount = 0;
+        foreach($periodList as $period) {
+            $timetableDef['desc'][] = $period['title'];
+            $timetableDef['start'][] = $period['start'];
+            $timetableDef['end'][] = $period['finish'];
+            $timetableDef['number'][]   = $period[$periodCount+1];
+            $timetableDef['sequence'][] = $period['sequence'];
+        }
+
+        $timetableDef['periodCount'] = $periodCount;
+        $timetableDef['dayCount']    = $timetableDefinition['cycle_length'];
+
+        return $timetableDef;
     }
 
+    /**
+     * @param \Schoolbox\Campus $campus
+     * @param int $day
+     * @return array
+     */
+    public function getPeriodList(\Schoolbox\Campus $campus, $day) {
+        $query = "
+            SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
+            FROM timetable_campus tc
+            LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+            LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
+            WHERE tc.campus_id = :campusId
+            ";
+
+        if($day > 0) {
+            $query .= " AND tp.day = :day ";
+        }
+
+        $query .= "ORDER BY tp.day, tp.sequence";
+
+        $periodStatement = $this->getDatabase()->prepare($query);
+
+
+        /* Get current campus timetable */
+        if($day > 0) {
+            $periodStatement->execute(
+                array(
+                    ':campusId' => $campus->getId(),
+                    ':day'      => $day
+                )
+            );
+        } else {
+            $periodStatement->execute(
+                array(
+                    ':campusId' => $campus->getId(),
+                )
+            );
+        }
+
+        $periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $periodList;
+    }
+
+    /**
+     * @param \Schoolbox\Campus $campus
+     * @param int $date
+     * @return bool|int
+     */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         return $this->getDayNumberFromDatabase($this->getDatabase(), $campus, $date);
@@ -38,32 +121,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     public function getDayName($dayNumber)
     {
         return 'Day ' . $dayNumber;
-    }
-
-    /**
-     * Gets a statement for fetching the periods for a given campus. Has
-     * parameters :campusId (and :day if $single_day is true).
-     *
-     * @param bool $single_day True if fetching only a single day's timetable.
-     *
-     * @return PDOStatement
-     */
-    protected function getPeriodStatement($single_day = false)
-    {
-        $query = "
-            SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
-            FROM timetable_campus tc
-            LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-            LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
-            WHERE tc.campus_id = :campusId
-            AND tc.start < NOW()
-            AND tc.finish > NOW()
-        ";
-        if ($single_day) {
-            $query .= ' AND tp.day = :day ';
-        }
-        $query .= " ORDER BY tp.sequence";
-        return $this->getDatabase()->prepare($query);
     }
 
     /**
@@ -97,26 +154,30 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
-        // Surely this should take a day number????
+        $dayNumber = $this->getDayNumber($campus, $now);
+        $now = $now ?: time();
 
-        if (!$definition = $this->getTimetableDefinition(null, $campus)) {
-            return false;
-        }
+        $query = "
+            SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
+            FROM timetable_campus tc
+            LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+            LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
+            WHERE tc.campus_id = :campusId
+            AND CAST(FROM_UNIXTIME(:now, '%h:%i:%s') as TIME) BETWEEN tp.start and tp.finish
+            AND tp.day = :dayNumber
+        ";
 
-        if (empty($definition['regular'])) {
-            return false;
-        }
+        $periodStatement = $this->getDatabase()->prepare($query);
 
-        $periodStatement = $this->getPeriodStatement(false);
-        $periodStatement->execute(array(':campusId' => $campus->getId(),));
-        $current_time = date('H:i:s', $now ?: time());
-        foreach ($periodStatement as $item) {
-            if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
-                return array(
-                    'PeriodNumber'    => $item['sequence'],
-                    'PeriodNumberSeq' => 1,
-                );
-            }
+        $periodStatement->execute(array(':campusId' => $campus->getId(), ':now' => $now, ':dayNumber' => $dayNumber));
+
+        $item = $periodStatement->fetch(PDO::FETCH_ASSOC);
+
+        if(is_array($item)) {
+            return array(
+                'PeriodNumber'    => $item['sequence'],
+                'PeriodNumberSeq' => 1,
+            );
         }
         return false;
     }
@@ -126,15 +187,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         if (empty($externalUserId)) {
             return array();
         }
-        /* Get current campus timetable */
-        $periodStatement = $this->getPeriodStatement(false);
-        $periodStatement->execute(
-            array(
-                ':campusId' => $campus->getId(),
-            )
-        );
 
-        $periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
+        $periodList = $this->getPeriodList($campus, 0);
 
         /* Get user's classes */
         // Is this a teacher? If so only get classes for which I'm a teacher
@@ -147,10 +201,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+
+        $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->getDatabase(), $campus);
         $dayCount            = $timetableDefinition['dayCount'];
 
         $periodListAdaption = array();
+
 
         foreach ($periodList as $period) {
             $periodSequence = $period['sequence'];
@@ -196,15 +252,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             return array();
         }
         /* Get current campus timetable */
-        $periodStatement = $this->getPeriodStatement(true);
-        $periodStatement->execute(
-            array(
-                ':campusId' => $campus->getId(),
-                ':day'      => $dayNumber
-            )
-        );
-
-        $periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
+        $periodList = $this->getPeriodList($campus, $dayNumber);
 
         /* Get user's classes */
         $classStatement = $this->getClassUserStatement();
@@ -217,7 +265,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
         $periodListAdaption = array();
-
         foreach ($periodList as $period) {
 
             $startTime = $period['start'] ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
