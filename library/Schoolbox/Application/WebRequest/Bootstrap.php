@@ -20,6 +20,7 @@ use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
 use Alaress\Session\Factory;
+use Alaress\Session\Session;
 use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Locale_Config;
@@ -522,8 +523,14 @@ class Bootstrap implements BootstrapInterface {
 
 
         // initialise session
-        $di->get('session')->start();
-
+        /** @var Session $session */
+        $session = $di->get('session');
+        // And set its expiry to later
+        $lifetime = $session->getCookieParams()['lifetime'];
+        if ($lifetime > 0) {
+            setcookie(session_name(), session_id(), $_SERVER['REQUEST_TIME'] + $lifetime);
+        }
+        $session->start();
 
         // Initialise module configuration
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
