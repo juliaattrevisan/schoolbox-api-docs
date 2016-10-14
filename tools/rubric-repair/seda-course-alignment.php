@@ -468,6 +468,11 @@ $kernel->run
 //                    $newVisibleMark = "$newNum / $newDenom";
 //                    $log->debug("New mark: $newVisibleMark");
 
+                    if ($marksToApply == 0) {
+                        $log->debug("No marks to apply");
+                        continue;
+                    }
+
                     // obtain the set of unmarked criteria for this student
                     $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
 
