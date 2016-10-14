@@ -436,6 +436,7 @@ class RubricMapper
               AND student_id = :userId
               AND valid = TRUE
             )
+            AND valid = TRUE
         ", [
             'boxId'  => $grid->getSubmissionBox()->getId(),
             'userId' => $student->getId()
