@@ -442,15 +442,15 @@ $kernel->run
                         continue;
                     }
 
+                    if ($unmarkedCount == 0) {
+                        $log->debug("Rubric grid is fully marked; no marks to apply");
+                        continue;
+                    }
+
                     $averageGiven = $grid->getSum() / $markedDenominator;
 
                     $marksToApply = round($averageGiven * $unmarkedDenominator);
 //                    $log->debug("Marks to apply: $marksToApply");
-
-                    if ($marksToApply == 0) {
-                        $log->debug("Rubric grid is fully marked; no marks to apply");
-                        continue;
-                    }
 
                     $newDenom  = $grid->getTotal();
                     $newNum    = $grid->getSum() + $marksToApply;
