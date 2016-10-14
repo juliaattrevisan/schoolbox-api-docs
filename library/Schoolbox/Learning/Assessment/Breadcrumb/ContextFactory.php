@@ -99,7 +99,7 @@ class ContextFactory
 
                 /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
                  */
-                $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
+                $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
             }
         }
         catch (DeletedException $e) {
