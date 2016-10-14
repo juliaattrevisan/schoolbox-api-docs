@@ -278,7 +278,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         $externalId = $user->getExternalId();
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (empty($externalId)) {
             return [];
         }
 

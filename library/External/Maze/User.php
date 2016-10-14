@@ -641,11 +641,6 @@ class External_Maze_User implements External_UserInterface {
 	public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
-
-        if (!$this->isExternalIdValid($externalId)) {
-            return [];
-        }
-
         $allSubjects = array();
 
 		if ($user->getRole()->isStudent()) {

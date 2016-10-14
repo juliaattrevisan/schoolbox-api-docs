@@ -258,11 +258,11 @@ class External_Schoolbox_User implements External_UserInterface
      * @param User $user
      * @return array
      */
-    function getSubjectList(Schoolbox\User $user)
+    function getSubjectList(\Schoolbox\User $user)
     {
         $externalId = $user->getExternalId();
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (empty($externalId)) {
             return [];
         }
 

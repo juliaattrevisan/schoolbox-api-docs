@@ -301,12 +301,11 @@ class External_Schoolpro_User implements External_UserInterface
     public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
+        $groupHandler = new Group();
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (empty($externalId)) {
             return [];
         }
-
-        $groupHandler = new Group();
 
         if ($user->getRole()->isStudent()) {
             $vars = array(

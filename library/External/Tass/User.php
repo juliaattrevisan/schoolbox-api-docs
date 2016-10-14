@@ -201,10 +201,9 @@ class External_Tass_User implements External_UserInterface
     {
         $externalId = $user->getExternalId();
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (empty($tassCode)) {
             return [];
         }
-
         if ($user->getRole()->isStudent()) {
             $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, student.year_grp, sub_desc, sub_type
 					FROM studsub

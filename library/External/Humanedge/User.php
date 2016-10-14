@@ -336,7 +336,7 @@ class External_Humanedge_User implements External_UserInterface
     {
         $externalId = $user->getExternalId();
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (empty($externalId)) {
             return [];
         }
 
