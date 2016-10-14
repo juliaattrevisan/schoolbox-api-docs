@@ -155,6 +155,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         $dayNumber = $this->getDayNumber($campus, $now);
+        $now = $now ?: time();
 
         $query = "
             SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
@@ -162,8 +163,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
             LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
             WHERE tc.campus_id = :campusId
-            AND tc.start < UNIX_TIMESTAMP(:now)
-            AND tc.finish > UNIX_TIMESTAMP(:now)
+            AND CAST(FROM_UNIXTIME(:now, '%h:%i:%s') as TIME) BETWEEN tp.start and tp.finish
             AND tp.day = :dayNumber
         ";
 
