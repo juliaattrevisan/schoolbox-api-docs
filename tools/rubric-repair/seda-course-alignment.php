@@ -77,6 +77,10 @@ $kernel->run
         ENGINE=INNODB
     ";
 
+    $indexDescriptorIdStmt = $db->prepare("
+        ALTER TABLE `rubric_mark` ADD INDEX (`descriptor_id`);
+    ");
+
     $selectedIndicatorStmt = $db->prepare("
         SELECT DISTINCT CONCAT_WS(' :: ', c.grouping, c.name) fullname, c.* 
         FROM rubric_descriptor d
@@ -213,6 +217,9 @@ $kernel->run
             exit(1);
         }
     }
+
+    // set the missing index so queries actually execute in non-molasses time
+    $indexDescriptorIdStmt->execute();
 
     $searchStmt = $db->query("
         SELECT COUNT(t.box_id) unit_boxes, COUNT(ti.box_id) class_boxes, ui.* 
