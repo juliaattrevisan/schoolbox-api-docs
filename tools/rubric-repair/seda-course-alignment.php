@@ -107,6 +107,14 @@ $kernel->run
         AND submission_box_id = :submission_box_id
     ");
 
+    $massInvalidateMarkStmt = $db->prepare("
+        UPDATE rubric_mark m
+        LEFT JOIN rubric_descriptor d ON m.descriptor_id = d.id
+        SET m.valid = FALSE
+        WHERE d.valid != m.valid
+        AND d.submission_box_id = :submission_box_id
+    ");
+
     $duplicateCriterionStmt = $db->prepare("
         INSERT INTO rubric_criterion (grouping, `name`, parent_id, parent_type)
         SELECT grouping, `name`, :parent_id, 'category'
@@ -365,9 +373,11 @@ $kernel->run
                     ));
 
                 } else {
+                    $log->info("Invalidating all incongruous rubric marks [box_id]($instanceBoxId)");
+                    $massInvalidateMarkStmt->execute([ 'submission_box_id' => $instanceBoxId ]);
+
                     $log->debug("Verifying integrity of returns");
                     $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
-
                 }
 
                 $userSeen = [];
@@ -727,7 +737,6 @@ function insertIndicators(
     LoggerInterface $log
 ) {
     $log->notice(sprintf("ADD indicator %5d into box %5d: %s", $addition['id'], $instanceBoxId, $addition['fullname']), [ 'char' => '+' ]);
-    // TODO
 
     // DUPLICATE the rubric_criterion record from the unit folder into the class folder, compensating for parent_id
     $log->info("DUPLICATE rubric_criterion {$addition['id']} into folder $classId");
