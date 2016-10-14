@@ -19,7 +19,7 @@ set iconClassnames = {
         />
         <label for="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
                title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
-               class="no-margin">
+               class="no-margin input-toggle">
             <a class="no-pointer-events icon-{{ iconClassnames[perm[1]] }}" title="r{{ perm[1] }}"></a>
         </label>
     </span>

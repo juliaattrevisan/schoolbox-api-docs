@@ -391,12 +391,12 @@ input[type=checkbox].plain {
 
 input[type=radio]:not(.plain)    {
 	@include fancy-check('radio-label');
-	@include vaporwave('radio-toggle');
+	@include vaporwave('input-toggle');
 }
 
 input[type=checkbox]:not(.plain) {
 	@include fancy-check('checkbox-label');
-	@include vaporwave('checkbox-toggle');
+	@include vaporwave('input-toggle');
 }
 
 // Win7/IE11 fix for size of checkboxes
