@@ -20,7 +20,7 @@
         Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
     </p>
 
-    <pre class="content">
+    <pre class="content stracktrace">
         {%- spaceless -%}
         {{ stackTrace }}
         {%- endspaceless -%}
