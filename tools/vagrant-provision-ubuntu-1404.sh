@@ -1,39 +1,38 @@
 #!/bin/bash
-vag="[schoolbox]";
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 cd $cachedir;
 
 # Defaults
 download_url="vagrant.alaress-dev.com.au";
-demo_data_version="latest"
 external_db="synergetic";
-external_db_host="192.168.1.20";
+external_db_host="172.31.15.10";
 
 # Get options
 if [ ! -z $1 ]; then download_url=$1; fi;
-if [ ! -z $2 ]; then demo_data_version=$2; fi;
+if [ ! -z $2 ]; then demo_data_version=$2; else echo "Please provide demo_data_version"; exit 1; fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
 
-echo "$vag Setting up vagrant with options:";
-echo "$vag Download URL: $download_url";
-echo "$vag Demo Data Version: $demo_data_version";
-echo "$vag External DB: $external_db";
-echo "$vag External DB Host: $external_db_host";
+echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
+echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
+echo "[SB][`date +%Y-%m-%d\ %X`] Download URL: $download_url";
+echo "[SB][`date +%Y-%m-%d\ %X`] Demo Data Version: $demo_data_version";
+echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
+echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 
-echo "$vag Retrieving latest Demo Data files";
+echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Demo Data files";
 curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
 if [ $? -eq 0 ];
 then
 	mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
 	rm -f schoolboxdemo-$demo_data_version-sha1.txt;
 else
-	echo "$vag Unable to retrive $demo_data_version sha1 list, continuing with current";
+	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrive $demo_data_version sha1 list, continuing with current";
 fi
 if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
 then
-	echo "$vag Unable to retrieve $demo_data_version demo data. Halting provisioning.";
+	echo "[SB][`date +%Y-%m-%d\ %X`] Unable to retrieve $demo_data_version demo data. Halting provisioning.";
 	exit 1;
 fi
 while read line;
@@ -43,108 +42,79 @@ do
 	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
 	if [ "$line" == "$currentsha1" ];
 	then
-		echo "$vag No change to $demofile";
+		echo "[SB][`date +%Y-%m-%d\ %X`] No change to $demofile";
 	else
-		echo "$vag Downloading $demofile";
-		curl -L http://vagrant.alaress-dev.com.au/$demofile > $demofile;
+		echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
+		curl -L http://$download_url/$demofile > $demofile;
 	fi
 done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
-mariadbcheck=`dpkg -l | grep 'mariadb-server' | wc -l`;
-if [ $mariadbcheck -eq 0 ];
-then
-	echo "$vag Installing MariaDB";
-	apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db >/dev/null 2>&1;
-	add-apt-repository 'deb [arch=amd64,i386] http://mirror.aarnet.edu.au/pub/MariaDB/repo/10.1/ubuntu trusty main' >/dev/null 2>&1;
-	apt-get update >/dev/null 2>&1; 
-	DEBIAN_FRONTEND=noninteractive apt-get install -q -y -o DPkg::Options::=--force-confold mariadb-server mariadb-client mariadb-server-10.1 mariadb-client-10.1 libmariadbclient18 mariadb-client-core-10.1 mariadb-server-core-10.1 mariadb-common >/dev/null 2>&1;
-fi
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL database";
+mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
 
-echo "$vag Ensuring MySQL is running";
-#service mysql restart > /dev/null 2>&1;
-service mysql start > /dev/null 2>&1;
-
-echo "$vag Stopping Apache";
-service apache2 stop > /dev/null 2>&1;
-
-echo "$vag Disabling php-fpm";
-if [ -f /etc/init.d/php5-fpm ];
-then
-	service php5-fpm stop;
-	rm -f /etc/init.d/php5-fpm;
-fi
-
-echo "$vag Updating timezone data";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -ptnp879 mysql;
-
-echo "$vag Removing current Schoolbox MySQL database";
-mysql -u root -ptnp879 -e "drop database if exists schoolbox";
-
-echo "$vag Removing current Schoolbox Data directory";
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox Data directory";
 rm /vagrant/data/* -fR;
 
-echo "$vag Setting up browscap cache";
+echo "[SB][`date +%Y-%m-%d\ %X`] Setting up browscap cache";
 mkdir -p /vagrant/tools/browscap;
 rm -f /vagrant/tools/browscap/browscap.ini;
 touch /vagrant/tools/browscap/browscap.ini;
 cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
 
-echo "$vag Loading Schoolbox MySQL Demo data";
-mysql -u root -ptnp879 -e "create database schoolbox";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
+echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
+mysql --defaults-extra-file=/root/.my.cnf -e "create database schoolbox";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
 
-mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
-mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
 
-echo "$vag Creating Schoolbox data directories";
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox data directories";
 cd /vagrant;
 tar -xzf $cachedir/schoolboxdemo-$demo_data_version.tar.gz;
 rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
 
-echo "$vag Creating Schoolbox conf file";
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 
-echo "$vag Installing vendor submodules with composer";
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
 /vagrant/tools/composer.sh;
 
-echo "$vag Building SQL updates";
+echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
 cd tools;
 ./build-sql-update.sh >/dev/null;
 cd /vagrant;
 
-echo "$vag Generating data dir sql fixes";
+echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes";
 cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
 
-echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
 
-echo "$vag Upgrading demo data with latest SQL updates";
+echo "[SB][`date +%Y-%m-%d\ %X`] Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
 /vagrant/tools/update-sql.sh;
 rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
-echo "$vag Generating data dir sql fixes";
+echo "[SB][`date +%Y-%m-%d\ %X`] Generating data dir sql fixes (post version upgrade)";
 cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_verison.sql;
 
-echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
 
-echo "$vag Applying UTF8 schema patch";
+echo "[SB][`date +%Y-%m-%d\ %X`] Applying UTF8 schema patch";
 /vagrant/tools/schema/collation.sh;
 
-echo "$vag Removing existing apache vhosts";
-rm -f /etc/apache2/sites-enabled/10*;
-rm -f /etc/apache2/sites-enabled/*schoolbox*;
-sed -i 's/vagrant\/data\/vagrant-xhdebug/vagrant\/vagrant-xhdebug/g' /etc/apache2/sites-enabled/*xhdebug*.conf;
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing existing apache vhosts";
+rm -f /etc/apache2/sites-enabled/*;
 
-echo "$vag Enabling Schoolbox apache vhost";
+echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox apache vhost";
 sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox > /etc/apache2/sites-available/schoolbox.conf;
 sed -i 's/php_flag\ display_startup_errors\ off/php_flag\ display_startup_errors\ on/g' /etc/apache2/sites-available/schoolbox.conf;
 sed -i 's/php_flag\ display_errors\ off/php_flag\ display_errors\ on/g' /etc/apache2/sites-available/schoolbox.conf;
@@ -160,15 +130,11 @@ sed -i 's/var\/log\/apache2/vagrant/g' /etc/apache2/sites-available/schoolbox-da
 sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 a2ensite schoolbox-dav.conf
 
-# ensure javascript-common is removed
-# ensure php5-enchant and myspell-en-au are installed
-puppet apply -e 'package { "javascript-common": ensure => absent } package { "php5-enchant": ensure => latest } package { "myspell-en-au": ensure => latest }' > /dev/null;
-
-echo "$vag Enabling Schoolbox nginx vhost";
+echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
 
-echo "$vag Set up video cronjobs"
+echo "[SB][`date +%Y-%m-%d\ %X`] Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
 sed -i 's/usr\/share\/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
 sed -i 's/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
@@ -177,67 +143,53 @@ sed -i 's/var\/lib\/vagrant/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
 sed -i 's/www-data/root/g' $cachedir/schoolboxdemo-latest-cron
 cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 
-echo "$vag Installing grunt-cli if not already installed";
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
-echo "$vag Building CSS and JS";
+echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS and JS";
 /vagrant/tools/pkg-build-css-js.sh --sass;
 
-echo "$vag Loading all demo data complete";
+echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
-echo "$vag Run Notifications binder";
+echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binder (in background)";
 cd /vagrant/tools/mq;
 ./binder.php &
 
-echo "$vag Install schoolbox-scheduled";
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
 cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
 cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
 
-echo "$vag Install schoolbox-socketd";
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-socketd";
 cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
 cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
 
-echo "$vag Install schoolbox-digestd";
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-digestd";
 cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
 cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
 
-echo "$vag Install schoolbox-rerouted";
+echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-rerouted";
 cp -f /vagrant/tools/init/upstart-rerouted.conf /etc/init/schoolbox-rerouted.conf;
 cp -f /vagrant/tools/init/upstart-rerouted.override /etc/init/schoolbox-rerouted.override;
 
-#echo "$vag Install schoolbox-belld";
+#echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-belld";
 #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
 #cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
 
-echo "$vag Ensure schoolbox-epl is of the required version";
-eplver='1.4.1-4';
-if [ "`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`" != "$eplver" ];
-then
-	apt-get update >/dev/null 2>&1;
-	apt-get -y install schoolbox-epl;
-fi
+eplver=`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`;
+echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-epl installed: $eplver";
 
-echo "$vag Ensure schoolbox-ffmpeg is of the required version";
-ffmpegver='2.6.3-1';
-if [ "`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`" != "$ffmpegver" ];
-then
-	apt-get update >/dev/null 2>&1;
-	apt-get -y install schoolbox-ffmpeg;
-fi
-
-echo "$vag Installing all required packages";
-apt-get -y install imagemagick php5-imagick php5-mcrypt;
+ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
+echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 
 if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
 then
-	echo "$vag Apache is v2.4.x, changing access config to match";
+	echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
 	sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
 	sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
 fi
 
-echo "$vag Ensure all services are running";
+echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
-#service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 service schoolbox-scheduled restart > /dev/null 2>/dev/null &
@@ -249,12 +201,12 @@ service schoolbox-rerouted restart > /dev/null 2>/dev/null &
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
 then
-	echo "$vag Running custom post provisioning";
+	echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
 	/vagrant/post-provision.sh 2>&1;
 fi
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
-	echo "$vag Website URL => http://$eth/";
-	echo "$vag WebDav URL => http://$eth:8000/";
+	echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
+	echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8000/";
 done
