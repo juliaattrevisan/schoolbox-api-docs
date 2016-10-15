@@ -61,6 +61,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", memory]
+    # Workaround issues in Vitualbox < 5.1.6
+    vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
   end
 
   config.vm.provider "vmware_fusion" do |vf|
