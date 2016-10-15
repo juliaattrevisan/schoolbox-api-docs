@@ -40,17 +40,15 @@ do
 	demofile=`echo "$line" | awk {'print $2'}`;
 	demosha1=`echo "$line" | awk {'print $1'}`;
 	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
-	if [ "$line" == "$currentsha1" ];
+	if [ "$line" != "$currentsha1" ];
 	then
-		echo "[SB][`date +%Y-%m-%d\ %X`] No change to $demofile";
-	else
 		echo "[SB][`date +%Y-%m-%d\ %X`] Downloading $demofile";
 		curl -L http://$download_url/$demofile > $demofile;
 	fi
 done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --defaults-extra-file=/root/.my.cnf mysql;
+mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL database";
 mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
@@ -83,7 +81,7 @@ sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
-/vagrant/tools/composer.sh;
+/vagrant/tools/composer.sh 2>&1;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
 cd tools;
@@ -150,7 +148,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS and JS";
-/vagrant/tools/pkg-build-css-js.sh --sass;
+/vagrant/tools/pkg-build-css-js.sh --sass 2>&1;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
