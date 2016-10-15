@@ -7,4 +7,4 @@ public_network: true
 private_network_ip: "192.168.36.10"
 external_db: "synergetic"
 external_db_host: "172.31.15.10"
-demo_data_version: "latest"
+demo_data_version: "v6.1"
