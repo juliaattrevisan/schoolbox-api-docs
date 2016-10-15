@@ -7,15 +7,16 @@ require 'yaml'
 VAGRANTFILE_API_VERSION = "2"
 
 
-# Defaults
-vagrant_box = "ubuntu-1204-gold-PHP55"
-download_url = "vagrant.alaress-dev.com.au"
-memory = "1024"
-external_db = "synergetic"
-external_db_host = "192.168.1.20"
-demo_data_version = "latest"
-public_network = true
-private_network_ip = "192.168.36.10"
+# Load Defaults
+default = YAML.load_file('vagrant.default.yaml')
+vagrant_box = default["vagrant_box"]
+download_url = default["download_url"]
+memory = default["memory"]
+external_db = default["external_db"]
+external_db_host = default["external_db_host"]
+demo_data_version = default["demo_data_version"]
+public_network = default["public_network"]
+private_network_ip = default["private_network_ip"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
