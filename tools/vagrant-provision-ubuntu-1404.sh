@@ -49,6 +49,9 @@ do
 	fi
 done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --defaults-extra-file=/root/.my.cnf mysql;
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL database";
 mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
 
