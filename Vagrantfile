@@ -17,6 +17,7 @@ external_db_host = default["external_db_host"]
 demo_data_version = default["demo_data_version"]
 public_network = default["public_network"]
 private_network_ip = default["private_network_ip"]
+provision_script = default["provision_script"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -46,6 +47,9 @@ if File.file?('vagrant.yaml')
   if !conf["private_network_ip"].nil?
     private_network_ip = conf["private_network_ip"]
   end
+  if !conf["provision_script"].nil?
+    provision_script = conf["provision_script"]
+  end
 
 end
 
@@ -71,7 +75,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision "shell" do |s|
-    s.path = "tools/vagrant-provision-ubuntu-1204.sh"
+    s.path = "#{provision_script}"
     s.args = "#{download_url} #{demo_data_version} #{external_db} #{external_db_host}"
   end
 
