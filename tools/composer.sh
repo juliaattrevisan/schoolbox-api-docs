@@ -13,3 +13,9 @@ then
 	chmod a+x composer.phar;
 fi
 php composer.phar install --no-progress -o $*
+checkexit=`echo $?`;
+if [ $checkexit -eq 0 ];
+then
+	sha1sum composer.lock > vendor/composer.lock.checksum;
+fi
+exit $checkexit;

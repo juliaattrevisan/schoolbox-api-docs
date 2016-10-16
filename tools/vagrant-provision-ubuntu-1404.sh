@@ -81,7 +81,89 @@ sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
-/vagrant/tools/composer.sh 2>&1;
+cd $cachedir;
+vendorfile='';
+composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
+if [ -f /vagrant/vendor/composer.lock.checksum ];
+then
+        currentvendorsha=`awk '{print $1}' /vagrant/vendor/composer.lock.checksum`;
+        if [ "$currentvendorsha" == "$composerlocksha" ];
+        then
+                echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
+                vendorfile='ignore';
+        fi
+fi
+
+if [ "$vendorfile" != 'ignore' ];
+then
+        check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+        if [ $check -gt 0 ];
+        then
+                # Woo - we've located a matching cache file
+                vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+        else
+                # No cache files match - boo hoo - check to see if there are new versions
+                for branch in develop master;
+                do
+                        # Check if we've already found a matching file
+                        if [ "$vendorfile" == '' ];
+                        then
+                                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                                if [ $? -eq 0 ];
+                                then
+                                        checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
+                                        if [ $checketag -eq 0 ];
+                                        then
+                                                # New/updated version available - download it
+                                                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
+                                                curl https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz > $branch-vendor-php-dev.tar.gz;
+                                                if [ $? -eq 0 ];
+                                                then
+                                                        # This is a new file, so remove old references
+                                                        sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
+                                                        sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
+                                                        # Add new file to etag cache
+                                                        echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
+                                                        # Cleanup for purity
+                                                        rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                                                        # Extract checksum
+                                                        tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
+                                                        vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
+                                                        rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                                                        # Add new file to vendor cache
+                                                        echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
+                                                        # Check if this is file we need
+                                                        if [ "$vendorchecksum" == "$composerlocksha" ];
+                                                        then
+                                                                vendorfile="$branch-vendor-php-dev.tar.gz";
+                                                        fi
+                                                fi
+                                        fi
+                                fi
+                        fi
+                done
+        fi
+	cd /vagrant;
+        if [ "$vendorfile" != '' ];
+        then
+                if [ -f /vagrant/vagrantcache/$vendorfile ];
+                then
+                        # Extract content
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
+                        rm -fR /vagrant/vendor 2>/dev/null;
+                        tar xzf /vagrant/vagrantcache/$vendorfile;
+                else
+                        # Still no luck, build from scratch with composer
+                        echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+                        /vagrant/tools/composer.sh 2>&1;
+                fi
+        else
+                # Still no luck, build from scratch with composer
+                echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+                /vagrant/tools/composer.sh 2>&1;
+        fi
+fi
+cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
 cd tools;
