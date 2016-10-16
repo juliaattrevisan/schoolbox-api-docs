@@ -19,7 +19,7 @@ Hopefully that makes some kind of sense.
 
 */
 
-UPDATE `ups_effect`
-SET arguments = REPLACE(arguments, '{:email', '{:homeEmail')
-WHERE `rule_id` = 1
-AND (SELECT value FROM `config` WHERE name = 'external_type') = 'synergetic';
+UPDATE  `ups_effect`
+SET     `arguments` = REPLACE(`arguments`, ':email', ':homeEmail')
+WHERE   `rule_id` IN (SELECT `id` FROM `ups_rule` WHERE role_type = 'student') AND
+        (SELECT value FROM `config` WHERE name = 'external_type') = 'synergetic';
