@@ -1053,14 +1053,15 @@ class Controller extends Base
 
                     foreach ($players as $player) {
                         try {
-                            $this->getTeamPlayerMapper()->findOneByColumnList([
-                                'team_id' => $team->getId(),
-                                'user_id' => $player
-                            ]);
-                        } catch (MapperException $e) {
-                            try {
-                                $user = $this->getUserMapper()->findByExternalId($player);
+                            $user = $this->getUserMapper()->findByExternalId($player);
 
+                            try {
+                                $this->getTeamPlayerMapper()->findOneByColumnList([
+                                    'team_id' => $team->getId(),
+                                    'user_id' => $user->getId()
+                                ]);
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Already in team ({$player})");
+                            } catch (MapperException $e) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to team '{$team->getName()}'");
 
                                 $teamPlayer = new TeamPlayer();
@@ -1068,9 +1069,9 @@ class Controller extends Base
                                 $teamPlayer->setSequence(0);
                                 $teamPlayer->setUser($user);
                                 $this->getTeamPlayerMapper()->save($teamPlayer);
-                            } catch (MapperException $e) {
-                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Unknown ID ({$player})");
                             }
+                        } catch (MapperException $e) {
+                            $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Unknown ID ({$player})");
                         }
                     }
                 }
