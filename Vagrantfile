@@ -7,15 +7,17 @@ require 'yaml'
 VAGRANTFILE_API_VERSION = "2"
 
 
-# Defaults
-vagrant_box = "ubuntu-1204-gold-PHP55"
-download_url = "vagrant.alaress-dev.com.au"
-memory = "1024"
-external_db = "synergetic"
-external_db_host = "192.168.1.20"
-demo_data_version = "latest"
-public_network = true
-private_network_ip = "192.168.36.10"
+# Load Defaults
+default = YAML.load_file('vagrant.default.yaml')
+vagrant_box = default["vagrant_box"]
+download_url = default["download_url"]
+memory = default["memory"]
+external_db = default["external_db"]
+external_db_host = default["external_db_host"]
+demo_data_version = default["demo_data_version"]
+public_network = default["public_network"]
+private_network_ip = default["private_network_ip"]
+provision_script = default["provision_script"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -45,6 +47,9 @@ if File.file?('vagrant.yaml')
   if !conf["private_network_ip"].nil?
     private_network_ip = conf["private_network_ip"]
   end
+  if !conf["provision_script"].nil?
+    provision_script = conf["provision_script"]
+  end
 
 end
 
@@ -61,6 +66,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", memory]
+    # Workaround issues in Vitualbox < 5.1.6
+    vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
   end
 
   config.vm.provider "vmware_fusion" do |vf|
@@ -68,7 +75,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision "shell" do |s|
-    s.path = "tools/vagrant-provision-ubuntu-1204.sh"
+    s.path = "#{provision_script}"
     s.args = "#{download_url} #{demo_data_version} #{external_db} #{external_db_host}"
   end
 
