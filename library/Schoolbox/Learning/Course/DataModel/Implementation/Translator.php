@@ -59,7 +59,10 @@ class Translator
         // I am not going to translate the entire course spec. Just set its ID.
         if ($implementation->getSpecification() instanceof CourseSpecification) {
             $specModel = new CourseSpecificationDataModel();
-            $specModel->setId($implementation->getSpecification()->getId());
+            $specModel
+                ->setId($implementation->getSpecification()->getId())
+                ->setFolder($implementation->getSpecification()->getFolder())
+            ;
             $dataModel->setSpecification($specModel);
         }
 
