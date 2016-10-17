@@ -166,18 +166,8 @@ class Controller extends Base
      */
     public function getSelectAssessmentInUnitImplementation($unitId, $assessmentTypeTitle)
     {
-        /* TODO: Get from db
-         */
-        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
-
-        /* TODO: Derive $folder from $unitId somehow
-         */
-        try {
-            $folder = new \Schoolbox\Resource\Folder\Model();
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
+        $unit   = $this->getUnitImplementationDataSource()->findById($unitId);
+        $folder = $unit->getFolder();
 
         /* Pump into twig-land
          */
