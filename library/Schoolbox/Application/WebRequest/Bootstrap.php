@@ -607,12 +607,12 @@ class Bootstrap implements BootstrapInterface {
                 $code    = 400;
                 $info    = "If the problem persists, please contact your System Administrator including the following information:";
 
-                if ($e instanceof \RuntimeException) {
+                if ($e instanceof \PDOException){
+                    $code = 500;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                } else if ($e instanceof \RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
-                } elseif ($e instanceof \PDOException) {
-                    $code    = 500;
-                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                 } else {
                     $message = 'Schoolbox has encountered a fatal error.';
 
@@ -629,9 +629,9 @@ class Bootstrap implements BootstrapInterface {
                     }
                 }
 
-                // Report to New Relic if not a RuntimeException
+                // Report to New Relic
                 if (extension_loaded('newrelic')) {
-                    if ($e instanceof \Exception && !($e instanceof \RuntimeException)) {
+                    if ($e instanceof \Exception ) {
                         newrelic_notice_error(null, $e);
                     }
                 }
@@ -649,7 +649,7 @@ class Bootstrap implements BootstrapInterface {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->kernel->getDependencyInjector();
 
-                if (!$e instanceof \Throwable) {
+                if (!$e instanceof \Exception) {
                     $e = $error;
                     $e['code'] = $code;
 
