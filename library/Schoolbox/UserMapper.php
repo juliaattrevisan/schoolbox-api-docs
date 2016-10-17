@@ -620,9 +620,10 @@ class UserMapper extends Mapper
     public function findByAccess($service, $accessLevel, $serviceIdentifier = null)
     {
         $query = "
-            SELECT DISTINCT {$this->getColumnString('u')}
+            SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}
             FROM {$this->getTable()} u
             INNER JOIN {$this->getJoinSql('userAccess', 'u', 'ua')}
+            INNER JOIN {$this->getJoinSql('role', 'u', 'r')}
             WHERE ua.service=:service
             AND ua.type >=:accessLevel
         ";
@@ -634,9 +635,19 @@ class UserMapper extends Mapper
             $query .= 'AND ua.sid=:serviceIdentifier';
             $params['serviceIdentifier'] = $serviceIdentifier;
         }
+
+        $users = new Collection();
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
-        return $this->hydrateList($statement, 'u');
+
+        foreach ($statement as $row) {
+            $user = $this->hydrate($row, 'u');
+            $role = $this->hydrateJoin($row, 'role', 'r');
+            $user->setRole($role);
+            $users->add($user);
+        }
+
+        return $users;
     }
 
     /**

@@ -7,6 +7,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
+
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -53,25 +59,24 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             )
         );
 
-        $userHandler = new User;
-        $managerList = $userHandler->getManagers($this->getContext()->getId());
+        // Get collection of managers
+        $userMapper = new UserMapper();
+        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId());
+
+        // Get admin
+        $userAccessMapper = new UserAccessMapper();
+        $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
         $emailObj = new Email();
 
-        if (is_array($managerList)) {
+        if (!empty($managerList)) {
             $j = 0;
             foreach ($managerList as $manager) {
 
-                // Save the servers, kill the loop if we've reached 100
-                if ($j === 100) {
-                    break;
-                }
+                $name  = $manager->getFullName();
+                $email = $manager->getEmail();
 
-                $name  = $userHandler->formatName($manager);
-                $email = $emailObj->formatEmailFromArray($manager);
-                $meta  = $userHandler->getByID($manager['uid']);
-
-                if ($manager['type'] == 3) {
+                if ($manager->getId() == $admin->getId()) {
                     $name .= " (Group Admin.)";
                 }
 
@@ -82,10 +87,10 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 $this->setVar(
                     array(
                         'ON_OFF'             => ++$j % 2 ? '' : 'dark',
-                        'PERSON_UID'         => $manager['uid'],
+                        'PERSON_UID'         => $manager->getId(),
                         'PERSON_NAME'        => $name,
-                        'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
-                        'PERSON_GROUP'       => Scrub::text($meta['gname']),
+                        'PERSON_EXTERNAL_ID' => $manager->getExternalId(),
+                        'PERSON_GROUP'       => $manager->getRole()->getName(),
                     )
                 );
 
