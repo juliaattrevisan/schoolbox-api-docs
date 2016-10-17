@@ -690,12 +690,6 @@ class Controller extends BaseController
             }
         }
 
-        // Did user remove the Homepage Template?
-        if ($postData['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-            // TODO replace with routeLookup once it exists
-            return '/resources/' . $model->getId();
-        }
-
         return $this->getSession()->getHistory(2);
     }
 
