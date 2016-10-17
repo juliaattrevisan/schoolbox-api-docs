@@ -363,6 +363,17 @@ $container-bg: white !default;
 	}
 }
 
+.trace {
+	pre {
+		display: inline;
+		&:before {
+			content: "";
+			display: block;
+		}
+	}
+}
+
+
 pre.stacktrace{
 	position: fixed;
 	left: 0;
