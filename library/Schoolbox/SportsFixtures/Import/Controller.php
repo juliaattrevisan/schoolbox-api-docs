@@ -1058,6 +1058,22 @@ class Controller extends Base
                             $user = $this->getUserMapper()->findByExternalId($player);
 
                             try {
+                                $this->getDivisionUserMapper()->findOneByColumnList([
+                                    'division_id' => $division->getId(),
+                                    'user_id' => $user->getId()
+                                ]);
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED DIVISION PLAYER: Already in division ({$player})");
+                            } catch (MapperException $e) {
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
+
+                                $divisionPlayer = new DivisionUser();
+                                $divisionPlayer->setDivision($division);
+                                $divisionPlayer->setUser($user);
+                                $divisionPlayer->setSequence(0);
+                                $this->getDivisionUserMapper()->save($divisionPlayer);
+                            }
+
+                            try {
                                 $this->getTeamPlayerMapper()->findOneByColumnList([
                                     'team_id' => $team->getId(),
                                     'user_id' => $user->getId()
