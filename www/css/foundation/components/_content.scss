@@ -373,21 +373,6 @@ $container-bg: white !default;
 	}
 }
 
-
-pre.stacktrace{
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	background-color: $white;
-	border-top: $alert-color 4px solid;
-	font-weight: $font-weight-normal;
-	text-align: left;
-	font-style: normal;
-	color: $black;
-	z-index: 9999;
-	width: 100%
-}
-
 // Deleting Components
 .delete-it{
 	background-color: tint($warning-color, 74%);
