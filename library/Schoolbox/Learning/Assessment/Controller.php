@@ -43,8 +43,7 @@ use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementati
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
-use Schoolbox\Learning\Assessment\Breadcrumb\AssessmentFactory as BreadcrumbAssessmentFactory;
-use Schoolbox\Learning\Assessment\Breadcrumb\ContextFactory as BreadcrumbContextFactory;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Controller extends Base
 {
@@ -254,13 +253,13 @@ class Controller extends Base
             'contextId' => $contextId,
             'contextType' => $contextType,
 
-            'breadcrumbs' => (new BreadcrumbContextFactory(
+            'breadcrumbs' => (new BreadcrumbFactory())->produceFromContext(
                 $contextId, $contextType,
                 $this->getFolderMapper(),
                 $this->getUnitImplementationDataSource(),
                 $this->getUnitSpecificationDataSource(),
                 $this->getAssessmentDataSource()
-            ))->produce(),
+            ),
 
             /* The usual info everything requires
              */
@@ -415,7 +414,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => (new BreadcrumbAssessmentFactory($assessment))->produce()->add(['Update', '#']),
+            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'attachzone' => $zone->getTwigContext(),
@@ -605,7 +604,7 @@ class Controller extends Base
 
         if ($types->isValidIndex($assessmentType)) {
             $data = [
-                'breadcrumbs' => (new BreadcrumbAssessmentFactory($project))->produce()->add(['Create Assessment', '#']),
+                'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
