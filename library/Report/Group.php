@@ -22,6 +22,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'title'              => 'Title',
         'firstname'          => 'First Name',
         'lastname'           => 'Surname',
+        'position_title'     => 'Position Title',
         'role'               => 'Role',
         'campus'             => 'Campus',
         'alt_email'          => 'Alt Email',
