@@ -7,6 +7,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -53,25 +58,25 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             )
         );
 
-        $userHandler = new User;
-        $userList    = $userHandler->getAllInCategory($this->getContext()->getId());
-        $emailObj    = new Email();
+        // Get collection of members
+        $userMapper = new UserMapper();
+        $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), 100);
 
+        // Get admin
+        $userAccessMapper = new UserAccessMapper();
+        $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+
+        $emailObj = new Email();
         $emailall = array();
-        if (is_array($userList)) {
+
+        if (!empty($userList)) {
             $j = 0;
             foreach ($userList as $user) {
 
-                // Save the servers, kill the loop if we've reached 100
-                if ($j === 100) {
-                    break;
-                }
+                $name  = $user->getFullName();
+                $email = $user->getEmail();
 
-                $name  = $userHandler->formatName($user);
-                $email = $emailObj->formatEmailFromArray($user);
-                $meta  = $userHandler->getByID($user['uid']);
-
-                if ($user['type'] == 3) {
+                if ($user->getId() == $admin->getId()) {
                     $name .= " (Group Admin.)";
                 }
 
@@ -82,10 +87,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 $this->setVar(
                     array(
                         'ON_OFF'             => ++$j % 2 ? '' : 'dark',
-                        'PERSON_UID'         => $user['uid'],
+                        'PERSON_UID'         => $user->getId(),
                         'PERSON_NAME'        => $name,
-                        'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                        'PERSON_GROUP'       => Scrub::text($meta['gname']),
+                        'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                        'PERSON_GROUP'       => $user->getRole()->getName(),
                         'LIST_STYLE'         => $displayOptions[$display]['css'],
                     )
                 );

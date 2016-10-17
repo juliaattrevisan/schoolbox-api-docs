@@ -11,7 +11,6 @@
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
 
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
