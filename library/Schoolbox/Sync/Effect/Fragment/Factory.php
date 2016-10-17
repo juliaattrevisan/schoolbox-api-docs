@@ -46,6 +46,7 @@ class Factory {
         'firstname' => 'Firstname',
         'lastname' => 'Surname',
         'year' => 'Year Level',
+        'positionTitle' => 'Position Title',
 
         'role' => 'Role',
         'userAccessRead' => 'Groups (Read) (Disabled)',
