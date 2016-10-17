@@ -12,8 +12,11 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
+use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Decorator implements DecoratorInterface
 {
@@ -88,5 +91,18 @@ class Decorator implements DecoratorInterface
         else {
             $assessment->noMarkPerCapability();
         }
+
+        // Rebuild attached files list
+        $factory     = new CollectorFactory();
+        $attachments = $factory->build($assessment->getAttachedFiles()->getAll())->getAll();
+        $newList     = new Collection();
+        foreach ($attachments as $file) {
+            $newList->add(
+                (new DueWorkFile())
+                    ->setHash($file->getHash())
+                    ->setFilename($file->getBasename())
+            );
+        }
+        $assessment->setAttachedFiles($newList);
     }
 }
