@@ -146,18 +146,12 @@ class Controller extends Base
             $this->getResponse()->redirect->to($redirect);
         }
 
-        /* TODO: Get from db
-         */
-        $project = (new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce()))->setId($projectId);
-
-        /* TODO: Derive $folder from $projectId somehow
-         */
-        try {
-            $folder = new \Schoolbox\Resource\Folder\Model();
+        $project = $this->getAssessmentDataSource()->findById($projectId);
+        if (!$project instanceof Project) {
+            // TODO replace with appropriate message
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
+        $folder = $project->getFolder();
 
         /* Pump into twig-land
          */
