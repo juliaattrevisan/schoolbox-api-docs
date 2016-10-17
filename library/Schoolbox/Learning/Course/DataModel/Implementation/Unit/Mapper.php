@@ -7,9 +7,12 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
+use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -60,5 +63,57 @@ class Mapper extends BaseMapper
     public function findAllByCourseId($courseId, $options = [])
     {
         return $this->findByColumn('course_implementation_id', $courseId, $options);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSelectString()
+    {
+        // Ensure course + its folder, and specification + its folder are selected.
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('course', 'c')},
+                {$this->getJoinColumnString('course.folder', 'cf')},
+                {$this->getJoinColumnString('course.folder.homepages', 'cfh')},
+                {$this->getJoinColumnString('specification', 's')},
+                {$this->getJoinColumnString('specification.folder', 'sf')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT  JOIN {$this->getJoinSql('course', '', 'c')}
+            LEFT  JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
+            LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
+            INNER JOIN {$this->getJoinSql('specification', '', 's')}
+            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hydrateSelect(PDOStatement $statement)
+    {
+        $modelList = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+
+            /** @var CourseImplementationModel $course */
+            $course = $this->hydrateJoin($row, 'course', 'c');
+            $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
+            $courseFolder->setHomepage($this->hydrateJoin($row, 'course.folder.homepages', 'cfh'));
+            $course->setFolder($courseFolder);
+            $model->setCourse($course);
+
+            /** @var UnitSpecificationModel $specification */
+            $specification = $this->hydrateJoin($row, 'specification', 's');
+            $specification->setFolder($this->hydrateJoin($row, 'specification.folder', 'sf'));
+            $model->setSpecification($specification);
+
+            // Add
+            $modelList->add($model);
+        }
+
+        return $modelList;
     }
 }
