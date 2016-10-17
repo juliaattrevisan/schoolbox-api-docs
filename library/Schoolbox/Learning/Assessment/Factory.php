@@ -130,9 +130,12 @@ class Factory
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
         $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
 
-        /* TODO: Work out file attachments
+        /* Check if any attached files existed in POST data
+         * Use their array if it existed
          */
-        $this->setAttachedFiles($post['attachment']);
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFiles($post['attachment']);
+        }
 
         /* Projects need this to instantiate
          */
