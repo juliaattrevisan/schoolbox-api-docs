@@ -220,19 +220,19 @@ class Factory
         // TODO move these constants
         $context = null;
         switch ($this->getContextType()) {
-            case Controller::SPAWN_CONTEXT_FOLDER:
+            case self::SPAWN_CONTEXT_FOLDER:
                 $context = new Folder();
                 break;
 
-            case Controller::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
+            case self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
                 $context = new UnitImplementation();
                 break;
 
-            case Controller::SPAWN_CONTEXT_UNIT_SPECIFICATION:
+            case self::SPAWN_CONTEXT_UNIT_SPECIFICATION:
                 $context = new UnitSpecification();
                 break;
 
-            case Controller::SPAWN_CONTEXT_PROJECT:
+            case self::SPAWN_CONTEXT_PROJECT:
                 $context = new Project();
                 break;
 
