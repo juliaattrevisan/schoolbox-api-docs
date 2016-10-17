@@ -45,6 +45,26 @@ class Factory
     use ProjectTrait;
 
     /**
+     * Spawn in a Folder
+     */
+    const SPAWN_CONTEXT_FOLDER = 'folder';
+
+    /**
+     * Spawn in a Project
+     */
+    const SPAWN_CONTEXT_PROJECT = 'project';
+
+    /**
+     * Spawn in a Unit Implementation
+     */
+    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
+
+    /**
+     * Spawn in a Unit Specification
+     */
+    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
+
+    /**
      * @var int
      */
     protected $type = -1;

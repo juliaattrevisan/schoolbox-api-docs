@@ -48,25 +48,7 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 class Controller extends Base
 {
 
-    /**
-     * Spawn in a Folder
-     */
-    const SPAWN_CONTEXT_FOLDER = 'folder';
 
-    /**
-     * Spawn in a Project
-     */
-    const SPAWN_CONTEXT_PROJECT = 'project';
-
-    /**
-     * Spawn in a Unit Implementation
-     */
-    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
-
-    /**
-     * Spawn in a Unit Specification
-     */
-    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
 
     /**
      * @var ErrorMapper
@@ -140,7 +122,7 @@ class Controller extends Base
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($folder->getId(), self::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($folder->getId(), Factory::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -179,7 +161,7 @@ class Controller extends Base
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($project->getId(), self::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($project->getId(), Factory::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -205,7 +187,7 @@ class Controller extends Base
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -221,7 +203,7 @@ class Controller extends Base
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -608,7 +590,7 @@ class Controller extends Base
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
-                'contextType' => self::SPAWN_CONTEXT_PROJECT,
+                'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
                 'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
