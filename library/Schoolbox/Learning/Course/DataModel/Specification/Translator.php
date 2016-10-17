@@ -93,6 +93,8 @@ class Translator
 
         // Constitute Unit Specs
         foreach ($dataModel->getUnits() as $unitDataModel) {
+            // Reciprocate relation, so that unit may set a relation back to the course:
+            $unitDataModel->setCourse($dataModel);
             $specification->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
         }
 
