@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -188,7 +189,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setId(2)
                     ->setAssessmentModel(
                         (new AssessmentModel())
-                            ->setAssessmentContext((new UnitSpecificationModel())->setId(34))
+                            ->setAssessmentContext(
+                                (new UnitSpecificationModel())
+                                    ->setId(34)
+                                    ->setCourse((new CourseSpecificationModel())->setId(1))
+                            )
                     ),
                 UnitSpecification::class,
                 34
