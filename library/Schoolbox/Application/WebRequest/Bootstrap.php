@@ -651,11 +651,12 @@ class Bootstrap implements BootstrapInterface {
 
                 if (!$e instanceof \Throwable) {
                     $e = $error;
-
-                    array_shift($stack);
-
                     $e['code'] = $code;
-                    $e['trace'] = $stack;
+
+                    if (is_array($stack)) {
+                        array_shift($stack);
+                        $e['trace'] = $stack;
+                    }
                 }
 
                 /* Use structured information for rendering
