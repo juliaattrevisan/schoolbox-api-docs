@@ -7,9 +7,9 @@
 
 namespace Schoolbox\Learning\Assessment\Attachzone;
 
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Types;
 use Schoolbox\Resource\Attachment\Zone;
 
@@ -37,7 +37,7 @@ class Factory
         if ($assessment instanceof Task) {
             return $this->buildForTask();
         } elseif ($assessment instanceof DueWork) {
-            return $this->buildForDueWork();
+            return $this->buildForDueWork($assessment);
         }
         return $this->buildGeneric();
     }
@@ -77,12 +77,23 @@ class Factory
     }
 
     /**
+     * @param DueWork $dueWork
      * @return Zone
      */
-    protected function buildForDueWork()
+    protected function buildForDueWork(DueWork $dueWork = null)
     {
         $zone = new Zone('files');
         $zone->setMulti(true);
+
+        // Attach files
+        if ($dueWork instanceof DueWork) {
+            $files = [];
+            foreach ($dueWork->getAllFiles() as $file) {
+                $files[] = $file->getHash();
+            }
+            $zone->attachFiles($files);
+        }
+
         return $zone;
     }
 }
