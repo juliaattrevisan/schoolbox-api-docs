@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFi
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Attachzone\Factory as ZoneFactory;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -241,8 +242,8 @@ class Controller extends Base
 
         $assessmentType = $types->getFromTitle($assessmentTypeTitle);
 
-        $zone = new Zone('files');
-        $zone->setMulti(true);
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessmentType($assessmentType);
 
         /* contextId, contextType:
          *
@@ -406,8 +407,10 @@ class Controller extends Base
             $assessmentType = Types::ASSESSMENT_PROJECT;
         }
 
-        $zone = new Zone('files');
-        $zone->setMulti(true);
+        $types = new Types();
+
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessment($assessment);
 
         /* Twig payload
          */
@@ -420,8 +423,6 @@ class Controller extends Base
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
         ];
-
-        $types = new Types();
 
         if ($types->isValidIndex($assessmentType)) {
 
