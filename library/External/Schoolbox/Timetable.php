@@ -69,6 +69,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
             LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
             WHERE tc.campus_id = :campusId
+            AND tc.start < NOW()
+            AND tc.finish > NOW()
             ";
 
         if($day > 0) {
