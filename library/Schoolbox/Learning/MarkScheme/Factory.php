@@ -84,6 +84,10 @@ class Factory
                 return new TotalMarkWholeNumber($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
+            case MarkType::TYPE_FREE:
+                // This is the ancient free grade mark type.
+                // As far as I know it was never migrated, but I still need it to not crash and die.
+                return new None();
             default:
                 throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
         }
