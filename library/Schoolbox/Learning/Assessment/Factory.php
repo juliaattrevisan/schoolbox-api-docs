@@ -132,7 +132,7 @@ class Factory
 
         /* TODO: Work out file attachments
          */
-        $this->setAttachedFiles([$post['attachedFiles']]);
+        $this->setAttachedFiles($post['attachment']);
 
         /* Projects need this to instantiate
          */
