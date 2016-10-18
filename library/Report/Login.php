@@ -27,6 +27,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
     private $csvFields = array(
         'date'      => 'date',
         'login'     => 'login success',
+        'username'  => 'username',
         'user'      => 'user id',
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
@@ -207,7 +208,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             return 0;
         }
 
-        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
+        $dataQuery = "SELECT `login_log`.`username`, `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -258,6 +259,10 @@ class Report_Login extends Report_Abstract implements Report_IReport
             $j = 0;
 
             foreach ($this->dataSet as $log) {
+                $page->setVar([
+                    'log_user_block'    => '',
+                    'log_no_user_block' => '',
+                ]);
                 $action = $log['login'] == 0 ? "Failed login" : "Logged in";
 
                 $userHandler = new User();
@@ -267,15 +272,14 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'firstname' => $log['firstname'],
                     'lastname'  => $log['lastname']);
 
-                $displayName = $userHandler->formatName($nameShards);
-
                 $page->setVar(array(
-                    'UID'       => Scrub::text($log['user']),
-                    'DATE'      => Scrub::text($log['date']),
-                    'USERNAME'  => Scrub::text($displayName),
-                    'ACTION'    => Scrub::text($action),
-                    'IP'        => Scrub::text($log['ip']),
-                    'ROLE'      => Scrub::text($log['role']),
+                    'UID'         => Scrub::text($log['user']),
+                    'DATE'        => Scrub::text($log['date']),
+                    'USERNAME'    => Scrub::text($log['username']),
+                    'DISPLAYNAME' => Scrub::text($userHandler->formatName($nameShards)),
+                    'ACTION'      => Scrub::text($action),
+                    'IP'          => Scrub::text($log['ip']),
+                    'ROLE'        => Scrub::text($log['role']),
                 ));
 
                 $page->parse('activity_block', 'activity', true);
