@@ -257,7 +257,8 @@ class Factory
     {
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
-                $this->getMarkType()
+                $this->getMarkType(),
+                $this->getSummator()
             );
 
         } elseif ($assessment instanceof DueWork) {

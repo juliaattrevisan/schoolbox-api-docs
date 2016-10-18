@@ -23,14 +23,14 @@ class Factory
     const MINIMUM = 'min';
 
     /**
-     * @var int
+     * @var string
      */
     protected $summator;
 
     /**
      * Factory constructor.
      *
-     * @param int $summator
+     * @param string $summator
      */
     public function __construct($summator)
     {

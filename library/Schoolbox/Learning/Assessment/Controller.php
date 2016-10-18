@@ -24,7 +24,6 @@ use \Alaress_Date_NullDate;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
-use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -443,6 +442,7 @@ class Controller extends Base
      */
     protected function persistAssessment(IAssessable $assessment = null)
     {
+
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
          *

@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Project;
+use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 
 class Decorator implements DecoratorInterface
 {
@@ -23,13 +24,20 @@ class Decorator implements DecoratorInterface
     protected $markType;
 
     /**
+     * @var string
+     */
+    protected $summator;
+
+    /**
      * Decorator constructor.
      *
      * @param int $markType
+     * @param string $summator
      */
-    public function __construct($markType)
+    public function __construct($markType, $summator)
     {
         $this->setMarkType($markType);
+        $this->setSummator($summator);
     }
 
     /**
@@ -46,6 +54,8 @@ class Decorator implements DecoratorInterface
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
         $assessment->setMarkScheme($markScheme);
+
+        $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
     }
 
     /**
@@ -64,5 +74,21 @@ class Decorator implements DecoratorInterface
     {
         $this->markType = $markType;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSummator()
+    {
+        return $this->summator;
+    }
+
+    /**
+     * @param string $summator
+     */
+    protected function setSummator($summator)
+    {
+        $this->summator = $summator;
     }
 }
