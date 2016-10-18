@@ -27,6 +27,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
     private $csvFields = array(
         'date'      => 'date',
         'login'     => 'login success',
+        'username'  => 'username',
         'user'      => 'user id',
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
