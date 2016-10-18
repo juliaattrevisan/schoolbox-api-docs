@@ -568,8 +568,12 @@ class Controller extends Base
 
         $types = new Types();
 
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessment($project);
+
         if ($types->isValidIndex($assessmentType)) {
             $data = [
+                'attachzone' => $zone->getTwigContext(),
                 'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
                 'folder' => $folder,
                 'types' => $types,
