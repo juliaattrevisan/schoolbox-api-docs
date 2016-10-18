@@ -69,7 +69,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $emailObj = new Email();
 
         if (!empty($managerList)) {
-            $j = 0;
             foreach ($managerList as $manager) {
 
                 $name  = $manager->getFullName();
@@ -85,7 +84,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                 $this->setVar(
                     array(
-                        'ON_OFF'             => ++$j % 2 ? '' : 'dark',
                         'PERSON_UID'         => $manager->getId(),
                         'PERSON_NAME'        => $name,
                         'PERSON_EXTERNAL_ID' => $manager->getExternalId(),
