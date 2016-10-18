@@ -17,10 +17,10 @@ use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 
 class Factory
 {
-    const WEIGHTED_AVERAGE = 0;
-    const AVERAGE = 1;
-    const MAXIMUM = 2;
-    const MINIMUM = 3;
+    const WEIGHTED_AVERAGE = 'weighted';
+    const AVERAGE = 'avg';
+    const MAXIMUM = 'max';
+    const MINIMUM = 'min';
 
     /**
      * @var int
