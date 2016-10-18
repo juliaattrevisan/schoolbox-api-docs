@@ -76,8 +76,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $this->db = Database::getInstance();
         $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
-        $this->getPage()->setBlock('activity', 'log_user', 'log_user_block');
-        $this->getPage()->setBlock('activity', 'log_no_user', 'log_no_user_block');
         $this->getPage()->setTitle('Login Report');
     }
 
@@ -274,26 +272,15 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'firstname' => $log['firstname'],
                     'lastname'  => $log['lastname']);
 
-                if ($log['user']) {
-                    $displayName = $userHandler->formatName($nameShards);
-                } else {
-                    $displayName = $log['username'];
-                }
-
                 $page->setVar(array(
-                    'UID'       => Scrub::text($log['user']),
-                    'DATE'      => Scrub::text($log['date']),
-                    'USERNAME'  => Scrub::text($displayName),
-                    'ACTION'    => Scrub::text($action),
-                    'IP'        => Scrub::text($log['ip']),
-                    'ROLE'      => Scrub::text($log['role']),
+                    'UID'         => Scrub::text($log['user']),
+                    'DATE'        => Scrub::text($log['date']),
+                    'USERNAME'    => Scrub::text($log['username']),
+                    'DISPLAYNAME' => Scrub::text($userHandler->formatName($nameShards)),
+                    'ACTION'      => Scrub::text($action),
+                    'IP'          => Scrub::text($log['ip']),
+                    'ROLE'        => Scrub::text($log['role']),
                 ));
-
-                if ($log['user']) {
-                    $page->parse('log_user_block', 'log_user');
-                } else {
-                    $page->parse('log_no_user_block', 'log_no_user');
-                }
 
                 $page->parse('activity_block', 'activity', true);
             }

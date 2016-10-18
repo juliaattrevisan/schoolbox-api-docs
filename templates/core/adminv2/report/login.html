@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th><a href="/adminv2/reports/{SORT_BASE}/date/{SORT_DATE_DIR}">Date</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USER_DIR}">Username</a></th>
                 <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
                 <th><a href="/adminv2/reports/{SORT_BASE}/role/{SORT_ROLE_DIR}">Role</a></th>
                 <th><a href="/adminv2/reports/{SORT_BASE}/login/{SORT_LOGIN_DIR}">Action</a></th>
@@ -13,14 +14,8 @@
         <!-- BEGIN activity -->
         <tr>
             <td>{DATE}</td>
-            <td>
-                <!-- BEGIN log_user -->
-                <a href="/search/user/{UID}">{USERNAME}</a>
-                <!-- END log_user -->
-                <!-- BEGIN log_no_user -->
-                {USERNAME}
-                <!-- END log_no_user -->
-            </td>
+            <td>{USERNAME}</td>
+            <td><a href="/search/user/{UID}">{DISPLAYNAME}</a></td>
             <td>{ROLE}</td>
             <td>{ACTION}</td>
             <td>{IP}</td>
