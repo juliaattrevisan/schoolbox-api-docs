@@ -541,6 +541,11 @@ class SitePage extends Page
 
         //reset session timer
         $_SESSION['lasttime'] = time();
+        if(\Config::get('session_length') > 0) {
+            setcookie(session_name(), session_id(), $_SERVER['REQUEST_TIME'] + \Config::get('session_length'), '/');
+        } else {
+            setcookie(session_name(), session_id(), 0, '/');
+        }
     }
 
     function saveHistory($override = '')

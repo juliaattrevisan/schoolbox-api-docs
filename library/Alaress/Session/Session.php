@@ -56,6 +56,17 @@ class Session extends BaseSession {
         parent::__construct($segment_factory, $csrf_token_factory, $phpfunc, $cookies);
         $this->setConfig($config);
         $this->setRequestTime($requestTime);
+        $this->configureCookie();
+    }
+
+    /**
+     * Set up this session's cookie based on its config.
+     */
+    protected function configureCookie()
+    {
+        $this->setCookieParams([
+            'lifetime' => $this->getConfig()->get('session_length'),
+        ]);
     }
 
     /**
@@ -79,6 +90,21 @@ class Session extends BaseSession {
     public function updateLastTime() {
         $authSession = $this->getSegment(null);
         $authSession->set('lasttime', $this->getRequestTime());
+
+        $this->setCookieExpiry(\Config::get('session_length'));
+    }
+
+    /**
+     * Set the expiry time on an session cookie that already exists
+     * @param $lifetime
+     */
+    public function setCookieExpiry($lifetime) {
+        if($lifetime > 0) {
+            $this->phpfunc->setcookie($this->getName(), $this->getId(), $this->getRequestTime() + $lifetime, '/');
+        }
+        else {
+            $this->phpfunc->setcookie($this->getName(), $this->getId(), 0, '/');
+        }
     }
 
     /**
