@@ -813,9 +813,9 @@ class Controller extends Base
      * Displays the teacher dashboard of an assessable with tracking and management details
      * @param $assessmentId
      */
-    private function getSummaryProject($assessmentId)
+    private function getSummaryStaff($assessmentId)
     {
-        $project = self::getDummyAssessment($assessmentId);
+        $project = $this->getAssessmentDataSource()->findById($assessmentId);
 
         // Calculate summary totals for display purposes
 
@@ -922,7 +922,7 @@ class Controller extends Base
             return $this->getSummaryStudent($assessmentId);
         }
 
-        return $this->getSummaryProject($assessmentId);
+        return $this->getSummaryStaff($assessmentId);
     }
 
     /**
