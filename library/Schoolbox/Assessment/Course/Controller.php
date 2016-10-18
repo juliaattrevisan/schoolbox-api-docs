@@ -555,6 +555,13 @@ class Controller extends Base\Base
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
+
+                // * Don't allow a folder to be its own parent
+                $folder->setParent($parent);
+                if (!$this->getFolderMapper()->checkParentage($folder)) {
+                    throw new Base\Exception("Courses may not be moved inside themselves");
+                }
+
             } catch (BaseMapper\Exception $e) {
                 throw new Base\Exception("Could not save because " . $e->getMessage());
             }
