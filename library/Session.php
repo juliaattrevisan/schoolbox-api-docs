@@ -176,15 +176,30 @@ class Session
             throw new SchoolboxAccessDeniedException();
         }
 
+        $ip    = Session::getIP();
+        $notif = Notifactory::create(Notif::TOPIC_AUTH);
+
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
         $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
         if(!$user instanceof \Schoolbox\User){
+            // Log the fact that user doesn't exist
+            $notif->notice("Login failure for non-existent user ".$username, array(
+                'username' => $username,
+                'ip'       => $ip,
+                'login'    => 0,
+            ));
             throw new SchoolboxNotFoundException();
         }
 
         if (!($user->getEnabled())) {
+            // Log the fact that user is not enabled
+            $notif->notice("Login failure for non-enabled user ".$user->getUsername(), array(
+                'username' => $user->getUsername(),
+                'ip'       => $ip,
+                'login'    => 0,
+            ));
             throw new SchoolboxAccountDisabledException();
         }
 
@@ -205,11 +220,8 @@ class Session
             $result = $this->authenticateSQL($username, $password);
         }
 
-        $ip = Session::getIP();
-
         if (!$result) {
             /* Log failure */
-            $notif = Notifactory::create(Notif::TOPIC_AUTH);
             $notif->notice("Login failure for ".$user->getUsername(), array(
                 'username' => $user->getUsername(),
                 'ip'       => $ip,
