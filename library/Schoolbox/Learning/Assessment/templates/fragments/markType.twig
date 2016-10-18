@@ -151,9 +151,9 @@
         <label>
             Grading Scheme
             <select name="gradingScheme">
-                <option value="1">Standard</option>
-                <option value="2">Satisfactory</option>
-                <option value="3">Competency</option>
+                {% for scheme in allGradeSchemes %}
+                    <option value="{{ scheme.id }}" {% if scheme.id == assessment.gradeGroup.id %}selected{% endif %}>{{ scheme.name }}</option>
+                {% endfor %}
             </select>
         </label>
     </div>

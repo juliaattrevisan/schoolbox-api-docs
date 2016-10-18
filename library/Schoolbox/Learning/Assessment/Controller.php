@@ -7,6 +7,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
@@ -387,6 +389,7 @@ class Controller extends Base
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
         if ($types->isValidIndex($assessmentType)) {
@@ -586,6 +589,7 @@ class Controller extends Base
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
                 'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+                'allGradeSchemes' => $this->getAllGradeSchemes(),
                 'returnUrl' => $this->getRequest()->query['return_url']
             ];
 
@@ -730,6 +734,18 @@ class Controller extends Base
         }
 
         return [];
+    }
+
+    /**
+     * Gets all grading schemes.
+     *
+     * TODO DI this if you feel like it
+     *
+     * @return GradeScheme[]|Collection
+     */
+    private function getAllGradeSchemes()
+    {
+        return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
     }
 
     /**
