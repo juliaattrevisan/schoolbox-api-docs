@@ -86,9 +86,9 @@
             </fieldset>
             <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not course.id %} disabled="disabled"{% endif %}>
                 <legend>Units</legend>
-                <div class="small-12 column no-pad">
+                <div class="small-12 column no-pad" {% if not course.id %}style="display:none;"{% endif %} data-mage-collapsed>
                     {# Don't delete the inline style, it's needed -#}
-                    <ul class="information-list" {% if not course.id %}style="display:none;"{% endif %} data-mage-collapsed>
+                    <ul class="information-list">
                     {% for unit in course.units %}
                         {% if access[unit.id] > 0 %}
                             {% include '@course/unit.twig' with { unit: unit, i: loop.index, '_writable': access[unit.id] > 1 } %}
@@ -119,6 +119,8 @@
                         </li>
                     {% endif %}
                     </ul>
+                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                    <input type="hidden" data-mage-next="none" name="unit-info" value="1" />
                 </div>
             </fieldset>
         </section>
@@ -205,7 +207,8 @@
                     history.pushState(data, '', '/course/modify/' + data.id);
                     $('[data-folder-id]').val(data.id);
                 }
-
+                $('[data-mage-next="unit-info"]').closest('[data-mage-submitrow]').slideUp(400, function () { $(this).detach(); });
+                $('[data-mage-next="main-course"]').closest('[data-mage-collapsed]').slideDown();
             }
         });
 
