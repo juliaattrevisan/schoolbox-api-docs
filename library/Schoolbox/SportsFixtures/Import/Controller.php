@@ -490,18 +490,20 @@ class Controller extends Base
                     }
                 }
 
-                try {
-                    $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
-                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Sport '{$row[1]}'");
-                } catch (MapperException $e) {
-                    $sport = new Sport();
-                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[1]}'");
-                }
-
                 if (!$error) {
-                    $sport->setName($row[1]);
-                    $sport->setUrl($row[2]);
-                    $this->getSportMapper()->save($sport);
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Sport '{$row[1]}'");
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[1]}'");
+                    }
+
+                    if (!$error) {
+                        $sport->setName($row[1]);
+                        $sport->setUrl($row[2]);
+                        $this->getSportMapper()->save($sport);
+                    }
                 }
             }
         }
