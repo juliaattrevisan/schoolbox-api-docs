@@ -523,14 +523,7 @@ class Bootstrap implements BootstrapInterface {
 
 
         // initialise session
-        /** @var Session $session */
-        $session = $di->get('session');
-        // And set its expiry to later
-        $lifetime = $session->getCookieParams()['lifetime'];
-        if ($lifetime > 0) {
-            setcookie(session_name(), session_id(), $_SERVER['REQUEST_TIME'] + $lifetime, '/');
-        }
-        $session->start();
+        $di->get('session')->start();
 
         // Initialise module configuration
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
