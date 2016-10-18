@@ -68,7 +68,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         $emailObj = new Email();
 
-        if (!empty($managerList)) {
+        if ($managerList->count() > 0) {
             foreach ($managerList as $manager) {
 
                 $name  = $manager->getFullName();
