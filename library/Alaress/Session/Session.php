@@ -99,7 +99,7 @@ class Session extends BaseSession {
      * @param $lifetime
      */
     public function setCookieExpiry($lifetime) {
-        if($lifetime == 0) {
+        if($lifetime > 0) {
             $this->phpfunc->setcookie($this->getName(), $this->getId(), $this->getRequestTime() + $lifetime, '/');
         }
         else {
