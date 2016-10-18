@@ -75,6 +75,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $this->db = Database::getInstance();
         $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
+        $this->getPage()->setBlock('activity', 'log_user', 'log_user_block');
+        $this->getPage()->setBlock('activity', 'log_no_user', 'log_no_user_block');
         $this->getPage()->setTitle('Login Report');
     }
 
@@ -207,7 +209,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             return 0;
         }
 
-        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
+        $dataQuery = "SELECT `login_log`.`username`, `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -258,6 +260,10 @@ class Report_Login extends Report_Abstract implements Report_IReport
             $j = 0;
 
             foreach ($this->dataSet as $log) {
+                $page->setVar([
+                    'log_user_block'    => '',
+                    'log_no_user_block' => '',
+                ]);
                 $action = $log['login'] == 0 ? "Failed login" : "Logged in";
 
                 $userHandler = new User();
@@ -267,7 +273,11 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'firstname' => $log['firstname'],
                     'lastname'  => $log['lastname']);
 
-                $displayName = $userHandler->formatName($nameShards);
+                if ($log['user']) {
+                    $displayName = $userHandler->formatName($nameShards);
+                } else {
+                    $displayName = $log['username'];
+                }
 
                 $page->setVar(array(
                     'UID'       => Scrub::text($log['user']),
@@ -277,6 +287,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'IP'        => Scrub::text($log['ip']),
                     'ROLE'      => Scrub::text($log['role']),
                 ));
+
+                if ($log['user']) {
+                    $page->parse('log_user_block', 'log_user');
+                } else {
+                    $page->parse('log_no_user_block', 'log_no_user');
+                }
 
                 $page->parse('activity_block', 'activity', true);
             }

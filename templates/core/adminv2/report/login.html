@@ -13,7 +13,14 @@
         <!-- BEGIN activity -->
         <tr>
             <td>{DATE}</td>
-            <td><a href="/search/user/{UID}">{USERNAME}</a></td>
+            <td>
+                <!-- BEGIN log_user -->
+                <a href="/search/user/{UID}">{USERNAME}</a>
+                <!-- END log_user -->
+                <!-- BEGIN log_no_user -->
+                {USERNAME}
+                <!-- END log_no_user -->
+            </td>
             <td>{ROLE}</td>
             <td>{ACTION}</td>
             <td>{IP}</td>
