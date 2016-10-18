@@ -258,6 +258,7 @@ class Factory
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
+                $this->getGradingScheme(),
                 $this->getSummator()
             );
 

@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -24,6 +25,11 @@ class Decorator implements DecoratorInterface
     protected $markType;
 
     /**
+     * @var int
+     */
+    protected $gradingScheme;
+
+    /**
      * @var string
      */
     protected $summator;
@@ -32,11 +38,13 @@ class Decorator implements DecoratorInterface
      * Decorator constructor.
      *
      * @param int $markType
+     * @param int $gradingScheme
      * @param string $summator
      */
-    public function __construct($markType, $summator)
+    public function __construct($markType, $gradingScheme, $summator)
     {
         $this->setMarkType($markType);
+        $this->setGradingScheme($gradingScheme);
         $this->setSummator($summator);
     }
 
@@ -50,6 +58,9 @@ class Decorator implements DecoratorInterface
         $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
         $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
+
+        $gradingGroup = (new GradeGroup())->setId($this->getGradingScheme());
+        $assessment->setGradeGroup($gradingGroup);
 
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
@@ -73,6 +84,24 @@ class Decorator implements DecoratorInterface
     protected function setMarkType($markType)
     {
         $this->markType = $markType;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getGradingScheme()
+    {
+        return $this->gradingScheme;
+    }
+
+    /**
+     * @param int $gradingScheme
+     * @return $this
+     */
+    protected function setGradingScheme($gradingScheme)
+    {
+        $this->gradingScheme = $gradingScheme;
         return $this;
     }
 
