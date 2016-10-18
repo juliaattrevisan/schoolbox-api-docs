@@ -326,7 +326,8 @@ class Controller extends Base
         }
         catch (\RuntimeException $e) {
 
-            /* Return Early to let mage deal with error messages
+            /* TODO actually handle the error
+             *  Return Early to let mage deal with error messages
              */
             return;
         }
