@@ -137,6 +137,22 @@ class Mapper extends BaseMapper
             null,
             'contextProject'
         );
+
+        // the specification of this assessment
+        // (if this assessment is within a unit implementation)
+        // An implementation may only have one specification,
+        // a spec may have multiple implementations.
+        $this->joinsVia(
+            'assessment_specification_implementation',
+            static::class,
+            'id',
+            'specification_assessment_id',
+            'implementation_assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'specificationAssessment'
+        );
     }
 
     /**
@@ -160,7 +176,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
-                {$this->getJoinColumnString('project_assessment', 'pa')}
+                {$this->getJoinColumnString('project_assessment', 'pa')},
+                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
                 -- May need to hydrate project's context too!
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
@@ -174,6 +191,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
+            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
         ";
     }
 
@@ -220,6 +238,13 @@ class Mapper extends BaseMapper
                 $model->setProject($this->hydrateJoin($row, 'project', 'p'));
             } else {
                 $model->setProject(null);
+            }
+
+            // Specification
+            if ($row['spec.id']) {
+                $model->setSpecificationAssessment($this->hydrateJoin($row, 'assessment_specification_implementation', 'spec'));
+            } else {
+                $model->setSpecificationAssessment(null);
             }
 
             // Context (whatever it might be)

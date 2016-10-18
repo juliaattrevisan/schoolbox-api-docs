@@ -48,6 +48,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:assessmentId, :courseUnitInstanceId)
     ");
 
+    // Insert relation between spec and implementation
+    $insertAssessmentImplementationRelationQuery = $db->prepare("
+        INSERT INTO assessment_specification_implementation (
+            specification_assessment_id,
+            implementation_assessment_id
+        )
+        SELECT
+            task.assessment_id,
+            :assessmentId
+        FROM task_instance
+        INNER JOIN task ON task_instance.task_id = task.id
+        WHERE task_instance.id = :taskInstanceId
+    ");
+
     // Insert task query - most fields are just copied from the task instance
     $insertTaskQuery = $db->prepare("
         INSERT INTO task (
@@ -184,6 +198,13 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             // Associate this assessment with the task's folder
             $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'courseUnitInstanceId' => $courseUnitInstanceId]);
             $log->debug('Created assessment/course implementation relation');
+
+            // Add a relation between assessment spec and implementation
+            $insertAssessmentImplementationRelationQuery->execute([
+                'assessmentId'   => $assessmentId,
+                'taskInstanceId' => $taskId,
+            ]);
+            $log->debug('Created implementation/specification assessment relation');
 
             // Create the task out of this assessment
             if ($quizId) {

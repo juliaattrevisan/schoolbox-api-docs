@@ -63,6 +63,7 @@ class MapperProxy
      * @param int $id
      * @return IAssessable
      * @throws MapperException\Deleted if the assessment was deleted
+     * @throws MapperException         if the assessment doesn't exist at all
      */
     public function findById($id)
     {
@@ -72,6 +73,36 @@ class MapperProxy
             $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
             throw $e;
         }
+    }
+
+    /**
+     * Finds the specification assessment for a implementation assessment
+     *
+     * @param int $assessmentId
+     * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws MapperException         if the assessment doesn't exist at all
+     */
+    public function findSpecificationForImplementationId($assessmentId)
+    {
+        // Find the assessable which this assessment implements
+        // TODO figure out how to do this in one query
+        $model = $this->baseMapper->findById($assessmentId);
+        return $this->findById($model->getSpecificationAssessment()->getId());
+    }
+
+    /**
+     * Finds the specification assessment for a implementation assessment
+     *
+     * @param int $assessmentId
+     * @param array $options
+     * @return IAssessable[]
+     */
+    public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
+    {
+        // Get all assessables which have this assessment as a spec
+        return $this->baseMapper->findByColumn('spec.id', $assessmentId, $options)
+                                ->map([$this, 'translateToDomainModel']);
     }
 
     /**
