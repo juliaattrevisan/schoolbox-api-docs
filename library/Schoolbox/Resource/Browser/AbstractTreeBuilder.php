@@ -423,45 +423,56 @@ abstract class AbstractTreeBuilder
     }
 
     /**
-     * Filter a collection of files by a mime filter
+     * Filter a collection of files to a certain mime type or multiple mime types
      * @param Collection $files
-     * @param string $mime MIME type filter (e.g. 'image/jpeg', 'image/*')
+     * @param string $mimes MIME types allowed (comma delimited) (e.g. 'image/jpeg', 'image/*', 'image/*,audio/*')
      * @return Collection
      */
-    protected function filterMime($files, $mime)
+    protected function filterMime($files, $mimes)
     {
-        // Check if the mime if a wildcard
+        // Check if the mime filter passed is a wildcard
         if ($mime != "*/*") {
 
             $filesFiltered = new Collection();
 
-            // Split the mime filter on '/'
-
-            $mimeFilterArray = explode("/", $mime);
+            // Split allowed mime types
+            $allowedMimes = explode(',', $mimes);
 
             // Iterate all files in the collection
-
             /** @var \Schoolbox\Resource\File\Model $file */
             foreach ($files as $file) {
-                // Get the current files mime type string split into an array
 
                 if (method_exists($file, 'getMime')) {
                     $match = true;
 
-                    $currentMime = explode("/", $file->getMime());
+                    // Split the current file mime type into two parts
+                    $fileMimeParts = explode("/", $file->getMime());
 
-                    for ($i = 0; $i < 2; $i++) {
-                        // If current filter is wildcard, dont need to test
-                        if ($mimeFilterArray[$i] != "*") {
-                            if (strtolower($currentMime[$i] != strtolower($mimeFilterArray[$i]))) {
-                                $match = false;
+                    // Loop through each mime type allowed
+                    foreach ($allowedMimes as $allowedMime) {
+
+                        // Split the allowed mime type into two parts
+                        $allowedMimeParts = explode('/', $allowedMime);
+
+                        // Loop twice and check both parts against each other
+                        for ($i = 0; $i < 2; $i++) {
+
+                            // If current filter is wildcard, dont need to test
+                            if ($allowedMimeParts[$i] != "*") {
+                                if (strtolower($fileMimeParts[$i] != strtolower($allowedMimeParts[$i]))) {
+                                    $match = false;
+                                }
                             }
-                        }
-                    }
 
-                    // If both sides of the mime filter matched, we want to return this file
-                    if ($match) {
-                        $filesFiltered->add($file);
+                        }
+
+                        // If both sides of the mime filter matched, we want to return this file
+                        if ($match) {
+                            $filesFiltered->add($file);
+
+                            // File has been added - no need to check it against any further mime types
+                            break;
+                        }
                     }
                 }
             }
