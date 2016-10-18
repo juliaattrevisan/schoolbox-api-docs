@@ -33,6 +33,26 @@ use Schoolbox\Application\WebRequest;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+
+// Learning related uses
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+
+
+use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
+use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplTranslator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
+
+use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
@@ -507,13 +527,91 @@ class Bootstrap implements BootstrapInterface {
         );
 
         // Enable mappers to be injectable, but instantiated only when required
-        $di->set('mapperFactory', $di->lazyNew(MapperFactory::class, ['injector' => $di]));
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));
 
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
+
+        // Register course/unit implementation data sources
+        $di->set(
+            'unitImplementationDataSource',
+            $di->lazyNew(
+                UnitImplMapperProxy::class,
+                [
+                    'mapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
+                    'translator' => $di->lazyNew(UnitImplTranslator::class),
+                ]
+            )
+        );
+        $di->set(
+            'courseImplementationDataSource',
+            $di->lazyNew(
+                CourseImplMapperProxy::class,
+                [
+                    'mapper'         => $mapperFactory->getLazy(CourseImplMapper::class),
+                    'translator'     => $di->lazyNew(CourseImplTranslator::class),
+                    'unitMapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
+                    'unitTranslator' => $di->lazyNew(UnitImplTranslator::class),
+                ]
+            )
+        );
+
+        // Register course/unit specification data sources
+        $di->set(
+            'unitSpecificationDataSource',
+            $di->lazyNew(
+                UnitSpecMapperProxy::class,
+                [
+                    'mapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
+                    'translator' => $di->lazyNew(UnitSpecTranslator::class),
+                ]
+            )
+        );
+        $di->set(
+            'courseSpecificationDataSource',
+            $di->lazyNew(
+                CourseSpecMapperProxy::class,
+                [
+                    'mapper'         => $mapperFactory->getLazy(CourseSpecMapper::class),
+                    'translator'     => $di->lazyNew(CourseSpecTranslator::class),
+                    'unitMapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
+                    'unitTranslator' => $di->lazyNew(UnitSpecTranslator::class),
+                ]
+            )
+        );
+
+        // Register assessment data source
+        $di->set(
+            'assessmentTranslator',
+            $di->lazy(function () use ($di) {
+                $translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
+                    new \Schoolbox\Learning\MarkScheme\Factory(),
+                    $di->newInstance(UnitSpecTranslator::class),
+                    $di->newInstance(UnitImplTranslator::class)
+                );
+                $translator
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\DueWork())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Quiz())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Project($translator))
+                ;
+                return $translator;
+            })
+        );
+        $di->set(
+            'assessmentDataSource',
+            $di->lazyNew(
+                AssessmentMapperProxy::class,
+                [
+                    'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
+                    'translator' => $di->lazyGet('assessmentTranslator'),
+                ]
+            )
+        );
 
 
         // load dependencies into the kernel itself

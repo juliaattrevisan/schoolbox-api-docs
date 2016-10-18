@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Tests for the assessment data model translator (quizzes only).
@@ -27,6 +28,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
     {
         $quiz = (new Quiz())
             // Generic fields
+            ->setContext((new Folder())->setId(1))
             ->setId(61)
             ->setCreator($this->teacher2)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -62,7 +64,11 @@ class QuizTest extends \PHPUnit_Framework_TestCase
     {
         $quizModel = (new QuizModel())
             ->setId(13)
-            ->setAssessmentModel((new AssessmentModel())->setId(105))
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(105)
+                    ->setAssessmentContext((new Folder())->setId(1))
+            )
             ->setCompletionMessage('you done a quiz')
             ->setDuration(Quiz::DURATION_UNLIMITED)
             ->setMaxAttempts(Quiz::ATTEMPTS_UNLIMITED)

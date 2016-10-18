@@ -40,7 +40,7 @@ class Module extends BaseModule
                 '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
                 '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
                 '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
-                '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
+                '/assessment/unitspec/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
                 /* Edit an assessment with their type-specific data
                  */
@@ -138,8 +138,11 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'folderMapper'                 => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'errorMapper'                  => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentDataSource'         => $injector->lazyGet('assessmentDataSource'),
+                'unitSpecificationDataSource'  => $injector->lazyGet('unitSpecificationDataSource'),
+                'unitImplementationDataSource' => $injector->lazyGet('unitImplementationDataSource'),
             ])
         );
     }

@@ -69,6 +69,20 @@ class Translator
             $unitSpecification->setFolder($unitDataModel->getFolder());
         }
 
+        // Basic translation of course spec
+        $unitSpecification->setCourse(
+            (new CourseSpecification())
+                ->setId($unitDataModel->getCourse()->getId())
+                ->setCreatedAt($unitDataModel->getCourse()->getCreatedAt())
+                ->setUpdatedAt($unitDataModel->getCourse()->getUpdatedAt())
+                ->setDeletedAt($unitDataModel->getCourse()->getDeletedAt())
+        );
+
+        // Allow translate if course folder is empty
+        if ($unitDataModel->getCourse()->getFolder() instanceof FolderModel) {
+            $unitSpecification->getCourse()->setFolder($unitDataModel->getCourse()->getFolder());
+        }
+
         // Set assessables directly is okay for now
         // TODO add translation of assessables, or verify whether translation is required
         $unitSpecification->setAssessables($unitDataModel->getAssessables());

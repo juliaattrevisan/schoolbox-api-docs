@@ -50,6 +50,14 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getIconClass()
+    {
+        return 'icon-task';
+    }
+
+    /**
      * Tasks always return null.
      *
      * @param User $user

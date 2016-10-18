@@ -61,12 +61,15 @@ class Project implements IAssessmentTypeTranslator
             ;
             $subModels = new Collection();
             $i         = 0;
-            foreach ($assessment->getAssessables() as $assessable) {
-                $subModel = $this->baseTranslator->translateToDataModel($assessable, $i++);
+            foreach ($assessment->getAssessables() as $subAssessment) {
                 // You can't have projects within projects
-                if ($subModel instanceof ProjectModel) {
+                if ($subAssessment instanceof ProjectObject) {
                     throw new UnexpectedValueException('A project may not contain another project');
                 }
+
+                // The sub-assessment's context is the project
+                $subAssessment->setContext($assessment);
+                $subModel = $this->baseTranslator->translateToDataModel($subAssessment, $i++);
                 $subModels->add($subModel);
             }
             $model->setAssessments($subModels);
@@ -132,6 +135,8 @@ class Project implements IAssessmentTypeTranslator
                 if ($subModel instanceof ProjectModel) {
                     throw new UnexpectedValueException('A project may not contain another project');
                 }
+                // The sub-assessment's context is the project
+                $subModel->getAssessmentModel()->setAssessmentContext($model);
                 $assessable->getAssessables()->add($this->baseTranslator->translateToDomainModel($subModel));
             }
 

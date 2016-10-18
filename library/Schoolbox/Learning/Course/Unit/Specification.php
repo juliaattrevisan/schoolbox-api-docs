@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -38,6 +39,13 @@ class Specification implements AssessmentContext, ISoftDeletable
     use DeletedAtDate;
 
     /**
+     * The Course Specification which this object belongs to.
+     *
+     * @var CourseSpecification
+     */
+    protected $course;
+
+    /**
      * The Folder which this object belongs to.
      *
      * TODO review if this relation is required - this object can't exist without Folders
@@ -62,6 +70,24 @@ class Specification implements AssessmentContext, ISoftDeletable
         $this->updatedAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
         $this->assessables = new Collection();
+    }
+
+    /**
+     * @return CourseSpecification
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseSpecification $course
+     * @return static
+     */
+    public function setCourse(CourseSpecification $course)
+    {
+        $this->course = $course;
+        return $this;
     }
 
     /* Getters/Setters */

@@ -12,13 +12,14 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
 /**
  * Data Model for Projects
  */
-class Model implements IAssessableDataModel
+class Model implements IAssessableDataModel, IAssessmentContextDataModel
 {
     use Id;
 

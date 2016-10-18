@@ -10,13 +10,18 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplementationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
@@ -34,6 +39,24 @@ class Translator
     protected $markSchemeFactory;
 
     /**
+     * Translator for unit specifications.
+     *
+     * Used in this class's translators to convert contexts.
+     *
+     * @var UnitSpecificationTranslator
+     */
+    protected $unitSpecificationTranslator;
+
+    /**
+     * Translator for unit implementations.
+     *
+     * Used in this class's translators to convert contexts.
+     *
+     * @var UnitImplementationTranslator
+     */
+    protected $unitImplementationTranslator;
+
+    /**
      * Sub-translators
      *
      * @var IAssessmentTypeTranslator[]
@@ -43,11 +66,18 @@ class Translator
     /**
      * Constructor
      *
-     * @param MarkSchemeFactory $markSchemeFactory
+     * @param MarkSchemeFactory            $markSchemeFactory
+     * @param UnitSpecificationTranslator  $unitSpecificationTranslator
+     * @param UnitImplementationTranslator $unitImplementationTranslator
      */
-    public function __construct(MarkSchemeFactory $markSchemeFactory)
-    {
-        $this->markSchemeFactory = $markSchemeFactory;
+    public function __construct(
+        MarkSchemeFactory $markSchemeFactory,
+        UnitSpecificationTranslator $unitSpecificationTranslator,
+        UnitImplementationTranslator $unitImplementationTranslator
+    ) {
+        $this->markSchemeFactory            = $markSchemeFactory;
+        $this->unitSpecificationTranslator  = $unitSpecificationTranslator;
+        $this->unitImplementationTranslator = $unitImplementationTranslator;
     }
 
     /**
@@ -92,13 +122,30 @@ class Translator
 
         // Translate assessment context
         // TODO consider moving this to a translator
+        // TODO add project context
         $context = $assessment->getContext();
         if ($context instanceof Folder) {
             $assessmentModel->setAssessmentContext($context);
+
         } elseif ($context instanceof UnitSpecification) {
+            // Can't use translator here.
+            // UnitSpecificationTranslator->translateToDataModel requires a course spec I don't have.
             $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
+
         } elseif ($context instanceof UnitImplementation) {
-            $assessmentModel->setAssessmentContext((new UnitImplementationModel())->setId($context->getId()));
+            $assessmentModel->setAssessmentContext($this->unitImplementationTranslator->translateToDataModel($context));
+
+        } elseif ($context instanceof Project) {
+            // Can't use translator for projects - it will attempt to translate its sub-assessments,
+            // thus causing an infinite loop.
+            // Set a simplified version instead.
+            $assessmentModel->setAssessmentContext(
+                (new ProjectModel())
+                    ->setAssessmentModel((new AssessmentModel())->setId($context->getId()))
+            );
+
+        } else {
+            throw new UnexpectedValueException('$assessment has no context (folder, unit, unit spec or project)');
         }
 
         // Attempt to translate tasks using the sub-translators
@@ -159,14 +206,31 @@ class Translator
         ;
 
         // Translate assessment context
-        // TODO consider moving this to a translator
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
             $assessable->setContext($context);
+
         } elseif ($context instanceof UnitSpecificationModel) {
-            $assessable->setContext((new UnitSpecification())->setId($context->getId()));
+            $assessable->setContext($this->unitSpecificationTranslator->translateToDomainModel($context));
+
         } elseif ($context instanceof UnitImplementationModel) {
-            $assessable->setContext((new UnitImplementation())->setId($context->getId()));
+            $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
+
+        } elseif ($context instanceof ProjectModel) {
+            // Need to be careful when translating project:
+            // any constituent assessments need to be removed, otherwise they
+            // will attempt to hydrate their children, which will hydrate this
+            // again, and so on...
+            $context->setAssessments(new Collection());
+            $translatedContext = $this->translateToDomainModel($context);
+            if ($translatedContext instanceof Project) {
+                $assessable->setContext($translatedContext);
+            } else {
+                throw new UnexpectedValueException('$dataModel is a project, but its context is not for some reason!');
+            }
+
+        } else {
+            throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
         }
 
         return $assessable;

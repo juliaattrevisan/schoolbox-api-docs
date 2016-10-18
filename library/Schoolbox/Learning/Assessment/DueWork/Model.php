@@ -110,6 +110,14 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getIconClass()
+    {
+        return 'icon-due-work';
+    }
+
+    /**
      * This DueWork accepts no submissions online
      *
      * @return $this

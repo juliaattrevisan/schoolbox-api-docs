@@ -24,6 +24,11 @@ trait QuizTrait
     protected $durationMinutes = 0;
 
     /**
+     * @var int
+     */
+    protected $maxAttempts = 0;
+
+    /**
      * @return int
      */
     public function getDurationHours()
@@ -56,6 +61,24 @@ trait QuizTrait
     public function setDurationMinutes($durationMinutes)
     {
         $this->durationMinutes = $durationMinutes;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxAttempts()
+    {
+        return $this->maxAttempts;
+    }
+
+    /**
+     * @param int $maxAttempts
+     * @return static
+     */
+    public function setMaxAttempts($maxAttempts)
+    {
+        $this->maxAttempts = $maxAttempts;
         return $this;
     }
 }

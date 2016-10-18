@@ -89,13 +89,17 @@ class Translator
         // Basic course and spec translation
         if ($dataModel->getSpecification() instanceof UnitSpecificationDataModel) {
             $unitSpec = new UnitSpecification();
-            $unitSpec->setId($dataModel->getSpecification()->getId());
+            $unitSpec
+                ->setId($dataModel->getSpecification()->getId())
+                ->setFolder($dataModel->getSpecification()->getFolder());
             $unitImpl->setSpecification($unitSpec);
         }
 
         if ($dataModel->getCourse() instanceof CourseImplementationDataModel) {
             $courseImpl = new CourseImplementation();
-            $courseImpl->setId($dataModel->getCourse()->getId());
+            $courseImpl
+                ->setId($dataModel->getCourse()->getId())
+                ->setFolder($dataModel->getCourse()->getFolder());
             $unitImpl->setCourse($courseImpl);
         }
 

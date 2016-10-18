@@ -7,12 +7,12 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
-use Guzzle\Common\Exception\UnexpectedValueException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Attachzone\Factory as ZoneFactory;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -21,10 +21,12 @@ use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
+use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
+use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -35,32 +37,18 @@ use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Learning\Assessment\Summator\Average;
-use Schoolbox\Learning\Assessment\Summator\Maximum;
-use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
+
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Controller extends Base
 {
 
-    /**
-     * Spawn in a Folder
-     */
-    const SPAWN_CONTEXT_FOLDER = 'folder';
 
-    /**
-     * Spawn in a Project
-     */
-    const SPAWN_CONTEXT_PROJECT = 'project';
-
-    /**
-     * Spawn in a Unit Implementation
-     */
-    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
-
-    /**
-     * Spawn in a Unit Specification
-     */
-    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
 
     /**
      * @var ErrorMapper
@@ -78,16 +66,43 @@ class Controller extends Base
     protected $submissionFileMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
+     * @var UnitSpecificationDataSource
+     */
+    protected $unitSpecificationDataSource;
+
+    /**
+     * @var UnitImplementationDataSource
+     */
+    protected $unitImplementationDataSource;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
+     * @param AssessmentDataSource $assessmentDataSource
+     * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     * @param UnitImplementationDataSource $unitImplementationDataSource
      */
-    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper, SubmissionFileMapper $submissionFileMapper)
-    {
+    public function __construct(
+        FolderMapper $folderMapper,
+        ErrorMapper $errorMapper,
+        SubmissionFileMapper $submissionFileMapper,
+        AssessmentDataSource $assessmentDataSource,
+        UnitSpecificationDataSource $unitSpecificationDataSource,
+        UnitImplementationDataSource $unitImplementationDataSource
+    ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
         $this->setSubmissionFileMapper($submissionFileMapper);
+        $this->setAssessmentDataSource($assessmentDataSource);
+        $this->setUnitSpecificationDataSource($unitSpecificationDataSource);
+        $this->setUnitImplementationDataSource($unitImplementationDataSource);
     }
 
     /**
@@ -107,7 +122,7 @@ class Controller extends Base
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($folder->getId(), self::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($folder->getId(), Factory::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -131,22 +146,16 @@ class Controller extends Base
             $this->getResponse()->redirect->to($redirect);
         }
 
-        /* TODO: Get from db
-         */
-        $project = (new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce()))->setId($projectId);
-
-        /* TODO: Derive $folder from $projectId somehow
-         */
-        try {
-            $folder = new \Schoolbox\Resource\Folder\Model();
+        $project = $this->getAssessmentDataSource()->findById($projectId);
+        if (!$project instanceof Project) {
+            // TODO replace with appropriate message
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
+        $folder = $project->getFolder();
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($project->getId(), self::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($project->getId(), Factory::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -157,22 +166,12 @@ class Controller extends Base
      */
     public function getSelectAssessmentInUnitImplementation($unitId, $assessmentTypeTitle)
     {
-        /* TODO: Get from db
-         */
-        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
-
-        /* TODO: Derive $folder from $unitId somehow
-         */
-        try {
-            $folder = new \Schoolbox\Resource\Folder\Model();
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
+        $unit   = $this->getUnitImplementationDataSource()->findById($unitId);
+        $folder = $unit->getFolder();
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -183,22 +182,12 @@ class Controller extends Base
      */
     public function getSelectAssessmentInUnitSpecification($unitId, $assessmentTypeTitle)
     {
-        /* TODO: Get from db
-         */
-        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
-
-        /* TODO: Derive $folder from $unitId somehow
-         */
-        try {
-            $folder = new \Schoolbox\Resource\Folder\Model();
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
+        $unit   = $this->getUnitSpecificationDataSource()->findById($unitId);
+        $folder = $unit->getFolder();
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
     }
 
     /**
@@ -218,8 +207,8 @@ class Controller extends Base
 
         $assessmentType = $types->getFromTitle($assessmentTypeTitle);
 
-        $zone = new Zone('files');
-        $zone->setMulti(true);
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessmentType($assessmentType);
 
         /* contextId, contextType:
          *
@@ -229,6 +218,14 @@ class Controller extends Base
         $data = [
             'contextId' => $contextId,
             'contextType' => $contextType,
+
+            'breadcrumbs' => (new BreadcrumbFactory())->produceFromContext(
+                $contextId, $contextType,
+                $this->getFolderMapper(),
+                $this->getUnitImplementationDataSource(),
+                $this->getUnitSpecificationDataSource(),
+                $this->getAssessmentDataSource()
+            ),
 
             /* The usual info everything requires
              */
@@ -324,76 +321,33 @@ class Controller extends Base
      */
     public function postCreateAssessment()
     {
-        $assessment = null;
-
-        /* TODO Everything magically happens here, correctly, based on $contextId and $contextType
-         */
         try {
-            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+            $assessmentInfo = $this->persistAssessment();
         }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
-            return;
-        }
+        catch (\RuntimeException $e) {
 
-        /* Figure out what kind of assessment was chosen
-         * and spawn a new instance of it to manipulate
-         */
-        try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
-
-            /* Manually do a check
+            /* Return Early to let mage deal with error messages
              */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                return;
-            }
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
             return;
         }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-
-        /* TODO: Actually save data here
-         */
-        $assessment->setId(5568);
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
-         *
-         * Unless you tried to spawn nested projects, which we don't allow
          */
         $types = new Types();
 
-        if ($assessment instanceof Project) {
-
-            /* Check that you don't spawn a Project in a Project
-             */
-            if ($types->isProject($types->getFromTitle($this->getRequest()->post['contextType']))) {
-                $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
-                return;
-            }
+        if ($assessmentInfo['assessment'] instanceof Project) {
 
             /* Continue as normal
              */
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
                 'types' => $types,
-                'assessmentId' => $assessment->getId(),
-                'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
+                'assessmentId' => $assessmentInfo['assessment']->getId(),
+                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']->getId()),
             ]));
-
-            return;
         }
         else {
-            $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
+            $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
         }
     }
 
@@ -405,80 +359,35 @@ class Controller extends Base
     public function getUpdateAssessment($assessmentId)
     {
 
-        /* TODO: Figure out assessment's relationship to $folder in some way
-         */
-        try {
-            $folder = $this->getFolderMapper()->findById(43);
+        $assessmentType = null;
+        $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
+        $folder         = $assessment->getContext()->getFolder();
+        if ($assessment instanceof Task) {
+            $assessmentType = Types::ASSESSMENT_TASK;
+        } elseif ($assessment instanceof Quiz) {
+            $assessmentType = Types::ASSESSMENT_QUIZ;
+        } elseif ($assessment instanceof DueWork) {
+            $assessmentType = Types::ASSESSMENT_DUE_WORK;
+        } elseif ($assessment instanceof Project) {
+            $assessmentType = Types::ASSESSMENT_PROJECT;
         }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
-            return;
-        }
 
-        /* TODO: Actually retrieve $assessmentId data here
-         */
-         $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
-//        $assessment = new DueWork();
-        $assessment
-//            ->setId($assessmentId)
-//            ->setTitle('Test Project')
-//            ->setDescription('This is an <b>example project</b>.')
-//            ->setCreator($_SESSION['user'])
-//            ->setAllParticipants(new Collection())
-//            ->setWeight(100)
-//            ->setAcceptsMultiple()
+        $types = new Types();
 
-            ->setAssessables((new Collection())
-                ->add((new DueWork())
-                    ->setId(44)
-                    ->setTitle('Write an essay')
-                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now()))
-                ->add((new DueWork())
-                    ->setId(55)
-                    ->setTitle('Do this homework')
-                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
-                    ->setType((new DueWorkType())
-                        ->setId(2)
-                        ->setName('Homework Assignment'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now())))
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now())
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
-
-        /* TODO: Determine type
-         */
-        $assessmentType = Types::ASSESSMENT_PROJECT;
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessment($assessment);
 
         /* Twig payload
          */
         $data = [
+            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
+            'attachzone' => $zone->getTwigContext(),
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
         ];
-
-        $types = new Types();
 
         if ($types->isValidIndex($assessmentType)) {
 
@@ -508,10 +417,131 @@ class Controller extends Base
      */
     public function postUpdateAssessment($assessmentId)
     {
-        /* TODO: Actually save data here
-         * TODO: Save the attributes common among all assessables
+        try {
+            $assessmentInfo = $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+        }
+        catch (\RuntimeException $e) {
+
+            /* Return Early to let mage deal with error messages
+             */
+            return;
+        }
+
+        $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
+    }
+
+    /**
+     * Generic method for create/update of an assessment.
+     *
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by actual controller methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
+     *
+     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     * @return array
+     */
+    protected function persistAssessment(IAssessable $assessment = null)
+    {
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
          */
-        new \Alaress_Probe($assessmentId, $this->getRequest()->post, "Redirect to <a href='".$this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId])."'>this url</a>");
+        $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
+
+        // Verify that the context of the assessment is valid
+        // TODO replace returnUrl values once I know what they should actually be
+        $context = $assessment->getContext();
+
+        try {
+            if ($context instanceof Folder) {
+
+                /* TODO: Pass contextId as a param into this method
+                 * It should be obtained from the routes
+                 */
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } elseif ($context instanceof UnitImplementation) {
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } elseif ($context instanceof UnitSpecification) {
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    // The unit spec doesn't contain a reference back to its course spec.
+                    // It should, or I should be able to find one.
+                    $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+            } elseif ($context instanceof Project) {
+
+                /* Check that you don't spawn a Project in a Project
+                 */
+                if ($assessment instanceof Project) {
+                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+                    return [];
+                }
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+
+                    // TODO figure out what to do about this
+                    $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } else {
+                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+                return [];
+            }
+
+        } catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+            return [];
+        }
+
+        // Don't change sequence if already in sequence - otherwise put at end
+        $sequence = 1;
+        foreach ($this->getAssessmentDataSource()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+            if ($otherAssessment->getId() == $assessment->getId()) {
+                break;
+            }
+            $sequence++;
+        }
+
+        // And save
+        $this->getAssessmentDataSource()->save($assessment, $sequence);
+
+        return [
+            'assessment' => $assessment,
+            'returnUrl' => $returnUrl
+        ];
     }
 
     /**
@@ -523,69 +553,32 @@ class Controller extends Base
     public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
     {
 
-        /* TODO: Figure out assessment's relationship to $folder in some way
-         */
         try {
-            $folder = $this->getFolderMapper()->findById(43);
+            $project = $this->getAssessmentDataSource()->findById($assessmentId);
+            $folder  = $project->getContext()->getFolder();
         }
         catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
             return;
         }
 
-        /* TODO: Actually retrieve $assessmentId data here
-         */
-        $project = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
-        $project
-            ->setId($assessmentId)
-            ->setTitle('Test Project')
-            ->setDescription('This is an <b>example project</b>.')
-            ->setCreator($_SESSION['user'])
-            ->setAllParticipants(new Collection())
-            ->setWeight(100)
-            ->setAssessables((new Collection())
-                ->add((new DueWork())
-                    ->setId(44)
-                    ->setTitle('Write an essay')
-                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now()))
-                ->add((new DueWork())
-                    ->setId(55)
-                    ->setTitle('Do this homework')
-                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
-                    ->setType((new DueWorkType())
-                        ->setId(2)
-                        ->setName('Homework Assignment'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now())))
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now())
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+        if (!$project instanceof Project) {
+            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
+        }
 
         $types = new Types();
 
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessment($project);
+
         if ($types->isValidIndex($assessmentType)) {
             $data = [
+                'attachzone' => $zone->getTwigContext(),
+                'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
                 'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
+                'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
                 'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
@@ -605,36 +598,17 @@ class Controller extends Base
      */
     public function postCreateAssessmentWithinProject()
     {
-        /* TODO: Actually save data here then redirect back to project update screen
-         */
-        //        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
-
-        /* Figure out what kind of assessment was chosen
-         * and spawn a new instance of it to manipulate
-         */
+        // Persist within context of a project
         try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                return;
-            }
+            $this->persistAssessment();
         }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            return;
-        }
-        catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
+        catch (\RuntimeException $e) {
             return;
         }
 
+        /* Use the returnUrl specified in querystring instead
+         * TODO: Maybe can infer it based on output of $this->persistAssessment?
+         */
         $data = [
             'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
         ];
@@ -649,21 +623,62 @@ class Controller extends Base
      */
     public function postDeleteAssessment($assessmentId)
     {
-        /* TODO: soft-delete this assessment
-         */
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        $folder     = $assessment->getContext()->getFolder();
+        $this->getAssessmentDataSource()->delete($assessment);
 
-        /*
-        if ($assessment was inside a Project instance) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
+        // TODO abstract this redirection logic
+        if ($assessment) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
         }
         else {
             $redirect = "/homepage/{$folder->getId()}";
-
         }
 
         $this->getResponse()->redirect->to($redirect);
-        */
         return;
+    }
+
+    /**
+     * Figure out what kind of assessment was chosen
+     * and spawn a new instance of it to manipulate
+     *
+     * @param $data
+     * @param IAssessable|null $assessment
+     * @return IAssessable $assessment
+     */
+    private function produceAssessment($data, IAssessable $assessment = null)
+    {
+        try {
+            $assessmentFactory = new Factory($this->getUser(), $data);
+
+            if ($assessment instanceof IAssessable) {
+                $assessment = $assessmentFactory->produceFromExistingAssessment($assessment);
+            } else {
+                $assessment = $assessmentFactory->produce();
+            }
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                throw new \RuntimeException;
+            }
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            throw new \RuntimeException;
+        }
+
+        return $assessment;
     }
 
     /* Utility methods - these can probably be refactored elsewhere
@@ -1103,6 +1118,56 @@ class Controller extends Base
     protected function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * @return AssessmentDataSource
+     */
+    protected function getAssessmentDataSource()
+    {
+        return $this->assessmentDataSource;
+    }
+
+    /**
+     * @param AssessmentDataSource $assessmentDataSource
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
+    }
+
+    /**
+     * @return UnitSpecificationDataSource
+     */
+    protected function getUnitSpecificationDataSource()
+    {
+        return $this->unitSpecificationDataSource;
+    }
+
+    /**
+     * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     */
+    protected function setUnitSpecificationDataSource(UnitSpecificationDataSource $unitSpecificationDataSource)
+    {
+        $this->unitSpecificationDataSource = $unitSpecificationDataSource;
+    }
+
+    /**
+     * @return UnitImplementationDataSource
+     */
+    public function getUnitImplementationDataSource()
+    {
+        return $this->unitImplementationDataSource;
+    }
+
+    /**
+     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @return static
+     */
+    public function setUnitImplementationDataSource(UnitImplementationDataSource $unitImplementationDataSource)
+    {
+        $this->unitImplementationDataSource = $unitImplementationDataSource;
+        return $this;
     }
 
 
@@ -2677,9 +2742,3 @@ class Controller extends Base
         return $zone->getTwigContext();
     }
 }
-
-
-
-
-
-

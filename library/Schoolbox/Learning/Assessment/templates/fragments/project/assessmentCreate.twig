@@ -1,7 +1,7 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{% block breadcrumbs %}
-{% endblock %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
@@ -38,7 +38,8 @@
         <form id="assessmentForm" action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: project.id}) }}" method="post">
             <section>
                 <fieldset class="content">
-                    <input type="hidden" name="projectId" value="{{ project.id }}" />
+                    <input type="hidden" name="contextType" value="{{ contextType }}" />
+                    <input type="hidden" name="contextId" value="{{ project.id }}" />
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 

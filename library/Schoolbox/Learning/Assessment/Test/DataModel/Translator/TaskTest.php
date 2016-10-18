@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -29,6 +30,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         $task = (new Task())
             // Generic fields
             ->setId(32)
+            ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -65,11 +67,14 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     {
         // Instance vars defined in setUp() aren't available to data providers
         // I am not sure if this is a bug.
+        $assessmentModel = (new AssessmentModel())
+            ->setId(1)
+            ->setAssessmentContext((new Folder())->setId(1));
         return [
             [
                 (new TaskModel())
                     ->setOwner((new User())->setId(3))
-                    ->setAssessmentModel((new AssessmentModel()))
+                    ->setAssessmentModel($assessmentModel)
                     ->setLink('https://www.google.com.au/')
                     ->setRequiresConfirmation(false),
                 'https://www.google.com.au/',
@@ -79,7 +84,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             [
                 (new TaskModel())
                     ->setOwner((new User())->setId(151))
-                    ->setAssessmentModel((new AssessmentModel()))
+                    ->setAssessmentModel($assessmentModel)
                     ->setLink(null)
                     ->setRequiresConfirmation(true),
                 null,

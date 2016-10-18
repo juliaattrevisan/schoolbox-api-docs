@@ -15,6 +15,9 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -42,9 +45,47 @@ class Factory
     use ProjectTrait;
 
     /**
+     * Spawn in a Folder
+     */
+    const SPAWN_CONTEXT_FOLDER = 'folder';
+
+    /**
+     * Spawn in a Project
+     */
+    const SPAWN_CONTEXT_PROJECT = 'project';
+
+    /**
+     * Spawn in a Unit Implementation
+     */
+    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
+
+    /**
+     * Spawn in a Unit Specification
+     */
+    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
+
+    /**
      * @var int
      */
     protected $type = -1;
+
+    /**
+     * What context is this within?
+     *
+     * Forms a unique identifier along with $contextIdentifier.
+     *
+     * @var string
+     */
+    protected $contextType;
+
+    /**
+     * What's the identifier of the context?
+     *
+     * Forms a unique identifier along with $contextType.
+     *
+     * @var int
+     */
+    protected $contextIdentifier;
 
     /**
      * @var string
@@ -98,18 +139,23 @@ class Factory
      */
     public function __construct(User $creator, $post) {
         $this->setType(trim($post['assessmentType']));
+        $this->setContextType(trim($post['contextType']));
+        $this->setContextIdentifier(trim($post['contextId']));
         $this->setTitle(trim($post['title']));
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
-        $this->setWeight(trim($post['weight']));
+        $this->setWeight(intval($post['weight']));
         $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
         $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
 
-        /* TODO: Work out file attachments
+        /* Check if any attached files existed in POST data
+         * Use their array if it existed
          */
-        $this->setAttachedFiles([$post['attachedFiles']]);
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFiles($post['attachment']);
+        }
 
         /* Projects need this to instantiate
          */
@@ -133,6 +179,7 @@ class Factory
          */
         $this->setDurationHours(trim($post['durationHours']));
         $this->setDurationMinutes(trim($post['durationMinutes']));
+        $this->setMaxAttempts(intval($post['maxAttempts']));
     }
 
     /**
@@ -150,39 +197,94 @@ class Factory
         switch($this->getType()) {
             case Types::ASSESSMENT_PROJECT:
                 $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
-                $decorator = new ProjectDecorator();
                 break;
 
             case Types::ASSESSMENT_DUE_WORK:
                 $assessment = new DueWork();
-                $decorator = new DueWorkDecorator(
-                    $this->getAcceptOnline(),
-                    $this->getMarkType(),
-                    $this->getGradingScheme(),
-                    $this->getHasRubric(),
-                    $this->getHasMarkPerCapability(),
-                    $this->getMaxMark()
-                );
                 break;
 
             case Types::ASSESSMENT_TASK:
                 $assessment = new Task();
-                $decorator = new TaskDecorator(
-                    $this->getHasSelfAssessed(),
-                    $this->getUrl()
-                );
                 break;
 
             case Types::ASSESSMENT_QUIZ:
                 $assessment = new Quiz();
-                $decorator = new QuizDecorator(
-                    $this->getDurationHours(),
-                    $this->getDurationMinutes()
-                );
                 break;
 
             default:
                 throw new \DomainException('select a valid assessment type');
+        }
+
+        // Figure out which context it's in
+        // TODO make sure these are real
+        // TODO move these constants
+        $context = null;
+        switch ($this->getContextType()) {
+            case self::SPAWN_CONTEXT_FOLDER:
+                $context = new Folder();
+                break;
+
+            case self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
+                $context = new UnitImplementation();
+                break;
+
+            case self::SPAWN_CONTEXT_UNIT_SPECIFICATION:
+                $context = new UnitSpecification();
+                break;
+
+            case self::SPAWN_CONTEXT_PROJECT:
+                $context = new Project();
+                break;
+
+            default:
+                throw new \DomainException('select a valid context');
+        }
+        $assessment->setContext($context->setId($this->getContextIdentifier()));
+
+        return $this->produceFromExistingAssessment($assessment);
+    }
+
+    /**
+     * Produce object from an existing assessment
+     *
+     * @param IAssessable $assessment
+     * @return DueWork|Project|Quiz|Task
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    public function produceFromExistingAssessment(IAssessable $assessment)
+    {
+        if ($assessment instanceof Project) {
+            $decorator = new ProjectDecorator(
+                $this->getMarkType()
+            );
+
+        } elseif ($assessment instanceof DueWork) {
+            $decorator = new DueWorkDecorator(
+                $this->getAcceptOnline(),
+                $this->getMarkType(),
+                $this->getGradingScheme(),
+                $this->getHasRubric(),
+                $this->getHasMarkPerCapability(),
+                $this->getMaxMark()
+            );
+
+        } elseif ($assessment instanceof Task) {
+            $decorator = new TaskDecorator(
+                $this->getHasSelfAssessed(),
+                $this->getUrl()
+            );
+
+        } elseif ($assessment instanceof Quiz) {
+            $decorator = new QuizDecorator(
+                $this->getDurationHours(),
+                $this->getDurationMinutes(),
+                $this->getMaxAttempts()
+            );
+
+        } else {
+            throw new \DomainException('select a valid assessment type');
         }
 
         /* Check required data
@@ -429,6 +531,42 @@ class Factory
     protected function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getContextType()
+    {
+        return $this->contextType;
+    }
+
+    /**
+     * @param string $contextType
+     * @return static
+     */
+    protected function setContextType($contextType)
+    {
+        $this->contextType = $contextType;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContextIdentifier()
+    {
+        return $this->contextIdentifier;
+    }
+
+    /**
+     * @param int $contextIdentifier
+     * @return static
+     */
+    protected function setContextIdentifier($contextIdentifier)
+    {
+        $this->contextIdentifier = $contextIdentifier;
         return $this;
     }
 }

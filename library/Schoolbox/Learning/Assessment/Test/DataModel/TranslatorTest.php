@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -33,6 +34,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $assessment = (new Task())
             ->setId(32)
+            ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -72,6 +74,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(401)
+                    ->setAssessmentContext((new Folder())->setId(1))
                     ->setTitle('Some assessment\'s title')
                     ->setDescription('Blargh')
                     ->setWeight(51)
@@ -186,7 +189,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setId(2)
                     ->setAssessmentModel(
                         (new AssessmentModel())
-                            ->setAssessmentContext((new UnitSpecificationModel())->setId(34))
+                            ->setAssessmentContext(
+                                (new UnitSpecificationModel())
+                                    ->setId(34)
+                                    ->setCourse((new CourseSpecificationModel())->setId(1))
+                            )
                     ),
                 UnitSpecification::class,
                 34

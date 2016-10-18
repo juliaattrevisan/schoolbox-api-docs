@@ -11,7 +11,5 @@
     </section>
 
     <h2 class="subheader">Assessments within {{ assessment.title }}</h2>
-    <section>
-        {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
-    </section>
+    {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
 {% endblock %}

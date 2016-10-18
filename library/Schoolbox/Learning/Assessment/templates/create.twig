@@ -1,10 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{{ bread.crumbs(
-    [ folder.name, '/homepage/' ~ folder.id ],
-    [ 'Create Assessment', '#' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
@@ -160,7 +157,7 @@
 
                 <fieldset class="content" data-mage="part-3" disabled="disabled">
                     <legend>Project Contents</legend>
-                    <div class="small-12 columns hide" data-mage-collapsed data-project-contents></div>
+                    <div class="small-12 columns" data-mage-collapsed data-project-contents></div>
                 </fieldset>
             </section>
         </form>

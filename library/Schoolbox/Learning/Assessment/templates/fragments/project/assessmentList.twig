@@ -24,33 +24,35 @@
 </script>
 
 {% if assessment.assessables|length > 0 %}
-<ul class="information-list" id="assessmentList">
-    {% for currentAssessment in assessment.assessables %}
-        <li class="actions-small-1">
-            <div class="list-item">
-                <div class="compact card small-12">
-                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}">
-                        <div class="{{ icon.renderClass(currentAssessment.typeName) }}"></div>
-                        <h3>{{ currentAssessment.title }}</h3>
-                    </a>
+<section>
+    <ul class="information-list" id="assessmentList">
+        {% for currentAssessment in assessment.assessables %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="compact card small-12">
+                        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}">
+                            <div class="{{ icon.renderClass(currentAssessment.typeName) }}"></div>
+                            <h3>{{ currentAssessment.title }}</h3>
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <nav>
-                <a class="icon-modify no-text" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}" title="Modify"></a>
-                <a class="icon-delete no-text" href="{{ routeLookup('learningAssessment.postDeleteAssessment', {'assessmentId': currentAssessment.id}) }}" title="Delete" data-assessment-delete></a>
-            </nav>
-        </li>
-    {% else %}
-        No assessments in this project - create some
-    {% endfor %}
-</ul>
-<div class="content">
-    <ul id="projectButtons" class="flex-list buttons">
-        <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
-        <li><a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task" class="button icon-task">New Task</a></li>
-        <li><a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
+                <nav>
+                    <a class="icon-modify no-text" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}" title="Modify"></a>
+                    <a class="icon-delete no-text" href="{{ routeLookup('learningAssessment.postDeleteAssessment', {'assessmentId': currentAssessment.id}) }}" title="Delete" data-assessment-delete></a>
+                </nav>
+            </li>
+        {% else %}
+            No assessments in this project - create some
+        {% endfor %}
     </ul>
-</div>
+    <div class="content">
+        <ul id="projectButtons" class="flex-list buttons">
+            <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
+            <li><a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task" class="button icon-task">New Task</a></li>
+            <li><a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
+        </ul>
+    </div>
+</section>
 {% else %}
 <div class="empty-state">
     <i class="icon-due-work"></i>

@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -47,12 +48,12 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        // Joins to:
+        // Type joins (what type of assessment is this?)
         // * task
         // * due work
         // * quiz
         // * project
-        // are defined without a related field, because they don't have a matching key in this mapper
+        // These are defined without a related field, because they don't have a matching key in this mapper
         // (that isn't this mapper's PK)
         $this->hasJoin(
             'task',
@@ -87,7 +88,11 @@ class Mapper extends BaseMapper
             ]
         );
 
-        // folder (by assessment_folder table)
+        // Context joins (where does this assessment live?)
+        // * folder (via assessment_folder)
+        // * unit specification (via assessment_course_unit_specification)
+        // * unit implementation (via assessment_course_unit_implementation)
+        // * project (via project_assessment)
         $this->joinsVia(
             'assessment_folder',
             FolderMapper::class,
@@ -97,10 +102,8 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'folder'
+            'contextFolder'
         );
-
-        // unit specification (by assessment_course_unit_specification table)
         $this->joinsVia(
             'assessment_course_unit_specification',
             UnitSpecificationMapper::class,
@@ -110,10 +113,8 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'unitSpecification'
+            'contextUnitSpecification'
         );
-
-        // unit implementation (by assessment_course_unit_implementation table)
         $this->joinsVia(
             'assessment_course_unit_implementation',
             UnitImplementationMapper::class,
@@ -123,7 +124,18 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'unitImplementation'
+            'contextUnitImplementation'
+        );
+        $this->joinsVia(
+            'project_assessment',
+            ProjectMapper::class,
+            'id',
+            'project_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'contextProject'
         );
     }
 
@@ -147,7 +159,9 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')}
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
+                {$this->getJoinColumnString('project_assessment', 'pa')}
+                -- May need to hydrate project's context too!
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd')}
@@ -159,6 +173,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
+            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
         ";
     }
 
@@ -171,8 +186,9 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Collection|Model[] $modelList */
-        $modelList  = $this->createCollection();
-        $dueWorkIds = [];
+        $modelList         = $this->createCollection();
+        $dueWorkIds        = [];
+        $contextProjectIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
@@ -209,11 +225,16 @@ class Mapper extends BaseMapper
             // Context (whatever it might be)
             $context = null;
             if ($row['f.id']) {
+                // Folder
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
+
             } elseif ($row['us.id']) {
+                // Unit spec
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
                     ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
+
             } elseif ($row['ui.id']) {
+                // Unit impl
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui')
                     ->setCourse(
                         $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
@@ -221,6 +242,14 @@ class Mapper extends BaseMapper
                                  $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
                              )
                     );
+
+            } elseif ($row['pa.id']) {
+                // Project
+                $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
+
+                // Load context for this project itself
+                $contextProjectIds[] = $row['pa.assessment_id'];
+
             }
             $model->setAssessmentContext($context);
 
@@ -250,9 +279,31 @@ class Mapper extends BaseMapper
                 $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
             }
             foreach ($modelList as $model) {
-                $submodel = $model->getSubObject();
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
                 if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
                     $submodel->setAttachments($files[$submodel->getId()]);
+                }
+            }
+        }
+
+        // Load context for projects separately
+        // Attempt to do it all in one query
+        /** @var Model[] $contextProjects */
+        if (!empty($contextProjectIds)) {
+            $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
+            foreach ($modelList as $model) {
+                // This has to be a project
+                $context = $model->getAssessmentContext();
+                if ($context instanceof ProjectModel) {
+                    $contextId = $context->getAssessmentModel()->getId();
+                    if (isset($contextProjects[$contextId])) {
+                        $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
+                    }
                 }
             }
         }

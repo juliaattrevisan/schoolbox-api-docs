@@ -33,7 +33,9 @@ function assertEquals($value1, $value2)
 
 // Mapper for assessables, and its required translator
 $translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
-    new \Schoolbox\Learning\MarkScheme\Factory()
+    new \Schoolbox\Learning\MarkScheme\Factory(),
+    new \Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator(),
+    new \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator()
 );
 $translator
     ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())
@@ -324,7 +326,6 @@ $project = (new Project(new WeightedAverage()))
 $project->getAssessables()
         ->add((new Task())
             // Generic
-            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -339,7 +340,6 @@ $project->getAssessables()
         )
         ->add((new Quiz())
             // Generic
-            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -355,7 +355,6 @@ $project->getAssessables()
         )
         ->add((new DueWork())
             // Generic
-            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -397,7 +396,7 @@ assertEquals($dbProject->getContext()->getId(), $project->getContext()->getId())
 // Specific fields
 assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMarkScheme()));
 // Sub-assessments - unable to be fetched yet
-//assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
+assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
 
 
 /**
@@ -405,9 +404,10 @@ assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMark
  *
  * For now just test that the counts are correct, rather than their actual results
  */
-assertEquals(5, count($mapper->findAllForFolderId($folder->getId())));
+assertEquals(2, count($mapper->findAllForFolderId($folder->getId())));
 assertEquals(1, count($mapper->findAllForUnitSpecificationId($unitSpec->getId())));
 assertEquals(1, count($mapper->findAllForUnitImplementationId($unitImpl->getId())));
+assertEquals(3, count($mapper->findAllForProjectId($project->getId())));
 
 
 /**
@@ -456,6 +456,7 @@ foreach ($project->getAssessables() as $subAssessment) {
 assertEquals(0, count($mapper->findAllForFolderId($folder->getId())));
 assertEquals(0, count($mapper->findAllForUnitSpecificationId($unitSpec->getId())));
 assertEquals(0, count($mapper->findAllForUnitImplementationId($unitImpl->getId())));
+assertEquals(0, count($mapper->findAllForProjectId($unitImpl->getId())));
 
 // And finally delete our test folder
 $folderMapper->delete($parentFolder);

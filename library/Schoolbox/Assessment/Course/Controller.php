@@ -31,6 +31,7 @@ use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -85,6 +86,11 @@ class Controller extends Base\Base
      * @var CourseSpecificationMapper
      */
     protected $courseSpecificationMapper;
+
+    /**
+     * @var AssessmentMapperProxy
+     */
+    protected $assessmentMapperProxy;
 
     /**
      * @var CourseSpecificationMapperProxy
@@ -151,10 +157,26 @@ class Controller extends Base\Base
 
     /**
      * Set dependencies
+     *
+     * @param CourseSpecificationMapperProxy $courseSpecificationDataSource
+     * @param UnitSpecificationMapperProxy   $unitSpecificationDataSource
+     * @param AssessmentMapperProxy          $assessmentDataSource
      */
-    public function __construct()
-    {
+    public function __construct(
+        CourseSpecificationMapperProxy $courseSpecificationDataSource,
+        UnitSpecificationMapperProxy $unitSpecificationDataSource,
+        AssessmentMapperProxy $assessmentDataSource
+    ) {
         // Deprecated course/unit specification mappers - all gone!
+
+        // Proxy for course/unit specification mappers
+        $this->setUnitSpecificationMapperProxy($unitSpecificationDataSource);
+        $this->setCourseSpecificationMapperProxy($courseSpecificationDataSource);
+
+        // Proxy for assessment mapper
+        $this->setAssessmentMapperProxy($assessmentDataSource);
+
+        // TODO DI everything below this line?
 
         // Modern course/unit specification mappers
         $this->setCourseSpecificationMapper(CourseSpecificationMapper::getInstance());
@@ -164,21 +186,6 @@ class Controller extends Base\Base
         $this->setUnitSpecificationTranslator(new UnitSpecificationTranslator());
         $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($this->getUnitSpecificationTranslator()));
 
-        // Proxy for course/unit specification mappers
-        $this->setUnitSpecificationMapperProxy(
-            new UnitSpecificationMapperProxy(
-                $this->getUnitSpecificationMapper(),
-                $this->getUnitSpecificationTranslator()
-            )
-        );
-        $this->setCourseSpecificationMapperProxy(
-            new CourseSpecificationMapperProxy(
-                $this->getCourseSpecificationMapper(),
-                $this->getCourseSpecificationTranslator(),
-                $this->getUnitSpecificationMapper(),
-                $this->getUnitSpecificationTranslator()
-            )
-        );
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
@@ -313,20 +320,20 @@ class Controller extends Base\Base
                 /** @var UnitSpecification $unit */
                 $unitFolder = $unit->getFolder();
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unitFolder);
+                $data['tasks'][$unit->getId()] = $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($unit->getId());
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
                 $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
-                // obtain the Course Builder Component Instance from the homepage.
-                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
-
-                foreach ($data['tasks'][$unit->getId()] as $task) {
-                    /** @var Task $task */
-                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
-                }
-
-                // set reference to this reveal instance
-                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
+//                // obtain the Course Builder Component Instance from the homepage.
+//                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
+//
+//                foreach ($data['tasks'][$unit->getId()] as $task) {
+//                    /** @var Task $task */
+//                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
+//                }
+//
+//                // set reference to this reveal instance
+//                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
             }
         }
 
@@ -2660,6 +2667,24 @@ class Controller extends Base\Base
     public function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
     {
         $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return AssessmentMapperProxy
+     */
+    public function getAssessmentMapperProxy()
+    {
+        return $this->assessmentMapperProxy;
+    }
+
+    /**
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @return static
+     */
+    public function setAssessmentMapperProxy($assessmentMapperProxy)
+    {
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         return $this;
     }
 

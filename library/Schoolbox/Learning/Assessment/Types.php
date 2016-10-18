@@ -110,6 +110,39 @@ class Types extends \Schoolbox\Collection
         return $index == self::ASSESSMENT_PROJECT;
     }
 
+    /**
+     * $index is a due work assessment type
+     *
+     * @param $index
+     * @return bool
+     */
+    public function isDueWork($index)
+    {
+        return $index == self::ASSESSMENT_DUE_WORK;
+    }
+
+    /**
+     * $index is a quiz assessment type
+     *
+     * @param $index
+     * @return bool
+     */
+    public function isQuiz($index)
+    {
+        return $index == self::ASSESSMENT_QUIZ;
+    }
+
+    /**
+     * $index is a task assessment type
+     *
+     * @param $index
+     * @return bool
+     */
+    public function isTask($index)
+    {
+        return $index == self::ASSESSMENT_PROJECT;
+    }
+
     /* Getters/Setters
      */
 

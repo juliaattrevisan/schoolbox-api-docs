@@ -13,11 +13,16 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -70,16 +75,39 @@ class MapperProxy
     }
 
     /**
+     * Find all assessables for this context
+     *
+     * @param AssessmentContext $context
+     * @param array             $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForContext(AssessmentContext $context, $options = [])
+    {
+        if ($context instanceof Folder) {
+            return $this->findAllForFolderId($context->getId(), $options);
+        }
+        if ($context instanceof UnitSpecification) {
+            return $this->findAllForUnitSpecificationId($context->getId(), $options);
+        }
+        if ($context instanceof UnitImplementation) {
+            return $this->findAllForUnitImplementationId($context->getId(), $options);
+        }
+        if ($context instanceof ProjectObject) {
+            return $this->findAllForProjectId($context->getId(), $options);
+        }
+        return new Collection();
+    }
+
+    /**
      * Finds all assessables for a unit specification
      *
      * @param int   $unitSpecId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->baseMapper->findByColumn('us.id', $unitSpecId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
     }
 
     /**
@@ -87,12 +115,11 @@ class MapperProxy
      *
      * @param int   $unitImplId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->baseMapper->findByColumn('ui.id', $unitImplId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
     }
 
     /**
@@ -100,23 +127,23 @@ class MapperProxy
      *
      * @param int   $folderId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->baseMapper->findByColumn('f.id', $folderId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
     }
 
     /**
      * Finds all assessables that are part of the given project
      *
-     * @param int $projectId
+     * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
+     * @param array $options
+     * @return Collection|IAssessable[]
      */
-    public function findAllForProjectId($projectId)
+    public function findAllForProjectId($projectId, $options = [])
     {
-        // TODO implement
-        // Requires 1..M join onto not yet existent project_assessment
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
     }
 
     /**
@@ -129,6 +156,15 @@ class MapperProxy
     {
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable, $sequence);
+
+        // Folder context translation:
+        // Look up the data model's assessment object ID, and translate to a project ID
+        $context = $dataModel->getAssessmentContext();
+        if ($context instanceof Project) {
+            $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
+            $context->setId($project->getId());
+        }
+
         $this->baseMapper->save($dataModel);
 
         // Set fields on the domain model object
@@ -141,29 +177,19 @@ class MapperProxy
 //            ->setDeletedAt($dataModel->getDeletedAt())
         ;
 
-        // Vestigial folder - for now, task/quiz/duework are linked to folders.
-        // This link will disappear eventually.
-        // TODO remove vestigial folder
-        $vestigialFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAll(['limit' => 1])->first();
-
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
         if ($subObject instanceof Task) {
-            $subObject->setCategory($vestigialFolder);
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
-            $subObject
-                ->setCategory($vestigialFolder)
-                ->setRubricResultSet(0)
-            ;
+            $subObject->setRubricResultSet(0);
             DueWorkMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Quiz) {
-            $subObject->setCategory($vestigialFolder);
             QuizMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Project) {
@@ -210,7 +236,36 @@ class MapperProxy
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
 
-        return $this->translator->translateToDomainModel($subModel);
+        // Retrieve sub-projects
+        $assessable = $this->translator->translateToDomainModel($subModel);
+        if ($assessable instanceof ProjectObject) {
+            $assessable->setAssessables($this->findAllForProjectId($assessable->getId()));
+        }
+        return $assessable;
+    }
+
+    /**
+     * Translates a collection of data models to a domain object.
+     *
+     * Any broken data models just get skipped.
+     *
+     * @param Collection|Model[] $collection
+     * @return Collection|IAssessable[]
+     */
+    public function translateToDomainModelCollection(Collection $collection)
+    {
+        $newCollection = new Collection();
+        foreach ($collection as $model) {
+            if ($model instanceof Model) {
+                try {
+                    $newCollection->add($this->translateToDomainModel($model));
+                } catch (\UnexpectedValueException $e) {
+                    // Broken object from database - not much I can do but...
+                    continue;
+                }
+            }
+        }
+        return $newCollection;
     }
 
     /**
