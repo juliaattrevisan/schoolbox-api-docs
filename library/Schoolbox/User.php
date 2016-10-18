@@ -845,7 +845,7 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
-     * @param CampusCollection $campusCollection
+     * @param Collection $campusCollection
      * @return self
      */
     public function setCampusCollection(CampusCollection $campusCollection)

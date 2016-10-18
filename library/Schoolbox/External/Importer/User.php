@@ -146,6 +146,7 @@ class User extends AbstractImporter
             "Title"                        => '',
             "First Name"                   => '',
             "Surname"                      => '',
+            "Position Title"               => 'The user\'s position title (e.g. Admissions Manager)',
             "Role"                         => 'The Schoolbox role for this user',
             "Campus"                       => 'A comma-separated list of campus names for this user.',
             "Password"                     => 'The user\'s password. If left blank, it will not be updated',
@@ -250,6 +251,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle');
         $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname');
         $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname');
+        $this->userHydrators[] = new User\Hydrator\Field('Position Title', 'setPositionTitle');
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail');
         $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear');
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
