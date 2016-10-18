@@ -69,20 +69,15 @@
                 $('#maxMark').prop('disabled', false);
             }
 
-            /* Disable everything initially
+            /**
+             * Initialise panels
              */
-            disableMaxMark();
-            hideMaxMark();
-            hideGradingScheme();
-
-            /* Mark Type switcher
-             */
-            $('#assessmentForm').on('change', '#markType', function(event) {
-                if ($(this).val() == {{ markTypeLetterGrade }}) {
+            function setupPanels(element) {
+                if ($(element).val() == {{ markTypeLetterGrade }}) {
                     hideMaxMark();
                     showGradingScheme();
                 }
-                else if ($(this).val() == {{ markTypeTotalMark }}) {
+                else if ($(element).val() == {{ markTypeTotalMark }}) {
                     hideGradingScheme();
                     showMaxMark();
 
@@ -101,6 +96,20 @@
                     hideMaxMark();
                     hideGradingScheme();
                 }
+            }
+
+            /* Disable everything initially
+             */
+            disableMaxMark();
+            hideMaxMark();
+            hideGradingScheme();
+
+            setupPanels($('#markType'));
+
+            /* Mark Type switcher
+             */
+            $('#assessmentForm').on('change', '#markType', function(event) {
+                setupPanels($(this));
             });
 
             /**
