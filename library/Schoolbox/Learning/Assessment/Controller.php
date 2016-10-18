@@ -393,10 +393,13 @@ class Controller extends Base
 
             /* Special treatment for projects for now
              */
+            $summatorMapping = new SummatorMapping();
+
             if ($types->isProject($assessmentType)) {
                 $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
-                $data['allSummators']  = new SummatorMapping();
+                $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
+                $data['allSummators']  = $summatorMapping;
             }
 
             $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));

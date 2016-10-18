@@ -38,7 +38,7 @@
 
 <select id="summatorSelect" name="summator">
     {% for index, title in allSummators.map %}
-    <option value="{{ index }}">{{ title }}</option>
+    <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
     {% endfor %}
 </select>
 
