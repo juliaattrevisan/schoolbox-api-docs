@@ -4,7 +4,7 @@
             Mark Type
             <select id="markType" name="markType">
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}">{{ title }}</option>
+                    <option value="{{ index }}" {% if index == assessment.markType.id %}selected{% endif %}>{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
