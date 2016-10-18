@@ -363,6 +363,16 @@ $container-bg: white !default;
 	}
 }
 
+.trace {
+	pre {
+		display: inline;
+		&:before {
+			content: "";
+			display: block;
+		}
+	}
+}
+
 // Deleting Components
 .delete-it{
 	background-color: tint($warning-color, 74%);

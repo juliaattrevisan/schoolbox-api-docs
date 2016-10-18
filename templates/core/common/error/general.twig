@@ -9,30 +9,43 @@
     <p>{{ info }}</p>
     {% endif %}
 
-
-
     {% if url|length %}
     <p class="meta">{{ url }}</p>
     {% endif %}
 
-    {% if outputStackTrace %}
-    <p class="meta">
-        Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
-    </p>
-
-    <pre class="content">
-        {%- spaceless -%}
-        {{ stackTrace }}
-        {%- endspaceless -%}
-    </pre>
-    {% endif %}
-    <p><br />Issued occured at {{ date.long }}, further information may have been logged</p>
+    <p><br />Issue occurred at {{ date.long }}, further information may have been logged.</p>
 </div>
+
+{% if outputStackTrace %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Stack trace</h2>
+        <section class="scrollable">
+            <ul class="action-list trace">
+                <li>
+                    <div class="column small-1"><pre>#0 </pre></div>
+                    <div class="column small-11">
+                        <pre>{{ exceptionClass }}{% if stackTrace.message %}: "{{ stackTrace.message }}"{% endif %}</pre>
+                        <pre class="meta">thrown on {{ stackTrace.file }}:{{ stackTrace.line }}</pre>
+                    </div>
+                </li>
+                {% for frame in stackTrace.trace %}
+                <li>
+                    <div class="column small-1"><pre>#{{ loop.index }} </pre></div>
+                    <div class="column small-11">
+                        <pre>{{ frame.class }}{{ frame.type }}{{ frame.function }}({{ frame.args | join(', ') }});</pre>
+                        <pre class="meta">called from {{ frame.file }}:{{ frame.line }}</pre>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
         {% include 'common/error/fragment/options.twig' %}
     </div>
 </div>
-
-

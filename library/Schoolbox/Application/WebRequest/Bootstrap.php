@@ -149,6 +149,15 @@ class Bootstrap implements BootstrapInterface {
      */
     public function registerErrorHandling() {
         // noop. WebRequest does not use custom error handling
+        set_error_handler(function ($code, $message, $file, $line) {
+            $this->shutdownSafely([
+                'type' => $code,
+                'message' => $message,
+                'file' => $file,
+                'line' => $line
+            ], debug_backtrace());
+            return true;
+        }, E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR);
     }
 
 
@@ -657,9 +666,10 @@ class Bootstrap implements BootstrapInterface {
     /**
      * Shutdown handler for either exceptions or fatal errors
      *
-     * @param \Exception $e
+     * @param \Exception|array $e
+     * @param array $stack
      */
-    public function shutdownSafely(\Exception $e = null)
+    public function shutdownSafely($e = null, $stack = null)
     {
         $outputStackTrace = Config::get('debug_show_stack_trace');
 
@@ -672,6 +682,9 @@ class Bootstrap implements BootstrapInterface {
             );
 
             $this->kernel->callExceptionCallbacks($e);
+
+        } elseif (is_array($e)) {
+            $error = $e;
         } else {
             $error = error_get_last();
         }
@@ -692,12 +705,12 @@ class Bootstrap implements BootstrapInterface {
                 $code    = 400;
                 $info    = "If the problem persists, please contact your System Administrator including the following information:";
 
-                if ($e instanceof \RuntimeException) {
+                if ($e instanceof \PDOException){
+                    $code = 500;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                } else if ($e instanceof \RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
-                } elseif ($e instanceof \PDOException) {
-                    $code    = 500;
-                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                 } else {
                     $message = 'Schoolbox has encountered a fatal error.';
 
@@ -714,9 +727,9 @@ class Bootstrap implements BootstrapInterface {
                     }
                 }
 
-                // Report to New Relic if not a RuntimeException
+                // Report to New Relic
                 if (extension_loaded('newrelic')) {
-                    if ($e instanceof \Exception && !($e instanceof \RuntimeException)) {
+                    if ($e instanceof \Exception ) {
                         newrelic_notice_error(null, $e);
                     }
                 }
@@ -734,6 +747,16 @@ class Bootstrap implements BootstrapInterface {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->kernel->getDependencyInjector();
 
+                if (!$e instanceof \Exception) {
+                    $e = $error;
+                    $e['code'] = $code;
+
+                    if (is_array($stack)) {
+                        array_shift($stack);
+                        $e['trace'] = $stack;
+                    }
+                }
+
                 /* Use structured information for rendering
                  */
                 $args = [
@@ -743,7 +766,7 @@ class Bootstrap implements BootstrapInterface {
                     'error' => $error,
                     'date' => date('Y-m-d H:i:s'),
                     'outputStackTrace' => $outputStackTrace,
-                    'stackTrace' => "$e"
+                    'stackTrace' => $e
                 ];
 
                 /* Pass $data straight in for twig rendering

@@ -660,6 +660,7 @@ class SitePage extends Page
                 'meta' => $args['error'],
                 'outputStackTrace' => $args['outputStackTrace'],
                 'stackTrace' => $args['stackTrace'],
+                'exceptionClass' => is_object($args['stackTrace']) ? get_class($args['stackTrace']) : 'Error'
             ]);
 
             $this->renderError('Error Encountered', $errorContents);
