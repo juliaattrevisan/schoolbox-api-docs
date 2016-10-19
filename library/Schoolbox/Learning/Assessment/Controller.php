@@ -10,7 +10,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
-use Guzzle\Common\Exception\UnexpectedValueException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
