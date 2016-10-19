@@ -840,6 +840,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'counts' => $counts,
             'assessment' => $assessment,
+            'types' => new Types(),
         ];
 
 

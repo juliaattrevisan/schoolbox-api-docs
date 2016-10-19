@@ -57,9 +57,15 @@
                 {% endif %}
 
                 <ul class="flex-list buttons">
-                    <li><a href="/task/create/15" data-reveal-id="createTask-component3428" title="Create a new Task" class="button icon-task">New Task</a></li>
-                    <li><a href="/submission/createSubmission/new/15/task?return_url=L2NvdXJzZS9tb2RpZnkvMyMxNQ%3D%3D" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
-                    <li><a href="/assess/create/15/task?return_url=L2NvdXJzZS9tb2RpZnkvMyMxNQ%3D%3D" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('task')}) }}"
+                           title="Create a new Task"
+                           class="button icon-task">New Task</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('dueWork')}) }}"
+                           title="Create a new Due Work"
+                           class="button icon-due-work">New Due Work</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('quiz')}) }}"
+                           title="Create a new Quiz"
+                           class="button icon-quiz">New Quiz</a></li>
                 </ul>
 
             </div>
