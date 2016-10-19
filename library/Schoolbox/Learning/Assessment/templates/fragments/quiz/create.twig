@@ -37,13 +37,20 @@
 <label>
     Max Attempts
     {% set maxAttempts = 10 %}
+
     <select name="maxAttempts">
 
         {% for i in 0..maxAttempts %}
-        {% if i == 0 %}
-            <option value="{{ i }}">Unlimited</option>
+        {% if i == assessment.maxAttempts %}
+            {% set selected = 'selected' %}
         {% else %}
-            <option value="{{ i }}">{{ i }}</option>
+            {% set selected = '' %}
+        {% endif %}
+
+        {% if i == 0 %}
+            <option value="{{ i }}" {{ selected }}>Unlimited</option>
+        {% else %}
+            <option value="{{ i }}" {{ selected }}>{{ i }}</option>
         {% endif %}
         {% endfor %}
 
