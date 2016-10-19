@@ -73,6 +73,14 @@ interface IAssessable extends ISoftDeletable
     public function getIconClass();
 
     /**
+     * Is this user a participant in this assessable?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isParticipant(User $user);
+
+    /**
      * Find a reference to a particular Participant in this Assessable
      * which saves you this traversal in Controllers etc
      *
