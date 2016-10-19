@@ -1,7 +1,5 @@
 <?php
 /**
- * Assessment Types
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,15 +8,24 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-class Types
+/**
+ * Encapsulates the mapping between Assessment Types and their URL fragments
+ *
+ * This class essentially enumerates the concrete implementations of IAssessable
+ * Does not map to DB table as that relationship is represented in join tables
+ *
+ * Does not belong on IAssessable as interface cannot have behaviour
+ * Does not belong on AbstractAssessment as parent class should not know about children
+ */
+class AssessmentType
 {
     /**
      * Assessable types
      */
-    const ASSESSMENT_TYPE_PROJECT = 1;
-    const ASSESSMENT_TYPE_DUE_WORK = 2;
-    const ASSESSMENT_TYPE_TASK = 3;
-    const ASSESSMENT_TYPE_QUIZ = 4;
+    const PROJECT = 1;
+    const DUE_WORK = 2;
+    const TASK = 3;
+    const QUIZ = 4;
 
     /**
      * Set of key-value pairs
@@ -29,10 +36,10 @@ class Types
      * @var string[] $urlFragments
      */
     private static $urlFragments = [
-        self::ASSESSMENT_TYPE_PROJECT  => 'project',
-        self::ASSESSMENT_TYPE_DUE_WORK => 'dueWork',
-        self::ASSESSMENT_TYPE_TASK     => 'task',
-        self::ASSESSMENT_TYPE_QUIZ     => 'quiz',
+        self::PROJECT  => 'project',
+        self::DUE_WORK => 'dueWork',
+        self::TASK     => 'task',
+        self::QUIZ     => 'quiz',
     ];
 
     /**
@@ -60,30 +67,30 @@ class Types
     }
 
     /**
-     * Is the $Key valid?
+     * Is the $urlFragment valid?
      *
-     * @param string $key
+     * @param string $urlFragment
      * @return bool
      */
-    public static function isValidKey($key)
+    public static function isValidUrlFragment($urlFragment)
     {
-        if (strlen($key)) {
-            return in_array($key, array_values(self::$urlFragments));
+        if (strlen($urlFragment)) {
+            return in_array($urlFragment, array_values(self::$urlFragments));
         }
 
         return false;
     }
 
     /**
-     * Is the $index valid?
+     * Is the $assessmentType valid?
      *
-     * @param int $index
+     * @param int $assessmentType
      * @return bool
      */
-    public static function isValidIndex($index)
+    public static function isValidIndex($assessmentType)
     {
-        if ($index !== null) {
-            return in_array($index, array_keys(self::$urlFragments));
+        if ($assessmentType !== null) {
+            return in_array($assessmentType, array_keys(self::$urlFragments));
         }
 
         return false;
@@ -92,51 +99,52 @@ class Types
     /**
      * $index is a project assessment type
      *
-     * @param $index
+     * @param int $assessmentType
      * @return bool
      */
-    public static function isProject($index)
+    public static function isProject($assessmentType)
     {
-        return $index == self::ASSESSMENT_TYPE_PROJECT;
+        return $assessmentType == self::PROJECT;
     }
 
     /**
      * $index is a due work assessment type
      *
-     * @param $index
+     * @param int $assessmentType
      * @return bool
      */
-    public static function isDueWork($index)
+    public static function isDueWork($assessmentType)
     {
-        return $index == self::ASSESSMENT_TYPE_DUE_WORK;
+        return $assessmentType == self::DUE_WORK;
     }
 
     /**
      * $index is a quiz assessment type
      *
-     * @param $index
+     * @param int $assessmentType
      * @return bool
      */
-    public static function isQuiz($index)
+    public static function isQuiz($assessmentType)
     {
-        return $index == self::ASSESSMENT_TYPE_QUIZ;
+        return $assessmentType == self::QUIZ;
     }
 
     /**
      * $index is a task assessment type
      *
-     * @param $index
+     * @param int $assessmentType
      * @return bool
      */
-    public static function isTask($index)
+    public static function isTask($assessmentType)
     {
-        return $index == self::ASSESSMENT_TYPE_TASK;
+        return $assessmentType == self::TASK;
     }
 
     /* Getters/Setters
      */
 
     /**
+     * Maps ID:int => UrlFragment:string
      * @return array
      */
     public static function getUrlFragments()

@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-use \Schoolbox\Learning\Assessment\Types as AssessmentTypes;
+use \Schoolbox\Learning\Assessment\AssessmentType as AssessmentTypes;
 use \Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 
 class Mapping
@@ -28,21 +28,21 @@ class Mapping
     public function __construct()
     {
         $this->setMap([
-            AssessmentTypes::ASSESSMENT_TYPE_PROJECT  => [
+            AssessmentTypes::PROJECT              => [
                 MarkType::TYPE_PERCENT => Percentage::getTitle(),
                 MarkType::TYPE_NONE => None::getTitle(),
                 MarkType::TYPE_LETTER => LetterGrade::getTitle()
             ],
-            AssessmentTypes::ASSESSMENT_TYPE_DUE_WORK => [
+            AssessmentTypes::DUE_WORK => [
                 MarkType::TYPE_PERCENT => Percentage::getTitle(),
                 MarkType::TYPE_NONE => None::getTitle(),
                 MarkType::TYPE_TOTAL => TotalMarkWholeNumber::getTitle(),
                 MarkType::TYPE_LETTER => LetterGrade::getTitle()
             ],
-            AssessmentTypes::ASSESSMENT_TYPE_TASK     => [
+            AssessmentTypes::TASK     => [
                 MarkType::TYPE_COMPLETION => Completion::getTitle(),
             ],
-            AssessmentTypes::ASSESSMENT_TYPE_QUIZ     => [
+            AssessmentTypes::QUIZ     => [
                 MarkType::TYPE_TOTAL => TotalMarkFractional::getTitle(),
             ],
         ]);

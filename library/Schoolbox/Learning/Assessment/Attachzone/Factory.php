@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Types;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Resource\Attachment\Zone;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
@@ -23,7 +23,7 @@ class Factory
 {
     protected $assessmentTypes;
 
-    public function __construct(Types $assessmentTypes)
+    public function __construct(AssessmentType $assessmentTypes)
     {
         $this->assessmentTypes = $assessmentTypes;
     }

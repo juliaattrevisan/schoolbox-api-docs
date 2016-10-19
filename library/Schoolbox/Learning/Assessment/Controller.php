@@ -139,7 +139,7 @@ class Controller extends Base
          *
          * Instead, redirect to a safe place
          */
-        $types = new Types();
+        $types = new AssessmentType();
 
         if ($types->isProject($types->getAssessmentType($assessmentTypeTitle))) {
             $data = ['projectId' => $projectId];
@@ -205,7 +205,7 @@ class Controller extends Base
     {
         /* Check that $type is valid
          */
-        $types = new Types();
+        $types = new AssessmentType();
         $assessmentType = $types->getAssessmentType($assessmentTypeTitle);
 
         $zoneFactory = new ZoneFactory($types);
@@ -242,6 +242,8 @@ class Controller extends Base
         /* Used to hide a ui element, preventing Projects being an option
          * to spawn inside a Project context
          */
+        // TODO - this is a bug. CONTEXT_TYPE_PROJECT != ASSESSMENT_TYPE_PROJECT
+        // TODO - need to create an AssessmentContextTypes class
         if ($types->isProject($types->getAssessmentType($contextType))) {
             $data['hideProjectOption'] = true;
         }
@@ -270,6 +272,8 @@ class Controller extends Base
             return;
         }
 
+        $assessmentType = $this->getRequest()->post['assessmentType'];
+
         /* TODO: Remove this stub
          * I added it to save myself choosing dates all the time
          */
@@ -283,9 +287,9 @@ class Controller extends Base
 
         /* Common data among all assessmentType fragments
          */
-        $types = new Types();
+        $types = new AssessmentType();
 
-        if (!$types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+        if (!$types->isValidIndex($assessmentType)) {
             $this->sendError('Could not create assessment', ['select a valid assessment type']);
             return;
         }
@@ -303,16 +307,15 @@ class Controller extends Base
 
         /* Select the fragment to return
          */
-        if ($types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+        if ($types->isValidIndex($assessmentType)) {
 
             /* Special treatment for projects for now
              */
-            if ($types->isProject($this->getRequest()->post['assessmentType'])) {
+            if ($types->isProject($assessmentType)) {
                 $data['allSummators'] = new SummatorMapping();
             }
 
-            $assessmentType = $types->getUrlFragment($this->getRequest()->post['assessmentType']);
-            $template = "@learningAssessment/fragments/{$assessmentType}/create.twig";
+            $template = "@learningAssessment/fragments/{$types->getUrlFragment($assessmentType)}/create.twig";
             $content = $this->buildUnthemedHtmlOutput($template, $data);
             $this->getResponse()->content->set($content);
         }
@@ -336,8 +339,10 @@ class Controller extends Base
             return;
         }
 
-        /** @var IAssessable $assessment */
-        $assessment = $assessmentInfo['assessment'];
+        /* If it were a project, go back to the project's Update screen
+         * Otherwise return to the homepage
+         */
+        $types = new AssessmentType();
 
         /* If you spawned a project or an assessable within a project
          * Redirect to project summary screen
@@ -372,17 +377,16 @@ class Controller extends Base
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
         if ($assessment instanceof Task) {
-            $assessmentType = Types::ASSESSMENT_TYPE_TASK;
+            $assessmentType = AssessmentType::TASK;
         } elseif ($assessment instanceof Quiz) {
-            $assessmentType = Types::ASSESSMENT_TYPE_QUIZ;
+            $assessmentType = AssessmentType::QUIZ;
         } elseif ($assessment instanceof DueWork) {
-            $assessmentType = Types::ASSESSMENT_TYPE_DUE_WORK;
+            $assessmentType = AssessmentType::DUE_WORK;
         } elseif ($assessment instanceof Project) {
-            $assessmentType = Types::ASSESSMENT_TYPE_PROJECT;
+            $assessmentType = AssessmentType::PROJECT;
         }
 
-        $types = new Types();
-        $assessmentIndex = $types->getFromTitle($assessmentType);
+        $types = new AssessmentType();
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessment($assessment);
@@ -456,7 +460,7 @@ class Controller extends Base
             $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
         }
 
-        $types = new Types();
+        $types = new AssessmentType();
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessment($project);
@@ -757,7 +761,7 @@ class Controller extends Base
         $allReturnUrls = [];
 
         $name = 'learningAssessment.getCreateAssessmentWithinProject';
-        foreach ((new Types())->getUrlFragments() as $title => $index) {
+        foreach ((new AssessmentType())->getUrlFragments() as $title => $index) {
             $data = ['assessmentId' => $assessmentId, 'assessmentType' => $index];
             $allReturnUrls[$index] = $this->getRouter()->generate($name, $data) . $suffix;
         }
@@ -773,7 +777,7 @@ class Controller extends Base
      */
     private function getAllMarkTypes($assessmentType)
     {
-        $types = new Types();
+        $types = new AssessmentType();
 
         if ($types->isValidIndex($assessmentType)) {
             $mapping = (new MarkSchemeMapping())->getMap();
