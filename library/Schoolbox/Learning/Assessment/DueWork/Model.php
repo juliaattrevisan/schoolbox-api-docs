@@ -100,6 +100,14 @@ class Model extends AbstractAssessment
 
     /**
      * @inheritdoc
+     */
+    public function getFamilyName()
+    {
+        return 'dueWork';
+    }
+
+    /**
+     * @inheritdoc
      *
      * @return string
      */

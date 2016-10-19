@@ -368,17 +368,10 @@ class Controller extends Base
         $assessmentType = null;
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
-        if ($assessment instanceof Task) {
-            $assessmentType = Types::ASSESSMENT_TASK;
-        } elseif ($assessment instanceof Quiz) {
-            $assessmentType = Types::ASSESSMENT_QUIZ;
-        } elseif ($assessment instanceof DueWork) {
-            $assessmentType = Types::ASSESSMENT_DUE_WORK;
-        } elseif ($assessment instanceof Project) {
-            $assessmentType = Types::ASSESSMENT_PROJECT;
-        }
+        $assessmentType = $assessment->getFamilyName();
 
         $types = new Types();
+        $assessmentIndex = $types->getFromTitle($assessmentType);
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessment($assessment);
@@ -388,28 +381,28 @@ class Controller extends Base
         $data = [
             'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment' => $assessment,
-            'assessmentType' => $assessmentType,
+            'assessmentType' => $assessmentIndex,
             'attachzone' => $zone->getTwigContext(),
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentIndex),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
-        if ($types->isValidIndex($assessmentType)) {
+        if ($types->isValidIndex($assessmentIndex)) {
 
             /* Special treatment for projects for now
              */
             $summatorMapping = new SummatorMapping();
 
-            if ($types->isProject($assessmentType)) {
+            if ($types->isProject($assessmentIndex)) {
                 $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
                 $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
                 $data['allSummators']  = $summatorMapping;
             }
 
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessmentType}/update.twig", $data));
         }
         else {
             $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
@@ -849,7 +842,13 @@ class Controller extends Base
             'assessment' => $assessment,
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary.twig",
+                $twigData
+            )
+        );
     }
 
     /**
@@ -912,7 +911,7 @@ class Controller extends Base
     /**
      * Display appropriate landing page based on role
      *
-     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
+     * @api   GET /learning/assessment/:assessmentId/summary
      * @level 165
      * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
      * @todo implement IAssessable interface

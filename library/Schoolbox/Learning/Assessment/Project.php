@@ -175,6 +175,14 @@ class Project extends AbstractAssessment implements AssessmentContext
 
     /**
      * @inheritdoc
+     */
+    public function getFamilyName()
+    {
+        return 'project';
+    }
+
+    /**
+     * @inheritdoc
      *
      * @return string
      */
