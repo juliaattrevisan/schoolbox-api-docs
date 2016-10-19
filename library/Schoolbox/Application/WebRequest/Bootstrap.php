@@ -54,6 +54,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpe
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 
+use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
@@ -316,6 +317,7 @@ class Bootstrap implements BootstrapInterface {
             'setRouter'     => $di->lazyGet('router'),
             'setAuthorizer' => $di->lazyGet('authorizer'),
             'setDi'         => $di,
+            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class)
         );
 
         // inject web params (yep, even Sitepage!)

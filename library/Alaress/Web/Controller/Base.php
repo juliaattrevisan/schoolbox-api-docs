@@ -52,6 +52,10 @@ abstract class Base {
      */
     protected $authorizer;
 
+    /** @var IExceptionGenerator */
+    private $eg;
+
+
     /**
      * @param  Request $request
      * @return $this
@@ -320,6 +324,56 @@ abstract class Base {
         }
 
         $this->getResponse()->content->set($content);
+    }
+
+
+    /**
+     * Send a neat and tidy error back to the client
+     *
+     * @param string|Exception $problem     either a ControllerException or a string describing what went wrong
+     * @param array            $resolutions an array that contains a human-readable list of how to resolve the problem
+     * @param int              $statusCode  the HTTP status code to send with this particular error
+     * @param int              $errorCode   a database ID of an error to use for non-XHR requests
+     * @throws Exception
+     */
+    protected function sendError($problem, array $resolutions = [], $statusCode = 400, $errorCode = 105)
+    {
+        // cast exception to primitives
+        if ($problem instanceof Exception) {
+            $resolutions = $problem->getReasons();
+            $problem = $problem->getMessage();
+        }
+
+        if (count($resolutions)) {
+            $problem .= ". You need to";
+        }
+
+        $this->getResponse()->status->set($statusCode);
+
+        // if this isn't XHR, let the kernel and SitePage take care of
+        if (!$this->getRequest()->isXhr()) {
+            throw $this->eg->generateException($errorCode, null, $problem . implode(', ', $resolutions));
+        }
+
+        $this->getResponse()->content->set([
+            'template' => 'sub/mage-error.twig',
+            'format' => 'nochrome',
+            'data' => [
+                'error' => [
+                    'problem' => $problem,
+                    'reasons' => $resolutions
+                ]
+            ]
+        ]);
+    }
+
+
+    /**
+     * @param IExceptionGenerator $eg
+     */
+    public function setExceptionGenerator(IExceptionGenerator $eg)
+    {
+        $this->eg = $eg;
     }
 
 }

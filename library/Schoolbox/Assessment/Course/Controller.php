@@ -632,46 +632,6 @@ class Controller extends Base\Base
     }
 
     /**
-     * Send a neat and tidy error back to the client
-     *
-     * @param $problem
-     * @param array $resolutions
-     * @param int $statusCode
-     * @throws SchoolboxException
-     */
-    protected function sendError($problem, array $resolutions = [], $statusCode = 400)
-    {
-        // cast exception to primitives
-        if ($problem instanceof Base\Exception) {
-            $resolutions = $problem->getReasons();
-            $problem = $problem->getMessage();
-        }
-
-        if (count($resolutions)) {
-            $problem .= ". You need to";
-        }
-
-        $this->getResponse()->status->set($statusCode);
-
-        if (!$this->getRequest()->isXhr()) {
-            throw $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions));
-        }
-
-        $this->getResponse()->content->set([
-            'template' => 'sub/mage-error.twig',
-            'format' => 'nochrome',
-            'data' => [
-                'error' => [
-                    'problem' => $problem,
-                    'reasons' => $resolutions
-                ]
-            ]
-        ]);
-
-    }
-
-
-    /**
      * Give the encoded return URL for the given course ID
      *
      * @param int $courseId
