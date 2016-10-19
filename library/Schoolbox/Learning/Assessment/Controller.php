@@ -453,6 +453,10 @@ class Controller extends Base
     protected function persistAssessment(IAssessable $assessment = null)
     {
 
+        /* Javascript redirect after form submits asynchronously
+         */
+        $returnUrl = '';
+
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
          *
@@ -477,9 +481,6 @@ class Controller extends Base
                     $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
                     $returnUrl = "/homepage/{$context->getId()}";
                 }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-                }
 
             } elseif ($context instanceof UnitImplementation) {
 
@@ -488,9 +489,6 @@ class Controller extends Base
                 if ($this->getRequest()->post['contextId']) {
                     $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
                     $returnUrl = "/homepage/{$context->getId()}";
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
                 }
 
             } elseif ($context instanceof UnitSpecification) {
@@ -502,9 +500,6 @@ class Controller extends Base
                     // It should, or I should be able to find one.
                     $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
                     $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
                 }
             } elseif ($context instanceof Project) {
 
@@ -522,9 +517,6 @@ class Controller extends Base
                     // TODO figure out what to do about this
                     $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
                     $returnUrl = "/homepage/{$context->getId()}";
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
                 }
 
             } else {
@@ -548,6 +540,13 @@ class Controller extends Base
 
         // And save
         $this->getAssessmentDataSource()->save($assessment, $sequence);
+
+        /* Figure out the returnUrl if we were creating a new assessment
+         * Currently just go back to the update screen
+         */
+        if (!$this->getRequest()->post['contextId']) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+        }
 
         return [
             'assessment' => $assessment,
