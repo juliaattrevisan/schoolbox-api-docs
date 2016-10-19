@@ -7,6 +7,15 @@
 <script type="text/javascript">
     $(function() {
 
+        var confirmRevert = function (e, revert) {
+            if (this.nextAll('.current-stop').length > 0) {
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to revert to this step? If you do, all data from subsequent steps will be lost.',
+                    confirmEvent: revert
+                });
+            }
+        };
+
         {# Attach Course Selector Modal listeners #}
         
         $.fn.courseSelectorModal({
@@ -53,14 +62,7 @@
         {# Global mage init #}
         $('input[data-mage-next]').mage({
             // all use the same reversion test
-            confirmRevert: function (e, revert) {
-                if (this.nextAll('.current-stop').length > 0) {
-                    $(this).confirmDialog({
-                        text: 'Are you sure you want to revert to this step? If you do, all data from subsequent steps will be lost.',
-                        confirmEvent: revert
-                    });
-                }
-            }
+            confirmRevert: confirmRevert
         });
 
 {# If modifying an existing course, skip straight to stage 3 #}
@@ -117,7 +119,9 @@
 
             var stageThree = $('input[data-mage-next="part-tasks-select"]');
 
-            stageThree.mage({onXhrDone: function (data) {
+            stageThree.mage({
+                confirmRevert: confirmRevert,
+                onXhrDone: function (data) {
                 {# Slide away the things we're not using #}
 
                 $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
