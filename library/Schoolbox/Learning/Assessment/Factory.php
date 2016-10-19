@@ -128,11 +128,6 @@ class Factory
     protected $closeAt;
 
     /**
-     * @var array
-     */
-    protected $attachedFiles = [];
-
-    /**
      * Factory constructor.
      * @param User $creator
      * @param $post (an array of post vars from the create/update forms)
@@ -149,13 +144,6 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
         $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
-
-        /* Check if any attached files existed in POST data
-         * Use their array if it existed
-         */
-        if (is_array($post['attachment'])) {
-            $this->setAttachedFiles($post['attachment']);
-        }
 
         /* Projects need this to instantiate
          */
@@ -534,24 +522,6 @@ class Factory
     protected function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAttachedFiles()
-    {
-        return $this->attachedFiles;
-    }
-
-    /**
-     * @param array $attachedFiles
-     * @return $this
-     */
-    protected function setAttachedFiles($attachedFiles)
-    {
-        $this->attachedFiles = $attachedFiles;
         return $this;
     }
 

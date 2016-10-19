@@ -41,6 +41,11 @@ trait DueWorkTrait
     protected $hasMarkPerCapability = false;
 
     /**
+     * @var array|string[]
+     */
+    protected $attachedFiles;
+
+    /**
      * @return int
      */
     protected function getAcceptOnline()
@@ -144,5 +149,23 @@ trait DueWorkTrait
     protected function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    protected function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+    /**
+     * @param array|string[] $attachedFiles
+     * @return $this
+     */
+    protected function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
+        return $this;
     }
 }
