@@ -287,7 +287,8 @@ class Factory
                 $this->getGradingScheme(),
                 $this->getHasRubric(),
                 $this->getHasMarkPerCapability(),
-                $this->getMaxMark()
+                $this->getMaxMark(),
+                $this->getAttachedFiles()
             );
 
         } elseif ($assessment instanceof Task) {

@@ -31,8 +31,9 @@ class Decorator implements DecoratorInterface
      * @param $hasRubric
      * @param $hasMarkPerCapability
      * @param $maxMark
+     * @param $attachedFiles
      */
-    public function __construct($acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark)
+    public function __construct($acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark, $attachedFiles)
     {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
@@ -40,6 +41,7 @@ class Decorator implements DecoratorInterface
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
         $this->setMaxMark(trim($maxMark));
+        $this->setAttachedFiles($attachedFiles);
     }
 
     /**
@@ -94,7 +96,7 @@ class Decorator implements DecoratorInterface
 
         // Rebuild attached files list
         $factory     = new CollectorFactory();
-        $attachments = $factory->build($assessment->getAttachedFiles()->getAll())->getAll();
+        $attachments = $factory->build($this->getAttachedFiles())->getAll();
         $newList     = new Collection();
         foreach ($attachments as $file) {
             $newList->add(
