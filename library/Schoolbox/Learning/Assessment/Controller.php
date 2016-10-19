@@ -464,94 +464,116 @@ class Controller extends Base
          */
         $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
 
-        // Verify that the context of the assessment is valid
-        // TODO replace returnUrl values once I know what they should actually be
-        $context = $assessment->getContext();
-
+        /* Try to figure out what the redirect destination should be
+         * Throw an error if some kind of context configuration is wrong
+         */
         try {
-            if ($context instanceof Folder) {
+            $transactor = new Transactor(
+                $this->getRequest()->post['contextId'],
+                $assessment,
+                $this->getFolderMapper(),
+                $this->getUnitImplementationDataSource(),
+                $this->getUnitSpecificationDataSource(),
+                $this->getAssessmentDataSource(),
+                $this->getRouter()
+            );
 
-                /* TODO: Pass contextId as a param into this method
-                 * It should be obtained from the routes
-                 */
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
-                }
-
-            } elseif ($context instanceof UnitImplementation) {
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
-                }
-
-            } elseif ($context instanceof UnitSpecification) {
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    // The unit spec doesn't contain a reference back to its course spec.
-                    // It should, or I should be able to find one.
-                    $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
-                }
-            } elseif ($context instanceof Project) {
-
-                /* Check that you don't spawn a Project in a Project
-                 */
-                if ($assessment instanceof Project) {
-                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
-                    return [];
-                }
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-
-                    // TODO figure out what to do about this
-                    $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
-                }
-
-            } else {
-                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
-                return [];
-            }
-
-        } catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+            $returnUrl = $transactor->transact();
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', $e->getMessage());
+            return [];
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', $e->getMessage());
             return [];
         }
 
-        // Don't change sequence if already in sequence - otherwise put at end
-        $sequence = 1;
-        foreach ($this->getAssessmentDataSource()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
-            if ($otherAssessment->getId() == $assessment->getId()) {
-                break;
-            }
-            $sequence++;
-        }
-
-        // And save
-        $this->getAssessmentDataSource()->save($assessment, $sequence);
-
-        /* Figure out the returnUrl if we were creating a new assessment
-         * Currently just go back to the update screen
+        /* Survived the gauntlet? continue normally
          */
-        if (!$this->getRequest()->post['contextId']) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-        }
+//        $context = $redirectSummary['context'];
+//
+//        try {
+//            if ($context instanceof Folder) {
+//
+//                /* TODO: Pass contextId as a param into this method
+//                 * It should be obtained from the routes
+//                 */
+//
+//                /* You only get contextId when you're Creating, not updating
+//                 */
+//                if ($this->getRequest()->post['contextId']) {
+//                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+//                    $returnUrl = "/homepage/{$context->getId()}";
+//                }
+//
+//            } elseif ($context instanceof UnitImplementation) {
+//
+//                /* You only get contextId when you're Creating, not updating
+//                 */
+//                if ($this->getRequest()->post['contextId']) {
+//                    $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
+//                    $returnUrl = "/homepage/{$context->getId()}";
+//                }
+//
+//            } elseif ($context instanceof UnitSpecification) {
+//
+//                /* You only get contextId when you're Creating, not updating
+//                 */
+//                if ($this->getRequest()->post['contextId']) {
+//                    // The unit spec doesn't contain a reference back to its course spec.
+//                    // It should, or I should be able to find one.
+//                    $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
+//                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+//                }
+//            } elseif ($context instanceof Project) {
+//
+//                /* Check that you don't spawn a Project in a Project
+//                 */
+//                if ($assessment instanceof Project) {
+//                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+//                    return [];
+//                }
+//
+//                /* You only get contextId when you're Creating, not updating
+//                 */
+//                if ($this->getRequest()->post['contextId']) {
+//
+//                    // TODO figure out what to do about this
+//                    $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
+//                    $returnUrl = "/homepage/{$context->getId()}";
+//                }
+//
+//            } else {
+//                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+//                return [];
+//            }
+//
+//        } catch (MapperException $e) {
+//            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+//            return [];
+//        }
+//
+//        // Don't change sequence if already in sequence - otherwise put at end
+//        $sequence = 1;
+//        foreach ($this->getAssessmentDataSource()->findAllForContext($redirectSummary['context'], ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+//            if ($otherAssessment->getId() == $assessment->getId()) {
+//                break;
+//            }
+//            $sequence++;
+//        }
 
-        return [
-            'assessment' => $assessment,
-            'returnUrl' => $returnUrl
-        ];
+//        // And save
+//        $this->getAssessmentDataSource()->save($assessment, $sequence);
+
+//        /* Figure out the returnUrl if we were creating a new assessment
+//         * Currently just go back to the update screen
+//         */
+//        if (!$this->getRequest()->post['contextId']) {
+//            $redirectSummary['returnUrl'] = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+//        }
+print_r($returnUrl);die();
+        return $returnUrl;
     }
 
     /**
