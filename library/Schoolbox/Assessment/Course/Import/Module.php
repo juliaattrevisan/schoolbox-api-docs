@@ -60,9 +60,9 @@ class Module extends \Alaress\Module\Module
                 '/modify/{componentId}'         => 'importModify',
             ],
             'POST' => [
+                '/classes'   => 'postClasses',
                 '/ownership' => 'importOwnership',
                 '/tasks'     => 'importTasks',
-                '/units'     => 'importUnits',
                 '/save'      => 'importSave',
                 '/delete'    => 'importDelete',
                 '/restore'   => 'restoreCourse',

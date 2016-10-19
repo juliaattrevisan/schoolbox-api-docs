@@ -157,10 +157,10 @@ class Controller extends Base\Base
     /**
      * This POST is the result of import stage 1. Retrieve fragment with units in the selected course, and checkboxes/dates for selection
      *
-     * @api   POST /course/importUnits
+     * @api   POST /course/import/classes
      * @level 160
      */
-    public function importUnits()
+    public function postClasses()
     {
         $homepage = trim($this->getRequest()->post["importFolders"]);
         $courseId = trim($this->getRequest()->post["importCourse"]);
