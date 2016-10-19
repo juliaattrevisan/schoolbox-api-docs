@@ -293,7 +293,8 @@ class Factory
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
-                $this->getUrl()
+                $this->getUrl(),
+                $this->getAttachedFile()
             );
 
         } elseif ($assessment instanceof Quiz) {
@@ -357,12 +358,6 @@ class Factory
             ->setCloseAt($closeAt)
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setUpdatedAt(\Alaress_Date_Format::now());
-
-        /* TODO: Attach files to instance
-         */
-        foreach ($this->getAttachedFiles() as $currentFile) {
-            $assessment->getAttachedFiles()->add($currentFile);
-        }
 
         /* Decorate with Assessable-specific data
          */
