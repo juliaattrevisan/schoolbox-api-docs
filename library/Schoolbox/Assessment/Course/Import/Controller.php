@@ -227,12 +227,12 @@ class Controller extends Base\Base
      * This POST is the result of import stage 3. Retrieve friend with a list of tasks, quizzes
      * and due work (and relevant date entry boxes) associated with the selected course.
      *
-     * @api   POST /course/importTasks
+     * @api   POST /course/import/units
      * @level 160
      *
      * @throws Unauthorized
      **/
-    public function importTasks()
+    public function postUnits()
     {
         $post = $this->getRequest()->post;
 
