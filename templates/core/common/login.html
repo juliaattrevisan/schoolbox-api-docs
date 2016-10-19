@@ -37,10 +37,11 @@
 </style>
 <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
-window.onload = init;
-function init(){
-	document.getElementById('username').focus();
-}
+$(function() {
+    if (!Modernizr.touch) {
+        $('#username').focus();
+    }
+});
 </script>
 <!--[if lt IE 9]>
 <script type="text/javascript">
