@@ -1,6 +1,6 @@
 <h2 class="subheader">Description</h2>
 <ul class="meta">
-    {% if type == 'staff' %}
+    {% if currentUser.role.isStaff %}
         <li class="icon-progress">
             Summator: {{ assessment.summator.title }}
         </li>

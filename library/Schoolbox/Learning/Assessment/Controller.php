@@ -841,6 +841,7 @@ class Controller extends Base
             'counts' => $counts,
             'assessment' => $assessment,
             'types' => new Types(),
+            'currentUser' => $this->getUser(),
         ];
 
 

@@ -14,7 +14,7 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
 
-        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, type: 'staff'} %}
+        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, user: currentUser} %}
 
         <div class="row">
 
