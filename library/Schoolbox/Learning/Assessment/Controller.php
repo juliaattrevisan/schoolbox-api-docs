@@ -441,58 +441,6 @@ class Controller extends Base
     }
 
     /**
-     * Generic method for create/update of an assessment.
-     *
-     * persistAssessment() CANNOT make any assumptions about redirects
-     * Redirects should be dealt with by actual controller methods, since
-     * the returnUrl is manipulated by javascript in particular contexts
-     *
-     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
-     * @return array
-     */
-    protected function persistAssessment(IAssessable $assessment = null)
-    {
-
-        /* Javascript redirect after form submits asynchronously
-         */
-        $returnUrl = '';
-
-        /* If an assessment couldn't be produced, bail out
-         * and let mage see the errors set by $this->sendError
-         *
-         * Controller must return early for that to happen
-         */
-        $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
-
-        /* Try to figure out what the redirect destination should be
-         * Throw an error if some kind of context configuration is wrong
-         */
-        try {
-            $transactor = new Transactor(
-                $this->getRequest()->post['contextId'],
-                $assessment,
-                $this->getFolderMapper(),
-                $this->getUnitImplementationDataSource(),
-                $this->getUnitSpecificationDataSource(),
-                $this->getAssessmentDataSource(),
-                $this->getRouter()
-            );
-
-            $transactionSummary = $transactor->transact();
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', $e->getMessage());
-            return [];
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', $e->getMessage());
-            return [];
-        }
-
-        return $transactionSummary;
-    }
-
-    /**
      * Create an Assessment within a particular Project
      *
      * @param $assessmentId
@@ -586,6 +534,53 @@ class Controller extends Base
 
         $this->getResponse()->redirect->to($redirect);
         return;
+    }
+
+    /**
+     * Generic method for create/update of an assessment.
+     *
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by actual controller methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
+     *
+     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     * @return array
+     */
+    protected function persistAssessment(IAssessable $assessment = null)
+    {
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
+         */
+        $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
+
+        /* Try to figure out what the redirect destination should be
+         * Throw an error if some kind of context configuration is wrong
+         */
+        try {
+            $transactor = new Transactor(
+                $this->getRequest()->post['contextId'],
+                $assessment,
+                $this->getFolderMapper(),
+                $this->getUnitImplementationDataSource(),
+                $this->getUnitSpecificationDataSource(),
+                $this->getAssessmentDataSource(),
+                $this->getRouter()
+            );
+
+            $transactionSummary = $transactor->transact();
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', $e->getMessage());
+            return [];
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', $e->getMessage());
+            return [];
+        }
+
+        return $transactionSummary;
     }
 
     /**
