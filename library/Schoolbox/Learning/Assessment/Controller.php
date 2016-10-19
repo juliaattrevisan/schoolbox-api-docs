@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Attachzone\Factory as ZoneFactory;
+use Schoolbox\Learning\Assessment\DueWork\Type;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
@@ -262,30 +263,44 @@ class Controller extends Base
         }
 
         if ($types->isDueWork($assessmentType)) {
-            $rubricMapper = RubricMapper::getInstance();
-            $submissionBoxMapper = SubmissionBoxMapper::getInstance();
-            // Collect all the criteria for the folder the DueWork is about to be created in
-            $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
-            $data['rubric'] = $grid->toContext();
-
-            $rubricZone = new Zone('rubric');
-            // JS file.type isn't set reliably enough to use text/csv mime filter
-            $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
-            $data['rubricAttachZone'] = $rubricZone->getTwigContext();
-
-            /** @var RubricResult[] $resultSets */
-            $resultSets = ResultMapper::getInstance()->findAll();
-            $rs = new Collection();
-            foreach ($resultSets as $result) {
-                if (!$rs[$result->getResultSetId()] instanceof Collection) {
-                    $rs[$result->getResultSetId()] = new Collection();
-                }
-                $rs[$result->getResultSetId()][$result->getValue()] = $result;
-            }
-            $data['rubricResultSets'] = $rs;
+            $data = array_merge($data, $this->generateRubricTwigData($folder));
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
+    }
+
+    /**
+     * Common logic when generating Rubrics
+     *
+     * @param Folder $folder
+     * @return array
+     */
+    private function generateRubricTwigData(Folder $folder)
+    {
+        $data = [];
+        $rubricMapper = RubricMapper::getInstance();
+        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
+        // Collect all the criteria for the folder the DueWork is about to be created in
+        $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
+        $data['rubric'] = $grid->toContext();
+
+        $rubricZone = new Zone('rubric');
+        // JS file.type isn't set reliably enough to use text/csv mime filter
+        $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
+        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+        /** @var RubricResult[] $resultSets */
+        $resultSets = ResultMapper::getInstance()->findAll();
+        $rs = new Collection();
+        foreach ($resultSets as $result) {
+            if (!$rs[$result->getResultSetId()] instanceof Collection) {
+                $rs[$result->getResultSetId()] = new Collection();
+            }
+            $rs[$result->getResultSetId()][$result->getValue()] = $result;
+        }
+        $data['rubricResultSets'] = $rs;
+
+        return $data;
     }
 
     /**
@@ -328,15 +343,25 @@ class Controller extends Base
         $data = [
             'attachzone'      => (new ZoneFactory())->buildForAssessment($assessment)->getTwigContext(),
             'assessment'      => $assessment,
-            'assessmentType'  => $types->objectToString($assessment),
             'curriculumNodes' => $folder->getCurriculumNodes(),
+            'assessmentType'  => $types->objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment)
         ];
+
+        // DueWork and Quiz can have files attached
+        if(in_array($assessmentType, [Types::ASSESSMENT_DUE_WORK, Types::ASSESSMENT_TASK])){
+            $data['attachzone'] = (new ZoneFactory($types))->buildForAssessmentType($assessmentType)->getTwigContext();
+        }
 
         /* Special treatment for projects for now
          */
         if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
+        }
+
+        // DueWork can have rubric
+        if ($types->isDueWork($assessmentType)) {
+            $data = array_merge($data, $this->generateRubricTwigData($folder));
         }
 
         /* Select the fragment to return
