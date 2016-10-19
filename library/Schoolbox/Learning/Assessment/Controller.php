@@ -881,14 +881,20 @@ class Controller extends Base
             /** @var IAssessable $assessable */
             foreach ($assessables as $assessable) {
 
-                $participant = $assessable->getParticipant($this->getUser());
-
                 $type = $assessable->getFamilyName();
 
-                $counts[$type]++;
-                $counts['total']++;
+                try {
+                    $participant = $assessable->getParticipant($this->getUser());
+                } catch (\UnexpectedValueException $e) {
+                    // This student isn't a participant.
+                    // This is fine - when PBL is implemented not all students
+                    // will participate in all sub-assessments
+                    continue;
+                }
 
                 // If the student has submitted at least one response we will assume it is completed
+                $counts[$type]++;
+                $counts['total']++;
 
                 if ($participant->getAllResponses()->count() > 0) {
                     $counts[$type.'Completed']++;
