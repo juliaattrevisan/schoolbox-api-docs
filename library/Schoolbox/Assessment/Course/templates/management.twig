@@ -84,7 +84,7 @@
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('courseImport.import', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
             </nav>
         </div>
 
@@ -136,7 +136,7 @@
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
-                <a href="{{ routeLookup('courseImport.import', { courseId: 0, classCode: folder.id }) }}">import one</a>.
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}">import one</a>.
             </p>
         </div>
 

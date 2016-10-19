@@ -134,7 +134,7 @@
             <p class="alert alert-box icon-alert" data-mage-error></p>
         </div>
         <div class="small-12 medium-4 column">
-            <input type="submit" name="part-results-select" value="{{ submitValue }}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importSave" />
+            <input type="submit" name="part-results-select" value="{{ submitValue }}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postTasks') }}" />
         </div>
     </div>
 </div>
