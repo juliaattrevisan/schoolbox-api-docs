@@ -157,11 +157,22 @@ class Factory
         $this->setHasRubric(trim($post['hasRubric']));
         $this->setHasMarkPerCapability(trim($post['hasMarkPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
+        /* Check if any attached files existed in POST data
+         * Use their array if it existed
+         */
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFiles($post['attachment']);
+        }
 
         /* Task needs this to instantiate correctly
          */
         $this->setHasSelfAssessed(trim($post['hasSelfAssessed']));
         $this->setUrl(trim($post['url']));
+        /* Set just a single attached file for task
+         */
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFile(isset($this->getAttachedFiles()[0]) ? $this->getAttachedFiles()[0] : null);
+        }
 
         /* Quiz needs this to instantiate correctly
          */
