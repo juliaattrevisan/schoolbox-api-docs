@@ -16,7 +16,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -92,7 +91,7 @@ class Module extends BaseModule
             $this->addGetRoute($router, $alias, $basePath, $path)->addTokens([
                 'assessmentId' => '\d+',
                 'assessmentType' => '\d+',
-                'assessmentTypeTitle' => '(dueWork|task|quiz|project)',
+                'assessmentTypeTitle' => '('.implode('|', AssessmentType::getStringValues()).')',
                 'studentId' => '\d+',
             ]);
         }
