@@ -42,6 +42,31 @@ class Mapping
         ]);
     }
 
+    /**
+     * Decompose an instance
+     *
+     * @param ISummator $summator
+     * @throws \InvalidArgumentException
+     * @return string
+     */
+    public function decompose(ISummator $summator)
+    {
+        if ($summator instanceof WeightedAverage) {
+            return Factory::WEIGHTED_AVERAGE;
+        }
+        elseif ($summator instanceof Average) {
+            return Factory::AVERAGE;
+        }
+        elseif ($summator instanceof Maximum) {
+            return Factory::MAXIMUM;
+        }
+        elseif ($summator instanceof Minimum) {
+            return Factory::MINIMUM;
+        }
+
+        throw new \InvalidArgumentException('choose a valid summation option');
+    }
+
     /* Getters/Setters
      */
 

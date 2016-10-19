@@ -10,8 +10,10 @@
  */
 namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Project;
+use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 
 class Decorator implements DecoratorInterface
 {
@@ -23,13 +25,27 @@ class Decorator implements DecoratorInterface
     protected $markType;
 
     /**
+     * @var int
+     */
+    protected $gradingScheme;
+
+    /**
+     * @var string
+     */
+    protected $summator;
+
+    /**
      * Decorator constructor.
      *
      * @param int $markType
+     * @param int $gradingScheme
+     * @param string $summator
      */
-    public function __construct($markType)
+    public function __construct($markType, $gradingScheme, $summator)
     {
         $this->setMarkType($markType);
+        $this->setGradingScheme($gradingScheme);
+        $this->setSummator($summator);
     }
 
     /**
@@ -43,9 +59,14 @@ class Decorator implements DecoratorInterface
         $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
 
+        $gradingGroup = (new GradeGroup())->setId($this->getGradingScheme());
+        $assessment->setGradeGroup($gradingGroup);
+
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
         $assessment->setMarkScheme($markScheme);
+
+        $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
     }
 
     /**
@@ -64,5 +85,39 @@ class Decorator implements DecoratorInterface
     {
         $this->markType = $markType;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getGradingScheme()
+    {
+        return $this->gradingScheme;
+    }
+
+    /**
+     * @param int $gradingScheme
+     * @return $this
+     */
+    protected function setGradingScheme($gradingScheme)
+    {
+        $this->gradingScheme = $gradingScheme;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSummator()
+    {
+        return $this->summator;
+    }
+
+    /**
+     * @param string $summator
+     */
+    protected function setSummator($summator)
+    {
+        $this->summator = $summator;
     }
 }

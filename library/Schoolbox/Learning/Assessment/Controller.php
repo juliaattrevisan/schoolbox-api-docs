@@ -7,6 +7,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
@@ -24,7 +26,6 @@ use \Alaress_Date_NullDate;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
-use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -392,16 +393,20 @@ class Controller extends Base
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
         if ($types->isValidIndex($assessmentType)) {
 
             /* Special treatment for projects for now
              */
+            $summatorMapping = new SummatorMapping();
+
             if ($types->isProject($assessmentType)) {
                 $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
-                $data['allSummators']  = new SummatorMapping();
+                $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
+                $data['allSummators']  = $summatorMapping;
             }
 
             $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
@@ -447,6 +452,7 @@ class Controller extends Base
      */
     protected function persistAssessment(IAssessable $assessment = null)
     {
+
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
          *
@@ -587,6 +593,7 @@ class Controller extends Base
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
                 'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+                'allGradeSchemes' => $this->getAllGradeSchemes(),
                 'returnUrl' => $this->getRequest()->query['return_url']
             ];
 
@@ -731,6 +738,18 @@ class Controller extends Base
         }
 
         return [];
+    }
+
+    /**
+     * Gets all grading schemes.
+     *
+     * TODO DI this if you feel like it
+     *
+     * @return GradeScheme[]|Collection
+     */
+    private function getAllGradeSchemes()
+    {
+        return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
     }
 
     /**
