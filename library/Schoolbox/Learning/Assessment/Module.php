@@ -12,6 +12,16 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -35,14 +45,16 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
 
-                /* Select an assessment fragment to start with
+                /* Get 'Create Assessment' form in a specific context. Optionally declare Assessment type
                  */
-                '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
-                '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
-                '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
-                '/assessment/unitspec/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
+                '/assessment/folder/{folderId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInFolder',
 
-                /* Edit an assessment with their type-specific data
+                // May contain a 'return_url' GET parameter to return to project modification page
+                '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
+                '/assessment/unit/{unitId}{/assessmentTypeTitle}'       => 'getSelectAssessmentInUnitImplementation',
+                '/assessment/unitspec/{unitId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInUnitSpecification',
+
+                /* Get a 'Modify Assessment' form to edit an existing assessment
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
 
@@ -50,7 +62,7 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}' => 'getSummary',
 
-                /* Temporary methods
+                /* Miscellaneous routes
                  */
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
@@ -97,7 +109,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummary|getStudentAssessment|getSubmitForm)',
+            '(?:getStatus|getSummary|getStudentAssessment)',
             function ($params) {
 
                 // TODO. Hydrate specified IAssessable
@@ -112,6 +124,100 @@ class Module extends BaseModule
                     }
                 }
                 return $args;
+            }
+        );
+
+
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getSubmitForm)',
+            function ($params) {
+
+                /** @var DueWork $assessment */
+                $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+
+                // Route is only valid for DueWork.
+                // TODO - if $assessment exists, redirect to more appropriate page. For now just error out.
+                if(!$assessment instanceof DueWork){
+                    throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
+                }
+
+                $student = $this->getUserMapper()->findById($params['studentId']);
+
+                $participant = new Participant($student, $assessment);
+                $assessment->getAllParticipants()->add($participant);
+
+                // Get all Student Submissions (IResponses)
+                $studentSubmissionMapper = $this->getStudentSubmissionMapper();
+
+                // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
+                $columnList = [
+                    'box_id' => $assessment->getId(),
+                    'owner' => $student->getId(),
+                ];
+
+
+                /** @var StudentSubmission[] $studentSubmissions */
+                $studentSubmissions = $studentSubmissionMapper->findByColumnList($columnList);
+
+                // TODO - This translation from 'StudentSubmission' to 'DueWorkResponse' should
+                // TODO - not be necessary. A StudentSubmission should BE AN IResponse
+                // TODO - see SA-1212
+                foreach($studentSubmissions as $studentSubmission){
+                    $response = (new DueWorkSubmission())
+                        ->setId($studentSubmission->getId())
+                        ->setSubmittedBy($student)
+                        ->setSubmittedOnBehalfOf($student)
+                        ->setCreatedAt($studentSubmission->getCreatedAt())
+                        ->setDeletedAt(new \Alaress_Date_NullDate())
+                        ->setUpdatedAt($studentSubmission->getCreatedAt());
+
+                    if($hash = $studentSubmission->getHash()){
+                        $response->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
+                    }
+                    $response->setAssessable($assessment);
+                    $assessment->getResponses()->add($response);
+                    $participant->getAllResponses()->add($response);
+                }
+
+                // Get all Student Returns (IFeedbacks)
+                $submissionReturnMapper = $this->getSubmissionReturnMapper();
+
+                // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
+                $columnList = [
+                    'box_id' => $assessment->getId(),
+                    'owner' => $student->getId(),
+                ];
+                /** @var ReturnedWork[] $submissionReturns */
+                $submissionReturns = $submissionReturnMapper->findByColumnList($columnList);
+
+                // TODO - This translation from 'ReturnedWork' to 'DueWorkFeedback' should
+                // TODO - not be necessary. A ReturnedWork should BE AN IFeedback
+                // TODO - see SA-1212
+                foreach($submissionReturns as $submissionReturn){
+                    $feedback = (new DueWorkFeedback())
+                        ->setId($submissionReturn->getId())
+                        ->setComment($submissionReturn->getComment())
+                        ->setNormalisedMark($submissionReturn->getNormalizedMark())
+                        ->setHumanReadableMark($submissionReturn->getMark())
+                        ->setReviewer($submissionReturn->getMarker())
+                        ->setCreatedAt($submissionReturn->getCreatedAt())
+                        ->setUpdatedAt($submissionReturn->getCreatedAt())
+                        ->setPublishedAt($submissionReturn->getCreatedAt())
+                        ->setDeletedAt($submissionReturn->getDeletedAt());
+
+                    if($hash = $submissionReturn->getHash()){
+                        $feedback->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
+                    }
+                    $feedback->setAssessable($assessment);
+                    $assessment->getFeedbacks()->add($feedback);
+                    $participant->getAllFeedbacks()->add($feedback);
+                }
+
+                return [
+                    'assessment' => $assessment,
+                    'student' => $student
+                ];
             }
         );
     }
@@ -214,4 +320,37 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
+
+    /**
+     * @return AssessmentMapperProxy
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
+    }
+
+    /**
+     * @return StudentSubmissionMapper
+     */
+    protected function getStudentSubmissionMapper()
+    {
+        return $this->getMapperFactory()->get(StudentSubmissionMapper::class);
+    }
+
+    /**
+     * @return SubmissionReturnMapper
+     */
+    protected function getSubmissionReturnMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionReturnMapper::class);
+    }
+
+    /**
+     * @return StorageMapper
+     */
+    protected function getStorageMapper()
+    {
+        return $this->getMapperFactory()->get(StorageMapper::class);
+    }
+
 }

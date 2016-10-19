@@ -147,7 +147,7 @@
 [ 'Learning',    '#' ],
 [ 'Classname',   '#' ],
 [ student.fullName,   '#' ],
-[ assessment.context.title, routeLookup(user.role.isStudent ? 'learningAssessment.getSummary' : 'learningAssessment.getSummaryStaff', {assessmentId: assessment.context.id, studentId: student.id})],
+[ assessment.context.title, routeLookup(user.role.isStudent ? 'learningAssessment.getSummary' : 'learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: student.id})],
 [ assessment.title,   '#' ],
 [ 'Submit Response', '#']
 ) }}
