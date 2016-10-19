@@ -1,6 +1,19 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage({
+            onXhrDone: function (data) {
+                window.location.href = data.returnUrl;
+            }
+        });
+    });
+</script>
+
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row">
