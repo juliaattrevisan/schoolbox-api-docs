@@ -10,7 +10,6 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Realtime\Admin\Module;
 
 class Admin implements ModuleConfigInterface
 {
@@ -32,8 +31,13 @@ class Admin implements ModuleConfigInterface
 
         // Messages
 
-        $messagesModule = new Module($di);
+        $messagesModule = new \Schoolbox\Realtime\Admin\Module($di);
         $messagesModule->init('/adminv2/messages');
+
+        // Messages
+
+        $modifyUser = new \Schoolbox\Admin\User\Module($di);
+        $modifyUser->init('/adminv2/user');
 
         // Admin home
 
