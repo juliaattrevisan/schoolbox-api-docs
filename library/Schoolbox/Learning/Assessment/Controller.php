@@ -394,7 +394,7 @@ class Controller extends Base
             'attachzone' => $zone->getTwigContext(),
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessmentIndex),
+            'allMarkTypes' => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
@@ -409,7 +409,7 @@ class Controller extends Base
             $data['allSummators']  = $summatorMapping;
         }
 
-        $template = "@learningAssessment/fragments/{$types->getTemplateDirectory($assessmentType)}/update.twig";
+        $template = "@learningAssessment/fragments/{$types->getTemplateDirectory($assessment)}/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
 
     }
