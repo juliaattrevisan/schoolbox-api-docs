@@ -815,11 +815,11 @@ class Controller extends Base
      */
     private function getSummaryStaff($assessmentId)
     {
-        $project = $this->getAssessmentDataSource()->findById($assessmentId);
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
 
         // Calculate summary totals for display purposes
 
-        $participants = $project->getAllParticipants();
+        $participants = $assessment->getAllParticipants();
 
         $counts = [];
 
@@ -830,14 +830,14 @@ class Controller extends Base
             ];
         }
 
-        $assessables = $project->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-            foreach ($assessable->getAllParticipants() as $participant) {
-                $counts[$participant->getUser()->getId()]['total']++;
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            foreach ($assessment->getAssessables() as $subAssessment) {
+                foreach ($subAssessment->getAllParticipants() as $participant) {
+                    $counts[$participant->getUser()->getId()]['total']++;
+                    if ($participant->getAllResponses()->count() > 0) {
+                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                    }
                 }
             }
         }
@@ -845,7 +845,7 @@ class Controller extends Base
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'counts' => $counts,
-            'assessment' => $project,
+            'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
