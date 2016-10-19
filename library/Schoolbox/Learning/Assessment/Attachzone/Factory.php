@@ -12,6 +12,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Types;
 use Schoolbox\Resource\Attachment\Zone;
+use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Factory for creating \Schoolbox\Resource\Attachment\Zone instances for an
@@ -35,7 +37,7 @@ class Factory
     public function buildForAssessment(IAssessable $assessment)
     {
         if ($assessment instanceof Task) {
-            return $this->buildForTask();
+            return $this->buildForTask($assessment);
         } elseif ($assessment instanceof DueWork) {
             return $this->buildForDueWork($assessment);
         }
@@ -67,12 +69,40 @@ class Factory
     }
 
     /**
+     * @param Task|null $task
      * @return Zone
      */
-    protected function buildForTask()
+    protected function buildForTask(Task $task = null)
     {
         $zone = new Zone('files');
         $zone->setMulti(false);
+
+        if ($task instanceof Task) {
+
+            /* Figure out what the hash is
+             * TODO: I'm sure there's a better way, but I can't remember it right now
+             */
+            $foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches);
+            $hash = $matches[1];
+
+            if ($foundHash) {
+                $zone->attachFiles([$hash]);
+
+                /* Ram in an actual file instance to the task
+                 * Clear url field Since this is really about files now
+                 */
+                try {
+                    $task
+                        ->setAttachedFile(StorageMapper::getInstance()->findByHash($hash))
+                        ->setUrl('');
+                }
+                catch (MapperException $e) {
+                    /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
+                     */
+                }
+            }
+        }
+
         return $zone;
     }
 
