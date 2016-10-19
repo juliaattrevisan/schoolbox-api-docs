@@ -4,7 +4,7 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 
-class SitePage extends Page
+class SitePage extends \Page
 {
     /**
      * The site that this SitePage uses to get templates from
