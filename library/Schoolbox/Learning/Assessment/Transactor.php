@@ -26,12 +26,6 @@ use \Schoolbox\Mapper\Exception as MapperException;
 
 class Transactor
 {
-
-    /**
-     * @var int
-     */
-    protected $contextId;
-
     /**
      * @var IAssessable
      */
@@ -64,7 +58,6 @@ class Transactor
 
     /**
      * Transactor constructor.
-     * @param $contextId
      * @param IAssessable $assessment
      * @param FolderMapper $folderMapper
      * @param UnitImplementationDataSource $unitImplementationDataSource
@@ -73,14 +66,13 @@ class Transactor
      * @param $router
      */
     public function __construct(
-        $contextId, IAssessable $assessment,
+        IAssessable $assessment,
         FolderMapper $folderMapper,
         UnitImplementationDataSource $unitImplementationDataSource,
         UnitSpecificationDataSource $unitSpecificationDataSource,
         AssessmentDataSource $assessmentDataSource,
         Router $router
     ) {
-        $this->setContextId($contextId);
         $this->setAssessment($assessment);
         $this->setFolderMapper($folderMapper);
         $this->setUnitImplementationDataSource($unitImplementationDataSource);
@@ -108,7 +100,7 @@ class Transactor
         /* If you followed a creational link from a particular place,
          * go back to that place
          */
-        if ($this->getContextId()) {
+        if (!$this->getAssessment()->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
                     $returnUrl = $this->transactFolderContext();
@@ -246,15 +238,7 @@ class Transactor
      */
     protected function getContextId()
     {
-        return $this->contextId;
-    }
-
-    /**
-     * @param int $contextId
-     */
-    protected function setContextId($contextId)
-    {
-        $this->contextId = $contextId;
+        return $this->getAssessment()->getContext()->getId();
     }
 
     /**

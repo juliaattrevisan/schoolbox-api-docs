@@ -573,7 +573,6 @@ class Controller extends Base
              * Throw an error if some kind of context configuration is wrong
              */
             $transactor = new Transactor(
-                $this->getRequest()->post['contextId'],
                 $assessment,
                 $this->getFolderMapper(),
                 $this->getUnitImplementationDataSource(),
