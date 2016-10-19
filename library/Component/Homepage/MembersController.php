@@ -86,8 +86,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         // If the members are going to go over the max..
         // Set the people_hidden_block to show and set the number of members that are hidden
         if ($userListCount > self::MAX_MEMBERS) {
-            $this->parse('people_hidden_block', 'people_hidden');
             $this->setVar('HIDDEN_COUNT', $userListCount - self::MAX_MEMBERS);
+            $this->parse('people_hidden_block', 'people_hidden');
         }
 
         // Get admin
