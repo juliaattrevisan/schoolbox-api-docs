@@ -177,16 +177,61 @@ class Leave_Controller extends Controller
         $this->setHostTypes(\Leave\HostTypeMapper::getInstance()->findAll());
     }
 
-    /**
-     * Test email deployments
-     */
-    public function executeEmailTest()
-    {
-        $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
 
-        $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
-        $email->send();
+    public function renderSummary()
+    {
+
+        $data = Array();
+
+        $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewSummary.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'summary_house', 'summary_house_block');
+
+        foreach ($this->getHouseMapper()->findAll() as $house) {
+            $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
+            $data [$house->getId()]['house'] = $house->getHouse();
+
+            $data [$house->getId()]['total_approved'] = 0;
+            $data [$house->getId()]['total_rejected'] = 0;
+            $data [$house->getId()]['total_pending'] = 0;
+            foreach ($requestList as $request) {
+                if ($request->getStatus() == 2){
+                    $data [$house->getId()]['total_approved'] ++;
+                }
+                elseif ($request->getStatus() == 3) {
+                    $data [$house->getId()]['total_rejected'] ++;
+                }
+                elseif ($request->getStatus() == 1) {
+                    $data [$house->getId()]['total_pending'] ++;
+                }
+                else {
+                    //shouldn't happen...
+                }
+
+            }
+//            new \Alaress_Probe($data);
+
+            $this->getPage()->setVar(
+                array(
+                    'SUMMARY_HOUSE_NAME' => $data[$house->getId()]['house'],
+                    'HOUSE_STUDENTS_TOTAL' => $data[$house->getId()]['all'],
+                    'SUMMARY_HOUSE_LEAVE_APPROVED' => $data[$house->getId()]['total_approved'],
+                    'SUMMARY_HOUSE_LEAVE_PENDING' => $data[$house->getId()]['total_pending'],
+                    'SUMMARY_HOUSE_LEAVE_REJECTED' => $data[$house->getId()]['total_rejected'],
+                )
+            );
+
+            $this->getPage()->parse('summary_house_block', 'summary_house', true);
+
+        }
+
+
+
+
+
+
+
     }
+
 
     /**
      * Render host type dropdown
@@ -980,6 +1025,8 @@ class Leave_Controller extends Controller
     public function renderHouseRequestList($data)
     {
         /** @var \HouseResidential $house */
+        new \Alaress_Probe($data);
+
         $house = $data['house'];
         $requestList = $data['requestList'];
 

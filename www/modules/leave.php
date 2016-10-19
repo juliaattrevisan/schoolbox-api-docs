@@ -8,7 +8,11 @@ $leaveController = new Leave_Controller($this);
 $method = $this->arg[0];
 
 try {
-    if ($method == 'create') {
+    if(!isset($method) && empty($this->arg)){
+        $leaveController->renderSummary();
+
+    }
+    else if ($method == 'create') {
         $data = $leaveController->executeCreateRequest();
         $leaveController->renderCreateRequest($data);
     }
