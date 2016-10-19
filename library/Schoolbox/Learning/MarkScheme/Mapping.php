@@ -22,6 +22,8 @@ class Mapping
      */
     private $map = [];
 
+    private $markTypesProject;
+
     /**
      * Mapping constructor.
      */
@@ -52,9 +54,10 @@ class Mapping
      */
 
     /**
+     * @param IAssessable $assessable
      * @return array
      */
-    public function getMap()
+    public function getMap(IAssessable $assessable)
     {
         return $this->map;
     }

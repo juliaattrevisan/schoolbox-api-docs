@@ -83,12 +83,4 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     {
         return self::TOTAL_MARK_MIN;
     }
-
-    /**
-     * @return string
-     */
-    public static function getTitle()
-    {
-        return parent::getTitle();
-    }
 }

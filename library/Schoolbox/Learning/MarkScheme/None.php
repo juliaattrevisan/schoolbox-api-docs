@@ -12,6 +12,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class None extends AbstractMarkScheme
 {
+    const TITLE = 'None';
+
     /**
      * No human-readable mark returned
      *
@@ -38,13 +40,5 @@ class None extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         return null;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle()
-    {
-        return 'None';
     }
 }

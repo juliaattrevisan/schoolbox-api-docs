@@ -13,6 +13,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class Completion extends AbstractMarkScheme
 {
+    const TITLE = 'Completion';
+
     const HUMAN_READABLE_INCOMPLETE        = 'Not Completed';
     const HUMAN_READABLE_STUDENT_COMPLETED = 'Student-Assessed';
     const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher-Assessed';
@@ -49,13 +51,5 @@ class Completion extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         return null;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle()
-    {
-        return 'Completion';
     }
 }
