@@ -122,9 +122,12 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->setAttachedFiles(new Collection());
         $this->responses = new Collection();
         $this->feedbacks = new Collection();
+
+        /* TODO: Move into DueWork-specific implementation
+         */
+        $this->setAttachedFiles(new Collection());
     }
 
     /**
