@@ -842,8 +842,9 @@ class Controller extends Base
             }
         }
 
+        $breadcrumbBuilder = new BreadcrumbFactory();
         $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'counts' => $counts,
             'assessment' => $assessment,
         ];

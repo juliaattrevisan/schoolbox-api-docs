@@ -7,14 +7,8 @@
     });
 </script>
 
-{# TODO: Replace with real breadcrumbs #}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-[ 'Learning',    '#' ],
-[ 'Classname',   '#' ],
-[ assessment.title,   '#' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row">
     <div class="small-12 island">
