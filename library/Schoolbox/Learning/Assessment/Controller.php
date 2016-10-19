@@ -911,7 +911,7 @@ class Controller extends Base
             'counts' => $counts
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summaryStudent.twig", $twigData));
     }
 
     /**
