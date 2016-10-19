@@ -297,4 +297,29 @@ abstract class Base {
         $output = $this->getDi()->get('webOutput:html');
         return $output->setData($fileContents);
     }
+
+
+    /**
+     * Just a raw template render
+     *
+     * @param string $namespace
+     * @param string $template
+     * @param array  $data
+     * @param string $tab
+     */
+    protected function tpl($namespace, $template, $data = [], $tab = '')
+    {
+        $content = [
+            'template' => "@$namespace/$template.twig",
+            'data'     => array_merge($data, ['currentUser' => $this->getUser()]),
+            'tab'      => $tab ?: $namespace,
+        ];
+
+        if ($this->getRequest()->isXhr()) {
+            $content['format'] = 'nochrome';
+        }
+
+        $this->getResponse()->content->set($content);
+    }
+
 }
