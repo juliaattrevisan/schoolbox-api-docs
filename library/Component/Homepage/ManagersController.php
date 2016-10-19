@@ -15,6 +15,23 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Maximum number of managers to display
+     * If the collection exceeds this it will truncate the list and leave a message
+     *
+     * @var int
+     */
+    const MAX_MANAGERS = 100;
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return void
+     */
+    public function execute()
+    {
+    }
+
+    /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean
@@ -29,12 +46,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         //output managers
         $this->setBlock($templateHandle, "member_email", "member_email_block");
         $this->setBlock($templateHandle, "person", "person_block");
+        $this->setBlock($templateHandle, 'people_hidden', 'people_hidden_block');
         $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
         $this->setBlock('person', 'has_icon', 'has_icon_block');
 
         $this->setVar('has_thumbnail_block', '');
         $this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
+        $this->setVar('people_hidden_block', '');
+        $this->setVar('MAX_MEMBERS', self::MAX_MANAGERS);
 
         /* Display options
          */
@@ -60,7 +80,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         // Get collection of managers
         $userMapper = new UserMapper();
-        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), 100);
+        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId());
+        $managerListCount = $managerList->count();
+
+        // If the members are going to go over the max..
+        // Set the people_hidden_block to show and set the number of members that are hidden
+        if ($managerListCount > self::MAX_MANAGERS) {
+            $this->parse('people_hidden_block', 'people_hidden');
+            $this->setVar('HIDDEN_COUNT', $managerListCount - self::MAX_MANAGERS);
+        }
 
         // Get admin
         $userAccessMapper = new UserAccessMapper();
@@ -68,8 +96,14 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         $emailObj = new Email();
 
-        if ($managerList->count() > 0) {
+        if ($managerListCount > 0) {
+            $i = 0;
             foreach ($managerList as $manager) {
+
+                // Kill the loop if we've reached max
+                if ($i === self::MAX_MANAGERS) {
+                    break;
+                }
 
                 $name  = $manager->getFullName();
                 $email = $manager->getEmail();
@@ -116,7 +150,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 $this->setVar('has_thumbnail_block', '');
                 $this->setVar('has_icon_block', '');
 
+                $i++;
             }
+
             /* Student bulk email
         	 */
             if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
