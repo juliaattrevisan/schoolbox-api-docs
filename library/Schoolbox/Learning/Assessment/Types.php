@@ -1,6 +1,6 @@
 <?php
 /**
- * Types
+ * Assessment Types
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,75 +10,65 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-
-class Types extends \Schoolbox\Collection
+class Types
 {
     /**
      * Assessable types
      */
-    const ASSESSMENT_PROJECT = 1;
-    const ASSESSMENT_DUE_WORK = 2;
-    const ASSESSMENT_TASK = 3;
-    const ASSESSMENT_QUIZ = 4;
+    const ASSESSMENT_TYPE_PROJECT = 1;
+    const ASSESSMENT_TYPE_DUE_WORK = 2;
+    const ASSESSMENT_TYPE_TASK = 3;
+    const ASSESSMENT_TYPE_QUIZ = 4;
 
     /**
      * Set of key-value pairs
      *
-     * @var array
-     */
-    private $types = [];
-
-    /**
-     * Types constructor.
+     * These should only be used on parsing / rendering of URLs.
+     * They should not be used internally, use the constants for that.
      *
-     * @param array $stack
+     * @var string[] $urlFragments
      */
-    public function __construct($stack = [])
-    {
-        parent::__construct($stack);
-
-        $this->setTypes([
-            'project' => self::ASSESSMENT_PROJECT,
-            'dueWork' => self::ASSESSMENT_DUE_WORK,
-            'task' => self::ASSESSMENT_TASK,
-            'quiz' => self::ASSESSMENT_QUIZ
-        ]);
-    }
+    private static $urlFragments = [
+        self::ASSESSMENT_TYPE_PROJECT  => 'project',
+        self::ASSESSMENT_TYPE_DUE_WORK => 'dueWork',
+        self::ASSESSMENT_TYPE_TASK     => 'task',
+        self::ASSESSMENT_TYPE_QUIZ     => 'quiz',
+    ];
 
     /**
      * Get the string representation from numeric representation
      *
-     * @param $index
-     * @return mixed
+     * @param int $assessmentType
+     * @return string
      */
-    public function getFromIndex($index)
+    public static function getUrlFragment($assessmentType)
     {
-        $flipped = array_flip($this->types);
-
-        return $flipped[$index];
+        return self::$urlFragments[$assessmentType];
     }
 
     /**
      * Get the numeric representation from string representation
      *
-     * @param $title
-     * @return mixed
+     * @param string $urlFragment
+     * @return int
      */
-    public function getFromTitle($title)
+    public static function getAssessmentType($urlFragment)
     {
-        return $this->types[$title];
+        $flipped = array_flip(self::$urlFragments);
+
+        return $flipped[$urlFragment];
     }
 
     /**
      * Is the $Key valid?
      *
-     * @param $key
+     * @param string $key
      * @return bool
      */
-    public function isValidKey($key)
+    public static function isValidKey($key)
     {
         if (strlen($key)) {
-            return in_array($key, array_keys($this->getTypes()));
+            return in_array($key, array_values(self::$urlFragments));
         }
 
         return false;
@@ -90,10 +80,10 @@ class Types extends \Schoolbox\Collection
      * @param int $index
      * @return bool
      */
-    public function isValidIndex($index)
+    public static function isValidIndex($index)
     {
         if ($index !== null) {
-            return in_array($index, array_values($this->getTypes()));
+            return in_array($index, array_keys(self::$urlFragments));
         }
 
         return false;
@@ -105,9 +95,9 @@ class Types extends \Schoolbox\Collection
      * @param $index
      * @return bool
      */
-    public function isProject($index)
+    public static function isProject($index)
     {
-        return $index == self::ASSESSMENT_PROJECT;
+        return $index == self::ASSESSMENT_TYPE_PROJECT;
     }
 
     /**
@@ -116,9 +106,9 @@ class Types extends \Schoolbox\Collection
      * @param $index
      * @return bool
      */
-    public function isDueWork($index)
+    public static function isDueWork($index)
     {
-        return $index == self::ASSESSMENT_DUE_WORK;
+        return $index == self::ASSESSMENT_TYPE_DUE_WORK;
     }
 
     /**
@@ -127,9 +117,9 @@ class Types extends \Schoolbox\Collection
      * @param $index
      * @return bool
      */
-    public function isQuiz($index)
+    public static function isQuiz($index)
     {
-        return $index == self::ASSESSMENT_QUIZ;
+        return $index == self::ASSESSMENT_TYPE_QUIZ;
     }
 
     /**
@@ -138,9 +128,9 @@ class Types extends \Schoolbox\Collection
      * @param $index
      * @return bool
      */
-    public function isTask($index)
+    public static function isTask($index)
     {
-        return $index == self::ASSESSMENT_TASK;
+        return $index == self::ASSESSMENT_TYPE_TASK;
     }
 
     /* Getters/Setters
@@ -149,16 +139,8 @@ class Types extends \Schoolbox\Collection
     /**
      * @return array
      */
-    public function getTypes()
+    public static function getUrlFragments()
     {
-        return $this->types;
-    }
-
-    /**
-     * @param array $types
-     */
-    private function setTypes($types)
-    {
-        $this->types = $types;
+        return self::$urlFragments;
     }
 }

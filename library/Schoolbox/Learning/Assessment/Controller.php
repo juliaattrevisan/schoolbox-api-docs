@@ -141,8 +141,9 @@ class Controller extends Base
          */
         $types = new Types();
 
-        if ($types->isProject($types->getFromTitle($assessmentTypeTitle))) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', ['projectId' => $projectId]);
+        if ($types->isProject($types->getAssessmentType($assessmentTypeTitle))) {
+            $data = ['projectId' => $projectId];
+            $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', $data);
 
             $this->getResponse()->redirect->to($redirect);
         }
@@ -205,8 +206,7 @@ class Controller extends Base
         /* Check that $type is valid
          */
         $types = new Types();
-
-        $assessmentType = $types->getFromTitle($assessmentTypeTitle);
+        $assessmentType = $types->getAssessmentType($assessmentTypeTitle);
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessmentType($assessmentType);
@@ -242,7 +242,7 @@ class Controller extends Base
         /* Used to hide a ui element, preventing Projects being an option
          * to spawn inside a Project context
          */
-        if ($types->isProject($types->getFromTitle($contextType))) {
+        if ($types->isProject($types->getAssessmentType($contextType))) {
             $data['hideProjectOption'] = true;
         }
 
@@ -311,7 +311,10 @@ class Controller extends Base
                 $data['allSummators'] = new SummatorMapping();
             }
 
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($this->getRequest()->post['assessmentType'])}/create.twig", $data));
+            $assessmentType = $types->getUrlFragment($this->getRequest()->post['assessmentType']);
+            $template = "@learningAssessment/fragments/{$assessmentType}/create.twig";
+            $content = $this->buildUnthemedHtmlOutput($template, $data);
+            $this->getResponse()->content->set($content);
         }
     }
 
@@ -368,7 +371,15 @@ class Controller extends Base
         $assessmentType = null;
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
-        $assessmentType = $assessment->getFamilyName();
+        if ($assessment instanceof Task) {
+            $assessmentType = Types::ASSESSMENT_TYPE_TASK;
+        } elseif ($assessment instanceof Quiz) {
+            $assessmentType = Types::ASSESSMENT_TYPE_QUIZ;
+        } elseif ($assessment instanceof DueWork) {
+            $assessmentType = Types::ASSESSMENT_TYPE_DUE_WORK;
+        } elseif ($assessment instanceof Project) {
+            $assessmentType = Types::ASSESSMENT_TYPE_PROJECT;
+        }
 
         $types = new Types();
         $assessmentIndex = $types->getFromTitle($assessmentType);
@@ -401,10 +412,10 @@ class Controller extends Base
                 $data['allSummators']  = $summatorMapping;
             }
 
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessmentType}/update.twig", $data));
-        }
-        else {
-            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            $template = "@learningAssessment/fragments/{$types->getUrlFragment($assessmentType)}/update.twig";
+            $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        } else {
+            $this->sendError('Could not create assessment', ['select a valid assessment type']);
             return;
         }
     }
@@ -436,11 +447,57 @@ class Controller extends Base
         if ($assessmentInfo['assessment'] instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
-        else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
+            return;
         }
-        else {
-            $returnUrl = $assessmentInfo['returnUrl'];
+
+        if (!$project instanceof Project) {
+            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
+        }
+
+        $types = new Types();
+
+        $zoneFactory = new ZoneFactory($types);
+        $zone = $zoneFactory->buildForAssessment($project);
+
+        if ($types->isValidIndex($assessmentType)) {
+            $data = [
+                'attachzone' => $zone->getTwigContext(),
+                'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
+                'folder' => $folder,
+                'types' => $types,
+                'project' => $project,
+                'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
+                'assessment' => [],
+                'assessmentType' => $assessmentType,
+                'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+                'allGradeSchemes' => $this->getAllGradeSchemes(),
+                'returnUrl' => $this->getRequest()->query['return_url']
+            ];
+
+            $template = "@learningAssessment/fragments/{$types->getUrlFragment($assessmentType)}/createWithinProject.twig";
+            $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        } else {
+            $this->sendError('Could not create assessment', ['select a valid assessment type']);
+            return;
+        }
+    }
+
+    /**
+     * Save the data when creating an assessment within a Project
+     *
+     * Use the returnUrl specified in querystring instead, but you
+     * could infer it based on output of $this->persistAssessment()
+     */
+    public function postCreateAssessmentWithinProject()
+    {
+        // Persist within context of a project
+        try {
+            $this->persistAssessment();
+        }
+        catch (\RuntimeException $e) {
+            return;
         }
 
         $data = [
@@ -682,6 +739,33 @@ class Controller extends Base
      */
 
     /**
+     * Find all the returnUrls
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function getAllReturnUrls($assessmentId)
+    {
+        /* Figure out a returnUrl
+         *
+         * When spawning a Project, its constituent Assessables return to this url
+         * after they are spawned
+         */
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+
+        $allReturnUrls = [];
+
+        $name = 'learningAssessment.getCreateAssessmentWithinProject';
+        foreach ((new Types())->getUrlFragments() as $title => $index) {
+            $data = ['assessmentId' => $assessmentId, 'assessmentType' => $index];
+            $allReturnUrls[$index] = $this->getRouter()->generate($name, $data) . $suffix;
+        }
+
+        return $allReturnUrls;
+    }
+
+    /**
      * All the possible Mark Types to chooze from for this particular $assessmentType
      *
      * @param int $assessmentType
@@ -920,7 +1004,7 @@ class Controller extends Base
     {
         $this->submissionFileMapper = $submissionFileMapper;
         return $this;
-    }    
+    }
 
     /**
      * @return FolderMapper

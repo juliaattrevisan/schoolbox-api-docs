@@ -28,21 +28,21 @@ class Mapping
     public function __construct()
     {
         $this->setMap([
-            AssessmentTypes::ASSESSMENT_PROJECT => [
+            AssessmentTypes::ASSESSMENT_TYPE_PROJECT  => [
                 MarkType::TYPE_PERCENT => Percentage::getTitle(),
                 MarkType::TYPE_NONE => None::getTitle(),
                 MarkType::TYPE_LETTER => LetterGrade::getTitle()
             ],
-            AssessmentTypes::ASSESSMENT_DUE_WORK => [
+            AssessmentTypes::ASSESSMENT_TYPE_DUE_WORK => [
                 MarkType::TYPE_PERCENT => Percentage::getTitle(),
                 MarkType::TYPE_NONE => None::getTitle(),
                 MarkType::TYPE_TOTAL => TotalMarkWholeNumber::getTitle(),
                 MarkType::TYPE_LETTER => LetterGrade::getTitle()
             ],
-            AssessmentTypes::ASSESSMENT_TASK => [
+            AssessmentTypes::ASSESSMENT_TYPE_TASK     => [
                 MarkType::TYPE_COMPLETION => Completion::getTitle(),
             ],
-            AssessmentTypes::ASSESSMENT_QUIZ => [
+            AssessmentTypes::ASSESSMENT_TYPE_QUIZ     => [
                 MarkType::TYPE_TOTAL => TotalMarkFractional::getTitle(),
             ],
         ]);
