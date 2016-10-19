@@ -44,6 +44,15 @@ if (is_numeric($_GET['eventID'])) {
         exit;
     }
 
+    // Check user has permission to modify this event
+    $event->getOwner()->loadParents();
+    if ($event->getOwner()->getId() !== $_SESSION['user']->getId() &&
+        !$_SESSION['user']->isSuperuser() &&
+        !$_SESSION['user']->isParentOf($event->getOwner())
+    ) {
+        error(34);
+    }
+
     /* Default values
      */
     $defaultTypeId      = $event->getType()->getId();
