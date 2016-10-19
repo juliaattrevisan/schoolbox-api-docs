@@ -44,6 +44,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
                 ->setUseRubric($assessment->hasRubric())
+                ->setMarkedPerRubricGroup($assessment->hasMarkPerCapbility())
                 ->setOwner($assessment->getCreator())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
@@ -106,13 +107,19 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setCreator($model->getOwner())
                 ->setMaxMark($model->getMaxMark())
                 ->setGradeGroup($model->getGradeGroup())
+
             ;
 
             // Has Rubric?
             if ($model->getUseRubric()) {
                 $assessable->useRubric();
+
+                if ($model->isMarkedPerRubricGroup()) {
+                    $assessable->useMarkPerCapability();
+                }
             } else {
                 $assessable->noRubric();
+                $assessable->noMarkPerCapability();
             }
 
             // Figure out submission visibility

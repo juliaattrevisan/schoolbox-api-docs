@@ -29,10 +29,7 @@
                 },
 
                 onXhrDone: function (data) {
-
-                    /* TODO: Redirect somewhere upon success
-                     */
-                    console.log(data);
+                    window.location.href = data.returnUrl;
                 }
             });
         }
