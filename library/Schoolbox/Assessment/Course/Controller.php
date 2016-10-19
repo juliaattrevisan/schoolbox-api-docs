@@ -658,7 +658,7 @@ class Controller extends Base\Base
         }
 
         $this->getResponse()->content->set([
-            'template' => '@course/mage-error.twig',
+            'template' => 'sub/mage-error.twig',
             'format' => 'nochrome',
             'data' => [
                 'error' => [
