@@ -15,7 +15,7 @@
         </div>
     </div>
     <nav>
-        {% if type == 'student' %}
+        {% if assessable.isParticipant(student) %}
             <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
         {% endif %}
     </nav>
