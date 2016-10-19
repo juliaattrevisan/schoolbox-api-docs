@@ -859,7 +859,7 @@ class Controller extends Base
      */
     private function getSummaryStudent($assessmentId)
     {
-        $project = self::getDummyAssessment($assessmentId);
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
 
         // Calculate summary totals for display purposes
 
@@ -874,36 +874,34 @@ class Controller extends Base
             'totalCompleted' => 0,
         ];
 
-        $assessables = $project->getAssessables();
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            $assessables = $assessment->getAssessables();
 
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
+            /** @var IAssessable $assessable */
+            foreach ($assessables as $assessable) {
 
-            $participant = $assessable->getParticipant($this->getUser());
+                $participant = $assessable->getParticipant($this->getUser());
 
-            if ($assessable instanceof Quiz) {
-                $type = "quiz";
-            } else if ($assessable instanceof Task) {
-                $type = "task";
-            } else {
-                $type = "dueWork";
-            }
+                $type = $assessable->getFamilyName();
 
-            $counts[$type]++;
-            $counts['total']++;
+                $counts[$type]++;
+                $counts['total']++;
 
-            // If the student has submitted at least one response we will assume it is completed
+                // If the student has submitted at least one response we will assume it is completed
 
-            if ($participant->getAllResponses()->count() > 0) {
-                $counts[$type.'Completed']++;
-                $counts['totalCompleted']++;
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$type.'Completed']++;
+                    $counts['totalCompleted']++;
+                }
             }
         }
 
+
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student' => $this->getUser(),
-            'assessment' => $project,
+            'currentUser' => $this->getUser(),
+            'assessment' => $assessment,
             'counts' => $counts
         ];
 
