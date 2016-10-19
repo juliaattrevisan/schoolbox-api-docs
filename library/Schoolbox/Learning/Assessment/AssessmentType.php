@@ -8,147 +8,91 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+
 /**
- * Encapsulates the mapping between Assessment Types and their URL fragments
+ * Encapsulates the mapping between Assessment Types and their twig-template-directories / URL-fragments
  *
  * This class essentially enumerates the concrete implementations of IAssessable
  * Does not map to DB table as that relationship is represented in join tables
  *
- * Does not belong on IAssessable as interface cannot have behaviour
+ * Does not belong on IAssessable as interface cannot have behaviour (and shouldn't know about implementors)
  * Does not belong on AbstractAssessment as parent class should not know about children
  */
 class AssessmentType
 {
-    /**
-     * Assessable types
-     */
-    const PROJECT = 1;
-    const DUE_WORK = 2;
-    const TASK = 3;
-    const QUIZ = 4;
+    // Template Directories
+    const TEMPLATE_DIRECTORY_PROJECT = 'project';
+    const TEMPLATE_DIRECTORY_DUE_WORK = 'dueWork';
+    const TEMPLATE_DIRECTORY_TASK = 'task';
+    const TEMPLATE_DIRECTORY_QUIZ = 'quiz';
+
+    // URL fragments
+    // (for now, these are both the same values. Could trivially split into URL- vs template-specific if required)
+    const URL_FRAGMENT_PROJECT = self::TEMPLATE_DIRECTORY_PROJECT;
+    const URL_FRAGMENT_DUE_WORK = self::TEMPLATE_DIRECTORY_DUE_WORK;
+    const URL_FRAGMENT_TASK = self::TEMPLATE_DIRECTORY_TASK;
+    const URL_FRAGMENT_QUIZ = self::TEMPLATE_DIRECTORY_QUIZ;
+
 
     /**
-     * Set of key-value pairs
+     * Get twig template directory for a given IAssessable
      *
-     * These should only be used on parsing / rendering of URLs.
-     * They should not be used internally, use the constants for that.
-     *
-     * @var string[] $urlFragments
-     */
-    private static $urlFragments = [
-        self::PROJECT  => 'project',
-        self::DUE_WORK => 'dueWork',
-        self::TASK     => 'task',
-        self::QUIZ     => 'quiz',
-    ];
-
-    /**
-     * Get the string representation from numeric representation
-     *
-     * @param int $assessmentType
+     * @param IAssessable $assessment
      * @return string
      */
-    public static function getUrlFragment($assessmentType)
+    public static function getTemplateDirectory(IAssessable $assessment)
     {
-        return self::$urlFragments[$assessmentType];
+        if($assessment instanceof Project){
+            return self::TEMPLATE_DIRECTORY_PROJECT;
+        } elseif($assessment instanceof DueWork){
+            return self::TEMPLATE_DIRECTORY_DUE_WORK;
+        } elseif($assessment instanceof Task){
+            return self::TEMPLATE_DIRECTORY_TASK;
+        } elseif($assessment instanceof Quiz){
+            return self::TEMPLATE_DIRECTORY_QUIZ;
+        }
+        throw new \UnexpectedValueException('Unknown IAssessable: '.get_class($assessment));
     }
+
 
     /**
      * Get the numeric representation from string representation
      *
      * @param string $urlFragment
-     * @return int
+     * @return IAssessable
      */
-    public static function getAssessmentType($urlFragment)
+    public static function getAssessmentByUrlFragment($urlFragment)
     {
-        $flipped = array_flip(self::$urlFragments);
-
-        return $flipped[$urlFragment];
-    }
-
-    /**
-     * Is the $urlFragment valid?
-     *
-     * @param string $urlFragment
-     * @return bool
-     */
-    public static function isValidUrlFragment($urlFragment)
-    {
-        if (strlen($urlFragment)) {
-            return in_array($urlFragment, array_values(self::$urlFragments));
+        if(self::URL_FRAGMENT_PROJECT == $urlFragment){
+            return new Project();
+        } elseif(self::URL_FRAGMENT_DUE_WORK == $urlFragment){
+            return new DueWork();
+        } elseif(self::URL_FRAGMENT_TASK == $urlFragment){
+            return new Task();
+        } elseif(self::URL_FRAGMENT_QUIZ == $urlFragment){
+            return new Quiz();
         }
-
-        return false;
+        throw new \UnexpectedValueException("Unknown URL fragment: $urlFragment");
     }
 
-    /**
-     * Is the $assessmentType valid?
-     *
-     * @param int $assessmentType
-     * @return bool
-     */
-    public static function isValidIndex($assessmentType)
-    {
-        if ($assessmentType !== null) {
-            return in_array($assessmentType, array_keys(self::$urlFragments));
-        }
-
-        return false;
-    }
-
-    /**
-     * $index is a project assessment type
-     *
-     * @param int $assessmentType
-     * @return bool
-     */
-    public static function isProject($assessmentType)
-    {
-        return $assessmentType == self::PROJECT;
-    }
-
-    /**
-     * $index is a due work assessment type
-     *
-     * @param int $assessmentType
-     * @return bool
-     */
-    public static function isDueWork($assessmentType)
-    {
-        return $assessmentType == self::DUE_WORK;
-    }
-
-    /**
-     * $index is a quiz assessment type
-     *
-     * @param int $assessmentType
-     * @return bool
-     */
-    public static function isQuiz($assessmentType)
-    {
-        return $assessmentType == self::QUIZ;
-    }
-
-    /**
-     * $index is a task assessment type
-     *
-     * @param int $assessmentType
-     * @return bool
-     */
-    public static function isTask($assessmentType)
-    {
-        return $assessmentType == self::TASK;
-    }
 
     /* Getters/Setters
      */
 
     /**
-     * Maps ID:int => UrlFragment:string
+     * Returns the available URL fragments
      * @return array
      */
     public static function getUrlFragments()
     {
-        return self::$urlFragments;
+        return [
+            self::TEMPLATE_DIRECTORY_PROJECT,
+            self::TEMPLATE_DIRECTORY_DUE_WORK,
+            self::TEMPLATE_DIRECTORY_TASK,
+            self::TEMPLATE_DIRECTORY_QUIZ,
+        ];
     }
 }

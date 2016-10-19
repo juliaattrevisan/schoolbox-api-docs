@@ -47,14 +47,14 @@ class Factory
     /**
      * Creates a zone from a given assessment type.
      *
-     * @param int $type
+     * @param IAssessable $assessment
      * @return Zone
      */
-    public function buildForAssessmentType($type)
+    public function buildForAssessmentType(IAssessable $assessment)
     {
-        if ($this->assessmentTypes->isTask($type)) {
+        if ($assessment instanceof Task) {
             return $this->buildForTask();
-        } elseif ($this->assessmentTypes->isDueWork($type)) {
+        } elseif ($assessment instanceof DueWork) {
             return $this->buildForDueWork();
         }
         return $this->buildGeneric();
