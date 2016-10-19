@@ -492,6 +492,9 @@ class Controller extends Base
 
     /**
      * Save the data when creating an assessment within a Project
+     *
+     * Use the returnUrl specified in querystring instead, but you
+     * could infer it based on output of $this->persistAssessment()
      */
     public function postCreateAssessmentWithinProject()
     {
@@ -503,9 +506,6 @@ class Controller extends Base
             return;
         }
 
-        /* Use the returnUrl specified in querystring instead
-         * TODO: Maybe can infer it based on output of $this->persistAssessment?
-         */
         $data = [
             'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
         ];
