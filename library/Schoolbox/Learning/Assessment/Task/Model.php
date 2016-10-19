@@ -22,6 +22,7 @@ use Schoolbox\Learning\MarkScheme\Completion;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use \Schoolbox\Resource\Storage\Model as StorageFile;
 
 class Model extends AbstractAssessment
 {
@@ -38,6 +39,13 @@ class Model extends AbstractAssessment
      * @var string
      */
     protected $url = '';
+
+    /**
+     * An optional attached File
+     *
+     * @var StorageFile|null
+     */
+    protected $attachedFile = null;
 
     /**
      * @inheritdoc
@@ -146,10 +154,12 @@ class Model extends AbstractAssessment
 
     /**
      * @param boolean $isSelfAssessed
+     * @return $this;
      */
     protected function setIsSelfAssessed($isSelfAssessed)
     {
         $this->isSelfAssessed = $isSelfAssessed;
+        return $this;
     }
 
     /**
@@ -167,6 +177,24 @@ class Model extends AbstractAssessment
     public function setUrl($url)
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @return null|StorageFile
+     */
+    public function getAttachedFile()
+    {
+        return $this->attachedFile;
+    }
+
+    /**
+     * @param null|StorageFile $attachedFile
+     * @return $this
+     */
+    public function setAttachedFile($attachedFile)
+    {
+        $this->attachedFile = $attachedFile;
         return $this;
     }
 }
