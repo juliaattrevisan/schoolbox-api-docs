@@ -1,158 +1,92 @@
+{# Letter Grade enables Grading Scheme
+ # Total Mark enables Maximum Available Marks
+ #}
+{% set markTypeLetterGrade = 2 %}
+{% set markTypeTotalMark = 3 %}
+
+<script type="text/javascript">
+    $(function() {
+        var $markTypeDropdown = $('#markType');
+        var $maxMarkDiv = $('[data-max-mark]');
+        var $gradeSchemeDiv = $('[data-grading-scheme]');
+
+        /**
+         * Show max mark
+         */
+        function showMaxMark() {
+            $maxMarkDiv.show();
+        }
+
+        /**
+         * Hide max mark
+         */
+        function hideMaxMark() {
+            $maxMarkDiv.hide();
+        }
+
+        /**
+         * Show grading scheme
+         */
+        function showGradingScheme() {
+            $gradeSchemeDiv.show();
+        }
+
+        /**
+         * Hide grading scheme
+         */
+        function hideGradingScheme() {
+            $gradeSchemeDiv.hide();
+        }
+
+
+        /* Mark Type switcher
+         */
+        $markTypeDropdown.on('change', function () {
+
+            if ($(this).val() == {{ markTypeTotalMark }}) {
+                showMaxMark();
+            } else {
+                hideMaxMark();
+            }
+
+            if ($(this).val() == {{ markTypeLetterGrade }}) {
+                showGradingScheme();
+            } else {
+                hideGradingScheme();
+            }
+        });
+
+        // Initiate
+        $markTypeDropdown.trigger('change');
+    });
+</script>
+
 <div class="row">
     <div class="small-12 medium-6 columns">
         <label>
             Mark Type
             <select id="markType" name="markType">
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}" {% if index == assessment.markType.id %}selected{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"{% if index == assessment.markType.id %} selected{% endif %}>{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
     </div>
 
-    {# Letter Grade enables Grading Scheme
-     # Total Mark enables Maximum Available Marks
-     #}
-    {% set markTypeLetterGrade = 2 %}
-    {% set markTypeTotalMark = 3 %}
-
-    <script type="text/javascript">
-        $(function() {
-
-            /**
-             * Show max mark
-             */
-            function showMaxMark() {
-                $('#assessmentForm').find('[data-max-mark]').show();
-            }
-
-            /**
-             * Hide max mark
-             */
-            function hideMaxMark() {
-                $('#assessmentForm').find('[data-max-mark]').hide();
-            }
-
-            /**
-             * Show grading scheme
-             */
-            function showGradingScheme() {
-                $('#assessmentForm').find('[data-grading-scheme]').show();
-            }
-
-            /**
-             * Hide grading scheme
-             */
-            function hideGradingScheme() {
-                $('#assessmentForm').find('[data-grading-scheme]').hide();
-            }
-
-            /**
-             * Rubrics is activated
-             */
-            function hasRubric() {
-                return $('#hasRubric:checked').length;
-            }
-
-            /**
-             * Disable the field, but allow us to show its value
-             * which will be programmatically generated
-             */
-            function disableMaxMark() {
-                $('#maxMark').prop('disabled', true);
-            }
-
-            /**
-             * Enable the field for humans to change its value
-             */
-            function enableMaxMark() {
-                $('#maxMark').prop('disabled', false);
-            }
-
-            /**
-             * Initialise panels
-             */
-            function setupPanels(element) {
-                if ($(element).val() == {{ markTypeLetterGrade }}) {
-                    hideMaxMark();
-                    showGradingScheme();
-                }
-                else if ($(element).val() == {{ markTypeTotalMark }}) {
-                    hideGradingScheme();
-                    showMaxMark();
-
-                    /* Disable maxmark field if rubrics is selected
-                     * Dynamically alter value according to rubric grid
-                     */
-                    if (hasRubric()) {
-                        disableMaxMark();
-                    }
-                    else {
-                        enableMaxMark();
-                    }
-                }
-                else {
-                    disableMaxMark();
-                    hideMaxMark();
-                    hideGradingScheme();
-                }
-            }
-
-            /* Disable everything initially
-             */
-            disableMaxMark();
-            hideMaxMark();
-            hideGradingScheme();
-
-            setupPanels($('#markType'));
-
-            /* Mark Type switcher
-             */
-            $('#assessmentForm').on('change', '#markType', function(event) {
-                setupPanels($(this));
-            });
-
-            /**
-             * Determine which fields to show when Rubrics is activated
-             */
-            function determineRubricSetting(element) {
-                if (element.is(':checked')) {
-                    $('#hasMarkPerCapabilityPanel').removeClass('hide');
-                    disableMaxMark();
-                }
-                else {
-                    $('#hasMarkPerCapabilityPanel').addClass('hide');
-                    enableMaxMark();
-                }
-
-                showMaxMark();
-            }
-
-            /* Rubrics switcher
-             */
-            if ($('#hasRubric').is(':checked')) {
-                determineRubricSetting($('#hasRubric'));
-            }
-
-            $('#hasRubric').click(function(event) {
-                determineRubricSetting($(this));
-            });
-
-        });
-    </script>
 
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
         <label for="maxMark">
             Maximum Available Marks
-            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
+            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}"/>
         </label>
     </div>
+
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
         <label>
             Grading Scheme
             <select name="gradingScheme">
                 {% for scheme in allGradeSchemes %}
-                    <option value="{{ scheme.id }}" {% if scheme.id == assessment.gradeGroup.id %}selected{% endif %}>{{ scheme.name }}</option>
+                    <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
                 {% endfor %}
             </select>
         </label>

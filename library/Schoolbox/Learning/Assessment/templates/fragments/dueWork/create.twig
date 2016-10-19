@@ -1,24 +1,21 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{% include 'sub/rubricResultSet.twig' with {'resultSets': rubricResultSets } only %}
-
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function () {
 
-        /* Description only
-         */
-        $.fn.alaressEditor(
-            {targetElements: $('[name=description]')}
-        );
+        // 'Description' TextArea only
+        $.fn.alaressEditor({
+            targetElements: $('[name=description]')
+        });
     });
 </script>
 
 <label>
     Title
-    <input type="text" name="title" value="{{ assessment.title }}" required />
+    <input type="text" name="title" value="{{ assessment.title }}" required/>
 </label>
 <label>
     Type
@@ -43,15 +40,14 @@
 <div class="row">
     <div class="small-12 columns">
         <label for="acceptOnline">Accepts Online Submissions?</label>
-        <select name="acceptOnline">
+        <select name="acceptOnline" id="acceptOnline">
             {% set options = {
             0: 'None',
             1: 'Single',
             2: 'Multiple'
-            }
-            %}
+            } %}
             {% for index, title in options %}
-                <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
+                <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
             {% endfor %}
         </select>
     </div>
@@ -74,237 +70,58 @@
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
 {% include '@learningAssessment/fragments/markType.twig' %}
+{% include '@learningAssessment/fragments/rubric.twig' with {rubric: rubric, rubricAttachZone: rubricAttachZone, resultSets: rubricResultSets, assessment: assessment} only %}
 
-    {# Letter Grade enables Grading Scheme
-     # Total Mark enables Maximum Available Marks
-     #}
-    {% set markTypeLetterGrade = 2 %}
-    {% set markTypeTotalMark = 3 %}
+{# Letter Grade enables Grading Scheme
+ # Total Mark enables Maximum Available Marks
+ #}
+{% set markTypeLetterGrade = 2 %}
+{% set markTypeTotalMark = 3 %}
 
-    <script type="text/javascript">
-        $(function() {
+<script type="text/javascript">
+    $(function () {
 
-            var $markTypeDropdown = $('#markType');
-            var $assessmentForm   = $('#assessmentForm');
-            var $maxMarkWrap      = $assessmentForm.find('[data-max-mark]');
-            var $maxMarkInput     = $maxMarkWrap.find('#maxMark');
-            var $gradeSchemeDiv   = $assessmentForm.find('[data-grading-scheme]');
-            var $hasRubricSwitch  = $('#hasRubric');
+        var $maxMarkInput = $('#maxMark');
+        var $hasRubricSwitch = $('#hasRubric');
 
+        /**
+         * Rubrics is activated
+         */
+        function hasRubric() {
+            return $('#hasRubric:checked').length;
+        }
 
-            /**
-             * Show max mark
-             */
-            function showMaxMark() {
-                $maxMarkWrap.show();
+        /**
+         * Disable the field, but allow us to show its value
+         * which will be programmatically generated
+         */
+        function disableMaxMark() {
+            $maxMarkInput.prop('disabled', true);
+        }
+
+        /**
+         * Enable the field for humans to change its value
+         */
+        function enableMaxMark() {
+            $maxMarkInput.prop('disabled', false);
+        }
+
+        /* Rubrics switcher
+         */
+        $hasRubricSwitch.on('click', function () {
+            var $element = $(this);
+
+            if ($element.is(':checked')) {
+                disableMaxMark();
+            } else {
+                enableMaxMark();
             }
-
-            /**
-             * Hide max mark
-             */
-            function hideMaxMark() {
-                $maxMarkWrap.hide();
-            }
-
-            /**
-             * Show grading scheme
-             */
-            function showGradingScheme() {
-                $gradeSchemeDiv.show();
-            }
-
-            /**
-             * Hide grading scheme
-             */
-            function hideGradingScheme() {
-                $gradeSchemeDiv.hide();
-            }
-
-            /**
-             * Rubrics is activated
-             */
-            function hasRubric() {
-                return $('#hasRubric:checked').length;
-            }
-
-            /**
-             * Disable the field, but allow us to show its value
-             * which will be programmatically generated
-             */
-            function disableMaxMark() {
-                $maxMarkInput.prop('disabled', true);
-            }
-
-            /**
-             * Enable the field for humans to change its value
-             */
-            function enableMaxMark() {
-                $maxMarkInput.prop('disabled', false);
-            }
-
-
-            /* Mark Type switcher
-             */
-            $markTypeDropdown.on('change', function(event) {
-
-                if($(this).val() == {{ markTypeTotalMark }}){
-                    showMaxMark();
-                } else {
-                    hideMaxMark();
-                }
-
-                if(hasRubric() && $(this).val() == {{ markTypeTotalMark }}){
-                    disableMaxMark();
-                } else {
-                    enableMaxMark();
-                }
-
-                if($(this).val() == {{ markTypeLetterGrade }}){
-                    showGradingScheme();
-                } else {
-                    hideGradingScheme();
-                }
-            });
-
-            /* Rubrics switcher
-             */
-            $hasRubricSwitch.on('click', function (event) {
-                var $element = $(this);
-
-                if($element.is(':checked') && $markTypeDropdown.val() == {{ markTypeTotalMark }}){
-                    disableMaxMark();
-                } else {
-                    enableMaxMark();
-                }
-            });
-
-            // Initiate
-            $markTypeDropdown.trigger('change');
-            $hasRubricSwitch.trigger('click');
-
-
-
-
-            // Rubric ResultSets Modal
-
-            var $rsReveal     = $('#reveal-resultset');
-            var $interactions = $rsReveal.find('input,a');
-            var $overlay      = $rsReveal.find('[data-overlay]');
-
-            $rsReveal.on('closed.fndtn.reveal', function () {
-                // uncheck the selected radio
-                $rsReveal.find('[type=radio]').prop('checked', false);
-
-                // re-enable all inputs and links
-                $interactions.prop('disabled', false);
-
-                $overlay.addClass('hide');
-
-            });
-
-            $('#apply-resultset').on('click', function (e) {
-                e.preventDefault();
-                $rsReveal.foundation('reveal', 'open');
-            });
-
-            $rsReveal.on('click', 'a', function (e) {
-                e.preventDefault();
-
-                var $button = $(this), rubricEditable, value, $input, $label, options ;
-
-                switch ($button.data('action')) {
-                    case 'applyResultSet':
-
-                        rubricEditable = $('table[data-rubric]').data('plugin_rubricEditable');
-
-                        if (rubricEditable) {
-
-                            $input = $rsReveal.find('input:checked');
-
-                            if ($input.length) {
-                                value  = $input.val();
-                                $label = $input.siblings('[for=' + $input.attr('id') + ']');
-
-                                // ensure value
-                                if (value > 0) {
-                                    // get the list of options we're going to populate
-                                    options = $label.text().split(',').map(function (v) { return v.trim(); });
-
-                                    // prevent multi-submit
-                                    $interactions.prop('disabled', true);
-                                    $overlay.removeClass('hide');
-
-                                    // break this out of main execution
-                                    setTimeout(function () {
-                                        // apply the set
-                                        rubricEditable.applyResultSet(options);
-                                        $rsReveal.foundation('reveal', 'close');
-                                    }, 100);
-                                }
-                            }
-                        }
-
-                        break;
-                    default:
-                        // only other known option is 'close'
-                        $rsReveal.foundation('reveal', 'close');
-                        break;
-                }
-            });
-
         });
-    </script>
 
-    <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
-        <label>
-            Grading Scheme
-            <select name="gradingScheme">
-                <option value="1">Standard</option>
-                <option value="2">Satisfactory</option>
-                <option value="3">Competency</option>
-            </select>
-        </label>
-    </div>
-    <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
-        <label for="maxMark">
-            Maximum Available Marks
-            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
-        </label>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 medium-6 columns">
-        <label for="hasRubric">Use Rubric?</label>
-        <div class="switch round">
-            <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
-            <label for="hasRubric">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-    <div class="small-12 medium-6 columns">
-        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}" data-hide-watch="#hasRubric">
-            <label for="hasMarkPerCapability">Mark Per-Capability</label>
-            <div class="switch round">
-                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
-                <label for="hasMarkPerCapability">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
+        $hasRubricSwitch.trigger('click');
+    });
+</script>
 
-<div id="rubric-section" class="small-12 columns{% if not assessment.hasRubric %} hide{% endif %}" data-hide-watch="#hasRubric">
-    <div class="small-12 columns no-pad">
-        <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
-    </div>
-    <div class="small-12 columns no-pad">
-        {% include '@rubric/grid-csv.twig' with {'rubric': rubric, 'attachzone': rubricAttachZone } only %}
-    </div>
-</div>
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 
