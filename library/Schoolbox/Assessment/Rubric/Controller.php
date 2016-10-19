@@ -72,7 +72,7 @@ class Controller extends BaseController
     /**
      * AJAX method for creating a new group or criterion
      *
-     * @api POST /rubric/create
+     * @api POST /rubric
      * @level 156
      */
     public function create()
