@@ -140,21 +140,6 @@ class Controller extends Base\Base
     }
 
     /**
-     * Get the Units and Tasks for a particular Course
-     *
-     * @api   GET /course/importResults/{courseId}
-     * @level 160
-     *
-     * @param string $courseId
-     */
-    public function importResults($courseId)
-    {
-        $importer = new Import();
-
-        $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
-    }
-
-    /**
      * This POST is the result of import stage 1. Retrieve fragment with units in the selected course, and checkboxes/dates for selection
      *
      * @api   POST /course/import/classes
