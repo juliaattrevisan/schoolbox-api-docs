@@ -118,7 +118,7 @@ class Factory
         // Attach files
         if ($dueWork instanceof DueWork) {
             $files = [];
-            foreach ($dueWork->getAllFiles() as $file) {
+            foreach ($dueWork->getAttachedFiles() as $file) {
                 $files[] = $file->getHash();
             }
             $zone->attachFiles($files);

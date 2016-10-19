@@ -37,7 +37,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $dueWork = new DueWork();
 
         $this->assertInstanceOf(Collection::class, $dueWork->getAllParticipants());
-        $this->assertInstanceOf(Collection::class, $dueWork->getAllFiles());
+        $this->assertInstanceOf(Collection::class, $dueWork->getAttachedFiles());
         $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
         $this->assertSame(DueWork::ACCEPT_ONLINE_NONE, $dueWork->getAcceptOnline());
     }
@@ -81,7 +81,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->add(new Participant($this->bsalem, $dueWork))
                 ->add(new Participant($this->sberryhill, $dueWork))
                 ->add(new Participant($this->asaxon, $dueWork)))
-            ->setAllFiles((new Collection())
+            ->getAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
                     ->setHash($files[0]['hash'])
@@ -148,9 +148,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < count($files); $i++) {
             $currentFile = $files[$i];
 
-            $this->assertEquals($currentFile['id'], $dueWork->getAllFiles()->getOffset($i)->getId());
-            $this->assertEquals($currentFile['hash'], $dueWork->getAllFiles()->getOffset($i)->getHash());
-            $this->assertEquals($currentFile['filename'], $dueWork->getAllFiles()->getOffset($i)->getFilename());
+            $this->assertEquals($currentFile['id'], $dueWork->getAttachedFiles()->getOffset($i)->getId());
+            $this->assertEquals($currentFile['hash'], $dueWork->getAttachedFiles()->getOffset($i)->getHash());
+            $this->assertEquals($currentFile['filename'], $dueWork->getAttachedFiles()->getOffset($i)->getFilename());
         }
 
         /* Dates

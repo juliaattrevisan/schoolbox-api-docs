@@ -79,7 +79,7 @@ $dueWork1
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents()
     ->setAllParticipants($allParticipants)
-    ->getAllFiles()->add($file1)->add($file2);
+    ->getAttachedFiles()->add($file1)->add($file2);
 
 $feedbackFile1 = new DueWorkFeedbackFile();
 $feedbackFile1

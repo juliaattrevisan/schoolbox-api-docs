@@ -71,7 +71,7 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Translate files
             // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
-            foreach ($assessment->getAllFiles() as $file) {
+            foreach ($assessment->getAttachedFiles() as $file) {
                 $model->addAttachment(
                     (new StorageModel())
                         ->setHash($file->getHash())
@@ -135,7 +135,7 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Convert attachments
             foreach ($model->getAttachments() as $attachment) {
-                $assessable->getAllFiles()->add(
+                $assessable->getAttachedFiles()->add(
                     (new DueWorkFile())
                         ->setHash($attachment->getHash())
                         ->setFilename($attachment->getBasename())

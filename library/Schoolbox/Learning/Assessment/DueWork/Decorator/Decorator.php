@@ -103,6 +103,6 @@ class Decorator implements DecoratorInterface
                     ->setFilename($file->getBasename())
             );
         }
-        $assessment->setAllFiles($newList);
+        $assessment->setAttachedFiles($newList);
     }
 }

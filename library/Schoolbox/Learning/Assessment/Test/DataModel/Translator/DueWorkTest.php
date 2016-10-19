@@ -281,19 +281,19 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($dueWork->isAcceptMulti());
         $this->assertEquals(151, $dueWork->getCreator()->getId());
 
-        $this->assertCount(3, $dueWork->getAllFiles());
+        $this->assertCount(3, $dueWork->getAttachedFiles());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[0]);
-        $this->assertEquals('a file.txt', $dueWork->getAllFiles()[0]->getFilename());
-        $this->assertEquals('1234567890123456789012345678901234567890', $dueWork->getAllFiles()[0]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[0]);
+        $this->assertEquals('a file.txt', $dueWork->getAttachedFiles()[0]->getFilename());
+        $this->assertEquals('1234567890123456789012345678901234567890', $dueWork->getAttachedFiles()[0]->getHash());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[1]);
-        $this->assertEquals('an image.png', $dueWork->getAllFiles()[1]->getFilename());
-        $this->assertEquals('0000000000000000000000000000000000000002', $dueWork->getAllFiles()[1]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[1]);
+        $this->assertEquals('an image.png', $dueWork->getAttachedFiles()[1]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000002', $dueWork->getAttachedFiles()[1]->getHash());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[2]);
-        $this->assertEquals('a sound.mp3', $dueWork->getAllFiles()[2]->getFilename());
-        $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAllFiles()[2]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[2]);
+        $this->assertEquals('a sound.mp3', $dueWork->getAttachedFiles()[2]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAttachedFiles()[2]->getHash());
 
         $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
         $this->assertEquals(12, $dueWork->getType()->getId());

@@ -263,7 +263,7 @@ $dueWork = (new DueWork())
     ->useRubric()
 ;
 // Due work files have no sequence stored, so order by name
-$dueWork->getAllFiles()->sortBy('filename', 'asc');
+$dueWork->getAttachedFiles()->sortBy('filename', 'asc');
 $mapper->save($dueWork, 0);
 
 // Change and save it again
@@ -294,12 +294,12 @@ assertEquals($dbDueWork->getType()->getId(), $dueWork->getType()->getId());
 assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMarkScheme()));
 assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
 // Due work files
-assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
+assertEquals($dbDueWork->getAttachedFiles()->count(), $dueWork->getAttachedFiles()->count());
 // Sequence isn't stored for due work files
-$dbDueWork->getAllFiles()->sortBy('filename', 'asc');
-assertEquals($dbDueWork->getAllFiles()[0]->getFilename(), $dueWork->getAllFiles()[0]->getFilename());
-assertEquals($dbDueWork->getAllFiles()[1]->getFilename(), $dueWork->getAllFiles()[1]->getFilename());
-assertEquals($dbDueWork->getAllFiles()[2]->getFilename(), $dueWork->getAllFiles()[2]->getFilename());
+$dbDueWork->getAttachedFiles()->sortBy('filename', 'asc');
+assertEquals($dbDueWork->getAttachedFiles()[0]->getFilename(), $dueWork->getAttachedFiles()[0]->getFilename());
+assertEquals($dbDueWork->getAttachedFiles()[1]->getFilename(), $dueWork->getAttachedFiles()[1]->getFilename());
+assertEquals($dbDueWork->getAttachedFiles()[2]->getFilename(), $dueWork->getAttachedFiles()[2]->getFilename());
 
 
 /**
