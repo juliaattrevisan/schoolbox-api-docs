@@ -431,7 +431,7 @@ abstract class AbstractTreeBuilder
     protected function filterMime($files, $mimes)
     {
         // Check if the mime filter passed is a wildcard
-        if ($mime != "*/*") {
+        if ($mimes != "*/*") {
 
             $filesFiltered = new Collection();
 
