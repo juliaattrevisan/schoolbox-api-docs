@@ -71,7 +71,7 @@ class Controller extends Base\Base
      * @param Folder\Model         $targetClass
      * @param int                  $componentId the ID of the component the course is to be imported into
      */
-    public function import(Course\Specification $courseSpec = null, Folder\Model $targetClass = null, $componentId = null)
+    public function getImportForm(Course\Specification $courseSpec = null, Folder\Model $targetClass = null, $componentId = null)
     {
         $importer = new Import();
 

@@ -45,7 +45,7 @@ class Module extends \Alaress\Module\Module
             'GET' => [
                 /* Import screen
                  */
-                '/{courseId}/class/{classCode}{/componentId}' => 'import',
+                '/{courseId}/class/{classCode}{/componentId}' => 'getImportForm',
 
                 /* Dynamic Unit/Task list when choosing course to import
                  */
@@ -92,7 +92,7 @@ class Module extends \Alaress\Module\Module
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // these routes require that the entity exist
-        $this->addRoutePreload($matcher, 'import', function ($params) {
+        $this->addRoutePreload($matcher, 'getImportForm', function ($params) {
 
             try {
                 $dmSpecUnitMapper   = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class);
