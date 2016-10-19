@@ -212,19 +212,19 @@ class Factory
         /* Check types exist
          */
         switch($this->getType()) {
-            case AssessmentType::TEMPLATE_DIRECTORY_PROJECT:
+            case AssessmentType::TYPE_PROJECT:
                 $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
                 break;
 
-            case AssessmentType::TEMPLATE_DIRECTORY_DUE_WORK:
+            case AssessmentType::TYPE_DUE_WORK:
                 $assessment = new DueWork();
                 break;
 
-            case AssessmentType::TEMPLATE_DIRECTORY_TASK:
+            case AssessmentType::TYPE_TASK:
                 $assessment = new Task();
                 break;
 
-            case AssessmentType::TEMPLATE_DIRECTORY_QUIZ:
+            case AssessmentType::TYPE_QUIZ:
                 $assessment = new Quiz();
                 break;
 

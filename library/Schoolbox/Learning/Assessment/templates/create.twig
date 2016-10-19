@@ -81,14 +81,9 @@
                     <fieldset class="radiolist">
                         <div class="column small-12">
                             <input type="hidden" name="folderId" value="{{ folder.id }}" />
-
-                            {% if not hideProjectOption %}
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('project') }}" id="project"><label for="project" class="radio-label">Project</label>
-                            {% endif %}
-
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('dueWork') }}" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('task') }}" id="task"><label for="task" class="radio-label">Task</label>
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('quiz') }}" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
+                            {% for type in types %}
+                                <input type="radio" name="assessmentType" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
+                            {% endfor %}
                         </div>
                     </fieldset>
 

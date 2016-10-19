@@ -18,7 +18,7 @@
 
 {% include '@learningAssessment/fragments/dates.twig' %}
 
-<input type="hidden" name="assessmentType" value="{{ types.fromTitle('task') }}" />
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 <input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
 
 <script type="text/javascript">

@@ -206,7 +206,7 @@ class Controller extends Base
         /* Check that $type is valid
          */
         $types = new AssessmentType();
-        $assessment = $types->getAssessmentByUrlFragment($assessmentTypeTitle);
+        $assessment = $assessmentTypeTitle ? $types->stringToObject($assessmentTypeTitle) : null;
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessmentType($assessment);
@@ -231,19 +231,24 @@ class Controller extends Base
             /* The usual info everything requires
              */
             'attachzone' => $zone->getTwigContext(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessment),
+            'allMarkTypes' => $assessment ? $this->getAllMarkTypes($assessment) : null,
             'assessmentTypeTitle' => $assessmentTypeTitle,
             'assessmentType' => $assessment,
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'types' => $types,
+            'types' => [
+                ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work'],
+                ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
+                ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
+            ]
         ];
 
         /* Used to hide a ui element, preventing Projects being an option
          * to spawn inside a Project context
          */
-        if ($contextType instanceof Project) {
-            $data['hideProjectOption'] = true;
+        if (!$contextType instanceof Project) {
+            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
+            array_unshift($data['types'], $item);
         }
 
         /* Special treatment for projects for now
@@ -272,20 +277,23 @@ class Controller extends Base
 
         $assessmentType = $this->getRequest()->post['assessmentType'];
 
-        /* TODO: Remove this stub
-         * I added it to save myself choosing dates all the time
-         */
-        $assessment = (new DueWork())
-            ->useRubric()
-            ->setAcceptsMultiple()
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now());
-
         /* Common data among all assessmentType fragments
          */
         $types = new AssessmentType();
+
+        /* TODO: Remove this stub
+         * I added it to save myself choosing dates all the time
+         */
+        $assessment = $types->stringToObject($assessmentType)
+                ->setPublishAt(Alaress_Date_Format::now())
+                ->setOpenAt(Alaress_Date_Format::now())
+                ->setDueAt(Alaress_Date_Format::now())
+                ->setCloseAt(Alaress_Date_Format::now());
+        if($assessment instanceof DueWork){
+            $assessment
+                ->useRubric()
+                ->setAcceptsMultiple();
+        }
 
 
         $zone = new Zone('files');
@@ -293,21 +301,21 @@ class Controller extends Base
 
         $data = [
             'attachzone' => $zone->getTwigContext(),
-            'types' => $types,
             'assessment' => $assessment,
+            'assessmentType' => $types->objectToString($assessment),
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($this->getRequest()->post['assessmentType'])
+            'allMarkTypes' => $this->getAllMarkTypes($assessment)
         ];
 
         /* Special treatment for projects for now
          */
-        if ($assessmentType instanceof Project) {
+        if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
         }
 
         /* Select the fragment to return
          */
-        $template = "@learningAssessment/fragments/{$types->getTemplateDirectory($assessmentType)}/create.twig";
+        $template = "@learningAssessment/fragments/$assessmentType/create.twig";
         $content = $this->buildUnthemedHtmlOutput($template, $data);
         $this->getResponse()->content->set($content);
 
@@ -336,16 +344,15 @@ class Controller extends Base
          */
         $types = new AssessmentType();
 
-        /* If you spawned a project or an assessable within a project
-         * Redirect to project summary screen
-         *
-         * Otherwise return to whatever context you came from
-         */
-        if ($assessment instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-        }
-        elseif ($assessment->getContext() instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
+        if ($assessmentInfo['assessment'] instanceof Project) {
+
+            /* Continue as normal
+             */
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
+                'types' => $types,
+                'assessmentId' => $assessmentInfo['assessment']->getId(),
+                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']),
+            ]));
         }
         else {
             $returnUrl = $assessmentInfo['returnUrl'];
@@ -371,13 +378,13 @@ class Controller extends Base
 
         // TODO this is AssessmentType.php responsibility
         if ($assessment instanceof Task) {
-            $assessmentType = AssessmentType::TEMPLATE_DIRECTORY_TASK;
+            $assessmentType = AssessmentType::TYPE_TASK;
         } elseif ($assessment instanceof Quiz) {
-            $assessmentType = AssessmentType::TEMPLATE_DIRECTORY_QUIZ;
+            $assessmentType = AssessmentType::TYPE_QUIZ;
         } elseif ($assessment instanceof DueWork) {
-            $assessmentType = AssessmentType::TEMPLATE_DIRECTORY_DUE_WORK;
+            $assessmentType = AssessmentType::TYPE_DUE_WORK;
         } elseif ($assessment instanceof Project) {
-            $assessmentType = AssessmentType::TEMPLATE_DIRECTORY_PROJECT;
+            $assessmentType = AssessmentType::TYPE_PROJECT;
         }
 
         $types = new AssessmentType();
@@ -404,12 +411,12 @@ class Controller extends Base
 
         if ($assessmentId instanceof Project) {
             $data['types']         = $types;
-            $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
+            $data['allReturnUrls'] = $this->getAllReturnUrls($assessment);
             $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
             $data['allSummators']  = $summatorMapping;
         }
 
-        $template = "@learningAssessment/fragments/{$types->getTemplateDirectory($assessment)}/update.twig";
+        $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
 
     }
@@ -484,7 +491,7 @@ class Controller extends Base
             'returnUrl' => $this->getRequest()->query['return_url']
         ];
 
-        $template = "@learningAssessment/fragments/{$types->getTemplateDirectory($assessmentType)}/createWithinProject.twig";
+        $template = "@learningAssessment/fragments/{$types->objectToString($assessmentType)}/createWithinProject.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
 
     }
@@ -750,7 +757,7 @@ class Controller extends Base
      * to the parent project so we can return to it once we have finished created the sub-assessable.
      *
      * @param Project $project
-     * @return array
+     * @return string[] Maps link label to link URL
      */
     private function getAllReturnUrls(Project $project)
     {
@@ -759,15 +766,31 @@ class Controller extends Base
          * When spawning a Project, its constituent Assessables return to this url
          * after they are spawned
          */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', $project->getId());
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
         $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
+        $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
 
-        $name = 'learningAssessment.getSelectAssessmentInProject';
-        foreach ((new AssessmentType())->getUrlFragments() as $urlFragment) {
-            $data = ['projectId' => $project->getId(), 'assessmentTypeTitle' => $urlFragment];
-            $allReturnUrls[$urlFragment] = $this->getRouter()->generate($name, $data) . $suffix;
+        foreach(AssessmentType::getStringValues() as $assessmentType){
+
+            // Don't permit Project in Project
+            if(AssessmentType::TYPE_PROJECT == $assessmentType){
+                continue;
+            }
+            $data = ['projectId' => $project->getId(), 'assessmentTypeTitle' => $assessmentType];
+            $url = $this->getRouter()->generate($name, $data) . $suffix;
+
+            // Ugggh. Not sure about this. I think it's already abstracted in a class somewhere else?
+            // Or maybe better just to hard-code a plain list, only generating the URL
+            $label = ucwords(preg_replace('/[A-Z]/', ' ${0}', $assessmentType));
+            $icon = str_replace(' ','-', strtolower($label));
+
+            $allReturnUrls[] = [
+                'url'   => $url,
+                'label' => $label,
+                'icon'  => $icon,
+            ];
         }
 
         return $allReturnUrls;
