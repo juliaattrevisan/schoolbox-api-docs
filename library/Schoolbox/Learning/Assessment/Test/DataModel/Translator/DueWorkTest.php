@@ -50,7 +50,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             // Specific fields
             ->setAcceptsMultiple()
             ->showOnlySubmittedStudents()
-            ->setAllFiles((new Collection())
+            ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId(33)
                     ->setFilename('a file.txt')
