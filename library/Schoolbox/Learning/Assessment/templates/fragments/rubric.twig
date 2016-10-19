@@ -1,12 +1,13 @@
 {#
-Modal content to display a set of Rubric ResultSets.
-When displayed, the user can select a ResultSet and have it pre-populate their Rubric Grid
-
 Usage:
 
-    {% include 'ubric.twig' with {'resultSets': rubricResultSets, 'assessment': assessment } only %}
+{% include '@learningAssessment/fragments/rubric.twig' with {
+    rubric: rubric,
+    rubricAttachZone: rubricAttachZone,
+    resultSets: rubricResultSets,
+    assessment: assessment
+} only %}
 
-    Where 'rubricResultSets' is whatever the ResultSets were named when passed to parent template.
 #}
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
@@ -38,6 +39,7 @@ Usage:
 </div>
 
 
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -48,7 +50,7 @@ Usage:
         var $overlay      = $rsReveal.find('[data-overlay]');
 
         $rsReveal.on('closed.fndtn.reveal', function () {
-            // uncheck the selected radio
+            // un-check the selected radio
             $rsReveal.find('[type=radio]').prop('checked', false);
 
             // re-enable all inputs and links
