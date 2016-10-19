@@ -281,6 +281,10 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
         // Preload of route parameters, and its module loader
         $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
             ModuleLoader::class,
@@ -535,10 +539,6 @@ class Bootstrap implements BootstrapInterface {
                 ]
             )
         );
-
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));
