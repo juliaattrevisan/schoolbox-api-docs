@@ -38,8 +38,11 @@
                             <p>
                                 Overall Completion
                             </p>
-                            <p class="meta spaced {{ totalClass }}">{{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}%
-                                Completed</p>
+                            <p class="meta spaced {{ totalClass }}">
+                                {% if counts.total > 0 %}
+                                {{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}% Completed
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </li>
