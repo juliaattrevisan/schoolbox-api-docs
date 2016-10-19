@@ -44,6 +44,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
                 ->setUseRubric($assessment->hasRubric())
+                ->setMarkedPerRubricGroup($assessment->hasMarkPerCapbility())
                 ->setOwner($assessment->getCreator())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
