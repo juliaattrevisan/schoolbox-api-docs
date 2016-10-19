@@ -111,43 +111,16 @@ class Transactor
         if ($this->getContextId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
-
-                    /* TODO: Pass contextId as a param into this method
-                     * It should be obtained from the routes
-                     * You only get contextId when you're Creating, not updating
-                     */
-                    $context   = $this->getFolderMapper()->findById($this->getContextId());
-                    $returnUrl = "/homepage/{$context->getId()}";
-                    $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-                    $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+                    $returnUrl = $this->transactFolderContext();
                 }
                 elseif ($assessmentContext instanceof UnitImplementation) {
-                    $context   = $this->getUnitImplementationDataSource()->findById($this->getContextId());
-                    $returnUrl = "/homepage/{$context->getId()}";
-                    $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-                    $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+                    $returnUrl = $this->transactUnitImplementationContext();
                 }
                 elseif ($assessmentContext instanceof UnitSpecification) {
-                    // The unit spec doesn't contain a reference back to its course spec.
-                    // It should, or I should be able to find one.
-                    $context   = $this->getUnitSpecificationDataSource()->findById($this->getContextId());
-                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
-                    $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-                    $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+                    $returnUrl = $this->transactUnitSpecificationContext();
                 }
                 elseif ($assessmentContext instanceof Project) {
-
-                    /* Check that you don't spawn a Project in a Project
-                     */
-                    if ($this->getAssessment() instanceof Project) {
-                        throw new \DomainException('You cannot create nested projects.');
-                    }
-
-                    // TODO figure out what to do about this
-                    $context   = $this->getAssessmentDataSource()->findById($this->getContextId());
-                    $returnUrl = "/homepage/{$context->getId()}";
-                    $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-                    $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+                    $returnUrl = $this->transactProjectContext();
                 } else {
                     throw new \InvalidArgumentException('select a valid context');
                 }
@@ -160,13 +133,90 @@ class Transactor
         else {
             $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $assessmentContext);
             $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
-            $context = null;
+
             $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
          */
+        return [
+            'assessment' => $this->getAssessment(),
+            'returnUrl' => $returnUrl
+        ];
+    }
+
+    /**
+     * Transact from Folder context
+     *
+     * @return string
+     */
+    private function transactFolderContext()
+    {
+
+        /* TODO: Pass contextId as a param into this method
+         * It should be obtained from the routes
+         * You only get contextId when you're Creating, not updating
+         */
+        $context   = $this->getFolderMapper()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
+        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+
+        $returnUrl = "/homepage/{$context->getId()}";
+
         return $returnUrl;
+    }
+
+    /**
+     * Transact from Unit Implementation context
+     *
+     * @return string
+     * @throws MapperException\Deleted
+     */
+    private function transactUnitImplementationContext()
+    {
+        $context   = $this->getUnitImplementationDataSource()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
+        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+
+        return "/homepage/{$context->getId()}";
+    }
+
+    /**
+     * Transact from Unit Specification context
+     *
+     * @return string
+     * @throws MapperException\Deleted
+     */
+    private function transactUnitSpecificationContext()
+    {
+        // The unit spec doesn't contain a reference back to its course spec.
+        // It should, or I should be able to find one.
+        $context   = $this->getUnitSpecificationDataSource()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
+        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+
+        return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+    }
+
+    /**
+     * Transact from Project context
+     *
+     * Check that you don't spawn a Project in a Project
+     *
+     * @throws MapperException\Deleted
+     */
+    private function transactProjectContext()
+    {
+        if ($this->getAssessment() instanceof Project) {
+            throw new \DomainException('You cannot create nested projects.');
+        }
+
+        // TODO figure out what to do about this
+        $context   = $this->getAssessmentDataSource()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
+        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+
+        return "/homepage/{$context->getId()}";
     }
 
     /**

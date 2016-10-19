@@ -478,7 +478,7 @@ class Controller extends Base
                 $this->getRouter()
             );
 
-            $returnUrl = $transactor->transact();
+            $transactionSummary = $transactor->transact();
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', $e->getMessage());
@@ -572,8 +572,7 @@ class Controller extends Base
 //        if (!$this->getRequest()->post['contextId']) {
 //            $redirectSummary['returnUrl'] = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
 //        }
-print_r($returnUrl);die();
-        return $returnUrl;
+        return $transactionSummary;
     }
 
     /**
