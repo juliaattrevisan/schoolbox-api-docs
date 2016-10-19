@@ -20,7 +20,7 @@
         <section>
             <ul class="information-list">
                 {% for assessable in assessment.assessables %}
-                    {% include '@learningAssessment/fragments/' ~ (assessable.familyName | lower) ~ '/card.twig' with {assessment: assessment, student: student, assessable: assessable, type: 'student'} %}
+                    {% include '@learningAssessment/fragments/' ~ (assessable.familyName ) ~ '/card.twig' with {assessment: assessment, student: student, assessable: assessable, type: 'student'} %}
                 {% endfor %}
             </ul>
         </section>
