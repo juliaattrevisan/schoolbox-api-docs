@@ -35,7 +35,8 @@
                                     <div class="list-item">
                                         <div class="card wrap-down small-12">
                                             <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
-                                            <a href="#{{ assessable.id }}">
+
+                                            <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}">
                                                 <h3>
                                                     {{ assessable.title }}
                                                 </h3>
@@ -46,7 +47,8 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a href="#" class="icon-modify no-text" title="Modify"></a>
+                                        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}"
+                                           class="icon-modify no-text" title="Modify"></a>
                                     </nav>
                                 </li>
 
