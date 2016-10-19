@@ -50,37 +50,11 @@ class Module extends BaseModule
                 /* Course Management for a particular Homepage
                  */
                 '/management/{folderId}'               => 'management',
-
-                /* Import screen
-                 */
-                '/import/{courseId}/class/{classCode}{/componentId}' => 'import',
-
-                /* Dynamic Unit/Task list when choosing course to import
-                 */
-                '/importResults/{courseId}'            => 'importResults',
-
-                /* A list of Classes you can import into via selectize
-                 */
-                '/import/classes'                      => 'importClasses',
-
-                /* Modify the imported Course's Unit details
-                 */
-                '/import/modify/{componentId}'         => 'importModify',
             ],
             'POST' => [
                 '/unit/new'         => 'newUnit',
                 // AFAICT this was never used - I'm re-purposing it
                 '/unit/delete/{id}' => 'deleteUnitSpecification',
-                '/import/ownership' => 'importOwnership',
-                '/importTasks'      => 'importTasks',
-                '/importUnits'      => 'importUnits',
-                '/importSave'       => 'importSave',
-                '/import/delete'    => 'importDelete',
-
-                /* Restore an unlinked Course Outline that was previously imported
-                 */
-                '/import/restore'   => 'restoreCourse',
-
                 '/new'              => 'createCourse',
                 '/modify/{id}'      => 'updateCourse',
                 '/finalise'         => 'persistCourse',
@@ -96,59 +70,6 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
-    }
-
-
-    /**
-     * Initializes any preloads on routes for this module.
-     *
-     * Preloads adjust route params before they are passed to the controller.
-     * Usually, they're used to load a single item into the route's params,
-     * which is then passed directly as a parameter to the action.
-     *
-     * @param PathMatcher $matcher
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        // these routes require that the entity exist
-        $this->addRoutePreload($matcher, 'import', function ($params) {
-
-            try {
-                $dmSpecUnitMapper   = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class);
-                $dmSpecCourseMapper = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Mapper::class);
-
-                $unitTranslator   = new Course\DataModel\Specification\Unit\Translator();
-                $courseTranslator = new Course\DataModel\Specification\Translator($unitTranslator);
-                $courseSpecMapper = new Course\SpecificationMapperProxy($dmSpecCourseMapper, $courseTranslator, $dmSpecUnitMapper, $unitTranslator);
-
-                $courseSpec = $courseSpecMapper->findById($params['courseId']);
-
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // null is ok
-                $courseSpec = null;
-            }
-
-            try {
-                /** @var Folder\Mapper $folderMapper */
-                $folderMapper = $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
-                try {
-                    $targetClass = $folderMapper->findByCode($params['classCode']);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $targetClass = $folderMapper->findById($params['classCode']);
-                }
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // null is ok
-                $targetClass = null;
-            }
-
-            return [
-                'courseSpec'  => $courseSpec,
-                'targetClass' => $targetClass,
-                'componentId' => $params['componentId']
-            ];
-
-        });
-
     }
 
 

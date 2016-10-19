@@ -2,7 +2,7 @@
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 {% set linkhref =
     folder.id
-        ? routeLookup('course.import', { courseId: course.id, classCode: folder.id, componentId: component.id })
+        ? routeLookup('courseImport.import', { courseId: course.id, classCode: folder.id, componentId: component.id })
         : routeLookup('course.modifyCourse', { id: course.id })
 %}
 

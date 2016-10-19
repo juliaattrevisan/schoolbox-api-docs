@@ -300,7 +300,7 @@
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('course.importUnits') }}" />
+                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.importUnits') }}" />
                             </div>
                         </div>
                     </div>
@@ -320,7 +320,7 @@
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('course.importOwnership') }}" />
+                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.importOwnership') }}" />
                             </div>
                         </div>
 {% endif %}

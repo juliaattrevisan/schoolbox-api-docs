@@ -1,0 +1,179 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Assessment\Course\Import;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Schoolbox\Learning\Course;
+use Schoolbox\Learning\Course\Unit;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
+use Twig_Error_Loader;
+use Twig_Loader_Chain;
+
+class Module extends \Alaress\Module\Module
+{
+    /** @var string */
+    protected $basename = 'courseImport';
+
+    /**
+     * Initializes any routes for this module, with a given base path.
+     *
+     * The base path for each route needs to match up to the name of the
+     * controller in $this->initControllers(), so if its base path is
+     * "user", there must be a controller in the DI container called
+     * "controller:user"
+     *
+     * @param Router $router
+     * @param string $basePath The base route for this module
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $routes = [
+            'GET' => [
+                /* Import screen
+                 */
+                '/{courseId}/class/{classCode}{/componentId}' => 'import',
+
+                /* Dynamic Unit/Task list when choosing course to import
+                 */
+                '/results/{courseId}'            => 'importResults',
+
+                /* A list of Classes you can import into via selectize
+                 */
+                '/classes'                      => 'importClasses',
+
+                /* Modify the imported Course's Unit details
+                 */
+                '/modify/{componentId}'         => 'importModify',
+            ],
+            'POST' => [
+                '/ownership' => 'importOwnership',
+                '/tasks'     => 'importTasks',
+                '/units'     => 'importUnits',
+                '/save'      => 'importSave',
+                '/delete'    => 'importDelete',
+                '/restore'   => 'restoreCourse',
+
+            ]
+        ];
+
+        foreach ($routes['GET'] as $path => $alias) {
+            $this->addGetRoute($router, $alias, $basePath, $path);
+        }
+
+        foreach ($routes['POST'] as $path => $alias) {
+            $this->addPostRoute($router, $alias, $basePath, $path);
+        }
+    }
+
+
+    /**
+     * Initializes any preloads on routes for this module.
+     *
+     * Preloads adjust route params before they are passed to the controller.
+     * Usually, they're used to load a single item into the route's params,
+     * which is then passed directly as a parameter to the action.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // these routes require that the entity exist
+        $this->addRoutePreload($matcher, 'import', function ($params) {
+
+            try {
+                $dmSpecUnitMapper   = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class);
+                $dmSpecCourseMapper = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Mapper::class);
+
+                $unitTranslator   = new Course\DataModel\Specification\Unit\Translator();
+                $courseTranslator = new Course\DataModel\Specification\Translator($unitTranslator);
+                $courseSpecMapper = new Course\SpecificationMapperProxy($dmSpecCourseMapper, $courseTranslator, $dmSpecUnitMapper, $unitTranslator);
+
+                $courseSpec = $courseSpecMapper->findById($params['courseId']);
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // null is ok
+                $courseSpec = null;
+            }
+
+            try {
+                /** @var Folder\Mapper $folderMapper */
+                $folderMapper = $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
+                try {
+                    $targetClass = $folderMapper->findByCode($params['classCode']);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $targetClass = $folderMapper->findById($params['classCode']);
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // null is ok
+                $targetClass = null;
+            }
+
+            return [
+                'courseSpec'  => $courseSpec,
+                'targetClass' => $targetClass,
+                'componentId' => $params['componentId']
+            ];
+
+        });
+
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer) {
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            ));
+    }
+
+    /**
+     * @param Twig_Loader_Chain $templateLoader
+     * @throws Twig_Error_Loader
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../templates');
+    }
+
+    /**
+     * Initializes controller classes into the dependency injector.
+     *
+     * @param ContainerInterface $injector The dependency injection container.
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(Controller::class, [], [
+                'setUnitSpecificationMapperProxy' => $injector->lazyNew(Unit\SpecificationMapperProxy::class),
+                'setFolderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+                'setCourseSpecificationMapperProxy' => $injector->lazyNew(Course\SpecificationMapperProxy::class),
+                'setUserAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'setAccess' => $injector->lazyNew(Access::class),
+                'setUserMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            ])
+        );
+
+    }
+}
