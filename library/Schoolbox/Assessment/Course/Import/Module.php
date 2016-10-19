@@ -43,30 +43,18 @@ class Module extends \Alaress\Module\Module
     {
         $routes = [
             'GET' => [
-                /* Import screen
-                 */
-                '/{courseId}/class/{classCode}{/componentId}' => 'getImportForm',
-
-                /* Dynamic Unit/Task list when choosing course to import
-                 */
-                '/results/{courseId}'            => 'importResults',
-
-                /* A list of Classes you can import into via selectize
-                 */
-                '/classes'                      => 'importClasses',
-
-                /* Modify the imported Course's Unit details
-                 */
-                '/modify/{componentId}'         => 'importModify',
+                '/{courseId}/class/{classCode}{/componentId}' => 'getImportForm', // Import screen
+                '/results/{courseId}'                         => 'importResults', // Dynamic Unit/Task list when choosing course to import
+                '/classes'                                    => 'importClasses', // A list of Classes you can import into via selectize
+                '/modify/{componentId}'                       => 'importModify',  // Modify the imported Course's Unit details
             ],
             'POST' => [
-                '/classes'   => 'postClasses',
-                '/ownership' => 'postOwnership',
-                '/units'     => 'postUnits',
-                '/tasks'     => 'postTasks',
-                '/delete'    => 'importDelete',
-                '/restore'   => 'restoreCourse',
-
+                '/classes'   => 'postClasses',   // result of step 1
+                '/ownership' => 'postOwnership', // result of step 2
+                '/units'     => 'postUnits',     // result of step 3
+                '/tasks'     => 'postTasks',     // result of step 4
+                '/delete'    => 'importDelete',  // TODO rename and add params
+                '/restore'   => 'restoreCourse', // TODO rename and add params
             ]
         ];
 
@@ -166,12 +154,12 @@ class Module extends \Alaress\Module\Module
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
-                'setUnitSpecificationMapperProxy' => $injector->lazyNew(Unit\SpecificationMapperProxy::class),
-                'setFolderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+                'setUnitSpecificationMapperProxy'   => $injector->lazyNew(Unit\SpecificationMapperProxy::class),
+                'setFolderMapper'                   => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
                 'setCourseSpecificationMapperProxy' => $injector->lazyNew(Course\SpecificationMapperProxy::class),
-                'setUserAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'setAccess' => $injector->lazyNew(Access::class),
-                'setUserMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'setAccess'                         => $injector->lazyNew(Access::class),
+                'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
             ])
         );
 
