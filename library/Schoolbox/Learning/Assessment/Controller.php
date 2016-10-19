@@ -553,12 +553,25 @@ class Controller extends Base
          *
          * Controller must return early for that to happen
          */
-        $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
-
-        /* Try to figure out what the redirect destination should be
-         * Throw an error if some kind of context configuration is wrong
-         */
         try {
+
+            /* Figure out what kind of assessment was chosen
+             * and spawn a new instance of it to manipulate
+             */
+            $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
+            $assessment = $assessmentFactory->produce($assessment);
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                throw new \RuntimeException;
+            }
+
+            /* Save the $asseessment
+             * Try to figure out what the redirect destination should be
+             * Throw an error if some kind of context configuration is wrong
+             */
             $transactor = new Transactor(
                 $this->getRequest()->post['contextId'],
                 $assessment,
@@ -570,44 +583,6 @@ class Controller extends Base
             );
 
             $transactionSummary = $transactor->transact();
-        }
-        catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', $e->getMessage());
-            return [];
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', $e->getMessage());
-            return [];
-        }
-
-        return $transactionSummary;
-    }
-
-    /**
-     * Figure out what kind of assessment was chosen
-     * and spawn a new instance of it to manipulate
-     *
-     * @param $data
-     * @param IAssessable|null $assessment
-     * @return IAssessable $assessment
-     */
-    private function produceAssessment($data, IAssessable $assessment = null)
-    {
-        try {
-            $assessmentFactory = new Factory($this->getUser(), $data);
-
-            if ($assessment instanceof IAssessable) {
-                $assessment = $assessmentFactory->produceFromExistingAssessment($assessment);
-            } else {
-                $assessment = $assessmentFactory->produce();
-            }
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                throw new \RuntimeException;
-            }
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', [$e->getMessage()]);
@@ -622,7 +597,7 @@ class Controller extends Base
             throw new \RuntimeException;
         }
 
-        return $assessment;
+        return $transactionSummary;
     }
 
     /* Utility methods - these can probably be refactored elsewhere
