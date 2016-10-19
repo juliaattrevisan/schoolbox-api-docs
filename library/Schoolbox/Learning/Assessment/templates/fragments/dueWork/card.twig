@@ -22,7 +22,7 @@
 
 {# Check if there was a response #}
 
-{% if assessable.getParticipant(student).getAllResponses | length %}
+{% if assessable.isParticipant(student) %}
     {% for response in assessable.getParticipant(student).getAllResponses %}
 
         <li class="actions-small-2">

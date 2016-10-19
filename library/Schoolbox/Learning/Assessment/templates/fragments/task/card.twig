@@ -15,7 +15,7 @@
         </div>
     </div>
     <nav>
-        {% if assessable.getParticipant(student).getAllResponses | length %}
+        {% if assessable.isParticipant(student) and (assessable.getParticipant(student).getAllResponses | length) %}
             <a disabled href="#" class="icon-tick no-text" title="Completed"></a>
         {% endif %}
     </nav>
