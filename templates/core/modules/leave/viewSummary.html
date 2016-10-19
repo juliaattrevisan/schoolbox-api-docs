@@ -1,8 +1,41 @@
+<style>
+div.leave_summary span {
+    width: 100%;
+    display: block;
+    font-size: 1000%;
+    line-height: 100%;
+}
+div.leave_summary p {
+    text-align: center;
+    color: white;
+    font-size: large;
+}
+section.departing {
+    background-color: tomato;
+    min-height: 220px;
+}
+section.returning {
+    background-color: yellowgreen;
+    min-height: 220px;
+}
+section.catering {
+    background-color: slategrey;
+    min-height: 220px;
+}
+section.catering p {
+    padding: 80px 0;
+}
+section.catering a {
+    color: white;
+    font-size: 150%;
+
+}
+</style>
 <ul class="breadcrumb">
     <li><a href="/modules/leave/">Boarder Leave</a></li>
 </ul>
-
-<div class="actions-small-2 row">
+<div class="leave_summary">
+<div class="actions-small-2 row ">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Border Leave Management</h1>
@@ -16,85 +49,76 @@
 
 <div class="row">
     <div class="small-4 island">
-        <section>
-            <div class="content">
-                <p>
-                   <a href="/modules/leave/report/catering">View Catering Report</a>
-                </p>
-            </div>
+        <section class="departing">
+
+            <p>
+                <span class="departing">{STUDENTS_DEPARTING}</span> Departing Today
+            </p>
+
         </section>
     </div>
     <div class="small-4 island">
-        <section>
-            <div class="content">
-                <p>
-                    {STUDENTS_DEPARTING} Departing Today
-                </p>
-            </div>
+        <section class="returning">
+
+            <p>
+                <span class="returning">{STUDENTS_RETURNING}</span> Returning Today
+            </p>
+
         </section>
     </div>
     <div class="small-4 island">
-        <section>
-            <div class="content">
-                <p>
-                    {STUDENTS_RETURNING} Returning Today
-                </p>
-            </div>
+        <section class="catering">
+            <p>
+                <a href="/modules/leave/report/catering" class="icon-progress">View Catering Report</a>
+            </p>
         </section>
     </div>
 </div>
-
+<!-- BEGIN summary_house -->
 <div class="row">
-    <!-- BEGIN summary_house -->
-    <section class="content">
-        <p>
-            {SUMMARY_HOUSE_NAME}
-        </p>
-    </section>
+    <div class="small-12 columns">
+        <h2 class="subheader">{SUMMARY_HOUSE_NAME}</h2>
+    </div>
     <div class="small-4 island">
         <section>
-            <div class="content">
-                <p>
-                    {HOUSE_STUDENTS_TOTAL} Total
-                </p>
-            </div>
+            <p>
+                {SUMMARY_HOUSE_TOTAL} Total
+            </p>
         </section>
     </div>
     <div class="small-4 island">
         <section>
             <div class="content">
                 <p>
-                    {HOUSE_STUDENTS_ONLEAVE} On Leave
+                    {SUMMARY_HOUSE_ONLEAVE} On Leave
                 </p>
             </div>
         </section>
     </div>
     <div class="small-4 island">
         <section>
-            <div class="content">
-                <p>
-                    {SUMMARY_HOUSE_LEAVE_PENDING} Pending
-                </p>
-            </div>
+
+            <p>
+                {SUMMARY_HOUSE_PENDING} Pending
+            </p>
         </section>
 
         <section>
-            <div class="content">
-                <p>
-                    {SUMMARY_HOUSE_LEAVE_APPROVED} Approved
-                </p>
-            </div>
+            <p>
+                {SUMMARY_HOUSE_APPROVED} Approved
+            </p>
         </section>
         <section>
-            <div class="content">
-                <p>
-                    {SUMMARY_HOUSE_LEAVE_REJECTED} Rejected
-                </p>
-            </div>
+            <p>
+                {SUMMARY_HOUSE_REJECTED} Rejected
+            </p>
         </section>
     </div>
-    <!-- END summary_house -->
+
 </div>
+<!-- END summary_house -->
+</div>
+
 
 
 

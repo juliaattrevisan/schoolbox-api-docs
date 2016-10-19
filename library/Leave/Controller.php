@@ -180,55 +180,74 @@ class Leave_Controller extends Controller
 
     public function renderSummary()
     {
-
-        $data = Array();
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewSummary.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'summary_house', 'summary_house_block');
 
-        foreach ($this->getHouseMapper()->findAll() as $house) {
-            $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
-            $data [$house->getId()]['house'] = $house->getHouse();
+        $today = new Alaress_Date_Format(time(), 'U');
 
-            $data [$house->getId()]['total_approved'] = 0;
-            $data [$house->getId()]['total_rejected'] = 0;
-            $data [$house->getId()]['total_pending'] = 0;
-            foreach ($requestList as $request) {
-                if ($request->getStatus() == 2){
-                    $data [$house->getId()]['total_approved'] ++;
-                }
-                elseif ($request->getStatus() == 3) {
-                    $data [$house->getId()]['total_rejected'] ++;
-                }
-                elseif ($request->getStatus() == 1) {
-                    $data [$house->getId()]['total_pending'] ++;
-                }
-                else {
-                    //shouldn't happen...
-                }
+        $allHouses = $this->getRequestMapper()->getCateringReport($today);
 
+        $leaving_today = 0;
+        $returning_today = 0;
+
+        foreach ($allHouses as $house) {
+            $summary_house_name = $house['name'];
+
+            //Quick way to get total students per residential house
+            $summary_house_total = $house['absent_morning'] + $house['present_morning'];
+
+            $summary_house_absent = 0;
+            if ($house['absent_morning'] > 0 || $house['absent_day'] > 0 || $house['absent_night'] > 0) {
+                $summary_house_absent= max(Array($house['absent_morning'],$house['absent_day'],$house['absent_night']));
             }
-//            new \Alaress_Probe($data);
+
+            $requestList = $this->getRequestMapper()->findAllByHouseId($house['houseId']);
+//            new \Alaress_Probe($requestList);
+            $summary_house_approved = 0;
+            $summary_house_rejected = 0;
+            $summary_house_pending = 0;
+            foreach ($requestList as $request) {
+
+                if ($request->isApproved()){
+                    $summary_house_approved ++;
+                }
+                if ($request->isRejected()) {
+                    $summary_house_rejected ++;
+                }
+                if ($request->isPending()) {
+                    $summary_house_pending ++;
+                }
+
+                if($request->getStart()->getDatabaseDate() == $today->getDatabaseDate() ) {
+                    $leaving_today ++;
+                }
+                if($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()  ) {
+                    $returning_today ++;
+                }
+            }
 
             $this->getPage()->setVar(
                 array(
-                    'SUMMARY_HOUSE_NAME' => $data[$house->getId()]['house'],
-                    'HOUSE_STUDENTS_TOTAL' => $data[$house->getId()]['all'],
-                    'SUMMARY_HOUSE_LEAVE_APPROVED' => $data[$house->getId()]['total_approved'],
-                    'SUMMARY_HOUSE_LEAVE_PENDING' => $data[$house->getId()]['total_pending'],
-                    'SUMMARY_HOUSE_LEAVE_REJECTED' => $data[$house->getId()]['total_rejected'],
+                    'SUMMARY_HOUSE_NAME' => $summary_house_name,
+                    'SUMMARY_HOUSE_TOTAL' => $summary_house_total,
+                    'SUMMARY_HOUSE_ONLEAVE' => $summary_house_absent,
+                    'SUMMARY_HOUSE_APPROVED' => $summary_house_approved,
+                    'SUMMARY_HOUSE_PENDING' => $summary_house_pending,
+                    'SUMMARY_HOUSE_REJECTED' => $summary_house_rejected,
                 )
             );
 
             $this->getPage()->parse('summary_house_block', 'summary_house', true);
 
         }
-
-
-
-
-
-
+        $this->getPage()->setVar(Array(
+            'STUDENTS_DEPARTING' => $leaving_today,
+            'STUDENTS_RETURNING' => $returning_today,
+        ));
 
     }
 
