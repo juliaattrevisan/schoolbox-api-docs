@@ -325,10 +325,10 @@ class Controller extends Base\Base
      * This POST is the result of import stage 4 (final). Do the actual import
      * and create all relevant database entries.
      *
-     * @api   POST /course/importSave
+     * @api   POST /course/import/tasks
      * @level 160
      */
-    public function importSave()
+    public function postTasks()
     {
         $post = $this->getRequest()->post;
 

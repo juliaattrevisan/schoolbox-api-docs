@@ -63,7 +63,7 @@ class Module extends \Alaress\Module\Module
                 '/classes'   => 'postClasses',
                 '/ownership' => 'postOwnership',
                 '/units'     => 'postUnits',
-                '/save'      => 'importSave',
+                '/tasks'     => 'postTasks',
                 '/delete'    => 'importDelete',
                 '/restore'   => 'restoreCourse',
 
