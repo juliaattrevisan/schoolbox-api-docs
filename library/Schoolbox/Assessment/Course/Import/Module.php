@@ -61,7 +61,7 @@ class Module extends \Alaress\Module\Module
             ],
             'POST' => [
                 '/classes'   => 'postClasses',
-                '/ownership' => 'importOwnership',
+                '/ownership' => 'postOwnership',
                 '/tasks'     => 'importTasks',
                 '/save'      => 'importSave',
                 '/delete'    => 'importDelete',

@@ -89,7 +89,7 @@ class Controller extends Base\Base
      * @api   POST /course/import/ownership
      * @level 160
      */
-    public function importOwnership()
+    public function postOwnership()
     {
         $ownerships  = $this->getRequest()->post["ownership"];
         $courseId    = trim($this->getRequest()->post["importCourse"]);
