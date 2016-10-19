@@ -903,9 +903,11 @@ class Controller extends Base
             }
         }
 
-
+        // TODO make this an instance var instead of instantiating all the time
+        $breadcrumbBuilder = new BreadcrumbFactory();
+        // TODO these crumbs have an update URL, and thus aren't appropriate for students
         $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'currentUser' => $this->getUser(),
             'assessment' => $assessment,
             'counts' => $counts

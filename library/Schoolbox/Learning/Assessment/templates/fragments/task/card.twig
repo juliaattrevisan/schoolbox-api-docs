@@ -6,7 +6,7 @@
             <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
             {# Not all tasks have links #}
             {% if assessable.url %}
-                <a data-preview href="{{ assessable.url }}">
+                <a data-plugin="preview" href="{{ assessable.url }}">
                     <h3>{{ assessable.title }}</h3>
                 </a>
             {% else %}

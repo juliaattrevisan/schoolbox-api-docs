@@ -1,11 +1,13 @@
-{# TODO: Replace with real breadcrumbs #}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-[ 'Learning',    '#' ],
-[ 'Classname',   '#' ],
-[ assessment.title,   '#' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<script type='text/javascript' src='/javascript/preview/preview.js'></script>
+<script type="text/javascript">
+    // Add previews
+    $(function() {
+        $('[data-plugin="preview"]').preview();
+    });
+</script>
 
 <div class="row">
     <div class="small-12 island">
