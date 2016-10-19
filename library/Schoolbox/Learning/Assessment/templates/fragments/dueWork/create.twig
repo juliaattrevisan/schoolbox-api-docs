@@ -67,6 +67,7 @@
 
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+<input type="hidden" name="category" value="{{ folder.id }}">
 
 {% include '@learningAssessment/fragments/markType.twig' %}
 {% include '@learningAssessment/fragments/rubric.twig' with {
