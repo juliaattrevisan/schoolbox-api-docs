@@ -44,7 +44,7 @@ class Module extends \Alaress\Module\Module
         $routes = [
             'GET' => [
                 '/{courseId}/class/{classCode}{/componentId}' => 'getImportForm', // Import screen
-                '/classes'                                    => 'importClasses', // A list of Classes you can import into via selectize
+                '/classes'                                    => 'searchClasses', // A list of Classes you can import into via selectize
                 '/modify/{componentId}'                       => 'importModify',  // Modify the imported Course's Unit details
             ],
             'POST' => [

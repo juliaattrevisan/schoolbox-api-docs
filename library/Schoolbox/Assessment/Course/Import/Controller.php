@@ -123,19 +123,17 @@ class Controller extends Base\Base
 
     /**
      * Search function. Retrieve a list of Folders that match the string in $_GET['query']
-     * TODO: rename this, and everything in it; it confusingly uses "import" in its noun form, rather than verb
      *
      * @api   GET /course/import/classes
      * @level 160
      */
-    public function importClasses()
+    public function searchClasses()
     {
         $importer = new Import();
 
-        // TODO: despite its name, "importClasses" actually just performs a search based on the query string given
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data' => $importer->importClasses($this->getRequest()->query->get('query'))
+            'data' => $importer->findMatchingClasses($this->getRequest()->query->get('query'))
         ]);
     }
 
