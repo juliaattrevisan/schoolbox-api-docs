@@ -81,7 +81,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->add(new Participant($this->bsalem, $dueWork))
                 ->add(new Participant($this->sberryhill, $dueWork))
                 ->add(new Participant($this->asaxon, $dueWork)))
-            ->getAttachedFiles((new Collection())
+            ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
                     ->setHash($files[0]['hash'])
