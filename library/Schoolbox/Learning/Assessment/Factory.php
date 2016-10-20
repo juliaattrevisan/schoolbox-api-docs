@@ -183,6 +183,24 @@ class Factory
     }
 
     /**
+     * Produce an assessment
+     *
+     * Either spawn a new one, or decorate an existing one
+     * based on the arg
+     *
+     * @param IAssessable|null $assessment
+     * @return DueWork|Project|Quiz|Task
+     */
+    public function produce(IAssessable $assessment = null)
+    {
+        if ($assessment instanceof IAssessable) {
+            return $this->produceFromExistingAssessment($assessment);
+        }
+
+        return $this->produceNew();
+    }
+
+    /**
      * Produce object
      *
      * @return DueWork|Project|Quiz|Task
@@ -190,7 +208,7 @@ class Factory
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce()
+    private function produceNew()
     {
         /* Check types exist
          */
@@ -239,6 +257,7 @@ class Factory
             default:
                 throw new \DomainException('select a valid context');
         }
+
         $assessment->setContext($context->setId($this->getContextIdentifier()));
 
         return $this->produceFromExistingAssessment($assessment);
@@ -253,7 +272,7 @@ class Factory
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produceFromExistingAssessment(IAssessable $assessment)
+    private function produceFromExistingAssessment(IAssessable $assessment)
     {
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(

@@ -36,7 +36,7 @@ class Decorator implements DecoratorInterface
     {
         /* TODO: Work out $numSeconds from $this->getDurationHours() and $this->getDurationMinutes()
          */
-        $duration = $this->getDurationHours() + $this->getDurationMinutes();
+        $duration = (3600 * $this->getDurationHours()) + (60 * $this->getDurationMinutes());
 
         $assessment->setDuration($duration);
 

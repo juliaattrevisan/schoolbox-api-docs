@@ -77,6 +77,64 @@ class Model extends AbstractAssessment
     protected $completionMessage;
 
     /**
+     * @param GradeGroup|null $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    {
+        if(!is_null($gradeGroup)){
+            throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
+        }
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return null|string
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        $markScheme = $this->getMarkScheme();
+
+        // Special Case: If a Quiz has sections with questions pools, the total marks available may change per attempt
+        if($markScheme instanceof TotalMarkFractional && !$this->getHasFixedTotalMarks()) {
+            $participant = $this->getParticipant($user);
+
+            $feedback = $publishedOnly
+                ? $participant->findMostRecentPublishedFeedback()
+                : $participant->findMostRecentFeedback();
+
+            $response = $feedback
+                ? $feedback->getResponse()
+                : null;
+
+            return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
+        }
+
+        return parent::getHumanReadableMark($user, $publishedOnly);
+    }
+
+    /**
+     * The number of hours and minutes that is represented by getDuration()
+     * (which is the duration represented in seconds)
+     */
+    public function getDurationComponents()
+    {
+        if ($this->getDuration()) {
+            return [
+                'hours'   => floor($this->getDuration() / 3600),
+                'minutes' => ($this->getDuration() % 3600) / 60
+            ];
+        }
+
+        return [];
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
      * @inheritdoc
      *
      * @return string
@@ -112,19 +170,6 @@ class Model extends AbstractAssessment
         return $this;
     }
 
-
-    /**
-     * @param GradeGroup|null $gradeGroup
-     * @return static
-     */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
-    {
-        if(!is_null($gradeGroup)){
-            throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
-        }
-        return $this;
-    }
-
     /**
      * @return bool
      */
@@ -142,36 +187,6 @@ class Model extends AbstractAssessment
         $this->hasFixedTotalMarks = $hasFixedTotalMarks;
         return $this;
     }
-
-    /**
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return null|string
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly)
-    {
-        $markScheme = $this->getMarkScheme();
-
-        // Special Case: If a Quiz has sections with questions pools, the total marks available may change per attempt
-        if($markScheme instanceof TotalMarkFractional && !$this->getHasFixedTotalMarks()) {
-            $participant = $this->getParticipant($user);
-
-            $feedback = $publishedOnly
-                ? $participant->findMostRecentPublishedFeedback()
-                : $participant->findMostRecentFeedback();
-
-            $response = $feedback
-                ? $feedback->getResponse()
-                : null;
-
-            return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
-        }
-
-        return parent::getHumanReadableMark($user, $publishedOnly);
-    }
-
-    /* Getters/Setters
-     */
 
     /**
      * @return int

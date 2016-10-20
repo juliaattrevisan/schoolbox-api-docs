@@ -37,13 +37,20 @@
 <label>
     Max Attempts
     {% set maxAttempts = 10 %}
+
     <select name="maxAttempts">
 
         {% for i in 0..maxAttempts %}
-        {% if i == 0 %}
-            <option value="{{ i }}">Unlimited</option>
+        {% if i == assessment.maxAttempts %}
+            {% set selected = 'selected' %}
         {% else %}
-            <option value="{{ i }}">{{ i }}</option>
+            {% set selected = '' %}
+        {% endif %}
+
+        {% if i == 0 %}
+            <option value="{{ i }}" {{ selected }}>Unlimited</option>
+        {% else %}
+            <option value="{{ i }}" {{ selected }}>{{ i }}</option>
         {% endif %}
         {% endfor %}
 
@@ -57,7 +64,12 @@
                 $('#durationPanel').stop().hide().removeClass('hide').slideDown(600);
             }
             else {
+
+                /* Empty values and hide
+                 */
                 $('#durationPanel').stop().slideUp(600, function() {
+                    $(this).find('input[name=durationHours]').val('');
+                    $(this).find('input[name=durationMinutes]').val('');
                     $(this).addClass('hide');
                 });
             }
@@ -68,7 +80,7 @@
     <div class="small-12 columns">
         <label for="hasDuration">Duration</label>
         <div class="switch round">
-            <input name="hasDuration" id="hasDuration" type="checkbox" />
+            <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.durationComponents.hours or assessment.durationComponents.minutes %}checked="checked"{% endif %} />
             <label for="hasDuration">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
@@ -77,16 +89,16 @@
     </div>
 </div>
 
-<div class="row hide" id="durationPanel">
+<div class="row {% if not assessment.durationComponents.hours and not assessment.durationComponents.minutes %}hide{% endif %}" id="durationPanel">
     <div class="small-12 columns no-pad">
         <div class="small-12 medium-6 columns">
             <label>Hours
-                <input name='durationHours' type="text" />
+                <input name='durationHours' type="text" value="{{ assessment.durationComponents.hours }}" />
             </label>
         </div>
         <div class="small-12 medium-6 columns">
             <label>Minutes
-                <input name='durationMinutes' type="text" />
+                <input name='durationMinutes' type="text" value="{{ assessment.durationComponents.minutes }}" />
             </label>
         </div>
     </div>
