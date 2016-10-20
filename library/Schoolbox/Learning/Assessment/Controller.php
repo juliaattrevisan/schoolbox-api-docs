@@ -422,11 +422,17 @@ class Controller extends Base
             return;
         }
 
-        $data = [
-            'returnUrl' => $assessmentInfo['returnUrl']
-        ];
+        /* Redirect to project summary screen instead, if you spawned a project
+         * Otherwise return to context
+         */
+        if ($assessmentInfo['assessment'] instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+        }
+        else {
+            $returnUrl = $assessmentInfo['returnUrl'];
+        }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->getResponse()->redirect->to($returnUrl);
     }
 
     /**
