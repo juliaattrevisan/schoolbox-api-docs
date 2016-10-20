@@ -88,10 +88,10 @@
     </div>
 </div>
 {% for unit in units %}
-<input type="hidden" name="unit[{{ loop.index }}][unit_impl_id]" value="{{ unit.id }}">
-<input type="hidden" name="unit[{{ loop.index }}][unit_spec_id]" value="{{ unit.specification.id }}">
-<input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.openDate.localShort }}">
-<input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.dueDate.localShort }}">
+    {% set inputPrefix %}unit[{{ unit.specification.id }}][a]{% endset %}
+<input type="hidden" name="unit[{{ unit.specification.id }}][impl_id]" value="{{ unit.id }}">
+<input type="hidden" name="unit[{{ unit.specification.id }}][open]" value="{{ unit.openDate.localShort }}">
+<input type="hidden" name="unit[{{ unit.specification.id }}][due]" value="{{ unit.dueDate.localShort }}">
 <div class="row">
     <div class="small-12 columns">
         <section>
@@ -99,7 +99,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>{{ unit.folder.name }}</h3>
+                            <h3>{{ unit.specification.folder.name }}</h3>
                         </div>
                     </div>
                     <nav>
@@ -116,14 +116,13 @@
                                 {% for assessment in unit.specification.assessables %}
 
                                     {# decide some things about this assessment #}
-                                    {% set assessmentHasClosure = assessment is not task %}
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                     {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
 
                                     <li data-type="unit_row">
 
                                         <div class="compact card small-12 large-4">
-                                            <input type="checkbox" id="a_import-{{ assessment.id}}" name="a[{{ assessment.id }}][import]" checked="checked" data-assessment="{{ assessment.id }}" />
+                                            <input type="checkbox" id="a_import-{{ assessment.id}}" checked="checked" data-assessment="{{ assessment.id }}" />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment.typeName) }}"></span>
                                                 <span>{{ assessment.title }}</span>
@@ -132,6 +131,7 @@
                                         <div data-assessment-dates="{{ assessment.id }}">
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
                                                 dateProperty: 'publish',
                                                 dateSyncProperty: publishDateSync
                                             } %}
@@ -139,6 +139,7 @@
                                             {# open date is relevant when accepting responses #}
                                             {% if acceptingResponses %}
                                                 {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
                                                 dateProperty: 'open',
                                                 dateSyncProperty: 'due'
                                                 } %}
@@ -146,19 +147,17 @@
                                                 <div class="small-12 medium-3 large-2 columns">{# empty column #}</div>
                                             {% endif %}
 
-                                            {# due date is relevant when: not task #}
-                                            {% if assessmentHasClosure %}
-                                                {% include '@course/import/date.twig' with {
-                                                dateProperty: 'due',
-                                                dateSyncProperty: 'late'
-                                                } %}
-                                            {% else %}
-                                                <div class="small-12 medium-3 large-2 columns">{# empty column #}</div>
-                                            {% endif %}
+                                            {# due date is always relevant #}
+                                            {% include '@course/import/date.twig' with {
+                                            inputPrefix: inputPrefix,
+                                            dateProperty: 'due',
+                                            dateSyncProperty: 'late'
+                                            } %}
 
                                             {# close (late) date is relevant when accepting responses #}
                                             {% if acceptingResponses %}
                                                 {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
                                                 dateProperty: 'close',
                                                 dateLabel: 'Late'
                                                 } %}
