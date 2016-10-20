@@ -64,15 +64,6 @@ interface IAssessable extends ISoftDeletable
     public function getTypeName();
 
     /**
-     * Degenerate method for fetching an assessment's icon class.
-     *
-     * @todo move this to a renderer class at some point.
-     *
-     * @return string
-     */
-    public function getIconClass();
-
-    /**
      * Is this user a participant in this assessable?
      *
      * @param User $user

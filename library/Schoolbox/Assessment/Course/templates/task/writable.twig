@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
 {% if task.type == 1 %}
     {% set doReveal %}data-reveal-id="modifyTask-{{ task.id }}"{% endset %}
 {% endif %}
@@ -8,7 +10,7 @@
             {% if task.link -%}
             <a data-plugin="preview" href="{{ task.link }}">
             {% endif -%}
-                <span class="{{ task.iconClass }} icon-16"></span>
+                <span class="{{ icon.renderClass(task) }} icon-16"></span>
                 <p>{{ task.title }}</p>
             {% if task.link -%}
             </a>

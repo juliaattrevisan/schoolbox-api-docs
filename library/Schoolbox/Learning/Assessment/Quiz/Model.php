@@ -153,14 +153,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getIconClass()
-    {
-        return 'icon-quiz';
-    }
-
-    /**
      * @return float
      */
     public function getMaxMark()

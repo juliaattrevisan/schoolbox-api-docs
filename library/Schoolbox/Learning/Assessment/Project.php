@@ -191,14 +191,6 @@ class Project extends AbstractAssessment implements AssessmentContext
         return 'Project';
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getIconClass()
-    {
-        return 'icon-project';
-    }
-
     /* Getters/Setters
      */
 
