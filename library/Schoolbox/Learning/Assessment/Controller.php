@@ -334,7 +334,7 @@ class Controller extends Base
 
                     // Did we save inside a Project
                     if($context instanceof Project){
-                        $data = ['assessmentId' => $context->getId()];
+                        $data = ['assessmentId' => $this->getRequest()->post['contextId']];
                         $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
                     }
                     // Else must be inside a Folder, UnitImpl, or UnitSpec
@@ -343,7 +343,11 @@ class Controller extends Base
                     }
                 }
 
-                $this->getResponse()->redirect->to($returnUrl);
+                if($this->getRequest()->isXhr()){
+                    $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
+                } else {
+                    $this->getResponse()->redirect->to($returnUrl);
+                }
             }
 
         } catch (ControllerException $e){
@@ -428,7 +432,11 @@ class Controller extends Base
                 }
             }
 
-            $this->getResponse()->redirect->to($returnUrl);
+            if($this->getRequest()->isXhr()){
+                $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
+            } else {
+                $this->getResponse()->redirect->to($returnUrl);
+            }
 
         } catch (ControllerException $e){
             $this->sendError($e->getMessage(), $e->getReasons());
