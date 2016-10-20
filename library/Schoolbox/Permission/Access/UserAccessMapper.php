@@ -274,37 +274,39 @@ class UserAccessMapper extends Mapper
 
     /**
     * @param FolderModel $folder
-    * @param string $roleType
+    * @param string $roleType If provided, restrict to this role type
     * @param int $accessType
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
-    public function findUsersInCategory($folder, $roleType, $accessType = UserAccess::ACCESS_READ, $includeSynergy = true)
+    public function findUsersInCategory($folder, $roleType = null, $accessType = UserAccess::ACCESS_READ, $includeSynergy = true)
     {
         // union 3 sources: userAccess, and if synergy, external class and external user
 
         // acquire users from internal access definition
-        $stmt = $this->database->prepare(
-            "
-			SELECT
-				{$this->getJoinColumnString('user', 'u')}
-			FROM
-				`{$this->table}` ua
-				LEFT JOIN {$this->getJoinSql('user', 'ua', 'u')}
-				LEFT JOIN groups g on u.group_id = g.id
-			WHERE ua.service = :service
-			AND ua.sid = :serviceId
-			AND ua.type >= :minAccess
-			AND g.group_type = :roleType
-		"
-        );
-
-        $stmt->execute(array(
+        $query = "
+            SELECT
+                {$this->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->table}` ua
+                LEFT JOIN {$this->getJoinSql('user', 'ua', 'u')}
+                LEFT JOIN groups g on u.group_id = g.id
+            WHERE ua.service = :service
+            AND ua.sid = :serviceId
+            AND ua.type >= :minAccess
+        ";
+        $params = [
             'service'   => UserAccess::SERVICE_HOMEPAGE,
             'serviceId' => $folder->getId(),
             'minAccess' => $accessType,
             'roleType'  => $roleType
-        ));
+        ];
+        if (isset($roleType)) {
+            $query .= 'AND g.group_type = :roleType';
+            $params['roleType'] = $roleType;
+        }
+        $stmt = $this->database->prepare($query);
+        $stmt->execute($params);
         $userCollection = $this->createCollection();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
