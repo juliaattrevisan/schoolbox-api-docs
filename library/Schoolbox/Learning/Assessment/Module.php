@@ -52,7 +52,7 @@ class Module extends BaseModule
                  */
                 '/assessment/folder/{folderId}{/assessmentTypeTitle}'     => 'getSelectAssessmentInFolder',
 
-                // May contain a 'return_url' GET parameter to return to project modification page
+                // May contain a 'returnUrl' GET parameter to return to project modification page
                 '/assessment/project/{projectId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInProject',
                 '/assessment/unit/{unitId}{/assessmentTypeTitle}'         => 'getSelectAssessmentInUnitImplementation',
                 '/assessment/unitspec/{unitSpecId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',

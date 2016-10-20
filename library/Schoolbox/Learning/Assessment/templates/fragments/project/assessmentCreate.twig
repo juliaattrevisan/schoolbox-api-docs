@@ -18,7 +18,7 @@
                 }
             },
             onXhrDone: function (data) {
-                window.location.href = data.return_url;
+                window.location.href = data.returnUrl;
             }
         });
     });
@@ -37,7 +37,7 @@
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="contextId" value="{{ project.id }}" />
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-                    <input type="hidden" name="return_url" value="{{ return_url }}" />
+                    <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
                     <div class="small-12 columns">
                         {% block content %}

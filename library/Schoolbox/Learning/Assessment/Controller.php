@@ -204,7 +204,7 @@ class Controller extends Base
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Do we have a returnUrl?
-        $returnUrl = $this->getRequest()->query->get('return_url');
+        $returnUrl = $this->getRequest()->query->get('returnUrl');
         if($returnUrl){
             $data['returnUrl'] = $returnUrl;
         }
@@ -304,6 +304,48 @@ class Controller extends Base
             $existingAssessment = null;
             $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
             $this->persistAssessment($assessment);
+
+            // If we are creating a Project, show Step-3 (options to create Assessments in Project)
+            if ($assessment instanceof Project) {
+
+                $types = new AssessmentType();
+
+                /* Continue as normal
+                 */
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/assessmentList.twig", [
+                    'types'         => $types,
+                    'assessmentId'  => $assessment->getId(),
+                    'allReturnUrls' => $this->getAllReturnUrls($assessment),
+                ]));
+            }
+            // Else we created a DueWork / Quiz / Task.
+            // Redirect somewhere.
+            else {
+
+                // Determine returnUrl
+                $returnUrl = $this->getRequest()->post['returnUrl'];
+
+                // Explicitly specified?
+                if($returnUrl) {
+                    $returnUrl = $this->returnUrlDecode($returnUrl);
+                } else {
+                    // Determine appropriate location
+                    $context = $assessment->getContext();
+
+                    // Did we save inside a Project
+                    if($context instanceof Project){
+                        $data = ['assessmentId' => $context->getId()];
+                        $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+                    }
+                    // Else must be inside a Folder, UnitImpl, or UnitSpec
+                    else {
+                        $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
+                    }
+                }
+
+                $this->getResponse()->redirect->to($returnUrl);
+            }
+
         } catch (ControllerException $e){
             $this->sendError($e->getMessage(), $e->getReasons());
         }
@@ -364,6 +406,30 @@ class Controller extends Base
         try {
             $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
             $this->persistAssessment($assessment);
+
+            // Determine returnUrl
+            $returnUrl = $this->getRequest()->post['returnUrl'];
+
+            // Explicitly specified?
+            if($returnUrl) {
+                $returnUrl = $this->returnUrlDecode($returnUrl);
+            } else {
+                // Determine appropriate location
+                $context = $assessment->getContext();
+
+                // Did we save inside a Project
+                if($context instanceof Project){
+                    $data = ['assessmentId' => $context->getId()];
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+                }
+                // Else must be inside a Folder, UnitImpl, or UnitSpec
+                else {
+                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
+                }
+            }
+
+            $this->getResponse()->redirect->to($returnUrl);
+
         } catch (ControllerException $e){
             $this->sendError($e->getMessage(), $e->getReasons());
         }
@@ -393,29 +459,6 @@ class Controller extends Base
                 $sequence++;
             }
             $this->getAssessmentMapperProxy()->save($assessment, $sequence);
-
-            // Determine returnUrl
-            $returnUrl = $this->getRequest()->post['returnUrl'];
-
-            // Explicitly specified?
-            if($returnUrl) {
-                $returnUrl = $this->returnUrlDecode($returnUrl);
-            } else {
-                // Determine appropriate location
-                $context = $assessment->getContext();
-
-                // Did we save inside a Project
-                if($context instanceof Project){
-                    $data = ['assessmentId' => $context->getId()];
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
-                }
-                // Else must be inside a Folder, UnitImpl, or UnitSpec
-                else {
-                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
-                }
-            }
-
-            $this->getResponse()->redirect->to($returnUrl);
         }
         catch (\Exception $e) {
             $this->sendError($e);
@@ -507,7 +550,7 @@ class Controller extends Base
          * Return to summary screen with this suffix
          */
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
-        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+        $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
 
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
@@ -657,7 +700,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?return_url=' . $this->returnUrlEncode($returnUrl);
+        $suffix = '?returnUrl=' . $this->returnUrlEncode($returnUrl);
 
         $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
