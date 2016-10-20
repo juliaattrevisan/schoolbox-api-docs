@@ -180,10 +180,11 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
                 -- May need to hydrate project's context too!
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT JOIN {$this->getJoinSql('task', '', 't')}
-            LEFT JOIN {$this->getJoinSql('duework', '', 'd')}
-            LEFT JOIN {$this->getJoinSql('quiz', '', 'q')}
-            LEFT JOIN {$this->getJoinSql('project', '', 'p')}
+            -- Allow join onto deleted objects
+            LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
+            LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf')}
