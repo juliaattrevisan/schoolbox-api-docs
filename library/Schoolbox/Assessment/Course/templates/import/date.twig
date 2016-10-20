@@ -1,0 +1,29 @@
+{#
+    assessmentId:     the ID of the assessment in question
+    assessmentDate:   assessment date object to work with
+    unitDate:         unit date object to fall back to
+    dateProperty:     the name of the property on the object
+    dateLabel:        the human-readable label to use
+    dateSyncProperty: the end-date to sync to
+#}
+
+{% if not assessmentId %}{% set assessmentId = assessment.id %}{% endif %}
+{% if not assessmentDate %}{% set assessmentDate = assessment[dateProperty ~ 'date'] %}{% endif %}
+{% if not unitDate %}{% set unitDate = dateProperty in [ 'publish', 'open' ] ? unit.openDate : unit.dueDate %}{% endif %}
+{% if not dateLabel %}{% set dateLabel = dateProperty | capitalize %}{% endif %}
+
+<div class="small-12 medium-3 large-2 columns">
+    <label for="a_{{ dateProperty }}_date-{{ assessmentId }}">{{ dateLabel }} Date</label>
+    <input id="a_{{ dateProperty }}_date-{{ assessmentId }}"
+           name="a[{{ assessmentId }}][{{ dateProperty }}]"
+           type="text"
+           value="{% if assessmentDate.valid %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
+           data-role="{{ dateProperty }}_date"
+           data-datepicker
+            {% if dateSyncProperty %}
+           data-datepicker-sync
+           data-datepicker-sync-enddate="#a_{{ dateSyncProperty }}_date-{{ assessmentId }}"
+           {% endif %}
+    />
+    <label for="a_{{ dateProperty }}_date-{{ assessmentId }}" class="hide error">This field is required.</label>
+</div>
