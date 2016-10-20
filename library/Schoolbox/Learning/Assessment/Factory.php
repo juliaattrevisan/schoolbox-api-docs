@@ -37,32 +37,14 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 
+use Schoolbox\Learning\Assessment\AssessmentContextType as ContextType;
+
 class Factory
 {
     use DueWorkTrait;
     use QuizTrait;
     use TaskTrait;
     use ProjectTrait;
-
-    /**
-     * Spawn in a Folder
-     */
-    const SPAWN_CONTEXT_FOLDER = 'folder';
-
-    /**
-     * Spawn in a Project
-     */
-    const SPAWN_CONTEXT_PROJECT = 'project';
-
-    /**
-     * Spawn in a Unit Implementation
-     */
-    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
-
-    /**
-     * Spawn in a Unit Specification
-     */
-    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
 
     /**
      * @var int
@@ -234,22 +216,21 @@ class Factory
 
         // Figure out which context it's in
         // TODO make sure these are real
-        // TODO move these constants
         $context = null;
         switch ($this->getContextType()) {
-            case self::SPAWN_CONTEXT_FOLDER:
+            case ContextType::TYPE_FOLDER:
                 $context = new Folder();
                 break;
 
-            case self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
+            case ContextType::TYPE_UNIT_IMPLEMENTATION:
                 $context = new UnitImplementation();
                 break;
 
-            case self::SPAWN_CONTEXT_UNIT_SPECIFICATION:
+            case ContextType::TYPE_UNIT_SPECIFICATION:
                 $context = new UnitSpecification();
                 break;
 
-            case self::SPAWN_CONTEXT_PROJECT:
+            case ContextType::TYPE_PROJECT:
                 $context = new Project();
                 break;
 
