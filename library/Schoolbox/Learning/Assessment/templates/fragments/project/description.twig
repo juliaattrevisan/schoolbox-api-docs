@@ -1,8 +1,8 @@
 <ul class="meta">
     {% if currentUser.role.isStaff %}
-        <li class="icon-progress">
-            Summator: {{ assessment.summator.title }}
-        </li>
+        <li class="icon-progress">Summator: {{ assessment.summator.title }}</li>
+        <li class="icon-calendar">Published {{ assessment.publishAt.short }}</li>
+        <li class="icon-calendar">Late {{ assessment.closeAt.short }}</li>
     {% endif %}
 </ul>
 
