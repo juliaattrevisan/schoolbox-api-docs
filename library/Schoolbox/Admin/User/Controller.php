@@ -7,15 +7,19 @@
 
 namespace Schoolbox\Admin\User;
 
+use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Group;
 use HouseMapper;
 use HouseResidentialMapper;
+use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\CampusCollection;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -27,6 +31,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Scrub;
+use Session;
+use User_Logger_AssumeUser;
 
 /**
  * Controller for managing school users through the admin section.
@@ -140,7 +146,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'pageCurrent' => user,
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst(\Cfg::get('external_type')),
@@ -162,9 +168,30 @@ class Controller extends Base
     }
 
     /**
-     * Modify group membership
+     * Insert user screen
+     * @param User $user
      */
-    public function postModifyGroups()
+    public function getInsert($user)
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminUser/modify.twig',
+            'data' => [
+                'pageCurrent' => 'user',
+                'campuses' => $this->campusMapper->findAll(),
+                'roles' => $this->roleMapper->findAll(),
+                'externalDatabase' => ucfirst(\Cfg::get('external_type')),
+                'residentialHouses' => $this->houseResidentialMapper->findAll(),
+                'houses' => $this->houseMapper->findAll(),
+                'titles' => $this->userTitleMapper->findAll(),
+            ],
+            'title' => 'Admin - Users'
+        ]);
+    }
+
+    /**
+     * Add group membership
+     */
+    public function postInsertGroup()
     {
         $post = $this->getRequest()->post;
 
@@ -182,9 +209,9 @@ class Controller extends Base
     }
 
     /**
-     * Modify permissions
+     * Add service permission
      */
-    public function postModifyPermissions()
+    public function postInsertPermission()
     {
         $post = $this->getRequest()->post;
 
@@ -202,9 +229,9 @@ class Controller extends Base
     }
 
     /**
-     * Modify linked users
+     * Add linked user
      */
-    public function postModifyLinked()
+    public function postInsertLinked()
     {
         $post = $this->getRequest()->post;
 
@@ -231,7 +258,7 @@ class Controller extends Base
      * @param User $user
      * @param \Schoolbox\Resource\Folder\Model $folder
      */
-    public function getDeleteGroups($user, $folder)
+    public function getDeleteGroup($user, $folder)
     {
         $this->userAccessMapper->deleteByColumnList([
             'service' => UserAccess::SERVICE_HOMEPAGE,
@@ -243,10 +270,26 @@ class Controller extends Base
     }
 
     /**
-     * Remove a linked user from a persons account
+     * Remove a service permission from a users account
      * @param User $user
-     * @param User $linked
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param int $sid
+     * @param int $service
+     */
+    public function getDeletePermission($user, $sid, $service)
+    {
+        $this->userAccessMapper->deleteByColumnList([
+            'service' => $service,
+            'sid' => $sid,
+            'uid' => $user->getId()
+        ]);
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#permissions");
+    }
+
+    /**
+     * Remove a linked user from a persons account
+     * @param User $user Account to remove link from
+     * @param User $linked Linked user to remove
      */
     public function getDeleteLinked($user, $linked)
     {
@@ -269,7 +312,7 @@ class Controller extends Base
     /**
      * Modify user details
      */
-    public function postModifyDetails()
+    public function postDetails()
     {
         $post = $this->getRequest()->post;
 
@@ -371,5 +414,109 @@ class Controller extends Base
     {
         $this->userMapper->delete($user);
         $this->getResponse()->redirect->afterPost("/adminv2/user");
+    }
+
+    /**
+     * Send instant alert to user
+     */
+    public function postAlert()
+    {
+        $post = $this->getRequest()->post;
+
+        $userId = (int)$post['user'];
+
+        $bob = new NotificationInstanceBuilder();
+        $bob->setTitle(Scrub::text($post['body']))
+            ->setSeverity(Logger::INFO)
+            ->setNamespace('ALERT')
+            ->setHref('#')
+            ->setIcon('/images/icon.php?icon=bolt&size=64')
+            ->addTopic("notify.user.$userId")
+            ->putMeta('ttl', 30)
+            ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
+
+        $n = Notifactory::create("instant.user.$userId.alert", ConfigMapper::getInstance());
+        $n->log(Logger::INFO, json_encode($bob->build()->jsonSerialize()));
+
+        // Redirect back to modify page
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$userId}");
+    }
+
+    /**
+     * Impersonate user
+     */
+    public function postImpersonate()
+    {
+        $post = $this->getRequest()->post;
+
+        $oldSession = $_SESSION;
+
+        $sessionHandler = new Session();
+
+        if ($sessionHandler->create($post['login'])) {
+            $this->getSession()->set('previous', $oldSession);
+            $logger = new User_Logger_AssumeUser($oldSession['user'], $_SESSION['user']);
+            $logger->notify();
+            $this->getResponse()->redirect->afterPost("/");
+        } else {
+            $this->getResponse()->redirect->afterPost("/adminv2/user");
+        }
+    }
+
+    /**
+     * Update a groups access level
+     */
+    public function postUpdateGroup()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            // If assigning a group admin, demote any existing group admins
+
+            if ($post['type'] == FULL_ACCESS) {
+                $admins = $this->userAccessMapper->findByColumnList([
+                    'uid' => $post['uid'],
+                    'sid' => $post['sid'],
+                    'service' => $post['service'],
+                    'type' => FULL_ACCESS
+                ]);
+
+                /** @var UserAccess $admin */
+                foreach ($admins as $admin) {
+                    $admin->setAccessLevel(WRITE_ACCESS);
+                    $this->userAccessMapper->save($admin);
+                }
+            }
+
+            /** @var UserAccess $userAccess */
+            $userAccess = $this->userAccessMapper->findOneByColumnList([
+                'uid' => $post['uid'],
+                'sid' => $post['sid'],
+                'service' => $post['service']
+            ]);
+            $userAccess->setAccessLevel($post['type']);
+            $this->userAccessMapper->save($userAccess);
+        } catch (MapperException $e) {
+        }
+    }
+
+    /**
+     * Update a service permission level
+     */
+    public function postUpdateService()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            $userAccess = $this->userAccessMapper->findOneByColumnList([
+                'uid' => $post['uid'],
+                'sid' => $post['sid'],
+                'service' => $post['service']
+            ]);
+            $userAccess->setAccessLevel($post['type']);
+            $this->userAccessMapper->save($userAccess);
+        } catch (MapperException $e) {
+        }
     }
 }
