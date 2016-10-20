@@ -139,9 +139,6 @@ class Controller extends Base
             $this->getResponse()->redirect->to($redirect);
         }
 
-        // TODO, should the Module or Controller hydrate the $project's context + folder?
-//        $folder = $project->getFolder();
-
         /* Pump into twig-land
          */
         $this->getSelectAssessmentData($project, $assessment);
@@ -202,6 +199,12 @@ class Controller extends Base
             ]
         ];
 
+        // Do we have a returnUrl?
+        $returnUrl = $this->getRequest()->query->get('return_url');
+        if($returnUrl){
+            $data['returnUrl'] = $returnUrl;
+        }
+
         if($assessment){
             $data = array_merge($data, [
                 'allMarkTypes'   => $this->getAllMarkTypes($assessment),
@@ -222,7 +225,6 @@ class Controller extends Base
         if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
         }
-        //var_dump($data);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
