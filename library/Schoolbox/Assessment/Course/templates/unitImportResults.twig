@@ -47,12 +47,12 @@
             var unit = $('#' + $(e.target).attr('data-collapser'));
             if (unit.hasClass('hide')) {
                 unit.removeClass('hide');
-                $(e.target).removeClass('icon-up-arrow');
-                $(e.target).addClass('icon-down-arrow');
-            } else {
-                unit.addClass('hide');
                 $(e.target).removeClass('icon-down-arrow');
                 $(e.target).addClass('icon-up-arrow');
+            } else {
+                unit.addClass('hide');
+                $(e.target).removeClass('icon-up-arrow');
+                $(e.target).addClass('icon-down-arrow');
             }
         });
 
