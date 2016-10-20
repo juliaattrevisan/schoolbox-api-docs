@@ -62,23 +62,28 @@ class DataSource
     }
 
     /**
-     * Find all Participants for a given assessment context.
+     * Find all Participants for a given assessment.
      *
      * This is a union of:
      * * any students in the context's folder's class
      * * any read-level members of the context's folder's group
+     * * anyone who has submitted a Response for this assessment
+     * * anyone who has been given Feedback for this assessment
      *
-     * @param AssessmentContext $context
+     * @param IAssessable $assessment
      * @return Collection|Participant[]
      */
-    public function findForContext(AssessmentContext $context)
+    public function findForAssessment(IAssessable $assessment)
     {
         // This will use:
         // External_ClassInterface
         // UserAccessMapper
+        // various data sources depending on the variant of $assessment
+        // This will probably retrieve all Feedbacks and Responses for $assessment
 
         $participants = new Collection();
 
+        $context = $assessment->getContext();
         if ($context instanceof UnitImplementation) {
             // Unit implementations have no participants
             return $participants;
@@ -104,25 +109,14 @@ class DataSource
         // Consider caching $users
 
         // Convert $users into a participant list
+        foreach ($users as $user) {
+            $participants->add(
+                new Participant($user, $assessment)
+            );
+        }
+
+        // TODO add feedback and responses
 
         return $participants;
-    }
-
-    /**
-     * Find all Participants for a given assessment.
-     *
-     * This is a union of:
-     * * the result of `findForContext()` for this assessment's context
-     * * anyone who has submitted a Response for this assessment
-     * * anyone who has been given Feedback for this assessment
-     *
-     * @param IAssessable $assessment
-     * @return Collection|Participant[]
-     */
-    public function findForAssessment(IAssessable $assessment)
-    {
-        // This will use:
-        // various data sources depending on the variant of $assessment
-        // This will probably retrieve all Feedbacks and Responses for $assessment
     }
 }
