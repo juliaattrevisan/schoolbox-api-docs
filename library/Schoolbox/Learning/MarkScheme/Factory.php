@@ -108,14 +108,6 @@ class Factory
                 return new TotalMarkWholeNumber($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
-            case MarkType::TYPE_FREE:
-//                // This is the ancient free grade mark type.
-//                // As far as I know it was never migrated, but I still need it to not crash and die.
-                //
-                // TODO ^^ Yes you are right. It does still exist in DB. I've temporarily uncommented-out this case
-                // TODO ^^ until we migrate (it was causing page to crash for me)
-                // TODO - Consider migrating all 'TYPE_FREE' -> 'TYPE_NONE' in 'DueWork' table
-                return new None();
             default:
                 throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
         }
