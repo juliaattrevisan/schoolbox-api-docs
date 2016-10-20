@@ -15,9 +15,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -37,7 +34,6 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 
-use Schoolbox\Learning\Assessment\AssessmentContextType as ContextType;
 
 class Factory
 {
@@ -170,7 +166,7 @@ class Factory
      * based on the arg
      *
      * @param IAssessable|null $assessment
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      */
     public function produce(IAssessable $assessment = null)
     {
@@ -184,60 +180,21 @@ class Factory
     /**
      * Produce object
      *
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
     private function produceNew()
     {
-        /* Check types exist
-         */
-        switch($this->getType()) {
-            case AssessmentType::TYPE_PROJECT:
-                $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
-                break;
-
-            case AssessmentType::TYPE_DUE_WORK:
-                $assessment = new DueWork();
-                break;
-
-            case AssessmentType::TYPE_TASK:
-                $assessment = new Task();
-                break;
-
-            case AssessmentType::TYPE_QUIZ:
-                $assessment = new Quiz();
-                break;
-
-            default:
-                throw new \DomainException('select a valid assessment type');
+        // Instantiate empty Assessment model
+        $assessment = AssessmentType::stringToObject($this->getType());
+        if($assessment instanceof Project){
+            $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
 
-        // Figure out which context it's in
-        // TODO make sure these are real
-        $context = null;
-        switch ($this->getContextType()) {
-            case ContextType::TYPE_FOLDER:
-                $context = new Folder();
-                break;
-
-            case ContextType::TYPE_UNIT_IMPLEMENTATION:
-                $context = new UnitImplementation();
-                break;
-
-            case ContextType::TYPE_UNIT_SPECIFICATION:
-                $context = new UnitSpecification();
-                break;
-
-            case ContextType::TYPE_PROJECT:
-                $context = new Project();
-                break;
-
-            default:
-                throw new \DomainException('select a valid context');
-        }
-
+        // Attach context
+        $context = AssessmentContextType::stringToObject($this->getContextType());
         $assessment->setContext($context->setId($this->getContextIdentifier()));
 
         return $this->produceFromExistingAssessment($assessment);
@@ -247,7 +204,7 @@ class Factory
      * Produce object from an existing assessment
      *
      * @param IAssessable $assessment
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException

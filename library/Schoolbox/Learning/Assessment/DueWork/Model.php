@@ -94,7 +94,7 @@ class Model extends AbstractAssessment
          */
         parent::__construct();
 
-        $this->setAllFiles(new Collection());
+        $this->setAttachedFiles(new Collection());
         $this->setType(new DueWorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());

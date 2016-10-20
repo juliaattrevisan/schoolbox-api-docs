@@ -297,6 +297,9 @@ class Controller extends Base
      * Save the Assessment's data
      *
      * This saves the combination of common+assessmentType-specific details
+     *
+     * @api POST /learning/assessment/create
+     * @level 165
      */
     public function postCreateAssessment()
     {
@@ -312,11 +315,13 @@ class Controller extends Base
 
                 /* Continue as normal
                  */
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/assessmentList.twig", [
+                $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/assessmentList.twig";
+                $data = [
                     'types'         => $types,
                     'assessmentId'  => $assessment->getId(),
                     'allReturnUrls' => $this->getAllReturnUrls($assessment),
-                ]));
+                ];
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
             }
             // Else we created a DueWork / Quiz / Task.
             // Redirect somewhere.
@@ -327,7 +332,7 @@ class Controller extends Base
 
                 // Explicitly specified?
                 if($returnUrl) {
-                    $returnUrl = $this->returnUrlDecode($returnUrl);
+                    $returnUrl = $this->decodeReturnUrl($returnUrl);
                 } else {
                     // Determine appropriate location
                     $context = $assessment->getContext();
@@ -416,7 +421,7 @@ class Controller extends Base
 
             // Explicitly specified?
             if($returnUrl) {
-                $returnUrl = $this->returnUrlDecode($returnUrl);
+                $returnUrl = $this->decodeReturnUrl($returnUrl);
             } else {
                 // Determine appropriate location
                 $context = $assessment->getContext();
@@ -659,21 +664,6 @@ class Controller extends Base
             if (!$assessment->isValidDates()) {
                 throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
             }
-
-            /* Save the $asseessment
-             * Try to figure out what the redirect destination should be
-             * Throw an error if some kind of context configuration is wrong
-             */
-            $transactor = new Transactor(
-                $assessment,
-                $this->getFolderMapper(),
-                $this->getUnitImplementationDataSource(),
-                $this->getUnitSpecificationDataSource(),
-                $this->getAssessmentDataSource(),
-                $this->getRouter()
-            );
-
-            $transactionSummary = $transactor->transact();
         }
         catch (\DomainException $e) {
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);
@@ -685,7 +675,7 @@ class Controller extends Base
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
 
-        return $transactionSummary;
+        return $assessment;
     }
 
     /* Utility methods - these can probably be refactored elsewhere
@@ -708,7 +698,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?returnUrl=' . $this->returnUrlEncode($returnUrl);
+        $suffix = '?returnUrl=' . $this->encodeReturnUrl($returnUrl);
 
         $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
@@ -734,7 +724,7 @@ class Controller extends Base
      * @param string $returnUrl
      * @return string
      */
-    private function returnUrlEncode($returnUrl)
+    private function encodeReturnUrl($returnUrl)
     {
         return urlencode(base64_encode($returnUrl));
     }
@@ -745,7 +735,7 @@ class Controller extends Base
      * @param string $encodedReturnUrl
      * @return string
      */
-    private function returnUrlDecode($encodedReturnUrl)
+    private function decodeReturnUrl($encodedReturnUrl)
     {
         return base64_decode(urldecode($encodedReturnUrl));
     }
@@ -986,6 +976,7 @@ class Controller extends Base
             return $this->getSummaryStudent($assessment);
         }
 
+        // TODO - what happens here when the $assessment is not a Project, and the user is not a student?
         return $this->getSummaryProject($assessment);
     }
 
@@ -1037,7 +1028,6 @@ class Controller extends Base
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'assessment'  => $assessment,
             'responses'   => $assessment->getResponses(),
-            'project'     => $project,
             'student'     => $student,
             'user'        => $this->getUser(),
             'attachzone'  => $this->getAttachZone(),

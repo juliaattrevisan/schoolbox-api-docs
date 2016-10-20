@@ -27,6 +27,14 @@ interface AssessmentContext
     public function getId();
 
     /**
+     * Sets this assessment context's ID.
+     *
+     * @param int $id
+     * @return static
+     */
+    public function setId($id);
+
+    /**
      * Retrieves the title of the assessment context
      *
      * @return string
