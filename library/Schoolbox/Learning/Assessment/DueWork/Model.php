@@ -38,7 +38,7 @@ class Model extends AbstractAssessment
      *
      * @var Collection|File[]
      */
-    protected $allFiles;
+    protected $attachedFiles;
 
     /**
      * The "type" of the Due Work
@@ -93,9 +93,9 @@ class Model extends AbstractAssessment
          */
         parent::__construct();
 
-        $this->setAllFiles(new Collection());
         $this->setType(new Type());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
+        $this->setAttachedFiles(new Collection());
     }
 
     /**
@@ -116,6 +116,35 @@ class Model extends AbstractAssessment
     {
         return 'icon-due-work';
     }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string|null
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        $normalised = false;
+        return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        $normalised = true;
+        return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /* Getters/Setters
+     */
 
     /**
      * This DueWork accepts no submissions online
@@ -262,27 +291,6 @@ class Model extends AbstractAssessment
         return $this;
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Collection|File[]
-     */
-    public function getAllFiles()
-    {
-        return $this->allFiles;
-    }
-
-    /**
-     * @param Collection|File[] $allFiles
-     * @return self
-     */
-    public function setAllFiles($allFiles)
-    {
-        $this->allFiles = $allFiles;
-        return $this;
-    }
-
     /**
      * @return Type
      */
@@ -374,32 +382,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * DueWork does not use the MarkScheme. It merely returns the cached value.
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return string|null
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly)
-    {
-        $normalised = false;
-        return $this->getMark($user, $publishedOnly, $normalised);
-    }
-
-    /**
-     * DueWork does not use the MarkScheme. It merely returns the cached value.
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return float|null
-     */
-    public function getNormalisedMark(User $user, $publishedOnly)
-    {
-        $normalised = true;
-        return $this->getMark($user, $publishedOnly, $normalised);
-    }
-
-    /**
      * @return boolean
      */
     public function getHasMarkPerCapability()
@@ -414,6 +396,24 @@ class Model extends AbstractAssessment
     public function setHasMarkPerCapability($hasMarkPerCapability)
     {
         $this->hasMarkPerCapability = $hasMarkPerCapability;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+    /**
+     * @param Collection $attachedFiles
+     * @return $this
+     */
+    public function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
         return $this;
     }
 }

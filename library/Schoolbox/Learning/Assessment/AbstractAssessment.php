@@ -61,11 +61,6 @@ abstract class AbstractAssessment implements IAssessable
     protected $closeAt;
 
     /**
-     * @var Collection
-     */
-    protected $attachedFiles;
-
-    /**
      * @var float
      */
     protected $weight;
@@ -122,7 +117,6 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->setAttachedFiles(new Collection());
         $this->responses = new Collection();
         $this->feedbacks = new Collection();
     }
@@ -566,23 +560,6 @@ abstract class AbstractAssessment implements IAssessable
     public function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
-        return $this;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getAttachedFiles()
-    {
-        return $this->attachedFiles;
-    }
-
-    /**
-     * @param Collection $attachedFiles
-     */
-    public function setAttachedFiles($attachedFiles)
-    {
-        $this->attachedFiles = $attachedFiles;
         return $this;
     }
 

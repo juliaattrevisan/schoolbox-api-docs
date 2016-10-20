@@ -128,11 +128,6 @@ class Factory
     protected $closeAt;
 
     /**
-     * @var array
-     */
-    protected $attachedFiles = [];
-
-    /**
      * Factory constructor.
      * @param User $creator
      * @param $post (an array of post vars from the create/update forms)
@@ -150,13 +145,6 @@ class Factory
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
         $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
 
-        /* Check if any attached files existed in POST data
-         * Use their array if it existed
-         */
-        if (is_array($post['attachment'])) {
-            $this->setAttachedFiles($post['attachment']);
-        }
-
         /* Projects need this to instantiate
          */
         $this->setSummator($post['summator']);
@@ -169,11 +157,22 @@ class Factory
         $this->setHasRubric(trim($post['hasRubric']));
         $this->setHasMarkPerCapability(trim($post['hasMarkPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
+        /* Check if any attached files existed in POST data
+         * Use their array if it existed
+         */
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFiles($post['attachment']);
+        }
 
         /* Task needs this to instantiate correctly
          */
         $this->setHasSelfAssessed(trim($post['hasSelfAssessed']));
         $this->setUrl(trim($post['url']));
+        /* Set just a single attached file for task
+         */
+        if (is_array($post['attachment'])) {
+            $this->setAttachedFile(isset($this->getAttachedFiles()[0]) ? $this->getAttachedFiles()[0] : null);
+        }
 
         /* Quiz needs this to instantiate correctly
          */
@@ -288,13 +287,15 @@ class Factory
                 $this->getGradingScheme(),
                 $this->getHasRubric(),
                 $this->getHasMarkPerCapability(),
-                $this->getMaxMark()
+                $this->getMaxMark(),
+                $this->getAttachedFiles()
             );
 
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
-                $this->getUrl()
+                $this->getUrl(),
+                $this->getAttachedFile()
             );
 
         } elseif ($assessment instanceof Quiz) {
@@ -358,12 +359,6 @@ class Factory
             ->setCloseAt($closeAt)
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setUpdatedAt(\Alaress_Date_Format::now());
-
-        /* TODO: Attach files to instance
-         */
-        foreach ($this->getAttachedFiles() as $currentFile) {
-            $assessment->getAttachedFiles()->add($currentFile);
-        }
 
         /* Decorate with Assessable-specific data
          */
@@ -534,24 +529,6 @@ class Factory
     protected function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAttachedFiles()
-    {
-        return $this->attachedFiles;
-    }
-
-    /**
-     * @param array $attachedFiles
-     * @return $this
-     */
-    protected function setAttachedFiles($attachedFiles)
-    {
-        $this->attachedFiles = $attachedFiles;
         return $this;
     }
 

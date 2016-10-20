@@ -60,7 +60,7 @@
     <div class="small-12 columns">
         <label for="hasSelfAssessed">Allow self-assessed?</label>
         <div class="switch round">
-            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.hasSelfAssessed %}checked="checked"{% endif %} />
+            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.isSelfAssessed %}checked="checked"{% endif %} />
             <label for="hasSelfAssessed">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>

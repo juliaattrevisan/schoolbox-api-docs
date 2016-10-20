@@ -437,7 +437,11 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
+        $data = [
+            'returnUrl' => $assessmentInfo['returnUrl']
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**

@@ -23,11 +23,13 @@ class Decorator implements DecoratorInterface
      *
      * @param $hasSelfAssessed
      * @param $url
+     * @param $attachedFile
      */
-    public function __construct($hasSelfAssessed, $url)
+    public function __construct($hasSelfAssessed, $url, $attachedFile)
     {
         $this->setHasSelfAssessed($hasSelfAssessed);
         $this->setUrl($url);
+        $this->setAttachedFile($attachedFile);
     }
 
     /**
@@ -46,7 +48,7 @@ class Decorator implements DecoratorInterface
         // (ripped out of old task save form)
         $url = $this->getUrl();
         if (empty($url)) {
-            $attachment = $assessment->getAttachedFiles()->first();
+            $attachment = $this->getAttachedFile();
             if (!empty($attachment)) {
                 $folderPrefix = \Schoolbox\Resource\Browser\NodeFactory::SBFS . '.folder:';
                 if (strpos($attachment, $folderPrefix) === 0) {
