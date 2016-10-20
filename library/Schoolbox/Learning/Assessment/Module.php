@@ -17,6 +17,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmi
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
+use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -46,12 +50,12 @@ class Module extends BaseModule
 
                 /* Get 'Create Assessment' form in a specific context. Optionally declare Assessment type
                  */
-                '/assessment/folder/{folderId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInFolder',
+                '/assessment/folder/{folderId}{/assessmentTypeTitle}'     => 'getSelectAssessmentInFolder',
 
                 // May contain a 'return_url' GET parameter to return to project modification page
-                '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
-                '/assessment/unit/{unitId}{/assessmentTypeTitle}'       => 'getSelectAssessmentInUnitImplementation',
-                '/assessment/unitspec/{unitId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInUnitSpecification',
+                '/assessment/project/{projectId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInProject',
+                '/assessment/unit/{unitId}{/assessmentTypeTitle}'         => 'getSelectAssessmentInUnitImplementation',
+                '/assessment/unitspec/{unitSpecId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
                 /* Get a 'Modify Assessment' form to edit an existing assessment
                  */
@@ -106,6 +110,32 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getSelectAssessmentInFolder|getSelectAssessmentInProject|getSelectAssessmentInUnitImplementation|getSelectAssessmentInUnitSpecification)',
+            function ($params) {
+
+                $args = [];
+                $args['assessment'] = $params['assessmentTypeTitle']
+                    ? AssessmentType::stringToObject($params['assessmentTypeTitle'])
+                    : null;
+
+                // TODO add mapper error handling
+                if(array_key_exists('folderId', $params)){
+                    $args['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+                } elseif(array_key_exists('projectId', $params)){
+                    $args['project'] = $this->getAssessmentMapperProxy()->findById($params['projectId']);
+                } elseif(array_key_exists('unitId', $params)){
+                    $args['unit'] = $this->getUnitImplMapperProxy()->findById($params['unitId']);
+                } elseif(array_key_exists('unitSpecId', $params)){
+                    $args['unitSpec'] = $this->getUnitSpecMapperProxy()->findById($params['unitSpecId']);
+                }
+
+                return $args;
+            }
+        );
+
+
         $this->addRoutePreload(
             $matcher,
             '(?:getStatus|getSummary|getStudentAssessment)',
@@ -298,6 +328,19 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF)
                 )
             );
+
+
+        $ruleRegexp = '(?:getSelectAssessmentInFolder|getSelectAssessmentInProject|getSelectAssessmentInUnitImplementation|getSelectAssessmentInUnitSpecification)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                $ruleRegexp,
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
     }
 
 
@@ -329,6 +372,38 @@ class Module extends BaseModule
     }
 
     /**
+     * @return UnitImplMapperProxy
+     */
+    protected function getUnitImplMapperProxy()
+    {
+        return $this->injector->get('unitImplementationDataSource');
+    }
+
+    /**
+     * @return UnitSpecMapperProxy
+     */
+    protected function getUnitSpecMapperProxy()
+    {
+        return $this->injector->get('unitSpecificationDataSource');
+    }
+
+//    /**
+//     * @return CourseImplMapperProxy
+//     */
+//    protected function getCourseImplMapperProxy()
+//    {
+//        return $this->injector->get('courseImplementationDataSource');
+//    }
+//
+//    /**
+//     * @return CourseSpecMapperProxy
+//     */
+//    protected function getCourseSpecMapperProxy()
+//    {
+//        return $this->injector->get('courseSpecificationDataSource');
+//    }
+
+    /**
      * @return StudentSubmissionMapper
      */
     protected function getStudentSubmissionMapper()
@@ -350,6 +425,14 @@ class Module extends BaseModule
     protected function getStorageMapper()
     {
         return $this->getMapperFactory()->get(StorageMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
 }
