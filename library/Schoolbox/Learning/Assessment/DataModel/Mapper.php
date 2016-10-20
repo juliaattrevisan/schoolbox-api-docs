@@ -287,22 +287,8 @@ class Mapper extends BaseMapper
         // Due work files
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
 
-        // Load context for projects separately
-        // Attempt to do it all in one query
-        /** @var Model[] $contextProjects */
-        if (!empty($contextProjectIds)) {
-            $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
-            foreach ($modelList as $model) {
-                // This has to be a project
-                $context = $model->getAssessmentContext();
-                if ($context instanceof ProjectModel) {
-                    $contextId = $context->getAssessmentModel()->getId();
-                    if (isset($contextProjects[$contextId])) {
-                        $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
-                    }
-                }
-            }
-        }
+        // Project contexts
+        $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
 
         return $modelList;
     }
@@ -348,6 +334,31 @@ class Mapper extends BaseMapper
                 }
                 if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
                     $submodel->setAttachments($files[$submodel->getId()]);
+                }
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with context projects.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $contextProjectIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
+    {
+        if (!empty($contextProjectIds)) {
+            $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
+            foreach ($modelList as $model) {
+                // This has to be a project
+                $context = $model->getAssessmentContext();
+                if ($context instanceof ProjectModel) {
+                    $contextId = $context->getAssessmentModel()->getId();
+                    if (isset($contextProjects[$contextId])) {
+                        $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
+                    }
                 }
             }
         }
