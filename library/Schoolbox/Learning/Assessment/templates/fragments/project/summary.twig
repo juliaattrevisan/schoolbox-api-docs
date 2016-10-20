@@ -33,7 +33,7 @@
                                     <div class="card wrap-down small-12">
                                         <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
 
-                                        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}">
+                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
                                             </h3>
