@@ -19,8 +19,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
-use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
-use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -399,22 +397,6 @@ class Module extends BaseModule
     {
         return $this->injector->get('unitSpecificationDataSource');
     }
-
-//    /**
-//     * @return CourseImplMapperProxy
-//     */
-//    protected function getCourseImplMapperProxy()
-//    {
-//        return $this->injector->get('courseImplementationDataSource');
-//    }
-//
-//    /**
-//     * @return CourseSpecMapperProxy
-//     */
-//    protected function getCourseSpecMapperProxy()
-//    {
-//        return $this->injector->get('courseSpecificationDataSource');
-//    }
 
     /**
      * @return StudentSubmissionMapper
