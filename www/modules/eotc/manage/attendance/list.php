@@ -45,32 +45,18 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $externalHandler = new \External_Synergetic_Class();
     $allFiletypes    = $externalHandler->findFiletypes();
 
-    // Lame hardcoded filetype lameness. LAAAAAME [SB-5494]
-    $hardcodedFiletypes = array(
-        'A' => 'Academic',
-        'C' => 'Cultural',
-        'L' => 'Leadership',
-        'M' => 'Music',
-        'R' => 'Service',
-        'S' => 'Sports',
-        'V' => 'Awards',
-        'Z' => 'Miscellaneous',
-    );
-
     $this->setVar('filetype_block', '');
 
     if (is_array($allFiletypes) && count($allFiletypes)) {
         foreach ($allFiletypes as $currentFiletype) {
-            if (array_key_exists($currentFiletype['Code'], $hardcodedFiletypes)) {
-                $this->setVar(
-                    array(
-                        'FILETYPE_ID'   => $currentFiletype['Code'],
-                        'FILETYPE_NAME' => $currentFiletype['Description']
-                    )
-                );
+            $this->setVar(
+                array(
+                    'FILETYPE_ID'   => $currentFiletype['Code'],
+                    'FILETYPE_NAME' => $currentFiletype['Description']
+                )
+            );
 
-                $this->parse('filetype_block', 'filetype', true);
-            }
+            $this->parse('filetype_block', 'filetype', true);
         }
     }
 
