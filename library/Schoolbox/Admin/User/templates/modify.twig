@@ -1,5 +1,7 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+<div class="row">
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+</div>
 
 <div class="actions-small-2 row">
     <div class="list-item">
@@ -11,7 +13,7 @@
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a class="icon-staff-students" title="{ASSUME_PROMPT}" data-assimilator>Impersonate</a></li>
+        <li><a class="icon-staff-students" title="{% if user.enabled %}Login as user{% else %}Account Disabled{% endif %}" data-assimilator>Impersonate</a></li>
         <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
         <li><a class="icon-delete" title="Delete User" data-delete>Delete User</a></li>
     </ul>
@@ -21,22 +23,26 @@
     <input type="hidden" name="login" value="{{ user.username }}" />
 </form>
 
+{# User detail section #}
+
 <div class="row">
     <div class="small-12 island">
         <h3 class="subheader">User Detail</h3>
         <section class="content">
             <div class="row">
-                <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails" data-modify-user-form>
+                <form method="POST" action="{{ routeLookup('adminUser.postModifyDetails') }}" data-validatable-as="userDetails" data-modify-user-form>
                     <input type="hidden" name="type" value="modify" />
                     <input type="hidden" name="userID" value="{{ user.id }}" />
 
                     <div class="small-12 medium-6 island">
+
                         <label for="title">Title</label>
                         <select id="title" name="title">
                             {% for title in titles %}
                                 <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
                             {% endfor %}
                         </select>
+
                         <label for="firstname">First Name</label>
                         <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}" data-relation="name" />
 
@@ -115,7 +121,7 @@
                             {% endfor %}
                         </select>
 
-                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnabled %}checked{% endif %} />
+                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %} />
                         <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
 
                         <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
@@ -127,13 +133,13 @@
                         <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
                         <label for="local_email" class="checkbox-label">Email Address from Username</label>
 
-                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.mailHandler %}checked{% endif %}/>
+                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
                         <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
 
                         <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
                         <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
 
-                        <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {SUPERUSER_CHECKED} />
+                        <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
                         <label for="superuser" class="checkbox-label">Superuser</label>
 
                         <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1" {% if user.enabled %}checked{% endif %} />
@@ -171,7 +177,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h3 class="subheader">Groups</h3>
+        <h3 class="subheader" id="groups">Groups</h3>
         <section>
             <ul class="action-list">
                 <li class="actions-small-1 row-header">
@@ -222,14 +228,14 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-delete" title="Remove" href="/group/modifyForm.php?delete={{ user.id }}&categoryID={{ folder.id }}"></a>
+                                <a class="icon-delete" title="Remove" href="{{ routeLookup('adminUser.getDeleteGroups', {userId: user.id, folderId: folder.id}) }}"></a>
                             </nav>
                         </li>
                     {% endfor %}
                 {% endfor %}
 
                 <li class="actions-small-1">
-                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
+                    <form action="{{ routeLookup('adminUser.postModifyGroups') }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                         <div class="card small-7">
                             <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                 <option value="">Select a Group</option>
@@ -320,7 +326,7 @@
                 {% endfor %}
 
                 <li class="actions-small-1">
-                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
+                    <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postModifyPermissions') }}" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
                         <div class="small-4 card">
                             <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
                                 <option value="" data-identifier="none">Select Service</option>
@@ -390,13 +396,13 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="/adminv2/userForm.php?deleteUserLink={{ user.id }}&linkedUser={{ linkedUser.id }}" class="icon-delete" title="Remove"></a>
+                            <a href="{{ routeLookup('adminUser.getDeleteLinked', {userId: user.id, linkedId: linkedUser.id}) }}" class="icon-delete" title="Remove"></a>
                         </nav>
                     </li>
                 {% endfor %}
 
                 <li class="actions-small-1">
-                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd" class="list-item">
+                    <form action="{{ routeLookup('adminUser.postModifyLinked') }}" method="post" id="linkedUserAdd" class="list-item">
                         <div class="small-12 card">
                             <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                         </div>

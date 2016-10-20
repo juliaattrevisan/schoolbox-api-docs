@@ -39,6 +39,14 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getModify', $basePath, "/modify/{userId}");
+        $this->addGetRoute($router, 'getDeleteGroups', $basePath, "/delete/groups/{userId}/{folderId}");
+        $this->addGetRoute($router, 'getDeleteLinked', $basePath, "/delete/linked/{userId}/{linkedId}");
+
+        $this->addPostRoute($router, 'postModifyDetails', $basePath, "/modify/details");
+        $this->addPostRoute($router, 'postModifyGroups', $basePath, "/modify/groups");
+        $this->addPostRoute($router, 'postModifyPermissions', $basePath, "/modify/permissions");
+        $this->addPostRoute($router, 'postModifyLinked', $basePath, "/modify/linked");
+
     }
 
     /**
@@ -60,10 +68,21 @@ class Module extends BaseModule
     {
         $this
             ->addRoutePreload($matcher, '.*', function($params) {
+                $returnParams = [];
+
                 if (array_key_exists('userId', $params)) {
-                    return ['user' => $this->getUserMapper()->findById($params['userId']),];
+                    $returnParams['user'] = $this->getUserMapper()->findById($params['userId']);
                 }
-                return [];
+
+                if (array_key_exists('folderId', $params)) {
+                    $returnParams['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+                }
+
+                if (array_key_exists('linkedId', $params)) {
+                    $returnParams['linked'] = $this->getFolderMapper()->findById($params['linkedId']);
+                }
+
+                return $returnParams;
             })
         ;
     }
@@ -108,5 +127,13 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 }

@@ -7,9 +7,16 @@
 
 namespace Schoolbox\Admin\User;
 
+use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
+use Group;
 use HouseMapper;
 use HouseResidentialMapper;
+use Schoolbox\Campus;
+use Schoolbox\CampusCollection;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -19,6 +26,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
+use Scrub;
 
 /**
  * Controller for managing school users through the admin section.
@@ -100,8 +108,8 @@ class Controller extends Base
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseResidentialMapper $houseResidentialMapper,
-        HouseMapper $houseMapper)
-    {
+        HouseMapper $houseMapper
+    ) {
         $this->cmsLogMapper = $cmsLogMapper;
         $this->userLogMapper = $userLogMapper;
         $this->folderMapper = $folderMapper;
@@ -121,35 +129,246 @@ class Controller extends Base
     public function getModify($user)
     {
         if (\Cfg::get('external_enable') && \Cfg::get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
-            $synuser = new \External_Synergetic_User();
-            $fileSemester = $synuser->getCurrentSemester($user->getExternalId());
-            $fileYear = $synuser->getCurrentYear($user->getExternalId());
-        }
-        else {
+            $externalUser = new \External_Synergetic_User();
+            $fileSemester = $externalUser->getCurrentSemester($user->getExternalId());
+            $fileYear = $externalUser->getCurrentYear($user->getExternalId());
+        } else {
             $fileSemester = '';
             $fileYear = '';
         }
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
-            'data'     => [
-                'pageCurrent'       => basename($this->getRequest()->query->get('page')),
-                'campuses'          => $this->campusMapper->findAll(),
-                'roles'             => $this->roleMapper->findAll(),
-                'externalDatabase'  => ucfirst(\Cfg::get('external_type')),
+            'data' => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'campuses' => $this->campusMapper->findAll(),
+                'roles' => $this->roleMapper->findAll(),
+                'externalDatabase' => ucfirst(\Cfg::get('external_type')),
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
-                'houses'            => $this->houseMapper->findAll(),
-                'titles'            => $this->userTitleMapper->findAll(),
-                'fileYear'          => $fileYear,
-                'fileSemester'      => $fileSemester,
-                'folders'           => $this->folderMapper->findAll()->sortBy('name', 'asc'),
-                'user'              => $user,
-                'userAccess'        => $this->userAccessMapper->findAllGroupsForUser($user),
-                'userPermissions'   => $this->userAccessMapper->findAllForUser($user),
-                'userLog'           => $this->userLogMapper->findByColumn('username', $user->getUsername())->sortBy('date', 'desc')->limit(0, 10),
-                'cmsLog'            => $this->cmsLogMapper->findByUser($user, 10)->sortBy('time', 'desc')
+                'houses' => $this->houseMapper->findAll(),
+                'titles' => $this->userTitleMapper->findAll(),
+                'fileYear' => $fileYear,
+                'fileSemester' => $fileSemester,
+                'folders' => $this->folderMapper->findAll()->sortBy('name', 'asc'),
+                'user' => $user,
+                'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
+                'userPermissions' => $this->userAccessMapper->findAllForUser($user),
+                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername())->sortBy('date', 'desc')->limit(0, 10),
+                'cmsLog' => $this->cmsLogMapper->findByUser($user, 10)->sortBy('time', 'desc')
             ],
             'title' => 'Admin - Users'
         ]);
+    }
+
+    /**
+     * Modify group membership
+     */
+    public function postModifyGroups()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            $userAccess = new UserAccess();
+            $userAccess->setService(UserAccess::SERVICE_HOMEPAGE);
+            $userAccess->setUser($this->userMapper->findById($post['uid']));
+            $userAccess->setAccessLevel($post['type']);
+            $userAccess->setServiceIdentifier($post['sid']);
+            $this->userAccessMapper->save($userAccess);
+        } catch (MapperException $e) {
+        }
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#groups");
+    }
+
+    /**
+     * Modify permissions
+     */
+    public function postModifyPermissions()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            $userAccess = new UserAccess();
+            $userAccess->setService($post['service']);
+            $userAccess->setUser($this->userMapper->findById($post['uid']));
+            $userAccess->setAccessLevel($post['type']);
+            $userAccess->setServiceIdentifier(empty($post['sid']) ? 0 : $post['sid']);
+            $this->userAccessMapper->save($userAccess);
+        } catch (MapperException $e) {
+        }
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#permissions");
+    }
+
+    /**
+     * Modify linked users
+     */
+    public function postModifyLinked()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            $originalUser = $this->userMapper->findById($post['userID']);
+
+            foreach ($post['linkUser'] as $userId) {
+                try {
+                    $linkedUser = $this->userMapper->findById($userId);
+                    $originalUser->getLinkedUser()->add($linkedUser);
+                } catch (MapperException $e) {
+                }
+            }
+
+            $this->userMapper->save($originalUser);
+        } catch (MapperException $e) {
+        }
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['userID']}#linked");
+    }
+
+    /**
+     * Remove a group from a users account
+     * @param User $user
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    public function getDeleteGroups($user, $folder)
+    {
+        $this->userAccessMapper->deleteByColumnList([
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'sid' => $folder->getId(),
+            'uid' => $user->getId()
+        ]);
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#groups");
+    }
+
+    /**
+     * Remove a linked user from a persons account
+     * @param User $user
+     * @param User $linked
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    public function getDeleteLinked($user, $linked)
+    {
+        $linkedUserList = new Collection();
+
+        foreach ($user->getLinkedUser() as $linkedUser) {
+            if ($linkedUser->getId() != $linked->getId()) {
+                $linkedUserList->add($linkedUser);
+            }
+        }
+
+        $user->setLinkedUser($linkedUserList);
+
+        $this->userMapper->save($user);
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#linked");
+    }
+
+
+    /**
+     * Modify user details
+     */
+    public function postModifyDetails()
+    {
+        $post = $this->getRequest()->post;
+
+        $passwordService = new PasswordService();
+
+        if (is_numeric($post['userID']) && $post['modusername']) {
+
+            // Modify existing user
+
+            try {
+                $user = $this->userMapper->findById($post['userID']);
+            } catch (MapperException $e) {
+                // User could not be found
+                error(31);
+                exit;
+            }
+
+            // Username check - if any other user has this username, abort
+            foreach ($this->userMapper->findByColumn('username', $post['modusername']) as $userWithUsername) {
+                if ($userWithUsername->getId() != $user->getId()) {
+                    error(138);
+                    exit;
+                }
+            }
+        } else {
+
+            if ($post['modusername']) {
+                // Username check - if any other user has this username, abort
+                if ($this->userMapper->countByColumn('username', $post['modusername']) > 0) {
+                    error(138);
+                    exit;
+                }
+            }
+        }
+
+        if (!isset($user)) {
+
+            // Creating a new user
+
+            $user = new \Schoolbox\User();
+
+            // Set password
+
+            $user->setPassword($post['modpassword'] == '' ? null : $passwordService->hash($post['modpassword']));
+
+        } else {
+
+            // Updating an existing user, only password only if the user edited the textbox
+
+            if ($post['modpassword'] != 'donotchange') {
+                $user->setPassword($passwordService->hash($post['modpassword']));
+            }
+        }
+
+        $user->setTitle($post['title']);
+        $user->setFirstname($post['firstname']);
+        $user->setLastname($post['lastname']);
+        $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
+        $user->getRole()->setId($post['group']);
+        $user->setAltEmail($post['alt_email']);
+        $user->setYear($post['year'] == '' ? null : $post['year']);
+        $user->getSchoolHouse()->setId($post['house']);
+        $user->getResidentialHouse()->setId($post['residential_house']);
+        $user->setEportfolioEnable(!empty($post['eportfolio']));
+        $user->setHideContacts(!empty($post['hide_contacts']));
+        $user->setHideTimetable(!empty($post['hide_timetable']));
+        $user->setLocalEmail(!empty($post['local_email']));
+        $user->setUseInternalMail(!empty($post['mail_handler']));
+        $user->setWebmail(!empty($post['webmail']));
+        $user->setSuperuser(isset($post['superuser']));
+        $user->setUsername($post['modusername']);
+        $user->setEnabled(isset($post['account_enabled']));
+
+        if (is_array($post['campus']) && count($post['campus']) || $post['defaultCampus']) {
+            foreach ($post['campus'] as $campusId) {
+                $campus = new Campus();
+                $campus->setId($campusId);
+                if ($campusId == $post['defaultCampus']) {
+                    $user->setDefaultCampus($campus);
+                }
+                $user->getCampusCollection()->add($campus);
+            }
+        }
+
+        // Save the user
+
+        $this->userMapper->save($user);
+
+        // Redirect back to modify page
+
+        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}");
+    }
+
+    /**
+     * Delete a user
+     * @param User $user
+     */
+    public function getDeleteUser($user)
+    {
+        $this->userMapper->delete($user);
+        $this->getResponse()->redirect->afterPost("/adminv2/user");
     }
 }
