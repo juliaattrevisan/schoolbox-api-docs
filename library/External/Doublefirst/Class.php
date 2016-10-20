@@ -78,17 +78,13 @@ class External_Doublefirst_Class implements External_ClassInterface
      */
     protected function getClassCodeQuery($subCode)
     {
-        $classQuery = '(';
-        $subCodeArray = explode(',', $subCode);
-        foreach ($subCodeArray as $code) {
-            if (strpos($code, '/') !== false) {
-                $codeArray = explode('/', $code);
-                $classQuery .= "(ygsd.SubjectDivisionName = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
-            } else {
-                $classQuery .= "ygsd.SubjectDivisionName = '{$this->database->quote($code)}' OR ";
-            }
+        $subCodeArray = array_filter(explode(",", $subCode));
+
+        foreach ($subCodeArray as &$code) {
+            $code = "'" . $this->database->quote($code) . "'";
         }
-        return substr($classQuery, 0, -3) . ')';
+
+        return "ygsd.SubjectDivisionName IN (" . implode($subCodeArray, ',') . ")";
     }
 
     /**
