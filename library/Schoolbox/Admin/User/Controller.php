@@ -151,6 +151,7 @@ class Controller extends Base
                 'fileSemester' => $fileSemester,
                 'folders' => $this->folderMapper->findAll()->sortBy('name', 'asc'),
                 'user' => $user,
+                'currentUser' => $this->getUser(),
                 'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
                 'userPermissions' => $this->userAccessMapper->findAllForUser($user),
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername())->sortBy('date', 'desc')->limit(0, 10),
