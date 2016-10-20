@@ -186,6 +186,7 @@ class Leave_Controller extends Controller
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewSummary.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'summary_house', 'summary_house_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'reports_menu', 'reports_menu_block');
 
         $today = new Alaress_Date_Format(time(), 'U');
 
@@ -195,10 +196,6 @@ class Leave_Controller extends Controller
         $returning_today = 0;
 
         foreach ($allHouses as $house) {
-            $summary_house_name = $house['name'];
-
-            //Quick way to get total students per residential house
-            $summary_house_total = $house['absent_morning'] + $house['present_morning'];
 
             $summary_house_absent = 0;
             if ($house['absent_morning'] > 0 || $house['absent_day'] > 0 || $house['absent_night'] > 0) {
@@ -206,13 +203,13 @@ class Leave_Controller extends Controller
             }
 
             $requestList = $this->getRequestMapper()->findAllByHouseId($house['houseId']);
-//            new \Alaress_Probe($requestList);
             $summary_house_approved = 0;
             $summary_house_rejected = 0;
             $summary_house_pending = 0;
+
             foreach ($requestList as $request) {
 
-                if ($request->isApproved()){
+                if ($request->isApproved()) {
                     $summary_house_approved ++;
                 }
                 if ($request->isRejected()) {
@@ -221,11 +218,10 @@ class Leave_Controller extends Controller
                 if ($request->isPending()) {
                     $summary_house_pending ++;
                 }
-
-                if($request->getStart()->getDatabaseDate() == $today->getDatabaseDate() ) {
+                if($request->getStart()->getDatabaseDate() == $today->getDatabaseDate()) {
                     $leaving_today ++;
                 }
-                if($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()  ) {
+                if($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()) {
                     $returning_today ++;
                 }
             }
@@ -233,8 +229,18 @@ class Leave_Controller extends Controller
             $this->getPage()->setVar(
                 array(
                     'SUMMARY_HOUSE_ID' => $house['houseId'],
-                    'SUMMARY_HOUSE_NAME' => $summary_house_name,
-                    'SUMMARY_HOUSE_TOTAL' => $summary_house_total,
+                    'SUMMARY_HOUSE_NAME' => $house['name'],
+                    'SUMMARY_HOUSE_PENDING' => $summary_house_pending,
+                )
+            );
+            $this->getPage()->parse('reports_menu_block', 'reports_menu', true);
+
+
+            $this->getPage()->setVar(
+                array(
+                    'SUMMARY_HOUSE_ID' => $house['houseId'],
+                    'SUMMARY_HOUSE_NAME' => $house['name'],
+                    'SUMMARY_HOUSE_TOTAL' => $house['absent_morning'] + $house['present_morning'],
                     'SUMMARY_HOUSE_ONLEAVE' => $summary_house_absent,
                     'SUMMARY_HOUSE_APPROVED' => $summary_house_approved,
                     'SUMMARY_HOUSE_PENDING' => $summary_house_pending,
@@ -243,26 +249,25 @@ class Leave_Controller extends Controller
             );
 
             $this->getPage()->parse('summary_house_block', 'summary_house', true);
-
         }
+
         $this->getPage()->setVar(Array(
             'SUMMARY_TODAY' => $today->getURLDate(),
             'SUMMARY_WEEK' => $today->addDays(7)->getURLDate(),
             'SUMMARY_DEPARTING' => $leaving_today,
             'SUMMARY_RETURNING' => $returning_today,
         ));
+
         $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 6));
-        $i = 0;
-        foreach($colourList as $colour){
+
+        foreach($colourList as $i=>$colour){
             $this->getPage()->setVar(
                 array(
                 'SUMMARY_COLOR_'.$i => $colour->getHexColour(),
             ));
-            $i++;
         }
 
     }
-
 
     /**
      * Render host type dropdown
