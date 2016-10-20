@@ -21,13 +21,6 @@ use \Schoolbox\Mapper\Exception as MapperException;
  */
 class Factory
 {
-    protected $assessmentTypes;
-
-    public function __construct(AssessmentType $assessmentTypes)
-    {
-        $this->assessmentTypes = $assessmentTypes;
-    }
-
     /**
      * Creates a zone from a given assessment.
      *
