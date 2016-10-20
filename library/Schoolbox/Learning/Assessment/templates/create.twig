@@ -30,6 +30,33 @@
             });
         }
 
+        /**
+         * When you finish configuring a project's AbstractAssessment details.
+         * Receives a HTML fragment back from the server and inserts into Step-3
+         */
+        function setupProjectEnd() {
+            $('input[data-mage-next="part-3"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+                onXhrDone: function (data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                        .find('[data-project-contents]')
+                        .html(data);
+                }
+            });
+        }
+
         {% if assessmentType|length %}
 
         /* Save everything when Part 1 was already chosen in route
