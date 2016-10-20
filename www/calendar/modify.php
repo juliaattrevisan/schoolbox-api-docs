@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Permission\Access\UserAccess;
+
 if (isset($this)) {
     $page = $this;
 } else {
@@ -44,14 +46,62 @@ if (is_numeric($_GET['eventID'])) {
         exit;
     }
 
-    // Check user has permission to modify this event
+    /* Begin a series of checks for permission to modify this event
+     */
+
+    /* Check superuser
+     */
+    $isSuperuser = $_SESSION['user']->isSuperuser();
+
+    /* Check if user is parent of the owner
+     */
     $event->getOwner()->loadParents();
-    if ($event->getOwner()->getId() !== $_SESSION['user']->getId() &&
-        !$_SESSION['user']->isSuperuser() &&
-        !$_SESSION['user']->isParentOf($event->getOwner())
-    ) {
+    $isParentOfOwner = $_SESSION['user']->isParentOf($event->getOwner());
+
+    /* Check if user is a calendar moderator
+     */
+    $hasServicePermission = false;
+
+    /** @var UserAccess $currentAccess */
+    foreach ($_SESSION['user']->getAccessList() as $currentAccess) {
+        if ($currentAccess->getService() == UserAccess::SERVICE_CALENDAR) {
+            if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_FULL) {
+
+                /* If the event is on a campus level, check this user
+                 * has permission to moderate one of the selected campuses
+                 */
+                if ($event->getCampusCollection()->count()) {
+                    foreach ($event->getCampusCollection() as $currentCampus) {
+                        if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
+                            $hasServicePermission = true;
+                            break;
+                        }
+                    }
+                }
+                /* Not a campus-level event
+                 * Service Moderator can modify any group- and personal-level events
+                 */
+                else {
+                    $hasServicePermission = true;
+                }
+            }
+        }
+    }
+
+    /* For Personal events, owners only
+     */
+    $isOwner = false;
+
+    if ($_SESSION['user']->getId() == $event->getOwner()->getId()) {
+        $isOwner = true;
+    }
+
+    /* Run through the check results, if user doesn't pass one - kick 'em out
+     */
+    if (!$isSuperuser && !$isParentOfOwner && !$hasServicePermission && !$isOwner) {
         error(34);
     }
+
 
     /* Default values
      */
