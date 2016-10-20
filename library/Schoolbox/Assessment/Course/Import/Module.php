@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\Unit;
 use Schoolbox\Permission\Access\Access;
@@ -159,6 +160,7 @@ class Module extends \Alaress\Module\Module
                 'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                 'setAccess'                         => $injector->lazyNew(Access::class),
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'setAssessmentMapper'               => $injector->lazyGet('assessmentDataSource'),
             ])
         );
 

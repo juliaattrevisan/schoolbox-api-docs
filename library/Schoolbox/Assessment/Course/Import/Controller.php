@@ -49,6 +49,8 @@ class Controller extends Base\Base
     /** @var UserMapper */
     private $userMapper;
 
+    /** @var Assessment\DataModel\MapperProxy */
+    private $assessmentMapper;
 
     /**
      * Just a raw template render
@@ -248,14 +250,12 @@ class Controller extends Base\Base
             }
         }
 
-        $foundUnit = false;
+        $impls = new Collection();
 
         foreach ($post["unit"] as $unit) {
-            if (empty($unit['import'])) {
+            if (empty($unit['import']) || $unit['import'] == 0) {
                 continue;
             }
-
-            $foundUnit = true;
 
             try {
                 // valiDate *puns* XD
@@ -269,23 +269,29 @@ class Controller extends Base\Base
                 $this->sendError('You must specify a valid open and close date for each unit you are importing');
                 return;
             }
+
+            try {
+                // TODO in import-modify context, support overlay of implementation assessments over spec
+                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unit_spec_id']);
+
+                $spec->setAssessables($this->getAssessmentMapper()->findAllForUnitSpecificationId($unit['unit_spec_id']));
+
+                $impl = new Unit\Implementation();
+                $impl->setOpenDate($openDate)
+                     ->setDueDate($dueDate)
+                     ->setSpecification($spec);
+
+                $impls[] = $impl;
+            } catch (MapperException $e) {
+                $this->sendError($e->getMessage(), array_map(function ($k, $v) { return "$k = $v"; }, array_keys($unit), array_values($unit)));
+                return;
+            }
+
         }
 
         // Make sure at least one unit was specified
-        if (!$foundUnit) {
+        if (empty($impls)) {
             $this->sendError('You must select at least one unit to import');
-            return;
-        }
-
-        /* Figger out when each task should open, due, late, etc
-         * A superposition of Implementation Tasks over Specification Tasks
-         */
-        try {
-            // TODO reimplement on Spec/Impl object graph
-            $allTaskDates = [];
-
-        } catch (MapperException $e) {
-            $this->sendError($e->getMessage());
             return;
         }
 
@@ -296,7 +302,7 @@ class Controller extends Base\Base
             'componentId'    => $post["componentId"],
             'courseHomepage' => $post["course_homepage"],
             'unitDates'      => $post["unit"],
-            'units'          => $allTaskDates['units'],
+            'units'          => $impls,
             'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import',
         ]);
     }
@@ -902,6 +908,26 @@ class Controller extends Base\Base
     public function setUserMapper($userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Assessment\DataModel\MapperProxy
+     */
+    public function getAssessmentMapper()
+    {
+        return $this->assessmentMapper;
+    }
+
+
+    /**
+     * @param Assessment\DataModel\MapperProxy $assessmentMapper
+     * @return static
+     */
+    public function setAssessmentMapper($assessmentMapper)
+    {
+        $this->assessmentMapper = $assessmentMapper;
         return $this;
     }
 
