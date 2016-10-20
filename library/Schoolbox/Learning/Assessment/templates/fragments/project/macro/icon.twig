@@ -1,12 +1,12 @@
-{% macro renderClass(typeName) %}
+{% macro renderClass(assessment) %}
 {% spaceless %}
-    {% if typeName|lower ==  'project' %}
+    {% if assessment is project %}
         icon-project
-    {% elseif typeName|lower == 'task' %}
+    {% elseif assessment is task %}
         icon-task
-    {% elseif typeName|lower == 'quiz' %}
+    {% elseif assessment is quiz %}
         icon-quiz
-    {% else %}
+    {% elseif assessment is dueWork %}
         icon-due-work
     {% endif %}
 {% endspaceless %}

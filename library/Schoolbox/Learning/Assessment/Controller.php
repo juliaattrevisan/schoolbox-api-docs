@@ -711,7 +711,7 @@ class Controller extends Base
      * to the parent project so we can return to it once we have finished created the sub-assessable.
      *
      * @param Project $project
-     * @return string[] Maps link label to link URL
+     * @return IAssessable[] Maps URL:string to an IAssessable
      */
     private function getAllReturnUrls(Project $project)
     {
@@ -735,16 +735,7 @@ class Controller extends Base
             $data = ['projectId' => $project->getId(), 'assessmentTypeTitle' => $assessmentType];
             $url = $this->getRouter()->generate($name, $data) . $suffix;
 
-            // Ugggh. Not sure about this. I think it's already abstracted in a class somewhere else?
-            // Or maybe better just to hard-code a plain list, only generating the URL
-            $label = ucwords(preg_replace('/[A-Z]/', ' ${0}', $assessmentType));
-            $icon = str_replace(' ','-', strtolower($label));
-
-            $allReturnUrls[] = [
-                'url'   => $url,
-                'label' => $label,
-                'icon'  => $icon,
-            ];
+            $allReturnUrls[$url] = AssessmentType::stringToObject($assessmentType);
         }
 
         return $allReturnUrls;
