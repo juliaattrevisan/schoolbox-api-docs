@@ -20,6 +20,7 @@
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
+        onRevert: $.noop,
         confirmRevert: $.noop,
         setFormData: $.noop
     };
@@ -57,6 +58,9 @@
                 var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
 
                 sectionsToClear.find(':submit').mage('hide');
+
+                // just before re-enabling the section, call the callback
+                self.options.onRevert.call(self.element);
 
                 // enable this section (which will also open it)
                 self.enableSection();

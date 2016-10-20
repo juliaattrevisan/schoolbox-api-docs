@@ -121,6 +121,9 @@
 
             stageThree.mage({
                 confirmRevert: confirmRevert,
+                onRevert: function () {
+                    $('#importUnits').find(':checkbox').closest('li').slideDown();
+                },
                 onXhrDone: function (data) {
                 {# Slide away the things we're not using #}
 
