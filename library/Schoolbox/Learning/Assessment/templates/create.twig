@@ -94,17 +94,17 @@
                 {% endif %}
 
                 <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
-                    <input type="hidden" name="contextId" value="{{ contextId }}" />
+                    <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
 
                     {% if assessmentType|length %}
-                    <input type="hidden" name="assessmentType" value="{{ assessmentType}}" />
+                    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     {% endif %}
 
                     <legend>Assessment Details</legend>
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
-                        {% if assessmentTypeTitle|length %}
-                            {% include '@learningAssessment/fragments/'~assessmentTypeTitle~'/create.twig' %}
+                        {% if assessmentType|length %}
+                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
                         {% endif %}
                     </div>
                 </fieldset>

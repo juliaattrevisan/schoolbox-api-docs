@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Attachzone\Factory as ZoneFactory;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -109,133 +110,94 @@ class Controller extends Base
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
      *
-     * @param int $folderId
-     * @param string $assessmentTypeTitle
+     * @api /assessment/folder/{folderId}{/assessmentTypeTitle}
+     * @level 165
+     * @param Folder $folder
+     * @param AbstractAssessment|null $assessment
      */
-    public function getSelectAssessmentInFolder($folderId, $assessmentTypeTitle)
+    public function getSelectAssessmentInFolder(Folder $folder, AbstractAssessment $assessment = null)
     {
-        try {
-            $folder = $this->getFolderMapper()->findById($folderId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
-
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($folder->getId(), Factory::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($folder, $assessment);
     }
 
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Project $projectId
      *
-     * @param int $projectId
-     * @param string $assessmentTypeTitle
+     * @param Project $project
+     * @param AbstractAssessment $assessment
      */
-    public function getSelectAssessmentInProject($projectId, $assessmentTypeTitle)
+    public function getSelectAssessmentInProject(Project $project, AbstractAssessment $assessment = null)
     {
         /* Die early if you're trying to ram a project into a project
          * We specifically don't allow it
          *
          * Instead, redirect to a safe place
          */
-        $types = new AssessmentType();
 
-        if ($assessmentTypeTitle instanceof Project) {
-            $data = ['projectId' => $projectId];
+        if ($assessment instanceof Project) {
+            $data = ['projectId' => $project->getId()];
             $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', $data);
-
             $this->getResponse()->redirect->to($redirect);
         }
 
-        $project = $this->getAssessmentDataSource()->findById($projectId);
-        if (!$project instanceof Project) {
-            // TODO replace with appropriate message
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-        $folder = $project->getFolder();
+        // TODO, should the Module or Controller hydrate the $project's context + folder?
+//        $folder = $project->getFolder();
 
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($project->getId(), Factory::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($project, $assessment);
     }
 
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
      *
-     * @param int $unitId
-     * @param string $assessmentTypeTitle
+     * @param UnitImplementation $unitImpl
+     * @param AbstractAssessment|null $assessment
      */
-    public function getSelectAssessmentInUnitImplementation($unitId, $assessmentTypeTitle)
+    public function getSelectAssessmentInUnitImplementation(UnitImplementation $unitImpl, AbstractAssessment $assessment = null)
     {
-        $unit   = $this->getUnitImplementationDataSource()->findById($unitId);
-        $folder = $unit->getFolder();
-
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unitImpl, $assessment);
     }
 
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
      *
-     * @param int $unitId
-     * @param string $assessmentTypeTitle
+     * @param UnitSpecification $unitSpec
+     * @param AbstractAssessment $assessment
      */
-    public function getSelectAssessmentInUnitSpecification($unitId, $assessmentTypeTitle)
+    public function getSelectAssessmentInUnitSpecification(UnitSpecification $unitSpec, AbstractAssessment $assessment = null)
     {
-        $unit   = $this->getUnitSpecificationDataSource()->findById($unitId);
-        $folder = $unit->getFolder();
-
         /* Pump into twig-land
          */
-        $this->getSelectAssessmentData($unit->getId(), Factory::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
+        $this->getSelectAssessmentData($unitSpec, $assessment);
     }
 
     /**
      * A macro for creating the standard data for all assessmentTypes
      * for use in their Create screen
      *
-     * @param int $contextId
-     * @param string $contextType e.g. one of "project", "folder", "unitimpl", "unitspec"
-     * @param Folder $folder related to object that has $contextId
-     * @param string $assessmentTypeTitle e.g. one of "project", "dueWork", "task", "quiz"
+     * @param AssessmentContext $context
+     * @param AbstractAssessment $assessment = null
      */
-    private function getSelectAssessmentData($contextId, $contextType, Folder $folder, $assessmentTypeTitle)
+    private function getSelectAssessmentData(AssessmentContext $context, AbstractAssessment $assessment = null)
     {
-        /* Check that $type is valid
-         */
-        $types = new AssessmentType();
-        $assessment = $assessmentTypeTitle ? $types->stringToObject($assessmentTypeTitle) : null;
-
-        $zoneFactory = new ZoneFactory($types);
+        $zoneFactory = new ZoneFactory(new AssessmentType());
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
-        /* contextId, contextType:
-         *
-         * Both exist here so you know where the new Assessment should be spawned
-         * in the corresponding post request
+        /* The usual info everything requires
          */
         $data = [
-            'contextId' => $contextId,
-            'contextType' => $contextType,
-
-            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromContext(
-                $contextId, $contextType,
-                $this->getFolderMapper(),
-                $this->getUnitImplementationDataSource(),
-                $this->getUnitSpecificationDataSource(),
-                $this->getAssessmentDataSource()
-            ),
-
-            /* The usual info everything requires
-             */
-            'attachzone' => $zone->getTwigContext(),
-            'allMarkTypes' => $assessment ? $this->getAllMarkTypes($assessment) : null,
-            'assessmentTypeTitle' => $assessmentTypeTitle,
-            'assessmentType' => $assessment,
-            'folder' => $folder,
-            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'context'         => $context,
+            'contextType'     => AssessmentContextType::objectToString($context),
+            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromContext($context),
+            'attachzone'      => $zone->getTwigContext(),
+            'assessment'      => $assessment,
+            'folder'          => $context->getFolder(),
+            'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
             'types' => [
                 ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work'],
                 ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
@@ -243,19 +205,27 @@ class Controller extends Base
             ]
         ];
 
+        if($assessment){
+            $data = array_merge($data, [
+                'allMarkTypes'   => $this->getAllMarkTypes($assessment),
+                'assessmentType' => AssessmentType::objectToString($assessment),
+            ]);
+        }
+
         /* Used to hide a ui element, preventing Projects being an option
          * to spawn inside a Project context
          */
-        if (!$contextType instanceof Project) {
+        if (!$context instanceof Project) {
             $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
             array_unshift($data['types'], $item);
         }
 
         /* Special treatment for projects for now
          */
-        if ($assessmentTypeTitle instanceof Project) {
+        if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
         }
+        //var_dump($data);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
@@ -456,45 +426,44 @@ class Controller extends Base
      * @param $assessmentType
      * @todo merge this with getSelectAssessmentInProject()
      */
-    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-    {
-
-        try {
-            $project = $this->getAssessmentDataSource()->findById($assessmentId);
-            $folder  = $project->getContext()->getFolder();
-        }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-            return;
-        }
-
-        if (!$project instanceof Project) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-        }
-
-        $types = new AssessmentType();
-
-        $zoneFactory = new ZoneFactory($types);
-        $zone = $zoneFactory->buildForAssessment($project);
-
-        $data = [
-            'attachzone' => $zone->getTwigContext(),
-            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
-            'folder' => $folder,
-            'types' => $types,
-            'project' => $project,
-            'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
-            'assessment' => [],
-            'assessmentType' => $assessmentType,
-            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
-            'allGradeSchemes' => $this->getAllGradeSchemes(),
-            'returnUrl' => $this->getRequest()->query['return_url']
-        ];
-
-        $template = "@learningAssessment/fragments/{$types->objectToString($assessmentType)}/createWithinProject.twig";
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
-
-    }
+//    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
+//    {
+//
+//        try {
+//            $project = $this->getAssessmentDataSource()->findById($assessmentId);
+//            $folder  = $project->getContext()->getFolder();
+//        }
+//        catch (MapperException $e) {
+//            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
+//            return;
+//        }
+//
+//        if (!$project instanceof Project) {
+//            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
+//        }
+//
+//        $types = new AssessmentType();
+//
+//        $zoneFactory = new ZoneFactory($types);
+//        $zone = $zoneFactory->buildForAssessment($project);
+//
+//        $data = [
+//            'attachzone' => $zone->getTwigContext(),
+//            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
+//            'folder' => $folder,
+//            'types' => $types,
+//            'project' => $project,
+//            'contextType' => AssessmentContextType::TYPE_PROJECT,
+//            'assessment' => [],
+//            'assessmentType' => $assessmentType,
+//            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+//            'allGradeSchemes' => $this->getAllGradeSchemes(),
+//            'returnUrl' => $this->getRequest()->query['return_url']
+//        ];
+//
+//        $template = "@learningAssessment/fragments/{$types->objectToString($assessmentType)}/createWithinProject.twig";
+//        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+//    }
 
     /**
      * Save the data when creating an assessment within a Project
