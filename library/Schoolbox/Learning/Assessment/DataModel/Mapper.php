@@ -283,39 +283,9 @@ class Mapper extends BaseMapper
         }
 
         // Load related 1-M models
-        if (!empty($dueWorkIds)) {
 
-            // Due work files
-            $files      = [];
-            $filesQuery = "
-                SELECT
-                    d.id as duework_id,
-                    {$this->getJoinColumnString('duework.submission_box_file', 's')}
-                FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
-                INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
-                WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
-                ORDER BY d.id ASC
-            ";
-            $filesStatement = $this->getDatabase()->prepare($filesQuery);
-            $filesStatement->execute($this->getArrayParameters($dueWorkIds, 'id'));
-            foreach ($filesStatement as $row) {
-                if (!isset($files[$row['duework_id']])) {
-                    $files[$row['duework_id']] = new Collection();
-                }
-                $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
-            }
-            foreach ($modelList as $model) {
-                try {
-                    $submodel = $model->getSubObject();
-                } catch (\UnexpectedValueException $e) {
-                    // Broken assessment - not much I can do besides ignore
-                    continue;
-                }
-                if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
-                    $submodel->setAttachments($files[$submodel->getId()]);
-                }
-            }
-        }
+        // Due work files
+        $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
 
         // Load context for projects separately
         // Attempt to do it all in one query
@@ -334,6 +304,53 @@ class Mapper extends BaseMapper
             }
         }
 
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with due work files.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
+    {
+        if (!empty($dueWorkIds)) {
+
+            // Retrieve and sort list of duework files
+            $files      = [];
+            $filesQuery = "
+                SELECT
+                    d.id as duework_id,
+                    {$this->getJoinColumnString('duework.submission_box_file', 's')}
+                FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
+                INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
+                WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
+                ORDER BY d.id ASC
+            ";
+            $filesStatement = $this->getDatabase()->prepare($filesQuery);
+            $filesStatement->execute($this->getArrayParameters($dueWorkIds, 'id'));
+            foreach ($filesStatement as $row) {
+                if (!isset($files[$row['duework_id']])) {
+                    $files[$row['duework_id']] = new Collection();
+                }
+                $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
+            }
+
+            // Augment list with due work files
+            foreach ($modelList as $model) {
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
+                if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
+                    $submodel->setAttachments($files[$submodel->getId()]);
+                }
+            }
+        }
         return $modelList;
     }
 }
