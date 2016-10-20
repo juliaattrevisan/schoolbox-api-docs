@@ -29,12 +29,13 @@
 
     <form method='get' action='?'>
         <div class="row">
-            <div class="large-6 columns">
+            <div class="large-{SEARCH_WIDTH} columns">
                 <label>
                     Name
                     <input type='text' name='searchName' value="{SEARCH_NAME}"/>
                 </label>
             </div>
+            <!-- BEGIN has_boarder -->
             <div class="large-2 columns">
                 <label>
                     Boarder
@@ -45,6 +46,7 @@
                     </select>
                 </label>
             </div>
+            <!-- END has_boarder -->
             <div class="large-2 columns">
                 <label>
                     Form

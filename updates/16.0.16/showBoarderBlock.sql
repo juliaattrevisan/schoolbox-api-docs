@@ -1,0 +1,2 @@
+INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required)
+VALUES ('show_boarder_block', '1', 'Show Boarder Filter On Parent Directory', 'Controls whether the board filter criteria appears on the parent directory screen', 3, '', 5, 'true', 'false', 'true');
