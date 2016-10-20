@@ -19,6 +19,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\Project;
 
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use \Schoolbox\Resource\Folder\Model as Folder;
@@ -83,43 +84,30 @@ class Factory
      * These won't have enough information to determine a meaningful trail of crumbs
      * so we give it the contextId/contextType, and decide from there
      *
-     * @param $contextId int
-     * @param $contextType string
-     * @param $folderMapper FolderMapper
-     * @param $unitImplementationDataSource UnitImplementationDataSource
-     * @param $unitSpecificationDataSource UnitSpecificationDataSource
-     * @param $assessmentDataSource AssessmentDataSource
-     * @throws DeletedException
+     * @param AssessmentContext $context
      * @return Collection
      */
-    public function produceFromContext(
-        $contextId, $contextType,
-        FolderMapper $folderMapper,
-        UnitImplementationDataSource $unitImplementationDataSource,
-        UnitSpecificationDataSource $unitSpecificationDataSource,
-        AssessmentDataSource $assessmentDataSource
-    ) {
+    public function produceFromContext(AssessmentContext $context)
+    {
         $trail = new Collection();
         $trail->add(['Learning', '#']);
 
         try {
-            if ($contextType == 'folder') {
-                $context = $folderMapper->findById($contextId);
+            if ($context instanceof Folder) {
                 $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'unit') {
-                $context = $unitImplementationDataSource->findById($contextId);
+            } elseif ($context instanceof UnitImplementation) {
                 $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'unitspec') {
-                $context = $unitSpecificationDataSource->findById($contextId);
+            } elseif ($context instanceof UnitSpecification) {
                 $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'project') {
-                $context = $assessmentDataSource->findById($contextId);
+            } elseif ($context instanceof Project) {
                 $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
             }
         }
         catch (DeletedException $e) {
 
-            // noop?
+            /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
+             */
+            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
         }
 
         $trail->add(["Create Assessment", '#']);
