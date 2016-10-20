@@ -52,28 +52,13 @@
                         {% endfor %}
                     </ul>
                 </section>
-                <ul class="flex-list buttons">
-                    <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}"
-                           title="Create a new Due Work"
-                           class="button icon-due-work">New Due Work</a>
-                    </li>
-                    <li><a href="{{ allReturnUrls[types.fromTitle('task')] }}"
-                           title="Create a new Task"
-                           class="button icon-task">New Task</a>
-                    </li>
-                    <li><a href="{{ allReturnUrls[types.fromTitle('quiz')] }}"
-                           title="Create a new Quiz"
-                           class="button icon-quiz">New Quiz</a>
-                    </li>
-                </ul>
+                <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create new Assessment</a>
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
                     <p>Your project is empty.</p>
-                    <p>Add a
-                        <a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work">Due Work</a>,
-                        <a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task">Task</a>, or
-                        <a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz">Quiz</a>
+                    <p>
+                        Add a new <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id}) }}{{ returnUrlSuffix }}" title="Create a new Assessment">Assessment</a>
                     </p>
                 </div>
                 {% endif %}

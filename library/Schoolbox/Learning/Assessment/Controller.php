@@ -333,11 +333,19 @@ class Controller extends Base
             return;
         }
 
-        /* Redirect to project summary screen instead, if you spawned a project
-         * Otherwise return to context
+        /** @var IAssessable $assessment */
+        $assessment = $assessmentInfo['assessment'];
+
+        /* If you spawned a project or an assessable within a project
+         * Redirect to project summary screen
+         *
+         * Otherwise return to whatever context you came from
          */
-        if ($assessmentInfo['assessment'] instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+        if ($assessment instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+        }
+        elseif ($assessment->getContext() instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
         }
         else {
             $returnUrl = $assessmentInfo['returnUrl'];
@@ -587,13 +595,20 @@ class Controller extends Base
          * IAssessables inside projects
          */
         $breadcrumbBuilder = new BreadcrumbFactory();
+
+        /* Manufacture a universal returnUrl
+         * Return to summary screen with this suffix
+         */
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
+        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'counts' => $counts,
             'assessment' => $assessment,
             'types' => new Types(),
             'currentUser' => $this->getUser(),
-            'allReturnUrls' => $this->getAllReturnUrls($assessment->getId())
+            'returnUrlSuffix' => $returnUrlSuffix
         ];
 
         $this->getResponse()->content->set(

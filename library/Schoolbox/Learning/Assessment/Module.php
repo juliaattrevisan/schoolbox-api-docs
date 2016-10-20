@@ -48,7 +48,7 @@ class Module extends BaseModule
 
                 /* Add assessments to a Project
                  */
-                '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
+//                '/assessment/{assessmentId}/new{/assessmentType}' => 'getCreateAssessmentWithinProject',
 
                 /* Assessment Summary screen
                  */
