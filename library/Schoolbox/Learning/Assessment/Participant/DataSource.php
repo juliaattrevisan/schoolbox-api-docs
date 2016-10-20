@@ -96,18 +96,14 @@ class DataSource
 
         // I want to search for ALL read-level users, not just students
         // Deliberately don't search external DB, I have already done that
-        // TODO make findUsersInCategory accept any role
-        $groupMembers = $this->userAccessMapper->findUsersInCategory($folder, Role::STUDENT, UserAccess::ACCESS_READ, false)
-                                               ->add($this->userAccessMapper->findUsersInCategory($folder, Role::STAFF, UserAccess::ACCESS_READ, false))
-                                               ->add($this->userAccessMapper->findUsersInCategory($folder, Role::PARENT, UserAccess::ACCESS_READ, false))
-                                               ->add($this->userAccessMapper->findUsersInCategory($folder, Role::GUEST, UserAccess::ACCESS_READ, false))
-        ;
+        $users->mergeUnique(
+            $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false),
+            'id'
+        );
 
+        // Consider caching $users
 
-
-
-
-        // Consider caching this result
+        // Convert $users into a participant list
 
         return $participants;
     }
