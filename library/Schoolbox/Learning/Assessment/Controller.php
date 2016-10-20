@@ -534,6 +534,138 @@ class Controller extends Base
     }
 
     /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessment/:assessmentId/summary
+     * @level 165
+     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
+     * @todo implement IAssessable interface
+     */
+    public function getSummary($assessmentId)
+    {
+        if ($this->getUser()->getRole()->isStudent()) {
+            $this->getSummaryStudent($assessmentId);
+        }
+
+        $this->getSummaryStaff($assessmentId);
+
+        return;
+    }
+
+    /**
+     * Displays the teacher dashboard of an assessable with tracking and management details
+     * @param $assessmentId
+     */
+    private function getSummaryStaff($assessmentId)
+    {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+
+        // Calculate summary totals for display purposes
+
+        $participants = $assessment->getAllParticipants();
+
+        $counts = [];
+
+        foreach ($participants as $participant) {
+            $counts[$participant->getId()] = [
+                'total' => 0,
+                'totalCompleted' => 0,
+            ];
+        }
+
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            foreach ($assessment->getAssessables() as $subAssessment) {
+                foreach ($subAssessment->getAllParticipants() as $participant) {
+                    $counts[$participant->getUser()->getId()]['total']++;
+                    if ($participant->getAllResponses()->count() > 0) {
+                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                    }
+                }
+            }
+        }
+
+        $breadcrumbBuilder = new BreadcrumbFactory();
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'counts' => $counts,
+            'assessment' => $assessment,
+            'types' => new Types(),
+            'currentUser' => $this->getUser(),
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary.twig",
+                $twigData
+            )
+        );
+    }
+
+    /**
+     * Display the student dashboard for an assessable
+     * @param $assessmentId
+     */
+    private function getSummaryStudent($assessmentId)
+    {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+
+        // Calculate summary totals for display purposes
+
+        $counts = [
+            'dueWork' => 0,
+            'dueWorkCompleted' => 0,
+            'quiz' => 0,
+            'quizCompleted' => 0,
+            'task' => 0,
+            'taskCompleted' => 0,
+            'total' => 0,
+            'totalCompleted' => 0,
+        ];
+
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            $assessables = $assessment->getAssessables();
+
+            /** @var IAssessable $assessable */
+            foreach ($assessables as $assessable) {
+
+                $type = $assessable->getFamilyName();
+
+                try {
+                    $participant = $assessable->getParticipant($this->getUser());
+                } catch (\UnexpectedValueException $e) {
+                    // This student isn't a participant.
+                    // This is fine - when PBL is implemented not all students
+                    // will participate in all sub-assessments
+                    continue;
+                }
+
+                // If the student has submitted at least one response we will assume it is completed
+                $counts[$type]++;
+                $counts['total']++;
+
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$type.'Completed']++;
+                    $counts['totalCompleted']++;
+                }
+            }
+        }
+
+        // TODO make this an instance var instead of instantiating all the time
+        $breadcrumbBuilder = new BreadcrumbFactory();
+        // TODO these crumbs have an update URL, and thus aren't appropriate for students
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'currentUser' => $this->getUser(),
+            'assessment' => $assessment,
+            'counts' => $counts
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summaryStudent.twig", $twigData));
+    }
+
+    /**
      * Generic method for create/update of an assessment.
      *
      * persistAssessment() CANNOT make any assumptions about redirects
@@ -800,137 +932,6 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
-    }
-
-    /**
-     * Displays the teacher dashboard of an assessable with tracking and management details
-     * @param $assessmentId
-     */
-    private function getSummaryStaff($assessmentId)
-    {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
-
-        // Calculate summary totals for display purposes
-
-        $participants = $assessment->getAllParticipants();
-
-        $counts = [];
-
-        foreach ($participants as $participant) {
-            $counts[$participant->getId()] = [
-                'total' => 0,
-                'totalCompleted' => 0,
-            ];
-        }
-
-        // This isn't necessarily a project.
-        if ($assessment instanceof Project) {
-            foreach ($assessment->getAssessables() as $subAssessment) {
-                foreach ($subAssessment->getAllParticipants() as $participant) {
-                    $counts[$participant->getUser()->getId()]['total']++;
-                    if ($participant->getAllResponses()->count() > 0) {
-                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
-                    }
-                }
-            }
-        }
-
-        $breadcrumbBuilder = new BreadcrumbFactory();
-        $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
-            'counts' => $counts,
-            'assessment' => $assessment,
-            'types' => new Types(),
-            'currentUser' => $this->getUser(),
-        ];
-
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary.twig",
-                $twigData
-            )
-        );
-    }
-
-    /**
-     * Display the student dashboard for an assessable
-     * @param $assessmentId
-     */
-    private function getSummaryStudent($assessmentId)
-    {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
-
-        // Calculate summary totals for display purposes
-
-        $counts = [
-            'dueWork' => 0,
-            'dueWorkCompleted' => 0,
-            'quiz' => 0,
-            'quizCompleted' => 0,
-            'task' => 0,
-            'taskCompleted' => 0,
-            'total' => 0,
-            'totalCompleted' => 0,
-        ];
-
-        // This isn't necessarily a project.
-        if ($assessment instanceof Project) {
-            $assessables = $assessment->getAssessables();
-
-            /** @var IAssessable $assessable */
-            foreach ($assessables as $assessable) {
-
-                $type = $assessable->getFamilyName();
-
-                try {
-                    $participant = $assessable->getParticipant($this->getUser());
-                } catch (\UnexpectedValueException $e) {
-                    // This student isn't a participant.
-                    // This is fine - when PBL is implemented not all students
-                    // will participate in all sub-assessments
-                    continue;
-                }
-
-                // If the student has submitted at least one response we will assume it is completed
-                $counts[$type]++;
-                $counts['total']++;
-
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$type.'Completed']++;
-                    $counts['totalCompleted']++;
-                }
-            }
-        }
-
-        // TODO make this an instance var instead of instantiating all the time
-        $breadcrumbBuilder = new BreadcrumbFactory();
-        // TODO these crumbs have an update URL, and thus aren't appropriate for students
-        $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
-            'currentUser' => $this->getUser(),
-            'assessment' => $assessment,
-            'counts' => $counts
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summaryStudent.twig", $twigData));
-    }
-
-    /**
-     * Display appropriate landing page based on role
-     *
-     * @api   GET /learning/assessment/:assessmentId/summary
-     * @level 165
-     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
-     * @todo implement IAssessable interface
-     */
-    public function getSummary($assessmentId)
-    {
-        if ($this->getUser()->getRole()->isStudent()) {
-            return $this->getSummaryStudent($assessmentId);
-        }
-
-        return $this->getSummaryStaff($assessmentId);
     }
 
     /**

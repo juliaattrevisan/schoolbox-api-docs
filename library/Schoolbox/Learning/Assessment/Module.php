@@ -50,9 +50,12 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
 
+                /* Assessment Summary screen
+                 */
+                '/assessment/{assessmentId}' => 'getSummary',
+
                 /* Temporary methods
                  */
-                '/assessment/{assessmentId}'                    => 'getSummary',
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
                 '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
