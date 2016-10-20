@@ -8,7 +8,7 @@
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
             onXhrDone: function (data) {
-                window.location.href = data.returnUrl;
+                window.location.href = data.return_url;
             }
         });
     });

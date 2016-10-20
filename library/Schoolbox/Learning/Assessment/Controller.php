@@ -352,7 +352,7 @@ class Controller extends Base
         }
 
         $data = [
-            'returnUrl' => $returnUrl
+            'return_url' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -445,7 +445,7 @@ class Controller extends Base
         }
 
         $data = [
-            'returnUrl' => $returnUrl
+            'return_url' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -468,7 +468,7 @@ class Controller extends Base
         }
 
         $data = [
-            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
+            'return_url' => (new Redirect())->decode($this->getRequest()->post['return_url'])
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -558,7 +558,7 @@ class Controller extends Base
          * Return to summary screen with this suffix
          */
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
-        $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
+        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
 
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
