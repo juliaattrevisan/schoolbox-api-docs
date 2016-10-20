@@ -28,7 +28,7 @@ use \Alaress_Date_NullDate;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
-use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -41,9 +41,9 @@ use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Resource\Attachment\Zone;
 
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationMapperProxy;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
@@ -65,43 +65,43 @@ class Controller extends Base
     protected $submissionFileMapper;
 
     /**
-     * @var AssessmentDataSource
+     * @var AssessmentMapperProxy
      */
-    protected $assessmentDataSource;
+    protected $assessmentMapperProxy;
 
     /**
-     * @var UnitSpecificationDataSource
+     * @var UnitSpecificationMapperProxy
      */
-    protected $unitSpecificationDataSource;
+    protected $unitSpecificationMapperProxy;
 
     /**
-     * @var UnitImplementationDataSource
+     * @var UnitImplementationMapperProxy
      */
-    protected $unitImplementationDataSource;
+    protected $unitImplementationMapperProxy;
 
     /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param UnitSpecificationDataSource $unitSpecificationDataSource
-     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      */
     public function __construct(
         FolderMapper $folderMapper,
         ErrorMapper $errorMapper,
         SubmissionFileMapper $submissionFileMapper,
-        AssessmentDataSource $assessmentDataSource,
-        UnitSpecificationDataSource $unitSpecificationDataSource,
-        UnitImplementationDataSource $unitImplementationDataSource
+        AssessmentMapperProxy $assessmentMapperProxy,
+        UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
+        UnitImplementationMapperProxy $unitImplementationMapperProxy
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
         $this->setSubmissionFileMapper($submissionFileMapper);
-        $this->setAssessmentDataSource($assessmentDataSource);
-        $this->setUnitSpecificationDataSource($unitSpecificationDataSource);
-        $this->setUnitImplementationDataSource($unitImplementationDataSource);
+        $this->setAssessmentMapperProxy($assessmentMapperProxy);
+        $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
+        $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
     }
 
     /**
@@ -232,7 +232,10 @@ class Controller extends Base
     }
 
     /**
-     * Return a fragment corresponding to the type of assessment you choze
+     * Return a HTML fragment to display in Step-2 for the AssessmentType selected in Step-1
+     *
+     * @api /learning/assessment/select
+     * @level 165
      */
     public function postSelectAssessment()
     {
@@ -266,16 +269,12 @@ class Controller extends Base
                 ->setAcceptsMultiple();
         }
 
-
-        $zone = new Zone('files');
-        $zone->setMulti(true);
-
         $data = [
-            'attachzone' => $zone->getTwigContext(),
-            'assessment' => $assessment,
-            'assessmentType' => $types->objectToString($assessment),
+            'attachzone'      => (new ZoneFactory())->buildForAssessment($assessment)->getTwigContext(),
+            'assessment'      => $assessment,
+            'assessmentType'  => $types->objectToString($assessment),
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessment)
+            'allMarkTypes'    => $this->getAllMarkTypes($assessment)
         ];
 
         /* Special treatment for projects for now
@@ -286,7 +285,7 @@ class Controller extends Base
 
         /* Select the fragment to return
          */
-        $template = "@learningAssessment/fragments/$assessmentType/create.twig";
+        $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/create.twig";
         $content = $this->buildUnthemedHtmlOutput($template, $data);
         $this->getResponse()->content->set($content);
 
@@ -300,7 +299,8 @@ class Controller extends Base
     public function postCreateAssessment()
     {
         try {
-            $assessmentInfo = $this->persistAssessment();
+            $existingAssessment = null;
+            $assessmentInfo = $this->persistAssessment($existingAssessment);
         }
         catch (\RuntimeException $e) {
 
@@ -389,7 +389,7 @@ class Controller extends Base
     {
 
         try {
-            $assessmentInfo = $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
+            $assessmentInfo = $this->persistAssessment($this->getAssessmentMapperProxy()->findById($assessmentId));
         }
         catch (\RuntimeException $e) {
 
@@ -398,8 +398,124 @@ class Controller extends Base
             return;
         }
 
-        $data = [
-            'returnUrl' => $assessmentInfo['returnUrl']
+        $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
+    }
+
+    /**
+     * Generic method for:
+     * * Create new assessment
+     * * Update existing assessment.
+     *
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by calling methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
+     *
+     * @param IAssessable $existingAssessment 'Create' => null, 'Update' => object
+     * @return void
+     * @throws MapperException TODO - enumerate possible exceptions in separate 'throws' annotations
+     */
+    protected function persistAssessment(IAssessable $existingAssessment = null)
+    {
+
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
+         */
+        $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
+
+        // Verify that the context of the assessment is valid
+        // TODO replace returnUrl values once I know what they should actually be
+        $context = $assessment->getContext();
+
+        try {
+            if ($context instanceof Folder) {
+
+                /* TODO: Pass contextId as a param into this method
+                 * It should be obtained from the routes
+                 */
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } elseif ($context instanceof UnitImplementation) {
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    $context   = $this->getUnitImplementationMapperProxy()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } elseif ($context instanceof UnitSpecification) {
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+                    // The unit spec doesn't contain a reference back to its course spec.
+                    // It should, or I should be able to find one.
+                    $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+            } elseif ($context instanceof Project) {
+
+                /* Check that you don't spawn a Project in a Project
+                 */
+                if ($assessment instanceof Project) {
+                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+                    return [];
+                }
+
+                /* You only get contextId when you're Creating, not updating
+                 */
+                if ($this->getRequest()->post['contextId']) {
+
+                    // TODO figure out what to do about this
+                    $context   = $this->getAssessmentMapperProxy()->findById($this->getRequest()->post['contextId']);
+                    $returnUrl = "/homepage/{$context->getId()}";
+                }
+                else {
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+                }
+
+            } else {
+                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+                return [];
+            }
+
+        } catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+            return [];
+        }
+
+        // Don't change sequence if already in sequence - otherwise put at end
+        $sequence = 1;
+        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+            if ($otherAssessment->getId() == $assessment->getId()) {
+                break;
+            }
+            $sequence++;
+        }
+
+        // And save
+        $this->getAssessmentMapperProxy()->save($assessment, $sequence);
+
+        return [
+            'assessment' => $assessment,
+            'returnUrl' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -416,7 +532,7 @@ class Controller extends Base
 //    {
 //
 //        try {
-//            $project = $this->getAssessmentDataSource()->findById($assessmentId);
+//            $project = $this->getAssessmentMapperProxy()->findById($assessmentId);
 //            $folder  = $project->getContext()->getFolder();
 //        }
 //        catch (MapperException $e) {
@@ -484,9 +600,9 @@ class Controller extends Base
      */
     public function postDeleteAssessment($assessmentId)
     {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        $assessment = $this->getAssessmentMapperProxy()->findById($assessmentId);
         $folder     = $assessment->getContext()->getFolder();
-        $this->getAssessmentDataSource()->delete($assessment);
+        $this->getAssessmentMapperProxy()->delete($assessment);
 
         // TODO abstract this redirection logic
         if ($assessment) {
@@ -973,52 +1089,52 @@ class Controller extends Base
     }
 
     /**
-     * @return AssessmentDataSource
+     * @return AssessmentMapperProxy
      */
-    protected function getAssessmentDataSource()
+    protected function getAssessmentMapperProxy()
     {
-        return $this->assessmentDataSource;
+        return $this->assessmentMapperProxy;
     }
 
     /**
-     * @param AssessmentDataSource $assessmentDataSource
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      */
-    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
+    protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
     {
-        $this->assessmentDataSource = $assessmentDataSource;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
     }
 
     /**
-     * @return UnitSpecificationDataSource
+     * @return UnitSpecificationMapperProxy
      */
-    protected function getUnitSpecificationDataSource()
+    protected function getUnitSpecificationMapperProxy()
     {
-        return $this->unitSpecificationDataSource;
+        return $this->unitSpecificationMapperProxy;
     }
 
     /**
-     * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      */
-    protected function setUnitSpecificationDataSource(UnitSpecificationDataSource $unitSpecificationDataSource)
+    protected function setUnitSpecificationMapperProxy(UnitSpecificationMapperProxy $unitSpecificationMapperProxy)
     {
-        $this->unitSpecificationDataSource = $unitSpecificationDataSource;
+        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
     }
 
     /**
-     * @return UnitImplementationDataSource
+     * @return UnitImplementationMapperProxy
      */
-    public function getUnitImplementationDataSource()
+    public function getUnitImplementationMapperProxy()
     {
-        return $this->unitImplementationDataSource;
+        return $this->unitImplementationMapperProxy;
     }
 
     /**
-     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      * @return static
      */
-    public function setUnitImplementationDataSource(UnitImplementationDataSource $unitImplementationDataSource)
+    public function setUnitImplementationMapperProxy(UnitImplementationMapperProxy $unitImplementationMapperProxy)
     {
-        $this->unitImplementationDataSource = $unitImplementationDataSource;
+        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
         return $this;
     }
 
