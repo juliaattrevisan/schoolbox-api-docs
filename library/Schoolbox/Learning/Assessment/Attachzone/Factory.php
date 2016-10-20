@@ -75,7 +75,7 @@ class Factory
     protected function buildForTask(Task $task = null)
     {
         $zone = new Zone('files');
-        $zone->setMulti(false);
+        $zone->setMulti(false)->setAttachmentsLabel('');
 
         if ($task instanceof Task) {
 
@@ -113,7 +113,7 @@ class Factory
     protected function buildForDueWork(DueWork $dueWork = null)
     {
         $zone = new Zone('files');
-        $zone->setMulti(true);
+        $zone->setMulti(true)->setAttachmentsLabel('');
 
         // Attach files
         if ($dueWork instanceof DueWork) {
