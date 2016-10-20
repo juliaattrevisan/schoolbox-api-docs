@@ -299,7 +299,6 @@ class UserAccessMapper extends Mapper
             'service'   => UserAccess::SERVICE_HOMEPAGE,
             'serviceId' => $folder->getId(),
             'minAccess' => $accessType,
-            'roleType'  => $roleType
         ];
         if (isset($roleType)) {
             $query .= 'AND g.group_type = :roleType';
