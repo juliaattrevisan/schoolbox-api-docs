@@ -585,6 +585,9 @@ class Controller extends Base
             }
         }
 
+        /* Manufacture a set of returnUrls since staff with perms can create
+         * IAssessables inside projects
+         */
         $breadcrumbBuilder = new BreadcrumbFactory();
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
@@ -592,6 +595,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'types' => new Types(),
             'currentUser' => $this->getUser(),
+            'allReturnUrls' => $this->getAllReturnUrls($assessment->getId())
         ];
 
         $this->getResponse()->content->set(
@@ -744,7 +748,7 @@ class Controller extends Base
          * When spawning a Project, its constituent Assessables return to this url
          * after they are spawned
          */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
         $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
         $allReturnUrls = [];

@@ -29,9 +29,7 @@
                                 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
                                 <li class="actions-small-1">
-                                    <div class="grip">
-
-                                    </div>
+                                    <div class="grip"></div>
                                     <div class="list-item">
                                         <div class="card wrap-down small-12">
                                             <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
@@ -59,17 +57,19 @@
                 {% endif %}
 
                 <ul class="flex-list buttons">
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('task')}) }}"
-                           title="Create a new Task"
-                           class="button icon-task">New Task</a></li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('dueWork')}) }}"
+                    <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}"
                            title="Create a new Due Work"
-                           class="button icon-due-work">New Due Work</a></li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: types.getFromTitle('quiz')}) }}"
+                           class="button icon-due-work">New Due Work</a>
+                    </li>
+                    <li><a href="{{ allReturnUrls[types.fromTitle('task')] }}"
+                           title="Create a new Task"
+                           class="button icon-task">New Task</a>
+                    </li>
+                    <li><a href="{{ allReturnUrls[types.fromTitle('quiz')] }}"
                            title="Create a new Quiz"
-                           class="button icon-quiz">New Quiz</a></li>
+                           class="button icon-quiz">New Quiz</a>
+                    </li>
                 </ul>
-
             </div>
 
             <div class="small-6 island">
