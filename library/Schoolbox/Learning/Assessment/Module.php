@@ -73,15 +73,15 @@ class Module extends BaseModule
             ],
             'POST' => [
 
-                /* Return a fragment corresponding to the type of assessment you choze
+                /* Return a HTML fragment for the AssessmentType selected in Step-1
                  */
                 '/assessment/select' => 'postSelectAssessment',
 
-                /* Save the Assessment's data
+                /* Save the Assessment's data + redirect somewhere appropriate (context or returnUrl)
                  */
                 '/assessment/create' => 'postCreateAssessment',
 
-                /* This is the second half containing assessable-specific data
+                /* Update an existing Assessment + redirect somewhere appropriate (context or returnUrl)
                  */
                 '/assessment/{assessmentId}/update' => 'postUpdateAssessment',
 

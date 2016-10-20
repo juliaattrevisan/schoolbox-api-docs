@@ -198,6 +198,8 @@ class Controller extends Base
                 ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
             ]
         ];
+        // TODO, 'types' should just be the 3 objects, and twig can do the rest
+        // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Do we have a returnUrl?
         $returnUrl = $this->getRequest()->query->get('return_url');
@@ -455,22 +457,25 @@ class Controller extends Base
      * Use the returnUrl specified in querystring instead, but you
      * could infer it based on output of $this->persistAssessment()
      */
-    public function postCreateAssessmentWithinProject()
-    {
-        // Persist within context of a project
-        try {
-            $this->persistAssessment();
-        }
-        catch (\RuntimeException $e) {
-            return;
-        }
-
-        $data = [
-            'return_url' => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
+//    public function postCreateAssessmentWithinProject()
+//    {
+//        // Persist within context of a project
+//        try {
+//            $this->persistAssessment();
+//        }
+//        catch (\RuntimeException $e) {
+//            return;
+//        }
+//
+//        /* Use the returnUrl specified in querystring instead
+//         * TODO: Maybe can infer it based on output of $this->persistAssessment?
+//         */
+//        $data = [
+//            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
+//        ];
+//
+//        $this->getResponse()->content->set($this->buildJsonOutput($data));
+//    }
 
     /**
      * Delete an assessment
@@ -640,14 +645,11 @@ class Controller extends Base
     /**
      * Generic method for create/update of an assessment.
      *
-     * persistAssessment() CANNOT make any assumptions about redirects
-     * Redirects should be dealt with by actual controller methods, since
-     * the returnUrl is manipulated by javascript in particular contexts
-     *
-     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
-     * @return array
+     * @param $postData
+     * @param IAssessable|null $assessment
+     * @return IAssessable $assessment
      */
-    protected function persistAssessment(IAssessable $assessment = null)
+    protected function produceAssessment($postData, IAssessable $assessment = null)
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError
@@ -655,11 +657,7 @@ class Controller extends Base
          * Controller must return early for that to happen
          */
         try {
-
-            /* Figure out what kind of assessment was chosen
-             * and spawn a new instance of it to manipulate
-             */
-            $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
+            $assessmentFactory = new Factory($this->getUser(), $postData);
             $assessment = $assessmentFactory->produce($assessment);
 
             /* Manually do a check
