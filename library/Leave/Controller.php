@@ -232,6 +232,7 @@ class Leave_Controller extends Controller
 
             $this->getPage()->setVar(
                 array(
+                    'SUMMARY_HOUSE_ID' => $house['houseId'],
                     'SUMMARY_HOUSE_NAME' => $summary_house_name,
                     'SUMMARY_HOUSE_TOTAL' => $summary_house_total,
                     'SUMMARY_HOUSE_ONLEAVE' => $summary_house_absent,
@@ -245,9 +246,20 @@ class Leave_Controller extends Controller
 
         }
         $this->getPage()->setVar(Array(
-            'STUDENTS_DEPARTING' => $leaving_today,
-            'STUDENTS_RETURNING' => $returning_today,
+            'SUMMARY_TODAY' => $today->getURLDate(),
+            'SUMMARY_WEEK' => $today->addDays(7)->getURLDate(),
+            'SUMMARY_DEPARTING' => $leaving_today,
+            'SUMMARY_RETURNING' => $returning_today,
         ));
+        $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 6));
+        $i = 0;
+        foreach($colourList as $colour){
+            $this->getPage()->setVar(
+                array(
+                'SUMMARY_COLOR_'.$i => $colour->getHexColour(),
+            ));
+            $i++;
+        }
 
     }
 
@@ -1044,7 +1056,6 @@ class Leave_Controller extends Controller
     public function renderHouseRequestList($data)
     {
         /** @var \HouseResidential $house */
-        new \Alaress_Probe($data);
 
         $house = $data['house'];
         $requestList = $data['requestList'];

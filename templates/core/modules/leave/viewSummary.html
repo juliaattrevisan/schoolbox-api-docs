@@ -7,35 +7,48 @@ div.leave_summary span {
 }
 div.leave_summary p {
     text-align: center;
-    color: white;
     font-size: large;
 }
-section.departing {
-    background-color: tomato;
+div.leave_summary a {
+    color: inherit;
+}
+/*div.leave_summary section.summary_catering p {*/
+    /*line-height: 200px;*/
+    /*color: inherit;*/
+/*}*/
+div.leave_summary span.icon-progress:before{
+    font-size: 100%;
+    color: inherit!important;
+}
+section.summary_tile{
     min-height: 220px;
 }
-section.returning {
-    background-color: yellowgreen;
-    min-height: 220px;
-}
-section.catering {
-    background-color: slategrey;
-    min-height: 220px;
-}
-section.catering p {
-    padding: 80px 0;
-}
-section.catering a {
-    color: white;
-    font-size: 150%;
+
+section.summary_house_tile{
+min-height: 150px;
 
 }
+
+div.leave_summary section.summary_house_tile span {
+    width: 100%;
+    display: block;
+    font-size: 600%;
+    line-height: 100%;
+}
+section.summary_house_line{
+    min-hight: 50px;
+}
+section.summary_house_line p {
+    margin: 0px;
+    line-height: 40px;
+}
+
 </style>
 <ul class="breadcrumb">
     <li><a href="/modules/leave/">Boarder Leave</a></li>
 </ul>
 <div class="leave_summary">
-<div class="actions-small-2 row ">
+<div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Border Leave Management</h1>
@@ -49,29 +62,31 @@ section.catering a {
 
 <div class="row">
     <div class="small-4 island">
-        <section class="departing">
+        <section class="summary_tile" style="background-color:{SUMMARY_COLOR_0}">
 
             <p>
-                <span class="departing">{STUDENTS_DEPARTING}</span> Departing Today
+                <span class="departing">{SUMMARY_DEPARTING}</span> Departing Today
             </p>
 
         </section>
     </div>
     <div class="small-4 island">
-        <section class="returning">
+        <section class="summary_tile" style="background-color:{SUMMARY_COLOR_1}">
 
             <p>
-                <span class="returning">{STUDENTS_RETURNING}</span> Returning Today
+                <span class="returning">{SUMMARY_RETURNING}</span> Returning Today
             </p>
 
         </section>
     </div>
     <div class="small-4 island">
-        <section class="catering">
+        <a href="/modules/leave/report/catering">
+        <section class="summary_tile" style="background-color:{SUMMARY_COLOR_2}">
             <p>
-                <a href="/modules/leave/report/catering" class="icon-progress">View Catering Report</a>
+              <span class="icon-progress"></span>View Catering Report
             </p>
         </section>
+        </a>
     </div>
 </div>
 <!-- BEGIN summary_house -->
@@ -80,39 +95,48 @@ section.catering a {
         <h2 class="subheader">{SUMMARY_HOUSE_NAME}</h2>
     </div>
     <div class="small-4 island">
-        <section>
+        <a href="/modules/leave/report/house/{SUMMARY_HOUSE_ID}/range/{SUMMARY_TODAY}/{SUMMARY_WEEK}">
+        <section class="summary_house_tile">
             <p>
-                {SUMMARY_HOUSE_TOTAL} Total
+                <span>{SUMMARY_HOUSE_TOTAL}</span> Total
             </p>
         </section>
+        </a>
     </div>
     <div class="small-4 island">
-        <section>
-            <div class="content">
+        <a href="/modules/leave/report/house/{SUMMARY_HOUSE_ID}/day/{SUMMARY_TODAY}/">
+        <section class="summary_house_tile">
+
                 <p>
-                    {SUMMARY_HOUSE_ONLEAVE} On Leave
+                    <span>{SUMMARY_HOUSE_ONLEAVE}</span> On Leave Today
                 </p>
-            </div>
+
         </section>
+        </a>
     </div>
     <div class="small-4 island">
-        <section>
+        <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}">
+        <section class="summary_house_line" style="background-color: {SUMMARY_COLOR_3}">
 
             <p>
                 {SUMMARY_HOUSE_PENDING} Pending
             </p>
         </section>
-
-        <section>
+        </a>
+        <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}">
+        <section class="summary_house_line" style="background-color: {SUMMARY_COLOR_4}">
             <p>
                 {SUMMARY_HOUSE_APPROVED} Approved
             </p>
         </section>
-        <section>
+        </a>
+        <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}">
+        <section class="summary_house_line" style="background-color: {SUMMARY_COLOR_5}">
             <p>
                 {SUMMARY_HOUSE_REJECTED} Rejected
             </p>
         </section>
+        </a>
     </div>
 
 </div>
