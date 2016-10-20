@@ -49,9 +49,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Controller extends Base
 {
-
-
-
     /**
      * @var ErrorMapper
      */
@@ -193,7 +190,7 @@ class Controller extends Base
         $data = [
             'context'         => $context,
             'contextType'     => AssessmentContextType::objectToString($context),
-            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromContext($context, $assessment),
+            'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromContext($context, $assessment),
             'attachzone'      => $zone->getTwigContext(),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
@@ -350,7 +347,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
+            'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment'      => $assessment,
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'attachzone'      => $zone->getTwigContext(),
@@ -434,7 +431,7 @@ class Controller extends Base
 //
 //        $data = [
 //            'attachzone' => $zone->getTwigContext(),
-//            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
+//            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($project)->add(['Create Assessment', '#']),
 //            'folder' => $folder,
 //            'types' => $types,
 //            'project' => $project,

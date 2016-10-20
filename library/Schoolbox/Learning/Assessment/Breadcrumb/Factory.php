@@ -34,7 +34,7 @@ class Factory
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * Constructor
@@ -72,7 +72,9 @@ class Factory
         /* Additional project node, if you're creating within a project
          */
         if ($assessment instanceof Project) {
-            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"]);
+            $params = ['assessmentId' => $assessment->getId()];
+            $route = $this->router->generate('learningAssessment.getUpdateAssessment', $params);
+            $trail->add([$assessment->getTitle(), $route]);
         }
 
         return $trail;
@@ -93,22 +95,14 @@ class Factory
         $trail = new Collection();
         $trail->add(['Learning', '#']);
 
-        try {
-            if ($context instanceof Folder) {
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($context instanceof UnitImplementation) {
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($context instanceof UnitSpecification) {
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($context instanceof Project) {
-                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
-            }
-        }
-        catch (DeletedException $e) {
-
-            /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
-             */
-            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
+        if ($context instanceof Folder) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitImplementation) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitSpecification) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof Project) {
+            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
         }
 
         $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Assessment';
