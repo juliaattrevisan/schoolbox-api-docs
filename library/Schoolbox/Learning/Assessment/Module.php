@@ -155,9 +155,7 @@ class Module extends BaseModule
             '(?:getStatus|getSummary|getStudentAssessment)',
             function ($params) {
 
-                // TODO. Hydrate specified IAssessable
-                $args['assessment'] = $params['assessmentId'];
-                $args['project'] = $params['projectId'];
+                $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
 
                 if (array_key_exists('studentId', $params)) {
                     try {

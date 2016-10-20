@@ -871,6 +871,125 @@ class Controller extends Base
     }
 
     /**
+     * Displays the teacher dashboard of an assessable with tracking and management details
+     * @param IAssessable $assessment
+     */
+    private function getSummaryProject(IAssessable $assessment)
+    {
+        // TODO - use the specified $assessment instead of DummyData
+
+        $project = self::getDummyAssessment(7);
+
+        // Calculate summary totals for display purposes
+
+        $participants = $project->getAllParticipants();
+
+        $counts = [];
+
+        foreach ($participants as $participant) {
+            $counts[$participant->getUser()->getId()] = [
+                'total' => 0,
+                'totalCompleted' => 0,
+            ];
+        }
+
+        $assessables = $project->getAssessables();
+
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
+            foreach ($assessable->getAllParticipants() as $participant) {
+                $counts[$participant->getUser()->getId()]['total']++;
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                }
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'counts' => $counts,
+            'assessment' => $project,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
+    }
+
+    /**
+     * Display the student dashboard for an assessable
+     * @param IAssessable $assessment
+     */
+    private function getSummaryStudent(IAssessable $assessment)
+    {
+        // TODO - use the specified $assessment instead of DummyData
+
+        $project = self::getDummyAssessment(7);
+
+        // Calculate summary totals for display purposes
+
+        $counts = [
+            'dueWork' => 0,
+            'dueWorkCompleted' => 0,
+            'quiz' => 0,
+            'quizCompleted' => 0,
+            'task' => 0,
+            'taskCompleted' => 0,
+            'total' => 0,
+            'totalCompleted' => 0,
+        ];
+
+        $assessables = $project->getAssessables();
+
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
+
+            $participant = $assessable->getParticipant($this->getUser());
+
+            if ($assessable instanceof Quiz) {
+                $type = "quiz";
+            } else if ($assessable instanceof Task) {
+                $type = "task";
+            } else {
+                $type = "dueWork";
+            }
+
+            $counts[$type]++;
+            $counts['total']++;
+
+            // If the student has submitted at least one response we will assume it is completed
+
+            if ($participant->getAllResponses()->count() > 0) {
+                $counts[$type.'Completed']++;
+                $counts['totalCompleted']++;
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'student' => $this->getUser(),
+            'assessment' => $project,
+            'counts' => $counts
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
+    }
+
+    /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessment/{assessmentId}
+     * @level 165
+     * @param IAssessable $assessment
+     */
+    public function getSummary(IAssessable $assessment)
+    {
+        if ($this->getUser()->getRole()->isStudent()) {
+            return $this->getSummaryStudent($assessment);
+        }
+
+        return $this->getSummaryProject($assessment);
+    }
+
+    /**
      * Displays a form enabling a student to submit items to an assessment
      *
      * @api   GET /learning/assessment/:assessmentId/:studentId/submit
