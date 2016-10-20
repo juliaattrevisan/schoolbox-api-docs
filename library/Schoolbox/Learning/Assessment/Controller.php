@@ -397,8 +397,10 @@ class Controller extends Base
             // Determine returnUrl
             $returnUrl = $this->getRequest()->post['returnUrl'];
 
-            // Not explicitly specified?
-            if(!$returnUrl){
+            // Explicitly specified?
+            if($returnUrl) {
+                $returnUrl = $this->returnUrlDecode($returnUrl);
+            } else {
                 // Determine appropriate location
                 $context = $assessment->getContext();
 
@@ -412,85 +414,14 @@ class Controller extends Base
                     $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
                 }
             }
+
             $this->getResponse()->redirect->to($returnUrl);
-//            $this->getResponse()->content->set($this->buildJsonOutput([]));
         }
         catch (\Exception $e) {
             $this->sendError($e);
         }
     }
 
-    /**
-     * Create an Assessment within a particular Project
-     *
-     * @param $assessmentId
-     * @param $assessmentType
-     * @todo merge this with getSelectAssessmentInProject()
-     */
-//    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-//    {
-//
-//        try {
-//            $project = $this->getAssessmentMapperProxy()->findById($assessmentId);
-//            $folder  = $project->getContext()->getFolder();
-//        }
-//        catch (MapperException $e) {
-//            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-//            return;
-//        }
-//
-//        if (!$project instanceof Project) {
-//            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-//        }
-//
-//        $types = new AssessmentType();
-//
-//        $zoneFactory = new ZoneFactory();
-//        $zone = $zoneFactory->buildForAssessment($project);
-//
-//        $data = [
-//            'attachzone' => $zone->getTwigContext(),
-//            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($project)->add(['Create Assessment', '#']),
-//            'folder' => $folder,
-//            'types' => $types,
-//            'project' => $project,
-//            'contextType' => AssessmentContextType::TYPE_PROJECT,
-//            'assessment' => [],
-//            'assessmentType' => $assessmentType,
-//            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
-//            'allGradeSchemes' => $this->getAllGradeSchemes(),
-//            'returnUrl' => $this->getRequest()->query['return_url']
-//        ];
-//
-//        $template = "@learningAssessment/fragments/{$types->objectToString($assessmentType)}/createWithinProject.twig";
-//        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
-//    }
-
-    /**
-     * Save the data when creating an assessment within a Project
-     *
-     * Use the returnUrl specified in querystring instead, but you
-     * could infer it based on output of $this->persistAssessment()
-     */
-//    public function postCreateAssessmentWithinProject()
-//    {
-//        // Persist within context of a project
-//        try {
-//            $this->persistAssessment();
-//        }
-//        catch (\RuntimeException $e) {
-//            return;
-//        }
-//
-//        /* Use the returnUrl specified in querystring instead
-//         * TODO: Maybe can infer it based on output of $this->persistAssessment?
-//         */
-//        $data = [
-//            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
-//        ];
-//
-//        $this->getResponse()->content->set($this->buildJsonOutput($data));
-//    }
 
     /**
      * Delete an assessment
@@ -726,7 +657,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+        $suffix = '?return_url=' . $this->returnUrlEncode($returnUrl);
 
         $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
@@ -744,6 +675,28 @@ class Controller extends Base
         }
 
         return $allReturnUrls;
+    }
+
+    /**
+     * Encodes a returnUrl
+     *
+     * @param string $returnUrl
+     * @return string
+     */
+    private function returnUrlEncode($returnUrl)
+    {
+        return urlencode(base64_encode($returnUrl));
+    }
+
+    /**
+     * Decodes an encoded returnUrl
+     *
+     * @param string $encodedReturnUrl
+     * @return string
+     */
+    private function returnUrlDecode($encodedReturnUrl)
+    {
+        return base64_decode(urldecode($encodedReturnUrl));
     }
 
     /**

@@ -282,11 +282,12 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'folderMapper'                 => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'errorMapper'                  => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'assessmentDataSource'         => $injector->lazyGet('assessmentDataSource'),
-                'unitSpecificationDataSource'  => $injector->lazyGet('unitSpecificationDataSource'),
-                'unitImplementationDataSource' => $injector->lazyGet('unitImplementationDataSource'),
+                'folderMapper'                  => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'submissionFileMapper'          => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class),
+                'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
+                'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
+                'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
             ])
         );
     }
