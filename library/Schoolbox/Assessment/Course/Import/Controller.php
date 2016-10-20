@@ -40,6 +40,9 @@ class Controller extends Base\Base
     /** @var Course\SpecificationMapperProxy */
     private $courseSpecificationMapperProxy;
 
+    /** @var Course\ImplementationMapperProxy */
+    private $courseImplementationMapperProxy;
+
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
@@ -51,6 +54,9 @@ class Controller extends Base\Base
 
     /** @var Assessment\DataModel\MapperProxy */
     private $assessmentMapper;
+
+    /** @var Course\ImplementationFactory */
+    private $courseImplementationFactory;
 
     /**
      * Just a raw template render
@@ -321,318 +327,120 @@ class Controller extends Base\Base
     {
         $post = $this->getRequest()->post;
 
-        // Validate dates before we save (nothing to do for tasks)
+        // $post['unit'][$specId]              contains the information from which to spawn a unit instance
+        // $post['unit'][$specId]['a'][$assId] contains the information from which to spawn an assessment to jam into the instance
 
-        // Validate due work
+        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['course_homepage'])->setUnits(new Collection()); // TODO what the actual fuck
 
-        if (isset($post["work"])) {
-            foreach ($post["work"] as $work) {
-                try {
-                    \Alaress_Date_Format::newLocalShort($work['publish_date']);
-                } catch (\Exception $e) {
-                    $this->sendError('You must enter a publish date for each due work item before you can proceed.');
+        foreach ($post['unit'] as $unitSpecId => $unitPost) {
+//          $unitImplId = $unitPost['impl_id'];
+
+            try {
+                // cache the spec
+                $unitSpec = $this->getUnitSpecificationMapperProxy()->findById($unitSpecId);
+
+                // TODO in import-modify context, support overlay of implementation assessments over spec
+
+            } catch (MapperException $e) {
+                $this->sendError("Could not import non-existent unit [spec $unitSpecId]");
+                return;
+            }
+
+            foreach ($unitPost['a'] as $assId => $assDates) {
+                // get the assessment
+                $a = $this->getAssessmentMapper()->findById($assId);
+
+                // locate its unit in the cache
+                $ctxId = $a->getContext()->getId();
+
+                // verify the context matches what we were given in post
+                if ($ctxId != $unitSpec->getId()) {
+                    $this->sendError("Trying to import assessment $assId from incorrect unit spec $ctxId");
                     return;
                 }
 
-                try {
-                    \Alaress_Date_Format::newLocalShort($work['due_date']);
-                } catch (\Exception $e) {
-                    $this->sendError('You must enter a due date for each due work item before you can proceed.');
-                    return;
-                }
-
-                // Accepting submissions, must have the other two dates
-
-                if ($work['submissions'] == '1') {
-                    try {
-                        \Alaress_Date_Format::newLocalShort($work['open_date']);
-                    } catch (\Exception $e) {
-                        $this->sendError('You must enter an open date for each due work item that accepts submissions before you can proceed.');
+                // set dates
+                foreach ($assDates as $property => $localShort) {
+                    $method = "set{$property}at";
+                    if (!method_exists($a, $method)) {
+                        $this->sendError("Invalid date property: $property");
                         return;
                     }
-
-                    try {
-                        \Alaress_Date_Format::newLocalShort($work['late_date']);
-                    } catch (\Exception $e) {
-                        $this->sendError('You must enter a late date for each due work item that accepts submissions before you can proceed.');
-                        return;
-                    }
+                    $a->$method(\Alaress_Date_Format::newLocalShort($localShort));
                 }
+
+                // attach assessment to spec
+                $unitSpec->getAssessables()->add($a);
             }
+
+            // load the unit spec into our course spec
+            $courseSpec->getUnits()->add($unitSpec);
         }
 
-        // Validate quizzes
+        // course is full loaded
+        $ships = array_map(function ($v) { return explode(':', $v); }, explode(',', $post['ownerships']));
+        $ships = array_combine(array_column($ships, 0), array_column($ships, 1));
 
-        if (isset($post["quiz"])) {
-            foreach ($post["quiz"] as $quiz) {
-                try {
-                    \Alaress_Date_Format::newLocalShort($quiz['start_date']);
-                } catch (\Exception $e) {
-                    $this->sendError('You must enter a start date for each quiz before you can proceed.');
+        /** @var Course\Implementation[]|Collection $courseImplementations */
+        $courseImplementations = new Collection();
+
+        foreach ($ships as $folderId => $newOwnerId) {
+
+            // convert the fully-loaded course spec into an implementation for this class
+            $courseImpl = $this->getCourseImplementationFactory()->build($courseSpec, $this->getFolderMapper()->findById($folderId));
+
+            // assign the new owner to every assessment
+            foreach ($courseImpl->getUnits() as $unit) {
+
+                // locate the dates provided in post and assign to this now-created implementation
+                $unitSpecId = $unit->getSpecification()->getId();
+
+                if (empty($post['unit'][$unitSpecId])) {
+                    $this->sendError("No dates provided for unit spec: $unitSpecId");
                     return;
                 }
 
-                try {
-                    \Alaress_Date_Format::newLocalShort($quiz['finish_date']);
-                } catch (\Exception $e) {
-                    $this->sendError('You must enter a finish date for each quiz before you can proceed.');
-                    return;
+                $dates = $post['unit'][$unitSpecId];
+
+                $unit->setOpenDate(\Alaress_Date_Format::newLocalShort($dates['open']));
+                $unit->setDueDate(\Alaress_Date_Format::newLocalShort($dates['due']));
+
+                foreach ($unit->getAssessables() as $a) {
+                    $a->setCreator($this->getUserMapper()->findById($newOwnerId));
                 }
             }
+
+            $courseImplementations->add($courseImpl);
         }
-
-        // Parse homepages out of CSV format into an array
-
-        $homepages = explode(",", $post["homepage"]);
-
-        // Test permissions for each homepage. Must have write permission on the destination page and read permission
-        // on the course we are trying to import.
-
-        // Test course page read access
-
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
-            throw new Failure\Unauthorized();
-        }
-
-        // Test each homepage for write access
-
-        foreach ($homepages as $homepage) {
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                throw new Failure\Unauthorized();
-            }
-        }
-
-        /** @var \Schoolbox\User[] $owners */
-        $owners = [];
-
-        if (isset($post['ownerships']) && strlen($post['ownerships']) && strpos($post['ownerships'], ':')) {
-            // unsquash ownerships
-            foreach (explode(',', $post['ownerships']) as $ownership) {
-                if (preg_match('/^\\d+:\\d+/', $ownership)) {
-                    list ($folderId, $userId) = explode(':', $ownership);
-                    try {
-                        $owners[$folderId] = $this->getUserMapper()->findById($userId);
-                    } catch (MapperException $e) {
-                        // Couldn't find user. That's sort of okay.
-                        $owners[$folderId] = null;
-                    }
-                }
-            }
-        }
-
-
-        // Keep a cache of queried data
-
-        /** @var Folder\Model[] $unitCache */
-        $unitCache = [];
-        /** @var Folder\Model[] $homepageCache */
-        $homepageCache = [];
-        /** @var Component_Instance[] $componentCache */
-        $componentCache = [];
-
-        // Delete any units that aren't selected
-
-        foreach ($post["unit"] as $unit) {
-            if ($unit["import"] != 1) {
-                $unitsToDelete = $this->getUnitInstanceMapper()->findByColumnList([
-                    "unit_category_id" => $unit["unit_id"],
-                    "component_id" => $post["component_id"],
-                    "category_id" => $post["homepage"]
-                ]);
-                $this->getUnitInstanceMapper()->delete($unitsToDelete);
-            }
-        }
-
-        // Create course outline component on each homepage
 
         try {
-            foreach ($homepages as $homepage) {
-                // Get the homepage we are importing into and store it for later
-                $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
+            // aaaaaand, into the DB with you!
+            foreach ($courseImplementations as $ci) {
+                $this->getCourseImplementationMapperProxy()->save($ci);
 
-                try {
-
-                    // Updating existing course outline, just grab it from the database
-                    $component = $this->getComponentInstanceMapper()->findById($post["component_id"]);
-
-                    if ($component->getIdentifier() == $homepage
-                        && $component->getModule() == 'homepage'
-                    ) {
-                        $componentCache[$homepage] = $component;
-                    } else {
-                        // Inserting new course outline, create it on the current homepage
-                        $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
-                    }
-
-                } catch (\Exception $e) {
-
-                    // Inserting new course outline, create it on the current homepage
-                    $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
-                }
-            }
-
-            // Create new unit instances in each of these pages/components
-
-            foreach ($homepages as $homepage) {
-
-                /* Use same derivation as previous step
-                 */
-                $allTaskDates = $this->determineTaskDates(
-                    $post["unit"],
-                    $componentCache[$homepage]->getId()
-                );
-
-                $unit_instance_list = new Collection();
-
-                foreach ($allTaskDates['units'] as $currentUnit) {
-
-                    /* TODO: Not sure if caching is much use here
-                     * I thought Units couldn't be duped anyway
-                     */
-                    if (!isset($unitCache[$currentUnit['id']])) {
-                        try {
-                            $unitCache[$currentUnit['id']] = $this->getFolderMapper()->findById($currentUnit['id']);
-                        } catch (MapperExceptionDeleted $e) {
-                            // accommodate deleted units
-                            $unitCache[$currentUnit['id']] = $e->getDeletedObject();
-                        } catch (\Exception $e) {
-                            $this->sendError('An unexpected error occurred');
-                            return;
-                        }
-                    }
-
-                    // Work out if we are updating an existing course, or importing a new one
-
-                    try {
-
-                        // Updating an existing unit
-
-                        /** @var UnitInstance $unit_instance */
-                        $unit_instance = $this->getUnitInstanceMapper()->findOneByColumnList([
-                            "component_id" => $componentCache[$homepage]->getId(),
-                            "category_id" => $homepageCache[$homepage]->getId(),
-                            "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
-                            "deleted_at" => null,
-                        ]);
-
-                        // Update the units open/due date
-
-                        $unit_instance
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date'])->startOfDay())
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date'])->endOfDay());
-
-                        // Update everything associated with the unit instance
-
-                        $taskInstances = $this->getTaskInstanceMapper()->findByColumn("course_unit_instance_id", $unit_instance->getId());
-
-                        /** @var TaskInstance $taskInstance */
-                        foreach ($taskInstances as $taskInstance) {
-                            switch ($taskInstance->getType()) {
-                                case Task::TYPE_DUE_WORK:
-
-                                    // Due work
-
-                                    $submissionBox = $this->submissionBoxMapper->findById($taskInstance->getSubmissionBox()->getId());
-                                    $submissionBox->setDatesFromForm($post["work"][$taskInstance->getId()]);
-
-                                    // Date validation:
-                                    // Publish <= Open <= Due <= Late
-                                    if ($submissionBox->getPublishDate()->gt($submissionBox->getOpenDate())) {
-                                        $this->sendError('A task\'s open date may not be before its publish date.');
-                                        return;
-                                    }
-                                    if ($submissionBox->getOpenDate()->gt($submissionBox->getDueDate())) {
-                                        $this->sendError('A task\'s due date may not be before its open date.');
-                                        return;
-                                    }
-                                    if ($submissionBox->getDueDate()->gt($submissionBox->getLateDate())) {
-                                        $this->sendError('A task\'s late date may not be before its due date.');
-                                        return;
-                                    }
-
-                                    if (isset($owners[$homepage])) {
-                                        // update the owner
-                                        $submissionBox->setOwner($owners[$homepage]);
-                                    }
-
-                                    $this->getSubmissionBoxMapper()->save($submissionBox);
-
-                                    break;
-
-                                case Task::TYPE_ONLINE_ASSESS:
-
-                                    // Quizzes
-
-                                    $assessment = $this->getOnlineAssessmentMapper()->findById($taskInstance->getAssessment()->getId());
-                                    $assessment->setDatesFromForm($post["quiz"][$taskInstance->getId()]);
-
-                                    // Date validation:
-                                    // Start <= Finish
-                                    if ($assessment->getStart()->gt($assessment->getFinish())) {
-                                        $this->sendError('A task\'s finish date may not be before its start date.');
-                                        return;
-                                    }
-
-                                    if (isset($owners[$homepage])) {
-                                        // update the owner
-                                        $assessment->setUser($owners[$homepage]);
-                                    }
-
-                                    $this->getOnlineAssessmentMapper()->save($assessment);
-
-                                    break;
-                            }
-                        }
-
-                        $this->getSubmissionBoxMapper()->findByColumn("task_instance_id", $unit_instance->getId());
-
-                        $unit_instance_list->add($unit_instance);
-
-                    } catch (MapperException $e) {
-
-                        // Adding a new unit into the course.
-
-                        $unit_instance = new UnitInstance();
-
-                        $unit_instance
-                            ->setWorkDates($post["work"])// Override due work dates in cloner
-                            ->setQuizDates($post["quiz"])// Override quiz dates in cloner
-                            ->setWorkOwner(isset($owners[$homepage]) ? $owners[$homepage] : $this->getUser())
-                            ->setComponent($componentCache[$homepage])
-                            ->setTitle($unitCache[$currentUnit['id']]->getName())
-                            ->setCategory($homepageCache[$homepage])
-                            ->setUnitCategory($unitCache[$currentUnit['id']])
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date'])->startOfDay())
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date'])->endOfDay());
-
-                        $unit_instance_list->add($unit_instance);
+                // save the assessments inside
+                foreach ($ci->getUnits() as $unit) {
+                    foreach ($unit->getAssessables() as $seq => $a) {
+                        $this->getAssessmentMapper()->save($a, $seq + 1);
                     }
                 }
-
-                /* TODO: Coursework Date superposition
-                 * Apply separate dates for existing and new tasks
-                 */
-                $this->getUnitInstanceMapper()->save($unit_instance_list);
             }
-
-            /* Redirect back to wherever you came from...
-             * ...hopefully (...your confidence is inspiring)
-             */
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => [
-                    'redirect' => $this->getSession()->getHistory(2)
-                ]
-            ]);
-
-        } catch (\InvalidArgumentException $e) {
-            // bad dates, most likely
-            $this->sendError("Invalid date given");
-
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             $this->sendError($e->getMessage());
+            return;
         }
 
+        /* Redirect back to wherever you came from...
+         * ...hopefully (...your confidence is inspiring)
+         */
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => [
+                'redirect' => $this->getSession()->getHistory(2)
+            ]
+        ]);
+
+        return;
     }
 
     /**
@@ -928,6 +736,46 @@ class Controller extends Base\Base
     public function setAssessmentMapper($assessmentMapper)
     {
         $this->assessmentMapper = $assessmentMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Course\ImplementationFactory
+     */
+    public function getCourseImplementationFactory()
+    {
+        return $this->courseImplementationFactory;
+    }
+
+
+    /**
+     * @param Course\ImplementationFactory $unitImplementationFactory
+     * @return static
+     */
+    public function setCourseImplementationFactory($unitImplementationFactory)
+    {
+        $this->courseImplementationFactory = $unitImplementationFactory;
+        return $this;
+    }
+
+
+    /**
+     * @return Course\ImplementationMapperProxy
+     */
+    public function getCourseImplementationMapperProxy()
+    {
+        return $this->courseImplementationMapperProxy;
+    }
+
+
+    /**
+     * @param Course\ImplementationMapperProxy $courseImplementationMapperProxy
+     * @return static
+     */
+    public function setCourseImplementationMapperProxy($courseImplementationMapperProxy)
+    {
+        $this->courseImplementationMapperProxy = $courseImplementationMapperProxy;
         return $this;
     }
 

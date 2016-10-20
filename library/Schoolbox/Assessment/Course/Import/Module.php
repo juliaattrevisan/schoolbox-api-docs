@@ -157,10 +157,14 @@ class Module extends \Alaress\Module\Module
                 'setUnitSpecificationMapperProxy'   => $injector->lazyNew(Unit\SpecificationMapperProxy::class),
                 'setFolderMapper'                   => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
                 'setCourseSpecificationMapperProxy' => $injector->lazyNew(Course\SpecificationMapperProxy::class),
+                'setCourseImplementationMapperProxy' => $injector->lazyNew(Course\ImplementationMapperProxy::class),
                 'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                 'setAccess'                         => $injector->lazyNew(Access::class),
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
                 'setAssessmentMapper'               => $injector->lazyGet('assessmentDataSource'),
+                'setCourseImplementationFactory'    => $injector->lazyNew(Course\ImplementationFactory::class, [
+                    'unitImplementationFactory' => $injector->lazyNew(Unit\ImplementationFactory::class)
+                ])
             ])
         );
 
