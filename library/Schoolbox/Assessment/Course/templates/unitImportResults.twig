@@ -59,7 +59,11 @@
         $(document).on('change', 'input[data-assessment]', function () {
             var $input = $(this),
                 aid    = $input.data('assessment'),
-                $tgt   = $('[data-assessment-dates=' + aid + ']');
+                $tgt   = $('[data-assessment-dates=' + aid + ']'),
+                $unit  = $input.closest('[data-unit]'),
+                $count = $unit.find('[data-show-count]');
+
+            $count.attr('data-show-count', $unit.find(':checked').length);
 
             if ($input.prop('checked')) {
                 $tgt.find('input').prop('disabled', false);
@@ -84,34 +88,36 @@
 
 <div class="row">
     <div class="small-12 column">
-        <p class="meta" data-mage-helptext>The list of coursework to be imported is below. You can change the dates of due work and quizzes before completing the import.</p>
+        <p class="meta" data-mage-helptext>The list of coursework to be imported is below. You can deselect assessments and change dates before completing the import.</p>
     </div>
 </div>
 {% for unit in units %}
     {% set inputPrefix %}unit[{{ unit.specification.id }}][a]{% endset %}
+    {% set unitAssessCount = unit.specification.assessables | length %}
 <input type="hidden" name="unit[{{ unit.specification.id }}][impl_id]" value="{{ unit.id }}">
 <input type="hidden" name="unit[{{ unit.specification.id }}][open]" value="{{ unit.openDate.localShort }}">
 <input type="hidden" name="unit[{{ unit.specification.id }}][due]" value="{{ unit.dueDate.localShort }}">
-<div class="row">
+<div class="row" data-unit="{{ unit.specification.id }}">
     <div class="small-12 columns">
         <section>
             <ul class="action-list">
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>{{ unit.specification.folder.name }}</h3>
+                            <h3><span class="icon-unit"></span>{{ unit.specification.folder.name }}</h3>
+                            <p class="meta">{{ unitAssessCount ?: "No" }} assessments{% if unitAssessCount %}, <span data-show-count="{{ unitAssessCount }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
                     <nav>
-                        <a data-collapser="unit-{{ unit.specification.id }}" href="#" class="icon-{% if loop.first %}down{% else %}up{% endif %}-arrow collapse" title="Collapse Content"></a>
+                        <a data-collapser="unit-{{ unit.specification.id }}" href="#" class="icon-down-arrow collapse" title="Collapse Content"></a>
                     </nav>
                 </li>
             </ul>
-            <div id="unit-{{ unit.specification.id }}" data-start_date="{{ unit.openDate.localShort }}" data-finish_date="{{ unit.dueDate.localShort }}">
+            <div id="unit-{{ unit.specification.id }}" data-start_date="{{ unit.openDate.localShort }}" data-finish_date="{{ unit.dueDate.localShort }}" class="hide">
                 <div class="row">
                     <div class="small-12 island">
                         <section>
-                            {% if unit.specification.assessables | length %}
+                            {% if unitAssessCount %}
                             <ul class="information-list">
                                 {% for assessment in unit.specification.assessables %}
 
