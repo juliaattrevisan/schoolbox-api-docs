@@ -29,7 +29,7 @@ class ImplementationFactory
         foreach ($unitSpecification->getAssessables() as $assessable) {
             // Maybe each assessable has a clone method?
             $newAssessable = clone $assessable;
-            $newAssessable->setId(null);
+            $newAssessable->setId(null)->setContext($implementation);
             $implementation->getAssessables()->add($newAssessable);
         }
         return $implementation

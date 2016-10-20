@@ -48,7 +48,7 @@ class ImplementationFactory
         $implementation = new CourseImplementation();
         foreach ($courseSpecification->getUnits() as $unitSpecification) {
             $implementation->getUnits()->add(
-                $this->unitImplementationFactory->build($unitSpecification)
+                $this->unitImplementationFactory->build($unitSpecification)->setCourse($implementation)
             );
         }
         return $implementation
