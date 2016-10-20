@@ -15,17 +15,13 @@
          */
         function setupAssessmentEnd() {
             $('input[data-mage-next="end"]').mage({
-                manipulateSerialized: function(data) {
-                    var newData = data;
-
+                setFormData: function(data) {
                     if (CKEDITOR.instances['description'] != undefined) {
-                        newData.push({
+                        data.push({
                             name: 'description',
                             value: CKEDITOR.instances['description'].getData()
                         });
                     }
-
-                    return newData;
                 },
 
                 onXhrDone: function (data) {
