@@ -328,33 +328,26 @@ class Controller extends Base
         catch (\RuntimeException $e) {
 
             /* TODO actually handle the error
-             *  Return Early to let mage deal with error messages
+             * Return Early to let mage deal with error messages
              */
             return;
         }
 
-        /* If it were a project, go back to the project's Update screen
-         * Otherwise return to the homepage
+        /* Redirect to project summary screen instead, if you spawned a project
+         * Otherwise return to context
          */
-        $types = new Types();
-
         if ($assessmentInfo['assessment'] instanceof Project) {
-
-            /* Continue as normal
-             */
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => $types,
-                'assessmentId' => $assessmentInfo['assessment']->getId(),
-                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']->getId()),
-            ]));
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else {
-            $data = [
-                'returnUrl' => $assessmentInfo['returnUrl']
-            ];
-
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
+            $returnUrl = $assessmentInfo['returnUrl'];
         }
+
+        $data = [
+            'returnUrl' => $returnUrl
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -364,7 +357,6 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
-
         $assessmentType = null;
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
