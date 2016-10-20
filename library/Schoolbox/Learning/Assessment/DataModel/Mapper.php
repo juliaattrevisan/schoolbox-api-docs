@@ -290,6 +290,9 @@ class Mapper extends BaseMapper
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
 
+        // Folder codes for all contexts
+        $modelList = $this->augmentListWithFolderCodes($modelList);
+
         return $modelList;
     }
 
@@ -362,6 +365,28 @@ class Mapper extends BaseMapper
                 }
             }
         }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with context projects.
+     *
+     * @param Collection|Model[] $modelList
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithFolderCodes($modelList)
+    {
+        // Load context's category codes (Required for retrieving participants)
+        // Not viable to fetch in the mega-query due to 1-M join shenanigans
+        foreach ($modelList as $model) {
+            $context = $model->getAssessmentContext();
+
+            // Folder context: load folder codes
+            // Unit impl context: load context's folder codes
+            // Unit spec context: don't need folder codes?
+            // Project context: its folder was loaded separately.
+        }
+
         return $modelList;
     }
 }
