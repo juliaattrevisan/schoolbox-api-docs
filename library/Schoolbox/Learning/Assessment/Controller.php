@@ -420,6 +420,7 @@ class Controller extends Base
      */
     public function postUpdateAssessment($assessmentId)
     {
+
         try {
             $assessmentInfo = $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
         }
@@ -443,7 +444,11 @@ class Controller extends Base
             $returnUrl = $assessmentInfo['returnUrl'];
         }
 
-        $this->getResponse()->redirect->to($returnUrl);
+        $data = [
+            'returnUrl' => $returnUrl
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
