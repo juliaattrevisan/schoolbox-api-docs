@@ -447,56 +447,6 @@ class Controller extends Base
     }
 
     /**
-     * Create an Assessment within a particular Project
-     *
-     * @param $assessmentId
-     * @param $assessmentType
-     */
-    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-    {
-
-        try {
-            $project = $this->getAssessmentDataSource()->findById($assessmentId);
-            $folder  = $project->getContext()->getFolder();
-        }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-            return;
-        }
-
-        if (!$project instanceof Project) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-        }
-
-        $types = new Types();
-
-        $zoneFactory = new ZoneFactory($types);
-        $zone = $zoneFactory->buildForAssessment($project);
-
-        if ($types->isValidIndex($assessmentType)) {
-            $data = [
-                'attachzone' => $zone->getTwigContext(),
-                'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
-                'folder' => $folder,
-                'types' => $types,
-                'project' => $project,
-                'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
-                'assessment' => [],
-                'assessmentType' => $assessmentType,
-                'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
-                'allGradeSchemes' => $this->getAllGradeSchemes(),
-                'returnUrl' => $this->getRequest()->query['return_url']
-            ];
-
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/createWithinProject.twig", $data));
-        }
-        else {
-            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-            return;
-        }
-    }
-
-    /**
      * Save the data when creating an assessment within a Project
      *
      * Use the returnUrl specified in querystring instead, but you
@@ -603,7 +553,7 @@ class Controller extends Base
          * Return to summary screen with this suffix
          */
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
-        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+        $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
 
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
