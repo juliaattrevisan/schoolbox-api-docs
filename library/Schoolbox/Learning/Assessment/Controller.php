@@ -185,7 +185,7 @@ class Controller extends Base
      */
     private function getSelectAssessmentData(AssessmentContext $context, AbstractAssessment $assessment = null)
     {
-        $zoneFactory = new ZoneFactory(new AssessmentType());
+        $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
         /* The usual info everything requires
@@ -338,40 +338,25 @@ class Controller extends Base
     /**
      * Update an existing Assessment's details
      *
-     * @param int $assessmentId
+     * @param IAssessable $assessment
      */
-    public function getUpdateAssessment($assessmentId)
+    public function getUpdateAssessment(IAssessable $assessment)
     {
-        $assessmentType = null;
-        $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
-        $folder         = $assessment->getContext()->getFolder();
-
-        // TODO this is AssessmentType.php responsibility
-        if ($assessment instanceof Task) {
-            $assessmentType = AssessmentType::TYPE_TASK;
-        } elseif ($assessment instanceof Quiz) {
-            $assessmentType = AssessmentType::TYPE_QUIZ;
-        } elseif ($assessment instanceof DueWork) {
-            $assessmentType = AssessmentType::TYPE_DUE_WORK;
-        } elseif ($assessment instanceof Project) {
-            $assessmentType = AssessmentType::TYPE_PROJECT;
-        }
-
         $types = new AssessmentType();
 
-        $zoneFactory = new ZoneFactory($types);
+        $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessment($assessment);
 
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '#']),
-            'assessment' => $assessment,
-            'assessmentType' => $assessmentIndex,
-            'attachzone' => $zone->getTwigContext(),
-            'folder' => $folder,
-            'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessment),
+            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
+            'assessment'      => $assessment,
+            'assessmentType'  => AssessmentType::objectToString($assessment),
+            'attachzone'      => $zone->getTwigContext(),
+            'folder'          => $assessment->getContext()->getFolder(),
+            'curriculumNodes' => $assessment->getContext()->getFolder()->getCurriculumNodes(),
+            'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
@@ -379,7 +364,7 @@ class Controller extends Base
          */
         $summatorMapping = new SummatorMapping();
 
-        if ($assessmentId instanceof Project) {
+        if ($assessment instanceof Project) {
             $data['types']         = $types;
             $data['allReturnUrls'] = $this->getAllReturnUrls($assessment);
             $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
@@ -444,7 +429,7 @@ class Controller extends Base
 //
 //        $types = new AssessmentType();
 //
-//        $zoneFactory = new ZoneFactory($types);
+//        $zoneFactory = new ZoneFactory();
 //        $zone = $zoneFactory->buildForAssessment($project);
 //
 //        $data = [
