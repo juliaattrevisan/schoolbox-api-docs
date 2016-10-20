@@ -58,7 +58,7 @@
                     <i class="icon-project"></i>
                     <p>Your project is empty.</p>
                     <p>
-                        Add a new <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id}) }}{{ returnUrlSuffix }}" title="Create a new Assessment">Assessment</a>
+                        Add a new <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" title="Create a new Assessment">Assessment</a>
                     </p>
                 </div>
                 {% endif %}
