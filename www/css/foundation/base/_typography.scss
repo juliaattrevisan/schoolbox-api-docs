@@ -234,45 +234,9 @@ blockquote{
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 
-/* These should now be obsoleted
- */
-.primary{
-  color: $primary-color;
-}
-
-.secondary{
-  color: $secondary-color;
-}
-
-.tertiary{
-  color: $tertiary;
-}
-
-
-// Add colours
-.success{
-	color: $success-color;
-}
-
-.warning{
-	color: $warning-color;
-}
-
 // .info.card is not the same thing as .info
 .info:not(.card){
 	color: $info-color;
-}
-
-.alert{
-	color: $alert-color;
-}
-
-.ocean-sunset{
-	color: $ocean-sunset;
-}
-
-.neutral{
-	color: $steel;
 }
 
 @media print {
