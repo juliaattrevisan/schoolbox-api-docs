@@ -35,6 +35,24 @@ class External_Humanedge_Class implements External_ClassInterface
 //    }
 
     /**
+     * Gets the class code part of a query.
+     *
+     * @param  string $subCode
+     * @return string
+     */
+    protected function getClassCodeQuery($subCode)
+    {
+        $db    = $this->loadAPlusDatabase();
+        $classQuery = '(';
+        $subCodeArray = explode(',', $subCode);
+        foreach ($subCodeArray as $code) {
+            $classQuery .= "s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($code)} OR ";
+        }
+        return substr($classQuery, 0, -3) . ')';
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function getStudents($classCode)
@@ -42,6 +60,9 @@ class External_Humanedge_Class implements External_ClassInterface
         $db    = $this->loadAPlusDatabase();
         // Period join is required even though it's unused - this filters out
         // students who actually don't have periods for this class.
+
+        $classQuery   = $this->getClassCodeQuery($classCode);
+
         $query = "
             SELECT DISTINCT
                 st.FirstName AS firstname,
@@ -58,7 +79,7 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblStudent st on a.FormID = st.FormID
             WHERE st.deleted = 0
-            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+            AND   $classQuery
 
             UNION
 
@@ -76,7 +97,7 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
             INNER JOIN tblStudent st ON sc.StudentID = st.ID
             WHERE st.deleted = 0
-            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+            AND   $classQuery
         ";
         return $db->getAll($query);
     }
