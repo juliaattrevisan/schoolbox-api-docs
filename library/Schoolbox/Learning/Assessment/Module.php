@@ -138,13 +138,16 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getUpdateAssessment)',
+            '(?:getUpdateAssessment|postUpdateAssessment)',
             function ($params) {
                 return [
                     'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
                 ];
             }
         );
+
+
+
 
 
         $this->addRoutePreload(

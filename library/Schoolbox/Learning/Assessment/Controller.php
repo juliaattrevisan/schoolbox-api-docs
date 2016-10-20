@@ -47,6 +47,8 @@ use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecification
 
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
+use \Alaress\Web\Controller\Exception as ControllerException;
+
 class Controller extends Base
 {
     /**
@@ -300,40 +302,11 @@ class Controller extends Base
     {
         try {
             $existingAssessment = null;
-            $assessmentInfo = $this->persistAssessment($existingAssessment);
+            $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
+            $this->persistAssessment($assessment);
+        } catch (ControllerException $e){
+            $this->sendError($e->getMessage(), $e->getReasons());
         }
-        catch (\RuntimeException $e) {
-
-            /* TODO actually handle the error
-             * Return Early to let mage deal with error messages
-             */
-            return;
-        }
-
-        /* If it were a project, go back to the project's Update screen
-         * Otherwise return to the homepage
-         */
-        $types = new AssessmentType();
-
-        if ($assessmentInfo['assessment'] instanceof Project) {
-
-            /* Continue as normal
-             */
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => $types,
-                'assessmentId' => $assessmentInfo['assessment']->getId(),
-                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']),
-            ]));
-        }
-        else {
-            $returnUrl = $assessmentInfo['returnUrl'];
-        }
-
-        $data = [
-            'return_url' => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -383,22 +356,17 @@ class Controller extends Base
      * This happens after the common details are saved and after
      * you've chosen one of project, due work, task, or quiz
      *
-     * @param $assessmentId
+     * @param IAssessable $existingAssessment
      */
-    public function postUpdateAssessment($assessmentId)
+    public function postUpdateAssessment(IAssessable $existingAssessment)
     {
 
         try {
-            $assessmentInfo = $this->persistAssessment($this->getAssessmentMapperProxy()->findById($assessmentId));
+            $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
+            $this->persistAssessment($assessment);
+        } catch (ControllerException $e){
+            $this->sendError($e->getMessage(), $e->getReasons());
         }
-        catch (\RuntimeException $e) {
-
-            /* Return Early to let mage deal with error messages
-             */
-            return;
-        }
-
-        $this->getResponse()->redirect->to($assessmentInfo['returnUrl']);
     }
 
     /**
@@ -406,119 +374,50 @@ class Controller extends Base
      * * Create new assessment
      * * Update existing assessment.
      *
-     * persistAssessment() CANNOT make any assumptions about redirects
-     * Redirects should be dealt with by calling methods, since
-     * the returnUrl is manipulated by javascript in particular contexts
+     * Redirects to appropriate location after successful save
      *
-     * @param IAssessable $existingAssessment 'Create' => null, 'Update' => object
-     * @return void
-     * @throws MapperException TODO - enumerate possible exceptions in separate 'throws' annotations
+     * @param IAssessable $assessment
      */
-    protected function persistAssessment(IAssessable $existingAssessment = null)
+    protected function persistAssessment(IAssessable $assessment)
     {
-
-        /* If an assessment couldn't be produced, bail out
-         * and let mage see the errors set by $this->sendError
-         *
-         * Controller must return early for that to happen
-         */
-        $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
-
-        // Verify that the context of the assessment is valid
-        // TODO replace returnUrl values once I know what they should actually be
-        $context = $assessment->getContext();
-
         try {
-            if ($context instanceof Folder) {
-
-                /* TODO: Pass contextId as a param into this method
-                 * It should be obtained from the routes
-                 */
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
+            // Determine sequence
+            // If 'create' then append at end, if 'update' retain current sequence
+            $sequence = 1;
+            $context = $assessment->getContext();
+            $options = ['order' => ['sequence' => 'asc']];
+            foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, $options) as $otherAssessment) {
+                if ($otherAssessment->getId() == $assessment->getId()) {
+                    break;
                 }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-                }
-
-            } elseif ($context instanceof UnitImplementation) {
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    $context   = $this->getUnitImplementationMapperProxy()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-                }
-
-            } elseif ($context instanceof UnitSpecification) {
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-                    // The unit spec doesn't contain a reference back to its course spec.
-                    // It should, or I should be able to find one.
-                    $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-                }
-            } elseif ($context instanceof Project) {
-
-                /* Check that you don't spawn a Project in a Project
-                 */
-                if ($assessment instanceof Project) {
-                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
-                    return [];
-                }
-
-                /* You only get contextId when you're Creating, not updating
-                 */
-                if ($this->getRequest()->post['contextId']) {
-
-                    // TODO figure out what to do about this
-                    $context   = $this->getAssessmentMapperProxy()->findById($this->getRequest()->post['contextId']);
-                    $returnUrl = "/homepage/{$context->getId()}";
-                }
-                else {
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-                }
-
-            } else {
-                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
-                return [];
+                $sequence++;
             }
+            $this->getAssessmentMapperProxy()->save($assessment, $sequence);
 
-        } catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
-            return [];
-        }
+            // Determine returnUrl
+            $returnUrl = $this->getRequest()->post['returnUrl'];
 
-        // Don't change sequence if already in sequence - otherwise put at end
-        $sequence = 1;
-        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
-            if ($otherAssessment->getId() == $assessment->getId()) {
-                break;
+            // Not explicitly specified?
+            if(!$returnUrl){
+                // Determine appropriate location
+                $context = $assessment->getContext();
+
+                // Did we save inside a Project
+                if($context instanceof Project){
+                    $data = ['assessmentId' => $context->getId()];
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+                }
+                // Else must be inside a Folder, UnitImpl, or UnitSpec
+                else {
+                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
+                }
             }
-            $sequence++;
+            $this->getResponse()->redirect->to($returnUrl);
+//            $this->getResponse()->content->set($this->buildJsonOutput([]));
         }
-
-        // And save
-        $this->getAssessmentMapperProxy()->save($assessment, $sequence);
-
-        return [
-            'assessment' => $assessment,
-            'returnUrl' => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        catch (\Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**
@@ -762,16 +661,13 @@ class Controller extends Base
      * Generic method for create/update of an assessment.
      *
      * @param $postData
-     * @param IAssessable|null $assessment
+     * @param IAssessable|null $existingAssessment
      * @return IAssessable $assessment
+     * @throws ControllerException
      */
-    protected function produceAssessment($postData, IAssessable $assessment = null)
+    protected function produceAssessment($postData, IAssessable $existingAssessment = null)
     {
-        /* If an assessment couldn't be produced, bail out
-         * and let mage see the errors set by $this->sendError
-         *
-         * Controller must return early for that to happen
-         */
+        $assessment = null;
         try {
             $assessmentFactory = new Factory($this->getUser(), $postData);
             $assessment = $assessmentFactory->produce($assessment);
@@ -779,8 +675,7 @@ class Controller extends Base
             /* Manually do a check
              */
             if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                throw new \RuntimeException;
+                throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
             }
 
             /* Save the $asseessment
@@ -799,16 +694,13 @@ class Controller extends Base
             $transactionSummary = $transactor->transact();
         }
         catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
         catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
         catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
 
         return $transactionSummary;
