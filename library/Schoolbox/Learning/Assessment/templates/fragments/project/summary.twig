@@ -22,40 +22,36 @@
                 <h2 class="subheader">Assessables</h2>
 
                 {% if assessment.assessables | length %}
+                <section>
+                    <ul class="information-list sortable-card ui-sortable" data-sortable>
+                        {% for assessable in assessment.assessables %}
+                            {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-                    <section>
-                        <ul class="information-list sortable-card ui-sortable" data-sortable>
-                            {% for assessable in assessment.assessables %}
-                                {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+                            <li class="actions-small-1">
+                                <div class="grip"></div>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
 
-                                <li class="actions-small-1">
-                                    <div class="grip"></div>
-                                    <div class="list-item">
-                                        <div class="card wrap-down small-12">
-                                            <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
-
-                                            <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}">
-                                                <h3>
-                                                    {{ assessable.title }}
-                                                </h3>
-                                            </a>
-                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                                                Due {{ assessable.getDueAt.getRelativeTime }}
-                                            </p>
-                                        </div>
+                                        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}">
+                                            <h3>
+                                                {{ assessable.title }}
+                                            </h3>
+                                        </a>
+                                        <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                            Due {{ assessable.getDueAt.getRelativeTime }}
+                                        </p>
                                     </div>
-                                    <nav>
-                                        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}"
-                                           class="icon-modify no-text" title="Modify"></a>
-                                    </nav>
-                                </li>
+                                </div>
+                                <nav>
+                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}"
+                                       class="icon-modify no-text" title="Modify"></a>
+                                </nav>
+                            </li>
 
-                            {% endfor %}
-                        </ul>
-                    </section>
-
-                {% endif %}
-
+                        {% endfor %}
+                    </ul>
+                </section>
                 <ul class="flex-list buttons">
                     <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}"
                            title="Create a new Due Work"
@@ -70,6 +66,17 @@
                            class="button icon-quiz">New Quiz</a>
                     </li>
                 </ul>
+                {% else %}
+                <div class="empty-state">
+                    <i class="icon-project"></i>
+                    <p>Your project is empty.</p>
+                    <p>Add a
+                        <a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work">Due Work</a>,
+                        <a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task">Task</a>, or
+                        <a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz">Quiz</a>
+                    </p>
+                </div>
+                {% endif %}
             </div>
 
             <div class="small-12 medium-6 island">
