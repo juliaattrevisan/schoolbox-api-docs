@@ -22,7 +22,7 @@
 
         var openModifyScreen = function(event) {
             event.preventDefault();
-            window.location.href = '/adminv2/modify-user/'+modifyForm.find(':input[name="userId"]').val();
+            window.location.href = '/adminv2/user/modify/'+modifyForm.find(':input[name="userId"]').val();
         };
         modifyForm.submit(openModifyScreen);
 
