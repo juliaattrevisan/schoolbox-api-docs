@@ -91,22 +91,22 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.id}) }}">
-                                                <img src="/portrait.php?userId={{ participant.externalId }}&size=square64" width="48">
+                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
-                                                    {{ participant.fullName }}
+                                                    {{ participant.user.fullName }}
                                                 </h3>
                                             </a>
                                             <p class="meta">
-                                                {% if participant.year and participant.role.isStudent %}
-                                                    Year {{ participant.year }}
+                                                {% if participant.user.user.year and participant.user.role.isStudent %}
+                                                    Year {{ participant.user.year }}
                                                 {% endif %}
-                                                {{ participant.role.name }}
+                                                {{ participant.user.role.name }}
                                             </p>
                                         </div>
                                         <div class="progress">
                                             <span class="meter"
-                                                  style="width:{{ counts[participant.id].totalCompleted / counts[participant.id].total * 100 }}%"></span>
+                                                  style="width:{{ counts[participant.user.id].totalCompleted / counts[participant.user.id].total * 100 }}%"></span>
                                         </div>
                                     </div>
                                 </li>
