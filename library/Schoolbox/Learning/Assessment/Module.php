@@ -201,7 +201,7 @@ class Module extends BaseModule
 
                 // TODO - This translation from 'StudentSubmission' to 'DueWorkResponse' should
                 // TODO - not be necessary. A StudentSubmission should BE AN IResponse
-                // TODO - see SA-1212
+                // TODO - Update the mappers to return the new objects
                 foreach($studentSubmissions as $studentSubmission){
                     $response = (new DueWorkSubmission())
                         ->setId($studentSubmission->getId())
@@ -232,7 +232,7 @@ class Module extends BaseModule
 
                 // TODO - This translation from 'ReturnedWork' to 'DueWorkFeedback' should
                 // TODO - not be necessary. A ReturnedWork should BE AN IFeedback
-                // TODO - see SA-1212
+                // TODO - Update the mappers to return the new objects
                 foreach($submissionReturns as $submissionReturn){
                     $feedback = (new DueWorkFeedback())
                         ->setId($submissionReturn->getId())

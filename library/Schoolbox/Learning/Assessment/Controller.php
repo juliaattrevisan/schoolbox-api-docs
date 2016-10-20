@@ -805,13 +805,14 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/:studentId
      * @level 165
-     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
+     * @param IAssessable $assessment
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getStudentAssessment($assessmentId, User $student)
+    public function getStudentAssessment(IAssessable $assessment, User $student)
     {
-        $project = self::getDummyAssessment($assessmentId);
+        // TODO - replace with method arg objects
+        $project = self::getDummyAssessment(7);
 
         // Calculate summary totals for display purposes
 
