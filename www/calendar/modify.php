@@ -70,7 +70,7 @@ if (is_numeric($_GET['eventID'])) {
                 /* If the event is on a campus level, check this user
                  * has permission to moderate one of the selected campuses
                  */
-                if ($event->getCampusCollection()->count()) {
+                if ($event->isCampusLevel()) {
                     foreach ($event->getCampusCollection() as $currentCampus) {
                         if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
                             $hasServicePermission = true;
