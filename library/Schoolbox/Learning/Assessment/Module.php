@@ -66,10 +66,6 @@ class Module extends BaseModule
                  */
                 '/assessment/create' => 'postCreateAssessment',
 
-                /* Add assessments to a Project
-                 */
-                '/assessment/{assessmentId}/new' => 'postCreateAssessmentWithinProject',
-
                 /* This is the second half containing assessable-specific data
                  */
                 '/assessment/{assessmentId}/update' => 'postUpdateAssessment',

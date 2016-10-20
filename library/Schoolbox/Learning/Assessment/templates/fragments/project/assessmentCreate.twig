@@ -35,7 +35,7 @@
 
 <div class="row">
     <div class="small-12 columns island">
-        <form id="assessmentForm" action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: project.id}) }}" method="post">
+        <form id="assessmentForm" action="{{ routeLookup('learningAssessment.postCreateAssessment', {assessmentId: project.id}) }}" method="post">
             <section>
                 <fieldset class="content">
                     <input type="hidden" name="contextType" value="{{ contextType }}" />

@@ -397,7 +397,6 @@ class Controller extends Base
 
             if ($types->isProject($assessmentIndex)) {
                 $data['types']         = $types;
-                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
                 $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
                 $data['allSummators']  = $summatorMapping;
             }
@@ -446,29 +445,6 @@ class Controller extends Base
 
         $data = [
             'return_url' => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-    /**
-     * Save the data when creating an assessment within a Project
-     *
-     * Use the returnUrl specified in querystring instead, but you
-     * could infer it based on output of $this->persistAssessment()
-     */
-    public function postCreateAssessmentWithinProject()
-    {
-        // Persist within context of a project
-        try {
-            $this->persistAssessment();
-        }
-        catch (\RuntimeException $e) {
-            return;
-        }
-
-        $data = [
-            'return_url' => (new Redirect())->decode($this->getRequest()->post['return_url'])
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -705,31 +681,6 @@ class Controller extends Base
 
     /* Utility methods - these can probably be refactored elsewhere
      */
-
-    /**
-     * Find all the returnUrls
-     *
-     * @param int $assessmentId
-     * @return array
-     */
-    private function getAllReturnUrls($assessmentId)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        $allReturnUrls = [];
-
-        foreach ((new Types())->getTypes() as $title => $index) {
-            $allReturnUrls[$index] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $index]) . $suffix;
-        }
-
-        return $allReturnUrls;
-    }
 
     /**
      * All the possible Mark Types to chooze from for this particular $assessmentType
