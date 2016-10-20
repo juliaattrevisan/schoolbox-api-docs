@@ -1668,6 +1668,17 @@ class Leave_Controller extends Controller
         $leaveFactory->produceAdminFactory()->produce()->send();
     }
 
+    /**
+     * Test email deployments
+     */
+    public function executeEmailTest()
+    {
+        $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
+
+        $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
+        $email->send();
+    }
+
     /* Getters/Setters
       */
 
