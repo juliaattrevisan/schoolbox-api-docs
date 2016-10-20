@@ -85,9 +85,10 @@ class Factory
      * so we give it the contextId/contextType, and decide from there
      *
      * @param AssessmentContext $context
+     * @param IAssessable $assessment
      * @return Collection
      */
-    public function produceFromContext(AssessmentContext $context)
+    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
     {
         $trail = new Collection();
         $trail->add(['Learning', '#']);
@@ -110,7 +111,8 @@ class Factory
             $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
         }
 
-        $trail->add(["Create Assessment", '#']);
+        $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Assessment';
+        $trail->add(["Create $assessmentType", '#']);
 
         return $trail;
     }

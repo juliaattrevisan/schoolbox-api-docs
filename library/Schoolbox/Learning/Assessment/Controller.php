@@ -193,7 +193,7 @@ class Controller extends Base
         $data = [
             'context'         => $context,
             'contextType'     => AssessmentContextType::objectToString($context),
-            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromContext($context),
+            'breadcrumbs'     => (new BreadcrumbFactory())->produceFromContext($context, $assessment),
             'attachzone'      => $zone->getTwigContext(),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
