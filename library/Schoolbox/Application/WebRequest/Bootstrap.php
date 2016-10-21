@@ -637,7 +637,7 @@ class Bootstrap implements BootstrapInterface {
             $di->lazyNew(
                 ParticipantDataSource::class,
                 [
-                    'externalClass'    => $di->lazyGet('externalClass'),
+                    'externalDb'       => $di->lazyGet('externalClass'),
                     'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
                     'userMapper'       => $mapperFactory->getLazy(UserMapper::class),
                 ]
