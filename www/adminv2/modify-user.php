@@ -84,7 +84,8 @@ if(is_numeric($this->arg[0])) {
                         'YEAR'              => $user['year'],
                         'DATABASE_TYPE'     => ucfirst(Cfg::get('external_type')),
                         'ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
-                        'ASSUME_CLASS'      => $user['enabled'] ? 'submit' : 'disabled' // doesn't affect admin ability to assume user
+                        'ASSUME_CLASS'      => $user['enabled'] ? '' : 'menu_disabled',
+                        'ASSUME_DATA'       => $user['enabled'] ? 'data-assimilator' : ''
             );
         $this->setVar($output);
 

@@ -74,6 +74,9 @@ class Renderer extends Handler
                         stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
                     ),
                     'USER_SEARCH_GROUP' => Scrub::text($user['group_name']),
+                    'USER_ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
+                    'USER_ASSUME_CLASS'      => $user['enabled'] ? '' : 'menu_disabled',
+                    'USER_ASSUME_DATA'       => $user['enabled'] ? 'data-assimilator' : ''
                 ));
 
                 $this->getPage()->setVar('timetable_block');
