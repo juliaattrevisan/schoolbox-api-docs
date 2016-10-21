@@ -147,6 +147,22 @@ abstract class AbstractAssessment implements IAssessable
      */
 
     /**
+     * Is this user a participant in this assessment?
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isParticipant(User $user)
+    {
+        try {
+            $this->getParticipant($user);
+            return true;
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Find a reference to a particular Participant in this Assessable
      * which saves you this traversal in Controllers etc
      *

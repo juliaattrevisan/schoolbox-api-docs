@@ -94,17 +94,22 @@ class Decorator implements DecoratorInterface
             $assessment->noMarkPerCapability();
         }
 
-        // Rebuild attached files list
-        $factory     = new CollectorFactory();
-        $attachments = $factory->build($this->getAttachedFiles())->getAll();
-        $newList     = new Collection();
-        foreach ($attachments as $file) {
-            $newList->add(
-                (new DueWorkFile())
-                    ->setHash($file->getHash())
-                    ->setFilename($file->getBasename())
-            );
+        /* If there were attachments, accumulate them
+         * Otherwise go away
+         */
+        if (count($this->getAttachedFiles())) {
+            // Rebuild attached files list
+            $factory     = new CollectorFactory();
+            $attachments = $factory->build($this->getAttachedFiles())->getAll();
+            $newList     = new Collection();
+            foreach ($attachments as $file) {
+                $newList->add(
+                    (new DueWorkFile())
+                        ->setHash($file->getHash())
+                        ->setFilename($file->getBasename())
+                );
+            }
+            $assessment->setAttachedFiles($newList);
         }
-        $assessment->setAttachedFiles($newList);
     }
 }

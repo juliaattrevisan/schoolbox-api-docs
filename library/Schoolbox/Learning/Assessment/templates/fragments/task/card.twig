@@ -4,18 +4,21 @@
     <div class="list-item">
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
-            <a href="{{ assessable.link }}">
-                <h3>
-                    {{ assessable.title }}
-                </h3>
-            </a>
+            {# Not all tasks have links #}
+            {% if assessable.url %}
+                <a data-plugin="preview" href="{{ assessable.url }}">
+                    <h3>{{ assessable.title }}</h3>
+                </a>
+            {% else %}
+                <h3>{{ assessable.title }}</h3>
+            {% endif %}
             <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                 Due {{ assessable.getDueAt.getRelativeTime }}
             </p>
         </div>
     </div>
     <nav>
-        {% if assessable.getParticipant(student).getAllResponses | length %}
+        {% if assessable.isParticipant(student) and (assessable.getParticipant(student).getAllResponses | length) %}
             <a disabled href="#" class="icon-tick no-text" title="Completed"></a>
         {% endif %}
     </nav>

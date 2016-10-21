@@ -46,13 +46,12 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
 
-                /* Add assessments to a Project
+                /* Assessment Summary screen
                  */
-                '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
+                '/assessment/{assessmentId}' => 'getSummary',
 
                 /* Temporary methods
                  */
-                '/assessment/{assessmentId}'                    => 'getSummary',
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
                 '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
@@ -66,10 +65,6 @@ class Module extends BaseModule
                 /* Save the Assessment's data
                  */
                 '/assessment/create' => 'postCreateAssessment',
-
-                /* Add assessments to a Project
-                 */
-                '/assessment/{assessmentId}/new' => 'postCreateAssessmentWithinProject',
 
                 /* This is the second half containing assessable-specific data
                  */

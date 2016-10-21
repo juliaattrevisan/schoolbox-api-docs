@@ -140,7 +140,7 @@ class Types extends \Schoolbox\Collection
      */
     public function isTask($index)
     {
-        return $index == self::ASSESSMENT_PROJECT;
+        return $index == self::ASSESSMENT_TASK;
     }
 
     /* Getters/Setters

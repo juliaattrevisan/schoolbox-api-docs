@@ -136,6 +136,14 @@ class Model extends AbstractAssessment
 
     /**
      * @inheritdoc
+     */
+    public function getFamilyName()
+    {
+        return 'quiz';
+    }
+
+    /**
+     * @inheritdoc
      *
      * @return string
      */

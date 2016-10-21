@@ -220,7 +220,7 @@ class Controller extends Base
             'contextId' => $contextId,
             'contextType' => $contextType,
 
-            'breadcrumbs' => (new BreadcrumbFactory())->produceFromContext(
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromContext(
                 $contextId, $contextType,
                 $this->getFolderMapper(),
                 $this->getUnitImplementationDataSource(),
@@ -328,33 +328,34 @@ class Controller extends Base
         catch (\RuntimeException $e) {
 
             /* TODO actually handle the error
-             *  Return Early to let mage deal with error messages
+             * Return Early to let mage deal with error messages
              */
             return;
         }
 
-        /* If it were a project, go back to the project's Update screen
-         * Otherwise return to the homepage
+        /** @var IAssessable $assessment */
+        $assessment = $assessmentInfo['assessment'];
+
+        /* If you spawned a project or an assessable within a project
+         * Redirect to project summary screen
+         *
+         * Otherwise return to whatever context you came from
          */
-        $types = new Types();
-
-        if ($assessmentInfo['assessment'] instanceof Project) {
-
-            /* Continue as normal
-             */
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => $types,
-                'assessmentId' => $assessmentInfo['assessment']->getId(),
-                'allReturnUrls' => $this->getAllReturnUrls($assessmentInfo['assessment']->getId()),
-            ]));
+        if ($assessment instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+        }
+        elseif ($assessment->getContext() instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
         }
         else {
-            $data = [
-                'returnUrl' => $assessmentInfo['returnUrl']
-            ];
-
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
+            $returnUrl = $assessmentInfo['returnUrl'];
         }
+
+        $data = [
+            'return_url' => $returnUrl
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -364,21 +365,13 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
-
         $assessmentType = null;
         $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
         $folder         = $assessment->getContext()->getFolder();
-        if ($assessment instanceof Task) {
-            $assessmentType = Types::ASSESSMENT_TASK;
-        } elseif ($assessment instanceof Quiz) {
-            $assessmentType = Types::ASSESSMENT_QUIZ;
-        } elseif ($assessment instanceof DueWork) {
-            $assessmentType = Types::ASSESSMENT_DUE_WORK;
-        } elseif ($assessment instanceof Project) {
-            $assessmentType = Types::ASSESSMENT_PROJECT;
-        }
+        $assessmentType = $assessment->getFamilyName();
 
         $types = new Types();
+        $assessmentIndex = $types->getFromTitle($assessmentType);
 
         $zoneFactory = new ZoneFactory($types);
         $zone = $zoneFactory->buildForAssessment($assessment);
@@ -386,30 +379,29 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment' => $assessment,
-            'assessmentType' => $assessmentType,
+            'assessmentType' => $assessmentIndex,
             'attachzone' => $zone->getTwigContext(),
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentIndex),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
-        if ($types->isValidIndex($assessmentType)) {
+        if ($types->isValidIndex($assessmentIndex)) {
 
             /* Special treatment for projects for now
              */
             $summatorMapping = new SummatorMapping();
 
-            if ($types->isProject($assessmentType)) {
+            if ($types->isProject($assessmentIndex)) {
                 $data['types']         = $types;
-                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
                 $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
                 $data['allSummators']  = $summatorMapping;
             }
 
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessmentType}/update.twig", $data));
         }
         else {
             $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
@@ -427,6 +419,7 @@ class Controller extends Base
      */
     public function postUpdateAssessment($assessmentId)
     {
+
         try {
             $assessmentInfo = $this->persistAssessment($this->getAssessmentDataSource()->findById($assessmentId));
         }
@@ -437,81 +430,21 @@ class Controller extends Base
             return;
         }
 
-        $data = [
-            'returnUrl' => $assessmentInfo['returnUrl']
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-    /**
-     * Create an Assessment within a particular Project
-     *
-     * @param $assessmentId
-     * @param $assessmentType
-     */
-    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-    {
-
-        try {
-            $project = $this->getAssessmentDataSource()->findById($assessmentId);
-            $folder  = $project->getContext()->getFolder();
+        /* Redirect to project summary screen instead, if you spawned a project
+         * Otherwise return to context
+         */
+        if ($assessmentInfo['assessment'] instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-            return;
-        }
-
-        if (!$project instanceof Project) {
-            $this->sendError('Could not create assessment', [ 'select a valid Project' ]);
-        }
-
-        $types = new Types();
-
-        $zoneFactory = new ZoneFactory($types);
-        $zone = $zoneFactory->buildForAssessment($project);
-
-        if ($types->isValidIndex($assessmentType)) {
-            $data = [
-                'attachzone' => $zone->getTwigContext(),
-                'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($project)->add(['Create Assessment', '#']),
-                'folder' => $folder,
-                'types' => $types,
-                'project' => $project,
-                'contextType' => Factory::SPAWN_CONTEXT_PROJECT,
-                'assessment' => [],
-                'assessmentType' => $assessmentType,
-                'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
-                'allGradeSchemes' => $this->getAllGradeSchemes(),
-                'returnUrl' => $this->getRequest()->query['return_url']
-            ];
-
-            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/createWithinProject.twig", $data));
+        else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
         }
         else {
-            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-            return;
-        }
-    }
-
-    /**
-     * Save the data when creating an assessment within a Project
-     *
-     * Use the returnUrl specified in querystring instead, but you
-     * could infer it based on output of $this->persistAssessment()
-     */
-    public function postCreateAssessmentWithinProject()
-    {
-        // Persist within context of a project
-        try {
-            $this->persistAssessment();
-        }
-        catch (\RuntimeException $e) {
-            return;
+            $returnUrl = $assessmentInfo['returnUrl'];
         }
 
         $data = [
-            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
+            'return_url' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -538,6 +471,148 @@ class Controller extends Base
 
         $this->getResponse()->redirect->to($redirect);
         return;
+    }
+
+    /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessment/:assessmentId/summary
+     * @level 165
+     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
+     * @todo implement IAssessable interface
+     */
+    public function getSummary($assessmentId)
+    {
+        if ($this->getUser()->getRole()->isStudent()) {
+            $this->getSummaryStudent($assessmentId);
+        }
+
+        $this->getSummaryStaff($assessmentId);
+
+        return;
+    }
+
+    /**
+     * Displays the teacher dashboard of an assessable with tracking and management details
+     * @param $assessmentId
+     */
+    private function getSummaryStaff($assessmentId)
+    {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+
+        // Calculate summary totals for display purposes
+
+        $participants = $assessment->getAllParticipants();
+
+        $counts = [];
+
+        foreach ($participants as $participant) {
+            $counts[$participant->getId()] = [
+                'total' => 0,
+                'totalCompleted' => 0,
+            ];
+        }
+
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            foreach ($assessment->getAssessables() as $subAssessment) {
+                foreach ($subAssessment->getAllParticipants() as $participant) {
+                    $counts[$participant->getUser()->getId()]['total']++;
+                    if ($participant->getAllResponses()->count() > 0) {
+                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                    }
+                }
+            }
+        }
+
+        /* Manufacture a set of returnUrls since staff with perms can create
+         * IAssessables inside projects
+         */
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+
+        /* Manufacture a universal returnUrl
+         * Return to summary screen with this suffix
+         */
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
+        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'counts' => $counts,
+            'assessment' => $assessment,
+            'types' => new Types(),
+            'currentUser' => $this->getUser(),
+            'returnUrlSuffix' => $returnUrlSuffix
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary.twig",
+                $twigData
+            )
+        );
+    }
+
+    /**
+     * Display the student dashboard for an assessable
+     * @param $assessmentId
+     */
+    private function getSummaryStudent($assessmentId)
+    {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+
+        // Calculate summary totals for display purposes
+
+        $counts = [
+            'dueWork' => 0,
+            'dueWorkCompleted' => 0,
+            'quiz' => 0,
+            'quizCompleted' => 0,
+            'task' => 0,
+            'taskCompleted' => 0,
+            'total' => 0,
+            'totalCompleted' => 0,
+        ];
+
+        // This isn't necessarily a project.
+        if ($assessment instanceof Project) {
+            $assessables = $assessment->getAssessables();
+
+            /** @var IAssessable $assessable */
+            foreach ($assessables as $assessable) {
+
+                $type = $assessable->getFamilyName();
+
+                try {
+                    $participant = $assessable->getParticipant($this->getUser());
+                } catch (\UnexpectedValueException $e) {
+                    // This student isn't a participant.
+                    // This is fine - when PBL is implemented not all students
+                    // will participate in all sub-assessments
+                    continue;
+                }
+
+                // If the student has submitted at least one response we will assume it is completed
+                $counts[$type]++;
+                $counts['total']++;
+
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$type.'Completed']++;
+                    $counts['totalCompleted']++;
+                }
+            }
+        }
+
+        // TODO make this an instance var instead of instantiating all the time
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'currentUser' => $this->getUser(),
+            'assessment' => $assessment,
+            'counts' => $counts
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summaryStudent.twig", $twigData));
     }
 
     /**
@@ -605,31 +680,6 @@ class Controller extends Base
 
     /* Utility methods - these can probably be refactored elsewhere
      */
-
-    /**
-     * Find all the returnUrls
-     *
-     * @param int $assessmentId
-     * @return array
-     */
-    private function getAllReturnUrls($assessmentId)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        $allReturnUrls = [];
-
-        foreach ((new Types())->getTypes() as $title => $index) {
-            $allReturnUrls[$index] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $index]) . $suffix;
-        }
-
-        return $allReturnUrls;
-    }
 
     /**
      * All the possible Mark Types to chooze from for this particular $assessmentType
@@ -807,122 +857,6 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
-    }
-
-    /**
-     * Displays the teacher dashboard of an assessable with tracking and management details
-     * @param $assessmentId
-     */
-    private function getSummaryProject($assessmentId)
-    {
-        $project = self::getDummyAssessment($assessmentId);
-
-        // Calculate summary totals for display purposes
-
-        $participants = $project->getAllParticipants();
-
-        $counts = [];
-
-        foreach ($participants as $participant) {
-            $counts[$participant->getId()] = [
-                'total' => 0,
-                'totalCompleted' => 0,
-            ];
-        }
-
-        $assessables = $project->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-            foreach ($assessable->getAllParticipants() as $participant) {
-                $counts[$participant->getUser()->getId()]['total']++;
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
-                }
-            }
-        }
-
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'counts' => $counts,
-            'assessment' => $project,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
-    }
-
-    /**
-     * Display the student dashboard for an assessable
-     * @param $assessmentId
-     */
-    private function getSummaryStudent($assessmentId)
-    {
-        $project = self::getDummyAssessment($assessmentId);
-
-        // Calculate summary totals for display purposes
-
-        $counts = [
-            'dueWork' => 0,
-            'dueWorkCompleted' => 0,
-            'quiz' => 0,
-            'quizCompleted' => 0,
-            'task' => 0,
-            'taskCompleted' => 0,
-            'total' => 0,
-            'totalCompleted' => 0,
-        ];
-
-        $assessables = $project->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-
-            $participant = $assessable->getParticipant($this->getUser());
-
-            if ($assessable instanceof Quiz) {
-                $type = "quiz";
-            } else if ($assessable instanceof Task) {
-                $type = "task";
-            } else {
-                $type = "dueWork";
-            }
-
-            $counts[$type]++;
-            $counts['total']++;
-
-            // If the student has submitted at least one response we will assume it is completed
-
-            if ($participant->getAllResponses()->count() > 0) {
-                $counts[$type.'Completed']++;
-                $counts['totalCompleted']++;
-            }
-        }
-
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student' => $this->getUser(),
-            'assessment' => $project,
-            'counts' => $counts
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
-    }
-
-    /**
-     * Display appropriate landing page based on role
-     *
-     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
-     * @level 165
-     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
-     * @todo implement IAssessable interface
-     */
-    public function getSummary($assessmentId)
-    {
-        if ($this->getUser()->getRole()->isStudent()) {
-            return $this->getSummaryStudent($assessmentId);
-        }
-
-        return $this->getSummaryProject($assessmentId);
     }
 
     /**

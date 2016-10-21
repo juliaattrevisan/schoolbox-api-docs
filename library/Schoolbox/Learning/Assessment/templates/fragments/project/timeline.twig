@@ -1,4 +1,4 @@
-{% if type == 'staff' %}
+{% if currentUser.role.isStaff %}
     {% set width = 3 %}
 {% else %}
     {% set width = 6 %}
