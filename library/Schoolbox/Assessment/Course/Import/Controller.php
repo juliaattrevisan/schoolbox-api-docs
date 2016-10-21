@@ -70,6 +70,59 @@ class Controller extends Base\Base
     }
 
     /**
+     * @param Folder\Model $folder
+     * @param array        $config
+     * @param string       $controller
+     * @return Component_Instance
+     */
+    protected function injectNewComponent(Folder\Model $folder, array $config = [], $controller = Component_Homepage_CourseOutlineController::class)
+    {
+        $definitionMapper = \Component_DefinitionMapper::getInstance(); // $this->getComponentDefinitionMapper();
+        $instanceMapper =  \Component_InstanceMapper::getInstance(); // $this->getComponentInstanceMapper();
+        $configDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();
+        $configInstanceMapper = \Component_ConfigMapper::getInstance();
+
+        // Doesn't exist. We need that to exist. Make it exist.
+        $definition = $definitionMapper->findOneByColumn('class', $controller);
+
+        // invent a new component
+        $newInstance = $instanceMapper
+                            ->createModel()
+                            ->setModule('homepage')
+                            ->setIdentifier($folder->getId())
+                            ->setDefinitionId($definition->getId())
+                            ->setSequence(0)
+                            ->setPosition('top');
+
+        // save it
+        $instanceMapper->save($newInstance);
+
+        // apply config
+        foreach ($config as $key => $value) {
+            $configDefinitionIds = $configDefinitionMapper->findIdsByColumnList([
+                'component_definition_id' => $definition->getId(),
+                'key' => $key
+            ]);
+
+            $conf = $configInstanceMapper->createModel()
+                ->setConfigDefinitionId($configDefinitionIds[0])
+                ->setInstanceId($newInstance->getId())
+                ->setValue($value);
+
+            $newInstance->getConfig()->add($conf);
+        }
+
+        // save the config
+        $configInstanceMapper->save($newInstance->getConfig());
+
+        // reapply the sequencing so the homepage doesn't break
+        $instanceMapper->cascadeSequence($folder->getId(), 'top');
+
+        return $newInstance;
+    }
+
+
+    /**
      * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
      * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
@@ -425,6 +478,9 @@ class Controller extends Base\Base
                         $this->getAssessmentMapper()->save($a, $seq + 1);
                     }
                 }
+
+                // if that all worked, spawn a component onto the page
+                $this->injectNewComponent($ci->getFolder(), [ 'importedCourse' => $ci->getId() ]);
             }
         } catch (\PDOException $e) {
             $this->sendError($e->getMessage());
