@@ -52,11 +52,11 @@ if (is_numeric($_GET['eventID'])) {
      */
 
     // Check superuser
-    $isSuperuser = $_SESSION['user']->isSuperuser();
+    $isSuperuser = $selectedUser->isSuperuser();
 
     // Check if user is parent of the owner
     $event->getOwner()->loadParents();
-    $isParentOfOwner = $_SESSION['user']->isParentOf($event->getOwner());
+    $isParentOfOwner = $selectedUser->isParentOf($event->getOwner());
 
     // If the event is on a campus level, check if this user
     // is a calendar moderator for one of the campuses selected
@@ -64,7 +64,7 @@ if (is_numeric($_GET['eventID'])) {
 
     if ($event->isCampusLevel()) {
 
-        $accessList = $_SESSION['user']->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_FULL);
+        $accessList = $selectedUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_FULL);
 
         /** @var UserAccess $currentAccess */
         foreach ($accessList as $currentAccess) {
@@ -101,7 +101,7 @@ if (is_numeric($_GET['eventID'])) {
     $isOwner = false;
 
     if ($event->isPersonalLevel()) {
-        if ($_SESSION['user']->getId() == $event->getOwner()->getId()) {
+        if ($selectedUser->getId() == $event->getOwner()->getId()) {
             $isOwner = true;
         }
     }
