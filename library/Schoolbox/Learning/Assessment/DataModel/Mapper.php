@@ -15,9 +15,12 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
@@ -369,22 +372,72 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Augments the list from hydrateSelect() with context projects.
+     * Augments the list from hydrateSelect() with their context's folder codes.
+     *
+     * This is required for retrieving participants, but isn't viable to join
+     * onto in getSelectString() due to the number of optional 1-M joins this
+     * would require.
      *
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
      */
     protected function augmentListWithFolderCodes($modelList)
     {
-        // Load context's category codes (Required for retrieving participants)
-        // Not viable to fetch in the mega-query due to 1-M join shenanigans
+        $folderIds = [];
+
+        // Pass 1: load folder IDs
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
 
-            // Folder context: load folder codes
-            // Unit impl context: load context's folder codes
-            // Unit spec context: don't need folder codes?
-            // Project context: its folder was loaded separately.
+            if ($context instanceof FolderModel) {
+                // Folder context: folder IS the folder
+                $folderIds[] = $context->getId();
+
+            } elseif ($context instanceof UnitSpecificationModel) {
+                // Unit spec context: folder is in the context
+                // Not strictly required: unit spec assessments will never have participants
+                $folderIds[] = $context->getFolder()->getId();
+
+            } elseif ($context instanceof UnitImplementationModel) {
+                // Unit impl context: folder is in the context's course
+                $folderIds[] = $context->getCourse()->getFolder()->getId();
+
+            } elseif ($context instanceof ProjectModel) {
+                // Project context: folder was loaded in augmentListWithProjectContexts.
+                continue;
+            }
+        }
+
+        // Load folders in a single query
+        $folders = $this->getJoinMapper('assessment_folder')->findByColumn('id', $folderIds)->indexBy('id');
+
+        // Pass 2: assign folders to contexts
+        foreach ($modelList as $model) {
+            $context = $model->getAssessmentContext();
+
+            if ($context instanceof FolderModel) {
+                $folderId = $context->getId();
+                if (isset($folders[$folderId])) {
+                    $context = $folders[$folderId];
+                }
+
+            } elseif ($context instanceof UnitSpecificationModel) {
+                $folderId = $context->getFolder()->getId();
+                if (isset($folders[$folderId])) {
+                    $context->setFolder($folders[$folderId]);
+                }
+
+            } elseif ($context instanceof UnitImplementationModel) {
+                $folderId = $context->getCourse()->getFolder()->getId();
+                if (isset($folders[$folderId])) {
+                    $context->getCourse()->setFolder($folders[$folderId]);
+                }
+
+            } elseif ($context instanceof ProjectModel) {
+                continue;
+            }
+
+            $model->setAssessmentContext($context);
         }
 
         return $modelList;
