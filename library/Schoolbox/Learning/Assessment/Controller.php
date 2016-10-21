@@ -480,26 +480,49 @@ class Controller extends Base
 
 
     /**
-     * Delete an assessment
+     * Delete the given entity. Deletion is considered to be an idempotent method,
+     * so do not return an error on repeat attempts to delete an entity.
      *
-     * @param $assessmentId
+     * On success, respond with '204 No Content' and a Location header to the list
+     * On failure, respond appropriately
+     *
+     * @api POST /learning/assessment/{assessmentId}/delete
+     * @level 165
+     * @param IAssessable $assessment Will be null if already deleted
+     * @return void
      */
-    public function postDeleteAssessment($assessmentId)
+    public function postDeleteAssessment(IAssessable $assessment)
     {
-        $assessment = $this->getAssessmentMapperProxy()->findById($assessmentId);
-        $folder     = $assessment->getContext()->getFolder();
-        $this->getAssessmentMapperProxy()->delete($assessment);
-
-        // TODO abstract this redirection logic
-        if ($assessment) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
-        }
-        else {
-            $redirect = "/homepage/{$folder->getId()}";
+        // Already deleted?
+        if($assessment->isDeleted()){
+            $this->getResponse()->status->setCode(204);
+        } else {
+            $this->getAssessmentMapperProxy()->delete($assessment);
         }
 
-        $this->getResponse()->redirect->to($redirect);
-        return;
+        $folder = $assessment->getContext()->getFolder();
+        $returnUrl = $this->getRequest()->post['returnUrl'];
+
+        // Did caller explicitly specify a returnUrl ?
+        if($returnUrl) {
+            $redirect = $returnUrl;
+        } else {
+            // Did we delete an item from a Project ?
+            if($assessment->getContext() instanceof Project){
+                $data = ['assessmentId' => $assessment->getContext()->getId()];
+                $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+            }
+            // Must be from a Folder, UnitImpl, or UnitSpec
+            else {
+                $redirect = "/homepage/{$folder->getId()}";
+            }
+        }
+
+        if($this->getRequest()->isXhr()){
+            $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $redirect]));
+        } else {
+            $this->getResponse()->redirect->to($redirect);
+        }
     }
 
     /**

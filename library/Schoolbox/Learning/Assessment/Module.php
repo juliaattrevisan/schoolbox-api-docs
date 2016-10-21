@@ -144,8 +144,18 @@ class Module extends BaseModule
             }
         );
 
-
-
+        $this->addRoutePreload(
+            $matcher,
+            '(?:postDeleteAssessment)',
+            function ($params) {
+                try {
+                    $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+                } catch (MapperException\Deleted $e){
+                    $assessment = $e->getDeletedObject();
+                }
+                return ['assessment' => $assessment];
+            }
+        );
 
 
         $this->addRoutePreload(
