@@ -420,7 +420,10 @@ class SitePage extends \Page
                         continue;
                     }
                 }
-
+                //Skip if user account is disable
+                if($linkedUser->getEnabled() != 1) {
+                    continue;
+                }
                 /* Fully hydrate, note this stores back in session so it only happens once */
                 if($linkedUser->getRole()->getName() == null) {
                     $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($linkedUser->getId());
