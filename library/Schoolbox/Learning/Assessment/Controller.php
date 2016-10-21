@@ -562,6 +562,9 @@ class Controller extends Base
         // This isn't necessarily a project.
         if ($assessment instanceof Project) {
             foreach ($assessment->getAssessables() as $subAssessment) {
+                // Populate the participants for every single sub-assessment
+                // TODO can this be performed more efficiently?
+                $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
                 foreach ($subAssessment->getAllParticipants() as $participant) {
                     $counts[$participant->getUser()->getId()]['total']++;
                     if ($participant->getAllResponses()->count() > 0) {
