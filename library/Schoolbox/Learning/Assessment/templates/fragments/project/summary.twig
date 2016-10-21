@@ -10,9 +10,17 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<div class="row actions-small-1">
+    <div class="list-item small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify"></a>
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ assessment.title }}</h1>
 
         {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, user: currentUser} %}
 
