@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
+use Aura\Router\Router;
 use \Schoolbox\Collection;
 
 use \Schoolbox\Learning\Assessment\Project;
@@ -29,6 +30,20 @@ use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
 
 class Factory
 {
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * Constructor
+     *
+     * @param Router $router Used to generate route URLs
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
 
     /**
      * Produce breadcrumb trail from a previously-existing IAssessable $assessment
@@ -53,7 +68,7 @@ class Factory
         } elseif ($context instanceof UnitSpecification) {
             $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof Project) {
-            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
+            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
         }
 
         /* Additional project node, if you're creating within a project
@@ -102,10 +117,7 @@ class Factory
                 $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
             } elseif ($contextType == 'project') {
                 $context = $assessmentDataSource->findById($contextId);
-
-                /* TODO: Use a route lookup instead, this branch doesn't have damo's PR:10840
-                 */
-                $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
+                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
             }
         }
         catch (DeletedException $e) {

@@ -220,7 +220,7 @@ class Controller extends Base
             'contextId' => $contextId,
             'contextType' => $contextType,
 
-            'breadcrumbs' => (new BreadcrumbFactory())->produceFromContext(
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromContext(
                 $contextId, $contextType,
                 $this->getFolderMapper(),
                 $this->getUnitImplementationDataSource(),
@@ -379,7 +379,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs' => (new BreadcrumbFactory())->produceFromAssessment($assessment)->add(['Update', '#']),
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '#']),
             'assessment' => $assessment,
             'assessmentType' => $assessmentIndex,
             'attachzone' => $zone->getTwigContext(),
@@ -528,7 +528,7 @@ class Controller extends Base
         /* Manufacture a set of returnUrls since staff with perms can create
          * IAssessables inside projects
          */
-        $breadcrumbBuilder = new BreadcrumbFactory();
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
 
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
@@ -604,8 +604,7 @@ class Controller extends Base
         }
 
         // TODO make this an instance var instead of instantiating all the time
-        $breadcrumbBuilder = new BreadcrumbFactory();
-        // TODO these crumbs have an update URL, and thus aren't appropriate for students
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'currentUser' => $this->getUser(),
