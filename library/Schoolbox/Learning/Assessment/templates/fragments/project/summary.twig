@@ -67,13 +67,17 @@
                         </ul>
                     </div>
                 </section>
+                <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create new Assessment</a>
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
                     <p>Your project is empty.</p>
                     <p>Add a
-                        {% for returnUrl in allReturnUrls %}
-                            <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}">{{ returnUrl.label }}</a>
+                        {% for projectAssessment in projectAssessments %}
+                            {%- set url -%}
+                                {{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: types.objectToString(projectAssessment)}) }}
+                            {%- endset -%}
+                            <a href="{{ url }}{{ returnUrlSuffix }}" title="Create a new {{ projectAssessment.typeName }}">{{ projectAssessment.typeName }}</a>
                             {%- if not loop.last %},{% endif %}{% if loop.revindex == 2 %} or{% endif %}
                         {% endfor %}
                     </p>

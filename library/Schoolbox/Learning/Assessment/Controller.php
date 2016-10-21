@@ -107,9 +107,9 @@ class Controller extends Base
     }
 
     /**
-     * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
+     * Generates a form to create an Assessment in the specified Folder
      *
-     * @api /assessment/folder/{folderId}{/assessmentTypeTitle}
+     * @api /learning/assessment/folder/{folderId}{/assessmentTypeTitle}
      * @level 165
      * @param Folder $folder
      * @param AbstractAssessment|null $assessment
@@ -122,8 +122,10 @@ class Controller extends Base
     }
 
     /**
-     * Select an IAssessable specified $assessmentTypeTitle into a Project $projectId
+     * Generates a form to create an Assessment in the specified Project
      *
+     * @api /learning/assessment/project/{projectId}{/assessmentTypeTitle}
+     * @level 165
      * @param Project $project
      * @param AbstractAssessment $assessment
      */
@@ -134,7 +136,6 @@ class Controller extends Base
          *
          * Instead, redirect to a safe place
          */
-
         if ($assessment instanceof Project) {
             $data = ['projectId' => $project->getId()];
             $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', $data);
@@ -147,8 +148,10 @@ class Controller extends Base
     }
 
     /**
-     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     * Generates a form to create an Assessment in the specified Unit Implementation
      *
+     * @api /learning/assessment/unit/{unitId}{/assessmentTypeTitle}
+     * @level 165
      * @param UnitImplementation $unitImpl
      * @param AbstractAssessment|null $assessment
      */
@@ -160,8 +163,10 @@ class Controller extends Base
     }
 
     /**
-     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     * Generates a form to create an Assessment in the specified Unit Specification
      *
+     * @api /learning/assessment/unitspec/{unitSpecId}{/assessmentTypeTitle}
+     * @level 165
      * @param UnitSpecification $unitSpec
      * @param AbstractAssessment $assessment
      */
@@ -173,8 +178,7 @@ class Controller extends Base
     }
 
     /**
-     * A macro for creating the standard data for all assessmentTypes
-     * for use in their Create screen
+     * Common logic to generate a form to create an IAssessable in the specified AssessmentContext
      *
      * @param AssessmentContext $context
      * @param AbstractAssessment $assessment = null
@@ -203,7 +207,7 @@ class Controller extends Base
         // TODO, 'types' should just be the 3 objects, and twig can do the rest
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
-        // Do we have a returnUrl?
+        // Do caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get('returnUrl');
         if($returnUrl){
             $data['returnUrl'] = $returnUrl;
@@ -307,56 +311,40 @@ class Controller extends Base
             $assessment = $this->produceAssessment($this->getRequest()->post);
             $this->persistAssessment($assessment);
 
-            // If we are creating a Project, show Step-3 (options to create Assessments in Project)
-            if ($assessment instanceof Project) {
-
-                $types = new AssessmentType();
-
-                /* Continue as normal
-                 */
-                $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/assessmentList.twig";
-                $data = [
-                    'types'         => $types,
-                    'assessmentId'  => $assessment->getId(),
-                    'allReturnUrls' => $this->getAllReturnUrls($assessment),
-                ];
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
-            }
-            // Else we created a DueWork / Quiz / Task.
-            // Redirect somewhere.
-            else {
-
-                // Determine returnUrl
-                $returnUrl = $this->getRequest()->post['returnUrl'];
-
-                // Explicitly specified?
-                if($returnUrl) {
-                    $returnUrl = $this->decodeReturnUrl($returnUrl);
-                } else {
-                    // Determine appropriate location
-                    $context = $assessment->getContext();
-
-                    // Did we save inside a Project
-                    if($context instanceof Project){
-                        $data = ['assessmentId' => $this->getRequest()->post['contextId']];
-                        $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
-                    }
-                    // Else must be inside a Folder, UnitImpl, or UnitSpec
-                    else {
-                        $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
-                        $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
-                    }
+            // Was a returnUrl explicitly specified?
+            $returnUrl = $this->getRequest()->post['returnUrl'];
+            if($returnUrl) {
+                $returnUrl = $this->decodeReturnUrl($returnUrl);
+            } else {
+                // Did we create a Project ?
+                if($assessment instanceof Project){
+                    $data = ['assessmentId' => $assessment->getId()];
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', $data);
                 }
-
-                if($this->getRequest()->isXhr()){
-                    $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
-                } else {
-                    $this->getResponse()->redirect->to($returnUrl);
+                // Did we create an Assessment inside a Project ?
+                else if($assessment->getContext() instanceof Project){
+                    $data = ['assessmentId' => $this->getRequest()->post['contextId']];
+                    $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', $data);
+                }
+                // Else must be inside a Folder, UnitImpl, or UnitSpec
+                else {
+                    $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
+                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
                 }
             }
 
+            if($this->getRequest()->isXhr()){
+                $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
+            } else {
+                $this->getResponse()->redirect->to($returnUrl);
+            }
+
+
+        // TODO - clean up error handling
         } catch (ControllerException $e){
             $this->sendError($e->getMessage(), $e->getReasons());
+        } catch (\Exception $e){
+            $this->sendError($e->getMessage());
         }
     }
 
@@ -411,7 +399,6 @@ class Controller extends Base
      */
     public function postUpdateAssessment(IAssessable $existingAssessment)
     {
-
         try {
             $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
             $this->persistAssessment($assessment);
@@ -433,6 +420,7 @@ class Controller extends Base
                 }
                 // Else must be inside a Folder, UnitImpl, or UnitSpec
                 else {
+                    $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
                     $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
                 }
             }
@@ -442,10 +430,13 @@ class Controller extends Base
             } else {
                 $this->getResponse()->redirect->to($returnUrl);
             }
-
+        // TODO - clean up error handling
         } catch (ControllerException $e){
             $this->sendError($e->getMessage(), $e->getReasons());
+        } catch (\Exception $e){
+            $this->sendError($e->getMessage());
         }
+
     }
 
     /**
@@ -456,26 +447,22 @@ class Controller extends Base
      * Redirects to appropriate location after successful save
      *
      * @param IAssessable $assessment
+     * @throws \UnexpectedValueException if attempting to save a Project within a Project
      */
     protected function persistAssessment(IAssessable $assessment)
     {
-        try {
-            // Determine sequence
-            // If 'create' then append at end, if 'update' retain current sequence
-            $sequence = 1;
-            $context = $assessment->getContext();
-            $options = ['order' => ['sequence' => 'asc']];
-            foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, $options) as $otherAssessment) {
-                if ($otherAssessment->getId() == $assessment->getId()) {
-                    break;
-                }
-                $sequence++;
+        // Determine sequence
+        // If 'create' then append at end, if 'update' retain current sequence
+        $sequence = 1;
+        $context = $assessment->getContext();
+        $options = ['order' => ['sequence' => 'asc']];
+        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, $options) as $otherAssessment) {
+            if ($otherAssessment->getId() == $assessment->getId()) {
+                break;
             }
-            $this->getAssessmentMapperProxy()->save($assessment, $sequence);
+            $sequence++;
         }
-        catch (\Exception $e) {
-            $this->sendError($e);
-        }
+        $this->getAssessmentMapperProxy()->save($assessment, $sequence);
     }
 
 
@@ -530,36 +517,33 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/summary
      * @level 165
-     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
-     * @todo implement IAssessable interface
+     * @param IAssessable $assessment
      */
-    public function getSummary($assessmentId)
+    public function getSummary(IAssessable $assessment)
     {
         if ($this->getUser()->getRole()->isStudent()) {
-            $this->getSummaryStudent($assessmentId);
+            $this->getSummaryStudent($assessment);
         }
 
-        $this->getSummaryStaff($assessmentId);
-
-        return;
+        // TODO - what happens here when the $assessment is not a Project, and the user is not a student?
+        $this->getSummaryStaff($assessment);
     }
 
     /**
      * Displays the teacher dashboard of an assessable with tracking and management details
-     * @param $assessmentId
+     * @param IAssessable $assessment
      */
-    private function getSummaryStaff($assessmentId)
+    private function getSummaryStaff(IAssessable $assessment)
     {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        // TODO -use real data
+        //$assessment = self::getDummyAssessment(7);
 
         // Calculate summary totals for display purposes
-
         $participants = $assessment->getAllParticipants();
 
         $counts = [];
-
         foreach ($participants as $participant) {
-            $counts[$participant->getId()] = [
+            $counts[$participant->getUser()->getId()] = [
                 'total' => 0,
                 'totalCompleted' => 0,
             ];
@@ -585,21 +569,23 @@ class Controller extends Base
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
          */
-        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessmentId]);
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
         $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
 
+        $types = new AssessmentType();
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'counts' => $counts,
             'assessment' => $assessment,
-            'types' => new Types(),
+            'types' => $types,
+            'projectAssessments' => [new DueWork(), new Quiz(), new Task()],
             'currentUser' => $this->getUser(),
             'returnUrlSuffix' => $returnUrlSuffix
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary.twig",
+                "@learningAssessment/fragments/{$types->objectToString($assessment)}/summary.twig",
                 $twigData
             )
         );
@@ -607,24 +593,26 @@ class Controller extends Base
 
     /**
      * Display the student dashboard for an assessable
-     * @param $assessmentId
+     *
+     * @param IAssessable $assessment
      */
-    private function getSummaryStudent($assessmentId)
+    private function getSummaryStudent(IAssessable $assessment)
     {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
-
         // Calculate summary totals for display purposes
+        $types = new AssessmentType();
 
-        $counts = [
-            'dueWork' => 0,
-            'dueWorkCompleted' => 0,
-            'quiz' => 0,
-            'quizCompleted' => 0,
-            'task' => 0,
-            'taskCompleted' => 0,
-            'total' => 0,
-            'totalCompleted' => 0,
-        ];
+        $counts = [];
+
+        foreach($types->getStringValues() as $type){
+            if(AssessmentType::TYPE_PROJECT == $type){
+                continue;
+            }
+            $counts[$type] = 0;
+            $counts["{$type}Completed"] = 0;
+        }
+        $counts['total'] = 0;
+        $counts['totalCompleted'] = 0;
+
 
         // This isn't necessarily a project.
         if ($assessment instanceof Project) {
@@ -632,8 +620,6 @@ class Controller extends Base
 
             /** @var IAssessable $assessable */
             foreach ($assessables as $assessable) {
-
-                $type = $assessable->getFamilyName();
 
                 try {
                     $participant = $assessable->getParticipant($this->getUser());
@@ -645,11 +631,11 @@ class Controller extends Base
                 }
 
                 // If the student has submitted at least one response we will assume it is completed
-                $counts[$type]++;
+                $counts[$types->objectToString($assessable)]++;
                 $counts['total']++;
 
                 if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$type.'Completed']++;
+                    $counts["{$types->objectToString($assessable)}Completed"]++;
                     $counts['totalCompleted']++;
                 }
             }
@@ -664,7 +650,7 @@ class Controller extends Base
             'counts' => $counts
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summaryStudent.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summaryStudent.twig", $twigData));
     }
 
     /**
@@ -838,17 +824,16 @@ class Controller extends Base
         $project = self::getDummyAssessment(7);
 
         // Calculate summary totals for display purposes
-
-        $counts = [
-            'dueWork' => 0,
-            'dueWorkCompleted' => 0,
-            'quiz' => 0,
-            'quizCompleted' => 0,
-            'task' => 0,
-            'taskCompleted' => 0,
-            'total' => 0,
-            'totalCompleted' => 0,
-        ];
+        $counts = [];
+        foreach(AssessmentType::getStringValues() as $assessmentType){
+            if(AssessmentType::TYPE_PROJECT == $assessmentType){
+                continue;
+            }
+            $counts[$assessmentType] = 0;
+            $counts["{$assessmentType}Completed"] = 0;
+        }
+        $counts['total'] = 0;
+        $counts['totalCompleted'] = 0;
 
         $assessables = $project->getAssessables();
 
@@ -857,11 +842,7 @@ class Controller extends Base
 
             $participant = $assessable->getParticipant($student);
 
-            switch ($assessable->getTypeName()) {
-                case 'Quiz': $type = "quiz"; break;
-                case 'Task': $type = "task"; break;
-                default: $type = "dueWork"; break;
-            }
+            $type = AssessmentType::objectToString($assessable);
 
             $counts[$type]++;
             $counts['total']++;
@@ -869,7 +850,7 @@ class Controller extends Base
             // If the student has submitted at least one response we will assume it is completed
 
             if ($participant->getAllResponses()->count() > 0) {
-                $counts[$type.'Completed']++;
+                $counts["{$type}Completed"]++;
                 $counts['totalCompleted']++;
             }
         }
@@ -884,125 +865,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
     }
 
-    /**
-     * Displays the teacher dashboard of an assessable with tracking and management details
-     * @param IAssessable $assessment
-     */
-    private function getSummaryProject(IAssessable $assessment)
-    {
-        // TODO - use the specified $assessment instead of DummyData
-
-        $project = self::getDummyAssessment(7);
-
-        // Calculate summary totals for display purposes
-
-        $participants = $project->getAllParticipants();
-
-        $counts = [];
-
-        foreach ($participants as $participant) {
-            $counts[$participant->getUser()->getId()] = [
-                'total' => 0,
-                'totalCompleted' => 0,
-            ];
-        }
-
-        $assessables = $project->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-            foreach ($assessable->getAllParticipants() as $participant) {
-                $counts[$participant->getUser()->getId()]['total']++;
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
-                }
-            }
-        }
-
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'counts' => $counts,
-            'assessment' => $project,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryProject.twig", $twigData));
-    }
-
-    /**
-     * Display the student dashboard for an assessable
-     * @param IAssessable $assessment
-     */
-    private function getSummaryStudent(IAssessable $assessment)
-    {
-        // TODO - use the specified $assessment instead of DummyData
-
-        $project = self::getDummyAssessment(7);
-
-        // Calculate summary totals for display purposes
-
-        $counts = [
-            'dueWork' => 0,
-            'dueWorkCompleted' => 0,
-            'quiz' => 0,
-            'quizCompleted' => 0,
-            'task' => 0,
-            'taskCompleted' => 0,
-            'total' => 0,
-            'totalCompleted' => 0,
-        ];
-
-        $assessables = $project->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-
-            $participant = $assessable->getParticipant($this->getUser());
-
-            if ($assessable instanceof Quiz) {
-                $type = "quiz";
-            } else if ($assessable instanceof Task) {
-                $type = "task";
-            } else {
-                $type = "dueWork";
-            }
-
-            $counts[$type]++;
-            $counts['total']++;
-
-            // If the student has submitted at least one response we will assume it is completed
-
-            if ($participant->getAllResponses()->count() > 0) {
-                $counts[$type.'Completed']++;
-                $counts['totalCompleted']++;
-            }
-        }
-
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student' => $this->getUser(),
-            'assessment' => $project,
-            'counts' => $counts
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
-    }
-
-    /**
-     * Display appropriate landing page based on role
-     *
-     * @api   GET /learning/assessment/{assessmentId}
-     * @level 165
-     * @param IAssessable $assessment
-     */
-    public function getSummary(IAssessable $assessment)
-    {
-        if ($this->getUser()->getRole()->isStudent()) {
-            return $this->getSummaryStudent($assessment);
-        }
-
-        // TODO - what happens here when the $assessment is not a Project, and the user is not a student?
-        return $this->getSummaryProject($assessment);
-    }
 
     /**
      * Displays a form enabling a student to submit items to an assessment
