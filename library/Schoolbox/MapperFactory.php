@@ -36,10 +36,15 @@ class MapperFactory
      */
     public function get($mapperName)
     {
-        if (!class_exists($mapperName)) {
-            throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
+        $di = $this->injector;
+
+        if (!$di->has($mapperName)) {
+            // register the lazy into the DI
+            $di->set($mapperName, $this->getLazy($mapperName));
         }
-        return $mapperName::getInstance();
+
+        // yank it straight back out (but now it's registered!)
+        return $di->get($mapperName);
     }
 
     /**
@@ -58,7 +63,12 @@ class MapperFactory
             throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
         }
         return $this->injector->lazy(function () use ($mapperName) {
-            return $mapperName::getInstance();
+            // utilise getInstance if possible
+            if (is_callable([ $mapperName, 'getInstance' ])) {
+                return $mapperName::getInstance();
+            }
+
+            return new $mapperName;
         });
     }
 }

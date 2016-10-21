@@ -32,12 +32,14 @@ use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
@@ -63,6 +65,7 @@ use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Learning\Course;
 
 class Controller extends Base\Base
 {
@@ -1110,15 +1113,17 @@ class Controller extends Base\Base
      * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
      * @level 160
      *
-     * @param int $courseId
-     * @param string $classCode
-     * @param int $componentId (Optional) the ID of the component the course is to be imported into
+     * @param Course\Specification $courseSpec
+     * @param Folder\Model         $targetClass
+     * @param int                  $componentId the ID of the component the course is to be imported into
      */
-    public function import($courseId, $classCode, $componentId = null)
+    public function import(Course\Specification $courseSpec = null, Folder\Model $targetClass = null, $componentId = null)
     {
         $importer = new CourseImport();
 
-        $this->tpl('import', array_merge($importer->importSelectize($courseId, $classCode), ['componentId' => $componentId]));
+        $context = array_merge($importer->importSelectize($courseSpec, $targetClass), ['componentId' => $componentId]);
+
+        $this->tpl('import', $context);
     }
 
 
@@ -1133,17 +1138,29 @@ class Controller extends Base\Base
      */
     public function importOwnership()
     {
-        $ownerships = $this->getRequest()->post["ownership"];
-        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $ownerships  = $this->getRequest()->post["ownership"];
+        $courseId    = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
+
+        $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseId);
+
+        // build implementation objects from the specs
+        // this may seem a little redundant, but the "new import" and "modify import" screen are one, and so require consistent data models
+        $unitImplFactory = new Course\Unit\ImplementationFactory();
+
+        $unitImpls = new Collection();
+
+        foreach ($unitSpecs as $spec) {
+            $unitImpls->add($unitImplFactory->build($spec));
+        }
 
         // process ownership assignments
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
             'homepage' => implode(',', array_keys($ownerships)),
-            'courseHomepage' => $courseHomepage,
+            'courseHomepage' => $courseId,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitSpecificationMapperProxy()->findAllByCourseFolderId($courseHomepage),
+            'units'          => $unitImpls,
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -1193,11 +1210,11 @@ class Controller extends Base\Base
     public function importUnits()
     {
         $homepage = trim($this->getRequest()->post["importFolders"]);
-        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $courseId = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseSpecificationMapperProxy()->findByFolderId($courseHomepage);
+            $this->getCourseSpecificationMapperProxy()->findById($courseId);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -1205,49 +1222,51 @@ class Controller extends Base\Base
             return;
         }
 
-        if ($homepage == "" && $courseHomepage == "") {
+        if ($homepage == "" && $courseId == "") {
             // They didn't select anything
 
             $this->throwError('You must select at least one class and a course to import before you can proceed');
-        } else {
-            if ($homepage == "") {
-                // They didn't select a class code
+            return;
 
-                $this->throwError('You must select at least one class before you can proceed');
-            } else {
-                if ($courseHomepage == "") {
-                    // They didn't select a course to import
+        } elseif ($homepage == "") {
+            // They didn't select a class code
 
-                    $this->throwError('You must select a course to import before you can proceed');
-                } else {
-                    $targetFolderIds = explode(',', $homepage);
+            $this->throwError('You must select at least one class before you can proceed');
+            return;
 
-                    $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
+        } elseif ($courseId == "") {
+            // They didn't select a course to import
 
-                    $possibleOwnerships = [];
+            $this->throwError('You must select a course to import before you can proceed');
+            return;
+        }
 
-                    foreach ($folders as $folder) {
-                        $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
-                            $folder, Role::STAFF, UserAccess::ACCESS_WRITE
-                        );
+        $targetFolderIds = explode(',', $homepage);
 
-                        if (count($possibleOwnerships[$folder->getId()]) == 0) {
-                            // if nobody else was returned, jam the session user in there.
-                            $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
-                        }
-                    }
+        $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
-                    // Everything kosher, proceed with the mage
-                    // respond with stage 2: ownership
-                    $this->tpl('import/ownership', [
-                        'targetFolders' => $folders,
-                        'importCourse' => $courseHomepage,
-                        'ownershipCandidates' => $possibleOwnerships,
-                        'componentId' => $componentId
-                    ]);
-                }
+        $possibleOwnerships = [];
+
+        foreach ($folders as $folder) {
+            $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
+                $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+            );
+
+            if (count($possibleOwnerships[$folder->getId()]) == 0) {
+                // if nobody else was returned, jam the session user in there.
+                $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
             }
         }
+
+        // Everything kosher, proceed with the mage
+        // respond with stage 2: ownership
+        $this->tpl('import/ownership', [
+            'targetFolders' => $folders,
+            'importCourse' => $courseId,
+            'ownershipCandidates' => $possibleOwnerships,
+            'componentId' => $componentId
+        ]);
+
     }
 
     /**
@@ -1261,115 +1280,105 @@ class Controller extends Base\Base
      *
      * TODO: make this take a course implementation ID, not a course component ID
      *
-     * @param $unitDates array User-selected dates for a Unit, (via POST, typically)
-     * @param $courseComponentId int A componentId related to this course >.<
+     * @param $unitPostData array User-selected dates for a Unit, (via POST, typically)
      * @return array
      */
-    private function determineTaskDates($unitDates, $courseComponentId)
+    private function determineTaskDates($unitPostData)
     {
-        /** @var Folder\Model[] $unitCache */
-        $unitCache = [];
+        $units = new Collection();
 
         /* Make a local cache for unit information
          */
+
         // TODO: figure out how this should work with course implementation
-        foreach ($unitDates as $unit) {
-            if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
-                try {
-                    $u = $this->getUnitSpecificationMapperProxy()->findByFolderId($unit['unit_id']);
-                } catch (MapperException\Deleted $e) {
-                    // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
-                    // any source units have been deleted, their existence still needs to be honoured.
-                    $u = $e->getDeletedObject();
-                }
-                $unitCache[$unit['unit_id']] = $u;
-            }
-        }
+        foreach ($unitPostData as $postUnit) {
+            $unitSpecId = $postUnit['unit_spec_id'];
+            $unitImplId = $postUnit['unit_impl_id'];
 
-        // Find all tasks, due work, and quizzes associated with the selected units.
-
-        $units = new Collection();
-
-        foreach ($unitCache as $key => $unitCurrent) {
-            $unit = [];
-            $unit['id'] = $unitCurrent->getId();
-            $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
-            $unit['items'] = new Collection();
-
-            foreach ($unitDates as $unitDate) {
-                if ($unitDate["unit_id"] == $unitCurrent->getId()) {
-                    $unit['open_date'] = $unitDate['open_date'];
-                    $unit['due_date'] = $unitDate['due_date'];
-                }
+            if (!$postUnit['import']) {
+                // if this unit is not to be imported, or we've already seen it somehow, skip...
+                continue;
             }
 
-            /* Get a list of all the abstract coursework that were part of
-             * the original unit specification
+            try {
+                $unitSpec = $this->getUnitSpecificationMapperProxy()->findById($unitSpecId);
+
+            } catch (MapperException\Deleted $e) {
+                // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
+                // any source units have been deleted, their existence still needs to be honoured.
+                $unitSpec = $e->getDeletedObject();
+            }
+
+            // Find all assessments associated with the selected units.
+            $unit = [
+                'id'        => $unitSpecId,
+                'name'      => $unitSpec->getFolder()->getName(),
+                'open_date' => $postUnit['open_date'],
+                'due_date'  => $postUnit['due_date'],
+                'items'     => new Collection(),
+            ];
+
+            // TODO shove this into the DI
+            $translator = new Assessment\DataModel\Translator(
+                new \Schoolbox\Learning\MarkScheme\Factory()
+            );
+
+            $translator->addSubTranslator(new Assessment\DataModel\Translator\DueWork());
+            $translator->addSubTranslator(new Assessment\DataModel\Translator\Quiz());
+            $translator->addSubTranslator(new Assessment\DataModel\Translator\Task());
+
+            $assessmentMapper = new Assessment\DataModel\MapperProxy(
+                Assessment\DataModel\Mapper::getInstance(),
+                $translator
+            );
+
+            /* Get a list of all the Specification assessments
              */
-            $abstractCoursework = $this->getTaskMapper()->findAbstractTasksForUnit($key);
+            $specAssessments = $assessmentMapper->findAllForUnitSpecificationId($unitSpecId);
 
-            /* Get a list of all the coursework instances that were created
-             * as instances of the original abstracts
+            /* Get a list of all the Implementation assessments
              */
-            if ($courseComponentId) {
-                $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
-                    [
-                        'component_id' => $courseComponentId,
-                        'unit_category_id' => $key
-                    ]
-                )->first();
-
-                if ($unitInstance instanceof UnitInstance) {
-                    $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn(
-                        'course_unit_instance_id',
-                        $unitInstance->getId()
-                    );
-                } else {
-
-                    /* No instances to list
-                     */
-                    $instancesCoursework = new Collection();
-                }
+            if ($unitImplId) {
+                $implAssessments = $assessmentMapper->findAllForUnitImplementationId(0);
             } else {
-
-                /* No instances to list
-                 */
-                $instancesCoursework = new Collection();
+                $implAssessments = new Collection();
             }
 
-            /* Unify all three of Tasks, Due Work and Quizzes
-             * into one mega list
-             */
-            $temp = new Collection();
+            /**
+             * Unify all assessments from both sources into one mega list
+             *
+             * @var Collection|Assessment\IAssessable[] $aggregateAssessments
+            */
+            $aggregateAssessments = new Collection();
 
             /* If the coursework instances exist, use them; otherwise use
              * an instance of the abstract coursework
              */
             $found = [];
 
-            foreach ($abstractCoursework as $currentAbstractCoursework) {
-                foreach ($instancesCoursework as $currentInstanceCoursework) {
+            foreach ($specAssessments as $specAssessment) {
+                foreach ($implAssessments as $implAssessment) {
 
                     /* An instance already exists; use that and stop searching
                      */
-                    if ($currentInstanceCoursework->getTask()->getId() == $currentAbstractCoursework->getId()) {
+                    if ($implAssessment->getTask()->getId() == $specAssessment->getId()) {
 
                         /* This abstract already has an instance; ignore it
                          * after inserting the instance
                          */
-                        $found[] = $currentAbstractCoursework->getId();
+                        $found[] = $specAssessment->getId();
 
                         /* Retain the dates for this coursework as specified by
                          * the original import; ram in the recently-found Unit Instance
                          */
                         $unitInstance = $this->getUnitInstanceMapper()->findById(
-                            $currentInstanceCoursework->getUnitInstance()->getId()
+                            $implAssessment->getUnitInstance()->getId()
                         );
-                        $currentInstanceCoursework->setUnitInstance($unitInstance);
+                        $implAssessment->setUnitInstance($unitInstance);
 
                         /* Stack it up
                          */
-                        $temp->add($currentInstanceCoursework);
+                        $aggregateAssessments->add($implAssessment);
 
                         break;
                     }
@@ -1378,64 +1387,61 @@ class Controller extends Base\Base
                 /* If an instance of the abstract coursework wasn't found,
                  * use the abstract instead; otherwise ignore and continue
                  */
-                if (!in_array($currentAbstractCoursework->getId(), $found)) {
-                    $temp->add($currentAbstractCoursework);
+                if (!in_array($specAssessment->getId(), $found)) {
+                    $aggregateAssessments->add($specAssessment);
                 }
             }
 
             /* Find any customisations to the imported course
              *
              * Take advantage of the fact that:
-             * $currentInstanceCoursework->getTask()->getId() = $currentAbstractCoursework->getId() = elements of $found
+             * $implAssessment->getTask()->getId() = $specAssessment->getId() = elements of $found
              *
-             * So we can find all the $currentInstanceCoursework that weren't superpositioned
+             * So we can find all the $implAssessment that weren't superpositioned
              * because there are no abstracts for them (ie. customisations)
              */
-            foreach ($instancesCoursework as $currentInstanceCoursework) {
-                if (!in_array($currentInstanceCoursework->getTask()->getId(), $found)) {
-                    $temp->add($currentInstanceCoursework);
+            foreach ($implAssessments as $implAssessment) {
+                if (!in_array($implAssessment->getTask()->getId(), $found)) {
+                    $aggregateAssessments->add($implAssessment);
                 }
             }
 
             /* Sort by Created At for now, until manual sequencing
              * is added to the ui so teachers can sort it themselves
              */
-            $temp->sortBy('created', 'asc');
+            $aggregateAssessments->sortBy('createdAt', 'asc');
 
-            foreach ($temp as $current) {
-                $class = 'Task';
-                $detail = null;
-                try {
-                    if ($current->getAssessment()->getId()) {
-                        $class = 'OnlineAssessment';
-                        $itemId = $current->getAssessment()->getId();
-                        $detail = $this->getOnlineAssessmentMapper()->findById($itemId);
-                    } elseif ($current->getSubmissionBox()->getId()) {
-                        $class = 'SubmissionBox';
-                        $itemId = $current->getSubmissionBox()->getId();
-                        $detail = $this->getSubmissionBoxMapper()->findById($itemId);
-                    }
-                } catch (MapperException $e) {
-                    // the underlying assessment entity does not exist. do not import.
+            foreach ($aggregateAssessments as $assessment) {
+
+                $class = '';
+
+                if ($assessment->getAssessmentContext() instanceof UnitSpecification) {
+                    $isAbstract = true;
+                } elseif ($assessment->getAssessmentContext() instanceof UnitImplementation) {
+                    $isAbstract = false;
+                } else {
+                    // invalid context (somehow) - SKIP!
                     continue;
                 }
-
+                
                 /* Determine whether this was an abstract task, or a task instance
                  * that actually exists (the former will have to inherit unit dates
                  * and the latter will have to retain unit dates
                  */
-                if ($current instanceof Task) {
-                    $isAbstract = true;
-                } else {
-                    $isAbstract = false;
+                if ($assessment instanceof Assessment\Task\Model) {
+                    $class = 'Task';
+                } elseif ($assessment instanceof Assessment\Quiz\Model) {
+                    $class = 'OnlineAssessment';
+                } elseif ($assessment instanceof Assessment\DueWork\Model) {
+                    $class = 'DueWork';
                 }
 
                 $unit['items']->add(
                     [
-                        'class' => $class,
+                        'class'      => $class,
                         'isAbstract' => $isAbstract,
-                        'item' => $current,
-                        'detail' => $detail
+                        'item'       => $assessment,
+                        'detail'     => $assessment,
                     ]
                 );
             }
@@ -1463,94 +1469,83 @@ class Controller extends Base\Base
 
         if (trim($post["homepage"]) == "") {
             // The homepage ID has gone missing
-
             $this->throwError('No class code was specified');
-        } else {
-            if (trim($post["course_homepage"]) == "") {
-                // The course homepage ID has gone missing
+            return;
+        }
 
-                $this->throwError('No course was specified');
-            } else {
-                $homepages = explode(",", $post["homepage"]);
+        if (trim($post["course_homepage"]) == "") {
+            // The course homepage ID has gone missing
+            $this->throwError('No course was specified');
+            return;
+        }
 
-                // Test permissions. Must have write permission on the destination page and read permission
-                // on the course we are trying to import.
+        $homepages = explode(",", $post["homepage"]);
 
-                // Test course page read access
+        // Test permissions. Must have write permission on the destination page and read permission
+        // on the course we are trying to import.
 
-                if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
-                    throw new Unauthorized();
-                }
+        // Test course page read access
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
+            throw new Unauthorized();
+        }
 
-                // Test each homepage for write access
-
-                foreach ($homepages as $homepage) {
-                    if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                        throw new Unauthorized();
-                    }
-                }
-
-                // Check all required dates have been specified
-
-                $errorDate = false;
-                $foundUnit = false;
-
-                foreach ($post["unit"] as $unit) {
-                    if (!empty($unit['import'])) {
-                        $foundUnit = true;
-
-                        /* Add date validation
-                         */
-                        try {
-                            $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                            $dueDate = \Alaress_Date_Format::newLocalShort($unit['due_date']);
-                            if ($openDate->gt($dueDate)) {
-                                $errorDate = true;
-                                $this->throwError('The open date must be before the close date');
-                                break;
-                            }
-                        } catch (\Exception $e) {
-                            $errorDate = true;
-                            $this->throwError('You must specify a valid open and close date for each unit you are importing');
-                            break;
-                        }
-                    }
-                }
-
-                // Make sure at least one unit was specified
-
-                if (!$foundUnit) {
-                    $this->throwError('You must select at least one unit to import');
-                } elseif (!$errorDate) {
-                    /* Figger out when each task should open, due, late, etc
-                     * A superposition of Task Instances over Task Abstracts
-                     *
-                     * (a Task Abstract is one specified in the original Unit
-                     * but has not yet been imported)
-                     */
-                    try {
-                        $allTaskDates = $this->determineTaskDates(
-                            $post["unit"],
-                            $post->get('componentId')
-                        );
-                    } catch (MapperException $e) {
-                        $this->sendError($e->getMessage());
-                        return;
-                    }
-
-                    // respond with stage 4: coursework list
-                    $this->tpl('unitImportResults', [
-                        'ownerships' => $post['ownerships'],
-                        'homepage' => $post["homepage"],
-                        'componentId' => $post["componentId"],
-                        'courseHomepage' => $post["course_homepage"],
-                        'unitDates' => $post["unit"],
-                        'units' => $allTaskDates['units'],
-                        'submitValue' => empty($post['ownerships']) ? 'Modify' : 'Import'
-                    ]);
-                }
+        // Test each homepage for write access
+        foreach ($homepages as $homepage) {
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                throw new Unauthorized();
             }
         }
+
+        $foundUnit = false;
+
+        foreach ($post["unit"] as $unit) {
+            if (empty($unit['import'])) {
+                continue;
+            }
+
+            $foundUnit = true;
+
+            try {
+                // valiDate *puns* XD
+                $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                $dueDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                if ($openDate->gt($dueDate)) {
+                    $this->throwError('The open date must be before the close date');
+                    return;
+                }
+            } catch (\Exception $e) {
+                $this->throwError('You must specify a valid open and close date for each unit you are importing');
+                return;
+            }
+        }
+
+        // Make sure at least one unit was specified
+        if (!$foundUnit) {
+            $this->throwError('You must select at least one unit to import');
+            return;
+        }
+
+        /* Figger out when each task should open, due, late, etc
+         * A superposition of Implementation Tasks over Specification Tasks
+         */
+        try {
+            $allTaskDates = $this->determineTaskDates($post["unit"]);
+
+        } catch (MapperException $e) {
+            $this->sendError($e->getMessage());
+            return;
+        }
+
+        // respond with stage 4: coursework list
+        $this->tpl('unitImportResults', [
+            'ownerships'     => $post['ownerships'],
+            'homepage'       => $post["homepage"],
+            'componentId'    => $post["componentId"],
+            'courseHomepage' => $post["course_homepage"],
+            'unitDates'      => $post["unit"],
+            'units'          => $allTaskDates['units'],
+            'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import',
+        ]);
     }
 
     /**
