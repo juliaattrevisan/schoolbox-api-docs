@@ -1,7 +1,7 @@
 <?php
 
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Calendar\Event\Access;
 
 if (isset($this)) {
     $page = $this;
@@ -24,10 +24,9 @@ $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 $page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
 $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
-$userMapper = new UserMapper();
-
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
     try {
+        $userMapper = new UserMapper();
         $selectedUser = $userMapper->findById($_GET['userId']);
     } catch (\Exception $e) {
         error(31);
@@ -48,69 +47,13 @@ if (is_numeric($_GET['eventID'])) {
         exit;
     }
 
-    /* Begin a series of checks for permission to modify this event
+    /* Check user has permission to modify this event
      */
+    $eventAccess = new Access();
 
-    // Check superuser
-    $isSuperuser = $selectedUser->isSuperuser();
-
-    // Check if user is parent of the owner
-    $event->getOwner()->loadParents();
-    $isParentOfOwner = $selectedUser->isParentOf($event->getOwner());
-
-    // If the event is on a campus level, check if this user
-    // is a calendar moderator for one of the campuses selected
-    $isModerator = false;
-
-    if ($event->isCampusLevel()) {
-
-        $accessList = $selectedUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_FULL);
-
-        /** @var UserAccess $currentAccess */
-        foreach ($accessList as $currentAccess) {
-
-            // Loop through the campuses selected for the event
-            foreach ($event->getCampusCollection() as $currentCampus) {
-                if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
-                    $isModerator = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // If the event is on a group level, check if the user is a group manager
-    $isGroupManager = false;
-
-    if ($event->isGroupLevel()) {
-
-        // Loop through the groups selected for this event
-       foreach ($event->getCategoryCollection() as $category) {
-
-           // Loop through the managers for this group and check for $selectedUser
-           $groupManagers = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $category->getCategoryId());
-           foreach ($groupManagers as $groupManager) {
-               if ($groupManager->getId() === $selectedUser->getId()) {
-                   $isGroupManager = true;
-               }
-           }
-       }
-    }
-
-    // For Personal events, owners only
-    $isOwner = false;
-
-    if ($event->isPersonalLevel()) {
-        if ($selectedUser->getId() == $event->getOwner()->getId()) {
-            $isOwner = true;
-        }
-    }
-
-    // Run through the check results, if user doesn't pass one - kick 'em out
-    if (!$isSuperuser && !$isParentOfOwner && !$isModerator && !$isGroupManager && !$isOwner) {
+    if ($eventAccess->checkAccess($selectedUser, $event) === false) {
         error(34);
     }
-
 
     /* Default values
      */
