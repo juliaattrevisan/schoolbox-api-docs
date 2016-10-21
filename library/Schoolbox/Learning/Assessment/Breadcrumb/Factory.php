@@ -53,13 +53,13 @@ class Factory
         } elseif ($context instanceof UnitSpecification) {
             $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof Project) {
-            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}/update"]);
+            $trail->add([$context->getTitle(), "/learning/assessment/{$context->getId()}"]);
         }
 
         /* Additional project node, if you're creating within a project
          */
         if ($assessment instanceof Project) {
-            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}/update"]);
+            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"]);
         }
 
         return $trail;
