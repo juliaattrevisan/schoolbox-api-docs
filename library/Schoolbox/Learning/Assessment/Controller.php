@@ -545,6 +545,9 @@ class Controller extends Base
         // TODO -use real data
         //$assessment = self::getDummyAssessment(7);
 
+        // Load participants manually
+        $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
