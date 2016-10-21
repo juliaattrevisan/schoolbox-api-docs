@@ -662,7 +662,8 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
             'currentUser' => $this->getUser(),
             'assessment' => $assessment,
-            'counts' => $counts
+            'counts' => $counts,
+            'participant' => $this->getUser()
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summary/student.twig", $twigData));

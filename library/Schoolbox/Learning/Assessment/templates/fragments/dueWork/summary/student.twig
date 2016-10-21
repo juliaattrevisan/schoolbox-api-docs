@@ -13,3 +13,8 @@
 {% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
 {% endif %}
 
+<div class="row">
+    <div class="small-12 columns">
+        <a class='submit' href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.id}) }}">Create Response</a>
+    </div>
+</div>
