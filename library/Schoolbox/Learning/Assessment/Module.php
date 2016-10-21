@@ -109,6 +109,10 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload(
+        /**
+         * @param $params
+         * @return array
+         */
             $matcher,
             '(?:getSelectAssessmentInFolder|getSelectAssessmentInProject|getSelectAssessmentInUnitImplementation|getSelectAssessmentInUnitSpecification)',
             function ($params) {
@@ -119,14 +123,29 @@ class Module extends BaseModule
                     : null;
 
                 // TODO add mapper error handling
+                $context = null;
                 if(array_key_exists('folderId', $params)){
-                    $args['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+                    $context = $this->getFolderMapper()->findById($params['folderId']);
+                    $args['folder'] = $context;
                 } elseif(array_key_exists('projectId', $params)){
-                    $args['project'] = $this->getAssessmentMapperProxy()->findById($params['projectId']);
+                    $context = $this->getAssessmentMapperProxy()->findById($params['projectId']);
+                    $context = ($context instanceof Project) ? $context : null;
+                    $args['project'] = $context;
                 } elseif(array_key_exists('unitId', $params)){
-                    $args['unit'] = $this->getUnitImplMapperProxy()->findById($params['unitId']);
+                    $context = $this->getUnitImplMapperProxy()->findById($params['unitId']);
+                    $args['unitImpl'] = $context;
                 } elseif(array_key_exists('unitSpecId', $params)){
-                    $args['unitSpec'] = $this->getUnitSpecMapperProxy()->findById($params['unitSpecId']);
+                    $context = $this->getUnitSpecMapperProxy()->findById($params['unitSpecId']);
+                    $args['unitSpec'] = $context;
+                }
+
+                if(is_null($context)){
+                    // TODO - needs more informative Exception
+                    throw new \DomainException('Not found');
+                }
+
+                if($args['assessment']){
+                    $args['assessment']->setContext($context);
                 }
 
                 return $args;
