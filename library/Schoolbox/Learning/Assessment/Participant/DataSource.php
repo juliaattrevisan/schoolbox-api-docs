@@ -115,8 +115,34 @@ class DataSource
             );
         }
 
+        // Sort by name
+        $participants = $participants->sortByCallback([$this, 'sortCallback']);
+
         // TODO add feedback and responses
 
         return $participants;
+    }
+
+    /**
+     * Sort callback: sort by surname, then first name, then ID.
+     *
+     * @param Participant $a
+     * @param Participant $b
+     * @return int
+     */
+    public function sortCallback(Participant $a, Participant $b)
+    {
+        $lastCmp = strcasecmp($a->getUser()->getLastname(), $b->getUser()->getLastname());
+        if ($lastCmp != 0) {
+            return $lastCmp;
+        }
+        $firstCmp = strcasecmp($a->getUser()->getFirstname(), $b->getUser()->getFirstname());
+        if ($firstCmp != 0) {
+            return $firstCmp;
+        }
+        // ID comparison:
+        // if a.user.id < b.user.id, then a < b
+        // if a.user.id > b.user.id, then a > b
+        return ($a->getUser()->getId() - $b->getUser()->getId());
     }
 }
