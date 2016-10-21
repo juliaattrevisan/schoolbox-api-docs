@@ -58,31 +58,24 @@ if (is_numeric($_GET['eventID'])) {
     $event->getOwner()->loadParents();
     $isParentOfOwner = $_SESSION['user']->isParentOf($event->getOwner());
 
-    /* Check if user is a calendar moderator
+    /* If the event is on a campus level, check if this user
+     * is a calendar moderator for one of the campuses selected
      */
-    $hasServicePermission = false;
+    $isModerator = false;
 
-    /** @var UserAccess $currentAccess */
-    foreach ($_SESSION['user']->getAccessList() as $currentAccess) {
-        if ($currentAccess->getService() == UserAccess::SERVICE_CALENDAR) {
-            if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_FULL) {
+    if ($event->isCampusLevel()) {
 
-                /* If the event is on a campus level, check this user
-                 * has permission to moderate one of the selected campuses
-                 */
-                if ($event->isCampusLevel()) {
-                    foreach ($event->getCampusCollection() as $currentCampus) {
-                        if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
-                            $hasServicePermission = true;
-                            break;
-                        }
-                    }
-                }
-                /* Not a campus-level event
-                 * Service Moderator can modify any group- and personal-level events
-                 */
-                else {
-                    $hasServicePermission = true;
+        $accessList = $_SESSION['user']->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_FULL);
+
+        /** @var UserAccess $currentAccess */
+        foreach ($accessList as $currentAccess) {
+
+            /* Loop through the campuses selected for the event
+             */
+            foreach ($event->getCampusCollection() as $currentCampus) {
+                if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
+                    $isModerator = true;
+                    break;
                 }
             }
         }
@@ -98,7 +91,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Run through the check results, if user doesn't pass one - kick 'em out
      */
-    if (!$isSuperuser && !$isParentOfOwner && !$hasServicePermission && !$isOwner) {
+    if (!$isSuperuser && !$isParentOfOwner && !$isModerator && !$isOwner) {
         error(34);
     }
 
