@@ -343,6 +343,7 @@ class Controller extends Base
                     }
                     // Else must be inside a Folder, UnitImpl, or UnitSpec
                     else {
+                        $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
                         $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
                     }
                 }
