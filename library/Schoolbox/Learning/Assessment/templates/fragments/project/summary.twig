@@ -98,19 +98,23 @@
                                             <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
-                                                    {{ participant.user.fullName }}
+                                                    {{ participant.user.formatName }}
                                                 </h3>
                                             </a>
                                             <p class="meta">
-                                                {% if participant.user.user.year and participant.user.role.isStudent %}
+                                                {% if participant.user.year and participant.user.role.isStudent %}
                                                     Year {{ participant.user.year }}
                                                 {% endif %}
                                                 {{ participant.user.role.name }}
                                             </p>
                                         </div>
                                         <div class="progress">
-                                            <span class="meter"
-                                                  style="width:{{ counts[participant.user.id].totalCompleted / counts[participant.user.id].total * 100 }}%"></span>
+                                            {% if counts[participant.user.id].total == 0 %}
+                                                {% set meterWidth = 0 %}
+                                            {% else %}
+                                                {% set meterWidth = counts[participant.user.id].totalCompleted / counts[participant.user.id].total * 100 %}
+                                            {% endif %}
+                                            <span class="meter" style="width:{{ meterWidth }}%"></span>
                                         </div>
                                     </div>
                                 </li>
