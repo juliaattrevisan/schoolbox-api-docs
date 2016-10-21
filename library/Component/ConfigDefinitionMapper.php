@@ -9,6 +9,10 @@
  * @
  */
 
+/**
+ * Class Component_ConfigDefinitionMapper
+ * @method Component_ConfigDefinition findOneByColumnList($columnList, $order = [])
+ */
 class Component_ConfigDefinitionMapper extends Schoolbox\Mapper {
 
 	protected $table = 'component_config_definition';
