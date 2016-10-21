@@ -44,9 +44,9 @@ class Module extends \Alaress\Module\Module
     {
         $routes = [
             'GET' => [
-                '/{courseId}/class/{classCode}{/componentId}' => 'getImportForm', // Import screen
-                '/classes'                                    => 'searchClasses', // A list of Classes you can import into via selectize
-                '/modify/{componentId}'                       => 'importModify',  // Modify the imported Course's Unit details
+                '/{courseId}/class{/classCode}' => 'getImportForm', // Import screen
+                '/classes'                      => 'searchClasses', // A list of Classes you can import into via selectize
+                '/modify/{componentId}'         => 'importModify',  // Modify the imported Course's Unit details
             ],
             'POST' => [
                 '/classes'   => 'postClasses',   // result of step 1
@@ -103,7 +103,11 @@ class Module extends \Alaress\Module\Module
                 try {
                     $targetClass = $folderMapper->findByCode($params['classCode']);
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $targetClass = $folderMapper->findById($params['classCode']);
+                    if ($params['classCode']) {
+                        $targetClass = $folderMapper->findById($params['classCode']);
+                    } else {
+                        $targetClass = null;
+                    }
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // null is ok
