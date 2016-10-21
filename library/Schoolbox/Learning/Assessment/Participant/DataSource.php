@@ -102,7 +102,7 @@ class DataSource
         // I want to search for ALL read-level users, not just students
         // Deliberately don't search external DB, I have already done that
         $users->mergeUnique(
-            $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false),
+            $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
             'id'
         );
 
