@@ -304,8 +304,7 @@ class Controller extends Base
     public function postCreateAssessment()
     {
         try {
-            $existingAssessment = null;
-            $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
+            $assessment = $this->produceAssessment($this->getRequest()->post);
             $this->persistAssessment($assessment);
 
             // If we are creating a Project, show Step-3 (options to create Assessments in Project)
@@ -680,7 +679,7 @@ class Controller extends Base
         $assessment = null;
         try {
             $assessmentFactory = new Factory($this->getUser(), $postData);
-            $assessment = $assessmentFactory->produce($assessment);
+            $assessment = $assessmentFactory->produce($existingAssessment);
 
             /* Manually do a check
              */
