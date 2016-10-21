@@ -86,7 +86,8 @@ if ($_POST['modusername']) {
     if (is_array($_POST['campus']) && count($_POST['campus']) || $_POST['defaultCampus']) {
         // Save and redirect back
         $userMapper->save($user);
-        SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
+        SitePage::localRedir('/adminv2/user/modify/' . $user->getId());
+
     } else {
         error(158);
     }
@@ -102,7 +103,7 @@ elseif ($_POST['type'] == 'delete') {
         exit;
     }
     $userMapper->delete($user);
-    SitePage::localRedir('/adminv2/user/');
+   SitePage::localRedir('/adminv2/user/');
 
 }
 /* Add user to group
@@ -111,17 +112,15 @@ elseif (isset($_POST['groupSubmit']) && is_numeric($_POST['uid'])) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
-    SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid']) . '#permissions');
-}
-/* Add user to service
+    SitePage::localRedir('/adminv2/user/modify/' . Scrub::text($_POST['uid']) . '#permissions');
+} /* Add user to service
  */
 elseif (isset($_POST['addService']) && is_numeric($_POST['uid'])) {
     $groupHandler->setService(Scrub::text($_POST['service']));
     $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
-    SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid'] . '#permissions'));
-}
-/* Ajax Update Groups and their access permissions etc
+    SitePage::localRedir('/adminv2/user/modify/' . Scrub::text($_POST['uid'] . '#permissions'));
+} /* Ajax Update Groups and their access permissions etc
  */
 elseif ($_POST['updateGroups'] == true) {
     $groupHandler->setService(Scrub::text($_POST['service']));
@@ -157,7 +156,7 @@ elseif (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_num
     $groupHandler->setService(Scrub::text($_GET['deleteService']));
     $groupHandler->deleteUser(Scrub::text($_GET['sid']), Scrub::text($_GET['uid']));
 
-    SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_GET['uid']) . '#permissions');
+    SitePage::localRedir('/adminv2/user/modify/' . Scrub::text($_GET['uid']) . '#permissions');
 }
 elseif (is_numeric($_GET['deleteUserLink']) && is_numeric($_GET['linkedUser']) ) {
     /* Deletes linked users */
@@ -179,7 +178,7 @@ elseif (is_numeric($_GET['deleteUserLink']) && is_numeric($_GET['linkedUser']) )
 
     \Schoolbox\UserMapper::getInstance()->save($originalUser);
 
-    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
+    SitePage::localRedir('/adminv2/user/modify/'.$originalUser->getId().'#linked');
 }
 elseif (is_array($_POST['linkUser'])) {
     /* Adds linked users */
@@ -204,7 +203,7 @@ elseif (is_array($_POST['linkUser'])) {
 
     \Schoolbox\UserMapper::getInstance()->save($originalUser);
 
-    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
+    SitePage::localRedir('/adminv2/user/modify/'.$originalUser->getId().'#linked');
 }
 /* Switch logins to the current user being viewed
  */

@@ -175,11 +175,6 @@
                         {% endif %}
                     </div>
 
-                    <div class="small-12 island">
-                        <label for="staff_profile_comment">Profile Page Comment (Staff Only)</label>
-                        <textarea rows="5" id="staff_profile_comment" type="text" name="staff_profile_comment">{{ user.staffProfileComment }}</textarea>
-                    </div>
-
                     <div class="small-12 columns">
                         <input type="submit" value="Update User"/>
                     </div>
@@ -190,6 +185,22 @@
 </div>
 
 {% if user %}
+
+    {% if user.role.isStudent %}
+
+        <div class="row">
+            <div class="small-12 island">
+                <h3 class="subheader">Student Profile Page Comment
+                    <span class="hint has-tip tip-top" data-tooltip
+                          title="This is a comment that will appear on the students profile page, and is visible by staff only">?</span>
+                </h3>
+                <section class="content">
+                    <textarea rows="5" id="staff_profile_comment" type="text" name="staff_profile_comment">{{ user.staffProfileComment }}</textarea>
+                </section>
+            </div>
+        </div>
+
+    {% endif %}
 
     {# Impersonate user form #}
 
@@ -438,7 +449,7 @@
                         <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="card small-12">
-                                    <a href="/adminv2/modify-user/{{ linkedUser.id }}">{{ linkedUser.fullName }}</a>
+                                    <a href="/adminv2/user/modify/{{ linkedUser.id }}">{{ linkedUser.fullName }}</a>
                                 </div>
                             </div>
                             <nav>
