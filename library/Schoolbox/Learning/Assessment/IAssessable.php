@@ -192,6 +192,13 @@ interface IAssessable extends ISoftDeletable
      */
     public function getPercentagePublished();
 
+    /**
+     * Check that all four dates are set validly
+     *
+     * @return bool
+     */
+    public function isValidDates();
+
     /* Getters/Setters
      */
 
