@@ -175,6 +175,11 @@
                         {% endif %}
                     </div>
 
+                    <div class="small-12 island">
+                        <label for="staff_profile_comment">Profile Page Comment (Staff Only)</label>
+                        <textarea rows="5" id="staff_profile_comment" type="text" name="staff_profile_comment">{{ user.staffProfileComment }}</textarea>
+                    </div>
+
                     <div class="small-12 columns">
                         <input type="submit" value="Update User"/>
                     </div>

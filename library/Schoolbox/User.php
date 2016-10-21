@@ -53,6 +53,9 @@ class User implements JsonSerializable, ISoftDeletable
 
     /** @var string */
     private $password;
+    
+    /** @var string */
+    private $staffProfileComment;
 
     /**
      * Retrievable version of the user's password.
@@ -1310,4 +1313,21 @@ class User implements JsonSerializable, ISoftDeletable
         return $this;
     }
 
+    /**
+     * @param string $staffProfileComment
+     * @return self
+     */
+    public function setStaffProfileComment($staffProfileComment)
+    {
+        $this->staffProfileComment = $staffProfileComment;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStaffProfileComment()
+    {
+        return $this->staffProfileComment;
+    }    
 }

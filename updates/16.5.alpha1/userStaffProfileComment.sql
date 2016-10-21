@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `staff_profile_comment` TEXT NULL;

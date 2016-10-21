@@ -9,6 +9,8 @@
 
 namespace Schoolbox;
 
+use HouseMapper;
+use HouseResidentialMapper;
 use Alaress\Cache;
 use PDOStatement;
 use Schoolbox;
@@ -37,239 +39,44 @@ class UserMapper extends Mapper
      */
     protected $usernameCache;
 
+    /**
+     * Setup mapping
+     */
     protected function mapping()
     {
 
         $this->hasTable('user');
         $this->hasModel(User::class);
-
-        $this->hasMap(
-            array(
-                'column' => 'id',
-                'property' => 'id',
-                'type' => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'username',
-                'property' => 'username',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'password',
-                'property' => 'password',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-
-        $this->hasMap(
-            array(
-                'column' => 'title',
-                'property' => 'title',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'firstname',
-                'property' => 'firstname',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'lastname',
-                'property' => 'lastname',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-
-        $this->hasMap(
-            array(
-                'column' => 'synergy_id',
-                'property' => 'externalId',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'year',
-                'property' => 'year',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'house',
-                'property' => 'schoolHouse',
-                'type' => Mapper::TYPE_MODEL,
-                'join' => 'house',
-                'join_def' => array(
-                    'mapper' => \HouseMapper::class,
-                    'this_key' => 'house',
-                    'other_key' => 'id'
-                )
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'residential_house_id',
-                'property' => 'residentialHouse',
-                'type' => Mapper::TYPE_MODEL,
-                'join' => 'reshouse',
-                'join_def' => array(
-                    'mapper' => \HouseResidentialMapper::class,
-                    'this_key' => 'residential_house_id',
-                    'other_key' => 'id'
-                )
-            )
-        );
-
-
-        $this->hasMap(
-            array(
-                'column' => 'local_email',
-                'property' => 'localEmail',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'alt_email',
-                'property' => 'altEmail',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'position_title',
-                'property' => 'positionTitle',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'webmail',
-                'property' => 'webmail',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'mail_handler',
-                'property' => 'useInternalMail',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'hash',
-                'property' => 'hash',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'key',
-                'property' => 'key',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'eportfolio_enabled',
-                'property' => 'eportfolioEnable',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'group_id',
-                'property' => 'role',
-                'type' => Mapper::TYPE_MODEL,
-                'join' => 'role',
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'enabled',
-                'property' => 'enabled',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'hide_contacts',
-                'property' => 'hideContacts',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'hide_timetable',
-                'property' => 'hideTimetable',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'hide_notifications_tray',
-                'property' => 'hideNotificationsTray',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        //
-        // Boarder leave field is only there if the boarder leave module is
-        // enabled.
-        $this_object = $this;
-        $this->hasMap(
-            array(
-                'column' => 'boarding_status',
-                'property' => 'boardingStatus',
-                'type' => self::TYPE_STRING,
-                'enabled' => function () use ($this_object) {
-                        return $this_object->getConfigLoader()->get('boarder_leave_enabled');
-                    }
-            )
-        );
-        unset($this_object);
-
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('username', self::TYPE_STRING);
+        $this->uses('password', self::TYPE_STRING);
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('firstname', self::TYPE_STRING);
+        $this->uses('lastname', self::TYPE_STRING);
+        $this->uses('year', self::TYPE_STRING);
+        $this->uses('local_email', self::TYPE_BOOLEAN);
+        $this->uses('alt_email', self::TYPE_STRING);
+        $this->uses('webmail', self::TYPE_BOOLEAN);
+        $this->uses('hash', self::TYPE_STRING);
+        $this->uses('position_title', self::TYPE_STRING);
+        $this->uses('key', self::TYPE_STRING);
+        $this->uses('staff_profile_comment', self::TYPE_STRING);
+        $this->uses('synergy_id', self::TYPE_STRING, null, 'externalId');
+        $this->uses('mail_handler', self::TYPE_BOOLEAN, null, 'useInternalMail');
+        $this->uses('eportfolio_enabled', self::TYPE_BOOLEAN, null, 'eportfolioEnable');
+        $this->uses('enabled', self::TYPE_BOOLEAN);
+        $this->uses('hide_contacts', self::TYPE_BOOLEAN);
+        $this->uses('hide_timetable', self::TYPE_BOOLEAN);
+        $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->hasSoftDeleteDateField('deleted_at');
 
-        $this->hasJoin(
-            'role',
-            array(
-                'mapper' => '\\Schoolbox\\RoleMapper',
-                'this_key' => 'group_id',
-                'other_key' => 'id',
-            )
-        );
+        $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
+        $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
+        $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
+        $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
+
         $this->hasJoin(
             'userAccess',
             array(
@@ -280,35 +87,22 @@ class UserMapper extends Mapper
             )
         );
 
-        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
+        // Boarder leave field is only there if the boarder leave module is enabled.
 
-        $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
-
-        $this->registerCallback(self::CALLBACK_PRESAVE, function (\Schoolbox\User $model) {
-
-            /** @var User $model */
-            if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-                $communityPortalFactory = new CommunityPortalFactory();
-                $communityPortal = $communityPortalFactory->build();
-                try {
-                    $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
-                } catch (\UnexpectedValueException $e) {
+        $this_object = $this;
+        $this->hasMap(
+            array(
+                'column' => 'boarding_status',
+                'property' => 'boardingStatus',
+                'type' => self::TYPE_STRING,
+                'enabled' => function () use ($this_object) {
+                    return $this_object->getConfigLoader()->get('boarder_leave_enabled');
                 }
-            }
+            )
+        );
+        unset($this_object);
 
-            /** @var User $model */
-
-            if (!$model->getKey()) {
-                // ensure a key is set when persisting users
-                $model->setKey(substr(md5(uniqid() . time()), 0, 25));
-            }
-
-            if ($model->getRetrievablePassword()) {
-                $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
-            }
-
-            return true;
-        });
+        // Setup callbacks
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
@@ -319,6 +113,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateSynergeticPassword']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
@@ -329,6 +124,37 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
+    }
+
+    /**
+     * Update password in Synergetic
+     * @param User $model
+     * @return bool
+     */
+    public function updateSynergeticPassword(User $model)
+    {
+        /** @var User $model */
+        if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
+            $communityPortalFactory = new CommunityPortalFactory();
+            $communityPortal = $communityPortalFactory->build();
+            try {
+                $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+            } catch (\UnexpectedValueException $e) {
+            }
+        }
+
+        /** @var User $model */
+
+        if (!$model->getKey()) {
+            // ensure a key is set when persisting users
+            $model->setKey(substr(md5(uniqid() . time()), 0, 25));
+        }
+
+        if ($model->getRetrievablePassword()) {
+            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
+        }
+
+        return true;
     }
 
     /**
