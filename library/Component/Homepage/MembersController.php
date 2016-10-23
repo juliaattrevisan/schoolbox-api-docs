@@ -116,7 +116,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     $name  = $user->getFullName();
 
                     if ($admin !== null && $user->getId() === $admin->getId()) {
-                        $name .= " (Group Admin.)";
+                        $name .= " (Group Admin)";
                     }
 
                     $this->setVar(
