@@ -27,6 +27,13 @@ interface AssessmentContext
     public function getId();
 
     /**
+     * Retrieves the title of the assessment context
+     *
+     * @return string
+     */
+    public function getTitle();
+
+    /**
      * Retrieves the folder that any Assessable objects within this object
      * belongs within.
      *

@@ -62,11 +62,11 @@ class Factory
         $context = $assessment->getContext();
 
         if ($context instanceof Folder) {
-            $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof UnitImplementation) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof UnitSpecification) {
-            $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
         } elseif ($context instanceof Project) {
             $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
         }
@@ -108,13 +108,13 @@ class Factory
         try {
             if ($contextType == 'folder') {
                 $context = $folderMapper->findById($contextId);
-                $trail->add([$context->getName(), "/homepage/{$context->getId()}"]);
+                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
             } elseif ($contextType == 'unit') {
                 $context = $unitImplementationDataSource->findById($contextId);
                 $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
             } elseif ($contextType == 'unitspec') {
                 $context = $unitSpecificationDataSource->findById($contextId);
-                $trail->add([$context->getFolder()->getName(), "/homepage/{$context->getId()}"]);
+                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
             } elseif ($contextType == 'project') {
                 $context = $assessmentDataSource->findById($contextId);
                 $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
