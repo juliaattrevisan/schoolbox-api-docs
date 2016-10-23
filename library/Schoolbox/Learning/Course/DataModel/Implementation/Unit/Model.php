@@ -79,6 +79,14 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     }
 
     /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->getCourse()->getFolder();
+    }
+
+    /**
      * @return CourseImplementationModel
      */
     public function getCourse()

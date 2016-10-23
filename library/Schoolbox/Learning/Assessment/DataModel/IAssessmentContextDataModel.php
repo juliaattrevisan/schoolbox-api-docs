@@ -14,13 +14,13 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 interface IAssessmentContextDataModel
 {
-//    /**
-//     * Retrieves the folder that any Assessable objects within this object
-//     * belongs within.
-//     *
-//     * @return FolderModel
-//     */
-//    public function getFolder();
+    /**
+     * Retrieves the folder that any Assessable objects within this object
+     * belongs within.
+     *
+     * @return FolderModel
+     */
+    public function getFolder();
 
     /**
      * Assessment context data models have an ID at least.
