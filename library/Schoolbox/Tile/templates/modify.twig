@@ -1,18 +1,12 @@
 {# I need some way of adding custom_head #}
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
         var form = $('form#tile-modify-form');
-        form.find('input[type="file"].prettify').prettyFileInput({
-            additionalButtonClasses: 'up-arrow no-marg float-right',
-            buttonActiveClass: 'tick',
-            defaultText: '<span></span>Upload Image',
-            defaultFileSelectedText: '<span></span>File selected'
-        });
+
 
         // Init colorpickers
         $('input[data-colorpicker]').spectrum({
