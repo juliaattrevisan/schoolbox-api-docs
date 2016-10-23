@@ -35,7 +35,7 @@ $(function() {
 			removalDelay: 300,
 			mainClass: 'mfp-fade',
 			gallery:{
-				enabled:true
+				enabled: true
 			}
 		});
 	});

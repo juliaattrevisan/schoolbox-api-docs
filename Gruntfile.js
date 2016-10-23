@@ -63,6 +63,8 @@ module.exports = function(grunt) {
                     'www/javascript/components/foundation/js/foundation/foundation.tab.js',
                     'www/javascript/components/foundation/js/foundation/foundation.tooltip.js',
                     'www/javascript/shared/foundation.dropdown.js',
+                    'www/javascript/shared/jquery.tab-activator.js',
+                    'www/javascript/shared/jquery.collapsable.js',
 
                     // Side Navigation
                     // This includes the Flyout menu, on user profile drop down
@@ -78,8 +80,10 @@ module.exports = function(grunt) {
                     // DateTime
                     'www/javascript/components/moment/moment.js',
 
-                    // Fullcalendar
+                    // System for displaying calendars and associated popups
                     'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
+                    'www/javascript/shared/calendar/jquery.fullcalendar.js',
+                    'www/javascript/shared/calendar/jquery.calendar.js',
 
                     // Files And Resource Browser
                     'www/socialstream/browser/browser.js',
@@ -99,6 +103,23 @@ module.exports = function(grunt) {
 
                     // Data tables
                     'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
+
+                    // Toasts, popups to notify something has happened
+                    'www/javascript/shared/jquery.toast-timeout.js',
+
+                    // Colour handling
+                    'www/javascript/components/tinycolor/tinycolor.js',
+                    'www/javascript/components/spectrum/spectrum.js',
+
+                    // Image/File previewing
+                    'www/javascript/preview/preview.js',
+
+                    // homepage editing
+                    'www/javascript/shared/masonry/jquery.masonry.js',
+                    'www/javascript/shared/masonry/jquery.masonry.spectrum.js',
+
+                    // Course selector
+                    '/javascript/shared/course/jquery.course-selector.js',
 
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
