@@ -47,12 +47,30 @@
             var unit = $('#' + $(e.target).attr('data-collapser'));
             if (unit.hasClass('hide')) {
                 unit.removeClass('hide');
-                $(e.target).removeClass('icon-up-arrow');
-                $(e.target).addClass('icon-down-arrow');
-            } else {
-                unit.addClass('hide');
                 $(e.target).removeClass('icon-down-arrow');
                 $(e.target).addClass('icon-up-arrow');
+            } else {
+                unit.addClass('hide');
+                $(e.target).removeClass('icon-up-arrow');
+                $(e.target).addClass('icon-down-arrow');
+            }
+        });
+
+        $(document).on('change', 'input[data-assessment]', function () {
+            var $input = $(this),
+                aid    = $input.data('assessment'),
+                $tgt   = $('[data-assessment-dates=' + aid + ']'),
+                $unit  = $input.closest('[data-unit]'),
+                $count = $unit.find('[data-show-count]');
+
+            $count.attr('data-show-count', $unit.find(':checked').length);
+
+            if ($input.prop('checked')) {
+                $tgt.find('input').prop('disabled', false);
+                $tgt.show();
+            } else {
+                $tgt.hide();
+                $tgt.find('input').prop('disabled', true);
             }
         });
     });
@@ -65,54 +83,94 @@
 <input type="hidden" name="component_id"    value="{{ componentId }}" />
 <input type="hidden" name="ownerships"      value="{{ ownerships }}" />
 
-{% for unit in unitDates %}
-<input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
-<input type="hidden" name="unit[{{ loop.index }}][import]" value="{{ unit.import }}">
-<input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.open_date }}">
-<input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.due_date }}">
-{% endfor %}
-
 {# Iterate through each unit being imported #}
+{% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
 
 <div class="row">
     <div class="small-12 column">
-        <p class="meta" data-mage-helptext>The list of coursework to be imported is below. You can change the dates of due work and quizzes before completing the import.</p>
+        <p class="meta" data-mage-helptext>The list of coursework to be imported is below. You can deselect assessments and change dates before completing the import.</p>
     </div>
 </div>
 {% for unit in units %}
-<div class="row">
+    {% set inputPrefix %}unit[{{ unit.specification.id }}][a]{% endset %}
+    {% set unitAssessCount = unit.specification.assessables | length %}
+<input type="hidden" name="unit[{{ unit.specification.id }}][impl_id]" value="{{ unit.id }}">
+<input type="hidden" name="unit[{{ unit.specification.id }}][open]" value="{{ unit.openDate.localShort }}">
+<input type="hidden" name="unit[{{ unit.specification.id }}][due]" value="{{ unit.dueDate.localShort }}">
+<div class="row" data-unit="{{ unit.specification.id }}">
     <div class="small-12 columns">
         <section>
             <ul class="action-list">
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>{{ unit.name }}</h3>
+                            <h3><span class="icon-unit"></span>{{ unit.specification.folder.name }}</h3>
+                            <p class="meta">{{ unitAssessCount ?: "No" }} assessments{% if unitAssessCount %}, <span data-show-count="{{ unitAssessCount }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
                     <nav>
-                        <a data-collapser="unit-{{ unit.id }}" href="#" class="icon-{% if loop.first %}down{% else %}up{% endif %}-arrow collapse" title="Collapse Content"></a>
+                        <a data-collapser="unit-{{ unit.specification.id }}" href="#" class="icon-down-arrow collapse" title="Collapse Content"></a>
                     </nav>
                 </li>
             </ul>
-            <div id="unit-{{ unit.id }}" data-start_date="{{ unit.open_date }}" data-finish_date="{{ unit.due_date }}" {% if not loop.first %}class="hide"{% endif %}>
+            <div id="unit-{{ unit.specification.id }}" data-start_date="{{ unit.openDate.localShort }}" data-finish_date="{{ unit.dueDate.localShort }}" class="hide">
                 <div class="row">
                     <div class="small-12 island">
                         <section>
-                            {% if unit.items | length %}
+                            {% if unitAssessCount %}
                             <ul class="information-list">
-                                {# All work items in the current unit #}
+                                {% for assessment in unit.specification.assessables %}
 
-                                {% for work in unit.items %}
+                                    {# decide some things about this assessment #}
+                                    {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
+                                    {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
+
                                     <li data-type="unit_row">
-                                        <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
-                                        {% if work.class == 'SubmissionBox' %}
-                                            {% include '@course/import/submissionBox.twig' %}
-                                        {% elseif work.class == 'Task' %}
-                                            {% include '@course/import/task.twig' %}
-                                        {% elseif work.class == 'OnlineAssessment' %}
-                                            {% include '@course/import/quiz.twig' %}
-                                        {% endif %}
+
+                                        <div class="compact card small-12 large-4">
+                                            <input type="checkbox" id="a_import-{{ assessment.id}}" checked="checked" data-assessment="{{ assessment.id }}" />
+                                            <label for="a_import-{{ assessment.id}}" class="checkbox-label">
+                                                <span class="{{ icon.renderClass(assessment.typeName) }}"></span>
+                                                <span>{{ assessment.title }}</span>
+                                            </label>
+                                        </div>
+                                        <div data-assessment-dates="{{ assessment.id }}">
+                                            {# publish date is always relevant #}
+                                            {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
+                                                dateProperty: 'publish',
+                                                dateSyncProperty: publishDateSync
+                                            } %}
+
+                                            {# open date is relevant when accepting responses #}
+                                            {% if acceptingResponses %}
+                                                {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
+                                                dateProperty: 'open',
+                                                dateSyncProperty: 'due'
+                                                } %}
+                                            {% else %}
+                                                <div class="small-12 medium-3 large-2 columns">{# empty column #}</div>
+                                            {% endif %}
+
+                                            {# due date is always relevant #}
+                                            {% include '@course/import/date.twig' with {
+                                            inputPrefix: inputPrefix,
+                                            dateProperty: 'due',
+                                            dateSyncProperty: 'late'
+                                            } %}
+
+                                            {# close (late) date is relevant when accepting responses #}
+                                            {% if acceptingResponses %}
+                                                {% include '@course/import/date.twig' with {
+                                                inputPrefix: inputPrefix,
+                                                dateProperty: 'close',
+                                                dateLabel: 'Late'
+                                                } %}
+                                            {% else %}
+                                                <div class="small-12 medium-3 large-2 columns">{# empty column #}</div>
+                                            {% endif %}
+                                        </div>
                                     </li>
                                 {% endfor %}
                             </ul>
@@ -134,7 +192,7 @@
             <p class="alert alert-box icon-alert" data-mage-error></p>
         </div>
         <div class="small-12 medium-4 column">
-            <input type="submit" name="part-results-select" value="{{ submitValue }}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importSave" />
+            <input type="submit" name="part-results-select" value="{{ submitValue }}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postTasks') }}" />
         </div>
     </div>
 </div>

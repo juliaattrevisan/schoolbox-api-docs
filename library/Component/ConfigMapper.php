@@ -6,7 +6,11 @@
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- * @
+ */
+
+/**
+ * Class Component_ConfigMapper
+ * @method Component_Config createModel($idValue = null)
  */
 class Component_ConfigMapper extends \Schoolbox\Mapper
 {

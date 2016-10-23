@@ -1296,6 +1296,18 @@ tr:hover{
 	position: fixed;
 }
 
+// generic counter
+[data-show-count]:before {
+	content: attr(data-show-count);
+}
+[data-show-count="0"]:before {
+	content: 'none';
+}
+[data-show-count="1"]:before {
+	content: 'one';
+}
+
+
 // Schoolbox Loader
 .loader{
 	background-color: $accent-foreground;

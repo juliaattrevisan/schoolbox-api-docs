@@ -54,6 +54,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpe
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 
+use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
@@ -281,6 +282,10 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
         // Preload of route parameters, and its module loader
         $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
             ModuleLoader::class,
@@ -312,6 +317,7 @@ class Bootstrap implements BootstrapInterface {
             'setRouter'     => $di->lazyGet('router'),
             'setAuthorizer' => $di->lazyGet('authorizer'),
             'setDi'         => $di,
+            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class)
         );
 
         // inject web params (yep, even Sitepage!)
@@ -535,10 +541,6 @@ class Bootstrap implements BootstrapInterface {
                 ]
             )
         );
-
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));

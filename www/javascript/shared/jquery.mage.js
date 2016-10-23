@@ -20,10 +20,8 @@
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
+        onRevert: $.noop,
         confirmRevert: $.noop,
-        manipulateSerialized: function(formSerial) {
-            return formSerial;
-        },
         setFormData: $.noop
     };
 
@@ -60,6 +58,9 @@
                 var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
 
                 sectionsToClear.find(':submit').mage('hide');
+
+                // just before re-enabling the section, call the callback
+                self.options.onRevert.call(self.element);
 
                 // enable this section (which will also open it)
                 self.enableSection();
@@ -358,11 +359,6 @@
 
         // set up an object that can be manipulated outside
         formSerial = form.serializeArray();
-
-        /* Last chance to manipulate serialized data stack
-         * There might be a better way than this, but didn't find it
-         */
-        formSerial = mage.options.manipulateSerialized.call(mage, formSerial);
 
         // pre-flight check
         mage.options.setFormData(formSerial);

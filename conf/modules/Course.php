@@ -11,7 +11,7 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\Assessment\Course\Module;
+use Schoolbox\Assessment;
 
 class Course implements ModuleConfigInterface
 {
@@ -24,8 +24,11 @@ class Course implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $messagesModule = new Module($kernel->getDependencyInjector());
-        $messagesModule->init('/course');
+        $courseModule = new Assessment\Course\Module($kernel->getDependencyInjector());
+        $courseModule->init('/course');
+
+        $importModule = new Assessment\Course\Import\Module($kernel->getDependencyInjector());
+        $importModule->init('/course/import');
     }
 
 } 

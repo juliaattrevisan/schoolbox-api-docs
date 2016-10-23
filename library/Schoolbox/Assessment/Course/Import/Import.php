@@ -51,7 +51,7 @@ class Import
      * @param string $query
      * @return array
      */
-    public function importClasses($query)
+    public function findMatchingClasses($query)
     {
         $data = [];
         $allFolders = $this->getFolderMapper()->searchByName($query);

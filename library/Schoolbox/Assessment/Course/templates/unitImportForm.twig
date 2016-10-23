@@ -66,7 +66,7 @@
                                    value="1"
                                    data-interaction="enable" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">
-                                {{ unit.title }}
+                                {{ unit.title }}<span class="icon-unit"></span>
                                 {% if not isUnitCheckable %}
                                     <span data-tooltip class="has-tip hint" title="This unit's course builder component has been deleted - its tasks may not be modified here.">?</span>
                                 {% endif %}
@@ -117,7 +117,7 @@
                 <p class="warning alert-box icon-alert hide" id="unit-warn-removal">Warning! Removal of existing units will also remove all associated tasks.</p>
             </div>
             <div class="small-12 medium-4 column">
-                <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-tasks-select" data-mage-working="Working..." formaction="/course/importTasks" />
+                <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-tasks-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postUnits') }}" />
             </div>
         </div>
     </div>

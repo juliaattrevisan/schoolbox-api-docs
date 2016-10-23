@@ -101,9 +101,10 @@ class ImplementationMapperProxy
         $existingUnits = $this->unitMapper->findAllByCourseId($implementation->getId());
         $savedUnits    = new Collection();
         foreach ($implementation->getUnits() as $unit) {
-            $savedUnits->add($this->unitTranslator->translateToDataModel($unit));
+            $dataUnit = $this->unitTranslator->translateToDataModel($unit);
+            $this->unitMapper->save($dataUnit);
+            $unit->setId($dataUnit->getId());
         }
-        $this->unitMapper->save($savedUnits);
 
         // Any units that exist but aren't in $implementation->getUnits() are deleted!
         $this->unitMapper->delete($existingUnits->diff($savedUnits, function (UnitModel $unit) {

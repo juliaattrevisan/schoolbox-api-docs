@@ -9,6 +9,10 @@
  * @
  */
 
+/**
+ * Class Component_DefinitionMapper
+ * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = [])
+ */
 class Component_DefinitionMapper extends Schoolbox\Mapper {
 
 

@@ -7,6 +7,15 @@
 <script type="text/javascript">
     $(function() {
 
+        var confirmRevert = function (e, revert) {
+            if (this.nextAll('.current-stop').length > 0) {
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to revert to this step? If you do, all data from subsequent steps will be lost.',
+                    confirmEvent: revert
+                });
+            }
+        };
+
         {# Attach Course Selector Modal listeners #}
         
         $.fn.courseSelectorModal({
@@ -53,14 +62,7 @@
         {# Global mage init #}
         $('input[data-mage-next]').mage({
             // all use the same reversion test
-            confirmRevert: function (e, revert) {
-                if (this.nextAll('.current-stop').length > 0) {
-                    $(this).confirmDialog({
-                        text: 'Are you sure you want to revert to this step? If you do, all data from subsequent steps will be lost.',
-                        confirmEvent: revert
-                    });
-                }
-            }
+            confirmRevert: confirmRevert
         });
 
 {# If modifying an existing course, skip straight to stage 3 #}
@@ -117,7 +119,12 @@
 
             var stageThree = $('input[data-mage-next="part-tasks-select"]');
 
-            stageThree.mage({onXhrDone: function (data) {
+            stageThree.mage({
+                confirmRevert: confirmRevert,
+                onRevert: function () {
+                    $('#importUnits').find(':checkbox').closest('li').slideDown();
+                },
+                onXhrDone: function (data) {
                 {# Slide away the things we're not using #}
 
                 $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
@@ -259,7 +266,7 @@
                 <ul class="train-line">
                     <li data-mage-trainstop="part-course-select" class="current-stop"><a><span class="icon-course-builder"></span>Course</a></li>
                     <li data-mage-trainstop="part-ownership"><a><span class="icon-teacher"></span>Ownership</a></li>
-                    <li data-mage-trainstop="part-unit-select"><a><span class="icon-course-builder"></span>Units</a></li>
+                    <li data-mage-trainstop="part-unit-select"><a><span class="icon-unit"></span>Units</a></li>
                     <li data-mage-trainstop="part-tasks-select"><a><span class="icon-curriculum"></span>Coursework</a></li>
                 </ul>
             </div>
@@ -300,7 +307,7 @@
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('course.importUnits') }}" />
+                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postClasses') }}" />
                             </div>
                         </div>
                     </div>
@@ -320,7 +327,7 @@
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('course.importOwnership') }}" />
+                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postOwnership') }}" />
                             </div>
                         </div>
 {% endif %}
@@ -340,10 +347,9 @@
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="importTasks">{# will be populated by ajax #}</div>
+                        <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                        <input type="hidden" data-mage-next="none" name="part-tasks-select" value="1" />
                     </div>
-                    <div id="importResults" class="hide" data-mage-collapsed></div>
-                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                    <input type="hidden" data-mage-next="none" name="part-3" value="1" />
                 </fieldset>
             </section>
         </form>

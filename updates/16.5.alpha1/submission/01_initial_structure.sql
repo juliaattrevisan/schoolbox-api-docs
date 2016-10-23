@@ -54,7 +54,6 @@ CREATE TABLE `course_implementation` (
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   INDEX `fk_course_implementation_course_specification_id_idx` (`course_specification_id` ASC),
   CONSTRAINT `fk_course_implementation_course_specification_id`
   FOREIGN KEY (`course_specification_id`)

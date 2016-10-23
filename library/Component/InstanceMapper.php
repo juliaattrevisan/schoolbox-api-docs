@@ -9,6 +9,8 @@
  *
  */
 
+use Schoolbox\Resource\Folder;
+
 /**
  * Class Component_InstanceMapper
  * @method Component_Instance createModel()
@@ -561,6 +563,58 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             }
         }
         return $collection;
+    }
+
+
+    /**
+     * @param Folder\Model $folder
+     * @param array        $config
+     * @param string       $controller
+     * @return Component_Instance
+     */
+    public function injectNewComponent(Folder\Model $folder, array $config = [], $controller = Component_Homepage_CourseOutlineController::class)
+    {
+        $definitionMapper = \Component_DefinitionMapper::getInstance(); // $this->getComponentDefinitionMapper();
+        $configDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();
+        $configInstanceMapper = \Component_ConfigMapper::getInstance();
+
+        // Doesn't exist. We need that to exist. Make it exist.
+        $definition = $definitionMapper->findOneByColumn('class', $controller);
+
+        // invent a new component
+        $newInstance = $this
+            ->createModel()
+            ->setModule('homepage')
+            ->setIdentifier($folder->getId())
+            ->setDefinitionId($definition->getId())
+            ->setSequence(0)
+            ->setPosition('top');
+
+        // save it
+        $this->save($newInstance);
+
+        // apply config
+        foreach ($config as $key => $value) {
+            $configDefinitionIds = $configDefinitionMapper->findIdsByColumnList([
+                'component_definition_id' => $definition->getId(),
+                'key' => $key
+            ]);
+
+            $conf = $configInstanceMapper->createModel()
+                                         ->setConfigDefinitionId($configDefinitionIds[0])
+                                         ->setInstanceId($newInstance->getId())
+                                         ->setValue($value);
+
+            $newInstance->getConfig()->add($conf);
+        }
+
+        // save the config
+        $configInstanceMapper->save($newInstance->getConfig());
+
+        // reapply the sequencing so the homepage doesn't break
+        $this->cascadeSequence($folder->getId(), 'top');
+
+        return $newInstance;
     }
 
 

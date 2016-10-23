@@ -29,7 +29,7 @@
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
-                    $.post('{{ routeLookup('course.importDelete') }}', { componentId: element.attr('data-delete') }, function(responseText) {
+                    $.post('{{ routeLookup('courseImport.importDelete') }}', { componentId: element.attr('data-delete') }, function(responseText) {
                         window.location.href = window.location.href;
                     });
                 }
@@ -84,7 +84,7 @@
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
             </nav>
         </div>
 
@@ -121,7 +121,7 @@
                         {% if courseComponentRemoved %}
                             <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% else %}
-                            <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
+                            <a href="{{ routeLookup('courseImport.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
                         {% endif %}
                         <a href="" class="icon-delete" title="Permanently Delete Import" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>
                     </nav>
@@ -136,7 +136,7 @@
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
-                <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}">import one</a>.
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}">import one</a>.
             </p>
         </div>
 

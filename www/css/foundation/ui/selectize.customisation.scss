@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-$selectize-font-size: 14px;
+$selectize-font-size: rem-calc(($base-font-size - 3));
 $selectize-line-height: 18px !default;
 
 // None of this is being used?
@@ -51,51 +51,76 @@ $selectize-padding-item-y: 0;
  * so you have to bring a bigger bang to the party
  */
 
-.selectize-control.single .selectize-input > div,
-.selectize-control.multi .selectize-input > div {
-	background: $content-ui-background;
-	padding: 0 0.5rem 0 0.5rem;
-	margin: 1px;
-	font-size: $base-font-size;
-	font-weight: $font-weight-normal;
-	a {
-		padding: 0.5rem !important;
-		width: 1.5rem !important;
-		color: $content-ui-foreground;
-	}
+// when you're disabled, you are disabled
+fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > a.remove {
+	width: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 .selectize-control {
 	margin: 0 0 $form-spacing 0;
 
+	&.single, &.multi {
+		.selectize-input > div {
+			background: $content-ui-background;
+			padding: 0 0.5rem 0 0.5rem;
+			margin: 1px;
+			font-size: $selectize-font-size;
+			font-weight: $font-weight-normal;
+			a {
+				padding: 0.5rem !important;
+				width: 1.5rem !important;
+				color: $content-ui-foreground;
+			}
+		}
+	}
+
 	&.multi .selectize-input.has-items {
 		padding: 1px;
 	}
 
-	.selectize-input > div a.remove {
-		padding: 1px 5px 2px 4px !important;
-		width: 1rem !important;
-		margin: 0 4px 0 5px !important;
+	.selectize-input {
+		> div {
+			a.remove {
+				padding: 0 0 0 0.25rem !important;
+				width: 1rem !important;
+				margin: 0 0 0 0.5rem !important;
+				display: inline-block;
+				line-height: 1rem;
+				height: 1rem;
+				overflow: hidden;
+				position: relative;
+				top: 0.1875rem;
+				&:hover {
+					text-decoration: none;
+					background: $content-ui-submit-foreground;
+					border-radius: 1rem;
+					color: calc-text-color($content-ui-submit-foreground);
+				}
+			}
+		}
+		> input[type=text] {
+			margin-left: 0.5rem !important;
+		}
 	}
 
-	.selectize-input > div a.remove:hover {
-		text-decoration: none;
-		background: $content-ui-submit-foreground;
-		border-radius: 1rem;
-		color: calc-text-color($content-ui-submit-foreground);
+	.row {
+		width: 100%;
 	}
 
-	.selectize-input > input[type=text] {
-		margin-left: 0.5rem !important;
+	.progress-tick {
+		margin-top: 1rem;
 	}
 }
 
 .selectize-input {
-    line-height: 2.25rem;
+    line-height: 1.875rem;
 	margin-bottom: 0;
+	padding: 3px 0;
     input {
         height: auto;
-		font-size: 1rem;
+		font-size: $selectize-font-size;
 
         .remove {
             color: $content-ui-foreground;
@@ -105,7 +130,7 @@ $selectize-padding-item-y: 0;
          */
         &[placeholder] {
             margin-left: 0.5rem !important;
-			font-size: 13px;
+			font-size: $selectize-font-size;
         }
     }
 	&.dropdown-active:before {
@@ -124,12 +149,4 @@ $selectize-padding-item-y: 0;
     .active {
         background-color: $content-ui-hover;
     }
-}
-
-.selectize-control .progress-tick {
-	margin-top: 1rem;
-}
-
-.selectize-control .row {
-	width: 100%;
 }
