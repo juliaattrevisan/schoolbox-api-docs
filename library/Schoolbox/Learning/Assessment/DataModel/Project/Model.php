@@ -128,6 +128,16 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel
     }
 
     /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder(FolderModel $folder)
+    {
+        $this->getAssessmentModel()->setContextFolder($folder);
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getSummator()
