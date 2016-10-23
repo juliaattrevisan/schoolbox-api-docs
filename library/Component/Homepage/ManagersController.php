@@ -129,8 +129,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     $this->setVar(
                         array(
                             'PERSON_UID' => $manager->getId(),
-                            'PERSON_NAME' => $name,
-                            'PERSON_EXTERNAL_ID' => $manager->getExternalId(),
+                            'PERSON_NAME' => \Scrub::text($name),
+                            'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
                             'PERSON_GROUP' => $manager->getRole()->getName(),
                         )
                     );

@@ -122,8 +122,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     $this->setVar(
                         array(
                             'PERSON_UID'         => $user->getId(),
-                            'PERSON_NAME'        => $name,
-                            'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                            'PERSON_NAME'        => \Scrub::text($name),
+                            'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
                             'PERSON_GROUP'       => $user->getRole()->getName(),
                             'LIST_STYLE'         => $displayOptions[$display]['css'],
                         )
