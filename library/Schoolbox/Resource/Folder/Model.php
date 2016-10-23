@@ -150,6 +150,14 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Returns title of folder, for AssessmentContext interface.
+     * @return string
+     */
+    public function getTitle() {
+        return $this->getNameWithCodes();
+    }
+
+    /**
      * Get code string
      *
      * Gets your category codes in a , seperated string

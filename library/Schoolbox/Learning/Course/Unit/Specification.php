@@ -111,6 +111,16 @@ class Specification implements AssessmentContext, ISoftDeletable
     }
 
     /**
+     * Returns title of folder, for AssessmentContext Interface
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->getFolder()->getTitle();
+    }
+
+    /**
      * @return Collection|IAssessable[]
      */
     public function getAssessables()
