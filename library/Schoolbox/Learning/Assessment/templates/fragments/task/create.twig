@@ -73,8 +73,6 @@
     <div class="row" {% if assessment.url|length %}style="display:none"{% endif %} data-attachment="attach">
         <div class="small-9 medium-10 columns">
             <label>Attach Files</label>
-
-            <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
         <div class="small-3 medium-2 columns no-pad">

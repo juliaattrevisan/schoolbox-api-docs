@@ -111,6 +111,9 @@ module.exports = function(grunt) {
                     'www/javascript/components/tinycolor/tinycolor.js',
                     'www/javascript/components/spectrum/spectrum.js',
 
+                    // File uploading
+                    'www/javascript/resource/jquery.resourceAttach.js',
+
                     // Image/File previewing
                     'www/javascript/preview/preview.js',
 
