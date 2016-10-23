@@ -101,56 +101,59 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $i = 0;
             foreach ($userList as $user) {
 
-                // Kill the loop if we've reached max
-                if ($i === self::MAX_MEMBERS) {
-                    break;
-                }
-
-                $name  = $user->getFullName();
+                /* Member bulk email
+                 */
                 $email = $user->getEmail();
-
-                if ($user->getId() == $admin->getId()) {
-                    $name .= " (Group Admin.)";
-                }
 
                 if ($email) {
                     $emailall[] = $email;
                 }
 
-                $this->setVar(
-                    array(
-                        'PERSON_UID'         => $user->getId(),
-                        'PERSON_NAME'        => $name,
-                        'PERSON_EXTERNAL_ID' => $user->getExternalId(),
-                        'PERSON_GROUP'       => $user->getRole()->getName(),
-                        'LIST_STYLE'         => $displayOptions[$display]['css'],
-                    )
-                );
+                /* Member cards
+                 */
+                if ($i < self::MAX_MEMBERS) {
 
-                /* Don't display images in list view
-			     */
-                if ($this->getConfig('displayPortraits') == 'grid') {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                    ));
+                    $name  = $user->getFullName();
 
-                    $this->parse('has_thumbnail_block', 'has_thumbnail');
-                    $this->setVar('has_icon_block', '');
-                } else {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => ''
-                    ));
+                    if ($user->getId() == $admin->getId()) {
+                        $name .= " (Group Admin.)";
+                    }
 
+                    $this->setVar(
+                        array(
+                            'PERSON_UID'         => $user->getId(),
+                            'PERSON_NAME'        => $name,
+                            'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                            'PERSON_GROUP'       => $user->getRole()->getName(),
+                            'LIST_STYLE'         => $displayOptions[$display]['css'],
+                        )
+                    );
+
+                    /* Don't display images in list view
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                        ));
+
+                        $this->parse('has_thumbnail_block', 'has_thumbnail');
+                        $this->setVar('has_icon_block', '');
+                    } else {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => ''
+                        ));
+
+                        $this->setVar('has_thumbnail_block', '');
+                        $this->parse('has_icon_block', 'has_icon');
+                    }
+
+                    $this->parse('person_block', 'person', true);
+
+                    /* Clear children after parsing out the parent
+                     */
                     $this->setVar('has_thumbnail_block', '');
-                    $this->parse('has_icon_block', 'has_icon');
+                    $this->setVar('has_icon_block', '');
                 }
-
-                $this->parse('person_block', 'person', true);
-
-                /* Clear children after parsing out the parent
-			     */
-                $this->setVar('has_thumbnail_block', '');
-                $this->setVar('has_icon_block', '');
 
                 $i++;
             }

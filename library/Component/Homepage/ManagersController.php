@@ -100,68 +100,70 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $i = 0;
             foreach ($managerList as $manager) {
 
-                // Kill the loop if we've reached max
-                if ($i === self::MAX_MANAGERS) {
-                    break;
-                }
-
-                $name  = $manager->getFullName();
+                /* Manager bulk email
+        	     */
                 $email = $manager->getEmail();
-
-                if ($manager->getId() == $admin->getId()) {
-                    $name .= " (Group Admin.)";
-                }
 
                 if ($email) {
                     $emailall[] = $email;
                 }
 
-                $this->setVar(
-                    array(
-                        'PERSON_UID'         => $manager->getId(),
-                        'PERSON_NAME'        => $name,
-                        'PERSON_EXTERNAL_ID' => $manager->getExternalId(),
-                        'PERSON_GROUP'       => $manager->getRole()->getName(),
-                    )
-                );
-
-                /* Don't display images in list view
-			  	 */
-                if ($this->getConfig('displayPortraits') == 'grid') {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                    ));
-
-                    $this->parse('has_thumbnail_block', 'has_thumbnail');
-                    $this->setVar('has_icon_block', '');
+                if ($_SESSION['user']->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+                    $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+                    $this->setVar("EMAILALL", implode(',', $emailall));
+                    $this->parse("member_email_block", "member_email");
                 } else {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => ''
-                    ));
-
-                    $this->setVar('has_thumbnail_block', '');
-                    $this->parse('has_icon_block', 'has_icon');
+                    $this->setVar('member_email_block', '');
                 }
 
-                $this->parse('person_block', 'person', true);
+                /* Manager cards
+                 */
+                if ($i < self::MAX_MANAGERS) {
 
-                /* Clear children after parsing out the parent
-			   	 */
-                $this->setVar('has_thumbnail_block', '');
-                $this->setVar('has_icon_block', '');
+                    $name = $manager->getFullName();
+
+                    if ($manager->getId() == $admin->getId()) {
+                        $name .= " (Group Admin.)";
+                    }
+
+                    $this->setVar(
+                        array(
+                            'PERSON_UID' => $manager->getId(),
+                            'PERSON_NAME' => $name,
+                            'PERSON_EXTERNAL_ID' => $manager->getExternalId(),
+                            'PERSON_GROUP' => $manager->getRole()->getName(),
+                        )
+                    );
+
+                    /* Don't display images in list view
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                        ));
+
+                        $this->parse('has_thumbnail_block', 'has_thumbnail');
+                        $this->setVar('has_icon_block', '');
+                    } else {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => ''
+                        ));
+
+                        $this->setVar('has_thumbnail_block', '');
+                        $this->parse('has_icon_block', 'has_icon');
+                    }
+
+                    $this->parse('person_block', 'person', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar('has_thumbnail_block', '');
+                    $this->setVar('has_icon_block', '');
+                }
 
                 $i++;
             }
 
-            /* Student bulk email
-        	 */
-            if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
-                $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                $this->setVar("EMAILALL", implode(',', $emailall));
-                $this->parse("member_email_block", "member_email");
-            } else {
-                $this->setVar('member_email_block', '');
-            }
         } else {
             $this->setVar("person_block", "");
             $this->setVar('member_email_block', '');
