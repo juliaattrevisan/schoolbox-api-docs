@@ -385,33 +385,20 @@ class Mapper extends BaseMapper
     {
         $folderIds = [];
 
-        // Pass 1: load folder IDs
+        // Pass 1: load folder IDs for all non-projects
+        // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
 
-            if ($context instanceof FolderModel) {
-                // Folder context: folder IS the folder
-                $folderIds[] = $context->getId();
-
-            } elseif ($context instanceof UnitSpecificationModel) {
-                // Unit spec context: folder is in the context
-                // Not strictly required: unit spec assessments will never have participants
+            if (!$context instanceof ProjectModel) {
                 $folderIds[] = $context->getFolder()->getId();
-
-            } elseif ($context instanceof UnitImplementationModel) {
-                // Unit impl context: folder is in the context's course
-                $folderIds[] = $context->getCourse()->getFolder()->getId();
-
-            } elseif ($context instanceof ProjectModel) {
-                // Project context: folder was loaded in augmentListWithProjectContexts.
-                continue;
             }
         }
 
         // Load folders in a single query
         $folders = $this->getJoinMapper('assessment_folder')->findByColumn('id', $folderIds)->indexBy('id');
 
-        // Pass 2: assign folders to contexts
+        // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
 
