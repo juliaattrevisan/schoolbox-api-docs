@@ -112,9 +112,9 @@ class Controller extends Base
      * @api /learning/assessment/folder/{folderId}{/assessmentTypeTitle}
      * @level 165
      * @param Folder $folder
-     * @param AbstractAssessment|null $assessment
+     * @param IAssessable|null $assessment
      */
-    public function getSelectAssessmentInFolder(Folder $folder, AbstractAssessment $assessment = null)
+    public function getSelectAssessmentInFolder(Folder $folder, IAssessable $assessment = null)
     {
         /* Pump into twig-land
          */
@@ -127,9 +127,9 @@ class Controller extends Base
      * @api /learning/assessment/project/{projectId}{/assessmentTypeTitle}
      * @level 165
      * @param Project $project
-     * @param AbstractAssessment $assessment
+     * @param IAssessable $assessment
      */
-    public function getSelectAssessmentInProject(Project $project, AbstractAssessment $assessment = null)
+    public function getSelectAssessmentInProject(Project $project, IAssessable $assessment = null)
     {
         /* Die early if you're trying to ram a project into a project
          * We specifically don't allow it
@@ -153,9 +153,9 @@ class Controller extends Base
      * @api /learning/assessment/unit/{unitId}{/assessmentTypeTitle}
      * @level 165
      * @param UnitImplementation $unitImpl
-     * @param AbstractAssessment|null $assessment
+     * @param IAssessable|null $assessment
      */
-    public function getSelectAssessmentInUnitImplementation(UnitImplementation $unitImpl, AbstractAssessment $assessment = null)
+    public function getSelectAssessmentInUnitImplementation(UnitImplementation $unitImpl, IAssessable $assessment = null)
     {
         /* Pump into twig-land
          */
@@ -168,9 +168,9 @@ class Controller extends Base
      * @api /learning/assessment/unitspec/{unitSpecId}{/assessmentTypeTitle}
      * @level 165
      * @param UnitSpecification $unitSpec
-     * @param AbstractAssessment $assessment
+     * @param IAssessable $assessment
      */
-    public function getSelectAssessmentInUnitSpecification(UnitSpecification $unitSpec, AbstractAssessment $assessment = null)
+    public function getSelectAssessmentInUnitSpecification(UnitSpecification $unitSpec, IAssessable $assessment = null)
     {
         /* Pump into twig-land
          */
@@ -181,9 +181,9 @@ class Controller extends Base
      * Common logic to generate a form to create an IAssessable in the specified AssessmentContext
      *
      * @param AssessmentContext $context
-     * @param AbstractAssessment $assessment = null
+     * @param IAssessable $assessment = null
      */
-    private function getSelectAssessmentData(AssessmentContext $context, AbstractAssessment $assessment = null)
+    private function getSelectAssessmentData(AssessmentContext $context, IAssessable $assessment = null)
     {
         $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
