@@ -122,7 +122,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                     $name = $manager->getFullName();
 
-                    if ($manager->getId() == $admin->getId()) {
+                    if ($admin !== null && $manager->getId() === $admin->getId()) {
                         $name .= " (Group Admin.)";
                     }
 
