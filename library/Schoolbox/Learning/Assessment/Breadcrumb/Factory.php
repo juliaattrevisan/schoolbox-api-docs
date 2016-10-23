@@ -58,7 +58,7 @@ class Factory
     public function produceFromAssessment(IAssessable $assessment)
     {
         $trail = new Collection;
-        $trail->add(['Learning', '#']);
+        $trail->add(['Learning']);
 
         $context = $assessment->getContext();
 
@@ -93,7 +93,7 @@ class Factory
     public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
     {
         $trail = new Collection();
-        $trail->add(['Learning', '#']);
+        $trail->add(['Learning']);
 
         if ($context instanceof Folder) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
@@ -106,7 +106,7 @@ class Factory
         }
 
         $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Assessment';
-        $trail->add(["Create $assessmentType", '#']);
+        $trail->add(["Create $assessmentType"]);
 
         return $trail;
     }
