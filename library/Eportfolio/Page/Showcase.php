@@ -61,10 +61,6 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         } else {
             $this->getPage()->setVar('has_intro_block', '');
         }
-
-        /* Render mime types
-         */
-        $this->renderMimeTypes();
     }
 
     /**

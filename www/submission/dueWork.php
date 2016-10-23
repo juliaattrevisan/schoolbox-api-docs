@@ -417,7 +417,6 @@ foreach ($categoryList as $category) {
     $output = array(
         'SUBJ_CAT_ID'       => $categoryID,
         'SUBJ_SUBJECT_NAME' => Scrub::text($category['name']),
-        'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
         'SUBJ_SUBJECT_CODE' => $categoryCode,
         'SUBJ_SUBJECT_URL'  => '/homepage/' . $categoryID,
         // This isn't used in activity/subjectlist.html
@@ -426,7 +425,6 @@ foreach ($categoryList as $category) {
         'SUBJ_TREND_DIR'    => $trendDir,
         'SUBJ_TREND_AMT'    => $trendAmt,
         'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
-        'DARK'              => ++$j % 2 ? '' : 'dark'
     );
     $this->setVar($output);
 

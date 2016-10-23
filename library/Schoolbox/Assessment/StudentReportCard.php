@@ -1139,14 +1139,12 @@ class StudentReportCard
             $output = array(
                 'SUBJ_CAT_ID'       => $categoryID,
                 'SUBJ_SUBJECT_NAME' => \Scrub::Text($category->getName()),
-                'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
                 'SUBJ_SUBJECT_CODE' => $categoryCode,
                 'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetTerm->getCode()}/$categoryID",
 //                'SUBJ_TOTAL' => $summary[$category['id']]['total'],
                 'SUBJ_TREND_DIR'    => $trendDir,
                 'SUBJ_TREND_AMT'    => $trendAmt,
                 'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
-                'DARK'              => ++$j % 2 ? '' : 'dark'
             );
             $page->setVar($output);
             if ($gradeAvg == -1) {

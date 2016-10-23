@@ -54,7 +54,7 @@
                     <div class="list-item">
                         <div class="small-12 card">
                             <a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
-                                <img src="/images/mime/60x60/{FILE_THUMB}" class="mime" alt="{FILE_NAME}">
+                                <img src="/images/mime/{FILE_THUMB}" class="mime" alt="{FILE_NAME}">
                                 <p>{FILE_NAME}</p>
                                 <!--<p class="meta">{FILE_DATE}</p>-->
                                 <p class="meta">{FILE_SIZE}</p>
@@ -84,7 +84,7 @@
                     <div class="list-item">
                         <div class="small-12 card">
                             <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" data-plugin="preview">
-                                <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="mime" alt="{RETURNED_WORK_FILE_NAME}">
+                                <img src="/images/mime/{RETURNED_WORK_FILE_THUMB}" class="mime" alt="{RETURNED_WORK_FILE_NAME}">
                                 <p>{RETURNED_WORK_FILE_NAME}</p>
                                 <p class="meta">Returned {RETURNED_WORK_FILE_DATE}</p>
                                 <p class="meta">{RETURNED_WORK_FILE_SIZE}</p>
@@ -129,7 +129,7 @@
                         <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}"
                            title="Most Recent Submission"
                            data-plugin="preview">
-                            <img src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}" class="mime" alt="{MOST_RECENT_SUBMISSION_FILE_NAME}">
+                            <img src="/images/mime/{MOST_RECENT_SUBMISSION_FILE_THUMB}" class="mime" alt="{MOST_RECENT_SUBMISSION_FILE_NAME}">
                             <p>{MOST_RECENT_SUBMISSION_FILE_NAME}</p>
                             <p class="meta">Submitted <time>{MOST_RECENT_SUBMISSION_FILE_DATE}</time></p>
                             <p class="meta">{MOST_RECENT_SUBMISSION_FILE_SIZE}</p>

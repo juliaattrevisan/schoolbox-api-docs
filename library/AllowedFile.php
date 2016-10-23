@@ -151,7 +151,7 @@ class AllowedFile extends DeprecatedModel {
 
 	function getIconList() {
 		//get a list of filenames from mime
-		$dir = $_SERVER['DOCUMENT_ROOT'].'/images/mime/22x22';
+		$dir = $_SERVER['DOCUMENT_ROOT'].'/images/mime/';
 		$path = opendir($dir);
 		while (false !== ($file = readdir($path))) {
 			if($file!="." && $file!="..") {
