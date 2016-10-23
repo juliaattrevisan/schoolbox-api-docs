@@ -402,29 +402,13 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
 
-            if ($context instanceof FolderModel) {
-                $folderId = $context->getId();
-                if (isset($folders[$folderId])) {
-                    $context = $folders[$folderId];
-                }
-
-            } elseif ($context instanceof UnitSpecificationModel) {
+            if (!$context instanceof ProjectModel) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
-                    $context->setFolder($folders[$folderId]);
+                    // Add the folder into the context
+                    $model->setAssessmentContext($context->setFolder($folders[$folderId]));
                 }
-
-            } elseif ($context instanceof UnitImplementationModel) {
-                $folderId = $context->getCourse()->getFolder()->getId();
-                if (isset($folders[$folderId])) {
-                    $context->getCourse()->setFolder($folders[$folderId]);
-                }
-
-            } elseif ($context instanceof ProjectModel) {
-                continue;
             }
-
-            $model->setAssessmentContext($context);
         }
 
         return $modelList;
