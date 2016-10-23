@@ -122,7 +122,7 @@ module.exports = function(grunt) {
                     'www/javascript/shared/masonry/jquery.masonry.spectrum.js',
 
                     // Course selector
-                    '/javascript/shared/course/jquery.course-selector.js',
+                    'www/javascript/shared/course/jquery.course-selector.js',
 
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
