@@ -9,10 +9,12 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use PDOStatement;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class CompletionMapper extends Mapper {
 
@@ -60,16 +62,52 @@ class CompletionMapper extends Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('student', array(
-            'mapper'    => 'Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'student_id',
             'other_key' => 'id',
         ));
         $this->hasJoin('marking_user', array(
-            'mapper'    => 'Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'marking_user_id',
             'other_key' => 'id',
         ));
         $this->registerCallback('preSave', array($this, 'preSave'));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('marking_user', 'm')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('student', '', 's', true)}
+            LEFT JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var Completion $completion */
+            $completion = $this->hydrate($row);
+            $completion
+                ->setStudent($this->hydrateJoin($row, 'student', 's'))
+                ->setMarkingUser($this->hydrateJoin($row, 'marking_user', 'm'))
+            ;
+            $c->add($completion);
+        }
+        return $c;
     }
 
     /**
