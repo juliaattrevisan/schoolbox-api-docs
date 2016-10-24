@@ -395,12 +395,12 @@ class Controller extends Base
      * This happens after the common details are saved and after
      * you've chosen one of project, due work, task, or quiz
      *
-     * @param IAssessable $existingAssessment
+     * @param IAssessable $assessment
      */
-    public function postUpdateAssessment(IAssessable $existingAssessment)
+    public function postUpdateAssessment(IAssessable $assessment)
     {
         try {
-            $assessment = $this->produceAssessment($this->getRequest()->post, $existingAssessment);
+            $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
             $this->persistAssessment($assessment);
 
             // Determine returnUrl
