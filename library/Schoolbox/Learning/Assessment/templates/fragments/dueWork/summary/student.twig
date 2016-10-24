@@ -1,1 +1,15 @@
-<h1>TODO fragments/dueWork/summaryStudent.twig</h1>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment, user: currentUser} %}
+    </div>
+</div>
+
+{% if assessment.hasRubric %}
+{% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
+{% endif %}
+

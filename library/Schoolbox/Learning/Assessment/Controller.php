@@ -530,10 +530,12 @@ class Controller extends Base
     {
         if ($this->getUser()->getRole()->isStudent()) {
             $this->getSummaryStudent($assessment);
+            return;
         }
 
         // TODO - what happens here when the $assessment is not a Project, and the user is not a student?
         $this->getSummaryStaff($assessment);
+        return;
     }
 
     /**
