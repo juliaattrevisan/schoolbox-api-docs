@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Response;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 
 /**
  * The single source of truth for assessment responses.
@@ -48,7 +49,8 @@ class DataSource implements IResponseDataSource
     }
 
     /**
-     * @inheritdoc
+     * @param IAssessable $assessment
+     * @return Collection|IResponse[]
      */
     public function findForAssessment(IAssessable $assessment)
     {
