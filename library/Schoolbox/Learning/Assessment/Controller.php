@@ -598,7 +598,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/{$types->objectToString($assessment)}/summary.twig",
+                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary/staff.twig",
                 $twigData
             )
         );
@@ -663,7 +663,7 @@ class Controller extends Base
             'counts' => $counts
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summaryStudent.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summary/student.twig", $twigData));
     }
 
     /**
@@ -875,7 +875,7 @@ class Controller extends Base
             'counts' => $counts
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summary/staff.twig", $twigData));
     }
 
 
