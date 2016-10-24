@@ -3,6 +3,8 @@
     <li class="icon-due-work">{{ assessment.typeName }}</li>
 </ul>
 
+{% if assessment.description|length %}
 <section class="content">
     {{ assessment.description | purify }}
 </section>
+{% endif %}
