@@ -33,6 +33,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     private $internalColumnName = 'assess_id';
 
     /**
+     * @var string
+     */
+    private $internalQuery = 'SELECT assess_id FROM assess';
+
+    /**
      * @return string
      */
     protected function getExternalColumnName()
@@ -49,30 +54,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param $externalValues
-     * @return array
+     * @return string
      */
-    protected function getInternalValues(array $externalValues)
+    protected function getInternalQuery()
     {
-        if (empty($externalValues)) {
-            return [];
-        }
-        if (!is_array($externalValues)) {
-            $externalValues = [$externalValues];
-        }
-
-        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
-
-        $query = "
-            SELECT `assess_id`
-            FROM `assess`
-            WHERE `assessment_id` IN {$placeholders}
-        ";
-
-        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
-        return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
+        return $this->internalQuery;
     }
-
 
     /**
      * Transforms the Mapper-generated models into the required type.

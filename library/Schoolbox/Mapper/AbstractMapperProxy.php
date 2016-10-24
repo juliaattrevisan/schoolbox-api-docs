@@ -95,10 +95,33 @@ abstract class AbstractMapperProxy
     protected abstract function getInternalColumnName();
 
     /**
+     * @return string
+     */
+    protected abstract function getInternalQuery();
+
+    /**
      * @param $externalValues
      * @return array
      */
-    protected abstract function getInternalValues(array $externalValues);
+    protected function getInternalValues(array $externalValues)
+    {
+        if (empty($externalValues)) {
+            return [];
+        }
+        if (!is_array($externalValues)) {
+            $externalValues = [$externalValues];
+        }
+
+        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
+
+        $query = "
+            {$this->getInternalQuery()}
+            WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
+        return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
+    }
 
     /**
      * @param Collection $mapperModels
