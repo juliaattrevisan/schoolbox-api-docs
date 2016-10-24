@@ -1,5 +1,11 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+
 <ul class="meta">
-    <li class="icon-calendar">Due {{ assessment.dueAt.short }}</li>
+    <li class="icon-calendar">
+        Due
+        <span class="gradient-{{ urgency.gradientIndex(assessment) }}">{{ assessment.dueAt.short }}</span>
+    </li>
     <li class="icon-due-work">{{ assessment.typeName }}</li>
 </ul>
 
