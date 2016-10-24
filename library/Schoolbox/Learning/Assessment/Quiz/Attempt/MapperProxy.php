@@ -30,7 +30,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private $internalColumnName = 'box_id';
+    private $internalColumnName = 'assess_id';
 
     /**
      * @return string
@@ -64,13 +64,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
 
         $query = "
-            SELECT `id`
+            SELECT `assess_id`
             FROM `assess`
             WHERE `assessment_id` IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query);
-        $statement->execute(Mapper\PredicateBuilder::getArrayParameters($externalValues));
+        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 
@@ -88,11 +87,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($mapperModels as $studentSubmission){
             $response = (new QuizAttempt())
                 ->setId($studentSubmission->getId())
-                ->setSubmittedBy($studentSubmission->getOwner())
-                ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
-                ->setCreatedAt($studentSubmission->getCreatedAt())
-                ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getCreatedAt());
+                ->setSubmittedBy($studentSubmission->getUser())
+                ->setSubmittedOnBehalfOf($studentSubmission->getUser())
+                ->setCreatedAt($studentSubmission->getStart())
+                ->setDeletedAt($studentSubmission->getDeleted())
+                ->setUpdatedAt($studentSubmission->getFinish());
 
             // TODO populate individual answers
             $quizResponses->add($response);
