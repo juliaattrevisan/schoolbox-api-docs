@@ -108,7 +108,7 @@ if (!empty($_POST)) {
             'ASSESS_KIND'                     => 'Survey',
             'ASSESS_KIND_LC'                  => 'survey',
             'ASSESS_CATEGORY_ID'              => $folder->getId(),
-            'ASSESS_CATEGORY_NAME'            => $folder->getName(),
+            'ASSESS_CATEGORY_NAME'            => Scrub::text($folder->getName()),
             'ASSESS_TITLE'                    => Scrub::text($survey['title']),
             'ASSESS_DESCRIPTION'              => $survey['description'],
             'ASSESS_START_DATE'               => $assessStartDate->getLocalShort(),

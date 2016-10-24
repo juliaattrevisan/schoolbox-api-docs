@@ -180,7 +180,7 @@ else {
     $survey = $surveyHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
-        'ASSESS_SECTION_TITLE' => $section['title'],
+        'ASSESS_SECTION_TITLE' => Scrub::text($section['title']),
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
         'ASSESS_KIND_LC'       => 'survey',
         'ASSESS_KIND'          => 'Survey',

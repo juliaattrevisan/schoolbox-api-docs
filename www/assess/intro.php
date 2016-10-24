@@ -113,7 +113,7 @@ $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
 
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
@@ -126,7 +126,7 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ID' => $author->getId(),
     'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
-    'ASSESS_FOLDER' => $folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': ''),
+    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
     'ASSESS_FOLDER_ID' => $folder->getId(),
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));

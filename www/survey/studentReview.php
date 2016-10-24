@@ -73,7 +73,7 @@ $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
-$this->setTitle('Survey: ' . $survey['title']);
+$this->setTitle('Survey: ' . Scrub::text($survey['title']));
 
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the survey.

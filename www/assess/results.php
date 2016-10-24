@@ -230,7 +230,7 @@ $this->setVar(array(
     'has_marks_block' => '',
 ));
 
-$this->setTitle('Results for: ' . $assess['title']);
+$this->setTitle('Results for: ' . Scrub::text($assess['title']));
 
 $dueDate = new Alaress_Date_Format($assess['finish'],Alaress_Date_Format::DATABASE_DATE_FORMAT);
 $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);

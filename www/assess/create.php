@@ -216,7 +216,7 @@ else {
         'ASSESS_IS_TASK'            => $is_task ? 1 : 0,
         'ASSESS_ASSESS_ID'          => '',
         'ASSESS_CATEGORY_ID'        => $folder->getId(),
-        'ASSESS_CATEGORY_NAME'      => $folder->getName(),
+        'ASSESS_CATEGORY_NAME'      => Scrub::text($folder->getName()),
         'ASSESS_UNIT_ID'            => $unit_id,
         'ASSESS_TITLE'              => '',
         'ASSESS_WEIGHT'             => 0,

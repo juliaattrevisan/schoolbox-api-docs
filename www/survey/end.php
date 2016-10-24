@@ -69,7 +69,7 @@ $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setBlock(TEMPLATE_content, 'completionMessage', 'completionMessage_block');
 
-$this->setTitle('Survey: ' . $survey['title']);
+$this->setTitle('Survey: ' . Scrub::text($survey['title']));
 
 $this->setVar(
     array(

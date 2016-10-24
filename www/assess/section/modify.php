@@ -107,7 +107,7 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_NAME' => $folder->getName(),
         'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
         'SECTION_ID'           => $section['section_id'],
-        'SECTION_TITLE'        => $section['title'],
+        'SECTION_TITLE'        => Scrub::text($section['title']),
         'TITLE'                => Scrub::text($section['title']),
         'DESCRIPTION'          => Scrub::html($section['description']),
         'SEQUENCE'             => $section['sequence'],
