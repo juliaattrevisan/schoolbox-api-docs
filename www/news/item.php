@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-// specified an article ID?
+// Didn't specify an article ID?
 if (!is_numeric($this->arg[0])) {
     // get the most recent one, and redirect
     $newsHandler = new News();
@@ -21,6 +21,64 @@ if (!is_numeric($this->arg[0])) {
     }
 }
 
+/* @var $user \Schoolbox\User */
+$user = $_SESSION['user'];
+
+$groupHandler = new Group(NEWS_SERVICE);
+$userHandler = new User();
+$newsHandler = new News();
+$article = null;
+
+if (!($article = $newsHandler->getByID($this->arg[0]))) {
+    error(19);
+}
+
+/* Check user has permission to see this news item
+ */
+
+// Check superuser
+$isSuperuser = false;
+if ($user->isSuperuser()) {
+    $isSuperuser = true;
+}
+
+// Check if user is in one of the selected roles
+$hasRole = false;
+foreach ($article['groupList'] as $groupId) {
+    if ($user->getRole()->getId() == $groupId) {
+        $hasRole = true;
+    }
+}
+
+// Check user is in one of the selected campuses
+$inCampus = false;
+foreach ($article['campusList'] as $articleCampusId) {
+    foreach ($user->getCampusCollection() as $userCampus) {
+        if ($userCampus->getId() == $articleCampusId) {
+            $hasCampus = true;
+        }
+    }
+}
+
+// We'll say they have 'normalAccess' if they pass the role & campus test
+$hasNormalAccess = false;
+if ($hasRole && $hasCampus) {
+    $hasNormalAccess = true;
+}
+
+// Check if user has been added individually for access to this
+$hasIndividualAccess = false;
+foreach ($article['userList'] as $accessUser) {
+    if ($accessUser['id'] == $user->getId()) {
+        $hasIndividualAccess = true;
+    }
+}
+
+// If user is not a super user & does not have normal access - error out
+if (!$isSuperuser && !$hasNormalAccess && !$hasIndividualAccess) {
+    error(185);
+}
+
 $this->setFile(TEMPLATE_content, 'news/item.html');
 $this->setBlock(TEMPLATE_content, 'featured_image', 'featured_image_block');
 $this->setBlock(TEMPLATE_content, 'modify_news', 'modify_news_block');
@@ -31,14 +89,7 @@ $this->setBlock(TEMPLATE_content, 'next_article', 'next_article_block');
 
 $this->setTab('news');
 
-$groupHandler = new Group(NEWS_SERVICE);
-$userHandler = new User();
-$newsHandler = new News();
-$article = null;
 
-if (!($article = $newsHandler->getByID($this->arg[0]))) {
-    error(19);
-}
 
 $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
