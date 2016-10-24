@@ -23,6 +23,10 @@ $f-dropdown-icon-align: 0.25rem;
 		background-color: $content-ui-hover;
 		text-decoration: none;
 	}
+	li a.menu_disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
 	.separator, .meta {
 		color: contrast-bg($background: $content-ui-background, $dark: $content-ui-foreground);
 	}
@@ -41,3 +45,4 @@ $f-dropdown-icon-align: 0.25rem;
 		padding: 0 (0.5rem + $f-dropdown-icon-align) 0 $f-dropdown-icon-align;
 	}
 }
+
