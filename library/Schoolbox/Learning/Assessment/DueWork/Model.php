@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Schoolbox\Assessment\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -68,8 +69,15 @@ class Model extends AbstractAssessment
      * This DueWork has an associated Rubric
      *
      * @var bool
+     * @todo Is this now superfluous?
+     * @todo Should this be determined dynamically by whether this DueWork has an attached Rubric?
      */
     protected $hasRubric = false;
+
+    /**
+     * @var Rubric|null
+     */
+    private $rubric;
 
     /**
      * This DueWork has Mark Per Capability on
@@ -322,6 +330,24 @@ class Model extends AbstractAssessment
     public function noMarkPerCapability()
     {
         $this->setHasMarkPerCapability(false);
+        return $this;
+    }
+
+    /**
+     * @return null|Rubric
+     */
+    public function getRubric()
+    {
+        return $this->rubric;
+    }
+
+    /**
+     * @param Rubric|null $rubric
+     * @return static
+     */
+    public function setRubric(Rubric $rubric = null)
+    {
+        $this->rubric = $rubric;
         return $this;
     }
 
