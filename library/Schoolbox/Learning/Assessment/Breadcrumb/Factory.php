@@ -73,7 +73,7 @@ class Factory
          */
         if ($assessment instanceof Project) {
             $params = ['assessmentId' => $assessment->getId()];
-            $route = $this->router->generate('learningAssessment.getUpdateAssessment', $params);
+            $route = $this->router->generate('learningAssessment.getSummary', $params);
             $trail->add([$assessment->getTitle(), $route]);
         }
 

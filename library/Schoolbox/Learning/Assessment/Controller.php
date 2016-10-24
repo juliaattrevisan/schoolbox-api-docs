@@ -609,7 +609,7 @@ class Controller extends Base
 
         $types = new AssessmentType();
         $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
             'counts' => $counts,
             'assessment' => $assessment,
             'types' => $types,
