@@ -120,18 +120,21 @@ and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester
 			return $this->getDatabase()->getAll($query);
 		}
 
-	private function setDatabase($database) {
+	
+	protected function setDatabase($database) {
                 $this->database = $database;
         }
-
+	
         /**
          * Get database
          *
          * @return MSSQL
          */
-        private function getDatabase() {
+	       
+	 protected function getDatabase() {
                 return $this->database;
         }
+
 
 
 }

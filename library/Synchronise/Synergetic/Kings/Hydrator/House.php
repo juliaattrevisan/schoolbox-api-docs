@@ -72,6 +72,8 @@ class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IH
 		return 19;
 	case 'BRF':
 		return 20;
+	case 'HHA':
+		return 19;
          default:
                 return 0;
         }
@@ -92,7 +94,7 @@ class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IH
 		return 5;
 	case 'GB':
 		return 6;
-	case 'HH':
+	case 'HHA':
 		return 7;
 	case 'MAW':
 		return 11;
