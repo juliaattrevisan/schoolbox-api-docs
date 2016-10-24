@@ -547,6 +547,14 @@ class Controller extends Base
         // TODO -use real data
         //$assessment = self::getDummyAssessment(7);
 
+        /* Tasks don't have anything to show on this screen
+         * 404 them instead
+         */
+        if ($assessment instanceof Task) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+
+        }
+
         // Load participants manually
         $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
 
@@ -613,6 +621,15 @@ class Controller extends Base
      */
     private function getSummaryStudent(IAssessable $assessment)
     {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+
+        /* Tasks don't have anything to show on this screen
+         * 404 them instead
+         */
+        if ($assessment instanceof Task) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         // Calculate summary totals for display purposes
         $types = new AssessmentType();
 
