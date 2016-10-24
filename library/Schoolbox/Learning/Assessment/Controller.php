@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
@@ -550,6 +551,13 @@ class Controller extends Base
             );
 
             $transactionSummary = $transactor->transact();
+
+            // TODO - This should be handled deep inside the AssessmentMapperProxy
+            // TODO - We can't at the moment, because a SubmissionBox does not HAVE A Rubric
+            if($assessment instanceof DueWork && $assessment->getRubric() instanceof Rubric){
+                $rubricMapper = RubricMapper::getInstance();
+                $rubricMapper->save($assessment->getRubric(), $this->getAssessmentMapperProxy()->translateToDataModel($assessment, 0));
+            }
         }
         catch (\DomainException $e) {
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);

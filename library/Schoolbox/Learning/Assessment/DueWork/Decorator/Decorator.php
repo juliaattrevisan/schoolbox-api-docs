@@ -31,9 +31,10 @@ class Decorator implements DecoratorInterface
      * @param $hasRubric
      * @param $hasMarkPerCapability
      * @param $maxMark
+     * @param $rubricData
      * @param $attachedFiles
      */
-    public function __construct($acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark, $attachedFiles)
+    public function __construct($acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark, $rubricData, $attachedFiles)
     {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
@@ -41,6 +42,7 @@ class Decorator implements DecoratorInterface
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
         $this->setMaxMark(trim($maxMark));
+        $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
     }
 
@@ -67,14 +69,6 @@ class Decorator implements DecoratorInterface
         $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
 
-        if($this->hasRubric){
-            $rubric = new \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric();
-            $grid    = (new \Schoolbox\Assessment\Rubric\Factory($rubric))->buildFromPostData($this->getRubricData(), false);
-            $markMax = $grid->getTotal();
-            $assessment->setMaxMark($markMax);
-        }
-
-
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
 
@@ -99,6 +93,14 @@ class Decorator implements DecoratorInterface
         }
         else {
             $assessment->noMarkPerCapability();
+        }
+
+        if($this->getHasRubric()){
+            $rubric = new \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric();
+            $rubric    = (new \Schoolbox\Assessment\Rubric\Factory($rubric))->buildFromPostData($this->getRubricData(), false);
+            $markMax = $rubric->getTotal();
+            $assessment->setMaxMark($markMax);
+            $assessment->setRubric($rubric);
         }
 
         /* If there were attachments, accumulate them

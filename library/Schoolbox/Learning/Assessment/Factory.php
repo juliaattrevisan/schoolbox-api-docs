@@ -139,7 +139,7 @@ class Factory
         $this->setHasMarkPerCapability(trim($post['hasMarkPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
 
-        $this->setRubricData($post['rb']);
+        $this->setRubricData($post[$post['formField']]);
 
         /* Check if any attached files existed in POST data
          * Use their array if it existed
@@ -230,9 +230,9 @@ class Factory
                 $this->getMarkType(),
                 $this->getGradingScheme(),
                 $this->getHasRubric(),
-                $this->getRubricData(),
                 $this->getHasMarkPerCapability(),
                 $this->getMaxMark(),
+                $this->getRubricData(),
                 $this->getAttachedFiles()
             );
 
