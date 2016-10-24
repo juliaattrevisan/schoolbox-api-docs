@@ -63,6 +63,9 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}' => 'getSummary',
 
+
+
+
                 /* Miscellaneous routes
                  */
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',

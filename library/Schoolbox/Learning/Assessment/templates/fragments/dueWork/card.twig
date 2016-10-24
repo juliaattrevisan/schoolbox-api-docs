@@ -15,7 +15,7 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('learningAssessment.getSubmitForm', {projectId: assessment.id, assessmentId: assessable.id, studentId: student.id}) }}"
+        <a href="{{ routeLookup('learningAssessment.getSubmitForm', {assessmentId: assessable.id, studentId: currentUser.id}) }}"
            class="icon-modify no-text" title="Submit Response{% if type == 'staff' %} On Behalf Of Student{% endif %}"></a>
     </nav>
 </li>

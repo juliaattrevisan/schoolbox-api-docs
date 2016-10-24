@@ -528,33 +528,47 @@ class Controller extends Base
      */
     public function getSummary(IAssessable $assessment)
     {
-        if ($this->getUser()->getRole()->isStudent()) {
-            $this->getSummaryStudent($assessment);
-            return;
-        }
-
-        // TODO - what happens here when the $assessment is not a Project, and the user is not a student?
-        $this->getSummaryStaff($assessment);
-        return;
-    }
-
-    /**
-     * Displays the teacher dashboard of an assessable with tracking and management details
-     * @param IAssessable $assessment
-     */
-    private function getSummaryStaff(IAssessable $assessment)
-    {
-        // TODO -use real data
-        //$assessment = self::getDummyAssessment(7);
-
-        /* Tasks don't have anything to show on this screen
-         * 404 them instead
+        /* There are no Summary views for Tasks; 404 them instead
          */
         if ($assessment instanceof Task) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-
         }
 
+        /* For everything else, determine view
+         */
+        if ($assessment instanceof Project) {
+            if ($this->getUser()->getRole()->isStaff()) {
+                $this->getSummaryProjectStaff($assessment);
+                return;
+            }
+
+            $this->getSummaryProjectStudent($assessment);
+            return;
+        }
+        elseif ($assessment instanceof DueWork) {
+            if ($this->getUser()->getRole()->isStaff()) {
+                $this->getSummaryDueWorkStaff($assessment);
+                return;
+            }
+
+            $this->getSummaryDueWorkStudent($assessment);
+            return;
+        }
+
+        /* Everything else, 404
+         */
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+    }
+
+    /**
+     * Project Summary for Staff
+     *
+     * Displays the teacher dashboard of an assessable with tracking and management details
+     *
+     * @param Project $assessment
+     */
+    private function getSummaryProjectStaff(Project $assessment)
+    {
         // Load participants manually
         $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
 
@@ -570,16 +584,14 @@ class Controller extends Base
         }
 
         // This isn't necessarily a project.
-        if ($assessment instanceof Project) {
-            foreach ($assessment->getAssessables() as $subAssessment) {
-                // Populate the participants for every single sub-assessment
-                // TODO can this be performed more efficiently?
-                $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
-                foreach ($subAssessment->getAllParticipants() as $participant) {
-                    $counts[$participant->getUser()->getId()]['total']++;
-                    if ($participant->getAllResponses()->count() > 0) {
-                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
-                    }
+        foreach ($assessment->getAssessables() as $subAssessment) {
+            // Populate the participants for every single sub-assessment
+            // TODO can this be performed more efficiently?
+            $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
+            foreach ($subAssessment->getAllParticipants() as $participant) {
+                $counts[$participant->getUser()->getId()]['total']++;
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
                 }
             }
         }
@@ -615,26 +627,19 @@ class Controller extends Base
     }
 
     /**
-     * Display the student dashboard for an assessable
+     * Project Summary for Students
      *
-     * @param IAssessable $assessment
+     * @param Project $assessment
      */
-    private function getSummaryStudent(IAssessable $assessment)
+    private function getSummaryProjectStudent(Project $assessment)
     {
-        /* Tasks don't have anything to show on this screen
-         * 404 them instead
-         */
-        if ($assessment instanceof Task) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
         // Calculate summary totals for display purposes
         $types = new AssessmentType();
 
         $counts = [];
 
         foreach($types->getStringValues() as $type){
-            if(AssessmentType::TYPE_PROJECT == $type){
+            if (AssessmentType::TYPE_PROJECT == $type){
                 continue;
             }
             $counts[$type] = 0;
@@ -643,42 +648,75 @@ class Controller extends Base
         $counts['total'] = 0;
         $counts['totalCompleted'] = 0;
 
+        $assessables = $assessment->getAssessables();
 
-        // This isn't necessarily a project.
-        if ($assessment instanceof Project) {
-            $assessables = $assessment->getAssessables();
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
+            try {
+                $participant = $assessable->getParticipant($this->getUser());
+            } catch (\UnexpectedValueException $e) {
+                // This student isn't a participant.
+                // This is fine - when PBL is implemented not all students
+                // will participate in all sub-assessments
+                continue;
+            }
 
-            /** @var IAssessable $assessable */
-            foreach ($assessables as $assessable) {
+            // If the student has submitted at least one response we will assume it is completed
+            $counts[$types->objectToString($assessable)]++;
+            $counts['total']++;
 
-                try {
-                    $participant = $assessable->getParticipant($this->getUser());
-                } catch (\UnexpectedValueException $e) {
-                    // This student isn't a participant.
-                    // This is fine - when PBL is implemented not all students
-                    // will participate in all sub-assessments
-                    continue;
-                }
-
-                // If the student has submitted at least one response we will assume it is completed
-                $counts[$types->objectToString($assessable)]++;
-                $counts['total']++;
-
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts["{$types->objectToString($assessable)}Completed"]++;
-                    $counts['totalCompleted']++;
-                }
+            if ($participant->getAllResponses()->count() > 0) {
+                $counts["{$types->objectToString($assessable)}Completed"]++;
+                $counts['totalCompleted']++;
             }
         }
 
         // TODO make this an instance var instead of instantiating all the time
         $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
         $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add(['Summary', '#']),
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
             'currentUser' => $this->getUser(),
             'assessment' => $assessment,
             'counts' => $counts,
             'participant' => $this->getUser()
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
+    }
+
+    /**
+     * Due Work Summary for Staff
+     *
+     * @param DueWork $assessment
+     */
+    private function getSummaryDueWorkStaff(DueWork $assessment)
+    {
+        $types = new AssessmentType();
+
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
+            'currentUser' => $this->getUser(),
+            'assessment' => $assessment,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/staff.twig", $twigData));
+    }
+
+    /**
+     * Due Work Summary for Students
+     *
+     * @param DueWork $assessment
+     */
+    private function getSummaryDueWorkStudent(DueWork $assessment)
+    {
+        $types = new AssessmentType();
+
+        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+        $twigData = [
+            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
+            'currentUser' => $this->getUser(),
+            'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));

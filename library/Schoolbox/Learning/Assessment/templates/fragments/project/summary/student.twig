@@ -13,7 +13,7 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
 
-        {% include '@learningAssessment/fragments/project/description.twig' with {assessment: assessment, currentUser: currentUser} %}
+        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, currentUser: currentUser} %}
         {% include '@learningAssessment/fragments/project/timeline.twig' with {assessment: assessment, currentUser: currentUser} %}
         {% include '@learningAssessment/fragments/project/progress.twig' with {counts: counts} %}
 
