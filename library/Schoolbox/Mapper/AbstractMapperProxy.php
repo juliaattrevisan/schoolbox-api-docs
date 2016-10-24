@@ -67,12 +67,7 @@ abstract class AbstractMapperProxy
      */
     protected function isTranslationRequired(array $columnList)
     {
-        foreach($columnList as $columnName => $columnValue){
-            if($this->getExternalColumnName() == $columnName){
-                return true;
-            }
-        }
-        return false;
+        return array_key_exists($this->getExternalColumnName(), $columnList);
     }
 
     /**
