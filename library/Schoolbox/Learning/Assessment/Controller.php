@@ -676,9 +676,9 @@ class Controller extends Base
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
             'currentUser' => $this->getUser(),
+            'participant' => $this->getUser(),
             'assessment' => $assessment,
             'counts' => $counts,
-            'participant' => $this->getUser()
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
@@ -697,6 +697,7 @@ class Controller extends Base
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
             'currentUser' => $this->getUser(),
+            'participant' => $this->getUser(),
             'assessment' => $assessment,
         ];
 
@@ -716,6 +717,7 @@ class Controller extends Base
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
             'currentUser' => $this->getUser(),
+            'participant' => $this->getUser(),
             'assessment' => $assessment,
         ];
 
