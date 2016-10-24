@@ -1,0 +1,35 @@
+<section>
+    <ul class="action-list">
+        {% for assessable in assessables if true or assessable.dueDate.isFuture %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="avatar card small-12">
+                        <a href="/submission/viewSubmission/{{ assessable.dueWork.id }}">
+                            <h3>{{ assessable.title }}</h3>
+                        </a>
+                        <p class="meta">
+                            <span class="gradient-{{ assessable.urgency }}">
+                                Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <nav>
+                    {% if isRouteAuthorized('learningAssessment.postUpdateAssessment', {assessmentId: assessable.id}) %}
+                        <a class="icon-modify" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}" title="Modify"></a>
+                    {% endif %}
+                </nav>
+                <article {% if compact %}class="hide"{% endif %}>
+                    {{ assessable.dueWork.description | raw }}
+                </article>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="content">
+        {# TODO: Replace hrefs with routeLookup #}
+        <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" title="View grades" class="button icon-approve">View Grades</a>
+        {% if isRouteAuthorized('learningAssessment.postCreateAssessment') %}
+            <a href="/submission/createSubmission/new/{{ folder.id }}" class="button icon-due-work">Post Due Work</a>
+        {% endif %}
+    </div>
+</section>

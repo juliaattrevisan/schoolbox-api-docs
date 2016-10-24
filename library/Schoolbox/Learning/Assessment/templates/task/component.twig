@@ -1,0 +1,66 @@
+<section>
+    <ul class="action-list">
+        {% for assessable in assessables %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="avatar card small-12">
+                        <a href="{{ assessable.task.link }}">
+                            <div class="icon-quiz icon-32"></div>
+                            <h3>{{ assessable.title }}</h3>
+                        </a>
+                        <p class="meta">
+                            <span class="gradient-{{ assessable.urgency }}">
+                                Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <nav>
+                    {# TODO: Find some way of determining task completion, currently hardcoded #}
+
+                    {% if assessable.requiresConfirmation %}
+
+                        {# Teacher assessed task #}
+
+                        {% set progressText = 'Teacher Assessed' %}
+
+                        {% if true %}
+                            {# Pending #}
+                            {% set progressClass = 'pending' %}
+                            {% set url = assessable.task.link %}
+                        {% else %}
+                            {# Completed #}
+                            {% set progressClass = 'complete' %}
+                            {% set url = '#' %}
+                        {% endif %}
+
+                    {% else %}
+
+                        {# Self assessed task #}
+
+                        {% set progressText = 'Self Assessed' %}
+
+                        {% if true %}
+                            {# Pending #}
+                            {% set progressClass = 'pending' %}
+                            {% set url = assessable.task.link %}
+                        {% else %}
+                            {# Completed #}
+                            {% set progressClass = 'complete' %}
+                            {% set progressText = progressText ~ ', Click To Undo' %}
+                            {% set url = '/task/start/' ~ assessable.task.id ~ '/undo' %}
+                        {% endif %}
+                    {% endif %}
+
+                    <a href="{{ url }}" class="progress-tick {{ progressClass }} no-text" data-interaction="update_progress" title="{{ progressText }}"></a>
+                </nav>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if isRouteAuthorized('learningAssessment.postCreateAssessment') %}
+        <div class="content">
+            {# TODO: Replace with create task route #}
+            <a href="/submission/createSubmission/new/{{ folder.id }}" class="button icon-add">Create Task</a>
+        </div>
+    {% endif %}
+</section>

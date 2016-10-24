@@ -405,7 +405,8 @@ class Module extends BaseModule
                 )
             );
 
-        $ruleRegexp = '(?:getSummaryStaff)';
+        // TODO: postCreateAssessment|postUpdateAssessment need more logic
+        $ruleRegexp = '(?:getSummaryStaff|postCreateAssessment|postUpdateAssessment)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
