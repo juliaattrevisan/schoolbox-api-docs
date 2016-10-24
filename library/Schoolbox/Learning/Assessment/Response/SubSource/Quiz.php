@@ -7,7 +7,9 @@
 
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 
@@ -16,6 +18,21 @@ use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
  */
 class Quiz implements IResponseDataSource
 {
+    /**
+     * @var MapperProxy
+     */
+    protected $mapperProxy;
+
+    /**
+     * Constructor
+     *
+     * @param MapperProxy $mapperProxy
+     */
+    public function __construct(MapperProxy $mapperProxy)
+    {
+        $this->mapperProxy = $mapperProxy;
+    }
+
     /**
      * @inheritdoc
      */
@@ -29,5 +46,9 @@ class Quiz implements IResponseDataSource
      */
     public function findForAssessment(IAssessable $assessment)
     {
+        if ($assessment instanceof QuizObject) {
+            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
+        }
+        return new Collection();
     }
 }
