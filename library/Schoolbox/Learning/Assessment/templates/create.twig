@@ -80,6 +80,8 @@
                     <fieldset class="radiolist">
                         <div class="column small-12">
                             <input type="hidden" name="folderId" value="{{ folder.id }}" />
+                            {# Legacy support for Rubric JS which uses 'category' - TODO Update Rubric JS to use 'folder.id' and remove this next line #}
+                            <input type="hidden" name="category" value="{{ folder.id }}" />
                             {% for type in types %}
                                 <input type="radio" name="assessmentType" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
                             {% endfor %}
