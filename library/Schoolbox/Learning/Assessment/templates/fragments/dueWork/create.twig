@@ -111,19 +111,27 @@ assessment: assessment
             $maxMarkInput.prop('disabled', false);
         }
 
-        /* Rubrics switcher
+        /**
+         * Callback when the 'Has Rubric' switch is clicked
          */
-        $hasRubricSwitch.on('click', function () {
-            var $element = $(this);
-
+        function processHasRubricClick($element)
+        {
             if ($element.is(':checked')) {
                 disableMaxMark();
             } else {
                 enableMaxMark();
             }
+        }
+
+        /* Rubrics switcher
+         */
+        $hasRubricSwitch.on('click', function () {
+            processHasRubricClick($(this));
         });
 
-        $hasRubricSwitch.trigger('click');
+
+        // Initiate
+        processHasRubricClick($hasRubricSwitch);
     });
 </script>
 

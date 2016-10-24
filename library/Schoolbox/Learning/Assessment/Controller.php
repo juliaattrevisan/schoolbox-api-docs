@@ -224,6 +224,7 @@ class Controller extends Base
         if($assessment instanceof AbstractAssessment){
             $data['assessmentType'] = AssessmentType::objectToString($assessment);
             $data['allMarkTypes'] = $this->getAllMarkTypes($assessment);
+            $data['allGradeSchemes'] = $this->getAllGradeSchemes();
 
             // DueWork and Tasks can have files attached
             if($assessment instanceof DueWork || $assessment instanceof Task){
@@ -424,25 +425,31 @@ class Controller extends Base
     {
         $types = new AssessmentType();
 
-        $zoneFactory = new ZoneFactory();
-        $zone = $zoneFactory->buildForAssessment($assessment);
-
         /* Twig payload
          */
         $data = [
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '']),
             'assessment'      => $assessment,
-            'assessmentType'  => AssessmentType::objectToString($assessment),
-            'attachzone'      => $zone->getTwigContext(),
             'folder'          => $assessment->getContext()->getFolder(),
             'curriculumNodes' => $assessment->getContext()->getFolder()->getCurriculumNodes(),
-            'allWorkTypes'    => $this->getAllWorkTypes(),
+            'assessmentType'  => AssessmentType::objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
         /* Special treatment for projects for now
          */
+        if($assessment instanceof DueWork || $assessment instanceof Task){
+            $zoneFactory = new ZoneFactory();
+            $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
+        }
+
+        // Due Work can have Rubrics
+        if ($assessment instanceof DueWork) {
+            $data['allWorkTypes'] => $this->getAllWorkTypes();
+            $data = array_merge($data, $this->generateRubricTwigData($assessment->getContext()->getFolder()));
+        }
+
         if ($assessment instanceof Project) {
             $summatorMapping = new SummatorMapping();
 
