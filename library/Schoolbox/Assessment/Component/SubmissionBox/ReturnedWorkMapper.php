@@ -457,22 +457,22 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 // If it's completed, don't mark again because the student has
                 // already completed it.
                 try {
-                    $recent_completion = Task\InstanceCompletionMapper::getInstance()->findLatestForTaskAndStudent(
+                    $recent_completion = Task\CompletionMapper::getInstance()->findLatestForTaskAndStudent(
                         $task_instance_id,
                         $object->getOwner()->getId()
                     );
-                    $is_already_completed = ($recent_completion->getCompletionStatus() == Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE);
+                    $is_already_completed = ($recent_completion->getCompletionStatus() == Task\Completion::COMPLETION_STATUS_COMPLETE);
                 } catch (Schoolbox\Mapper\Exception $e) {
                     $is_already_completed = false;
                 }
                 if (!$is_already_completed) {
-                    $completion = new Task\InstanceCompletion();
+                    $completion = new Task\Completion();
                     $completion
                         ->setTaskInstance($submission_box->getTaskInstance())
                         ->setStudent($object->getOwner())
                         ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
-                        ->setCompletionStatus(Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE);
-                    Task\InstanceCompletionMapper::getInstance()->save($completion);
+                        ->setCompletionStatus(Task\Completion::COMPLETION_STATUS_COMPLETE);
+                    Task\CompletionMapper::getInstance()->save($completion);
                 }
             }
         }

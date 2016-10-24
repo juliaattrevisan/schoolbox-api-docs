@@ -84,7 +84,7 @@ class TaskRedir extends Base {
 
                             foreach (FolderMapper::getInstance()->findForUser($user) as $userFolder) {
                                 if ($userFolder->getId() == $folder->getId()) {
-                                    Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                                    Task\CompletionMapper::getInstance()->markAsCompleted(
                                         $task->getId(),
                                         $user->getId()
                                     );

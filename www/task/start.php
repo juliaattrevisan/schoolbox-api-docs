@@ -88,10 +88,10 @@ switch ($task->getType()) {
             // Mark/unmark are never redirects.
             if ($isUndo) {
                 $neverRedirect = true;
-                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
+                Task\CompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
             } elseif ($isComplete) {
                 $neverRedirect = true;
-                Task\InstanceCompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
+                Task\CompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
             }
         }
 

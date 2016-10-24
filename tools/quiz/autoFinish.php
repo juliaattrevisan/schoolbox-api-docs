@@ -29,7 +29,7 @@ $log             = $kernel->logger();
 $attemptMapper   = new AttemptMapper();
 $responseHandler = new Assess_Response();
 
-$taskMapper      = new Task\InstanceCompletionMapper();
+$taskMapper      = new Task\CompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
 $updatedAttempts = [];
 

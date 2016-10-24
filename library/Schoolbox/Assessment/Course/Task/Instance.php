@@ -36,7 +36,7 @@ class Instance implements ISoftDeletable {
     protected $unit_instance;
 
     /**
-     * @var Collection|InstanceCompletion[]
+     * @var Collection|Completion[]
      */
     protected $completion_list;
 
@@ -282,7 +282,7 @@ class Instance implements ISoftDeletable {
     }
 
     /**
-     * @param  InstanceCompletion[]|Collection $completion_list
+     * @param  Completion[]|Collection $completion_list
      * @return $this
      */
     public function setCompletionList($completion_list) {
@@ -291,7 +291,7 @@ class Instance implements ISoftDeletable {
     }
 
     /**
-     * @return InstanceCompletion[]|Collection
+     * @return Completion[]|Collection
      */
     public function getCompletionList() {
         return $this->completion_list;

@@ -89,7 +89,7 @@ if (!$attempt['finish']) {
     // Does this item have a task instance associated? if so, set it as
     // completed (pending, instead of completed?)
     if (!empty($assess['task_instance_id'])) {
-        Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+        Task\CompletionMapper::getInstance()->markAsCompleted(
             $assess['task_instance_id'],
             $attempt->getUser()->getId()
         );

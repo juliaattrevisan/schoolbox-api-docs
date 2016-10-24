@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Course\Task;
 use Alaress_Date_Format;
 use Schoolbox\User;
 
-class InstanceCompletion {
+class Completion {
 
     const COMPLETION_STATUS_INCOMPLETE            = 1;
     const COMPLETION_STATUS_REQUIRES_CONFIRMATION = 2;

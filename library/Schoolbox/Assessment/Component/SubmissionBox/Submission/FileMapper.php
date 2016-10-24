@@ -116,7 +116,7 @@ class FileMapper extends Mapper
         $submissionBox  = $this->getJoinMapper('box_id')->findById($object->getSubmissionBox()->getId());
 
         if ($taskInstanceId = $submissionBox->getTaskInstance()->getId()) {
-            Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+            Task\CompletionMapper::getInstance()->markAsCompleted(
                 $taskInstanceId, $object->getOwner()->getId()
             );
         }
