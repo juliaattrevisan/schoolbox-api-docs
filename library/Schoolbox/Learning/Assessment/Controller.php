@@ -608,7 +608,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/{$assessment->getFamilyName()}/summary/staff.twig",
+                "@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/staff.twig",
                 $twigData
             )
         );
@@ -621,8 +621,6 @@ class Controller extends Base
      */
     private function getSummaryStudent(IAssessable $assessment)
     {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
-
         /* Tasks don't have anything to show on this screen
          * 404 them instead
          */
@@ -683,7 +681,7 @@ class Controller extends Base
             'participant' => $this->getUser()
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$assessment->getFamilyName()}/summary/student.twig", $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
     }
 
     /**
