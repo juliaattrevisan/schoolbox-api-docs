@@ -34,8 +34,8 @@ abstract class AbstractMapperProxy
      */
     public function __construct(Mapper $mapper)
     {
-        $this->database = \Database::getInstance();
-        $this->mapper = $mapper;
+        $this->mapper   = $mapper;
+        $this->database = $mapper->getDatabase();
     }
 
     /**
