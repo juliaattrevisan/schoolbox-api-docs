@@ -94,6 +94,7 @@ class Controller extends Base
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
+     * @param Participant\DataSource $participantDataSource
      */
     public function __construct(
         FolderMapper $folderMapper,
