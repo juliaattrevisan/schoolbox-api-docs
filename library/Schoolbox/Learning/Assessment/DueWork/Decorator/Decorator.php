@@ -65,8 +65,15 @@ class Decorator implements DecoratorInterface
          */
         $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
         $markType->setId($this->getMarkType());
-
         $assessment->setMarkType($markType);
+
+        if($this->hasRubric){
+            $rubric = new \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric();
+            $grid    = (new \Schoolbox\Assessment\Rubric\Factory($rubric))->buildFromPostData($this->getRubricData(), false);
+            $markMax = $grid->getTotal();
+            $assessment->setMaxMark($markMax);
+        }
+
 
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);

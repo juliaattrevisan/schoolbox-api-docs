@@ -36,6 +36,11 @@ trait DueWorkTrait
     protected $hasRubric = false;
 
     /**
+     * @var array|null
+     */
+    protected $rubricData;
+
+    /**
      * @var bool
      */
     protected $hasMarkPerCapability = false;
@@ -149,6 +154,24 @@ trait DueWorkTrait
     protected function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
+    }
+
+    /**
+     * @return array|null $rubricData
+     */
+    protected function getRubricData()
+    {
+        return $this->rubricData;
+    }
+
+    /**
+     * @param array|null $rubricData
+     * @return static
+     */
+    protected function setRubricData(array $rubricData = null)
+    {
+        $this->rubricData = $rubricData;
+        return $this;
     }
 
     /**
