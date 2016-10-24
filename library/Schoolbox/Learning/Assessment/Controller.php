@@ -196,6 +196,17 @@ class Controller extends Base
         $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
+        /* Set defaults */
+        if(empty($assessment->getId())) {
+
+            $assessment
+                ->setPublishAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
+                ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
+                ->setDueAt(new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+                ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
+                ->setWeight(0);
+        }
+
         /* The usual info everything requires
          */
         $data = [
@@ -277,7 +288,8 @@ class Controller extends Base
                 ->setPublishAt(Alaress_Date_Format::now())
                 ->setOpenAt(Alaress_Date_Format::now())
                 ->setDueAt(Alaress_Date_Format::now())
-                ->setCloseAt(Alaress_Date_Format::now());
+                ->setCloseAt(Alaress_Date_Format::now())
+                ->setWeight(0);
         if($assessment instanceof DueWork){
             $assessment
                 ->useRubric()

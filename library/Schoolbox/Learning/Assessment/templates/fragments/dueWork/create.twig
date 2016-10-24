@@ -30,8 +30,10 @@
 {{ visibility.dropdown(assessment.visibility) }}
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
-{% include '@learningAssessment/fragments/dates.twig' %}
-
+{% if contextType != 'unitspec' %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 

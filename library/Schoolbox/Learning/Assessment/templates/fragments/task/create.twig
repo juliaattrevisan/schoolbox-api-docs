@@ -16,7 +16,9 @@
     <input type="text" name="title" value="{{ assessment.title }}" required />
 </label>
 
-{% include '@learningAssessment/fragments/dates.twig' %}
+{% if contextType != 'unitspec' %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 <input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
