@@ -88,38 +88,7 @@ class FileMapper extends Mapper
         $this->joins('owner', UserMapper::class);
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'postSave' ]);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
-    }
-
-
-    /**
-     * Post-save callback for Submission models.
-     *
-     * Performs the following actions:
-     * * Saves a task completion for this submission's user, if there's a task
-     *   related to this submission box.
-     *
-     * @param File $object
-     * @param File $previous
-     */
-    protected function postSave(File $object, $previous = null)
-    {
-        // if there is a previous version, or this is a draft, bug out
-        if ($previous || $object->isDraft()) {
-            return;
-        }
-
-        // Attempt to save a task instance entry for this item.
-
-        // fully hydrate -_-
-        $submissionBox  = $this->getJoinMapper('box_id')->findById($object->getSubmissionBox()->getId());
-
-        if ($taskInstanceId = $submissionBox->getTaskInstance()->getId()) {
-            Task\CompletionMapper::getInstance()->markAsCompleted(
-                $taskInstanceId, $object->getOwner()->getId()
-            );
-        }
     }
 
     /**
