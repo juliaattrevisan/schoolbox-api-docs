@@ -1,0 +1,64 @@
+<?php
+/**
+ * @author    Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+namespace Schoolbox\Learning\Quiz;
+
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Module\RestfulModule;
+use Schoolbox\Module\StandardModuleTrait;
+
+/**
+ * The Purpose of this class is to:
+ * * Provide 302 Redirection between the new Assessment Quiz routes and the old Assess Quiz routes, and
+ * * Act as a placeholder for the planned Quiz rewrite of ~170
+ *
+ * During the Quiz re-write, all routes here can be considered TODOs.
+ */
+class Module extends RestfulModule
+{
+    use StandardModuleTrait;
+
+    /**
+     * @param ContainerInterface $injector
+     */
+    public function __construct(ContainerInterface $injector)
+    {
+        parent::__construct($injector, $injector->get('mapperFactory')->get(OnlineAssessmentMapper::class), 'quiz', null, 'learningQuiz');
+    }
+
+    /**
+     * Initializes any routes for this module, with a given base path.
+     *
+     * The base path for each route needs to match up to the name of the
+     * controller in $this->initControllers(), so if its base path is
+     * "user", there must be a controller in the DI container called
+     * "controller:user"
+     *
+     * @param Router $router
+     * @param string $basePath The base route for this module
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        parent::initRoutes($router, $basePath);
+
+        $routes = [
+            'GET' => [
+                '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection'
+            ],
+            'POST' => []
+        ];
+
+        foreach ($routes['GET'] as $path => $alias) {
+            $this->addGetRoute($router, $alias, $basePath, $path);
+        }
+
+        foreach ($routes['POST'] as $path => $alias) {
+            $this->addPostRoute($router, $alias, $basePath, $path);
+        }
+    }
+}
