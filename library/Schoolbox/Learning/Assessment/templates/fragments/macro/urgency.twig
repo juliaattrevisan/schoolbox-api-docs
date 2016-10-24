@@ -1,0 +1,13 @@
+{##
+ # Get index of gradient
+ #
+ # This represents a colour shift in the due date from green
+ # (have a lot of time to create responses) to red (you are
+ # running out of time to create responses)
+ #}
+{% macro gradientIndex(assessable) %}
+{% spaceless %}
+{% set urgency = (assessable.dueAt.unixTimestamp - date().format('U')) / 86400 %}
+{{ max(0, min(10, urgency))|round(0, 'floor') }}
+{% endspaceless %}
+{% endmacro %}

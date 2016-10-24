@@ -1,0 +1,13 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+
+<ul class="meta">
+    <li class="icon-calendar">Due <span class="gradient-{{ urgency.gradientIndex(assessment) }}">{{ assessment.dueAt.short }}</span></li>
+    <li class="icon-due-work">{{ assessment.typeName }}</li>
+</ul>
+
+{% if assessment.description|length %}
+<section class="content">
+    {{ assessment.description | purify }}
+</section>
+{% endif %}

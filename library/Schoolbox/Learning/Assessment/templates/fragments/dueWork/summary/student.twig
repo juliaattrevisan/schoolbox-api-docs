@@ -1,0 +1,20 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment, user: currentUser} %}
+    </div>
+</div>
+
+{% if assessment.hasRubric %}
+{% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
+{% endif %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <a class='submit' href="{{ routeLookup('learningAssessment.getSubmitForm', { assessmentId: assessment.id, studentId: participant.id}) }}">Create Response</a>
+    </div>
+</div>
