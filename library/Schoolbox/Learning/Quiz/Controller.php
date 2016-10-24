@@ -24,25 +24,32 @@ class Controller extends AbstractController
      */
     private $errorMapper;
 
-    public function __construct(OnlineAssessmentMapper $mapper, ErrorMapper $errorMapper)
+    /**
+     * @param OnlineAssessmentMapper $quizMapper
+     * @param ErrorMapper $errorMapper
+     */
+    public function __construct(OnlineAssessmentMapper $quizMapper, ErrorMapper $errorMapper)
     {
-        parent::__construct($mapper);
+        parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
     }
 
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
      *
+     * @api   GET /learning/quiz/review/{assessmentId}/{firstSectionId}/{responseId}
+     * @level 165
      * @param int $assessmentId
      * @param int $firstSectionId
      * @param int $responseId
+     * @todo Rebuild with twig
      */
     public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
     {
         /** @var OnlineAssessment $quiz */
         $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
 
-        if(OnlineAssessment::AVAILABILITY_ASSESS != $quiz->getAvailability()){
+        if (OnlineAssessment::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
         $assessId = $quiz->getId();
@@ -51,15 +58,17 @@ class Controller extends AbstractController
     }
 
 
-
     /**
      * Populate the Response object with a list of entities:
      *  - in the format provided in the request Accepts header
      *  - optionally based on search parameters provided in the query string
      *
+     * @api   GET /learning/quiz
+     * @level 165
      * @param object $context
      * @throws ControllerException
      * @return void
+     * @todo declare type (Class? Teacher?) in method args
      */
     public function getList($context = null)
     {
@@ -72,9 +81,12 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
+     * @api   GET /learning/quiz/{quizId}
+     * @level 165
      * @param object $entity
      * @throws ControllerException
      * @return void
+     * @todo declare type in method args
      */
     public function getEntity($entity)
     {
@@ -83,8 +95,12 @@ class Controller extends AbstractController
     }
 
     /**
+     * @api   GET /learning/quiz/new
+     * @api   GET /learning/quiz/{quizId}/edit
+     * @level 165
      * @param object $entity
      * @param object|null $context
+     * @todo declare types in method args
      */
     public function getForm($entity, $context = null)
     {
@@ -98,9 +114,12 @@ class Controller extends AbstractController
      *  - FAILS    - respond appropriately - some specific codes to consider before falling back to generics
      *     - 422 Unprocessable Entity - general validation fail
      *
+     * @api   POST /learning/quiz
+     * @level 165
      * @param object $entity
      * @throws ControllerException
      * @return void
+     * @todo declare type in method args
      */
     public function createEntity($entity)
     {
@@ -117,9 +136,12 @@ class Controller extends AbstractController
      *     - 422 Unprocessable Entity - general validation fail
      *     - 410 Gone                 - entity is deleted (soft or otherwise)
      *
+     * @api   POST /learning/quiz/{quizId}
+     * @level 165
      * @param object $entity
      * @throws ControllerException
      * @return void
+     * @todo declare type in method args
      */
     public function updateEntity($entity)
     {
@@ -130,8 +152,9 @@ class Controller extends AbstractController
 
     /**
      * @param object $entity
+     * @todo declare type in method args
      */
-    public function persistEntity($entity)
+    protected function persistEntity($entity)
     {
         // TODO: Implement method.
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
@@ -142,9 +165,12 @@ class Controller extends AbstractController
      * On success, respond with '204 No Content' and a Location header to the list
      * On failure, respond appropriately
      *
+     * @api   POST /learning/quiz/{quizId}/delete
+     * @level 165
      * @param object $entity
      * @throws ControllerException
      * @return void
+     * @todo declare type in method args
      */
     public function deleteEntity($entity)
     {
@@ -152,4 +178,24 @@ class Controller extends AbstractController
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
+    /* Getters / Setters
+     */
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return static
+     */
+    protected function setErrorMapper(ErrorMapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
 }
