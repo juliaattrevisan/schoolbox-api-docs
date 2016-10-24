@@ -20,13 +20,11 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Attachzone\Factory as ZoneFactory;
-use Schoolbox\Learning\Assessment\DueWork\Type;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
@@ -200,9 +198,6 @@ class Controller extends Base
      */
     private function getSelectAssessmentData(AssessmentContext $context, IAssessable $assessment = null)
     {
-        $zoneFactory = new ZoneFactory();
-        $dueWorkFileZone = $zoneFactory->buildForAssessmentType($assessment);
-
         /* Set defaults */
         if($assessment != null && empty($assessment->getId())) {
             $assessment
@@ -220,50 +215,52 @@ class Controller extends Base
             'contextType'     => AssessmentContextType::objectToString($context),
             'baseContextType' => AssessmentContextType::objectToString($context->getBaseContext()),
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromContext($context, $assessment),
-            'attachzone'      => $dueWorkFileZone->getTwigContext(),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
             'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
-            'types' => [
+        ];
+
+        // Did caller specify the AssessmentType ?
+        if($assessment instanceof AbstractAssessment){
+            $data['assessmentType'] = AssessmentType::objectToString($assessment);
+            $data['allMarkTypes'] = $this->getAllMarkTypes($assessment);
+
+            // DueWork and Tasks can have files attached
+            if($assessment instanceof DueWork || $assessment instanceof Task){
+                $zoneFactory = new ZoneFactory();
+                $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
+            }
+
+            // Due Work can have Rubrics
+            if ($assessment instanceof DueWork) {
+                $data['allWorkTypes'] => $this->getAllWorkTypes();
+                $data = array_merge($data, $this->generateRubricTwigData($context->getFolder()));
+            }
+
+            /* Projects have a Summator
+             */
+            if ($assessment instanceof Project) {
+                $data['allSummators'] = new SummatorMapping();
+            }
+
+        } else {
+            $data['types'] = [
                 ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work'],
                 ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
                 ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
-            ]
-        ];
-        // TODO, 'types' should just be the 3 objects, and twig can do the rest
-        // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+            ];
+            // Ensure we don't provide an option to spawn a Project inside a Project context
+            if (!$context instanceof Project) {
+                $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
+                array_unshift($data['types'], $item);
+            }
+        }
 
         // Do caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get('return_url');
 
         if ($returnUrl){
             $data['returnUrl'] = $returnUrl;
-        }
-
-        if ($assessment){
-            $data = array_merge($data, [
-                'allWorkTypes'   => $this->getAllWorkTypes(),
-                'allMarkTypes'   => $this->getAllMarkTypes($assessment),
-                'assessmentType' => AssessmentType::objectToString($assessment),
-            ]);
-        }
-
-        /* Used to hide a ui element, preventing Projects being an option
-         * to spawn inside a Project context
-         */
-        if (!$context instanceof Project) {
-            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
-            array_unshift($data['types'], $item);
-        }
-
-        /* Special treatment for projects for now
-         */
-        if ($assessment instanceof Project) {
-            $data['allSummators'] = new SummatorMapping();
-        }
-
-        if ($types->isDueWork($assessmentType)) {
-            $data = array_merge($data, $this->generateRubricTwigData($folder));
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
@@ -349,8 +346,8 @@ class Controller extends Base
         ];
 
         // DueWork and Task can have files attached
-        if(in_array($assessmentType, [Types::ASSESSMENT_DUE_WORK, Types::ASSESSMENT_TASK])){
-            $data['attachzone'] = (new ZoneFactory($types))->buildForAssessmentType($assessmentType)->getTwigContext();
+        if($assessment instanceof DueWork || $assessment instanceof Task){
+            $data['attachzone'] = (new ZoneFactory($types))->buildForAssessmentType($assessment)->getTwigContext();
         }
 
         /* Special treatment for projects for now
@@ -360,7 +357,7 @@ class Controller extends Base
         }
 
         // DueWork can have rubric
-        if ($types->isDueWork($assessmentType)) {
+        if ($assessment instanceof DueWork ) {
             $data = array_merge($data, $this->generateRubricTwigData($folder));
         }
 
@@ -1101,7 +1098,7 @@ class Controller extends Base
      */
     private function getAllMarkTypes(IAssessable $assessable)
     {
-        return MarkSchemeFactory::getAvailableMarkTypes($assessable);;
+        return MarkSchemeFactory::getAvailableMarkTypes($assessable);
     }
 
     /**
