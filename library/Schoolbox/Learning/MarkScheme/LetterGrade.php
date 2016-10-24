@@ -15,6 +15,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class LetterGrade extends AbstractMarkScheme
 {
+    const TITLE = 'Letter Grade';
+
     /** @var GradeGroup */
     private $gradeGroup;
 
@@ -94,13 +96,5 @@ class LetterGrade extends AbstractMarkScheme
 
         $this->gradeGroup = $gradeGroup;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle()
-    {
-        return 'Letter Grade';
     }
 }

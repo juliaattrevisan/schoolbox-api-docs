@@ -39,7 +39,7 @@
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card wrap-down small-12">
-                                        <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+                                        <div class="{{ icon.renderClass(assessable) }} icon-32" title="{{ assessable.getTypeName }}"></div>
 
                                         <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id}) }}">
                                             <h3>
@@ -59,14 +59,27 @@
 
                         {% endfor %}
                     </ul>
+                    <div class="content">
+                        <ul id="projectButtons" class="flex-list buttons">
+                            {% for returnUrl in allReturnUrls %}
+                                <li><a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </section>
                 <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create new Assessment</a>
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
                     <p>Your project is empty.</p>
-                    <p>
-                        Add a new <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" title="Create a new Assessment">Assessment</a>
+                    <p>Add a
+                        {% for projectAssessment in projectAssessments %}
+                            {%- set url -%}
+                                {{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: types.objectToString(projectAssessment)}) }}
+                            {%- endset -%}
+                            <a href="{{ url }}{{ returnUrlSuffix }}" title="Create a new {{ projectAssessment.typeName }}">{{ projectAssessment.typeName }}</a>
+                            {%- if not loop.last %},{% endif %}{% if loop.revindex == 2 %} or{% endif %}
+                        {% endfor %}
                     </p>
                 </div>
                 {% endif %}
@@ -82,22 +95,22 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.id}) }}">
-                                                <img src="/portrait.php?userId={{ participant.externalId }}&size=square64" width="48">
+                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
-                                                    {{ participant.fullName }}
+                                                    {{ participant.user.fullName }}
                                                 </h3>
                                             </a>
                                             <p class="meta">
-                                                {% if participant.year and participant.role.isStudent %}
-                                                    Year {{ participant.year }}
+                                                {% if participant.user.user.year and participant.user.role.isStudent %}
+                                                    Year {{ participant.user.year }}
                                                 {% endif %}
-                                                {{ participant.role.name }}
+                                                {{ participant.user.role.name }}
                                             </p>
                                         </div>
                                         <div class="progress">
                                             <span class="meter"
-                                                  style="width:{{ counts[participant.id].totalCompleted / counts[participant.id].total * 100 }}%"></span>
+                                                  style="width:{{ counts[participant.user.id].totalCompleted / counts[participant.user.id].total * 100 }}%"></span>
                                         </div>
                                     </div>
                                 </li>

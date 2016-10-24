@@ -15,9 +15,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -37,6 +34,7 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 
+
 class Factory
 {
     use DueWorkTrait;
@@ -45,29 +43,11 @@ class Factory
     use ProjectTrait;
 
     /**
-     * Spawn in a Folder
+     * Unique identifier
+     *
+     * @var string
      */
-    const SPAWN_CONTEXT_FOLDER = 'folder';
-
-    /**
-     * Spawn in a Project
-     */
-    const SPAWN_CONTEXT_PROJECT = 'project';
-
-    /**
-     * Spawn in a Unit Implementation
-     */
-    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
-
-    /**
-     * Spawn in a Unit Specification
-     */
-    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
-
-    /**
-     * @var int
-     */
-    protected $type = -1;
+    protected $assessmentType;
 
     /**
      * What context is this within?
@@ -86,6 +66,7 @@ class Factory
      * @var int
      */
     protected $contextIdentifier;
+
 
     /**
      * @var string
@@ -133,7 +114,7 @@ class Factory
      * @param $post (an array of post vars from the create/update forms)
      */
     public function __construct(User $creator, $post) {
-        $this->setType(trim($post['assessmentType']));
+        $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContextType(trim($post['contextType']));
         $this->setContextIdentifier(trim($post['contextId']));
         $this->setTitle(trim($post['title']));
@@ -188,7 +169,7 @@ class Factory
      * based on the arg
      *
      * @param IAssessable|null $assessment
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      */
     public function produce(IAssessable $assessment = null)
     {
@@ -202,61 +183,21 @@ class Factory
     /**
      * Produce object
      *
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
     private function produceNew()
     {
-        /* Check types exist
-         */
-        switch($this->getType()) {
-            case Types::ASSESSMENT_PROJECT:
-                $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
-                break;
-
-            case Types::ASSESSMENT_DUE_WORK:
-                $assessment = new DueWork();
-                break;
-
-            case Types::ASSESSMENT_TASK:
-                $assessment = new Task();
-                break;
-
-            case Types::ASSESSMENT_QUIZ:
-                $assessment = new Quiz();
-                break;
-
-            default:
-                throw new \DomainException('select a valid assessment type');
+        // Instantiate empty Assessment model
+        $assessment = AssessmentType::stringToObject($this->getAssessmentType());
+        if($assessment instanceof Project){
+            $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
 
-        // Figure out which context it's in
-        // TODO make sure these are real
-        // TODO move these constants
-        $context = null;
-        switch ($this->getContextType()) {
-            case self::SPAWN_CONTEXT_FOLDER:
-                $context = new Folder();
-                break;
-
-            case self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
-                $context = new UnitImplementation();
-                break;
-
-            case self::SPAWN_CONTEXT_UNIT_SPECIFICATION:
-                $context = new UnitSpecification();
-                break;
-
-            case self::SPAWN_CONTEXT_PROJECT:
-                $context = new Project();
-                break;
-
-            default:
-                throw new \DomainException('select a valid context');
-        }
-
+        // Attach context
+        $context = AssessmentContextType::stringToObject($this->getContextType());
         $assessment->setContext($context->setId($this->getContextIdentifier()));
 
         return $this->produceFromExistingAssessment($assessment);
@@ -266,7 +207,7 @@ class Factory
      * Produce object from an existing assessment
      *
      * @param IAssessable $assessment
-     * @return DueWork|Project|Quiz|Task
+     * @return IAssessable
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
@@ -371,20 +312,20 @@ class Factory
      */
 
     /**
-     * @return int
+     * @return string
      */
-    protected function getType()
+    protected function getAssessmentType()
     {
-        return $this->type;
+        return $this->assessmentType;
     }
 
     /**
-     * @param int $type
+     * @param string $assessmentType
      * @return $this
      */
-    protected function setType($type)
+    protected function setAssessmentType($assessmentType)
     {
-        $this->type = $type;
+        $this->assessmentType = $assessmentType;
         return $this;
     }
 

@@ -15,6 +15,8 @@ use Schoolbox\Learning\Assessment\IResponse;
  */
 abstract class TotalMarkAbstract extends AbstractMarkScheme
 {
+    const TITLE = 'Total Mark';
+
     /**
      * @var int|float
      */
@@ -125,9 +127,4 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return int|float
      */
     abstract protected function getTotalMarkMin();
-
-    public static function getTitle()
-    {
-        return 'Total Mark';
-    }
 }

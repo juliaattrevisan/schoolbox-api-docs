@@ -11,6 +11,8 @@ use RangeException;
 
 abstract class AbstractMarkScheme implements IMarkScheme
 {
+    const TITLE = 'Abstract Mark Scheme';
+
     /**
      * Bounds checks a normalised mark
      *
@@ -30,5 +32,13 @@ abstract class AbstractMarkScheme implements IMarkScheme
                 ' and '.IMarkScheme::NORMALISED_MARK_MAX.' inclusive: '.$normalisedMark;
             throw new RangeException($msg);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return static::TITLE;
     }
 }

@@ -156,7 +156,7 @@ trait DueWorkTrait
      */
     protected function getAttachedFiles()
     {
-        return $this->attachedFiles;
+        return $this->attachedFiles ?: [];
     }
 
     /**

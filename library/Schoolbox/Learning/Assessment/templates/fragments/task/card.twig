@@ -3,7 +3,7 @@
 <li class="actions-small-1">
     <div class="list-item">
         <div class="card wrap-down small-12">
-            <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+            <div class="{{ icon.renderClass(assessable) }} icon-32" title="{{ assessable.getTypeName }}"></div>
             {# Not all tasks have links #}
             {% if assessable.url %}
                 <a data-plugin="preview" href="{{ assessable.url }}">

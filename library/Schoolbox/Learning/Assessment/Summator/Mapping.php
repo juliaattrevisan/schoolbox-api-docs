@@ -19,6 +19,7 @@ use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedA
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 
 class Mapping
 {
@@ -35,10 +36,10 @@ class Mapping
     public function __construct()
     {
         $this->setMap([
-            Factory::WEIGHTED_AVERAGE => SummatorWeightedAverage::getTitle(),
-            Factory::AVERAGE => SummatorAverage::getTitle(),
-            Factory::MAXIMUM => SummatorMaximum::getTitle(),
-            Factory::MINIMUM => SummatorMinimum::getTitle(),
+            SummatorFactory::WEIGHTED_AVERAGE => SummatorWeightedAverage::getTitle(),
+            SummatorFactory::AVERAGE => SummatorAverage::getTitle(),
+            SummatorFactory::MAXIMUM => SummatorMaximum::getTitle(),
+            SummatorFactory::MINIMUM => SummatorMinimum::getTitle(),
         ]);
     }
 
@@ -52,16 +53,16 @@ class Mapping
     public function decompose(ISummator $summator)
     {
         if ($summator instanceof WeightedAverage) {
-            return Factory::WEIGHTED_AVERAGE;
+            return SummatorFactory::WEIGHTED_AVERAGE;
         }
         elseif ($summator instanceof Average) {
-            return Factory::AVERAGE;
+            return SummatorFactory::AVERAGE;
         }
         elseif ($summator instanceof Maximum) {
-            return Factory::MAXIMUM;
+            return SummatorFactory::MAXIMUM;
         }
         elseif ($summator instanceof Minimum) {
-            return Factory::MINIMUM;
+            return SummatorFactory::MINIMUM;
         }
 
         throw new \InvalidArgumentException('choose a valid summation option');

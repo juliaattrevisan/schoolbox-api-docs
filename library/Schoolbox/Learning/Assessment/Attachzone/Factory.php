@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Types;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Resource\Attachment\Zone;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
@@ -21,13 +21,6 @@ use \Schoolbox\Mapper\Exception as MapperException;
  */
 class Factory
 {
-    protected $assessmentTypes;
-
-    public function __construct(Types $assessmentTypes)
-    {
-        $this->assessmentTypes = $assessmentTypes;
-    }
-
     /**
      * Creates a zone from a given assessment.
      *
@@ -47,14 +40,14 @@ class Factory
     /**
      * Creates a zone from a given assessment type.
      *
-     * @param int $type
+     * @param IAssessable $assessment
      * @return Zone
      */
-    public function buildForAssessmentType($type)
+    public function buildForAssessmentType(IAssessable $assessment)
     {
-        if ($this->assessmentTypes->isTask($type)) {
+        if ($assessment instanceof Task) {
             return $this->buildForTask();
-        } elseif ($this->assessmentTypes->isDueWork($type)) {
+        } elseif ($assessment instanceof DueWork) {
             return $this->buildForDueWork();
         }
         return $this->buildGeneric();

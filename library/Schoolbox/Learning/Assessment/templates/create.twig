@@ -25,7 +25,34 @@
                 },
 
                 onXhrDone: function (data) {
-                    window.location.href = data.return_url;
+                    window.location.href = data.returnUrl;
+                }
+            });
+        }
+
+        /**
+         * When you finish configuring a project's AbstractAssessment details.
+         * Receives a HTML fragment back from the server and inserts into Step-3
+         */
+        function setupProjectEnd() {
+            $('input[data-mage-next="part-3"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+                onXhrDone: function (data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                        .find('[data-project-contents]')
+                        .html(data);
                 }
             });
         }
@@ -61,7 +88,7 @@
 </script>
 
 <div class="row">
-    <div class="small-12 columns"><h1>Create Assessment</h1></div>
+    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Assessment{% endif %}</h1></div>
 </div>
 
 {% if assessmentType|length %}
@@ -73,6 +100,7 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ formAction }}" id="assessmentForm" method="post">
+
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
@@ -81,14 +109,9 @@
                     <fieldset class="radiolist">
                         <div class="column small-12">
                             <input type="hidden" name="folderId" value="{{ folder.id }}" />
-
-                            {% if not hideProjectOption %}
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('project') }}" id="project"><label for="project" class="radio-label">Project</label>
-                            {% endif %}
-
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('dueWork') }}" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('task') }}" id="task"><label for="task" class="radio-label">Task</label>
-                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('quiz') }}" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
+                            {% for type in types %}
+                                <input type="radio" name="assessmentType" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
+                            {% endfor %}
                         </div>
                     </fieldset>
 
@@ -99,17 +122,21 @@
                 {% endif %}
 
                 <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
-                    <input type="hidden" name="contextId" value="{{ contextId }}" />
+                    {% if returnUrl|length %}
+                        <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+                    {% endif %}
+                    <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
 
+
                     {% if assessmentType|length %}
-                    <input type="hidden" name="assessmentType" value="{{ assessmentType}}" />
+                    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     {% endif %}
 
                     <legend>Assessment Details</legend>
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
-                        {% if assessmentTypeTitle|length %}
-                            {% include '@learningAssessment/fragments/'~assessmentTypeTitle~'/create.twig' %}
+                        {% if assessmentType|length %}
+                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
                         {% endif %}
                     </div>
                 </fieldset>

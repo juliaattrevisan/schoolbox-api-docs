@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
 class Model extends AbstractAssessment
 {
@@ -44,7 +45,7 @@ class Model extends AbstractAssessment
      * The "type" of the Due Work
      * (Essay, Homework, etc)
      *
-     * @var Type
+     * @var DueWorkType
      */
     protected $type;
 
@@ -93,7 +94,8 @@ class Model extends AbstractAssessment
          */
         parent::__construct();
 
-        $this->setType(new Type());
+        $this->setAttachedFiles(new Collection());
+        $this->setType(new DueWorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }
@@ -113,16 +115,8 @@ class Model extends AbstractAssessment
      */
     public function getTypeName()
     {
-        $subType = $this->getType()->getName();
-        return $subType ?: 'Due Work';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIconClass()
-    {
-        return 'icon-due-work';
+        $subTypeName = $this->type->getName();
+        return $subTypeName ?: 'Due Work';
     }
 
     /**
@@ -300,7 +294,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return Type
+     * @return DueWorkType
      */
     public function getType()
     {
@@ -308,7 +302,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @param Type $type
+     * @param DueWorkType $type
      * @return self
      */
     public function setType($type)

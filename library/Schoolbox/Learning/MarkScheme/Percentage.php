@@ -13,6 +13,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class Percentage extends AbstractMarkScheme
 {
+    const TITLE = 'Percentage';
+
     /**
      * Returns a string representation of a normalised Mark
      *
@@ -53,13 +55,5 @@ class Percentage extends AbstractMarkScheme
         $floatVal = floatval($matches[1]);
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle()
-    {
-        return 'Percentage';
     }
 }

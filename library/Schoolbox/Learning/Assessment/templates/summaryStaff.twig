@@ -35,9 +35,9 @@
                 <i class="icon-due-work"></i>
                 <p>Your project is empty.</p>
                 <p>Add a
-                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'dueWork'}) }}" title="Create a new Due Work">Due Work</a>,
-                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'task'}) }}" title="Create a new Task">Task</a>, or
-                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'quiz'}) }}" title="Create a new Quiz">Quiz</a>
+                    <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: 'dueWork'}) }}" title="Create a new Due Work">Due Work</a>,
+                    <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: 'task'}) }}" title="Create a new Task">Task</a>, or
+                    <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: 'quiz'}) }}" title="Create a new Quiz">Quiz</a>
                 </p>
             </div>
         {% endif %}

@@ -19,6 +19,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\Project;
 
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use \Schoolbox\Resource\Folder\Model as Folder;
@@ -33,7 +34,7 @@ class Factory
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * Constructor
@@ -57,7 +58,7 @@ class Factory
     public function produceFromAssessment(IAssessable $assessment)
     {
         $trail = new Collection;
-        $trail->add(['Learning', '#']);
+        $trail->add(['Learning']);
 
         $context = $assessment->getContext();
 
@@ -71,7 +72,9 @@ class Factory
         /* Additional project node, if you're creating within a project
          */
         if ($assessment instanceof Project) {
-            $trail->add([$assessment->getTitle(), "/learning/assessment/{$assessment->getId()}"]);
+            $params = ['assessmentId' => $assessment->getId()];
+            $route = $this->router->generate('learningAssessment.getUpdateAssessment', $params);
+            $trail->add([$assessment->getTitle(), $route]);
         }
 
         return $trail;
@@ -83,46 +86,27 @@ class Factory
      * These won't have enough information to determine a meaningful trail of crumbs
      * so we give it the contextId/contextType, and decide from there
      *
-     * @param $contextId int
-     * @param $contextType string
-     * @param $folderMapper FolderMapper
-     * @param $unitImplementationDataSource UnitImplementationDataSource
-     * @param $unitSpecificationDataSource UnitSpecificationDataSource
-     * @param $assessmentDataSource AssessmentDataSource
-     * @throws DeletedException
+     * @param AssessmentContext $context
+     * @param IAssessable $assessment
      * @return Collection
      */
-    public function produceFromContext(
-        $contextId, $contextType,
-        FolderMapper $folderMapper,
-        UnitImplementationDataSource $unitImplementationDataSource,
-        UnitSpecificationDataSource $unitSpecificationDataSource,
-        AssessmentDataSource $assessmentDataSource
-    ) {
+    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
+    {
         $trail = new Collection();
-        $trail->add(['Learning', '#']);
+        $trail->add(['Learning']);
 
-        try {
-            if ($contextType == 'folder') {
-                $context = $folderMapper->findById($contextId);
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'unit') {
-                $context = $unitImplementationDataSource->findById($contextId);
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'unitspec') {
-                $context = $unitSpecificationDataSource->findById($contextId);
-                $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
-            } elseif ($contextType == 'project') {
-                $context = $assessmentDataSource->findById($contextId);
-                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
-            }
-        }
-        catch (DeletedException $e) {
-
-            // noop?
+        if ($context instanceof Folder) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitImplementation) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof UnitSpecification) {
+            $trail->add([$context->getTitle(), "/homepage/{$context->getId()}"]);
+        } elseif ($context instanceof Project) {
+            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
         }
 
-        $trail->add(["Create Assessment", '#']);
+        $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Assessment';
+        $trail->add(["Create $assessmentType"]);
 
         return $trail;
     }

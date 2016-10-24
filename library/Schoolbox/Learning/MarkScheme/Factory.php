@@ -20,6 +20,30 @@ use Schoolbox\Learning\Assessment\Project;
  */
 class Factory
 {
+    /** @var string[] MarkTypes available for Projects */
+    private static $markTypesProject = [
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
+        MarkType::TYPE_NONE    => None::TITLE,
+        MarkType::TYPE_LETTER  => LetterGrade::TITLE
+    ];
+
+    /** @var string[] MarkTypes available for DueWorks */
+    private static $markTypesDueWork = [
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
+        MarkType::TYPE_NONE    => None::TITLE,
+        MarkType::TYPE_TOTAL   => TotalMarkWholeNumber::TITLE,
+        MarkType::TYPE_LETTER  => LetterGrade::TITLE
+    ];
+
+    /** @var string[] MarkTypes available for Tasks */
+    private static $markTypesTask = [
+        MarkType::TYPE_COMPLETION => Completion::TITLE,
+    ];
+
+    /** @var string[] MarkTypes available for Quizzes */
+    private static $markTypesQuiz = [
+        MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
+    ];
 
     /**
      * @param IAssessable $assessable
@@ -84,10 +108,6 @@ class Factory
                 return new TotalMarkWholeNumber($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
-//            case MarkType::TYPE_FREE:
-//                // This is the ancient free grade mark type.
-//                // As far as I know it was never migrated, but I still need it to not crash and die.
-//                return new None();
             default:
                 throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
         }
@@ -109,5 +129,23 @@ class Factory
             default:
                 throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
         }
+    }
+
+    /**
+     * @param IAssessable $assessable
+     * @return string[] Indexed by MarkType.id
+     */
+    public static function getAvailableMarkTypes(IAssessable $assessable)
+    {
+        if ($assessable instanceof Project) {
+            return self::$markTypesProject;
+        } elseif ($assessable instanceof DueWork) {
+            return self::$markTypesDueWork;
+        } elseif ($assessable instanceof Quiz) {
+            return self::$markTypesQuiz;
+        } elseif ($assessable instanceof Task) {
+            return self::$markTypesTask;
+        }
+        throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
     }
 }

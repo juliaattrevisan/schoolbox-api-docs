@@ -41,17 +41,6 @@ interface IAssessable extends ISoftDeletable
     public function setContext(AssessmentContext $assessmentContext);
 
     /**
-     * Return the family name of this Assessable.
-     *
-     * This is used when determining which variant of a template to display.
-     * This differs from `getTypeName()` in that this is always a hardcoded
-     * name for all instances of this class.
-     *
-     * @return string
-     */
-    public function getFamilyName();
-
-    /**
      * Return the name of the "type" of Assessable this is
      *
      * For Due Works, it'll be "Essay, Homework, etc"
@@ -62,15 +51,6 @@ interface IAssessable extends ISoftDeletable
      * @return mixed
      */
     public function getTypeName();
-
-    /**
-     * Degenerate method for fetching an assessment's icon class.
-     *
-     * @todo move this to a renderer class at some point.
-     *
-     * @return string
-     */
-    public function getIconClass();
 
     /**
      * Is this user a participant in this assessable?
@@ -200,6 +180,13 @@ interface IAssessable extends ISoftDeletable
      * @return float
      */
     public function getPercentagePublished();
+
+    /**
+     * Check that all four dates are set validly
+     *
+     * @return bool
+     */
+    public function isValidDates();
 
     /* Getters/Setters
      */
