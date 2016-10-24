@@ -313,6 +313,7 @@ class Module extends BaseModule
                 'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
                 'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
                 'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
+                'participantDataSource'         => $injector->lazyGet('participantDataSource'),
             ])
         );
     }

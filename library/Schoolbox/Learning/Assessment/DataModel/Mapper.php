@@ -15,9 +15,12 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
@@ -283,9 +286,31 @@ class Mapper extends BaseMapper
         }
 
         // Load related 1-M models
+
+        // Due work files
+        $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+
+        // Project contexts
+        $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
+
+        // Folder codes for all contexts
+        $modelList = $this->augmentListWithFolderCodes($modelList);
+
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with due work files.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
+    {
         if (!empty($dueWorkIds)) {
 
-            // Due work files
+            // Retrieve and sort list of duework files
             $files      = [];
             $filesQuery = "
                 SELECT
@@ -304,6 +329,8 @@ class Mapper extends BaseMapper
                 }
                 $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
             }
+
+            // Augment list with due work files
             foreach ($modelList as $model) {
                 try {
                     $submodel = $model->getSubObject();
@@ -316,10 +343,18 @@ class Mapper extends BaseMapper
                 }
             }
         }
+        return $modelList;
+    }
 
-        // Load context for projects separately
-        // Attempt to do it all in one query
-        /** @var Model[] $contextProjects */
+    /**
+     * Augments the list from hydrateSelect() with context projects.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $contextProjectIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
+    {
         if (!empty($contextProjectIds)) {
             $contextProjects = $this->findByColumn('id', $contextProjectIds)->indexBy('id');
             foreach ($modelList as $model) {
@@ -330,6 +365,48 @@ class Mapper extends BaseMapper
                     if (isset($contextProjects[$contextId])) {
                         $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
                     }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with their context's folder codes.
+     *
+     * This is required for retrieving participants, but isn't viable to join
+     * onto in getSelectString() due to the number of optional 1-M joins this
+     * would require.
+     *
+     * @param Collection|Model[] $modelList
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithFolderCodes($modelList)
+    {
+        $folderIds = [];
+
+        // Pass 1: load folder IDs for all non-projects
+        // (Project context: folder was loaded in augmentListWithProjectContexts.)
+        foreach ($modelList as $model) {
+            $context = $model->getAssessmentContext();
+
+            if (!$context instanceof ProjectModel) {
+                $folderIds[] = $context->getFolder()->getId();
+            }
+        }
+
+        // Load folders in a single query
+        $folders = $this->getJoinMapper('assessment_folder')->findByColumn('id', $folderIds)->indexBy('id');
+
+        // Pass 2: assign folders to all non-project contexts
+        foreach ($modelList as $model) {
+            $context = $model->getAssessmentContext();
+
+            if (!$context instanceof ProjectModel) {
+                $folderId = $context->getFolder()->getId();
+                if (isset($folders[$folderId])) {
+                    // Add the folder into the context
+                    $model->setAssessmentContext($context->setFolder($folders[$folderId]));
                 }
             }
         }

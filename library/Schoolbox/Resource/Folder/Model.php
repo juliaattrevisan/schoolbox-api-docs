@@ -313,6 +313,21 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * If an Assessable is in a folder, then its context is this folder.
+     *
+     * Note that this doesn't set anything - it just returns $folder.
+     * I have deemed overriding this object's values to be too dangerous and
+     * confusing.
+     *
+     * @param Model $folder
+     * @return static This method just returns $folder
+     */
+    public function setFolder(Model $folder)
+    {
+        return $folder;
+    }
+
+    /**
      * Decide whether this node is a Root node
      *
      * @return bool

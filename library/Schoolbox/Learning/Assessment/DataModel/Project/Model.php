@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 
 /**
@@ -116,6 +117,24 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel
     {
         $this->assessments = new Collection();
         $this->markType    = new MarkType();
+    }
+
+    /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->getAssessmentModel()->getContextFolder();
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder(FolderModel $folder)
+    {
+        $this->getAssessmentModel()->setContextFolder($folder);
+        return $this;
     }
 
     /**

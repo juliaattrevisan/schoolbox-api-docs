@@ -40,6 +40,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
@@ -57,6 +58,8 @@ use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperPro
 use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\UserMapper;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -548,6 +551,9 @@ class Bootstrap implements BootstrapInterface {
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
+        // Register External_Class service
+        $di->set('externalClass', $di->lazyNew(\External_Class::class));
+
         // Register course/unit implementation data sources
         $di->set(
             'unitImplementationDataSource',
@@ -621,6 +627,19 @@ class Bootstrap implements BootstrapInterface {
                 [
                     'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
                     'translator' => $di->lazyGet('assessmentTranslator'),
+                ]
+            )
+        );
+
+        // Register participant data source
+        $di->set(
+            'participantDataSource',
+            $di->lazyNew(
+                ParticipantDataSource::class,
+                [
+                    'externalDb'       => $di->lazyGet('externalClass'),
+                    'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
+                    'userMapper'       => $mapperFactory->getLazy(UserMapper::class),
                 ]
             )
         );

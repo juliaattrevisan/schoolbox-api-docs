@@ -82,6 +82,11 @@ class Controller extends Base
     protected $unitImplementationMapperProxy;
 
     /**
+     * @var Participant\DataSource
+     */
+    protected $participantDataSource;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
@@ -96,7 +101,8 @@ class Controller extends Base
         SubmissionFileMapper $submissionFileMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
-        UnitImplementationMapperProxy $unitImplementationMapperProxy
+        UnitImplementationMapperProxy $unitImplementationMapperProxy,
+        Participant\DataSource $participantDataSource
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
@@ -104,6 +110,7 @@ class Controller extends Base
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
         $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
+        $this->setParticipantDataSource($participantDataSource);
     }
 
     /**
@@ -538,6 +545,9 @@ class Controller extends Base
         // TODO -use real data
         //$assessment = self::getDummyAssessment(7);
 
+        // Load participants manually
+        $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
@@ -552,6 +562,9 @@ class Controller extends Base
         // This isn't necessarily a project.
         if ($assessment instanceof Project) {
             foreach ($assessment->getAssessables() as $subAssessment) {
+                // Populate the participants for every single sub-assessment
+                // TODO can this be performed more efficiently?
+                $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
                 foreach ($subAssessment->getAllParticipants() as $participant) {
                     $counts[$participant->getUser()->getId()]['total']++;
                     if ($participant->getAllResponses()->count() > 0) {
@@ -1026,6 +1039,24 @@ class Controller extends Base
     public function setUnitImplementationMapperProxy(UnitImplementationMapperProxy $unitImplementationMapperProxy)
     {
         $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return Participant\DataSource
+     */
+    public function getParticipantDataSource()
+    {
+        return $this->participantDataSource;
+    }
+
+    /**
+     * @param Participant\DataSource $participantDataSource
+     * @return static
+     */
+    public function setParticipantDataSource(Participant\DataSource $participantDataSource)
+    {
+        $this->participantDataSource = $participantDataSource;
         return $this;
     }
 
