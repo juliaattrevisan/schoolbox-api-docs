@@ -270,7 +270,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             // Only add students who are in the list of students for this homepage.
             $student_id = $item->getStudent()->getId();
             if (in_array($student_id, $studentIdList)) {
-                $task_instance_id                             = $item->getTaskInstance()->getId();
+                $task_instance_id                             = $item->getTask()->getId();
                 $grouped_list[$task_instance_id][$student_id] = $item;
             }
         }

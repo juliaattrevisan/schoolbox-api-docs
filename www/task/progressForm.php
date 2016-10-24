@@ -46,7 +46,7 @@ if (!$permissionDenied) {
     // Update the user's completion
     $completion = new Task\Completion();
     $completion
-        ->setTaskInstance($task)
+        ->setTask($task)
         ->setStudent($student)
         ->setCompletionDate(new Alaress_Date_Format(new DateTime('now')))
         ->setCompletionStatus($_POST['status'])

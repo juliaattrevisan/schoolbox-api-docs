@@ -132,7 +132,7 @@ class CompletionMapper extends Mapper {
 
         $model = new Completion();
         $model
-            ->setTaskInstance($task_id)
+            ->setTask($task_id)
             ->setStudent($student_id)
             ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
             ->setCompletionStatus($status)

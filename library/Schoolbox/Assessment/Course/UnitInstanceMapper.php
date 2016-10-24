@@ -752,7 +752,7 @@ class UnitInstanceMapper extends BaseMapper {
         $grouped_completion_list = $completion_list->groupByCallback(
             function ($item) {
                 /** @var Task\Completion $item */
-                return $item->getTaskInstance()->getId();
+                return $item->getTask()->getId();
             }
         );
         foreach ($task_list as $task) {

@@ -468,7 +468,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 if (!$is_already_completed) {
                     $completion = new Task\Completion();
                     $completion
-                        ->setTaskInstance($submission_box->getTaskInstance())
+                        ->setTask($submission_box->getTaskInstance())
                         ->setStudent($object->getOwner())
                         ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
                         ->setCompletionStatus(Task\Completion::COMPLETION_STATUS_COMPLETE);
