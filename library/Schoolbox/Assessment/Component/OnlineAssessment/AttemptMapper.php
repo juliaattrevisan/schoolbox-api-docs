@@ -11,10 +11,12 @@
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\UserMapper;
 
 /**
  * Class AttemptMapper
@@ -29,7 +31,7 @@ class AttemptMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('assess_attempt');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\Attempt');
+        $this->hasModel(Attempt::class);
         $this->hasMap(array(
             'column'     => 'attempt_id',
             'property'   => 'id',
@@ -71,13 +73,13 @@ class AttemptMapper extends Mapper
         $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin('assessment', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
+            'mapper'    => OnlineAssessmentMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id'
         ));
 
         $this->hasJoin('user', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'user_id',
             'other_key' => 'id'
         ));
