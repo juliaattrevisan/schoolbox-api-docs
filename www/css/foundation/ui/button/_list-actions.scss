@@ -100,42 +100,22 @@
 	);
 
 	@each $interaction, $selector in $interaction-map {
-		.#{$interaction} {
-			.card, .column, .columns {
-				margin-left: 3.5rem;
-			}
-			.#{$selector} {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 3rem;
-				height: 3rem;
 
-				&.compact{
-					height: 2rem;
+		.#{$interaction} {
+			li {
+				display: table;
+				width: calc(100% + 2rem);
+				.#{$selector} {
+					display: table-cell;
+					vertical-align: middle;
+					width: 2rem;
+					padding: 0 0.7rem;
+
+					&:before{
+						padding: 0;
+					}
 				}
 			}
-		}
-	}
-
-	.selector .checkbox-label {
-		@media #{$small-only} {
-			margin: rem-calc(($base-font-size - 3)) 1rem !important;
-		}
-		@media #{$medium-up} {
-			margin: 1.25rem 1rem !important;
-		}
-	}
-
-	.expandable-card {
-		.column, .columns {
-			margin-left: 3.5rem;
-			padding-left: 0;
-		}
-
-		.expander {
-			padding: 0.8125rem 1.25rem;
-			cursor: pointer;
 		}
 	}
 }
