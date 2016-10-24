@@ -251,6 +251,9 @@ class Controller extends Base
                 ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
                 ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
             ];
+            // TODO, 'types' should just be the 3 objects, and twig should do the rest
+            // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+
             // Ensure we don't provide an option to spawn a Project inside a Project context
             if (!$context instanceof Project) {
                 $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
