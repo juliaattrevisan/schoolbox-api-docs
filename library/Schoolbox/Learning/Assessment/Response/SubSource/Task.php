@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy;
+use Schoolbox\Learning\Assessment\Task\Completion\Model;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 
 /**
@@ -41,12 +42,17 @@ class Task implements IResponseDataSource
     }
 
     /**
-     * @inheritdoc
+     * @param IAssessable $assessment
+     * @return Collection|Model[]
      */
     public function findForAssessment(IAssessable $assessment)
     {
-        if ($assessment instanceof TaskObject) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
+        if ($this->recognizes($assessment)) {
+            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
+                                     ->map(function ($item) use ($assessment) {
+                                         /** @var Model $item*/
+                                         return $item->setAssessable($assessment);
+                                     });
         }
         return new Collection();
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Response\SubSource;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 
@@ -42,12 +43,17 @@ class Quiz implements IResponseDataSource
     }
 
     /**
-     * @inheritdoc
+     * @param IAssessable $assessment
+     * @return Collection|Model[]
      */
     public function findForAssessment(IAssessable $assessment)
     {
-        if ($assessment instanceof QuizObject) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
+        if ($this->recognizes($assessment)) {
+            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
+                                     ->map(function ($item) use ($assessment) {
+                                         /** @var Model $item*/
+                                         return $item->setAssessable($assessment);
+                                     });
         }
         return new Collection();
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Response\SubSource;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 
@@ -42,13 +43,17 @@ class DueWork implements IResponseDataSource
     }
 
     /**
-     * @inheritdoc
+     * @param IAssessable $assessment
+     * @return Collection|Model[]
      */
     public function findForAssessment(IAssessable $assessment)
     {
-        if ($assessment instanceof DueWorkObject) {
-            // Use the mapper proxy to get all the things
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()]);
+        if ($this->recognizes($assessment)) {
+            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
+                                     ->map(function ($item) use ($assessment) {
+                                         /** @var Model $item*/
+                                         return $item->setAssessable($assessment);
+                                     });
         }
         return new Collection();
     }
