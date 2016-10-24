@@ -348,7 +348,7 @@ class Controller extends Base
             'allMarkTypes'    => $this->getAllMarkTypes($assessment)
         ];
 
-        // DueWork and Quiz can have files attached
+        // DueWork and Task can have files attached
         if(in_array($assessmentType, [Types::ASSESSMENT_DUE_WORK, Types::ASSESSMENT_TASK])){
             $data['attachzone'] = (new ZoneFactory($types))->buildForAssessmentType($assessmentType)->getTwigContext();
         }
