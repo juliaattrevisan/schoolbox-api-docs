@@ -43,9 +43,11 @@ class Factory
     use ProjectTrait;
 
     /**
-     * @var int
+     * Unique identifier
+     *
+     * @var string
      */
-    protected $type = -1;
+    protected $assessmentType;
 
     /**
      * What context is this within?
@@ -64,6 +66,7 @@ class Factory
      * @var int
      */
     protected $contextIdentifier;
+
 
     /**
      * @var string
@@ -111,7 +114,7 @@ class Factory
      * @param $post (an array of post vars from the create/update forms)
      */
     public function __construct(User $creator, $post) {
-        $this->setType(trim($post['assessmentType']));
+        $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContextType(trim($post['contextType']));
         $this->setContextIdentifier(trim($post['contextId']));
         $this->setTitle(trim($post['title']));
@@ -188,7 +191,7 @@ class Factory
     private function produceNew()
     {
         // Instantiate empty Assessment model
-        $assessment = AssessmentType::stringToObject($this->getType());
+        $assessment = AssessmentType::stringToObject($this->getAssessmentType());
         if($assessment instanceof Project){
             $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
@@ -309,20 +312,20 @@ class Factory
      */
 
     /**
-     * @return int
+     * @return string
      */
-    protected function getType()
+    protected function getAssessmentType()
     {
-        return $this->type;
+        return $this->assessmentType;
     }
 
     /**
-     * @param int $type
+     * @param string $assessmentType
      * @return $this
      */
-    protected function setType($type)
+    protected function setAssessmentType($assessmentType)
     {
-        $this->type = $type;
+        $this->assessmentType = $assessmentType;
         return $this;
     }
 
