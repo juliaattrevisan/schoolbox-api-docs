@@ -9,15 +9,16 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
- * The new (165+) LMS uses DueWorkFeedback which IS A IFeedback
- * The old (160-) LMS used SubmissionReturns.
+ * The new (165+) LMS uses IResponses + IFeedback
+ * The old (160-) LMS used traditional Mapper Models
  *
- * This class accepts and provides DueWorkFeedback objects, and
+ * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
@@ -73,14 +74,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection $submissionReturns
+     * @param Collection|SubmissionReturn[] $mapperModels
      * @return GenericCollection
      */
-    protected function transformModels(Collection $submissionReturns)
+    protected function transformModels(Collection $mapperModels)
     {
         $dueWorkFeedbacks = new GenericCollection(DueWorkFeedback::class);
 
-        foreach($submissionReturns as $submissionReturn){
+        foreach($mapperModels as $submissionReturn){
             $feedback = (new DueWorkFeedback())
                 ->setId($submissionReturn->getId())
                 ->setComment($submissionReturn->getComment())
