@@ -52,7 +52,7 @@ class Synchronise_Synergetic_Kings_Strategy_Parent extends Synchronise_Base_Stra
             
             	if ($this->perform_update) {
             		$this->verbose_filter->outputMessage('- Deleting '.$existingParent['synergy_id']."|".$existingParent['lastname'].", ".$existingParent['firstname']);
-					$this->userMapper->delete($existingParent['id']);
+					#$this->userMapper->delete($existingParent['id']);
 	            } else {
 	            	$this->verbose_filter->outputMessage('- Planning delete of '.$existingParent['synergy_id']."|".$existingParent['lastname'].", ".$existingParent['firstname']);
 	            }
