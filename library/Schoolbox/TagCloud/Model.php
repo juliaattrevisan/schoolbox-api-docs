@@ -10,8 +10,9 @@
 namespace Schoolbox\TagCloud;
 
 use Schoolbox\User;
+use Schoolbox\ISoftDeletable;
 
-class Model implements \JsonSerializable
+class Model implements \JsonSerializable, ISoftDeletable
 {
     /** @var int */
     protected $id;
@@ -123,6 +124,16 @@ class Model implements \JsonSerializable
     public function getDeletedAt()
     {
         return $this->deletedAt;
+    }
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 
     /**
