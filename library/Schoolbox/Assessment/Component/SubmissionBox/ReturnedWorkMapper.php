@@ -430,9 +430,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * Post-save callback for returned work models.
      *
      * Performs the following actions:
-     * * Copies file from temp location into a location accessible by this model
-     * * Saves a task completion for this student, if there's a task related to
-     *   the submission box.
      * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
@@ -440,43 +437,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function postSave(ReturnedWork $object, $previous = null)
     {
-        // Doesn't matter whether it's new or not - only whether the mark is
-        // greater than 0.
-
-        // Attempt to save a task instance entry for this item.
-        // Because this is a teacher, the task needs to be marked as
-        // complete regardless of whether it requires confirmation.
-        // It should depend on the normalized mark, though.
-        if ($object->getNormalizedMark() > 0) {
-            $submission_box = $this->getJoinMapper('submission_box')->findById(
-                $object->getSubmissionBox()->getId()
-            );
-            $task_instance_id = $submission_box->getTaskInstance()->getId();
-            if (isset($task_instance_id)) {
-                // Find most recent for this task.
-                // If it's completed, don't mark again because the student has
-                // already completed it.
-                try {
-                    $recent_completion = Task\CompletionMapper::getInstance()->findLatestForTaskAndStudent(
-                        $task_instance_id,
-                        $object->getOwner()->getId()
-                    );
-                    $is_already_completed = ($recent_completion->getCompletionStatus() == Task\Completion::COMPLETION_STATUS_COMPLETE);
-                } catch (Schoolbox\Mapper\Exception $e) {
-                    $is_already_completed = false;
-                }
-                if (!$is_already_completed) {
-                    $completion = new Task\Completion();
-                    $completion
-                        ->setTask($submission_box->getTaskInstance())
-                        ->setStudent($object->getOwner())
-                        ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
-                        ->setCompletionStatus(Task\Completion::COMPLETION_STATUS_COMPLETE);
-                    Task\CompletionMapper::getInstance()->save($completion);
-                }
-            }
-        }
-        // Copy data to remote system
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
     }
