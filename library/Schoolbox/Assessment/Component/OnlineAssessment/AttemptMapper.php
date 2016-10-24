@@ -11,6 +11,7 @@
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
+use PDOStatement;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -87,6 +88,36 @@ class AttemptMapper extends Mapper
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var Attempt $attempt */
+            $attempt = $this->hydrate($row);
+            $attempt->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $c->add($attempt);
+        }
+        return $c;
+    }
 
     /**
      * On post save, write mark data back into remote markbook
