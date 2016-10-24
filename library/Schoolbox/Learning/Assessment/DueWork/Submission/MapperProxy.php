@@ -56,18 +56,22 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function getInternalValues(array $externalValues)
     {
-        if(!is_array($externalValues)){
+        if (empty($externalValues)) {
+            return [];
+        }
+        if (!is_array($externalValues)) {
             $externalValues = [$externalValues];
         }
+
+        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
 
         $query = "
             SELECT `id`
             FROM `submission_box`
-            WHERE `assessment_id` IN (".implode(',', $externalValues).")
+            WHERE `assessment_id` IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query);
-        $statement->execute();
+        $statement = $this->getDatabase()->query($query, Mapper\PredicateBuilder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 

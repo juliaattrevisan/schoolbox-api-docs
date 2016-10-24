@@ -57,7 +57,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         if (empty($externalValues)) {
             return [];
         }
-        if (!is_array($externalValues)){
+        if (!is_array($externalValues)) {
             $externalValues = [$externalValues];
         }
 
