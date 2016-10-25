@@ -12,6 +12,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
@@ -88,6 +89,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $submissionReturn){
             $feedback = (new DueWorkFeedback())
                 ->setId($submissionReturn->getId())
+                // TODO implement optional association due work feedback association with a response
+//                ->setResponse(
+//                    (new DueWorkResponse())
+//                        ->setId($submissionReturn->getResponse()->getId())
+//                )
                 ->setReviewee($submissionReturn->getOwner())
                 ->setComment($submissionReturn->getComment())
                 ->setNormalisedMark($submissionReturn->getNormalizedMark())

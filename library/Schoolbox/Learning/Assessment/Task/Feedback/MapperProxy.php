@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Mapper;
 
@@ -102,6 +103,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
             $taskFeedback = (new TaskFeedback())
                 ->setId($completion->getId())
+                // The completion serves as both a response and a feedback.
+                // Add a corresponding stub response.
+                ->setResponse(
+                    (new TaskResponse())
+                        ->setId($completion->getId())
+                )
                 ->setReviewee($completion->getStudent())
                 ->setReviewer($completion->getMarkingUser())
                 ->setCreatedAt($completion->getCompletionDate())

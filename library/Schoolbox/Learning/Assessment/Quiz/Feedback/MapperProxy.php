@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Mapper;
 use Schoolbox\User;
@@ -104,8 +105,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new QuizFeedback())
                 ->setId($attempt->getId())
+                // The completion serves as both a response and a feedback.
+                // Add a corresponding stub response.
+                ->setResponse(
+                    (new QuizResponse())
+                        ->setId($attempt->getId())
+                )
                 ->setReviewee($attempt->getUser())
-                // Quizzes have no concept of having been reviewed by anyone
+                // TODO implement reviewer for quizzes
                 ->setReviewer(new User())
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
