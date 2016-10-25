@@ -135,10 +135,51 @@ class DataSource
             );
         }
 
-        // Sort by name
-        $participants = $participants->sortByCallback([$this, 'sortCallback']);
+        // Need to add them into the assessment
+        $assessment->setAllParticipants($participants);
 
-        // TODO add feedback and responses
+        // Add responses
+        foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
+
+            // Currently submitted by and on behalf of are always the same.
+            $responseUser = $response->getSubmittedOnBehalfOf();
+
+            // Find participant, creating if required
+            try {
+                $responseParticipant = $assessment->getParticipant($responseUser);
+
+            } catch (\UnexpectedValueException $e) {
+                // Not a participant: add them
+                $responseParticipant = new Participant($responseUser, $assessment);
+                $assessment->getAllParticipants()->add($responseParticipant);
+            }
+
+            $responseParticipant->getAllResponses()->add($response);
+        }
+
+        // Add feedback
+        foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
+
+            $feedbackUser = $feedback->getReviewee();
+
+            // Find participant, creating if required
+            try {
+                $responseParticipant = $assessment->getParticipant($feedbackUser);
+
+            } catch (\UnexpectedValueException $e) {
+                // Not a participant: add them
+                $responseParticipant = new Participant($feedbackUser, $assessment);
+                $assessment->getAllParticipants()->add($responseParticipant);
+            }
+
+            // Associate feedbacks to a response somehow
+
+            $responseParticipant->getAllResponses()->add($feedback);
+        }
+
+        // Sort by name after all that
+        $participants = $participants->sortByCallback([$this, 'sortCallback']);
+        $assessment->setAllParticipants($participants);
 
         return $participants;
     }
