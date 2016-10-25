@@ -956,31 +956,39 @@ class Controller extends Base
      */
     public function getCreateResponse(DueWork $assessment, User $participant)
     {
+        $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
+        $latestResponse = null;
+        $editorContents = '';
 
-        // Retrieve the students responses
-        try {
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
 
-            // Try to load a draft submission if one exists
+        /** @var SubmissionFile $submission */
+        $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
+            'owner' => $participant->getId(),
+            'box_id' => 72
+        ], [
+            'order' => [
+                'submitted' => 'desc'
+            ]
+        ]);
 
-            /** @var SubmissionFile $submission */
-            $submission = $this->getSubmissionFileMapper()->findOneByColumnList([
-                'draft' => 1,
-                'owner' => $participant->getId(),
-                'box_id' => $assessment->getId()
-            ]);
+        /* Assume the most recent record is the latest submission
+         */
+        if ($allResponses->count()) {
+            $latestResponse = $allResponses->first();
 
-            try {
-                $draft = $submission->getStorage()->read();
-            } catch (\Exception $e) {
-                $draft = '';
+            /* Load in the wizzywig instead of a file attachment,
+             * if the submission uses the wizzywig editor and the
+             * submission is still a draft
+             */
+            if (in_array($latestResponse->getStorage()->getFilename(), $onlineSubmissionFilenames)) {
+                if ($latestResponse->getDraft()) {
+                    $editorContents = $latestResponse->getStorage()->read();
+                }
             }
-
-        } catch (MapperException $e) {
-
-            // No existing draft
-
-            $submission = new SubmissionFile();
-            $draft = '';
         }
 
         $zoneFactory = new ZoneFactory();
@@ -1036,6 +1044,7 @@ class Controller extends Base
             'participant' => $participant,
             'currentUser' => $this->getUser(),
             'attachzone'  => $zone->getTwigContext(),
+            'editorContents' => $editorContents,
 
 //            'responses'   => $assessment->getResponses(),
 

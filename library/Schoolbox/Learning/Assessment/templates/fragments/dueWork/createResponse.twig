@@ -211,7 +211,7 @@
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
-                        <textarea id="editor-body" name="body" rows="20">{{ draft }}</textarea>
+                        <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
