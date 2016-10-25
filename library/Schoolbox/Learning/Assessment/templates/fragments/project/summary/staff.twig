@@ -27,7 +27,7 @@
         <div class="row">
 
             <div class="small-12 medium-6 island">
-                <h2 class="subheader">Assessables</h2>
+                <h2 class="subheader">Activities</h2>
 
                 {% if assessment.assessables | length %}
                 <section>
@@ -35,7 +35,7 @@
                         {% for assessable in assessment.assessables %}
                             {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-                            <li class="actions-small-1">
+                            <li class="actions-small-2">
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card wrap-down small-12">
@@ -47,27 +47,35 @@
                                             </h3>
                                         </a>
                                         <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                            {{ assessableCounts[assessable.id].total }} / {{ assessment.allParticipants | length }} Students,
                                             Due {{ assessable.getDueAt.getRelativeTime }}
                                         </p>
                                     </div>
                                 </div>
                                 <nav>
+                                    {% if isRouteAuthorized('learningAssessment.postUpdateAssessment', {assessmentId: assessable.id}) %}
                                     <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}"
                                        class="icon-modify no-text" title="Modify"></a>
+                                    {% endif %}
+                                    {# TODO: Needs a route #}
+                                    {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
+                                        <a href="#" class="icon-delete no-text" title="Delete"></a>
+                                    {% endif %}
                                 </nav>
                             </li>
 
                         {% endfor %}
                     </ul>
-                    <div class="content">
-                        <ul id="projectButtons" class="flex-list buttons">
+                    <div class="component-action">
+                        <section>
                             {% for returnUrl in allReturnUrls %}
-                                <li><a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a></li>
+                                <a class="button" href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
                             {% endfor %}
-                        </ul>
+                            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create Assessment</a>
+                        </section>
                     </div>
                 </section>
-                <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create new Assessment</a>
+
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
@@ -86,7 +94,7 @@
             </div>
 
             <div class="small-12 medium-6 island">
-                <h2 class="subheader">Participants</h2>
+                <h2 class="subheader">Students</h2>
 
                 {% if assessment.allParticipants | length %}
                     <section>
@@ -95,6 +103,9 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
+                                            <span class="neutral label right">
+                                                {{ participant.findMostRecentFeedback.humanReadableMark }}
+                                            </span>
                                             <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
@@ -105,22 +116,19 @@
                                                 {% if participant.user.year and participant.user.role.isStudent %}
                                                     Year {{ participant.user.year }}
                                                 {% endif %}
-                                                {{ participant.user.role.name }}
+                                                {{ counts[participant.id].totalCompleted }} / {{ counts[participant.id].total }} Completed
                                             </p>
-                                        </div>
-                                        <div class="progress">
-                                            {% if counts[participant.user.id].total == 0 %}
-                                                {% set meterWidth = 0 %}
-                                            {% else %}
-                                                {% set meterWidth = counts[participant.user.id].totalCompleted / counts[participant.user.id].total * 100 %}
-                                            {% endif %}
-                                            <span class="meter" style="width:{{ meterWidth }}%"></span>
                                         </div>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                     </section>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="icon-group"></i>
+                        <p>There are no students currently undertaking this project.</p>
+                    </div>
                 {% endif %}
             </div>
 

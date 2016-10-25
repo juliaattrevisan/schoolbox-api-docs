@@ -1,7 +1,13 @@
 {% if currentUser.role.isStaff %}
     {% set width = 3 %}
 {% else %}
-    {% set width = 6 %}
+    {% if assessment.getHumanReadableMark(student, true) is empty %}
+        {# No mark to display #}
+        {% set width = 6 %}
+    {% else %}
+        {# Need to leave room for a mark #}
+        {% set width = 5 %}
+    {% endif %}
 {% endif %}
 
 <h2 class="subheader">Timeline</h2>
@@ -83,6 +89,30 @@
                                     Closes
                                 </p>
                                 <p class="meta spaced">{{ assessment.getCloseAt.getRelativeTime }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    {% endif %}
+
+    {# Display mark in timeline #}
+
+    {% if type == 'student' and assessment.getHumanReadableMark(student, true) is not empty %}
+        <div class="small-12 medium-2 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item" title="{{ assessment.getCloseAt.getLocal }}">
+                            <div class="card wrap-down small-12">
+                                <a href="#">
+                                    <i class="icon-tick icon-32"></i>
+                                </a>
+                                <p>
+                                    Mark
+                                </p>
+                                <p class="meta spaced">{{ assessment.getHumanReadableMark(student, true) }}</p>
                             </div>
                         </div>
                     </li>

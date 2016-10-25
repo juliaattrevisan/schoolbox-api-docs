@@ -1,11 +1,70 @@
 <ul class="meta">
     {% if currentUser.role.isStaff %}
-        <li class="icon-progress">Summator: {{ assessment.summator.title }}</li>
-        <li class="icon-calendar">Published {{ assessment.publishAt.short }}</li>
-        <li class="icon-calendar">Late {{ assessment.closeAt.short }}</li>
+        <li class="icon-calendar">Due {{ assessment.dueAt.short }}</li>
+        <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
     {% endif %}
 </ul>
 
-<section class="content">
-    {{ assessment.description | purify }}
+<section data-more="150">
+    <ul class="information-list">
+        <li class="description">
+            <div class="list-item"></div>
+            <article>
+                {{ assessment.description | purify }}
+            </article>
+        </li>
+    </ul>
+    <div class="component-action more hide">
+        <section>
+            <a style="width:100%" class="button icon-down-arrow" href="#">Show Full Description</a>
+        </section>
+    </div>
 </section>
+
+<script>
+    $(function () {
+
+        $('[data-more]').each(function() {
+            var maximumHeight = $(this).data('more');
+            var description = $(this).find('.description:first');
+            var more = $(this).find('.more:first');
+
+            if (description.height() > maximumHeight) {
+
+                {# Description was too long, truncate it and display read more link #}
+
+                description.data('original', description.height());
+                description.height(maximumHeight);
+                description.css({'overflow': 'hidden'});
+
+                {# Store reference to the description on the more link #}
+
+                more.data('description', description);
+                more.removeClass('hide');
+
+                $(more).click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).data('description').height() == maximumHeight) {
+                        {# Expand to original height #}
+                        $(this).data('description').height('auto');
+                        $(this).find('a:first').html('Hide Full Description');
+                        $(this).find('a:first').removeClass('icon-down-arrow');
+                        $(this).find('a:first').addClass('icon-up-arrow');
+                    } else {
+                        {# Collapse #}
+                        $(this).data('description').height(maximumHeight);
+                        $(this).find('a:first').html('Show Full Description');
+                        $(this).find('a:first').removeClass('icon-up-arrow');
+                        $(this).find('a:first').addClass('icon-down-arrow');
+                    }
+                });
+
+            } else {
+
+                {# Description was short enough to display, hide the read more link #}
+                $(more).hide();
+            }
+        })
+    });
+</script>

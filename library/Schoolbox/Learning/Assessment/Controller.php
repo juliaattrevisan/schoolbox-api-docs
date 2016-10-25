@@ -577,7 +577,9 @@ class Controller extends Base
         $participants = $assessment->getAllParticipants();
 
         $counts = [];
+        $assessableCounts = [];
         foreach ($participants as $participant) {
+
             $counts[$participant->getUser()->getId()] = [
                 'total' => 0,
                 'totalCompleted' => 0,
@@ -586,13 +588,17 @@ class Controller extends Base
 
         // This isn't necessarily a project.
         foreach ($assessment->getAssessables() as $subAssessment) {
+            $assessableCounts[$subAssessment->getId()]['total'] = 0;
+
             // Populate the participants for every single sub-assessment
             // TODO can this be performed more efficiently?
             $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
             foreach ($subAssessment->getAllParticipants() as $participant) {
                 $counts[$participant->getUser()->getId()]['total']++;
+                $assessableCounts[$subAssessment->getId()]['total']++;
                 if ($participant->getAllResponses()->count() > 0) {
                     $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                    $assessableCounts[$subAssessment->getId()]['totalCompleted']++;
                 }
             }
         }
@@ -612,6 +618,7 @@ class Controller extends Base
         $twigData = [
             'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
             'counts' => $counts,
+            'assessableCounts' => $assessableCounts,
             'assessment' => $assessment,
             'types' => $types,
             'projectAssessments' => [new DueWork(), new Quiz(), new Task()],
