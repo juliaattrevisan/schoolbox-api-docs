@@ -934,6 +934,9 @@ class Controller extends Base
          * (ie. not a draft) ram the current datetime in
          */
         if ($isFinal) {
+
+            /* TODO: this will die because it's not using an actual mapper/model
+             */
             $response->setSubmittedAt(Alaress_Date_Format::now());
         }
 
