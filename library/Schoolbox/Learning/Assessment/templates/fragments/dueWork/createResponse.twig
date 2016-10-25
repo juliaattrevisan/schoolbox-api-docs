@@ -208,16 +208,15 @@
         <div class="row">
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: participant.id}) }}" enctype="multipart/form-data">
-                    <input type="hidden" name="user_id" value="{{ currentUser.id }}"/>
-                    <input type="hidden" name="box_id" value="{{ assessment.id }}"/>
-                    <input type="hidden" name="submission_id" value="{{ submission.id }}"/>
+                    <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
+                    <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
+                    <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
                         <textarea id="editor-body" name="body" rows="20">{{ draft }}</textarea>
-                    </section>
-                    <section class="content">
+
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if currentUser.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save/>
+                    <input type="submit" value="Submit for Assessment {% if currentUser.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save />
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
