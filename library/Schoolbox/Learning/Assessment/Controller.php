@@ -281,15 +281,14 @@ class Controller extends Base
          */
         $types = new AssessmentType();
 
-        /* TODO: Remove this stub
-         * I added it to save myself choosing dates all the time
-         */
+        /* Set defaults */
         $assessment = $types->stringToObject($assessmentType)
-                ->setPublishAt(Alaress_Date_Format::now())
-                ->setOpenAt(Alaress_Date_Format::now())
-                ->setDueAt(Alaress_Date_Format::now())
-                ->setCloseAt(Alaress_Date_Format::now())
+                ->setPublishAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
+                ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
+                ->setDueAt(new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+                ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
                 ->setWeight(0);
+
         if($assessment instanceof DueWork){
             $assessment
                 ->useRubric()
@@ -809,11 +808,6 @@ class Controller extends Base
             $assessmentFactory = new Factory($this->getUser(), $postData);
             $assessment = $assessmentFactory->produce($existingAssessment);
 
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
-            }
         }
         catch (\DomainException $e) {
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);
