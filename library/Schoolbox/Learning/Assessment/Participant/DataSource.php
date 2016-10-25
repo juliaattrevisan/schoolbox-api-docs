@@ -195,7 +195,7 @@ class DataSource
         }
 
         // Sort by name after all that
-        $participants = $participants->sortByCallback([$this, 'sortCallback']);
+        $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
         $assessment->setAllParticipants($participants);
 
         return $participants;
