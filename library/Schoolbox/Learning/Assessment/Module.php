@@ -63,14 +63,16 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}' => 'getSummary',
 
-
+                /* Submit a Response to a Due Work
+                 */
+                '/assessment/{assessmentId}/{studentId}/submit' => 'getCreateResponse',
 
 
                 /* Miscellaneous routes
                  */
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
-                '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
+
             ],
             'POST' => [
 
@@ -89,6 +91,10 @@ class Module extends BaseModule
                 /* Delete an assessment
                  */
                 '/assessment/{assessmentId}/delete' => 'postDeleteAssessment',
+
+                /* Save a Response to a Due Work
+                 */
+                '/assessment/{assessmentId}/{studentId}/submit' => 'postCreateResponse'
             ]
         ];
 
@@ -201,7 +207,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getSubmitForm)',
+            '(?:getCreateResponse)',
             function ($params) {
 
                 /** @var DueWork $assessment */

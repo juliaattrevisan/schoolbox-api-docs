@@ -946,7 +946,7 @@ class Controller extends Base
 
 
     /**
-     * Displays a form enabling a student to submit items to an assessment
+     * Displays a form enabling a student to create responses to an assessment
      *
      * @api   GET /learning/assessment/:assessmentId/:studentId/submit
      * @level 165
@@ -954,12 +954,10 @@ class Controller extends Base
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSubmitForm(DueWork $assessment, User $student)
+    public function getCreateResponse(DueWork $assessment, User $student)
     {
 
         // Retrieve the students responses
-
-
         try {
 
             // Try to load a draft submission if one exists
@@ -989,7 +987,7 @@ class Controller extends Base
 
         $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/submitForm.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'assessment'  => $assessment,
             'responses'   => $assessment->getResponses(),
@@ -1002,6 +1000,15 @@ class Controller extends Base
         ]));
     }
 
+    /**
+     * Save a Response to a Due Work
+     *
+     * @api POST /learning/assessment/:assessmentId/:studentId/submit
+     */
+    public function postCreateResponse()
+    {
+
+    }
 
     /* Getters/Setters
      */
