@@ -42,7 +42,7 @@
                 clickoutFiresChange: true,
                 showInitial: true,
                 change: function(color) {
-                    $(this).val(color.toHexString());
+                    $(this).val(color.toHexString().substring(1));
                 }
             });
         });
@@ -57,7 +57,7 @@
             clickoutFiresChange: true,
             showInitial: true,
             change: function(color) {
-                $(this).val(color.toHexString());
+                $(this).val(color.toHexString().substring(1));
             }
         });
 
