@@ -986,10 +986,43 @@ class Controller extends Base
         $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
-        // Work out if we are going to accept submissions
+        /* Work out if we are going to accept responses
+         *
+         * It's not accepting submissions if:
+         *      - If it's not open
+         *      - If the close date has passed
+         *      - If the assessment is set to Accept None
+         *      - If the assessment only accepts single, and a response already exists for this participant
+         *      - You're not a student of this assessment's class (folder)
+         */
+        if ($assessment->getOpenAt()->gt(Alaress_Date_Format::now())) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+        }
 
-        $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
+        if ($assessment->getCloseAt()->lt(Alaress_Date_Format::now())) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+        }
 
+        if ($assessment->isAcceptNone()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+        }
+
+        if ($assessment->isAcceptSingle() && $assessment->getResponses()->count()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+        }
+
+        $folderIds = [];
+
+        foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
+            $folderIds[] = $currentSubject->getId();
+        }
+
+        if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
+
+        /* Pump into twig land
+         */
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
             'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'  => $assessment,
@@ -1001,7 +1034,6 @@ class Controller extends Base
 
             'submission'  => $submission,
             'draft'       => $draft,
-            'acceptSubmission' => $acceptSubmission
         ]));
     }
 

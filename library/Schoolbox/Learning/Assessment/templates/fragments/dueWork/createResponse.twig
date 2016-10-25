@@ -193,7 +193,6 @@
             {#{% endfor %}#}
         {#{% endif %}#}
 
-        {% if acceptSubmission %}
         <h2 class="subheader">Submit Response</h2>
 
         <div class="row">
@@ -228,10 +227,5 @@
             <a class="button full-width" data-interaction="close">OK</a>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
-        {% else %}
-        <div class="alert-box">
-            This assessment isn't accepting online submissions.
-        </div>
-        {% endif %}
     </div>
 </div>

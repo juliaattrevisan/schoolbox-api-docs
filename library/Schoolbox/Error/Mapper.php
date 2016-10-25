@@ -155,6 +155,11 @@ class Mapper extends BaseMapper
 
     const ERROR_GENERIC_NOT_FOUND = 180;
 
+    const ERROR_ASSESSMENT_NO_ONLINE_RESPONSE = 184;
+    const ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE = 185;
+    const ERROR_ASSESSMENT_CLOSED = 186;
+    const ERROR_ASSESSMENT_NOT_YET_OPEN = 187;
+
     public function mapping()
     {
         $this->hasTable('error');
