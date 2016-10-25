@@ -983,6 +983,9 @@ class Controller extends Base
             $draft = '';
         }
 
+        $zoneFactory = new ZoneFactory();
+        $zone = $zoneFactory->buildForAssessmentType($assessment);
+
         // Work out if we are going to accept submissions
 
         $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
@@ -992,11 +995,10 @@ class Controller extends Base
             'assessment'  => $assessment,
             'participant' => $participant,
             'currentUser' => $this->getUser(),
+            'attachzone'  => $zone->getTwigContext(),
 
 //            'responses'   => $assessment->getResponses(),
 
-
-            'attachzone'  => $this->getAttachZone(),
             'submission'  => $submission,
             'draft'       => $draft,
             'acceptSubmission' => $acceptSubmission
@@ -2680,30 +2682,5 @@ class Controller extends Base
         //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
         return $quiz;
-    }
-
-    /**
-     * Insert an attach zone into the template
-     *
-     * @param Collection $attachments|IStorage
-     * @return array
-     */
-    private function getAttachZone($attachments = null)
-    {
-        $zone = new Zone('attachment');
-        $zone
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select attachment')
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload attachment')
-            ->setMimeFilter('*/*')
-            ->setReadOnly(false)
-            ->setMulti(true);
-
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
-                $zone->attachFiles(array($attachment->getHash()));
-
-        return $zone->getTwigContext();
     }
 }
