@@ -1045,11 +1045,6 @@ class Controller extends Base
             'currentUser' => $this->getUser(),
             'attachzone'  => $zone->getTwigContext(),
             'editorContents' => $editorContents,
-
-//            'responses'   => $assessment->getResponses(),
-
-            'submission'  => $submission,
-            'draft'       => $draft,
         ]));
     }
 
