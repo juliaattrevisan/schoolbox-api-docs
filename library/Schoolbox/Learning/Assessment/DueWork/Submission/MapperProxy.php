@@ -90,6 +90,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $response = (new DueWorkSubmission())
                 ->setId($studentSubmission->getId())
                 ->setSubmittedBy($studentSubmission->getOwner())
+                // TODO add submitted on behalf of as a separate column
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
