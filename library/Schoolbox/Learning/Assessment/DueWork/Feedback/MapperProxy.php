@@ -88,6 +88,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $submissionReturn){
             $feedback = (new DueWorkFeedback())
                 ->setId($submissionReturn->getId())
+                ->setReviewee($submissionReturn->getOwner())
                 ->setComment($submissionReturn->getComment())
                 ->setNormalisedMark($submissionReturn->getNormalizedMark())
                 ->setHumanReadableMark($submissionReturn->getMark())

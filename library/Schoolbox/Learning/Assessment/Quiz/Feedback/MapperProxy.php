@@ -104,6 +104,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new QuizFeedback())
                 ->setId($attempt->getId())
+                ->setReviewee($attempt->getUser())
                 // Quizzes have no concept of having been reviewed by anyone
                 ->setReviewer(new User())
                 ->setCreatedAt($attempt->getStart())

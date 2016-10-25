@@ -102,6 +102,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
             $taskFeedback = (new TaskFeedback())
                 ->setId($completion->getId())
+                ->setReviewee($completion->getUser())
                 ->setReviewer($completion->getMarkingUser())
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
