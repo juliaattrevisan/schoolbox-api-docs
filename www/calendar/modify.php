@@ -1,5 +1,8 @@
 <?php
 
+use Schoolbox\UserMapper;
+use Schoolbox\Calendar\Event\Access;
+
 if (isset($this)) {
     $page = $this;
 } else {
@@ -23,7 +26,7 @@ $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
     try {
-        $userMapper   = new \Schoolbox\UserMapper();
+        $userMapper = new UserMapper();
         $selectedUser = $userMapper->findById($_GET['userId']);
     } catch (\Exception $e) {
         error(31);
@@ -42,6 +45,14 @@ if (is_numeric($_GET['eventID'])) {
     } catch (\Exception $e) {
         error(160);
         exit;
+    }
+
+    /* Check user has permission to modify this event
+     */
+    $eventAccess = new Access();
+
+    if ($eventAccess->checkAccess($selectedUser, $event) === false) {
+        error(34);
     }
 
     /* Default values
