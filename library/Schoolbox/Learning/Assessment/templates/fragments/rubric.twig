@@ -115,21 +115,21 @@ Usage:
 
 <div class="row">
     <div class="small-12 medium-6 columns">
-        <label for="hasRubric">Use Rubric?</label>
+        <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
-            <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
-            <label for="hasRubric">
+            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
+            <label for="useRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
         </div>
     </div>
     <div class="small-12 medium-6 columns">
-        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}" data-hide-watch="#hasRubric">
-            <label for="hasMarkPerCapability">Mark Per-Capability</label>
+        <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+            <label for="markPerCapability">Mark Per-Capability</label>
             <div class="switch round">
-                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
-                <label for="hasMarkPerCapability">
+                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
+                <label for="markPerCapability">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
@@ -139,7 +139,7 @@ Usage:
 </div>
 
 <div class="row">
-    <div id="rubric-section" class="small-12 columns{% if not assessment.hasRubric %} hide{% endif %}" data-hide-watch="#hasRubric">
+    <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>

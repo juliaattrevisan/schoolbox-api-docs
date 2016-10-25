@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
-use Schoolbox\Assessment\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -73,7 +73,7 @@ class Model extends AbstractAssessment
      *
      * @var bool
      */
-    protected $usesRubric = false;
+    protected $useRubric = false;
 
     /**
      * @var Rubric|null
@@ -81,7 +81,7 @@ class Model extends AbstractAssessment
     private $rubric;
 
     /**
-     * This DueWork has Mark Per Capability on
+     * This DueWork's Rubric has Mark Per Capability on
      *
      * @var bool
      */
@@ -272,41 +272,26 @@ class Model extends AbstractAssessment
         return $this;
     }
 
-
     /**
-     * This DueWork has Mark Per Capability on
-     *
-     * @return bool
+     * @return boolean
      */
-    public function hasMarkPerCapbility()
+    public function getUseRubric()
     {
-        return $this->getMarkPerCapability();
+        return $this->useRubric;
     }
 
     /**
-     * This DueWork's Rubrics uses Mark Per Capability
-     *
-     * @return $this
+     * @param boolean $useRubric
+     * @return static
      */
-    public function useMarkPerCapability()
+    public function setUseRubric($useRubric)
     {
-        $this->setMarkPerCapability(true);
+        $this->useRubric = $useRubric;
         return $this;
     }
 
     /**
-     * This DueWork's Rubrics does not use Mark Per Capability
-     *
-     * @return $this
-     */
-    public function noMarkPerCapability()
-    {
-        $this->setMarkPerCapability(false);
-        return $this;
-    }
-
-    /**
-     * @return null|Rubric
+     * @return Rubric|null
      */
     public function getRubric()
     {
@@ -374,24 +359,6 @@ class Model extends AbstractAssessment
     public function setShowSubmittedOnly($showSubmittedOnly)
     {
         $this->showSubmittedOnly = $showSubmittedOnly;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getUsesRubric()
-    {
-        return $this->usesRubric;
-    }
-
-    /**
-     * @param boolean $usesRubric
-     * @return $this
-     */
-    public function setUsesRubric($usesRubric)
-    {
-        $this->usesRubric = $usesRubric;
         return $this;
     }
 

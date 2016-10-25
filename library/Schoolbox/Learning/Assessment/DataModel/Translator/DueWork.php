@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
@@ -45,8 +44,8 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
-                ->setUseRubric($assessment->getUsesRubric())
-                ->setMarkedPerRubricGroup($assessment->hasMarkPerCapbility())
+                ->setUseRubric($assessment->getUseRubric())
+                ->setMarkedPerRubricGroup($assessment->getMarkPerCapability())
                 ->setOwner($assessment->getCreator())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
@@ -114,14 +113,14 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Has Rubric?
             if ($model->getUseRubric()) {
-                $assessable->setUsesRubric(true);
+                $assessable->setUseRubric(true);
 
                 if ($model->isMarkedPerRubricGroup()) {
-                    $assessable->useMarkPerCapability();
+                    $assessable->setMarkPerCapability(true);
                 }
             } else {
-                $assessable->setUsesRubric(false);
-                $assessable->noMarkPerCapability();
+                $assessable->setUseRubric(false);
+                $assessable->setMarkPerCapability(false);
             }
 
             // Figure out submission visibility

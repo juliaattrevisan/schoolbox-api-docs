@@ -87,7 +87,7 @@ rubricIndicatorFolderId: rubricIndicatorFolderId
     $(function () {
 
         var $maxMarkInput = $('#maxMark');
-        var $hasRubricSwitch = $('#hasRubric');
+        var $useRubricSwitch = $('#useRubric');
 
         /**
          * Disable the field, but allow us to show its value
@@ -107,7 +107,7 @@ rubricIndicatorFolderId: rubricIndicatorFolderId
         /**
          * Callback when the 'Has Rubric' switch is clicked
          */
-        function processHasRubricClick($element)
+        function processUseRubricClick($element)
         {
             if ($element.is(':checked')) {
                 disableMaxMark();
@@ -118,13 +118,13 @@ rubricIndicatorFolderId: rubricIndicatorFolderId
 
         /* Rubrics switcher
          */
-        $hasRubricSwitch.on('click', function () {
-            processHasRubricClick($(this));
+        $useRubricSwitch.on('click', function () {
+            processUseRubricClick($(this));
         });
 
 
         // Initiate
-        processHasRubricClick($hasRubricSwitch);
+        processUseRubricClick($useRubricSwitch);
     });
 </script>
 
