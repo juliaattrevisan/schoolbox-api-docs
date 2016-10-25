@@ -60,10 +60,8 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setDuration($model->getDuration())
                 ->setCompletionMessage($model->getCompletionMessage())
                 ->setCreator($model->getUser())
+                ->setMaxMark(floatval($model->getTotalMark()))
             ;
-
-            // TODO implement setting of max marks from quiz's questions
-            $assessable->setMaxMark(1);
             return $assessable;
         }
         return null;

@@ -596,6 +596,8 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
+     * TODO implement setting of max marks from this quiz's question set
+     *
      * @return float
      */
     public function getTotalMark()
