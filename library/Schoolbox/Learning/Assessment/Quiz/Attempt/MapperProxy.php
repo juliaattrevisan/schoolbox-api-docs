@@ -109,6 +109,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 $response
                     ->setMarksGiven($markSet['mark'])
                     ->setMarksAvailable($markSet['max_mark'])
+                    ->setFirstSectionId($markSet['first_section'])
                 ;
             }
         }

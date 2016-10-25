@@ -150,7 +150,7 @@ class AttemptMapper extends Mapper
     }
 
     /**
-     * Retrieves mark and max_mark for all given attempt IDs.
+     * Retrieves mark, max_mark and first_section for all given attempt IDs.
      *
      * TODO consider removing this sum method when mappers for responses and questions exist
      *
@@ -167,10 +167,17 @@ class AttemptMapper extends Mapper
             SELECT
                 aa.attempt_id,
                 SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark
+                SUM(aq.marks) AS max_mark,
+                (
+                    SELECT `as`.section_id
+                    FROM assess_section `as`
+                    WHERE `as`.section_id = aq.section_id
+                    ORDER BY `as`.sequence ASC
+                    LIMIT 1
+                ) AS first_section
             FROM assess_attempt aa
-                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+            LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+            LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
             WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
             GROUP BY aa.assess_id, aa.attempt_id
             ORDER BY aa.start DESC
