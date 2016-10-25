@@ -24,6 +24,8 @@ class Model extends AbstractResponse
      */
     protected $allFiles;
 
+    protected $submittedAt;
+
     /**
      * Model constructor.
      */
@@ -34,17 +36,6 @@ class Model extends AbstractResponse
         parent::__construct();
 
         $this->setAllFiles(new Collection());
-    }
-
-    /**
-     * When the Submission was submitted
-     * An alias to createdAt
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getSubmittedAt()
-    {
-        return $this->getCreatedAt();
     }
 
     /**
@@ -85,6 +76,24 @@ class Model extends AbstractResponse
     public function setAllFiles($allFiles)
     {
         $this->allFiles = $allFiles;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSubmittedAt()
+    {
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param mixed $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt($submittedAt)
+    {
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 }

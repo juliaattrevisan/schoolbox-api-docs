@@ -1061,7 +1061,6 @@ class Controller extends Base
      */
     public function postCreateResponse(IAssessable $assessment)
     {
-
         /* Creator is the currently-logged-in user
          * Participant is the actual owner of the Response
          *
@@ -1072,20 +1071,38 @@ class Controller extends Base
         $participant = \Schoolbox\UserMapper::getInstance()->findById($this->getRequest()->post['participantId']);
 
         /* Set in javascript when autmatically saving a draft
+         * Careful the negation
          */
-        $isDraft = $_POST['saveDraft'];
+        $isFinal = !$_POST['saveDraft'];
         $body = $_POST['body'];
 
         /* TODO: Do the actual saving
          */
-        $response = new DueWorkSubmission();
-        $response
-            ->setAssessable($assessment)
-            ->setSubmittedBy($creator)
-            ->setSubmittedOnBehalfOf($participant)
-            ->attachOnlineSubmissionContent($body)
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        /* Load an existing response to update
+         */
+        if ($this->getRequest()->post['responseId']) {
+            $response = new DueWorkSubmission();
+        }
+        /* Create a new response
+         */
+        else {
+            $response = new DueWorkSubmission();
+            $response
+                ->setAssessable($assessment)
+                ->setSubmittedBy($creator)
+                ->setSubmittedOnBehalfOf($participant)
+                ->attachOnlineSubmissionContent($body)
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
+        }
+
+        /* If we're saving the final version of the submission
+         * (ie. not a draft) ram the current datetime in
+         */
+        if ($isFinal) {
+            $response->setSubmittedAt(Alaress_Date_Format::now());
+        }
 
         /* Saving drafts from the wizzywig
          */
@@ -1101,7 +1118,6 @@ class Controller extends Base
          */
         else {
         }
-
     }
 
     /* Getters/Setters
