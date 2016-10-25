@@ -86,15 +86,15 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $quizResponses = new GenericCollection(QuizAttempt::class);
 
         $ids = [];
-        foreach ($mapperModels as $studentSubmission){
-            $ids[] = $studentSubmission->getId();
+        foreach ($mapperModels as $attempt) {
+            $ids[] = $attempt->getId();
             $response = (new QuizAttempt())
-                ->setId($studentSubmission->getId())
-                ->setSubmittedBy($studentSubmission->getUser())
-                ->setSubmittedOnBehalfOf($studentSubmission->getUser())
-                ->setCreatedAt($studentSubmission->getStart())
-                ->setDeletedAt($studentSubmission->getDeleted())
-                ->setUpdatedAt($studentSubmission->getFinish())
+                ->setId($attempt->getId())
+                ->setSubmittedBy($attempt->getUser())
+                ->setSubmittedOnBehalfOf($attempt->getUser())
+                ->setCreatedAt($attempt->getStart())
+                ->setDeletedAt($attempt->getDeleted())
+                ->setUpdatedAt($attempt->getFinish())
             ;
 
             // TODO populate individual answers
