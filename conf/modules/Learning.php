@@ -11,7 +11,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
-use \External_User;
+use Schoolbox\Learning\Quiz\Module as QuizModule;
 
 class Learning implements ModuleConfigInterface
 {
@@ -34,5 +34,8 @@ class Learning implements ModuleConfigInterface
 
         $feedbackModule = new FeedbackModule($di);
         $feedbackModule->init("/$namespace");
+
+        $quizModule = new QuizModule($di);
+        $quizModule->init("/$namespace");
     }
 }

@@ -2,7 +2,8 @@
 {% macro localUrl(response) -%}
 
     {%- if response.assessable is quiz -%}
-        /assess/review/{{ response.assessable.id }}/{{ response.firstSectionId }}/{{ response.id }}
+        {% set argList = {assessmentId: response.assessable.id, firstSectionId: response.firstSectionId, responseId: response.id} %}
+        {{ routeLookup('learningQuiz.getQuizResponseFirstSection', argList) }}
     {%- elseif response.assessable is dueWork -%}
         /submission/inlineGrading/view/{{ response.assessable.id }}/{{ response.submittedOnBehalfOf.id }}
     {%- elseif response.assessable is task -%}
