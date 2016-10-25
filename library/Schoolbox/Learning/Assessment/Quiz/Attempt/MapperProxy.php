@@ -78,23 +78,39 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|Attempt[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|QuizAttempt[]
      */
     protected function transformModels(Collection $mapperModels)
     {
+        /** @var QuizAttempt[] $quizResponses */
         $quizResponses = new GenericCollection(QuizAttempt::class);
 
+        $ids = [];
         foreach ($mapperModels as $studentSubmission){
+            $ids[] = $studentSubmission->getId();
             $response = (new QuizAttempt())
                 ->setId($studentSubmission->getId())
                 ->setSubmittedBy($studentSubmission->getUser())
                 ->setSubmittedOnBehalfOf($studentSubmission->getUser())
                 ->setCreatedAt($studentSubmission->getStart())
                 ->setDeletedAt($studentSubmission->getDeleted())
-                ->setUpdatedAt($studentSubmission->getFinish());
+                ->setUpdatedAt($studentSubmission->getFinish())
+            ;
 
             // TODO populate individual answers
             $quizResponses->add($response);
+        }
+
+        // Populate the marks available and marks given for each attempt
+        $markSets = $this->getMapper()->findSupplementaryInformation($ids);
+        foreach ($quizResponses as $response) {
+            if (isset($markSets[$response->getId()])) {
+                $markSet = $markSets[$response->getId()];
+                $response
+                    ->setMarksGiven($markSet['mark'])
+                    ->setMarksAvailable($markSet['max_mark'])
+                ;
+            }
         }
 
         return $quizResponses;

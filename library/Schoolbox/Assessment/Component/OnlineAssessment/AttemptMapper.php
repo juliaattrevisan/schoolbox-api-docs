@@ -149,6 +149,37 @@ class AttemptMapper extends Mapper
         return '(' . implode(',', $placeholders) . ')';
     }
 
+    /**
+     * Retrieves mark and max_mark for all given attempt IDs.
+     *
+     * TODO consider removing this sum method when mappers for responses and questions exist
+     *
+     * @param array $attemptIds
+     * @return Collection|array[]
+     */
+    public function findSupplementaryInformation($attemptIds)
+    {
+        $result = $this->createCollection();
+        if (empty($attemptIds)) {
+            return $result;
+        }
+        $query = "
+            SELECT
+                aa.attempt_id,
+                SUM(ar.mark)  AS mark,
+                SUM(aq.marks) AS max_mark
+            FROM assess_attempt aa
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+            WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
+            GROUP BY aa.assess_id, aa.attempt_id
+            ORDER BY aa.start DESC
+        ";
+        foreach ($this->getDatabase()->query($query, $this->getArrayParameters($attemptIds)) as $row) {
+            $result[$row['attempt_id']] = $row;
+        }
+        return $result;
+    }
 
     /**
      * Builds list of student's marks for all attempts in the given category.
