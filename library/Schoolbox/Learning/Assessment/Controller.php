@@ -999,7 +999,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
-        if ($assessment->getCloseAt()->lt(Alaress_Date_Format::now())) {
+        if (Alaress_Date_Format::now()->gt($assessment->getCloseAt())) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
 
@@ -1011,14 +1011,21 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
 
-        $folderIds = [];
+        if (!$this->getUser()->isSuperuser()) {
+            $folderIds = [];
 
-        foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
-            $folderIds[] = $currentSubject->getId();
-        }
+            /* Sometimes subjectCollection is null ie. when superuser
+             * [subject_collection:protected] =>
+             */
+            if (count($this->getUser()->getSubjectCollection())) {
+                foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
+                    $folderIds[] = $currentSubject['id'];
+                }
+            }
 
-        if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
         }
 
         /* Pump into twig land
