@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use PDOStatement;
+use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -211,6 +212,7 @@ class Mapper extends BaseMapper
         /** @var Collection|Model[] $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
+        $quizIds           = [];
         $contextProjectIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
@@ -237,6 +239,7 @@ class Mapper extends BaseMapper
             // Quiz?
             if ($row['q.assess_id']) {
                 $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
+                $quizIds[] = $row['q.assess_id'];
             } else {
                 $model->setQuiz(null);
             }
@@ -296,6 +299,10 @@ class Mapper extends BaseMapper
 
         // Due work rubric grids
         $modelList = $this->augmentListWithDueWorkRubrics($modelList, $dueWorkIds);
+
+        // Quiz total marks
+        // TODO replace with actually loading the set of quiz sub-objects, and interrogate that for total mark
+        $modelList = $this->augmentListWithQuizTotalMarks($modelList, $quizIds);
 
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
@@ -373,6 +380,55 @@ class Mapper extends BaseMapper
                 if ($submodel instanceof SubmissionBox) {
                     $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
                     $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
+                }
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with quiz total marks.
+     *
+     * This method will eventually be replaced with a method that retrieves the
+     * quiz's entire section/question tree.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $quizIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithQuizTotalMarks($modelList, $quizIds)
+    {
+        if (!empty($quizIds)) {
+
+            // Retrieve quiz total marks
+            $totalMarks      = [];
+            $totalMarksQuery = "
+                SELECT
+                    q.assess_id as quiz_id,
+                    SUM(qq.marks) as total_mark
+                FROM {$this->getJoinMapper('quiz', 'q')->getTable()} q
+                INNER JOIN assess_section qs ON q.assess_id = qs.assess_id AND qs.deleted_at IS NULL
+                INNER JOIN assess_question qq ON qs.section_id = qq.section_id AND qq.deleted_at IS NULL
+                WHERE q.assess_id IN {$this->getArrayPlaceholders($quizIds, 'id')}
+                GROUP BY q.assess_id
+                ORDER BY q.assess_id ASC
+            ";
+            $statement = $this->getDatabase()->prepare($totalMarksQuery);
+            $statement->execute($this->getArrayParameters($quizIds, 'id'));
+            foreach ($statement as $row) {
+                $totalMarks[$row['quiz_id']] = $row['total_mark'];
+            }
+
+            // Augment list with quiz total marks
+            foreach ($modelList as $model) {
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
+                if ($submodel instanceof OnlineAssessment && !empty($totalMarks[$submodel->getId()])) {
+                    $submodel->setTotalMark($totalMarks[$submodel->getId()]);
                 }
             }
         }
