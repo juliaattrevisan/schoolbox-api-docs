@@ -11,6 +11,7 @@ use External_ClassInterface;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
@@ -172,9 +173,22 @@ class DataSource
                 $assessment->getAllParticipants()->add($responseParticipant);
             }
 
-            // Associate feedbacks to a response somehow
+            // Feedbacks may have a stub response.
+            // If so, use it to find the actual response, and associate them together.
+            $stubResponse = $feedback->getResponse();
+            if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                $stubResponseId = $stubResponse->getId();
+                foreach ($responseParticipant->getAllResponses() as $response) {
+                    // For now assume that the types of response and feedback match
+                    if ($stubResponseId == $response->getId()) {
+                        $stubResponse->getAllFeedback()->add($feedback);
+                        $feedback->setResponse($feedback);
+                        break;
+                    }
+                }
+            }
 
-            $responseParticipant->getAllResponses()->add($feedback);
+            $responseParticipant->getAllFeedbacks()->add($feedback);
         }
 
         // Sort by name after all that
