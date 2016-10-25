@@ -1043,11 +1043,12 @@ class Controller extends Base
         /* Pump into twig land
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
-            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
-            'assessment'  => $assessment,
-            'participant' => $participant,
-            'currentUser' => $this->getUser(),
-            'attachzone'  => $zone->getTwigContext(),
+            'breadcrumbs'    => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
+            'assessment'     => $assessment,
+            'participant'    => $participant,
+            'currentUser'    => $this->getUser(),
+            'attachzone'     => $zone->getTwigContext(),
+            'response'       => $latestResponse,
             'editorContents' => $editorContents,
         ]));
     }
