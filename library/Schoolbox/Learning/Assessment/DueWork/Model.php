@@ -14,6 +14,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Model extends AbstractAssessment
 {
@@ -98,6 +99,37 @@ class Model extends AbstractAssessment
         $this->setType(new DueWorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
+    }
+
+    /**
+     * Work out if we are going to accept responses
+     *
+     * It's not accepting submissions if:
+     *      - If it's not open
+     *      - If the close date has passed
+     *      - If the assessment is set to Accept None
+     *      - If the assessment only accepts single, and a response already exists for this participant
+     *      - You're not a student of this assessment's class (folder)
+     *
+     * @throws \DomainException
+     */
+    public function isAcceptSubmission()
+    {
+        if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
+            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+        }
+
+        if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
+            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+        }
+
+        if ($this->isAcceptNone()) {
+            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+        }
+
+        if ($this->isAcceptSingle() && $this->getResponses()->count()) {
+            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+        }
     }
 
     /**

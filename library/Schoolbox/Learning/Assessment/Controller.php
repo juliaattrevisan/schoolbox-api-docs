@@ -956,6 +956,17 @@ class Controller extends Base
      */
     public function getCreateResponse(DueWork $assessment, User $participant)
     {
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
+        /* Otherwise continue
+         */
         $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
         $latestResponse = null;
         $editorContents = '';
@@ -998,30 +1009,7 @@ class Controller extends Base
         $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
-        /* Work out if we are going to accept responses
-         *
-         * It's not accepting submissions if:
-         *      - If it's not open
-         *      - If the close date has passed
-         *      - If the assessment is set to Accept None
-         *      - If the assessment only accepts single, and a response already exists for this participant
-         *      - You're not a student of this assessment's class (folder)
-         */
-        if ($assessment->getOpenAt()->gt(Alaress_Date_Format::now())) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
-        }
 
-        if (Alaress_Date_Format::now()->gt($assessment->getCloseAt())) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_CLOSED);
-        }
-
-        if ($assessment->isAcceptNone()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
-        }
-
-        if ($assessment->isAcceptSingle() && $assessment->getResponses()->count()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
-        }
 
         if (!$this->getUser()->isSuperuser()) {
             $folderIds = [];
@@ -1057,11 +1045,34 @@ class Controller extends Base
      * Save a Response to a Due Work
      *
      * @api POST /learning/assessment/:assessmentId/:participantId/submit
-     * @param IAssessable $assessment
+     * @param DueWork $assessment
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postCreateResponse(IAssessable $assessment)
+    public function postCreateResponse(DueWork $assessment)
     {
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+        }
+        catch (\DomainException $e) {
+
+            /* When asynchronously saving and suddenly you're not allowed to
+             * ie. when you've run out of time and you left this screen on
+             */
+            if ($this->getRequest()->isXhr()) {
+                $result['success'] = false;
+                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
+                $result['id']      = 72;
+
+                $this->getResponse()->status->setCode(403);
+                $this->getResponse()->content->set($this->buildJsonOutput($result));
+                return;
+            }
+
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
         /* Creator is the currently-logged-in user
          * Participant is the actual owner of the Response
          *
@@ -1071,7 +1082,7 @@ class Controller extends Base
         $creator = $this->getUser();
         $participant = \Schoolbox\UserMapper::getInstance()->findById($this->getRequest()->post['participantId']);
 
-        /* Set in javascript when autmatically saving a draft
+        /* Set in javascript when automatically saving a draft
          * Careful the negation
          */
         $isFinal = !$_POST['saveDraft'];
