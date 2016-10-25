@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
@@ -18,6 +19,7 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 
 /**
  * Sub-translator for due work specific fields.
@@ -43,7 +45,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
-                ->setUseRubric($assessment->hasRubric())
+                ->setUseRubric($assessment->getUsesRubric())
                 ->setMarkedPerRubricGroup($assessment->hasMarkPerCapbility())
                 ->setOwner($assessment->getCreator())
                 ->setMarkType(new DueWorkModel\MarkType())
@@ -112,13 +114,13 @@ class DueWork implements IAssessmentTypeTranslator
 
             // Has Rubric?
             if ($model->getUseRubric()) {
-                $assessable->useRubric();
+                $assessable->setUsesRubric(true);
 
                 if ($model->isMarkedPerRubricGroup()) {
                     $assessable->useMarkPerCapability();
                 }
             } else {
-                $assessable->noRubric();
+                $assessable->setUsesRubric(false);
                 $assessable->noMarkPerCapability();
             }
 
@@ -154,6 +156,10 @@ class DueWork implements IAssessmentTypeTranslator
                 (new DueWorkModel\MarkType())
                     ->setId($model->getMarkType()->getId())
             );
+
+            // Attach a (possibly empty) Rubric
+            $rubricMapper = RubricMapper::getInstance();
+            $assessable->setRubric($rubricMapper->findBySubmissionBox($model));
 
             return $assessable;
         }
