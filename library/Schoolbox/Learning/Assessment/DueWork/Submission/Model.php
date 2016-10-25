@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use \Schoolbox\Collection;
+use Schoolbox\Resource\Storage\IStorage;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
@@ -58,7 +59,7 @@ class Model extends AbstractResponse
      */
 
     /**
-     * @return Collection
+     * @return Collection|IStorage[]
      */
     public function getAllFiles()
     {
@@ -66,7 +67,7 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @param Collection $allFiles
+     * @param Collection|IStorage[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)
