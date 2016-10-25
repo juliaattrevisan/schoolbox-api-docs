@@ -757,29 +757,28 @@ nav {
 }
 
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
-	.#{$selector} {
-		@if str-length($icon) > 0 {
-			@extend .icon-#{$icon};
-		}
-		@extend [class^="icon-"]; // (this is valid)
+	li, .list-item {
 		display: table;
-		padding: 0;
-		text-align: center;
-		cursor: $cursor;
-		&:before {
+		width: calc(100% + 2rem);
+		.#{$selector} {
+			@if str-length($icon) > 0 {
+				@extend .icon-#{$icon};
+			}
+			@extend [class^="icon-"];
+			padding: 0 0.75rem;
+			cursor: $cursor;
 			display: table-cell;
 			vertical-align: middle;
-			padding: 0;
-			color: $color;
-			@media #{$small-only} {
-				line-height: 3;
-			}
-			@media #{$medium-up} {
-				line-height: 4;
+			width: 2rem;
+			&:before {
+				display: table-cell;
+				vertical-align: middle;
+				padding: 0;
+				color: $color;
 			}
 		}
-		&.compact:before{
-			line-height: 2.5;
+		> div:nth-child(2){
+			width: 100%;
 		}
 	}
 }
@@ -793,13 +792,20 @@ nav {
 	&.expandable {
 		@include list-interaction('expander', 'pointer');
 	}
-
+	&.card-selectable {
+		@include list-interaction('selector', 'pointer');
+		li .selector{
+			width: 3rem;
+			label{
+				padding: 0 !important;
+			}
+		}
+	}
     &.sortable, &.sortable-card {
         .ui-sortable-helper {
             border-bottom: none;
             background-color: $row-action-hover-background;
         }
-
 		@include list-interaction('grip', 'move', 'grip');
 	}
 	> li{
