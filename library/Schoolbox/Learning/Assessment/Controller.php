@@ -951,10 +951,10 @@ class Controller extends Base
      * @api   GET /learning/assessment/:assessmentId/:studentId/submit
      * @level 165
      * @param DueWork $assessment With the given student's IResponses or IFeedback attached
-     * @param User $student
+     * @param User $participant
      * @todo implement IAssessable interface
      */
-    public function getCreateResponse(DueWork $assessment, User $student)
+    public function getCreateResponse(DueWork $assessment, User $participant)
     {
 
         // Retrieve the students responses
@@ -965,7 +965,7 @@ class Controller extends Base
             /** @var SubmissionFile $submission */
             $submission = $this->getSubmissionFileMapper()->findOneByColumnList([
                 'draft' => 1,
-                'owner' => $student->getId(),
+                'owner' => $participant->getId(),
                 'box_id' => $assessment->getId()
             ]);
 
@@ -990,8 +990,8 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'assessment'  => $assessment,
-            'responses'   => $assessment->getResponses(),
-            'student'     => $student,
+//            'responses'   => $assessment->getResponses(),
+            'participant' => $participant,
             'user'        => $this->getUser(),
             'attachzone'  => $this->getAttachZone(),
             'submission'  => $submission,

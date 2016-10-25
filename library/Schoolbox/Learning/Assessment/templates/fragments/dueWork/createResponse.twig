@@ -152,137 +152,96 @@
 [ 'Submit Response', '#']
 ) }}
 
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
 <div class="row">
     <div class="small-12 island">
-
         <h1>{{ assessment.title }}</h1>
+        <ul class="meta">
+            <li class="icon-calendar">Due <span class="gradient-{{ urgency.gradientIndex(assessment) }}">{{ assessment.dueAt.short }}</span></li>
+            <li class="icon-due-work">{{ assessment.typeName }}</li>
+        </ul>
 
-        <h2 class="subheader">Description</h2>
-        <section>
-            <div class="content">
-                <p>{{ assessment.description }}</p>
-            </div>
+        <section class="content">
+            {{ assessment.description|purify }}
         </section>
 
-        <h2 class="subheader">Timeline</h2>
+        {#{% if responses | length %}#}
+            {#<h2 class="subheader">Responses</h2>#}
+            {#{% for response in responses %}#}
+                {#{% if response.getAllFiles | length %}#}
+                    {#<section>#}
+                        {#<ul data-dz-previews="" class="az-list">#}
+                            {#{% for file in response.getAllFiles %}#}
+                                {#<li class="dz-success actions-small-1">#}
+                                    {#<div class="list-item">#}
+                                        {#<div class="card small-12">#}
+                                            {#<img class="mime" src="/images/mime/60x60/{{ file.mimeType.getIconFile }}">#}
+                                            {#<p class="filename" data-dz-name="">#}
+                                                {#<a href="/storage/fetch.php?save=1&hash={{ file.hash }}">{{ file.filename }}</a>#}
+                                            {#</p>#}
+                                            {#<p class="meta">#}
+                                                {#{{ file.mimeType.description }}<br>#}
+                                                {#Submitted {{ file.createdAt.getRelativeTime }}#}
+                                            {#</p>#}
+                                        {#</div>#}
+                                    {#</div>#}
+                                    {#<nav>#}
+                                        {#{% if response.allFeedback | length %}#}
+                                            {#<a href="/learning/assessment/feedback/{{ response.id }}" data-dz-remove="" title="View Feedback"#}
+                                               {#class="icon-view"></a>#}
+                                        {#{% endif %}#}
+                                        {#<a href="#" data-dz-remove="" title="Delete Response" class="icon-delete"></a>#}
+                                        {#<input type="hidden" name="attachment[]" value="store:{{ file.hash }}" data-az-attachment="">#}
+                                    {#</nav>#}
+                                {#</li>#}
+                            {#{% endfor %}#}
+                        {#</ul>#}
+                    {#</section>#}
+                {#{% endif %}#}
+            {#{% endfor %}#}
+        {#{% endif %}#}
+
+        {% if acceptSubmission %}
+        <h2 class="subheader">Submit Response</h2>
+
         <div class="row">
-            <div class="small-12 medium-6 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Open Date
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
+            <div class="small-12 columns">
+                <div class="alert-box">
+                    You can attach files and/or edit online for your submission.
+                    Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for
+                    Assessment.
+                </div>
             </div>
-            <div class="small-12 medium-6 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Due Date
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
+        </div>
+        <div class="row">
+            <div class="small-12 island">
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: participant.id}) }}" enctype="multipart/form-data">
+                    <input type="hidden" name="user_id" value="{{ student.id }}"/>
+                    <input type="hidden" name="box_id" value="{{ assessment.id }}"/>
+                    <input type="hidden" name="submission_id" value="{{ submission.id }}"/>
+                    <section class="content">
+                        <textarea id="editor-body" name="body" rows="20">{{ draft }}</textarea>
+                    </section>
+                    <section class="content">
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                    </section>
+                    <input type="submit" value="Submit for Assessment {% if user.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save/>
+                    <div class="toast" data-alert data-save-draft></div>
+                </form>
             </div>
         </div>
 
-        {% if responses | length %}
-
-            <h2 class="subheader">Responses</h2>
-            {% for response in responses %}
-                {% if response.getAllFiles | length %}
-                    <section>
-                        <ul data-dz-previews="" class="az-list">
-                            {% for file in response.getAllFiles %}
-                                <li class="dz-success actions-small-1">
-                                    <div class="list-item">
-                                        <div class="card small-12">
-                                            <img class="mime" src="/images/mime/60x60/{{ file.mimeType.getIconFile }}">
-                                            <p class="filename" data-dz-name="">
-                                                <a href="/storage/fetch.php?save=1&hash={{ file.hash }}">{{ file.filename }}</a>
-                                            </p>
-                                            <p class="meta">
-                                                {{ file.mimeType.description }}<br>
-                                                Submitted {{ file.createdAt.getRelativeTime }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <nav>
-                                        {% if response.allFeedback | length %}
-                                            <a href="/learning/assessment/feedback/{{ response.id }}" data-dz-remove="" title="View Feedback"
-                                               class="icon-view"></a>
-                                        {% endif %}
-                                        <a href="#" data-dz-remove="" title="Delete Response" class="icon-delete"></a>
-                                        <input type="hidden" name="attachment[]" value="store:{{ file.hash }}" data-az-attachment="">
-                                    </nav>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
-            {% endfor %}
-
-        {% endif %}
-
-        {% if acceptSubmission %}
-
-            <h2 class="subheader">Submit Response</h2>
-
-            <div class="row">
-
-                <div class="small-12 columns">
-                    <div class="alert-box">
-                        You can attach files and/or edit online for your submission.
-                        Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for
-                        Assessment.
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12 island">
-                    <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
-                        <input type="hidden" name="user_id" value="{{ student.id }}"/>
-                        <input type="hidden" name="box_id" value="{{ assessment.id }}"/>
-                        <input type="hidden" name="submission_id" value="{{ submission.id }}"/>
-                        <section class="content">
-                            <textarea id="editor-body" name="body" rows="20">{{ draft }}</textarea>
-                        </section>
-                        <section class="content">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                        <input type="submit" value="Submit for Assessment {% if user.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save/>
-                        <div class="toast" data-alert data-save-draft></div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-                <h2 id="empty-dialog-title">Nothing To Submit</h2>
-                <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
-                <a class="button full-width" data-interaction="close">OK</a>
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-            </div>
-
+        <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
+            <h2 id="empty-dialog-title">Nothing To Submit</h2>
+            <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
+            <a class="button full-width" data-interaction="close">OK</a>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
+        {% else %}
+        <div class="alert-box">
+            This assessment isn't accepting online submissions.
+        </div>
         {% endif %}
     </div>
 </div>

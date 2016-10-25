@@ -65,7 +65,7 @@ class Module extends BaseModule
 
                 /* Submit a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{studentId}/submit' => 'getCreateResponse',
+                '/assessment/{assessmentId}/{participantId}/submit' => 'getCreateResponse',
 
 
                 /* Miscellaneous routes
@@ -94,7 +94,7 @@ class Module extends BaseModule
 
                 /* Save a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{studentId}/submit' => 'postCreateResponse'
+                '/assessment/{assessmentId}/{participantId}/submit' => 'postCreateResponse'
             ]
         ];
 
@@ -193,11 +193,11 @@ class Module extends BaseModule
 
                 $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
 
-                if (array_key_exists('studentId', $params)) {
+                if (array_key_exists('participantId', $params)) {
                     try {
-                        $args['student'] = $this->getUserMapper()->findById($params['studentId']);
+                        $args['participant'] = $this->getUserMapper()->findById($params['participantId']);
                     } catch (MapperException $e) {
-                        $args['student'] = $this->getUserMapper()->createModel();
+                        $args['participant'] = $this->getUserMapper()->createModel();
                     }
                 }
                 return $args;
@@ -219,7 +219,7 @@ class Module extends BaseModule
                     throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
                 }
 
-                $student = $this->getUserMapper()->findById($params['studentId']);
+                $student = $this->getUserMapper()->findById($params['participantId']);
 
                 $participant = new Participant($student, $assessment);
                 $assessment->getAllParticipants()->add($participant);
@@ -293,7 +293,7 @@ class Module extends BaseModule
 
                 return [
                     'assessment' => $assessment,
-                    'student' => $student
+                    'participant' => $student
                 ];
             }
         );
