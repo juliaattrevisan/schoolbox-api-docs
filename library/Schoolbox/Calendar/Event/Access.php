@@ -44,13 +44,6 @@ class Access
             }
         }
 
-        /* Check if user is a parent of the owner
-         */
-        $event->getOwner()->loadParents();
-        if ($user->isParentOf($event->getOwner())) {
-            return true;
-        }
-
         /* If the event is on a campus level, check if this user
          * is a calendar moderator for one of the campuses selected
          */
