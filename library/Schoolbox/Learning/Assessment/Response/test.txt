@@ -5,154 +5,119 @@ header('Content-Type: text/html; charset=utf-8');
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
 $kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
-/** @var \Schoolbox\Learning\Assessment\Response\DataSource $responseDataSource */
-$responseDataSource = $kernel->getDependencyInjector()->get('responseDataSource');
-
 /** @var \Schoolbox\Learning\Assessment\Participant\DataSource $participantDataSource */
 $participantDataSource = $kernel->getDependencyInjector()->get('participantDataSource');
-
-/** @var \Schoolbox\Learning\Assessment\Feedback\DataSource $feedbackDataSource */
-$feedbackDataSource = $kernel->getDependencyInjector()->get('feedbackDataSource');
 
 /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
 $assessmentDataSource = $kernel->getDependencyInjector()->get('assessmentDataSource');
 
 
-echo '<h1>Due Work #268</h1>';
-echo '<h2>Participants</h2>';
+/**
+ * Dump the content of an assessment.
+ *
+ * @param \Schoolbox\Learning\Assessment\IAssessable $assessment
+ */
+function dumpAssessment(\Schoolbox\Learning\Assessment\IAssessable $assessment)
+{
+    // Here be HTML output
+    ?>
+    <hr />
+    <h1>
+        Assessment #<?= $assessment->getId() ?>
+        (<a href="/homepage/<?= $assessment->getContext()->getFolder()->getId() ?>"><?= $assessment->getTypeName() ?>: <?= $assessment->getTitle() ?></a>)
+    </h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Participant</th>
+            <th>Responses</th>
+            <th>Feedback</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($assessment->getAllParticipants() as $participant): ?>
+            <tr>
+                <td><?= $participant->getUser()->formatName() ?></td>
+                <td>
+                    <?php
+                    foreach ($participant->getAllResponses() as $response) {
+                        $responseDump = [
+                            'class'   => get_class($response),
+                            'generic' => [
+                                'id'          => $response->getId(),
+                                'submittedBy' => $response->getSubmittedBy()->formatName(),
+                                'createdAt'   => $response->getCreatedAt()->getDatabase(),
+                                'feedbackIds' => $response->getAllFeedback()
+                                                          ->map(function ($v) { return $v->getId(); })
+                                                          ->getAll(),
+                            ]
+                        ];
+                        if ($response instanceof Schoolbox\Learning\Assessment\DueWork\Submission\Model) {
+                            $responseDump['specific'] = [
+                                'files' => $response->getAllFiles()
+                                                    ->map(function($b) {return $b->getHash();})
+                                                    ->getAll(),
+                            ];
+                        }
+                        if ($response instanceof Schoolbox\Learning\Assessment\Quiz\Attempt\Model) {
+                            $responseDump['specific'] = [
+                                'marksGiven'     => $response->getMarksGiven(),
+                                'marksAvailable' => $response->getMarksAvailable(),
+                                'firstSectionId' => $response->getFirstSectionId(),
+                            ];
+                        }
+                        var_dump($responseDump);
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    foreach ($participant->getAllFeedbacks() as $feedback) {
+                        /** @var Schoolbox\Learning\Assessment\Quiz\Feedback\Model $feedback */
+                        $feedbackDump = [
+                            'class'   => get_class($feedback),
+                            'generic' => [
+                                'id'           => $feedback->getId(),
+                                'reviewee'     => $feedback->getReviewee()->formatName(),
+                                'reviewer'     => $feedback->getReviewer()->formatName(),
+                                'createdAt'    => $feedback->getCreatedAt()->getDatabase(),
+                                'normMark'     => $feedback->getNormalisedMark(),
+                                'readableMark' => $feedback->getHumanReadableMark(),
+                                'responseId'   => ($feedback->getResponse() instanceof \Schoolbox\Learning\Assessment\IResponse
+                                    ? $feedback->getResponse()->getId()
+                                    : null
+                                ),
+                            ]
+                        ];
+                        if ($feedback instanceof Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+                            $feedbackDump['specific'] = [
+                                'comment' => $feedback->getComment(),
+                            ];
+                        }
+                        var_dump($feedbackDump);
+                    }
+                    ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php
+    // Here end HTML output
+}
+
+
 $dueWork = $assessmentDataSource->findById(268);
 $dueWork->setAllParticipants($participantDataSource->findForAssessment($dueWork));
-foreach ($dueWork->getAllParticipants() as $participant) {
-    var_dump($participant->getUser()->formatName());
-
-    echo '<h3>Responses</h3>';
-    foreach ($participant->getAllResponses() as $response) {
-        /** @var Schoolbox\Learning\Assessment\DueWork\Submission\Model $response */
-        var_dump([
-            get_class($response),
-            $response->getId(),
-            $response->getSubmittedBy()->formatName(),
-            $response->getCreatedAt()->getDatabase(),
-            $response->getAllFiles()->map(function($b) {return $b->getHash();}),
-        ]);
-
-        echo '<h4>Targeted By Feedback</h4>';
-        var_dump($response->getAllFeedback()->map(function($v) {return $v->getId();})->getAll());
-    }
-
-    echo '<h3>Feedback</h3>';
-    foreach ($participant->getAllFeedbacks() as $feedback) {
-        /** @var Schoolbox\Learning\Assessment\DueWork\Feedback\Model $feedback */
-        var_dump([
-            get_class($feedback),
-            $feedback->getId(),
-            $feedback->getReviewee()->formatName(),
-            $feedback->getReviewer()->formatName(),
-            $feedback->getCreatedAt()->getDatabase(),
-            $feedback->getNormalisedMark(),
-            $feedback->getHumanReadableMark(),
-            $feedback->getComment(),
-        ]);
-
-        echo '<h4>Targeted To Response</h4>';
-        var_dump(
-            ($feedback->getResponse() instanceof \Schoolbox\Learning\Assessment\IResponse
-                ? $feedback->getResponse()->getId()
-                : null
-            )
-        );
-    }
-}
+dumpAssessment($dueWork);
 
 
-echo '<h1>Task #206</h1>';
-echo '<h2>Participants</h2>';
 $task = $assessmentDataSource->findById(206);
 $task->setAllParticipants($participantDataSource->findForAssessment($task));
-foreach ($task->getAllParticipants() as $participant) {
-    var_dump($participant->getUser()->formatName());
-
-    echo '<h3>Responses</h3>';
-    foreach ($participant->getAllResponses() as $response) {
-        /** @var Schoolbox\Learning\Assessment\Task\Completion\Model $response */
-        var_dump([
-            get_class($response),
-            $response->getId(),
-            $response->getSubmittedBy()->formatName(),
-            $response->getCreatedAt()->getDatabase(),
-        ]);
-
-        echo '<h4>Targeted By Feedback</h4>';
-        var_dump($response->getAllFeedback()->map(function($v) {return $v->getId();})->getAll());
-    }
-
-    echo '<h3>Feedback</h3>';
-    foreach ($participant->getAllFeedbacks() as $feedback) {
-        /** @var Schoolbox\Learning\Assessment\Task\Feedback\Model $feedback */
-        var_dump([
-            get_class($feedback),
-            $feedback->getId(),
-            $feedback->getReviewee()->formatName(),
-            $feedback->getReviewer()->formatName(),
-            $feedback->getCreatedAt()->getDatabase(),
-            $feedback->getNormalisedMark(),
-            $feedback->getHumanReadableMark(),
-        ]);
-
-        echo '<h4>Targeted To Response</h4>';
-        var_dump(
-            ($feedback->getResponse() instanceof \Schoolbox\Learning\Assessment\IResponse
-                ? $feedback->getResponse()->getId()
-                : null
-            )
-        );
-    }
-}
+dumpAssessment($task);
 
 
-echo '<h1>Quiz #277</h1>';
-echo '<h2>Participants</h2>';
 $quiz = $assessmentDataSource->findById(277);
 $quiz->setAllParticipants($participantDataSource->findForAssessment($quiz));
-foreach ($quiz->getAllParticipants() as $participant) {
-    var_dump($participant->getUser()->formatName());
-
-    echo '<h3>Responses</h3>';
-    foreach ($participant->getAllResponses() as $response) {
-        /** @var Schoolbox\Learning\Assessment\Quiz\Attempt\Model $response */
-        var_dump([
-            get_class($response),
-            $response->getId(),
-            $response->getSubmittedBy()->formatName(),
-            $response->getCreatedAt()->getDatabase(),
-            $response->getMarksGiven(),
-            $response->getMarksAvailable(),
-            $response->getFirstSectionId(),
-        ]);
-
-        echo '<h4>Targeted By Feedback</h4>';
-        var_dump($response->getAllFeedback()->map(function($v) {return $v->getId();})->getAll());
-    }
-
-    echo '<h3>Feedback</h3>';
-    foreach ($participant->getAllFeedbacks() as $feedback) {
-        /** @var Schoolbox\Learning\Assessment\Quiz\Feedback\Model $feedback */
-        var_dump([
-            get_class($feedback),
-            $feedback->getId(),
-            $feedback->getReviewee()->formatName(),
-            $feedback->getReviewer()->formatName(),
-            $feedback->getCreatedAt()->getDatabase(),
-//            $feedback->getNormalisedMark(),
-//            $feedback->getHumanReadableMark(),
-        ]);
-
-        echo '<h4>Targeted To Response</h4>';
-        var_dump(
-            ($feedback->getResponse() instanceof \Schoolbox\Learning\Assessment\IResponse
-                ? $feedback->getResponse()->getId()
-                : null
-            )
-        );
-    }
-}
+dumpAssessment($quiz);
