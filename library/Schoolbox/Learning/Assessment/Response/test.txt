@@ -21,7 +21,6 @@ function dumpAssessment(\Schoolbox\Learning\Assessment\IAssessable $assessment)
 {
     // Here be HTML output
     ?>
-    <hr />
     <h1>
         Assessment #<?= $assessment->getId() ?>
         (<a href="/homepage/<?= $assessment->getContext()->getFolder()->getId() ?>"><?= $assessment->getTypeName() ?>: <?= $assessment->getTitle() ?></a>)
@@ -106,7 +105,27 @@ function dumpAssessment(\Schoolbox\Learning\Assessment\IAssessable $assessment)
     <?php
     // Here end HTML output
 }
-
+?>
+<style type="text/css">
+    table {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    table tr {
+        vertical-align: top;
+    }
+    table th {
+        background-color: #e8f3e8;
+        border-bottom: 1px solid black;
+        padding: 0.5rem;
+    }
+    table td {
+        border-bottom: 1px solid black;
+        padding: 0.5rem;
+    }
+</style>
+<?php
 
 $dueWork = $assessmentDataSource->findById(268);
 $dueWork->setAllParticipants($participantDataSource->findForAssessment($dueWork));
