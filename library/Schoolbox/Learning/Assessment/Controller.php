@@ -1097,7 +1097,7 @@ class Controller extends Base
 
             /** @var DueWorkSubmission $response */
             $response = $this->getSubmissionFileMapper()->findById($this->getRequest()->post['responseId']);
-            $response->setUpdatedAt(Alaress_Date_Format::now());
+//            $response->setUpdatedAt(Alaress_Date_Format::now());
         }
         /* Create a new response
          */

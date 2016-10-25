@@ -70,9 +70,11 @@
                         css: 'success'
                     });
                 },
-                error: function () {
+                error: function (response) {
+                    var temp = $.parseJSON(response.responseText);
+
                     formSaveLabel.toastTimeout({
-                        text: 'Error!',
+                        text: 'Error: ' + temp.message,
                         css: 'alert'
                     });
                 },
