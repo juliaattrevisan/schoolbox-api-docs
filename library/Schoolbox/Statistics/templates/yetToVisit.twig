@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
+{# Breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Statistics', '/statistics/homepage/' ~ folder.id ],
+    [ 'Yet To Visit' ]
+) }}
+
+{# Page Title & Actions  #}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Yet To Visit</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" data-reveal-id="statistics-date-range" class="icon-calendar" title="Change Date Range"></a>
+    </nav>
+</div>
+
+{# Yet To Visitors #}
+<div class="row">
+    <div class="small-12 island">
+        <table data-sortable>
+            <thead>
+                <th>Name</th>
+                <th>Role</th>
+            </thead>
+            <tbody>
+                {% for yetToVisitor in yetToVisitors %}
+                    <tr>
+                        <td>{{ yetToVisitor.user.fullName }}</td>
+                        <td>{{ yetToVisitor.user.role.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Filter Modal #}
+{% include '@statistics/fragment/filterModal.twig' %}

@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false,
+            order: [[ 2, "desc" ]]
+        });
+    });
+</script>
+
+{# Breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Statistics', '/statistics/homepage/' ~ folder.id ],
+    [ 'Top Files' ]
+) }}
+
+{# Page Title & Actions  #}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Top Files</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" data-reveal-id="statistics-date-range" class="icon-calendar" title="Change Date Range"></a>
+    </nav>
+</div>
+
+{# Top Files #}
+<div class="row">
+    <div class="small-12 island">
+        <table data-sortable>
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>File Added</th>
+                    <th>Downloads</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for topFile in topFiles %}
+                    <tr>
+                        <td>{{ topFile.info.title }}</td>
+                        <td>{{ topFile.info.createdAt.short }}</td>
+                        <td>{{ topFile.accessCount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Filter Modal #}
+{% include '@statistics/fragment/filterModal.twig' %}
