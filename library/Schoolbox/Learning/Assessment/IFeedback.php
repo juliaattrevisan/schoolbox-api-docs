@@ -89,6 +89,23 @@ interface IFeedback
     public function setComment($comment);
 
     /**
+     * Get the person for whom this IFeedback was created
+     *
+     * Typically a student
+     *
+     * @return User
+     */
+    public function getReviewee();
+
+    /**
+     * Set the person for whom this IFeedback was created
+     *
+     * @param User $reviewee
+     * @return $this
+     */
+    public function setReviewee($reviewee);
+
+    /**
      * Get the person who created this IFeedback
      *
      * Typically a teacher
