@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
@@ -105,8 +105,8 @@ class DataSource
         $participants = new Collection();
 
         $context = $assessment->getContext();
-        if ($context instanceof UnitImplementation) {
-            // Unit implementations have no participants
+        if ($context instanceof UnitSpecification) {
+            // Unit specifications have no participants
             return $participants;
         }
 
