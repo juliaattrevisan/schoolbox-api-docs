@@ -1077,13 +1077,16 @@ class Controller extends Base
         $isFinal = !$_POST['saveDraft'];
         $body = $_POST['body'];
 
-        /* TODO: Do the actual saving
-         */
-
         /* Load an existing response to update
          */
         if ($this->getRequest()->post['responseId']) {
-            $response = new DueWorkSubmission();
+
+            /* TODO: Implement with Mr Sannang's data sources
+             */
+
+            /** @var DueWorkSubmission $response */
+            $response = $this->getSubmissionFileMapper()->findById($this->getRequest()->post['responseId']);
+            $response->setUpdatedAt(Alaress_Date_Format::now());
         }
         /* Create a new response
          */
@@ -1105,6 +1108,9 @@ class Controller extends Base
             $response->setSubmittedAt(Alaress_Date_Format::now());
         }
 
+        /* TODO: Do the actual saving
+         */
+
         /* Saving drafts from the wizzywig
          */
         if ($this->getRequest()->isXhr()) {
@@ -1115,9 +1121,8 @@ class Controller extends Base
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
         }
-        /* Save the actual submission
-         */
         else {
+            // redirect after saving to Due Work Summary For Particular Student
         }
     }
 
