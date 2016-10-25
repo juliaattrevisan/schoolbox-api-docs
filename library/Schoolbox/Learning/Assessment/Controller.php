@@ -11,7 +11,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper as RubricResultMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
@@ -38,7 +38,6 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
@@ -274,17 +273,17 @@ class Controller extends Base
     /**
      * Common logic when generating Rubrics
      *
-     * @param Folder $folder
+     * @param DueWork $dueWork
      * @return array
      */
-    private function generateRubricTwigData(Folder $folder)
+    private function generateRubricTwigData(DueWork $dueWork)
     {
         $data = [];
-        $rubricMapper = RubricMapper::getInstance();
-        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
-        // Collect all the criteria for the folder the DueWork is about to be created in
-        $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
-        $data['rubric'] = $grid->toContext();
+//        $rubricMapper = RubricMapper::getInstance();
+//        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
+//        // Collect all the Indicators for the folder the DueWork is about to be created in
+//        $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
+        $data['rubric'] = $dueWork->getRubric()->toContext();
 
         $rubricZone = new Zone('rubric');
         // JS file.type isn't set reliably enough to use text/csv mime filter
@@ -292,7 +291,7 @@ class Controller extends Base
         $data['rubricAttachZone'] = $rubricZone->getTwigContext();
 
         /** @var RubricResult[] $resultSets */
-        $resultSets = ResultMapper::getInstance()->findAll();
+        $resultSets = RubricResultMapper::getInstance()->findAll();
         $rs = new Collection();
         foreach ($resultSets as $result) {
             if (!$rs[$result->getResultSetId()] instanceof Collection) {
@@ -301,6 +300,36 @@ class Controller extends Base
             $rs[$result->getResultSetId()][$result->getValue()] = $result;
         }
         $data['rubricResultSets'] = $rs;
+
+        /* A DueWork's Rubric Indicators are saved against a folder.
+         * Which folder depends on the DueWork's Context
+         * * Class               => Class folder
+         * * UnitImpl            => UnitSpec folder
+         * * UnitSpec            => UnitSpec folder
+         * * Project in Class    => Class folder
+         * * Project in UnitImpl => UnitSpec folder
+         * * Project in UnitSpec => UnitSpec folder
+         */
+        $context = $dueWork->getContext();
+        if($context instanceof Folder){
+            $data['rubricIndicatorFolderId'] = $context->getId();
+        } elseif($context instanceof UnitSpecification){
+            $data['rubricIndicatorFolderId'] = $context->getFolder()->getId();
+        } elseif($context instanceof UnitImplementation){
+            $data['rubricIndicatorFolderId'] = $context->getSpecification()->getFolder()->getId();
+        } elseif($context instanceof Project){
+            $projectContext = $context->getContext();
+            if($projectContext instanceof Folder){
+                $data['rubricIndicatorFolderId'] = $projectContext->getId();
+            } elseif($projectContext instanceof UnitSpecification){
+                $data['rubricIndicatorFolderId'] = $projectContext->getFolder()->getId();
+            } elseif($projectContext instanceof UnitImplementation){
+                $data['rubricIndicatorFolderId'] = $projectContext->getSpecification()->getFolder()->getId();
+            }
+        }
+        if(!isset($data['rubricIndicatorFolderId'])){
+            throw new \LogicException("Unable to determine DueWork's Rubric Indicator Folder");
+        }
 
         return $data;
     }
