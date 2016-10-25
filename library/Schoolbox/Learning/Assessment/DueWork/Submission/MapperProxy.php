@@ -80,13 +80,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|StudentSubmission[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|DueWorkSubmission[]
      */
     protected function transformModels(Collection $mapperModels)
     {
         $dueWorkResponses = new GenericCollection(DueWorkSubmission::class);
 
-        foreach($mapperModels as $studentSubmission){
+        foreach ($mapperModels as $studentSubmission) {
             $response = (new DueWorkSubmission())
                 ->setId($studentSubmission->getId())
                 ->setSubmittedBy($studentSubmission->getOwner())
@@ -94,9 +94,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
                 ->setUpdatedAt($studentSubmission->getCreatedAt());
-            if($hash = $studentSubmission->getHash()){
-                $response->getAllFiles()->add(StorageMapper::getInstance()->findByHash($hash));
-            }
+
+            // TODO update the mapper at some point to enable multiple upload support
+            $response->getAllFiles()->add($studentSubmission->getStorage());
             $dueWorkResponses->add($response);
         }
 
