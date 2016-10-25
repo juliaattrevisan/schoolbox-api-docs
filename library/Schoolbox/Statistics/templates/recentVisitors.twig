@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false,
+            order: [[ 2, "desc" ]]
+        });
+    });
+</script>
+
+{# Breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Statistics', '/statistics/homepage/' ~ folder.id ],
+    [ 'Recent Visitors' ]
+) }}
+
+{# Page Title & Actions  #}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Recent Visitors</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" data-reveal-id="statistics-date-range" class="icon-calendar" title="Change Date Range"></a>
+    </nav>
+</div>
+
+{# Recent Visitors #}
+<div class="row">
+    <div class="small-12 island">
+        <table data-sortable>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Last Visited</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for recentVisitor in recentVisitors %}
+                    <tr>
+                        <td>{{ recentVisitor.user.fullName }}</td>
+                        <td>{{ recentVisitor.user.role.name }}</td>
+                        <td>{{ recentVisitor.lastAccessTime.short }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Filter Modal #}
+{% include '@statistics/fragment/filterModal.twig' %}

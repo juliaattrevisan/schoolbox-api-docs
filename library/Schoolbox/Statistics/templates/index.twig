@@ -1,0 +1,282 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#page-visit-graph').highcharts({
+            title: {
+                text: ''
+            },
+            colors: {{ graphColours|json_encode|raw }},
+            xAxis: {
+                min: {{ graphXMin }},
+                max: {{ graphXMax }},
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Visits'
+                },
+                allowDecimals: false,
+                min: 0
+            },
+            series: {{ graphData|json_encode|raw }},
+            credits: {
+                enabled: false
+            }
+        });
+    });
+</script>
+
+
+{# Breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Statistics' ]
+) }}
+
+{# Page Title & Actions  #}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ folder.name }}</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" data-reveal-id="statistics-date-range" class="icon-calendar" title="Change Date Range"></a>
+    </nav>
+</div
+
+{# Page Visits #}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Page Visits</h2>
+        <section class="content">
+            <div id="page-visit-graph"></div>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-6 columns">
+        <div class="row">
+
+            {# Top Visitors #}
+            <div class="small-12 island">
+                <h2 class="subheader">Top Visitors</h2>
+
+                {% if topVisitors is not empty %}
+                    <section>
+                        <ul class="information-list">
+                            {% for topVisitor in topVisitors %}
+                                <li class="row">
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/{{ topVisitor.user.id }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ topVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
+                                            <p>{{ topVisitor.user.fullName }}</p>
+                                        </a>
+                                        <span class="meta tally">{{ topVisitor.hitcount }}</span>
+                                        <p class="meta">{{ topVisitor.user.role.name }}</p>
+                                    </div>
+
+                                    <div class="progress">
+                                        <span class="meter" title='{{ topVisitor.hitcount }} visits' style="width: {{ (topVisitor.hitcount / topVisitorInfo.hitcount) * 100 }}%"></span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if topVisitorsMore %}
+                            <div class="component-action">
+                                <section>
+                                    <a href="/statistics/homepage/{{ folder.id }}/topVisitors/{{ startDate }}/{{ endDate }}{{ (roleFilter != '') ? '/'~roleFilter : '' }}" class="button">View all</a>
+                                </section>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                {% else %}
+                    <div class="empty-state">
+                        <p>No visitors in this time period.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Top Files #}
+            <div class="small-12 island">
+
+                <h2 class="subheader">Top Files</h2>
+
+                {% if topFiles is not empty %}
+                    <section>
+                        <ul class="information-list">
+                            {% for topFile in topFiles %}
+                                <li class="row">
+                                    <div class="avatar card small-12">
+                                        <a href="/send.php?id={FILE_ID}" title="{{ topFile.info.title }}">
+                                            <img src="/images/mime/60x60/{{ topFile.iconFile }}" alt="{{ topFile.info.title }}" class="content" />
+
+                                            <p>{{ topFile.info.title }}</p>
+                                        </a>
+
+                                        <span class="meta tally">{{ topFile.accessCount }}</span>
+                                        <p class="meta">{{ topFile.info.createdAt.long }}</p>
+                                    </div>
+
+                                    <div class="progress">
+                                        <span class="meter" title="{{ topFile.accessCount }} hits" style="width: {{ (topFile.accessCount / topFileInfo.accessCount) * 100 }}%"></span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if topFilesMore %}
+                            <div class="component-action">
+                                <section>
+                                    <a href="/statistics/homepage/{{ folder.id }}/topFiles/{{ startDate }}/{{ endDate }}{{ (roleFilter != '') ? '/'~roleFilter : '' }}" class="button">View all</a>
+                                </section>
+                            </div>
+                        {% endif %}
+                    </section>
+
+
+
+                {% else %}
+                    <div class="empty-state">
+                        <p>No files viewed.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+    <div class="small-12 large-6 columns">
+        <div class="row">
+
+            {# Recent Visitors #}
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Visitors</h2>
+
+                {% if recentVisitors is not empty %}
+
+                    <section>
+                        <ul class="grid small-block-grid-1 medium-block-grid-2">
+                            {% for recentVisitor in recentVisitors %}
+                                <li>
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/{{ recentVisitor.user.id }}" title="{VISITOR_TOOLTIP}">
+                                            <img src="/portrait.php?userId={{ recentVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
+
+                                            <p>{{ recentVisitor.user.fullName }}</p>
+                                        </a>
+                                        <p class="meta">{{ recentVisitor.user.role.name }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if recentVisitorsMore %}
+                            <div class="component-action">
+                                <section>
+                                    <a href="/statistics/homepage/{{ folder.id }}/recentVisitors/{{ startDate }}/{{ endDate }}{{ (roleFilter != '') ? '/'~roleFilter : '' }}" class="button">View all</a>
+                                </section>
+                            </div>
+                        {% endif %}
+
+                    </section>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No recent visitors in this time period.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {# Yet To Visit #}
+            <div class="small-12 island">
+
+                <h2 class="subheader">Yet to Visit</h2>
+
+                {% if yetToVisit is not empty %}
+                    <section>
+                        <ul class="grid small-block-grid-1 medium-block-grid-2">
+                            {% for yetToVisitor in yetToVisit %}
+                                <li>
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/{{ yetToVisitor.user.id }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ yetToVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
+
+                                            <p>{{ yetToVisitor.user.fullName }}</p>
+                                        </a>
+                                        <p class="meta">{{ yetToVisitor.user.role.name }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if yetToVisitMore %}
+                            <div class="component-action">
+                                <section>
+                                    <a href="/statistics/homepage/{{ folder.id }}/yetToVisit/{{ startDate }}/{{ endDate }}{{ (roleFilter != '') ? '/'~roleFilter : '' }}" class="button">View all</a>
+                                </section>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                {% else %}
+                    <div class="empty-state">
+                        <p>All members have visited in this time period.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {# Top Links #}
+            <div class="small-12 island">
+
+                <h2 class="subheader">Top Links</h2>
+
+                {% if topLinks is not empty %}
+                    <section>
+                        <ul class="information-list">
+                            {% for topLink in topLinks %}
+                                <li class="row">
+                                    <div class="avatar card small-12">
+                                        <a href="/redir.php?id={{ topLink.info.id }}" title="{{ topLink.info.url }}">
+                                            <img src="/images/icons/60x60/link.png" alt="{{ topLink.info.url }}" class="content" />
+                                            <p>{{ topLink.info.url }}</p>
+                                        </a>
+                                        <span class="meta tally">{{ topLink.accessCount }}</span>
+                                    </div>
+
+                                    <div class="progress">
+                                        <span class="meter" title="{{ topLink.accessCount }} hits" style="width: {{ (topLink.accessCount / topLinkInfo.accessCount) * 100 }}%"></span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if topLinksMore %}
+                            <div class="component-action">
+                                <section>
+                                    <a href="/statistics/homepage/{{ folder.id }}/topLinks/{{ startDate }}/{{ endDate }}{{ (roleFilter != '') ? '/'~roleFilter : '' }}" class="button">View all</a>
+                                </section>
+                            </div>
+                        {% endif %}
+
+                    </section>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No links viewed.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{# Modal #}
+{% include '@statistics/fragment/filterModal.twig' %}
