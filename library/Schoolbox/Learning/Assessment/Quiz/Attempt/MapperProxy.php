@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
 use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
@@ -19,6 +20,8 @@ use Schoolbox\Mapper;
  *
  * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
+ *
+ * @method AttemptMapper getMapper()
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {
@@ -36,6 +39,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * @var string
      */
     private $internalQuery = 'SELECT assess_id FROM assess';
+
+    /**
+     * This only works with the Quiz Attempt mapper
+     *
+     * @param AttemptMapper $mapper
+     */
+    public function __construct(AttemptMapper $mapper)
+    {
+        parent::__construct($mapper);
+    }
 
     /**
      * @return string

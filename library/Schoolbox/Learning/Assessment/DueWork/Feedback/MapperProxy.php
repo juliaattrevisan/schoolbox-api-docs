@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -20,6 +21,8 @@ use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
  *
  * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
+ *
+ * @method SubmissionReturnMapper getMapper()
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {
@@ -37,6 +40,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * @var string
      */
     private $internalQuery = 'SELECT id FROM submission_box';
+
+    /**
+     * This only works with the Due Work Return mapper
+     *
+     * @param SubmissionReturnMapper $mapper
+     */
+    public function __construct(SubmissionReturnMapper $mapper)
+    {
+        parent::__construct($mapper);
+    }
 
     /**
      * @return string

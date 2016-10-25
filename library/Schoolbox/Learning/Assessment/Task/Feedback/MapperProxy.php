@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Task\Feedback;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Mapper;
 
@@ -20,6 +21,8 @@ use Schoolbox\Mapper;
  *
  * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
+ *
+ * @method CompletionMapper getMapper()
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {
@@ -37,6 +40,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * @var string
      */
     private $internalQuery = 'SELECT id FROM task';
+
+    /**
+     * This only works with the Task Completion mapper
+     *
+     * @param CompletionMapper $mapper
+     */
+    public function __construct(CompletionMapper $mapper)
+    {
+        parent::__construct($mapper);
+    }
 
     /**
      * @return string

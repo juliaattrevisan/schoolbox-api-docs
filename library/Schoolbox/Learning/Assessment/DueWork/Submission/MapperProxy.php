@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -21,6 +22,8 @@ use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
  *
  * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
+ *
+ * @method StudentSubmissionMapper getMapper()
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {
@@ -38,6 +41,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * @var string
      */
     private $internalQuery = 'SELECT id FROM submission_box';
+
+    /**
+     * This only works with the Due Work Submission mapper
+     *
+     * @param StudentSubmissionMapper $mapper
+     */
+    public function __construct(StudentSubmissionMapper $mapper)
+    {
+        parent::__construct($mapper);
+    }
 
     /**
      * @return string
