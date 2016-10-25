@@ -773,7 +773,6 @@ class Controller extends Base
      * @level 165
      * @param DueWork $assessment With the given student's IResponses or IFeedback attached
      * @param User $participant
-     * @todo implement IAssessable interface
      */
     public function getCreateResponse(DueWork $assessment, User $participant)
     {
