@@ -58,12 +58,11 @@
 
             $.ajax({
                 type: "POST",
-                url: '/submission/submitOnlineForm.php',
+                url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, participantId: participant.id}) }}',
                 data: formContents,
                 complete: function () {
                     // Re-init the autosave
                     initAutosave();
-
                 },
                 success: function () {
                     formSaveLabel.toastTimeout({
@@ -206,7 +205,7 @@
         </div>
         <div class="row">
             <div class="small-12 island">
-                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: participant.id}) }}" enctype="multipart/form-data">
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, participantId: participant.id}) }}" enctype="multipart/form-data">
                     <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>

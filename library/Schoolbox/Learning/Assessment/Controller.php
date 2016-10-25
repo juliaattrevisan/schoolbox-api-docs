@@ -948,7 +948,7 @@ class Controller extends Base
     /**
      * Displays a form enabling a student to create responses to an assessment
      *
-     * @api   GET /learning/assessment/:assessmentId/:studentId/submit
+     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
      * @param DueWork $assessment With the given student's IResponses or IFeedback attached
      * @param User $participant
@@ -963,6 +963,8 @@ class Controller extends Base
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
+         *
+         * TODO: Replace SubmissionFileMapper() usage
          */
 
         /** @var SubmissionFile $submission */
@@ -991,6 +993,8 @@ class Controller extends Base
             }
         }
 
+        /* Attach files if any exist
+         */
         $zoneFactory = new ZoneFactory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
@@ -1051,10 +1055,27 @@ class Controller extends Base
     /**
      * Save a Response to a Due Work
      *
-     * @api POST /learning/assessment/:assessmentId/:studentId/submit
+     * @api POST /learning/assessment/:assessmentId/:participantId/submit
      */
     public function postCreateResponse()
     {
+        /* Saving drafts from the wizzywig
+         */
+        if ($this->getRequest()->isXhr()) {
+
+            /* TODO: Do the actual saving
+             */
+            $result['success'] = true;
+            $result['message'] = 'OK';
+            $result['id']      = 72;
+
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+        }
+        /* Save the actual submission
+         */
+        else {
+        }
 
     }
 
