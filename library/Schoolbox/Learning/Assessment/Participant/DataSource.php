@@ -9,13 +9,13 @@ namespace Schoolbox\Learning\Assessment\Participant;
 
 use External_ClassInterface;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
@@ -45,20 +45,40 @@ class DataSource
     protected $userMapper;
 
     /**
+     * Data source for assessment responses
+     *
+     * @var ResponseDataSource
+     */
+    protected $responseDataSource;
+
+    /**
+     * Data source for assessment feedback
+     *
+     * @var FeedbackDataSource
+     */
+    protected $feedbackDataSource;
+
+    /**
      * Constructor
      *
      * @param External_ClassInterface $externalDb
      * @param UserAccessMapper        $userAccessMapper
      * @param UserMapper              $userMapper
+     * @param ResponseDataSource      $responseDataSource
+     * @param FeedbackDataSource      $feedbackDataSource
      */
     public function __construct(
         External_ClassInterface $externalDb,
         UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        ResponseDataSource $responseDataSource,
+        FeedbackDataSource $feedbackDataSource
     ) {
-        $this->externalDb       = $externalDb;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper       = $userMapper;
+        $this->externalDb         = $externalDb;
+        $this->userAccessMapper   = $userAccessMapper;
+        $this->userMapper         = $userMapper;
+        $this->responseDataSource = $responseDataSource;
+        $this->feedbackDataSource = $feedbackDataSource;
     }
 
     /**
