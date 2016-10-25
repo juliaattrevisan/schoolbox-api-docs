@@ -675,6 +675,37 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+        // Register feedback data source
+        $di->set(
+            'feedbackDataSource',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    return (new \Schoolbox\Learning\Assessment\Feedback\DataSource())
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork(
+                                new \Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\Task(
+                                new \Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Course\Task\CompletionMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz(
+                                new \Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class)
+                                )
+                            )
+                        );
+                }
+            )
+        );
+
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
