@@ -17,8 +17,7 @@ Usage:
         <legend>Available Result Sets</legend>
         <div class="small-12 columns no-pad">
             {% for resultSetId, resultSet in resultSets %}
-                {# TODO - still need to port PhpLib 'RS_CHECKED' behaviour #}
-                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}" {{ RS_CHECKED }} />
+                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
                 <label for="rs-{{ resultSetId }}" class="radio-label">
                     {%- for result in resultSet -%}
                         {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
