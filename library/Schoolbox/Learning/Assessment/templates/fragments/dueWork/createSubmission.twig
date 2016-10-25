@@ -58,7 +58,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, participantId: participant.id}) }}',
+                url: '{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, participantId: participant.id}) }}',
                 data: formContents,
                 complete: function () {
                     // Re-init the autosave
@@ -207,7 +207,7 @@
         </div>
         <div class="row">
             <div class="small-12 island">
-                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, participantId: participant.id}) }}" enctype="multipart/form-data">
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, participantId: participant.id}) }}" enctype="multipart/form-data">
                     <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
                     <input type="hidden" name="participantId" value="{{ participant.id }}" />
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>

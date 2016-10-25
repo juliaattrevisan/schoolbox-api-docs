@@ -767,14 +767,14 @@ class Controller extends Base
     }
 
     /**
-     * Displays a form enabling a student to create responses to an assessment
+     * Displays a form enabling a student to create Submission for a Due Work
      *
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
      * @param DueWork $assessment With the given student's IResponses or IFeedback attached
      * @param User $participant
      */
-    public function getCreateResponse(DueWork $assessment, User $participant)
+    public function getCreateSubmission(DueWork $assessment, User $participant)
     {
         /* Work out if we are going to accept responses
          */
@@ -848,7 +848,7 @@ class Controller extends Base
 
         /* Pump into twig land
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
             'breadcrumbs'    => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'participant'    => $participant,
@@ -860,13 +860,13 @@ class Controller extends Base
     }
 
     /**
-     * Save a Response to a Due Work
+     * Save a Submission to a Due Work
      *
      * @api POST /learning/assessment/:assessmentId/:participantId/submit
      * @param DueWork $assessment
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postCreateResponse(DueWork $assessment)
+    public function postCreateSubmission(DueWork $assessment)
     {
         /* Work out if we are going to accept responses
          */

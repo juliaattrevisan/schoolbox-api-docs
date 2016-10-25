@@ -65,7 +65,7 @@ class Module extends BaseModule
 
                 /* Submit a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{participantId}/submit' => 'getCreateResponse',
+                '/assessment/{assessmentId}/{participantId}/submit' => 'getCreateSubmission',
 
 
                 /* Miscellaneous routes
@@ -94,7 +94,7 @@ class Module extends BaseModule
 
                 /* Save a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{participantId}/submit' => 'postCreateResponse'
+                '/assessment/{assessmentId}/{participantId}/submit' => 'postCreateSubmission'
             ]
         ];
 
@@ -206,7 +206,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getCreateResponse)',
+            '(?:getCreateSubmission)',
             function ($params) {
 
                 /** @var DueWork $assessment */
@@ -299,7 +299,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:postCreateResponse)',
+            '(?:postCreateSubmission)',
             function ($params) {
                 return [
                     'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
