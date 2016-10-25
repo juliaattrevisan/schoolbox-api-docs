@@ -91,6 +91,9 @@ class DataSource
      * * anyone who has submitted a Response for this assessment
      * * anyone who has been given Feedback for this assessment
      *
+     * Currently, this method sets the participants into $assessment as well as
+     * returning them.
+     *
      * @param IAssessable $assessment
      * @return Collection|Participant[]
      */
@@ -181,8 +184,8 @@ class DataSource
                 foreach ($responseParticipant->getAllResponses() as $response) {
                     // For now assume that the types of response and feedback match
                     if ($stubResponseId == $response->getId()) {
-                        $stubResponse->getAllFeedback()->add($feedback);
-                        $feedback->setResponse($feedback);
+                        $response->getAllFeedback()->add($feedback);
+                        $feedback->setResponse($response);
                         break;
                     }
                 }
