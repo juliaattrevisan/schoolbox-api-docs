@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -48,6 +49,19 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     public function __construct(AttemptMapper $mapper)
     {
         parent::__construct($mapper);
+    }
+
+    /**
+     * Override to return only quizzes which have a reviewed_at time.
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findByColumnList(array $columnList, $options = [])
+    {
+        $columnList['!reviewed_at'] = null;
+        return parent::findByColumnList($columnList, $options);
     }
 
     /**
@@ -90,8 +104,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new QuizFeedback())
                 ->setId($attempt->getId())
-//                ->setSubmittedBy($attempt->getUser())
-//                ->setSubmittedOnBehalfOf($attempt->getUser())
+                // Quizzes have no concept of having been reviewed by anyone
+                ->setReviewer(new User())
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
@@ -101,18 +115,18 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $quizResponses->add($response);
         }
 
-        // Populate the marks available and marks given for each attempt
-        $markSets = $this->getMapper()->findSupplementaryInformation($ids);
-        foreach ($quizResponses as $response) {
-            if (isset($markSets[$response->getId()])) {
-                $markSet = $markSets[$response->getId()];
-                $response
-                    ->setMarksGiven($markSet['mark'])
-                    ->setMarksAvailable($markSet['max_mark'])
-                    ->setFirstSectionId($markSet['first_section'])
-                ;
-            }
-        }
+//        // Populate the marks available and marks given for each attempt
+//        $markSets = $this->getMapper()->findSupplementaryInformation($ids);
+//        foreach ($quizResponses as $response) {
+//            if (isset($markSets[$response->getId()])) {
+//                $markSet = $markSets[$response->getId()];
+//                $response
+//                    ->setMarksGiven($markSet['mark'])
+//                    ->setMarksAvailable($markSet['max_mark'])
+//                    ->setFirstSectionId($markSet['first_section'])
+//                ;
+//            }
+//        }
 
         return $quizResponses;
     }
