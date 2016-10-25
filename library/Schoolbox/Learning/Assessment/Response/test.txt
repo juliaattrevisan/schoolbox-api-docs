@@ -1,0 +1,50 @@
+<?php
+
+header('Content-Type: text/html; charset=utf-8');
+
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+/** @var \Schoolbox\Learning\Assessment\Response\DataSource $responseDataSource */
+$responseDataSource = $kernel->getDependencyInjector()->get('responseDataSource');
+
+/** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+$assessmentDataSource = $kernel->getDependencyInjector()->get('assessmentDataSource');
+
+
+// Duework #62
+foreach ($responseDataSource->findForAssessment($assessmentDataSource->findById(268)) as $response) {
+    /** @var Schoolbox\Learning\Assessment\DueWork\Submission\Model $response */
+    var_dump([
+        get_class($response),
+        $response->getSubmittedBy()->formatName(),
+        $response->getCreatedAt()->getDatabase(),
+        $response->getAllFiles()->map(function($b) {return $b->getHash();}),
+    ]);
+}
+
+echo '<hr />';
+
+// Task #247
+foreach ($responseDataSource->findForAssessment($assessmentDataSource->findById(276)) as $response) {
+    var_dump([
+        get_class($response),
+        $response->getSubmittedBy()->formatName(),
+        $response->getCreatedAt()->getDatabase(),
+    ]);
+}
+
+echo '<hr />';
+
+// Quiz #277
+foreach ($responseDataSource->findForAssessment($assessmentDataSource->findById(277)) as $response) {
+    /** @var Schoolbox\Learning\Assessment\Quiz\Attempt\Model $response */
+    var_dump([
+        get_class($response),
+        $response->getSubmittedBy()->formatName(),
+        $response->getCreatedAt()->getDatabase(),
+        $response->getMarksGiven(),
+        $response->getMarksAvailable(),
+        $response->getFirstSectionId(),
+    ]);
+}
