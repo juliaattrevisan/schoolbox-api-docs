@@ -49,7 +49,7 @@
 
             // Submit form via AJAX
             var formContents = form.serializeArray();
-            formContents.push({name: 'save_draft', value: '1'});
+            formContents.push({name: 'saveDraft', value: '1'});
             formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
 
             formSaveLabel.toastActivate({
@@ -207,6 +207,7 @@
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, participantId: participant.id}) }}" enctype="multipart/form-data">
                     <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
+                    <input type="hidden" name="participantId" value="{{ participant.id }}" />
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">

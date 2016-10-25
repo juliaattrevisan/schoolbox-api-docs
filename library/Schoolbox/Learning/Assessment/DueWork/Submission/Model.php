@@ -47,6 +47,26 @@ class Model extends AbstractResponse
         return $this->getCreatedAt();
     }
 
+    /**
+     * Add the contents of the wizzywig to this Response
+     * (add it as a file)
+     *
+     * @param $body
+     * @return $this
+     */
+    public function attachOnlineSubmissionContent($body)
+    {
+        // write body to a tempfile and accept into storage
+        $tmp = sb_tempnam('os');
+        file_put_contents($tmp, $body);
+
+        $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept('online-submission.html', $tmp, false);
+
+        $this->getAllFiles()->add($storage);
+
+        return $this;
+    }
+
     /* Getters/Setters
      */
 

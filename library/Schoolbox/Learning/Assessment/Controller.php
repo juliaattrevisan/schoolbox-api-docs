@@ -1056,15 +1056,40 @@ class Controller extends Base
      * Save a Response to a Due Work
      *
      * @api POST /learning/assessment/:assessmentId/:participantId/submit
+     * @param IAssessable $assessment
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postCreateResponse()
+    public function postCreateResponse(IAssessable $assessment)
     {
+
+        /* Creator is the currently-logged-in user
+         * Participant is the actual owner of the Response
+         *
+         * Usually the same person, unless you're a teacher creating a Response
+         * on behalf of a student (teacher is creator, student is participant)
+         */
+        $creator = $this->getUser();
+        $participant = \Schoolbox\UserMapper::getInstance()->findById($this->getRequest()->post['participantId']);
+
+        /* Set in javascript when autmatically saving a draft
+         */
+        $isDraft = $_POST['saveDraft'];
+        $body = $_POST['body'];
+
+        /* TODO: Do the actual saving
+         */
+        $response = new DueWorkSubmission();
+        $response
+            ->setAssessable($assessment)
+            ->setSubmittedBy($creator)
+            ->setSubmittedOnBehalfOf($participant)
+            ->attachOnlineSubmissionContent($body)
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
         /* Saving drafts from the wizzywig
          */
         if ($this->getRequest()->isXhr()) {
-
-            /* TODO: Do the actual saving
-             */
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = 72;

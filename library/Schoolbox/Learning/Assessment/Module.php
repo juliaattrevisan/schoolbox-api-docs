@@ -204,7 +204,6 @@ class Module extends BaseModule
             }
         );
 
-
         $this->addRoutePreload(
             $matcher,
             '(?:getCreateResponse)',
@@ -294,6 +293,16 @@ class Module extends BaseModule
                 return [
                     'assessment' => $assessment,
                     'participant' => $student
+                ];
+            }
+        );
+
+        $this->addRoutePreload(
+            $matcher,
+            '(?:postCreateResponse)',
+            function ($params) {
+                return [
+                    'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
                 ];
             }
         );
