@@ -143,14 +143,7 @@
 {# TODO: Replace with real breadcrumbs #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-[ 'Learning',    '#' ],
-[ 'Classname',   '#' ],
-[ student.fullName,   '#' ],
-[ assessment.context.title, routeLookup(user.role.isStudent ? 'learningAssessment.getSummary' : 'learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: student.id})],
-[ assessment.title,   '#' ],
-[ 'Submit Response', '#']
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 

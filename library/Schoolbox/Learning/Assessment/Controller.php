@@ -988,7 +988,7 @@ class Controller extends Base
         $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createResponse.twig', [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'  => $assessment,
 //            'responses'   => $assessment->getResponses(),
             'participant' => $participant,
