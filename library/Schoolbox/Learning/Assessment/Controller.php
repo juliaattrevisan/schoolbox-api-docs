@@ -279,10 +279,7 @@ class Controller extends Base
     private function generateRubricTwigData(DueWork $dueWork)
     {
         $data = [];
-//        $rubricMapper = RubricMapper::getInstance();
-//        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
-//        // Collect all the Indicators for the folder the DueWork is about to be created in
-//        $grid = $rubricMapper->findByFolderId($folder->getId())->setSubmissionBox($submissionBoxMapper->createModel());
+
         $data['rubric'] = $dueWork->getRubric()->toContext();
 
         $rubricZone = new Zone('rubric');

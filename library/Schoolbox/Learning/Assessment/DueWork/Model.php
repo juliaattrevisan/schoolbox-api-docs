@@ -66,13 +66,14 @@ class Model extends AbstractAssessment
     protected $showSubmittedOnly = false;
 
     /**
-     * This DueWork has an associated Rubric
+     * This DueWork uses a Rubric
+     *
+     * This property IS required. We cannot just inspect the attached Rubric because in some
+     * scenarios (eg Collections) we don't hydrate the Rubric.
      *
      * @var bool
-     * @todo Is this now superfluous?
-     * @todo Should this be determined dynamically by whether this DueWork has an attached Rubric?
      */
-    protected $hasRubric = false;
+    protected $usesRubric = false;
 
     /**
      * @var Rubric|null
@@ -84,7 +85,7 @@ class Model extends AbstractAssessment
      *
      * @var bool
      */
-    protected $hasMarkPerCapability = false;
+    protected $markPerCapability = false;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
@@ -271,35 +272,6 @@ class Model extends AbstractAssessment
         return $this;
     }
 
-    /**
-     * This DueWork has an associated Rubric
-     */
-    public function hasRubric()
-    {
-        return $this->getHasRubric();
-    }
-
-    /**
-     * Use rubrics
-     *
-     * @return $this
-     */
-    public function useRubric()
-    {
-        $this->setHasRubric(true);
-        return $this;
-    }
-
-    /**
-     * Don't use rubrics
-     *
-     * @return $this
-     */
-    public function noRubric()
-    {
-        $this->setHasRubric(false);
-        return $this;
-    }
 
     /**
      * This DueWork has Mark Per Capability on
@@ -308,7 +280,7 @@ class Model extends AbstractAssessment
      */
     public function hasMarkPerCapbility()
     {
-        return $this->getHasMarkPerCapability();
+        return $this->getMarkPerCapability();
     }
 
     /**
@@ -318,7 +290,7 @@ class Model extends AbstractAssessment
      */
     public function useMarkPerCapability()
     {
-        $this->setHasMarkPerCapability(true);
+        $this->setMarkPerCapability(true);
         return $this;
     }
 
@@ -329,7 +301,7 @@ class Model extends AbstractAssessment
      */
     public function noMarkPerCapability()
     {
-        $this->setHasMarkPerCapability(false);
+        $this->setMarkPerCapability(false);
         return $this;
     }
 
@@ -408,18 +380,18 @@ class Model extends AbstractAssessment
     /**
      * @return boolean
      */
-    protected function getHasRubric()
+    public function getUsesRubric()
     {
-        return $this->hasRubric;
+        return $this->usesRubric;
     }
 
     /**
-     * @param boolean $hasRubric
+     * @param boolean $usesRubric
      * @return $this
      */
-    protected function setHasRubric($hasRubric)
+    public function setUsesRubric($usesRubric)
     {
-        $this->hasRubric = $hasRubric;
+        $this->usesRubric = $usesRubric;
         return $this;
     }
 
@@ -444,18 +416,18 @@ class Model extends AbstractAssessment
     /**
      * @return boolean
      */
-    public function getHasMarkPerCapability()
+    public function getMarkPerCapability()
     {
-        return $this->hasMarkPerCapability;
+        return $this->markPerCapability;
     }
 
     /**
-     * @param boolean $hasMarkPerCapability
+     * @param boolean $markPerCapability
      * @return $this
      */
-    public function setHasMarkPerCapability($hasMarkPerCapability)
+    public function setMarkPerCapability($markPerCapability)
     {
-        $this->hasMarkPerCapability = $hasMarkPerCapability;
+        $this->markPerCapability = $markPerCapability;
         return $this;
     }
 

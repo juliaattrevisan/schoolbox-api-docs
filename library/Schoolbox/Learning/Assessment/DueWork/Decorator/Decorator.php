@@ -82,10 +82,10 @@ class Decorator implements DecoratorInterface
         $assessment->setGradeGroup($gradingGroup);
 
         if ($this->getHasRubric()) {
-            $assessment->useRubric();
+            $assessment->setUsesRubric(true);
         }
         else {
-            $assessment->noRubric();
+            $assessment->setUsesRubric(false);
         }
 
         if ($this->getHasMarkPerCapability()) {
