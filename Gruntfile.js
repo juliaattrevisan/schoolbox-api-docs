@@ -144,7 +144,7 @@ module.exports = function(grunt) {
             }
         },
         clean: {
-            js: ['www/javascript/components/schoolbox*.{min,map}.js'],
+            js: ['www/javascript/components/schoolbox*.min.js*'],
             css: ['www/css/*/chrome.css']
         }
     });
