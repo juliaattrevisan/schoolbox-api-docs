@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper as RubricResultMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
@@ -397,6 +396,7 @@ class Controller extends Base
 
         // DueWork can have rubric
         if ($assessment instanceof DueWork ) {
+            /** @var DueWork $assessment */
             $data = array_merge($data, $this->generateRubricTwigData($assessment));
         }
 
@@ -746,7 +746,7 @@ class Controller extends Base
              * Return to summary screen with this suffix
              */
             $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-            $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+            $returnUrlSuffix = '?return_url=' . Redirect::encode($baseUrl);
 
             $types = new AssessmentType();
             $twigData = [
