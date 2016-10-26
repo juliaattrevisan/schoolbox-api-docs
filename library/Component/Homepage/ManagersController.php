@@ -7,8 +7,30 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Maximum number of managers to display
+     * If the collection exceeds this it will truncate the list and leave a message
+     *
+     * @var int
+     */
+    const MAX_MANAGERS = 100;
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return void
+     */
+    public function execute()
+    {
+    }
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -24,12 +46,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         //output managers
         $this->setBlock($templateHandle, "member_email", "member_email_block");
         $this->setBlock($templateHandle, "person", "person_block");
+        $this->setBlock($templateHandle, 'people_hidden', 'people_hidden_block');
         $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
         $this->setBlock('person', 'has_icon', 'has_icon_block');
 
         $this->setVar('has_thumbnail_block', '');
         $this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
+        $this->setVar('people_hidden_block', '');
+        $this->setVar('MAX_MEMBERS', self::MAX_MANAGERS);
 
         /* Display options
          */
@@ -53,71 +78,92 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             )
         );
 
-        $userHandler = new User;
-        $managerList = $userHandler->getManagers($this->getContext()->getId());
+        // Get collection of managers
+        $userMapper = new UserMapper();
+        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId());
+        $managerListCount = $managerList->count();
+
+        // If the members are going to go over the max..
+        // Set the people_hidden_block to show and set the number of members that are hidden
+        if ($managerListCount > self::MAX_MANAGERS) {
+            $this->setVar('HIDDEN_COUNT', $managerListCount - self::MAX_MANAGERS);
+            $this->parse('people_hidden_block', 'people_hidden');
+        }
+
+        // Get admin
+        $userAccessMapper = new UserAccessMapper();
+        $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
         $emailObj = new Email();
 
-        if (is_array($managerList)) {
-            $j = 0;
+        if ($managerListCount > 0) {
+            $i = 0;
             foreach ($managerList as $manager) {
-                $name  = $userHandler->formatName($manager);
-                $email = $emailObj->formatEmailFromArray($manager);
-                $meta  = $userHandler->getByID($manager['uid']);
 
-                if ($manager['type'] == 3) {
-                    $name .= " (Group Admin.)";
-                }
+                /* Manager bulk email
+        	     */
+                $email = $manager->getEmail();
 
                 if ($email) {
                     $emailall[] = $email;
                 }
 
-                $this->setVar(
-                    array(
-                        'ON_OFF'             => ++$j % 2 ? '' : 'dark',
-                        'PERSON_UID'         => $manager['uid'],
-                        'PERSON_NAME'        => $name,
-                        'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
-                        'PERSON_GROUP'       => Scrub::text($meta['gname']),
-                    )
-                );
-
-                /* Don't display images in list view
-			  	 */
-                if ($this->getConfig('displayPortraits') == 'grid') {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                    ));
-
-                    $this->parse('has_thumbnail_block', 'has_thumbnail');
-                    $this->setVar('has_icon_block', '');
+                if ($_SESSION['user']->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+                    $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+                    $this->setVar("EMAILALL", implode(',', $emailall));
+                    $this->parse("member_email_block", "member_email");
                 } else {
-                    $this->setVar(array(
-                        'GRID_VIEW_CLASSES' => ''
-                    ));
-
-                    $this->setVar('has_thumbnail_block', '');
-                    $this->parse('has_icon_block', 'has_icon');
+                    $this->setVar('member_email_block', '');
                 }
 
-                $this->parse('person_block', 'person', true);
+                /* Manager cards
+                 */
+                if ($i < self::MAX_MANAGERS) {
 
-                /* Clear children after parsing out the parent
-			   	 */
-                $this->setVar('has_thumbnail_block', '');
-                $this->setVar('has_icon_block', '');
+                    $name = $manager->getFullName();
 
+                    if ($admin !== null && $manager->getId() === $admin->getId()) {
+                        $name .= " (Group Admin)";
+                    }
+
+                    $this->setVar(
+                        array(
+                            'PERSON_UID' => $manager->getId(),
+                            'PERSON_NAME' => \Scrub::text($name),
+                            'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
+                            'PERSON_GROUP' => $manager->getRole()->getName(),
+                        )
+                    );
+
+                    /* Don't display images in list view
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                        ));
+
+                        $this->parse('has_thumbnail_block', 'has_thumbnail');
+                        $this->setVar('has_icon_block', '');
+                    } else {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => ''
+                        ));
+
+                        $this->setVar('has_thumbnail_block', '');
+                        $this->parse('has_icon_block', 'has_icon');
+                    }
+
+                    $this->parse('person_block', 'person', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar('has_thumbnail_block', '');
+                    $this->setVar('has_icon_block', '');
+                }
+
+                $i++;
             }
-            /* Student bulk email
-        	 */
-            if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
-                $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                $this->setVar("EMAILALL", implode(',', $emailall));
-                $this->parse("member_email_block", "member_email");
-            } else {
-                $this->setVar('member_email_block', '');
-            }
+
         } else {
             $this->setVar("person_block", "");
             $this->setVar('member_email_block', '');

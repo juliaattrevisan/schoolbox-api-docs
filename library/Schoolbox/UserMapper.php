@@ -614,29 +614,47 @@ class UserMapper extends Mapper
      *                                constant.
      * @param  int $serviceIdentifier If provided, the campus or homepage that
      *                                $service is for.
+     * @param int $limit If provided, limit the amount of users to query
      * @return Collection|User[] A list of users who have this level of access
      *                           to the given service.
      */
-    public function findByAccess($service, $accessLevel, $serviceIdentifier = null)
+    public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $limit = null)
     {
         $query = "
-            SELECT DISTINCT {$this->getColumnString('u')}
+            SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}
             FROM {$this->getTable()} u
             INNER JOIN {$this->getJoinSql('userAccess', 'u', 'ua')}
+            INNER JOIN {$this->getJoinSql('role', 'u', 'r')}
             WHERE ua.service=:service
             AND ua.type >=:accessLevel
         ";
+
         $params = array(
             'service' => $service,
             'accessLevel' => $accessLevel,
         );
+
         if (isset($serviceIdentifier)) {
             $query .= 'AND ua.sid=:serviceIdentifier';
             $params['serviceIdentifier'] = $serviceIdentifier;
         }
+
+        if ($limit !== null) {
+            $query .= " LIMIT {$limit};";
+        }
+
+        $users = new Collection();
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
-        return $this->hydrateList($statement, 'u');
+
+        foreach ($statement as $row) {
+            $user = $this->hydrate($row, 'u');
+            $role = $this->hydrateJoin($row, 'role', 'r');
+            $user->setRole($role);
+            $users->add($user);
+        }
+
+        return $users;
     }
 
     /**
