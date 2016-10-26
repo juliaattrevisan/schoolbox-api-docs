@@ -217,7 +217,7 @@
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if currentUser.role.isStaff %}On Behalf Of Student{% endif %}" data-action-save />
+                    <input type="submit" value="Submit for Assessment {% if currentUser.id != participant.id %}On Behalf Of {{ participant.formatName }}{% endif %}" data-action-save />
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
