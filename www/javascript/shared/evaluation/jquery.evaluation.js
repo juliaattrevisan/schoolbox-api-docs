@@ -50,7 +50,7 @@
 		var questions = $('[data-question]');
 		saveForms(questions)
 			.fail(function() {
-				saving.removeClass('loader');
+				$.magnificPopup.close();
 				label.toastActivate({text: 'Progress Save Failed!', css: 'alert'});
 			})
 			.done(function() {
@@ -104,7 +104,7 @@
 				});
 				/* Remove loading gif; show success label
 				 */
-				saving.removeClass('loader');
+				$.magnificPopup.close();
 				label.removeClass('hide').toastTimeout({text: 'Progress Saved'});
 					//.find('[data-evaluation-progress-saved]').removeClass('hide');
 
@@ -115,7 +115,7 @@
 					location.href = href;
 				}
 				else {
-					saving.addClass('loader hide');
+					$.magnificPopup.close();
 				}
 			});
 
@@ -123,7 +123,13 @@
 		 * Init - show loading div
 		 */
 		function init() {
-			$('#evaluation-saving').removeClass('hide');
+			$.magnificPopup.open({
+				showCloseBtn: false,
+				items: {
+					src: "<div class='preview loader'></div>",
+					type: 'inline'
+				}
+			});
 		}
 
 		/**
