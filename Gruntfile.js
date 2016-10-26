@@ -78,9 +78,8 @@ module.exports = function(grunt) {
                     // DateTime
                     'www/javascript/components/moment/moment.js',
 
-                    // System for displaying calendars and associated popups
-                    'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
-                    'www/javascript/shared/calendar/jquery.fullcalendar.js',
+                    // Calendar-related popups
+                    // (included in main because this can be used outside of a fullcalendar)
                     'www/javascript/shared/calendar/jquery.calendar.js',
 
                     // Files And Resource Browser
@@ -139,6 +138,16 @@ module.exports = function(grunt) {
                 dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
                 sourceMap: 'www/javascript/components/<%= pkg.name %>-masonry.map.js',
                 sourceMappingURL: '<%= pkg.name %>-masonry.map.js'
+            },
+            fullcalendar: {
+                src:  [
+                    // System for displaying calendars and associated popups
+                    'www/javascript/components/fullcalendar/dist/fullcalendar.js',
+                    'www/javascript/shared/calendar/jquery.fullcalendar.js'
+                ],
+                dest: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
+                sourceMap: 'www/javascript/components/<%= pkg.name %>-fullcalendar.map.js',
+                sourceMappingURL: '<%= pkg.name %>-fullcalendar.map.js'
             }
         },
         clean: {
