@@ -614,6 +614,8 @@ class Controller extends Base
 
         /* TODO: Quiz needs to redirect to whatever their intro screen is
          */
+        if ($assessment instanceof Quiz) {
+        }
 
         /* For everything else, determine view
          */
@@ -629,22 +631,37 @@ class Controller extends Base
          * If you're a parent
          * You don't get a button
          */
+        if ($assessment instanceof DueWork) {
+            $types = new AssessmentType();
 
+            $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+            $twigData          = [
+                'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
+                'currentUser' => $this->getUser(),
+                'participant' => $this->getUser(),
+                'assessment'  => $assessment,
+            ];
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    "@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig",
+                    $twigData
+                )
+            );
+        }
         /* If you're a staff and you're viewing a project for a particular student
          * you get to see that student's progress in the project
          * OR
          * If you're a student and you're viewing a project
          * so you get to see your own progress in that project
          */
+        else if ($assessment instanceof Project) {
+
+            /* Do other things
+             */
+        }
 
 die();
-
-
-
-
-
-
-
 
 
 
@@ -825,46 +842,6 @@ die();
             'participant' => $this->getUser(),
             'assessment' => $assessment,
             'counts' => $counts,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
-    }
-
-    /**
-     * Due Work Summary for Staff
-     *
-     * @param DueWork $assessment
-     */
-    private function getSummaryDueWorkStaff(DueWork $assessment)
-    {
-        $types = new AssessmentType();
-
-        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
-        $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
-            'currentUser' => $this->getUser(),
-            'participant' => $this->getUser(),
-            'assessment' => $assessment,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/staff.twig", $twigData));
-    }
-
-    /**
-     * Due Work Summary for Students
-     *
-     * @param DueWork $assessment
-     */
-    private function getSummaryDueWorkStudent(DueWork $assessment)
-    {
-        $types = new AssessmentType();
-
-        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
-        $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
-            'currentUser' => $this->getUser(),
-            'participant' => $this->getUser(),
-            'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
