@@ -383,7 +383,6 @@ class Controller extends Base
 
         if ($assessment instanceof Project) {
             $data['types']         = $types;
-            $data['allReturnUrls'] = $this->getAllReturnUrls($assessment);
             $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
             $data['allSummators']  = $summatorMapping;
         }
@@ -793,44 +792,7 @@ class Controller extends Base
     /* Utility methods - these can probably be refactored elsewhere
      */
 
-    /**
-     * When viewing a project, the system displays links to create sub-assessables.
-     *
-     * Each link to create an assessable in the project must contain a reference back
-     * to the parent project so we can return to it once we have finished created the sub-assessable.
-     *
-     * @param Project $project
-     * @return IAssessable[] Maps URL:string to an IAssessable
-     */
-    private function getAllReturnUrls(Project $project)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        $name = 'learningAssessment.getSelectAssessmentInProject';
-        $allReturnUrls = [];
-
-        foreach(AssessmentType::getStringValues() as $assessmentType){
-
-            // Don't permit Project in Project
-            if(AssessmentType::TYPE_PROJECT == $assessmentType){
-                continue;
-            }
-            $data = ['projectId' => $project->getId(), 'assessmentTypeTitle' => $assessmentType];
-            $url = $this->getRouter()->generate($name, $data) . $suffix;
-
-            $allReturnUrls[$url] = AssessmentType::stringToObject($assessmentType);
-        }
-
-        return $allReturnUrls;
-    }
-
-    /**
+     /**
      * All the possible Mark Types to choose from for this particular $assessmentType
      *
      * @param IAssessable $assessable
