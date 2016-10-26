@@ -206,7 +206,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getCreateSubmission)',
+            ['getCreateSubmission', 'postCreateSubmission'],
             function ($params) {
 
                 /** @var DueWork $assessment */
