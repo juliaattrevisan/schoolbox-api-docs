@@ -26,7 +26,7 @@
                 };
 
             } else {
-                folderIdInput = body.find('input[name=rubricIndicatorFolderId]');
+                folderIdInput = body.find('input[name=folderId]');
 
                 if (folderIdInput.length == 1 && folderIdInput.val() > 0) {
                     postdata = {
@@ -102,7 +102,7 @@
     });
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
-    <input type="hidden" name="rubricIndicatorFolderId" value="{{ rubricIndicatorFolderId }}" />
+    <input type="hidden" name="folderId" value="{{ folderId }}" />
     {% if test %}<input type="hidden" name="id" value="{{ test }}" />{% endif %}
     <div data-hideable>
         <div data-replaceable>

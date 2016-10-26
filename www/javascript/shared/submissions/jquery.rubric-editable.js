@@ -94,7 +94,7 @@
 
             if (type == 'criterion') {
                 payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
-                payload.folderId  = $('input[name=rubricIndicatorFolderId]').val();
+                payload.folderId  = $('input[name=folderId]').val();
             }
 
             $.post(opt.url, payload, function (data) {
