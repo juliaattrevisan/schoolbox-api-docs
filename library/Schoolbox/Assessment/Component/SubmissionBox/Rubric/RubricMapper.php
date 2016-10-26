@@ -14,12 +14,14 @@ use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\IMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -71,16 +73,14 @@ class RubricMapper
 
 
     /**
-     * Given a folder ID, return the base rubric, including criteria inherited from parents
+     * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
      *
-     * @param int   $folderId
-     * @param bool  $forceTaskMode - if you need task-level criteria showing
-     * @param array $levelNames
+     * @param int[] $folderIds
+     * @param string[] $levelNames
      * @return Rubric
      */
-    public function findByFolderId($folderId, $forceTaskMode = false, array $levelNames = [])
+    public function createForFolder(array $folderIds, array $levelNames = [])
     {
-
         /** @var Criteria\Group[] $groupCache */
         $groupCache = [];
 
@@ -96,19 +96,11 @@ class RubricMapper
             $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
-        $args = [ 'folderId' => $folderId ];
-        $in   = [ 'folderId' ];
-
-        if ($forceTaskMode) {
-            $key      = 'parentFolderId';
-            $parentId = Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
-
-            $args[$key] = $parentId;
-            $in[] = $key;
+        $args = [];
+        foreach($folderIds as $idx => $folderId){
+            $args["arg$idx"] = $folderId;
         }
-
-        $in = implode(', :', $in);
-
+        $in = implode(', :', array_keys($args));
 
         // TODO DI and mapperise
         $stmt = \Database::getInstance()->query("
@@ -124,6 +116,9 @@ class RubricMapper
 
         $groupId = 21;
 
+        // TODO - if UnitSpec and CourseSpec return duplicate indicators
+        // (duplicate includes matches via preg_replace('`\s+`', ' ', trim($object->getName())))
+        // Then discard UnitSpec Indicator
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
             $groupName = $r['grouping'];
@@ -276,7 +271,7 @@ class RubricMapper
 
             if (!$parentId) {
                 // insufficient hydration
-                $parentId = Folder\Mapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
+                $parentId = FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
             }
 
             $args[$key] = $parentId;
@@ -502,19 +497,21 @@ class RubricMapper
      * @param IStorage $file
      * @param int      $folderId
      * @param int      $maxLevels
-     * @param bool     $taskMode
      * @throws \Schoolbox\Resource\Exception
      * @return Rubric
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels, $taskMode)
+    public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
     {
         $square = [];
 
         $folderLookup = [ $folderId ];
 
-        // if we're looking at a task, be observant of the parent folder as well
-        if ($taskMode) {
-            $folderLookup[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
+        // Determine if the specified folder has a UnitSpec
+        /** @var UnitSpecification $unitSpec */
+        $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+        if($unitSpec){
+            // Add the Unit's Course's Folder's ID
+            $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
         }
 
         $fp = $file->readStream();
@@ -601,7 +598,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
-        $postdata = $this->findByFolderId($folderId, $taskMode, $levelNames)->toPostData();
+        $postdata = $this->createForFolder($folderLookup, $levelNames)->toPostData();
 
         // overlay descriptor data
         for ($i = 1; $i < count($square); $i += 2) {

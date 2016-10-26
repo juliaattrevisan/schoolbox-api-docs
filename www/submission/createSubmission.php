@@ -288,7 +288,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             $grid = $map->findBySubmissionBox($submission, $is_task, true);
         } else {
             // otherwise, just collect all the criteria for the folder the box is about to be created in
-            $grid = $map->findByFolderId($submission->getCategory()->getId(), $is_task)->setSubmissionBox($submission);
+            $grid = $map->createForFolder([$submission->getCategory()->getId()])->setSubmissionBox($submission);
         }
 
         $rubricZone = new Zone('rubric');

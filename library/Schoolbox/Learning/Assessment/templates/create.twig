@@ -75,6 +75,9 @@
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
+                    <input type="hidden" name="contextType" value="{{ contextType }}" />
+                    <input type="hidden" name="contextId" value="{{ context.id }}" />
+
                     <legend>Choose Assessment Type</legend>
 
                     <fieldset class="radiolist">
@@ -96,8 +99,8 @@
                     {% if returnUrl|length %}
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}
-                    <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
+                    <input type="hidden" name="contextId" value="{{ context.id }}" />
 
                     {% if assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />

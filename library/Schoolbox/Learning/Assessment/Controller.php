@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
@@ -234,8 +235,8 @@ class Controller extends Base
 
             // Due Work can have Rubrics
             if ($assessment instanceof DueWork) {
-                $data['allWorkTypes'] => $this->getAllWorkTypes();
-                $data = array_merge($data, $this->generateRubricTwigData($context->getFolder()));
+                $data['allWorkTypes'] = $this->getAllWorkTypes();
+                $data = array_merge($data, $this->generateRubricTwigData($assessment);
             }
 
             /* Projects have a Summator
@@ -298,36 +299,6 @@ class Controller extends Base
         }
         $data['rubricResultSets'] = $rs;
 
-        /* A DueWork's Rubric Indicators are saved against a folder.
-         * Which folder depends on the DueWork's Context
-         * * Class               => Class folder
-         * * UnitImpl            => UnitSpec folder
-         * * UnitSpec            => UnitSpec folder
-         * * Project in Class    => Class folder
-         * * Project in UnitImpl => UnitSpec folder
-         * * Project in UnitSpec => UnitSpec folder
-         */
-        $context = $dueWork->getContext();
-        if($context instanceof Folder){
-            $data['rubricIndicatorFolderId'] = $context->getId();
-        } elseif($context instanceof UnitSpecification){
-            $data['rubricIndicatorFolderId'] = $context->getFolder()->getId();
-        } elseif($context instanceof UnitImplementation){
-            $data['rubricIndicatorFolderId'] = $context->getSpecification()->getFolder()->getId();
-        } elseif($context instanceof Project){
-            $projectContext = $context->getContext();
-            if($projectContext instanceof Folder){
-                $data['rubricIndicatorFolderId'] = $projectContext->getId();
-            } elseif($projectContext instanceof UnitSpecification){
-                $data['rubricIndicatorFolderId'] = $projectContext->getFolder()->getId();
-            } elseif($projectContext instanceof UnitImplementation){
-                $data['rubricIndicatorFolderId'] = $projectContext->getSpecification()->getFolder()->getId();
-            }
-        }
-        if(!isset($data['rubricIndicatorFolderId'])){
-            throw new \LogicException("Unable to determine DueWork's Rubric Indicator Folder");
-        }
-
         return $data;
     }
 
@@ -339,8 +310,6 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
-        /* TODO: Check against ($contextId, $contextType) as well
-         */
         try {
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
         } catch (MapperException $e) {
@@ -348,6 +317,8 @@ class Controller extends Base
             return;
         }
 
+        $contextType = $this->getRequest()->post['contextType'];
+        $contextId = $this->getRequest()->post['contextId'];
         $assessmentType = $this->getRequest()->post['assessmentType'];
 
         /* Common data among all assessmentType fragments
@@ -363,9 +334,38 @@ class Controller extends Base
                 ->setWeight(0);
 
         if($assessment instanceof DueWork){
-            $assessment
-                ->useRubric()
+            /** @var DueWork $dueWork */
+            $dueWork = $assessment;
+            $dueWork
+                ->setUseRubric(false)
                 ->setAcceptsMultiple();
+
+            switch($contextType) {
+                case AssessmentContextType::TYPE_FOLDER:
+                    $context = $this->getFolderMapper()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION:
+                    $context = $this->getUnitImplementationMapperProxy()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_UNIT_SPECIFICATION:
+                    $context = $this->getUnitSpecificationMapperProxy()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_PROJECT:
+                    $context = $this->getAssessmentMapperProxy()->findById($contextId);
+                    break;
+                default:
+                    $context = null;
+            }
+            $dueWork->setContext($context);
+
+            // Create an empty Rubric with appropriate Indicators
+            $folderIds = [$context->getFolder()->getId()];
+            if($context instanceof UnitSpecification){
+                $folderIds[] = $context->getCourse()->getFolder()->getId();
+            }
+            $rubric = RubricMapper::getInstance()->createForFolder($folderIds);
+            $rubric->setSubmissionBox(new SubmissionBox());
+            $dueWork->setRubric($rubric);
         }
 
         $data = [
@@ -389,7 +389,7 @@ class Controller extends Base
 
         // DueWork can have rubric
         if ($assessment instanceof DueWork ) {
-            $data = array_merge($data, $this->generateRubricTwigData($folder));
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
         }
 
         /* Select the fragment to return
@@ -476,8 +476,8 @@ class Controller extends Base
 
         // Due Work can have Rubrics
         if ($assessment instanceof DueWork) {
-            $data['allWorkTypes'] => $this->getAllWorkTypes();
-            $data = array_merge($data, $this->generateRubricTwigData($assessment->getContext()->getFolder()));
+            $data['allWorkTypes'] = $this->getAllWorkTypes();
+            $data = array_merge($data, $this->generateRubricTwigData($assessment);
         }
 
         if ($assessment instanceof Project) {

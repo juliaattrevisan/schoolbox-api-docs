@@ -13,7 +13,9 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
@@ -30,6 +32,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 class Module extends BaseModule
 {
@@ -136,9 +139,6 @@ class Module extends BaseModule
             function ($params) {
 
                 $args = [];
-                $args['assessment'] = $params['assessmentTypeTitle']
-                    ? AssessmentType::stringToObject($params['assessmentTypeTitle'])
-                    : null;
 
                 // TODO add mapper error handling
                 $context = null;
@@ -159,11 +159,25 @@ class Module extends BaseModule
 
                 if(is_null($context)){
                     // TODO - needs more informative Exception
-                    throw new \DomainException('Not found');
+                    throw new \DomainException('Unable to determine context');
                 }
 
-                if($args['assessment']){
+                if($params['assessmentTypeTitle']){
+                    $args['assessment'] = AssessmentType::stringToObject($params['assessmentTypeTitle']);
                     $args['assessment']->setContext($context);
+                    // Is this a DueWork ?
+                    if($args['assessment'] instanceof DueWork){
+                        // Create an empty Rubric with appropriate Indicators
+                        $folderIds = [$context->getFolder()->getId()];
+                        if($context instanceof UnitSpecification){
+                            $folderIds[] = $context->getCourse()->getFolder()->getId();
+                        }
+                        $rubric = RubricMapper::getInstance()->createForFolder($folderIds);
+                        $rubric->setSubmissionBox(new SubmissionBox());
+                        $args['assessment']->setRubric($rubric);
+                    }
+                } else {
+                    $args['assessment'] = null;
                 }
 
                 return $args;
