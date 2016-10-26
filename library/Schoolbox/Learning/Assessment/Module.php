@@ -297,7 +297,7 @@ class Module extends BaseModule
 
                 return [
                     'assessment' => $assessment,
-                    'participant' => $student
+                    'student' => $student
                 ];
             }
         );
