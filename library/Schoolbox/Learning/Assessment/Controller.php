@@ -528,7 +528,7 @@ class Controller extends Base
             // Did we delete an item from a Project ?
             if($assessment->getContext() instanceof Project){
                 $data = ['assessmentId' => $assessment->getContext()->getId()];
-                $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+                $redirect = $this->getRouter()->generate('learningAssessment.getSummary', $data);
             }
             // Must be from a Folder, UnitImpl, or UnitSpec
             else {
