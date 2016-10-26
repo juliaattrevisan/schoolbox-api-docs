@@ -866,7 +866,7 @@ class Controller extends Base
      * @param DueWork $assessment
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postCreateSubmission(DueWork $assessment)
+    public function postCreateSubmission(DueWork $assessment, User $participant)
     {
         /* Work out if we are going to accept responses
          */
@@ -898,7 +898,6 @@ class Controller extends Base
          * on behalf of a student (teacher is creator, student is participant)
          */
         $creator = $this->getUser();
-        $participant = \Schoolbox\UserMapper::getInstance()->findById($this->getRequest()->post['participantId']);
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation
