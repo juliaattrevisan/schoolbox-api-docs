@@ -15,6 +15,7 @@
 		 */
 		$('[data-evaluation-navigator]').click(function(event) {
 			event.preventDefault();
+			$(this).attr('disabled', 'disabled').attr('readonly', 'readonly');
 
 			$.fn.evaluation.saveAll($(this).attr('href'));
 
@@ -29,7 +30,9 @@
 		 */
 		$('[data-evaluation-finish]').click(function(event) {
 			event.preventDefault();
+			$(this).attr('disabled', 'disabled').attr('readonly', 'readonly');
 			var href = $(this).data('href');
+
 			$(this).confirmDialog({
 				confirmEvent: function() {
 					$.fn.evaluation.saveAll(href);
@@ -42,16 +45,16 @@
 	 * Save each individual question
 	 */
 	$.fn.evaluation.saveAll = function(href) {
-		init();
-
 		// Don't need to wait 2500ms now that AJAX calls are asynchronous
-		var saving    = $('#evaluation-saving');
-		var label     = saving.find('[data-evaluation-progress-saved]');
 		var questions = $('[data-question]');
+		var label       = $('[data-relation="save-label"]');
+		label.toastActivate({text: 'Saving results..'});
+
 		saveForms(questions)
 			.fail(function() {
-				$.magnificPopup.close();
-				label.toastActivate({text: 'Progress Save Failed!', css: 'alert'});
+				label.toastTimeout({text: 'Progress Save Failed!', css: 'alert'});
+				$('[data-evaluation-finish]').removeAttr('disabled').removeAttr('readonly');
+				$('[data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
 			})
 			.done(function() {
 				var errors = false;
@@ -104,9 +107,7 @@
 				});
 				/* Remove loading gif; show success label
 				 */
-				$.magnificPopup.close();
-				label.removeClass('hide').toastTimeout({text: 'Progress Saved'});
-					//.find('[data-evaluation-progress-saved]').removeClass('hide');
+				label.toastTimeout({text: 'Progress Saved'});
 
 				/* Detect errors, prevent redirection if any were made
 				 * and hide that Saving box
@@ -115,22 +116,8 @@
 					location.href = href;
 				}
 				else {
-					$.magnificPopup.close();
 				}
 			});
-
-		/**
-		 * Init - show loading div
-		 */
-		function init() {
-			$.magnificPopup.open({
-				showCloseBtn: false,
-				items: {
-					src: "<div class='preview loader'></div>",
-					type: 'inline'
-				}
-			});
-		}
 
 		/**
 		 * Save each question form
