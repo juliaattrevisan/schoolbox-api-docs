@@ -1,0 +1,2 @@
+UPDATE `config` SET `title`='Form Input Border Colour' WHERE `name`='skin_colour_form_input_border_color';
+UPDATE `config` SET `description`='Sets the form input and text area background hover colour' WHERE `name`='skin_colour_form_background_hover_color';
