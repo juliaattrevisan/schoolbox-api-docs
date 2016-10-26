@@ -108,7 +108,6 @@ module.exports = function(grunt) {
                     'www/javascript/shared/jquery.toast-timeout.js',
 
                     // Colour handling
-                    'www/javascript/components/tinycolor/tinycolor.js',
                     'www/javascript/components/spectrum/spectrum.js',
 
                     // File uploading
