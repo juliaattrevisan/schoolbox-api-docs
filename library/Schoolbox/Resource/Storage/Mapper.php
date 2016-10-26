@@ -228,11 +228,11 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
 
     /**
-     * Accept a datastream upload
+     * Accept a datastream (or string file contents) upload
      *
-     * @param string   $filename
-     * @param resource $fp
-     * @param bool     $public
+     * @param string          $filename
+     * @param resource|string $fp
+     * @param bool            $public
      * @return Model
      */
     public function acceptStream($filename, $fp, $public = false)

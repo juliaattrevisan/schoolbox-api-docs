@@ -47,11 +47,7 @@ class Model extends AbstractResponse
      */
     public function attachOnlineSubmissionContent($body)
     {
-        // write body to a tempfile and accept into storage
-        $tmp = sb_tempnam('os');
-        file_put_contents($tmp, $body);
-
-        $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept('online-submission.html', $tmp, false);
+        $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $body, false);
 
         $this->getAllFiles()->add($storage);
 
