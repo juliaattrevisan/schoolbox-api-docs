@@ -29,15 +29,13 @@
 {% import 'sub/visibility.twig' as visibility %}
 {{ visibility.dropdown(assessment.visibility) }}
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% if contextType != 'unitspec' %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-<label for="summatorSelect">Summation Options</label>
-
+<label for="summatorSelect">Mark Summation Method</label>
 <select id="summatorSelect" name="summator">
     {% for index, title in allSummators.map %}
     <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
@@ -45,6 +43,9 @@
 </select>
 
 {% include '@learningAssessment/fragments/markType.twig' %}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+
 
 {{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}
 

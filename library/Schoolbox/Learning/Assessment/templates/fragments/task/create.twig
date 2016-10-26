@@ -58,18 +58,6 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <label for="hasSelfAssessed">Allow self-assessed?</label>
-        <div class="switch round">
-            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.isSelfAssessed %}checked="checked"{% endif %} />
-            <label for="hasSelfAssessed">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-</div>
 
 <div id='taskEditor'>
     <div class="row" {% if assessment.url|length %}style="display:none"{% endif %} data-attachment="attach">
@@ -92,6 +80,18 @@
         <div class="small-3 medium-2 columns no-pad">
             <label>&nbsp;</label>
             <a class='button icon-attach' data-value='attach'>Attach</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns">
+        <label for="hasSelfAssessed">Allow self-assessed?</label>
+        <div class="switch round">
+            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.isSelfAssessed %}checked="checked"{% endif %} />
+            <label for="hasSelfAssessed">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
         </div>
     </div>
 </div>
