@@ -172,7 +172,7 @@ class Module extends BaseModule
                         if($context instanceof UnitSpecification){
                             $folderIds[] = $context->getCourse()->getFolder()->getId();
                         }
-                        $rubric = RubricMapper::getInstance()->createForFolder($folderIds);
+                        $rubric = $this->getRubricMapper()->createForFolder($folderIds);
                         $rubric->setSubmissionBox(new SubmissionBox());
                         $args['assessment']->setRubric($rubric);
                     }
@@ -375,6 +375,7 @@ class Module extends BaseModule
                 'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
                 'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
                 'participantDataSource'         => $injector->lazyGet('participantDataSource'),
+                'rubricMapper'                  => $this->getMapperFactory()->getLazy(RubricMapper::class),
             ])
         );
     }
@@ -505,4 +506,12 @@ class Module extends BaseModule
     {
         return $this->injector->get('participantDataSource');
     }
+    /**
+     * @return RubricMapper
+     */
+    protected function getRubricMapper()
+    {
+        return $this->getMapperFactory()->get(RubricMapper::class);
+    }
+
 }

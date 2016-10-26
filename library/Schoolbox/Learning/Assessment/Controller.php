@@ -93,6 +93,11 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
@@ -101,6 +106,7 @@ class Controller extends Base
      * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      * @param Participant\DataSource $participantDataSource
+     * @param RubricMapper $rubricMapper
      */
     public function __construct(
         FolderMapper $folderMapper,
@@ -109,7 +115,8 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentMapperProxy,
         UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
         UnitImplementationMapperProxy $unitImplementationMapperProxy,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        RubricMapper $rubricMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
@@ -118,6 +125,7 @@ class Controller extends Base
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
         $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
         $this->setParticipantDataSource($participantDataSource);
+        $this->setRubricMapper($rubricMapper);
     }
 
     /**
@@ -363,7 +371,7 @@ class Controller extends Base
             if($context instanceof UnitSpecification){
                 $folderIds[] = $context->getCourse()->getFolder()->getId();
             }
-            $rubric = RubricMapper::getInstance()->createForFolder($folderIds);
+            $rubric = $this->getRubricMapper()->createForFolder($folderIds);
             $rubric->setSubmissionBox(new SubmissionBox());
             $dueWork->setRubric($rubric);
         }
@@ -580,13 +588,6 @@ class Controller extends Base
             );
 
             $transactionSummary = $transactor->transact();
-
-            // TODO - This should be handled deep inside the AssessmentMapperProxy
-            // TODO - We can't at the moment, because a SubmissionBox does not HAVE A Rubric
-            if($assessment instanceof DueWork && $assessment->getRubric() instanceof Rubric){
-                $rubricMapper = RubricMapper::getInstance();
-                $rubricMapper->save($assessment->getRubric(), $this->getAssessmentMapperProxy()->translateToDataModel($assessment, 0));
-            }
         }
         catch (\DomainException $e) {
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);
@@ -1382,6 +1383,24 @@ class Controller extends Base
     public function setParticipantDataSource(Participant\DataSource $participantDataSource)
     {
         $this->participantDataSource = $participantDataSource;
+        return $this;
+    }
+
+    /**
+     * @return RubricMapper
+     */
+    public function getRubricMapper()
+    {
+        return $this->rubricMapper;
+    }
+
+    /**
+     * @param RubricMapper $rubricMapper
+     * @return static
+     */
+    public function setRubricMapper(RubricMapper $rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
         return $this;
     }
 
