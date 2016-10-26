@@ -293,6 +293,10 @@ $kernel->run
 
         // obtain rubric data and cross-reference
         foreach ($classTaskInstances as $classTaskInstance) {
+
+            // ensure this is blank
+            $markCache = null;
+
             /** @var Task $sourceTask */
             $sourceTask = $sourceTasks[$classTaskInstance->getTask()->getId()]->first();
 
@@ -351,6 +355,53 @@ $kernel->run
                         "Instance %d: indicators do not match between unit box %d and class box %d! Cleaning up difference [%d +%d/-%d = %d]",
                         $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
                     ));
+
+                    if ($instanceReturns->count() && count($instanceBoxIndicators) == count($del)) {
+                        $log->debug("All indicators are being removed; caching return data for {$instanceReturns->count()} students");
+
+                        $oldGrid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBox($instanceBox);
+
+                        foreach ($instanceReturns as $return) {
+                            $student = $return->getOwner();
+                            $studentId = $student->getId();
+
+                            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($oldGrid, $student);
+                            $array = $oldGrid->toContext();
+
+                            $markedDenominator   = 0;
+                            $unmarkedCount       = 0;
+                            $markedCount         = 0;
+                            $unmarkedDenominator = 0;
+
+                            foreach ($array['groups'] as $gid => $group) {
+                                foreach ($group['criteria'] as $critId => $criterion) {
+                                    $critMax    = $criterion['total'];
+                                    $critMarked = !is_null($criterion['sum']);
+
+                                    if ($critMarked) {
+                                        $markedDenominator += $critMax;
+                                        ++$markedCount;
+
+                                    } else {
+                                        ++$unmarkedCount;
+                                        $unmarkedDenominator += $critMax;
+                                    }
+                                }
+                            }
+
+                            if ($markedDenominator == 0) {
+                                // div by zero, no marks given: skip!
+                                continue;
+                            }
+
+                            if ($unmarkedCount == 0) {
+                                // rubric grid is fully marked; skip!
+                                continue;
+                            }
+
+                            $markCache[$studentId] = $oldGrid->getSum() / $markedDenominator;
+                        }
+                    }
 
                     foreach ($del as $deletion) {
                         removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
@@ -453,32 +504,39 @@ $kernel->run
 
 //                    $log->debug("Existing mark given: " . $grid->getSum() . " / $markedDenominator");
 
-                    if ($markedDenominator == 0) {
-                        // div by zero, no marks given: skip!
-                        $log->debug("No marks have been given, nothing to extrapolate");
-                        continue;
-                    }
+                    if ($markedDenominator == 0 && isset($markCache[$studentId])) {
+                        $log->debug("Restoring mark from cache");
 
-                    if ($unmarkedCount == 0) {
-                        $log->debug("Rubric grid is fully marked; no marks to apply");
-                        continue;
-                    }
+                        $averageGiven = $markCache[$studentId];
 
-                    $averageGiven = $grid->getSum() / $markedDenominator;
+                    } else {
+                        if ($markedDenominator == 0) {
+                            // div by zero, no marks given: skip!
+                            $log->debug("No marks have been given, nothing to extrapolate");
+                            continue;
+                        }
+
+                        if ($unmarkedCount == 0) {
+                            $log->debug("Rubric grid is fully marked; no marks to apply");
+                            continue;
+                        }
+
+                        $averageGiven = $grid->getSum() / $markedDenominator;
+                    }
 
                     $marksToApply = round($averageGiven * $unmarkedDenominator);
 //                    $log->debug("Marks to apply: $marksToApply");
+
+                    if ($marksToApply == 0) {
+                        $log->debug("No marks to apply");
+                        continue;
+                    }
 
                     $newDenom  = $grid->getTotal();
                     $newNum    = $grid->getSum() + $marksToApply;
 
 //                    $newVisibleMark = "$newNum / $newDenom";
 //                    $log->debug("New mark: $newVisibleMark");
-
-                    if ($marksToApply == 0) {
-                        $log->debug("No marks to apply");
-                        continue;
-                    }
 
                     // obtain the set of unmarked criteria for this student
                     $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
