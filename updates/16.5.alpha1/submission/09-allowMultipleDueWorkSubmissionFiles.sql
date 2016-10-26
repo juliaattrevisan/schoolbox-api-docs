@@ -1,5 +1,6 @@
 -- As God intended:
 ALTER TABLE `student_submission` ENGINE=INNODB;
+ALTER TABLE `storage` ENGINE=INNODB;
 
 -- Submission file table
 CREATE TABLE `student_submission_file` (
@@ -16,13 +17,12 @@ CREATE TABLE `student_submission_file` (
     REFERENCES `student_submission` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    INDEX `student_submission_file_hash` (`hash` ASC)
-    -- storage is MyISAM
-#     CONSTRAINT `fk_student_submission_file_hash`
-#     FOREIGN KEY (`hash`)
-#     REFERENCES `storage` (`hash`)
-#         ON DELETE CASCADE
-#         ON UPDATE CASCADE
+    INDEX `student_submission_file_hash` (`hash` ASC),
+    CONSTRAINT `fk_student_submission_file_hash`
+    FOREIGN KEY (`hash`)
+    REFERENCES `storage` (`hash`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
     )
     ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
