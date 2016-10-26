@@ -22,6 +22,8 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 
 /**
  * Class OnlineAssessmentMapper
@@ -189,13 +191,67 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
 		$this->hasSoftDeleteDateField('deleted_at');
 
-		$this->registerCallback('preSave', array($this, 'preSave'));
-        $this->registerCallback('postSave', array($this, 'postSave'));
+		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+
+        // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSections'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAttempts'));
 	}
+
+    /**
+     * Soft deletes all Attempts for the specified Quiz
+     *
+     * @param OnlineAssessment $quiz
+     */
+    public function softDeleteSections(OnlineAssessment $quiz)
+    {
+        $quizSectionMapper = QuizSectionMapper::getInstance();
+        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId());
+        $quizSectionMapper->delete($sections);
+    }
+
+    /**
+     * Soft deletes all Attempts for the specified Quiz
+     *
+     * @param OnlineAssessment $quiz
+     */
+	public function softDeleteAttempts(OnlineAssessment $quiz)
+    {
+        $quizAttemptMapper = QuizAttemptMapper::getInstance();
+        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId());
+        $quizAttemptMapper->delete($attempts);
+    }
+
+    /**
+     * Soft deletes all Attempts for the specified Quiz
+     *
+     * @param OnlineAssessment $quiz
+     */
+    public function restoreSections(OnlineAssessment $quiz)
+    {
+        $quizSectionMapper = QuizSectionMapper::getInstance();
+        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
+        $quizSectionMapper->restoreSoftDeleted($sections);
+    }
+
+    /**
+     * Soft deletes all Attempts for the specified Quiz
+     *
+     * @param OnlineAssessment $quiz
+     */
+    public function restoreAttempts(OnlineAssessment $quiz)
+    {
+        $quizAttemptMapper = QuizAttemptMapper::getInstance();
+        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
+        $quizAttemptMapper->restoreSoftDeleted($attempts);
+    }
 
 	/**
 	 * Pre-save callback.
