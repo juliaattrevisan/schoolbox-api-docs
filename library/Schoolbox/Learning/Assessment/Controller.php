@@ -555,22 +555,93 @@ class Controller extends Base
     }
 
     /**
+     * @api GET /learning/assessment/:assessmentId
+     */
+    public function getAssessment()
+    {
+        /* If you're a staff and you're viewing a due work,
+         * redirect to the Status screen
+         */
+    }
+
+    /**
+     * @api GET /learning/assessment/:assessmentId/status
+     */
+    public function getStatusTemp()
+    {
+
+        /* TODO: This place is Staff Only
+         */
+
+        /* Tasks go to 404
+         */
+
+        /* Quiz redirects somewhere else
+         */
+
+        /* If you're a staff and you're viewing a project,
+         * You get to see all the assessments and all the participants
+         */
+
+        /* If you're a staff and you're viewing a due work,
+         * You get to see all participants, quickmark them, and links to getSummary()
+         */
+    }
+
+    /**
      * Display appropriate landing page based on role
      *
-     * @api   GET /learning/assessment/:assessmentId/summary
+     * @api   GET /learning/assessment/:assessmentId/:userId
      * @level 165
-     * @param IAssessable $assessment
+     * @param Participant $participant
      */
-    public function getSummary(IAssessable $assessment)
+    public function getSummary(Participant $participant)
     {
+        /* TODO load $participant in Module.php
+         */
+
         /* There are no Summary views for Tasks; 404 them instead
          */
-        if ($assessment instanceof Task) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
+//        if ($assessment instanceof Task) {
+//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+//        }
+
+        /* TODO: Quiz needs to redirect to whatever their intro screen is
+         */
 
         /* For everything else, determine view
          */
+
+        /* One screen with an if() in it
+         *
+         * If you're a staff and you're viewing a due work for a particular student
+         * see the details of the due work and have a Submit On Behalf Of button available
+         * OR
+         * If you're a student and you're viewing a due work for yourself
+         * see the details of the due work and have a Submit button available
+         * OR
+         * If you're a parent
+         * You don't get a button
+         */
+
+        /* If you're a staff and you're viewing a project for a particular student
+         * you get to see that student's progress in the project
+         * OR
+         * If you're a student and you're viewing a project
+         * so you get to see your own progress in that project
+         */
+
+
+
+
+
+
+
+
+
+
+
+
         if ($assessment instanceof Project) {
             if ($this->getUser()->getRole()->isStaff()) {
                 $this->getSummaryProjectStaff($assessment);

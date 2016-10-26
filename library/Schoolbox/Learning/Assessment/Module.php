@@ -59,9 +59,14 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
 
+                /* Redirect url which sends people to either Status or
+                 * Summary screens depending on Role of the current user
+                 */
+                '/assessment/{assessmentId}' => 'getAssessment',
+
                 /* Assessment Summary screen
                  */
-                '/assessment/{assessmentId}' => 'getSummary',
+                '/assessment/{assessmentId}/{studentId}' => 'getSummary',
 
                 /* Submit a Response to a Due Work
                  */
