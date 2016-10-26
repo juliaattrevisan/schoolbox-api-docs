@@ -431,7 +431,7 @@ $kernel->run
                     ));
 
                 } else {
-                    $log->info("Invalidating all incongruous rubric marks [box_id]($instanceBoxId)");
+                    $log->info("Invalidating any incongruous rubric marks [box_id]($instanceBoxId)");
                     $massInvalidateMarkStmt->execute([ 'submission_box_id' => $instanceBoxId ]);
 
                     $log->debug("Verifying integrity of returns");
