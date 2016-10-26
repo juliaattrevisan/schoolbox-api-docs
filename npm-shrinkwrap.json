@@ -974,11 +974,6 @@
         }
       }
     },
-    "interpret": {
-      "version": "1.0.1",
-      "from": "interpret@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/interpret/-/interpret-1.0.1.tgz"
-    },
     "intersect": {
       "version": "0.0.3",
       "from": "intersect@>=0.0.3 <0.1.0",
@@ -1466,11 +1461,6 @@
         }
       }
     },
-    "rechoir": {
-      "version": "0.6.2",
-      "from": "rechoir@>=0.6.2 <0.7.0",
-      "resolved": "https://registry.npmjs.org/rechoir/-/rechoir-0.6.2.tgz"
-    },
     "redent": {
       "version": "1.0.0",
       "from": "redent@>=1.0.0 <2.0.0",
@@ -1603,9 +1593,9 @@
       "resolved": "https://registry.npmjs.org/shell-quote/-/shell-quote-1.4.3.tgz"
     },
     "shelljs": {
-      "version": "0.7.4",
-      "from": "shelljs@*",
-      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.7.4.tgz"
+      "version": "0.2.6",
+      "from": "shelljs@>=0.2.6 <0.3.0",
+      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.2.6.tgz"
     },
     "sigmund": {
       "version": "1.0.1",

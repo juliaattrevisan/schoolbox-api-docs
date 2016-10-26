@@ -13,7 +13,7 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-shell": "^2.0.0",
     "jit-grunt": "^0.10.0",
-    "shelljs": "^0.7.4"
+    "shelljs": "^0.2.6"
   },
   "license": "Commercial",
   "repository": {
