@@ -635,7 +635,7 @@ class Controller extends Base
          * Return to summary screen with this suffix
          */
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-        $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
+        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
 
         $types = new AssessmentType();
         $twigData = [
