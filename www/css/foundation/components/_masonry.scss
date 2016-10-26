@@ -389,4 +389,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-task;
   color: $icon-color-task;
 }
-
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController:before {
+  @extend .icon-teacher;
+  color: $icon-color-class-teachers;
+}

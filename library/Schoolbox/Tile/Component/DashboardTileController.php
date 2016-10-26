@@ -11,7 +11,6 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Group as GroupHandler;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -20,12 +19,6 @@ use SitePage;
 
 class DashboardTileController extends Component_Dashboard_ControllerAbstract implements TileControllerInterface
 {
-    /**
-     * Deprecated group handler, used for fetching user's permissions
-     *
-     * @var GroupHandler
-     */
-    protected $groupHandler;
 
     /**
      * @var Layout\Model
@@ -50,7 +43,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->groupHandler = new GroupHandler();
         $this->delegate = new TileControllerDelegate();
     }
 
