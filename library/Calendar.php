@@ -194,7 +194,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $query  = "SELECT eventTypeID, eventColour FROM luEventType";
             $result = $this->db->query($query);
             while ($row = $this->db->getNextArray($result)) {
-                $this->colourSet[$row['eventTypeID']] = '#' . $row['eventColour'];
+                $this->colourSet[$row['eventTypeID']] = $row['eventColour'];
             }
         }
         return $this->colourSet[$id];
