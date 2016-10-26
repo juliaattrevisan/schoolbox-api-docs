@@ -102,9 +102,11 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
+                                            {% if participant.findMostRecentFeedback %}
                                             <span class="neutral label right">
                                                 {{ participant.findMostRecentFeedback.humanReadableMark }}
                                             </span>
+                                            {% endif %}
                                             <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
