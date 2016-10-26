@@ -13,9 +13,7 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                sourceMapRoot: '/',
-                sourceMapPrefix: 1
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             main: {
                 // Bower files
@@ -122,9 +120,7 @@ module.exports = function(grunt) {
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
                 ],
-                dest: 'www/javascript/components/<%= pkg.name %>.min.js',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js',
-                sourceMappingURL: '<%= pkg.name %>.map.js'
+                dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             },
             masonry: {
                 src:  [
@@ -135,9 +131,7 @@ module.exports = function(grunt) {
                     'www/javascript/shared/masonry/jquery.masonry.js',
                     'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
                 ],
-                dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>-masonry.map.js',
-                sourceMappingURL: '<%= pkg.name %>-masonry.map.js'
+                dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js'
             },
             fullcalendar: {
                 src:  [
@@ -145,18 +139,16 @@ module.exports = function(grunt) {
                     'www/javascript/components/fullcalendar/dist/fullcalendar.js',
                     'www/javascript/shared/calendar/jquery.fullcalendar.js'
                 ],
-                dest: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>-fullcalendar.map.js',
-                sourceMappingURL: '<%= pkg.name %>-fullcalendar.map.js'
+                dest: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js'
             }
         },
         clean: {
-            js: ['www/javascript/components/schoolbox.{min,map}.js'],
+            js: ['www/javascript/components/schoolbox*.{min,map}.js'],
             css: ['www/css/*/chrome.css']
         }
     });
 
-    require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
+    require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     // Build tasks
     grunt.registerTask('build.js',   ['uglify']);
