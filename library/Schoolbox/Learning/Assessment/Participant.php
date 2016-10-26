@@ -93,10 +93,10 @@ class Participant
         $this->setAssessable($assessable);
 
         $responseClass = $this->getAllowedResponseType();
-        $this->allResponses = $responseClass ? new GenericCollection($responseClass) : null;
+        $this->allResponses = $responseClass ? new GenericCollection($responseClass) : new Collection();
 
         $feedbackClass = $this->getAllowedFeedbackType();
-        $this->allFeedbacks = $feedbackClass ? new GenericCollection($feedbackClass) : null;
+        $this->allFeedbacks = $feedbackClass ? new GenericCollection($feedbackClass) : new Collection();
 
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
