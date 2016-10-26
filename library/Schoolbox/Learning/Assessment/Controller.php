@@ -954,6 +954,15 @@ class Controller extends Base
         }
         else {
             // redirect after saving to Due Work Summary For Particular Student
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getStudentAssessment',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $participant->getId(),
+                    ]
+                )
+            );
         }
     }
 
