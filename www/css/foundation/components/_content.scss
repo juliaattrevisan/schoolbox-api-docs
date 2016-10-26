@@ -757,7 +757,7 @@ nav {
 }
 
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
-	li, .list-item {
+	li{
 		display: table;
 		width: calc(100% + 2rem);
 		.#{$selector} {
