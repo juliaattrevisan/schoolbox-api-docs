@@ -14,10 +14,8 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js',
                 sourceMapRoot: '/',
-                sourceMapPrefix: 1,
-                sourceMappingURL: '<%= pkg.name %>.map.js'
+                sourceMapPrefix: 1
             },
             main: {
                 // Bower files
@@ -107,18 +105,11 @@ module.exports = function(grunt) {
                     // Toasts, popups to notify something has happened
                     'www/javascript/shared/jquery.toast-timeout.js',
 
-                    // Colour handling
-                    'www/javascript/components/spectrum/spectrum.js',
-
                     // File uploading
                     'www/javascript/resource/jquery.resourceAttach.js',
 
                     // Image/File previewing
                     'www/javascript/preview/preview.js',
-
-                    // homepage editing
-                    'www/javascript/shared/masonry/jquery.masonry.js',
-                    'www/javascript/shared/masonry/jquery.masonry.spectrum.js',
 
                     // Course selector
                     'www/javascript/shared/course/jquery.course-selector.js',
@@ -132,7 +123,22 @@ module.exports = function(grunt) {
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
                 ],
-                dest: 'www/javascript/components/<%= pkg.name %>.min.js'
+                dest: 'www/javascript/components/<%= pkg.name %>.min.js',
+                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js',
+                sourceMappingURL: '<%= pkg.name %>.map.js'
+            },
+            masonry: {
+                src:  [
+                    // Colour handling
+                    'www/javascript/components/spectrum/spectrum.js',
+
+                    // homepage editing
+                    'www/javascript/shared/masonry/jquery.masonry.js',
+                    'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
+                ],
+                dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
+                sourceMap: 'www/javascript/components/<%= pkg.name %>-masonry.map.js',
+                sourceMappingURL: '<%= pkg.name %>-masonry.map.js'
             }
         },
         clean: {
