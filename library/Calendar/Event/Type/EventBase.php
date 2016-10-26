@@ -308,11 +308,7 @@ abstract class EventBase implements EventInterface
      */
     public function setColour($colour)
     {
-        if ($colour[0] != '#') {
-            $this->colour = '#' . $colour;
-        } else {
-            $this->colour = $colour;
-        }
+        $this->colour = $colour;
     }
 
     /**
