@@ -766,6 +766,206 @@ class Controller extends Base
         return $assessment;
     }
 
+    /**
+     * Displays a form enabling a student to create Submission for a Due Work
+     *
+     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
+     * @level 165
+     * @param DueWork $assessment With the given student's IResponses or IFeedback attached
+     * @param User $participant
+     */
+    public function getCreateSubmission(DueWork $assessment, User $participant)
+    {
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
+        /* Otherwise continue
+         */
+        $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
+        $latestResponse = null;
+        $editorContents = '';
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         *
+         * TODO: Replace SubmissionFileMapper() usage
+         */
+
+        /** @var SubmissionFile $submission */
+        $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
+            'owner' => $participant->getId(),
+            'box_id' => 72
+        ], [
+            'order' => [
+                'submitted' => 'desc'
+            ]
+        ]);
+
+        /* Assume the most recent record is the latest submission
+         */
+        if ($allResponses->count()) {
+            $latestResponse = $allResponses->first();
+
+            /* Load in the wizzywig instead of a file attachment,
+             * if the submission uses the wizzywig editor and the
+             * submission is still a draft
+             */
+            if (in_array($latestResponse->getStorage()->getFilename(), $onlineSubmissionFilenames)) {
+                if ($latestResponse->getDraft()) {
+                    $editorContents = $latestResponse->getStorage()->read();
+                }
+            }
+        }
+
+        /* Attach files if any exist
+         */
+        $zoneFactory = new ZoneFactory();
+        $zone = $zoneFactory->buildForAssessmentType($assessment);
+
+        if (!$this->getUser()->isSuperuser()) {
+            $folderIds = [];
+
+            /* Sometimes subjectCollection is null ie. when superuser
+             * [subject_collection:protected] =>
+             */
+            if (count($this->getUser()->getSubjectCollection())) {
+                foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
+                    $folderIds[] = $currentSubject['id'];
+                }
+            }
+
+            if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
+        }
+
+        /* Pump into twig land
+         */
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
+            'breadcrumbs'    => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
+            'assessment'     => $assessment,
+            'participant'    => $participant,
+            'currentUser'    => $this->getUser(),
+            'attachzone'     => $zone->getTwigContext(),
+            'response'       => $latestResponse,
+            'editorContents' => $editorContents,
+        ]));
+    }
+
+    /**
+     * Save a Submission to a Due Work
+     *
+     * @api POST /learning/assessment/:assessmentId/:participantId/submit
+     * @param DueWork $assessment
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    public function postCreateSubmission(DueWork $assessment, User $participant)
+    {
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+        }
+        catch (\DomainException $e) {
+
+            /* When asynchronously saving and suddenly you're not allowed to
+             * ie. when you've run out of time and you left this screen on
+             */
+            if ($this->getRequest()->isXhr()) {
+                $result['success'] = false;
+                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
+                $result['id']      = 72;
+
+                $this->getResponse()->status->setCode(403);
+                $this->getResponse()->content->set($this->buildJsonOutput($result));
+                return;
+            }
+
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
+        /* Creator is the currently-logged-in user
+         * Participant is the actual owner of the Response
+         *
+         * Usually the same person, unless you're a teacher creating a Response
+         * on behalf of a student (teacher is creator, student is participant)
+         */
+        $creator = $this->getUser();
+
+        /* Set in javascript when automatically saving a draft
+         * Careful the negation
+         */
+        $isFinal = !$_POST['saveDraft'];
+        $body = $_POST['body'];
+
+        /* Load an existing response to update
+         */
+        if ($this->getRequest()->post['responseId']) {
+
+            /* TODO: Implement with Mr Sannang's data sources
+             */
+
+            /** @var DueWorkSubmission $response */
+            $response = $this->getSubmissionFileMapper()->findById($this->getRequest()->post['responseId']);
+//            $response->setUpdatedAt(Alaress_Date_Format::now());
+        }
+        /* Create a new response
+         */
+        else {
+            $response = new DueWorkSubmission();
+            $response
+                ->setAssessable($assessment)
+                ->setSubmittedBy($creator)
+                ->setSubmittedOnBehalfOf($participant)
+                ->attachOnlineSubmissionContent($body)
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
+        }
+
+        /* If we're saving the final version of the submission
+         * (ie. not a draft) ram the current datetime in
+         */
+        if ($isFinal) {
+
+            /* TODO: this will die because it's not using an actual mapper/model
+             */
+            $response->setSubmittedAt(Alaress_Date_Format::now());
+        }
+
+        /* TODO: Do the actual saving
+         */
+
+        /* Saving drafts from the wizzywig
+         */
+        if ($this->getRequest()->isXhr()) {
+            $result['success'] = true;
+            $result['message'] = 'OK';
+            $result['id']      = 72;
+
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+        }
+        else {
+            // redirect after saving to Due Work Summary For Particular Student
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getStudentAssessment',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $participant->getId(),
+                    ]
+                )
+            );
+        }
+    }
+
     /* Utility methods - these can probably be refactored elsewhere
      */
 
@@ -943,65 +1143,6 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summary/staff.twig", $twigData));
     }
-
-
-    /**
-     * Displays a form enabling a student to submit items to an assessment
-     *
-     * @api   GET /learning/assessment/:assessmentId/:studentId/submit
-     * @level 165
-     * @param DueWork $assessment With the given student's IResponses or IFeedback attached
-     * @param User $student
-     * @todo implement IAssessable interface
-     */
-    public function getSubmitForm(DueWork $assessment, User $student)
-    {
-
-        // Retrieve the students responses
-
-
-        try {
-
-            // Try to load a draft submission if one exists
-
-            /** @var SubmissionFile $submission */
-            $submission = $this->getSubmissionFileMapper()->findOneByColumnList([
-                'draft' => 1,
-                'owner' => $student->getId(),
-                'box_id' => $assessment->getId()
-            ]);
-
-            try {
-                $draft = $submission->getStorage()->read();
-            } catch (\Exception $e) {
-                $draft = '';
-            }
-
-        } catch (MapperException $e) {
-
-            // No existing draft
-
-            $submission = new SubmissionFile();
-            $draft = '';
-        }
-
-        // Work out if we are going to accept submissions
-
-        $acceptSubmission = ($assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE && $responses->count() == 0) || $assessment->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI;
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/submitForm.twig', [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'assessment'  => $assessment,
-            'responses'   => $assessment->getResponses(),
-            'student'     => $student,
-            'user'        => $this->getUser(),
-            'attachzone'  => $this->getAttachZone(),
-            'submission'  => $submission,
-            'draft'       => $draft,
-            'acceptSubmission' => $acceptSubmission
-        ]));
-    }
-
 
     /* Getters/Setters
      */
@@ -2670,30 +2811,5 @@ class Controller extends Base
         //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
         return $quiz;
-    }
-
-    /**
-     * Insert an attach zone into the template
-     *
-     * @param Collection $attachments|IStorage
-     * @return array
-     */
-    private function getAttachZone($attachments = null)
-    {
-        $zone = new Zone('attachment');
-        $zone
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select attachment')
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload attachment')
-            ->setMimeFilter('*/*')
-            ->setReadOnly(false)
-            ->setMulti(true);
-
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
-                $zone->attachFiles(array($attachment->getHash()));
-
-        return $zone->getTwigContext();
     }
 }

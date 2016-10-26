@@ -24,6 +24,8 @@ class Model extends AbstractResponse
      */
     protected $allFiles;
 
+    protected $submittedAt;
+
     /**
      * Model constructor.
      */
@@ -37,14 +39,19 @@ class Model extends AbstractResponse
     }
 
     /**
-     * When the Submission was submitted
-     * An alias to createdAt
+     * Add the contents of the wizzywig to this Response
+     * (add it as a file)
      *
-     * @return \Alaress_Date_Format
+     * @param $body
+     * @return $this
      */
-    public function getSubmittedAt()
+    public function attachOnlineSubmissionContent($body)
     {
-        return $this->getCreatedAt();
+        $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $body, false);
+
+        $this->getAllFiles()->add($storage);
+
+        return $this;
     }
 
     /* Getters/Setters
@@ -65,6 +72,24 @@ class Model extends AbstractResponse
     public function setAllFiles($allFiles)
     {
         $this->allFiles = $allFiles;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSubmittedAt()
+    {
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param mixed $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt($submittedAt)
+    {
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 }

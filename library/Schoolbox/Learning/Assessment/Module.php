@@ -63,14 +63,16 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}' => 'getSummary',
 
-
+                /* Submit a Response to a Due Work
+                 */
+                '/assessment/{assessmentId}/submit/{participantId}' => 'getCreateSubmission',
 
 
                 /* Miscellaneous routes
                  */
                 '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
-                '/assessment/{assessmentId}/{studentId}/submit' => 'getSubmitForm',
+
             ],
             'POST' => [
 
@@ -89,6 +91,10 @@ class Module extends BaseModule
                 /* Delete an assessment
                  */
                 '/assessment/{assessmentId}/delete' => 'postDeleteAssessment',
+
+                /* Save a Response to a Due Work
+                 */
+                '/assessment/{assessmentId}/submit/{participantId}' => 'postCreateSubmission'
             ]
         ];
 
@@ -187,21 +193,20 @@ class Module extends BaseModule
 
                 $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
 
-                if (array_key_exists('studentId', $params)) {
+                if (array_key_exists('participantId', $params)) {
                     try {
-                        $args['student'] = $this->getUserMapper()->findById($params['studentId']);
+                        $args['participant'] = $this->getUserMapper()->findById($params['participantId']);
                     } catch (MapperException $e) {
-                        $args['student'] = $this->getUserMapper()->createModel();
+                        $args['participant'] = $this->getUserMapper()->createModel();
                     }
                 }
                 return $args;
             }
         );
 
-
         $this->addRoutePreload(
             $matcher,
-            '(?:getSubmitForm)',
+            ['getCreateSubmission', 'postCreateSubmission'],
             function ($params) {
 
                 /** @var DueWork $assessment */
@@ -213,7 +218,7 @@ class Module extends BaseModule
                     throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
                 }
 
-                $student = $this->getUserMapper()->findById($params['studentId']);
+                $student = $this->getUserMapper()->findById($params['participantId']);
 
                 $participant = new Participant($student, $assessment);
                 $assessment->getAllParticipants()->add($participant);
@@ -287,7 +292,17 @@ class Module extends BaseModule
 
                 return [
                     'assessment' => $assessment,
-                    'student' => $student
+                    'participant' => $student
+                ];
+            }
+        );
+
+        $this->addRoutePreload(
+            $matcher,
+            '(?:postCreateSubmission)',
+            function ($params) {
+                return [
+                    'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
                 ];
             }
         );
