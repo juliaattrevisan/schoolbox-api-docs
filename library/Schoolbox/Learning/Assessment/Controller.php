@@ -650,8 +650,61 @@ class Controller extends Base
          * so you get to see your own progress in that project
          */
         else if ($assessment instanceof Project) {
+            if ($this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent()) {
 
-            /* Do other things
+                // Calculate summary totals for display purposes
+                $types = new AssessmentType();
+
+                $counts = [];
+
+                foreach($types->getStringValues() as $type){
+                    if (AssessmentType::TYPE_PROJECT == $type){
+                        continue;
+                    }
+
+                    $counts[$type] = 0;
+                    $counts["{$type}Completed"] = 0;
+                }
+
+                $counts['total'] = 0;
+                $counts['totalCompleted'] = 0;
+
+                $assessables = $assessment->getAssessables();
+
+                /** @var IAssessable $assessable */
+                foreach ($assessables as $assessable) {
+                    try {
+                        $participant = $assessable->getParticipant($student);
+                    } catch (\UnexpectedValueException $e) {
+                        // This student isn't a participant.
+                        // This is fine - when PBL is implemented not all students
+                        // will participate in all sub-assessments
+                        continue;
+                    }
+
+                    // If the student has submitted at least one response we will assume it is completed
+                    $counts[$types->objectToString($assessable)]++;
+                    $counts['total']++;
+
+                    if ($participant->getAllResponses()->count() > 0) {
+                        $counts["{$types->objectToString($assessable)}Completed"]++;
+                        $counts['totalCompleted']++;
+                    }
+                }
+
+                // TODO make this an instance var instead of instantiating all the time
+                $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+                $twigData = [
+                    'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
+                    'currentUser' => $this->getUser(),
+                    'participant' => $this->getUser(),
+                    'assessment' => $assessment,
+                    'counts' => $counts,
+                ];
+
+                $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
+            }
+            /* For parents, do other things?
              */
         }
         else {
@@ -660,31 +713,6 @@ class Controller extends Base
              */
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
-
-//
-//
-//
-//
-//        if ($assessment instanceof Project) {
-//            if ($this->getUser()->getRole()->isStaff()) {
-//                $this->getSummaryProjectStaff($assessment);
-//                return;
-//            }
-//
-//            $this->getSummaryProjectStudent($assessment);
-//            return;
-//        }
-//        elseif ($assessment instanceof DueWork) {
-//            if ($this->getUser()->getRole()->isStaff()) {
-//                $this->getSummaryDueWorkStaff($assessment);
-//                return;
-//            }
-//
-//            $this->getSummaryDueWorkStudent($assessment);
-//            return;
-//        }
-
-
     }
 
     /**
@@ -785,64 +813,6 @@ class Controller extends Base
                 $twigData
             )
         );
-    }
-
-    /**
-     * Project Summary for Students
-     *
-     * @param Project $assessment
-     */
-    private function getSummaryProjectStudent(Project $assessment)
-    {
-        // Calculate summary totals for display purposes
-        $types = new AssessmentType();
-
-        $counts = [];
-
-        foreach($types->getStringValues() as $type){
-            if (AssessmentType::TYPE_PROJECT == $type){
-                continue;
-            }
-            $counts[$type] = 0;
-            $counts["{$type}Completed"] = 0;
-        }
-        $counts['total'] = 0;
-        $counts['totalCompleted'] = 0;
-
-        $assessables = $assessment->getAssessables();
-
-        /** @var IAssessable $assessable */
-        foreach ($assessables as $assessable) {
-            try {
-                $participant = $assessable->getParticipant($this->getUser());
-            } catch (\UnexpectedValueException $e) {
-                // This student isn't a participant.
-                // This is fine - when PBL is implemented not all students
-                // will participate in all sub-assessments
-                continue;
-            }
-
-            // If the student has submitted at least one response we will assume it is completed
-            $counts[$types->objectToString($assessable)]++;
-            $counts['total']++;
-
-            if ($participant->getAllResponses()->count() > 0) {
-                $counts["{$types->objectToString($assessable)}Completed"]++;
-                $counts['totalCompleted']++;
-            }
-        }
-
-        // TODO make this an instance var instead of instantiating all the time
-        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
-        $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
-            'currentUser' => $this->getUser(),
-            'participant' => $this->getUser(),
-            'assessment' => $assessment,
-            'counts' => $counts,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
     }
 
     /**
