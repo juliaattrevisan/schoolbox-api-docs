@@ -117,6 +117,8 @@
                                                 {% if participant.user.year and participant.user.role.isStudent %}
                                                     Year {{ participant.user.year }}
                                                 {% endif %}
+                                            </p>
+                                            <p class="meta">
                                                 {{ counts[participant.id].totalCompleted }} / {{ counts[participant.id].total }} Completed
                                             </p>
                                         </div>
