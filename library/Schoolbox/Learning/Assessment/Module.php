@@ -75,7 +75,7 @@ class Module extends BaseModule
 
                 /* Miscellaneous routes
                  */
-                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
+//                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
                 '/assessment/{assessmentId}/status'             => 'getStatus',
 
             ],

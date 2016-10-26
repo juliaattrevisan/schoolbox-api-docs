@@ -593,10 +593,12 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/:userId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User $student
      */
-    public function getSummary(Participant $participant)
+    public function getSummary(IAssessable $assessment, User $student)
     {
+
         /* TODO load $participant in Module.php
          */
 
@@ -631,7 +633,7 @@ class Controller extends Base
          * so you get to see your own progress in that project
          */
 
-
+die();
 
 
 
