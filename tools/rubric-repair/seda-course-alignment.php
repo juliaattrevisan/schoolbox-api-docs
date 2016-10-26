@@ -618,7 +618,7 @@ function computeMostAveragestDelta(array $set, $targetValue, $append = [])
     }
 
     // no work can be achieved
-    if (count($set) == 0) {
+    if (count($set) == 0 || $targetValue <= 0) {
 //        echo "NO CAN DO WORK\n";
         return $append;
     }
