@@ -70,7 +70,7 @@ class Module extends BaseModule
 
                 /* Submit a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/submit/{participantId}' => 'getCreateSubmission',
+                '/assessment/{assessmentId}/submit/{studentId}' => 'getCreateSubmission',
 
 
                 /* Miscellaneous routes
@@ -198,11 +198,11 @@ class Module extends BaseModule
 
                 $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
 
-                if (array_key_exists('participantId', $params)) {
+                if (array_key_exists('studentId', $params)) {
                     try {
-                        $args['participant'] = $this->getUserMapper()->findById($params['participantId']);
+                        $args['student'] = $this->getUserMapper()->findById($params['studentId']);
                     } catch (MapperException $e) {
-                        $args['participant'] = $this->getUserMapper()->createModel();
+                        $args['student'] = $this->getUserMapper()->createModel();
                     }
                 }
                 return $args;
@@ -223,7 +223,7 @@ class Module extends BaseModule
                     throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
                 }
 
-                $student = $this->getUserMapper()->findById($params['participantId']);
+                $student = $this->getUserMapper()->findById($params['studentId']);
 
                 $participant = new Participant($student, $assessment);
                 $assessment->getAllParticipants()->add($participant);

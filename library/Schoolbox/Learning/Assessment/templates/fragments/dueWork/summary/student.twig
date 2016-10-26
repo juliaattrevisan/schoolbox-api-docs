@@ -15,6 +15,10 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <a class='submit' href="{{ routeLookup('learningAssessment.getSubmitForm', { assessmentId: assessment.id, studentId: participant.id}) }}">Create Response</a>
+        {% if currentUser.role.isStaff %}
+        <a class='submit' href="{{ routeLookup('learningAssessment.getCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}">Create Submission on behalf of {{ student.fullname }}</a>
+        {% elseif currentUser.role.isStudent %}
+        <a class='submit' href="{{ routeLookup('learningAssessment.getCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}">Create Submission</a>
+        {% endif %}
     </div>
 </div>

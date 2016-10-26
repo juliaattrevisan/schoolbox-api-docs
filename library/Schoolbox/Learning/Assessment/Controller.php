@@ -602,7 +602,6 @@ class Controller extends Base
      */
     public function getSummary(IAssessable $assessment, User $student)
     {
-
         /* TODO load $participant in Module.php
          */
 
@@ -611,15 +610,10 @@ class Controller extends Base
         if ($assessment instanceof Task) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
-
         /* TODO: Quiz needs to redirect to whatever their intro screen is
          */
-        if ($assessment instanceof Quiz) {
+        else if ($assessment instanceof Quiz) {
         }
-
-        /* For everything else, determine view
-         */
-
         /* One screen with an if() in it
          *
          * If you're a staff and you're viewing a due work for a particular student
@@ -631,14 +625,14 @@ class Controller extends Base
          * If you're a parent
          * You don't get a button
          */
-        if ($assessment instanceof DueWork) {
+        else if ($assessment instanceof DueWork) {
             $types = new AssessmentType();
 
             $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
             $twigData          = [
                 'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
                 'currentUser' => $this->getUser(),
-                'participant' => $this->getUser(),
+                'student' => $student,
                 'assessment'  => $assessment,
             ];
 
@@ -660,33 +654,37 @@ class Controller extends Base
             /* Do other things
              */
         }
+        else {
 
-die();
-
-
-
-        if ($assessment instanceof Project) {
-            if ($this->getUser()->getRole()->isStaff()) {
-                $this->getSummaryProjectStaff($assessment);
-                return;
-            }
-
-            $this->getSummaryProjectStudent($assessment);
-            return;
-        }
-        elseif ($assessment instanceof DueWork) {
-            if ($this->getUser()->getRole()->isStaff()) {
-                $this->getSummaryDueWorkStaff($assessment);
-                return;
-            }
-
-            $this->getSummaryDueWorkStudent($assessment);
-            return;
+            /* Everything else, 404
+             */
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Everything else, 404
-         */
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+//
+//
+//
+//
+//        if ($assessment instanceof Project) {
+//            if ($this->getUser()->getRole()->isStaff()) {
+//                $this->getSummaryProjectStaff($assessment);
+//                return;
+//            }
+//
+//            $this->getSummaryProjectStudent($assessment);
+//            return;
+//        }
+//        elseif ($assessment instanceof DueWork) {
+//            if ($this->getUser()->getRole()->isStaff()) {
+//                $this->getSummaryDueWorkStaff($assessment);
+//                return;
+//            }
+//
+//            $this->getSummaryDueWorkStudent($assessment);
+//            return;
+//        }
+
+
     }
 
     /**
@@ -882,9 +880,9 @@ die();
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
      * @param DueWork $assessment With the given student's IResponses or IFeedback attached
-     * @param User $participant
+     * @param User $student
      */
-    public function getCreateSubmission(DueWork $assessment, User $participant)
+    public function getCreateSubmission(DueWork $assessment, User $student)
     {
         /* Work out if we are going to accept responses
          */
@@ -910,7 +908,7 @@ die();
 
         /** @var SubmissionFile $submission */
         $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
-            'owner' => $participant->getId(),
+            'owner' => $student->getId(),
             'box_id' => 72
         ], [
             'order' => [
@@ -961,7 +959,7 @@ die();
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
             'breadcrumbs'    => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
-            'participant'    => $participant,
+            'participant'    => $student,
             'currentUser'    => $this->getUser(),
             'attachzone'     => $zone->getTwigContext(),
             'response'       => $latestResponse,
