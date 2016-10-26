@@ -3,10 +3,31 @@ $success-color:					#4fa74f !default;
 $warning-color:					#ff7d00 !default;
 $info-color:					#a0d3e8 !default;
 $highlight-color:				#ffd100 !default;
+$hot-color: 					#ff5757;
+$cold-color: 					#00aded;
 
-$ocean-sunset:					#fff3bd;
+$white:							#ffffff;
+$ghost: 						#FAFAFA;
+$snow: 							#F9F9F9;
+$vapor: 						#F6F6F6;
+$white-smoke: 					#F5F5F5;
+$silver: 						#EFEFEF;
+$smoke: 						#EEEEEE;
+$gainsboro: 					#DDDDDD;
+$iron: 							#CCCCCC;
+$base: 							#AAAAAA;
+$aluminum:	 					#999999;
+$jumbo: 						#888888;
+$monsoon: 						#777777;
+$steel: 						#666666;
+$charcoal: 						#555555;
+$tuatara: 						#444444;
+$oil: 							#333333;
+$jet: 							#222222;
+$black:							#000000;
+$neutral-color:					$gainsboro;
 
-// Socialstream New Post
+// Social Stream New Post
 $asgard:                        #E8E8E8;
 
 // Homepage Components
@@ -73,28 +94,26 @@ $icon-color-advanced-list:		$icon-color-due-work;
 $icon-color-basic-list:			$icon-color-clickView;
 $icon-color-my-files:			$icon-color-files;
 
+.white			{ background-color: $white; }
+.ghost			{ background-color: $ghost; }
+.snow			{ background-color: $snow; }
+.vapor			{ background-color: $vapor; }
+.white-smoke	{ background-color: $white-smoke; }
+.silver			{ background-color: $silver; }
+.smoke			{ background-color: $smoke; }
+.gainsboro		{ background-color: $gainsboro; }
+.iron			{ background-color: $iron; }
+.base			{ background-color: $base; }
+.aluminum		{ background-color: $aluminum; }
+.jumbo			{ background-color: $jumbo; }
+.monsoon		{ background-color: $monsoon; }
+.steel			{ background-color: $steel; }
+.charcoal		{ background-color: $charcoal; }
+.tuatara		{ background-color: $tuatara; }
+.oil			{ background-color: $oil; }
+.jet			{ background-color: $jet; }
+.black			{ background-color: $black; }
 
-// Foundation dependant colours - do not delete
-$white:							#ffffff;
-$ghost: 						#FAFAFA;
-$snow: 							#F9F9F9;
-$vapor: 						#F6F6F6;
-$white-smoke: 					#F5F5F5;
-$silver: 						#EFEFEF;
-$smoke: 						#EEEEEE;
-$gainsboro: 					#DDDDDD;
-$iron: 							#CCCCCC;
-$base: 							#AAAAAA;
-$aluminum:	 					#999999;
-$jumbo: 						#888888;
-$monsoon: 						#777777;
-$steel: 						#666666;
-$charcoal: 						#555555;
-$tuatara: 						#444444;
-$oil: 							#333333;
-$jet: 							#222222;
-$black:							#000000;
-
-$hot-color: 					#ff5757;
-$cold-color: 					#00aded;
-$neutral-color:					$gainsboro;
+.alert 			{ color: $alert-color; }
+.success		{ color: $success-color; }
+.warning		{ color: $warning-color; }
