@@ -601,8 +601,8 @@ class Controller extends Base
 
         $counts = [];
         $assessableCounts = [];
-        foreach ($participants as $participant) {
 
+        foreach ($participants as $participant) {
             $counts[$participant->getUser()->getId()] = [
                 'total' => 0,
                 'totalCompleted' => 0,
@@ -619,6 +619,7 @@ class Controller extends Base
             foreach ($subAssessment->getAllParticipants() as $participant) {
                 $counts[$participant->getUser()->getId()]['total']++;
                 $assessableCounts[$subAssessment->getId()]['total']++;
+
                 if ($participant->getAllResponses()->count() > 0) {
                     $counts[$participant->getUser()->getId()]['totalCompleted']++;
                     $assessableCounts[$subAssessment->getId()]['totalCompleted']++;
