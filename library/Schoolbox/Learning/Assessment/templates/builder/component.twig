@@ -1,0 +1,32 @@
+{% if breadcrumbs | length %}
+    <div class="content">
+        <ul class="breadcrumb">
+            <li>
+                {% for node in breadcrumbs %}
+                    <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
+                {% endfor %}
+            </li>
+        </ul>
+    </div>
+{% endif %}
+
+{% if access > 0 %}
+    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, i: loop.index, '_writable': access > 1 } %}
+{% endif %}
+
+<div class="component-action">
+    <section>
+        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'project'}) }}" title="Create a new Project">
+            Add Project
+        </a>
+        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'task'}) }}" title="Create a new Task">
+            Add Task
+        </a>
+        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'dueWork'}) }}" title="Create a new Due Work">
+            Add Due Work
+        </a>
+        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'quiz'}) }}" title="Create a new Quiz">
+            Add Quiz
+        </a>
+    </section>
+</div>

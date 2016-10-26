@@ -1,0 +1,15 @@
+<li class="actions-small-1 content">
+    <h3>{{ unit.folder.name }}</h3>
+        {% if tasks | length %}
+    <ul class="information-list no-pad">
+        {% for task in tasks %}
+            {% include '@leaningAssessment/builder/task.twig' with { '_writable': false } %}
+        {% endfor %}
+    </ul>
+        {% else %}
+    <div class="empty-state">
+        <i class="icon-course"></i>
+        <p>No coursework in this unit.</p>
+    </div>
+        {% endif %}
+</li>
