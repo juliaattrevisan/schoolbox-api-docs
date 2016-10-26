@@ -810,7 +810,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?return_url=' . $this->encodeReturnUrl($returnUrl);
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
         $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
@@ -828,28 +828,6 @@ class Controller extends Base
         }
 
         return $allReturnUrls;
-    }
-
-    /**
-     * Encodes a returnUrl
-     *
-     * @param string $returnUrl
-     * @return string
-     */
-    private function encodeReturnUrl($returnUrl)
-    {
-        return urlencode(base64_encode($returnUrl));
-    }
-
-    /**
-     * Decodes an encoded returnUrl
-     *
-     * @param string $encodedReturnUrl
-     * @return string
-     */
-    private function decodeReturnUrl($encodedReturnUrl)
-    {
-        return base64_decode(urldecode($encodedReturnUrl));
     }
 
     /**
