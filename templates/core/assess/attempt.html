@@ -108,14 +108,9 @@ $(function() {
             <!-- BEGIN endAssess -->
             <li>
                 <button data-href="/assess/end/{ASSESS_ASSESS_ID}/{ATTEMPT_ID}" class="icon-approve submit expand" data-evaluation-finish>Finish</button>
-            </li>
+			</li>
             <!-- END endAssess -->
         </ul>
-
-		<div class="small-12 column no-pad">
-			<div id='evaluation-saving' class="loader text-center hide">
-				<span class="success label full-width hide" data-evaluation-progress-saved>Progress Saved</span>
-			</div>
-		</div>
 	</div>
+	<div class="toast" data-alert data-relation="save-label"></div>
 </div>

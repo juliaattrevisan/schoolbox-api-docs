@@ -114,27 +114,20 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement
-                                .data('opened', false)
-                                .foundation('reveal', 'open')
-                                .one('opened.fndtn.reveal', function() {
-                                    calendarLoadingElement.data('opened', true);
-                                });
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
-                         * Is it open? close it
-                         * Is it not yet open? close it when it is open
                          */
-                        if (calendarLoadingElement.data('opened')) {
-                            calendarLoadingElement.foundation('reveal', 'close');
-                        } else {
-                            calendarLoadingElement.one('opened.fndtn.reveal', function() {
-                                calendarLoadingElement.foundation('reveal', 'close');
-                            });
-                        }
+                        $.magnificPopup.close();
                     }
                 },
                 /**
@@ -294,11 +287,6 @@
 
         <div id="calendar"></div>
     </div>
-</div>
-
-<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
-    <div class='loader'></div>
-    <div class="toast" data-alert>Loading events</div>
 </div>
 
 <div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create">
