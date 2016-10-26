@@ -71,6 +71,23 @@ class External_Doublefirst_Class implements External_ClassInterface
     }
 
     /**
+     * Gets the class code part of a query.
+     *
+     * @param  string $subCode
+     * @return string
+     */
+    protected function getClassCodeQuery($subCode)
+    {
+        $subCodeArray = array_filter(explode(",", $subCode));
+
+        foreach ($subCodeArray as &$code) {
+            $code = "'" . $this->database->quote($code) . "'";
+        }
+
+        return "ygsd.SubjectDivisionName IN (" . implode($subCodeArray, ',') . ")";
+    }
+
+    /**
      * Retrieve teacher external IDs for a particular class (great function naming)
      * @param $subCode
      * @param null $user
@@ -80,15 +97,17 @@ class External_Doublefirst_Class implements External_ClassInterface
     {
         $year = date("Y");
 
+        $classQuery = $this->getClassCodeQuery($subCode);
+
         $query =
             "
-            SELECT DISTINCT tcs.StaffID, ygsd.SubjectDivisionName
+            SELECT DISTINCT tcs.StaffID
             FROM PupilSubjects ps 
             JOIN TimeTableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
             JOIN StaffPersonalDetails spd ON spd.StaffID = tcs.StaffID
             
             LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = tcs.SubjectID AND ygsd.YearGroup = tcs.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear
-            WHERE ps.SchoolYear = {$year} and ygsd.SubjectDivisionName = '{$subCode}'
+            WHERE ps.SchoolYear = {$year} and $classQuery
         ";
 
         $rows = $this->getDatabase()->getAll($query);
