@@ -21,6 +21,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class OnlineAssessmentMapper
@@ -141,33 +142,33 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			'type'       => self::TYPE_DATETIME,
 		));
 		$this->hasJoin('category', array(
-			'mapper'    => 'Schoolbox\\Resource\\Folder\\Mapper',
+			'mapper'    => FolderMapper::class,
 			'this_key'  => 'category_id',
 			'other_key' => 'id',
 		));
 		$this->hasJoin('user', array(
-			'mapper'    => 'Schoolbox\\UserMapper',
+			'mapper'    => Schoolbox\UserMapper::class,
 			'this_key'  => 'user_id',
 			'other_key' => 'id',
 		));
 		$this->hasJoin('work_type', array(
-			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
+			'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper::class,
 			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
 		$this->hasJoin('task', array(
-			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
+			'mapper'    => Schoolbox\Assessment\Course\TaskMapper::class,
 			'this_key'  => 'task_id',
 			'other_key' => 'id',
 		));
 		$this->hasJoin('attempt', array(
-			'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\AttemptMapper',
+			'mapper'    => Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class,
 			'multiple'  => true,
 			'this_key'  => 'assess_id',
 			'other_key' => 'assess_id',
 		));
 		$this->hasJoin('task_instance', array(
-			'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+			'mapper'    => Task\InstanceMapper::class,
 			'this_key'  => 'task_instance_id',
 			'other_key' => 'id',
 		));
