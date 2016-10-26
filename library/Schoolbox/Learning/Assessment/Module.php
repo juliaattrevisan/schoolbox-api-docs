@@ -65,7 +65,7 @@ class Module extends BaseModule
 
                 /* Submit a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{participantId}/submit' => 'getCreateSubmission',
+                '/assessment/{assessmentId}/submit/{participantId}' => 'getCreateSubmission',
 
 
                 /* Miscellaneous routes
@@ -94,7 +94,7 @@ class Module extends BaseModule
 
                 /* Save a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/{participantId}/submit' => 'postCreateSubmission'
+                '/assessment/{assessmentId}/submit/{participantId}' => 'postCreateSubmission'
             ]
         ];
 
