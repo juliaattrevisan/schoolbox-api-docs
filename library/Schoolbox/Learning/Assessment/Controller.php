@@ -566,15 +566,19 @@ class Controller extends Base
 
     /**
      * @api GET /learning/assessment/:assessmentId/status
+     * @param IAssessable $assessment
      */
-    public function getStatusTemp()
+    public function getStatusTemp(IAssessable $assessment)
     {
 
         /* TODO: This place is Staff Only
          */
 
-        /* Tasks go to 404
+        /* There are no Summary views for Tasks; 404 them instead
          */
+        if ($assessment instanceof Task) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
 
         /* Quiz redirects somewhere else
          */
@@ -604,9 +608,9 @@ class Controller extends Base
 
         /* There are no Summary views for Tasks; 404 them instead
          */
-//        if ($assessment instanceof Task) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-//        }
+        if ($assessment instanceof Task) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
 
         /* TODO: Quiz needs to redirect to whatever their intro screen is
          */
