@@ -256,7 +256,7 @@ class Factory
             throw new \InvalidArgumentException('set an assessment title');
         }
 
-        if(!$assessment->getContext() instanceof UnitSpecification) {
+        if(!$assessment->getBaseContext() instanceof UnitSpecification) {
             /* Check dates are provided
              * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
              */
