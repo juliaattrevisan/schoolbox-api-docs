@@ -216,10 +216,10 @@ class Controller extends Base
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Do caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get('returnUrl');
+        $return_url = $this->getRequest()->query->get('return_url');
 
-        if ($returnUrl){
-            $data['return_url'] = $returnUrl;
+        if ($return_url){
+            $data['return_url'] = $return_url;
         }
 
         if ($assessment){
@@ -336,17 +336,17 @@ class Controller extends Base
          * Otherwise return to whatever context you came from
          */
         if ($assessment instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
         }
         elseif ($assessment->getContext() instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
         }
         else {
-            $returnUrl = $assessmentInfo['returnUrl'];
+            $return_url = $assessmentInfo['return_url'];
         }
 
         $data = [
-            'return_url' => $returnUrl
+            'return_url' => $return_url
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -417,17 +417,17 @@ class Controller extends Base
          * Otherwise return to context
          */
         if ($assessmentInfo['assessment'] instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
         }
         else {
-            $returnUrl = $assessmentInfo['returnUrl'];
+            $return_url = $assessmentInfo['return_url'];
         }
 
         $data = [
-            'return_url' => $returnUrl
+            'return_url' => $return_url
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -519,7 +519,7 @@ class Controller extends Base
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $returnUrl = $this->getRequest()->post['returnUrl'];
+        $returnUrl = $this->getRequest()->post['return_url'];
 
         // Did caller explicitly specify a returnUrl ?
         if($returnUrl) {
@@ -809,7 +809,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?returnUrl=' . $this->encodeReturnUrl($returnUrl);
+        $suffix = '?return_url=' . $this->encodeReturnUrl($returnUrl);
 
         $name = 'learningAssessment.getSelectAssessmentInProject';
         $allReturnUrls = [];
