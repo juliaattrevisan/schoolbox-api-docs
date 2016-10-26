@@ -42,8 +42,6 @@
         var anchor = '';
         var parts  = location.href.split('#');
 
-        var calendarLoadingElement = $('#calendar-loading');
-
         if (parts.length > 1) {
             anchor = parts[1];
             switch (anchor) {
@@ -239,27 +237,20 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement
-                            .data('opened', false)
-                            .foundation('reveal', 'open')
-                            .one('opened.fndtn.reveal', function() {
-                                calendarLoadingElement.data('opened', true);
-                            });
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
-                         * Is it open? close it
-                         * Is it not yet open? close it when it is open
                          */
-                        if (calendarLoadingElement.data('opened')) {
-                            calendarLoadingElement.foundation('reveal', 'close');
-                        } else {
-                            calendarLoadingElement.one('opened.fndtn.reveal', function() {
-                                calendarLoadingElement.foundation('reveal', 'close');
-                            });
-                        }
+                        $.magnificPopup.close();
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {
@@ -713,13 +704,6 @@
     </form>
 
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
-    <div class='loader'></div>
-    <p>
-        <span class="label neutral full-width">Loading events</span>
-    </p>
 </div>
 
 <div class="row">
