@@ -212,6 +212,7 @@ class Controller extends Base
         $data = [
             'context'         => $context,
             'contextType'     => AssessmentContextType::objectToString($context),
+            'baseContextType' => AssessmentContextType::objectToString($context->getBaseContext()),
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromContext($context, $assessment),
             'attachzone'      => $zone->getTwigContext(),
             'assessment'      => $assessment,

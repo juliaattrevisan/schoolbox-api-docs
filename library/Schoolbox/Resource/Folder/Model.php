@@ -534,4 +534,12 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
+    }
+
 }
