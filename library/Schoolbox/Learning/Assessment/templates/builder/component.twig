@@ -10,23 +10,25 @@
     </div>
 {% endif %}
 
-{% if access > 0 %}
-    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, i: loop.index, '_writable': access > 1 } %}
+{% if access > constant('DENY_ACCESS') %}
+    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, '_writable': access > constant('READ_ACCESS') } %}
 {% endif %}
 
-<div class="component-action">
-    <section>
-        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'project'}) }}" title="Create a new Project">
-            Add Project
-        </a>
-        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'task'}) }}" title="Create a new Task">
-            Add Task
-        </a>
-        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'dueWork'}) }}" title="Create a new Due Work">
-            Add Due Work
-        </a>
-        <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'quiz'}) }}" title="Create a new Quiz">
-            Add Quiz
-        </a>
-    </section>
-</div>
+{% if access > constant('READ_ACCESS') %}
+    <div class="component-action">
+        <section>
+            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'project'}) }}" title="Create a new Project">
+                Add Project
+            </a>
+            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'task'}) }}" title="Create a new Task">
+                Add Task
+            </a>
+            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'dueWork'}) }}" title="Create a new Due Work">
+                Add Due Work
+            </a>
+            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'quiz'}) }}" title="Create a new Quiz">
+                Add Quiz
+            </a>
+        </section>
+    </div>
+{% endif %}
