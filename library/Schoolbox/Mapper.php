@@ -932,7 +932,7 @@ abstract class Mapper implements IMapper, Serializable
      * Overrides delete() method to call softDelete if a soft delete field was
      * set up, or hardDelete() method if it wasn't.
      *
-     * @param $object
+     * @param object|Collection $object
      *
      * @return bool
      */
@@ -948,7 +948,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Soft deletes one or more models.
      *
-     * @param object $object Model or collection of models to delete
+     * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
      */
@@ -977,7 +977,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Truly deletes an item.
      *
-     * @param object $object Model or collection of models to delete
+     * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
      */
@@ -1111,7 +1111,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Restores one or more models that were soft deleted.
      *
-     * @param object $object Model or collection of models to restore
+     * @param object|Collection $object Model or collection of models to restore
      *
      * @return bool
      */
