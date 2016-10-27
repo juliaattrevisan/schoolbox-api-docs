@@ -393,6 +393,7 @@ $kernel->run
 
                             if ($markedDenominator == 0) {
                                 // div by zero, no marks given: skip!
+                                $log->debug("Cannot cache, no marks given [box_id,student_id]($instanceBoxId,$studentId)");
                                 continue;
                             }
 
