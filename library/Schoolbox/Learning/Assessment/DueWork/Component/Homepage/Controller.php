@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
@@ -38,23 +39,31 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $assessables = $this->getAssessmentDataMapper()
+        $allAssessable = $this->getAssessmentDataMapper()
             ->findByColumn('d.category', $this->getSource()->getId())
             ->limit($this->getConfig('size'));
+
+        $futureAssessables = [];
+
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessable */
+        foreach ($allAssessable as $assessable) {
+            if (true || $assessable->getCloseDate()->isFuture()) {
+                $futureAssessables[] = $assessable;
+            }
+        }
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/dueWork/component.twig',
             array(
-                'session'               => $_SESSION,
                 'component_id'          => $this->getInstance()->getId(),
                 'compact'               => $this->getConfig('compactMode'),
                 'user'                  => $this->getUser(),
                 'folder'                => $this->getSource(),
-                'assessables'           => $assessables,
+                'assessables'           => $futureAssessables,
                 'termCode'              => $this->getTermMapper()->findForToday()->getCode()
             ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            true
         );
     }
 
@@ -94,5 +103,5 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function getTermMapper() {
         return $this->termMapper;
-    }    
+    }
 }

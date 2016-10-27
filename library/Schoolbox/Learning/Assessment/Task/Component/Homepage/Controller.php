@@ -43,14 +43,13 @@ class Controller extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@learningAssessment/task/component.twig',
             array(
-                'session'               => $_SESSION,
                 'component_id'          => $this->getInstance()->getId(),
                 'compact'               => $this->getConfig('compactMode'),
                 'user'                  => $this->getUser(),
                 'folder'                => $this->getSource(),
                 'assessables'           => $assessables
             ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            true
         );
     }
 

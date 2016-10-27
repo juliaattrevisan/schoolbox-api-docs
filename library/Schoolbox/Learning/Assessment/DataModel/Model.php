@@ -650,15 +650,4 @@ class Model implements ISoftDeletable
         $this->specificationAssessment = $specificationAssessment;
         return $this;
     }
-
-    /**
-     * Retrieve urgency value that can be used to render appropriate gradient CSS class
-     * @return int
-     */
-    public function getUrgency()
-    {
-        $urgency = intval(($this->getDueDate()->getUnixTimeStamp() - time()) / 86400);
-        return max(0, min(10, $urgency));
-
-    }
 }

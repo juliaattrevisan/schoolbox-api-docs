@@ -1,14 +1,19 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
     <ul class="action-list">
-        {% for assessable in assessables if true or assessable.dueDate.isFuture %}
+        {% for assessable in assessables %}
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="avatar card small-12">
-                        <a href="/submission/viewSubmission/{{ assessable.dueWork.id }}">
-                            <h3>{{ assessable.title }}</h3>
-                        </a>
+                    <div class="card small-12">
+                        {% if assessable.dueDate.isFuture or user.role.isStaff %}
+                            <a href="/submission/viewSubmission/{{ assessable.dueWork.id }}">
+                        {% endif %}
+                        <h3>{{ assessable.title }}</h3>
+                        {% if assessable.dueDate.isFuture or user.role.isStaff %}
+                            </a>
+                        {% endif %}
                         <p class="meta">
-                            <span class="gradient-{{ assessable.urgency }}">
+                            <span class="gradient-{{ urgency.gradientIndex(assessment) }}">
                                 Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
                             </span>
                         </p>
@@ -20,16 +25,18 @@
                     {% endif %}
                 </nav>
                 <article {% if compact %}class="hide"{% endif %}>
-                    {{ assessable.dueWork.description | raw }}
+                    {{ assessable.dueWork.description | purify }}
                 </article>
             </li>
         {% endfor %}
     </ul>
     <div class="content">
         {# TODO: Replace hrefs with routeLookup #}
-        <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" title="View grades" class="button icon-approve">View Grades</a>
+        {% if user.role.isStudent %}
+            <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" title="View grades" class="button icon-approve">View Grades</a>
+        {% endif %}
         {% if isRouteAuthorized('learningAssessment.postCreateAssessment') %}
-            <a href="/submission/createSubmission/new/{{ folder.id }}" class="button icon-due-work">Post Due Work</a>
+            <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'dueWork'}) }}" class="button icon-due-work">Post Due Work</a>
         {% endif %}
     </div>
 </section>

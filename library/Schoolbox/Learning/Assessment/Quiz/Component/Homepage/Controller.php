@@ -36,21 +36,30 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $assessables = $this->getAssessmentDataMapper()
-            ->findByColumn('q.category_id', $this->getSource()->getId());
+        $allAssessable = $this->getAssessmentDataMapper()
+            ->findByColumn('q.category_id', $this->getSource()->getId())
+            ->limit($this->getConfig('size'));
+
+        $futureAssessables = [];
+
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessable */
+        foreach ($allAssessable as $assessable) {
+            if (true || $assessable->getCloseDate()->isFuture()) {
+                $futureAssessables[] = $assessable;
+            }
+        }
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/quiz/component.twig',
             array(
-                'session'               => $_SESSION,
                 'component_id'          => $this->getInstance()->getId(),
                 'compact'               => $this->getConfig('compactMode'),
                 'user'                  => $this->getUser(),
                 'folder'                => $this->getSource(),
-                'assessables'           => $assessables
+                'assessables'           => $futureAssessables
             ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            true
         );
     }
 

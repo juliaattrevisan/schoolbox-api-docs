@@ -1,9 +1,10 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
     <ul class="action-list">
         {% for assessable in assessables %}
             <li class="actions-small-4">
                 <div class="list-item">
-                    <div class="avatar card small-12">
+                    <div class="card small-12">
                         <h3>
                             {# TODO: Replace href with routeLookup #}
                             {% if assessable.dueDate.isFuture %}<a href="/assess/intro/{{ assessable.quiz.id }}">{% endif %}
@@ -11,7 +12,7 @@
                             {% if assessable.dueDate.isFuture %}</a>{% endif %}
                         </h3>
                         <p class="meta">
-                            <span class="gradient-{{ assessable.urgency }}">
+                            <span class="gradient-{{ urgency.gradientIndex(assessment) }}">
                                 Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
                             </span>
                         </p>
@@ -34,18 +35,28 @@
 
                 </nav>
                 <article {% if compact %}class="hide"{% endif %}>
-                    {{ assessable.quiz.description | raw }}
+                    {{ assessable.quiz.description | purify }}
                 </article>
             </li>
         {% endfor %}
     </ul>
     {% if isRouteAuthorized('learningAssessment.postCreateAssessment') %}
         <div class="content">
-            {# TODO: Replace with create quiz route #}
-            <a href="/assess/create/{{ folder.id }}" class="button icon-add">Create Quiz</a>
+            <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'quiz'}) }}" class="button icon-add">Create Quiz</a>
         </div>
     {% endif %}
 </section>
+{% if isRouteAuthorized('learningAssessment.postDeleteAssessment') %}
+    <script type="text/javascript">
+        $('#component{{ component_id }}').on('click', 'a[data-action="delete"]', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: "Are you sure you want to delete this quiz?",
+                confirmAction: $.confirmDialog.followHref
+            });
+        });
+    </script>
+{% endif %}
 <script type="text/javascript">
     $('#component{{ component_id }}').on('click', 'a[data-action="delete"]', function(e) {
         e.preventDefault();
