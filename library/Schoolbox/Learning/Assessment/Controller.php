@@ -1022,9 +1022,10 @@ class Controller extends Base
      *
      * @api POST /learning/assessment/:assessmentId/:participantId/submit
      * @param DueWork $assessment
+     * @param User $student
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postCreateSubmission(DueWork $assessment, User $participant)
+    public function postCreateSubmission(DueWork $assessment, User $student)
     {
         /* Work out if we are going to accept responses
          */
@@ -1081,7 +1082,7 @@ class Controller extends Base
             $response
                 ->setAssessable($assessment)
                 ->setSubmittedBy($creator)
-                ->setSubmittedOnBehalfOf($participant)
+                ->setSubmittedOnBehalfOf($student)
                 ->attachOnlineSubmissionContent($body)
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
@@ -1117,7 +1118,7 @@ class Controller extends Base
                     'learningAssessment.getStudentAssessment',
                     [
                         'assessmentId' => $assessment->getId(),
-                        'studentId'    => $participant->getId(),
+                        'studentId'    => $student->getId(),
                     ]
                 )
             );

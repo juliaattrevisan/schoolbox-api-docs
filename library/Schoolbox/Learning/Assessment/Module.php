@@ -102,7 +102,7 @@ class Module extends BaseModule
 
                 /* Save a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/submit/{participantId}' => 'postCreateSubmission'
+                '/assessment/{assessmentId}/submit/{studentId}' => 'postCreateSubmission'
             ]
         ];
 
