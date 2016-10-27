@@ -96,8 +96,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setDeletedAt(new \Alaress_Date_NullDate())
                 ->setUpdatedAt($studentSubmission->getCreatedAt());
 
-            // TODO update the mapper at some point to enable multiple upload support
-            $response->getAllFiles()->add($studentSubmission->getStorage());
+            foreach ($studentSubmission->getFiles() as $file) {
+                $response->getAllFiles()->add($file->getStorage());
+            }
             $dueWorkResponses->add($response);
         }
 
