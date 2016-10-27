@@ -341,6 +341,9 @@ class Controller extends Base
         elseif ($assessment->getContext() instanceof Project) {
             $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
         }
+        elseif (strlen($this->getRequest()->post['return_url'])) {
+            $return_url = $this->getRequest()->post['return_url'];
+        }
         else {
             $return_url = $assessmentInfo['return_url'];
         }
