@@ -152,10 +152,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');
 
-            // Associate this assessment with its folder
-            $insertAssessmentFolderRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
-            $log->debug('Created assessment/folder relation');
-
             // Create the quiz or due work
             if ($quizId) {
                 $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $quizId]);
@@ -163,6 +159,17 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             } elseif ($boxId) {
                 $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $boxId]);
                 $log->debug('Created due work/assessment relation');
+            }
+
+            // Associate this assessment with its folder
+            try {
+                $insertAssessmentFolderRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+                $log->debug('Created assessment/folder relation');
+            } catch (PDOException $e) {
+                $log->warning($e->getMessage());
+                $log->warning('Could not create assessment/folder relation!');
+                $log->warning('This is probably because the folder in which this assessment lives has been deleted.');
+                $log->warning('This assessment will be orphaned (it likely was already).');
             }
 
             $successCount++;
