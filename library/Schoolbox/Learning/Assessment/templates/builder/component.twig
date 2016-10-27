@@ -10,11 +10,11 @@
     </div>
 {% endif %}
 
-{% if access > constant('DENY_ACCESS') %}
-    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, '_writable': access > constant('READ_ACCESS') } %}
+{% if canRead %}
+    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, '_writable': canWrite } %}
 {% endif %}
 
-{% if access > constant('READ_ACCESS') %}
+{% if canWrite %}
     <div class="component-action">
         <section>
             <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'project'}) }}" title="Create a new Project">

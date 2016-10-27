@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitInstanceTranslator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
 use Alaress\Web\Controller as Base;
@@ -116,10 +117,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
         // Get the units details
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
 
+        $data['canRead'] = $access >= UserAccess::ACCESS_READ;
+        $data['canWrite'] = $access >= UserAccess::ACCESS_WRITE;
         $data['unit'] = $this->getUnitSpecificationMapper()->findByFolderId($this->getSource()->getId());
-        $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
-        $data['access'] = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
         $data['tasks'] = $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($data["unit"]->getId());
         $data['usages'] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
         $data['returnUrl'] = $_GET["page"];
