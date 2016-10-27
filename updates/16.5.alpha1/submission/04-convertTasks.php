@@ -63,6 +63,42 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectQuizWeightQuery    = $db->prepare("SELECT weight FROM assess WHERE assess_id = :assessId");
     $selectDueWorkWeightQuery = $db->prepare("SELECT weight FROM submission_box WHERE id = :boxId");
 
+    // Add missing course and unit specifications
+    // This is required if a course builder is deleted.
+    $insertNewCourseQuery = $db->prepare("
+        INSERT INTO course_specification (
+            folder_id,
+            created_at,
+            updated_at,
+            deleted_at
+        ) VALUES (
+            (SELECT parent FROM folder WHERE id = :folderId),
+            NOW(),
+            NOW(),
+            NOW()
+        )
+    ");
+    $selectCourseIdQuery = $db->prepare("
+        SELECT id
+        FROM course_specification
+        WHERE folder_id = (SELECT parent FROM folder WHERE id = :folderId)
+    ");
+    $insertNewUnitQuery = $db->prepare("
+        INSERT INTO course_unit_specification (
+            folder_id,
+            course_specification_id,
+            created_at,
+            updated_at,
+            deleted_at
+        ) VALUES (
+            :folderId,
+            :courseId,
+            NOW(),
+            NOW(),
+            NOW()
+        )
+    ");
+
 
     // Go
     $selectTaskQuery->execute();
@@ -106,8 +142,31 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created assessment');
 
             // Associate this assessment with the task's course spec
-            $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId'  => $folderId]);
-            $log->debug('Created assessment/course specification relation');
+            try {
+                $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+                $log->debug('Created assessment/unit specification relation');
+            } catch (PDOException $e) {
+                // If this failed - most likely there WAS a course builder here, but there is no longer.
+                // Consider trying to rebuild it, but create it as deleted.
+                $log->warning('Could not create assessment/unit specification relation!');
+                $log->warning('What probably happened is that the course builder that was here was deleted.');
+
+                $selectCourseIdQuery->execute(['folderId' => $folderId]);
+                $courseId = $selectCourseIdQuery->fetchColumn();
+                if (!$courseId) {
+                    $log->debug('Course specification does not exist - attempting to create it');
+                    $insertNewCourseQuery->execute(['folderId' => $folderId]);
+                    $courseId = $db->lastInsertId();
+                } else {
+                    $log->debug('Course specification already exists');
+                }
+
+                $log->debug('Attempting to create unit specification');
+                $insertNewUnitQuery->execute(['folderId' => $folderId, 'courseId' => $courseId]);
+
+                $log->debug('Attempting to create assessment/unit specification relation again');
+                $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+            }
 
             // Associate this task with the assessment
             $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $taskId]);
