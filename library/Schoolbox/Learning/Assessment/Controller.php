@@ -686,9 +686,7 @@ class Controller extends Base
          */
         else if ($assessment instanceof Quiz) {
         }
-        /* One screen with an if() in it
-         *
-         * If you're a staff and you're viewing a due work for a particular student
+        /* If you're a staff and you're viewing a due work for a particular student
          * see the details of the due work and have a Submit On Behalf Of button available
          * OR
          * If you're a student and you're viewing a due work for yourself
