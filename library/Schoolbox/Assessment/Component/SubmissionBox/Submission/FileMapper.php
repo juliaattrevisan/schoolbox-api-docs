@@ -23,7 +23,9 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 
 /**
- * Class FileMapper
+ * A mapper for a student's submission to a due work.
+ *
+ * The name FileMapper is a misnomer, as student submissions may now contain multiple files.
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
  * @method File findById($id)

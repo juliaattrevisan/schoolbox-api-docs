@@ -23,6 +23,11 @@ use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * A student's submission to a due work.
+ *
+ * The name File is a misnomer, as now a submission may contain multiple files.
+ */
 class File implements IFile
 {
     use StorableTrait;
