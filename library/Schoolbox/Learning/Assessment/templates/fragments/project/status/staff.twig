@@ -93,15 +93,7 @@
                 <div class="empty-state">
                     <i class="icon-project"></i>
                     <p>Your project is empty.</p>
-                    <p>Add a
-                        {% for projectAssessment in projectAssessments %}
-                            {%- set url -%}
-                                {{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id, assessmentTypeTitle: types.objectToString(projectAssessment)}) }}
-                            {%- endset -%}
-                            <a href="{{ url }}{{ returnUrlSuffix }}" title="Create a new {{ projectAssessment.typeName }}">{{ projectAssessment.typeName }}</a>
-                            {%- if not loop.last %},{% endif %}{% if loop.revindex == 2 %} or{% endif %}
-                        {% endfor %}
-                    </p>
+                    <p><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}">Add a new Assessment</a></p>
                 </div>
                 {% endif %}
             </div>

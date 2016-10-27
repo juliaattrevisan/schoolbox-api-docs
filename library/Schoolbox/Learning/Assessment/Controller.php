@@ -636,8 +636,6 @@ class Controller extends Base
                 'counts' => $counts,
                 'assessableCounts' => $assessableCounts,
                 'assessment' => $assessment,
-                'types' => $types,
-                'projectAssessments' => [new DueWork(), new Quiz(), new Task()],
                 'currentUser' => $this->getUser(),
                 'returnUrlSuffix' => $returnUrlSuffix
             ];
