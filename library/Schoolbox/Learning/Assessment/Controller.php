@@ -378,7 +378,7 @@ class Controller extends Base
         /* Twig payload
          */
         $data = [
-            'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '#']),
+            'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '']),
             'assessment'      => $assessment,
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'attachzone'      => $zone->getTwigContext(),
@@ -741,7 +741,7 @@ class Controller extends Base
             }
 
             $twigData          = [
-                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '']),
                 'currentUser' => $this->getUser(),
                 'student' => $student,
                 'assessment'  => $assessment,
