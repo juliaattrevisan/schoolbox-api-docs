@@ -391,7 +391,7 @@ class Module extends BaseModule
 
         $staffOnly = [
             'getSummaryStaff','postCreateAssessment','postUpdateAssessment','postDeleteAssessment','getStatus', 'getSelectAssessmentInFolder',
-            'getSelectAssessmentInProject','getSelectAssessmentInUnitImplementation','getSelectAssessmentInUnitSpecification'
+            'getSelectAssessmentInProject','getSelectAssessmentInUnitImplementation','getSelectAssessmentInUnitSpecification', 'getUpdateAssessment'
         ];
 
         // TODO: postCreateAssessment|postUpdateAssessment need more logic
