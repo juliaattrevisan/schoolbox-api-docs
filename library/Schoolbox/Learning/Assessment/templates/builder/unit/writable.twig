@@ -1,0 +1,39 @@
+<ul class="information-list sortable-card ui-sortable" data-sortable data-task_list data-unit="{{ unit.id }}" id="{{ reveals.id }}">
+    {% for task in tasks %}
+        {% include '@learningAssessment/builder/task.twig' with { '_writable': true } %}
+    {% else %}
+        <li>
+            <div class="empty-state">
+                <i class="icon-course"></i>
+                <p>No coursework in this unit yet.</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+<form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
+    <input type="hidden" name="action" value="reorder"/>
+    <input type="hidden" name="category" value="{{ unit.id }}"/>
+    <input type="hidden" name="component" value="{{ reveals.component.id }}"/>
+    <input type="hidden" name="return_url" value="{{ returnUrl }}"/>
+</form>
+
+{% include '@learningAssessment/builder/task/reveal-modal.twig' with { reveal: reveals } %}
+
+<div class="reveal-modal" data-reveal role="dialog" data-interaction="copy_task_dialog">
+    <h2>This unit is in use by one or more classes</h2>
+    <p>Do you want to add this task to the classes which are currently using this unit?</p>
+    <a href="#" class="button submit" data-action="copy_task">Yes</a>
+    <a href="#" class="button" data-action="no_copy_task">No</a>
+    <a href="#" class="button" data-action="cancel">Don't create task</a>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#{{ reveals.id }}').setupCourseBuilder({% if usages | length %}
+            {
+                units: {{ usages | json_encode }}
+            }
+            {% endif %});
+    });
+</script>

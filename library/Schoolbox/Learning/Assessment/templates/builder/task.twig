@@ -1,0 +1,5 @@
+{% if _writable %}
+    {% include '@learningAssessment/builder/task/writable.twig' %}
+{% else %}
+    {% include '@learningAssessment/builder/task/readonly.twig' %}
+{% endif %}

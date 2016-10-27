@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
@@ -706,6 +707,11 @@ class Controller extends Base
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        if (!$this->getUser()->getRole()->isStaff() && $this->getUser()->getId() != $student->getId()) {
+            // if you are not staff, you must not be able to see any summary other than your own
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         /* There are no Summary views for Tasks; 404 them instead
          */
         if ($assessment instanceof Task) {
@@ -826,34 +832,6 @@ class Controller extends Base
             /* For parents, do other things?
              */
         }
-    }
-
-    /**
-     * Generic method for create/update of an assessment.
-     *
-     * @param $postData
-     * @param IAssessable|null $existingAssessment
-     * @return IAssessable $assessment
-     * @throws ControllerException
-     */
-    protected function produceAssessment($postData, IAssessable $existingAssessment = null)
-    {
-        $assessment = null;
-        try {
-            $assessmentFactory = new Factory($this->getUser(), $postData);
-            $assessment = $assessmentFactory->produce($existingAssessment);
-        }
-        catch (\DomainException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-        catch (\UnexpectedValueException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-
-        return $assessment;
     }
 
     /**

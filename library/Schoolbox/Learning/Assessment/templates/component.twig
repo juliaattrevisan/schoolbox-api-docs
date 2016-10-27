@@ -1,0 +1,86 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+<section>
+
+    {% if isRouteAuthorized('learningAssessment.getSelectAssessmentInFolder') %}
+        {% set createRoute = routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: type }) %}
+    {% endif %}
+
+    <ul class="action-list">
+        {% for assessable in assessables %}
+
+            {% if isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+                {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% endif %}
+
+            {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+                {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+            {% endif %}
+
+            {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
+                {% set deleteRoute = routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
+            {% endif %}
+
+            {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}
+
+            <li class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}">
+                <div class="list-item">
+                    <div class="card small-12">
+                        {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
+                            <h3 data-assessment-title>{{ assessable.title }}</h3>
+                            {% if viewRoute %}</a>{% endif %}
+                        <p class="meta">
+                            <span class="{{ urgency.gradientClass(assessment, user) }}">
+                                Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                {% if actionCount %}
+                    <nav>{% spaceless %}
+                            {% if modifyRoute %}
+                                <a class="icon-modify" href="{{ modifyRoute }}" title="Modify"></a>
+                            {% endif %}
+                            {% if deleteRoute %}
+                                <a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" title="Delete"></a>
+                            {% endif %}
+                        {% endspaceless %}</nav>
+                {% endif %}
+                {% if not compact %}
+                    <article>{{ assessable.description | purify }}</article>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="component-action">
+        <section>
+            {# TODO: Replace hrefs with routeLookup #}
+            {% if user.role.isStudent %}
+                <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View Grades</a>
+            {% endif %}
+            {% if createRoute %}
+                <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
+            {% endif %}
+        </section>
+    </div>
+</section>
+<script type="text/javascript">
+    $(function () {
+        $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+
+            var itemName = $(this).closest('[data-assessment]').find('[data-assessment-title]').text();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete ' + itemName + '?',
+                confirmLabel: 'Yes, delete it',
+                cancelLabel: 'No, keep it',
+                confirmEvent: function (anchor) {
+                    $.post(anchor.attr('href')).done(function() {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    })
+</script>
+

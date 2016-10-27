@@ -1,0 +1,74 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+{% set createRoute = isRouteAuthorized('learningAssessment.getSelectAssessmentInFolder')
+    ? routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'task'})
+    : ''
+%}
+
+<section>
+    <ul class="action-list">
+        {% for assessable in assessables %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="card small-12">
+                        <a href="{{ assessable.url }}">
+                            <div class="icon-task icon-32"></div>
+                            <h3>{{ assessable.title }}</h3>
+                        </a>
+                        <p class="meta">
+                            <span class="{{ urgency.gradientClass(assessment, user) }}">
+                                Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <nav>
+                    {# TODO: Find some way of determining task completion, currently hardcoded #}
+
+                    {% if assessable.requiresConfirmation %}
+
+                        {# Teacher assessed task #}
+
+                        {% set progressText = 'Teacher Assessed' %}
+
+                        {% if true %}
+                            {# Pending #}
+                            {% set progressClass = 'pending' %}
+                            {% set url = assessable.url %}
+                        {% else %}
+                            {# Completed #}
+                            {% set progressClass = 'complete' %}
+                            {% set url = '#' %}
+                        {% endif %}
+
+                    {% else %}
+
+                        {# Self assessed task #}
+
+                        {% set progressText = 'Self Assessed' %}
+
+                        {% if true %}
+                            {# Pending #}
+                            {% set progressClass = 'pending' %}
+                            {% set url = assessable.url %}
+                        {% else %}
+                            {# Completed #}
+                            {% set progressClass = 'complete' %}
+                            {% set progressText = progressText ~ ', Click To Undo' %}
+                            {% set url = '/task/start/' ~ assessable.id ~ '/undo' %}
+                        {% endif %}
+                    {% endif %}
+
+                    <a href="{{ url }}" class="progress-tick {{ progressClass }} no-text" data-interaction="update_progress" title="{{ progressText }}"></a>
+                </nav>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if createRoute %}
+        <div class="component-action">
+            <section>
+                <a href="{{ createRoute }}" class="button">Create Task</a>
+            </section>
+        </div>
+    {% endif %}
+</section>
