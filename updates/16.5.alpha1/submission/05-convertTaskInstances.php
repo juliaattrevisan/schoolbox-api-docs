@@ -251,4 +251,5 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     }
 
     $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    exit($failureCount > 0 ? 1 : 0);
 });

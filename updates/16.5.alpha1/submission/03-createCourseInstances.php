@@ -156,4 +156,5 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $database->commit();
     }
     $log->info(sprintf('%d unit instances converted, %d failed to convert', $successCount, $failureCount));
+    exit($failureCount > 0 ? 1 : 0);
 });
