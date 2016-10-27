@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -63,9 +64,9 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
             ));
         }
 
-        $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+        $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
-        SitePage::localRedir('/assess/summary/' . $assess['assess_id'] . $return_url);
+        SitePage::localRedir('/assess/summary/' . $assess['assess_id'] . $returnUrl);
     } else {
         error(131);
     }

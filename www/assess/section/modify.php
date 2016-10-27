@@ -9,6 +9,7 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
@@ -19,7 +20,7 @@ if (!empty($_POST)) {
     }
 
 
-    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
     $assess = $assessHandler->getByID($_POST['assess_id']);
 
@@ -45,10 +46,10 @@ if (!empty($_POST)) {
 
     /* Redirect to summary
      */
-    SitePage::localRedir('/assess/summary/' . $_POST['assess_id'] . $return_url);
+    SitePage::localRedir('/assess/summary/' . $_POST['assess_id'] . $returnUrl);
 } else {
 
-    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(112);
@@ -95,7 +96,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
-        'RETURN_URL'           => $_GET["return_url"],
+        'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
@@ -118,13 +119,13 @@ if (!empty($_POST)) {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$returnUrl}",
             'class' => '',
         ],
         [

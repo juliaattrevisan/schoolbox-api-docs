@@ -9,6 +9,7 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -42,11 +43,11 @@ catch (\Exception $e) {
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
-$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
 $this->setVar(array(
-    'RETURN_URL'           => $return_url,
-    'RETURN_URL_DECODED'   => base64_decode(urldecode($_GET["return_url"])) == '' ? "/homepage/{$folder->getId()}" : base64_decode(urldecode($_GET["return_url"])),
+    'RETURN_URL'           => $returnUrl,
+    'RETURN_URL_DECODED'   => $returnUrl == '' ? "/homepage/{$folder->getId()}" : Redirect::decode($_GET[Redirect::RETURN_URL]),
     'ASSESS_ASSESS_ID'     => $this->arg[0],
     'ASSESS_KIND_LC'       => 'assess',
     'ASSESS_KIND'          => 'Quiz',
@@ -87,13 +88,13 @@ $this->setVar(array(
 $trail = new \Schoolbox\Breadcrumbs();
 
 // get a crunchy biscuit base
-$crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+$crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
 // sprinkle some crumbs on top
 $crumbs = array_merge($crumbs, [
     [
         'text' => $assess['title'],
-        'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
+        'href' => "/assess/summary/{$assess['assess_id']}{$returnUrl}",
         'class' => 'active',
     ]
 ]);

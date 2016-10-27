@@ -9,6 +9,7 @@
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -19,7 +20,7 @@ $groupHandler = new Group();
  */
 if (!empty($_POST)) {
 
-    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($_POST['type_id'])) {
         error(116);
@@ -76,12 +77,12 @@ if (!empty($_POST)) {
         exit;
     }
     else {
-        SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $return_url);
+        SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $returnUrl);
     }
 
 } else {
 
-    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(115);
@@ -188,7 +189,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_SECTION_TITLE' => $section['title'],
-        'RETURN_URL'           => $_GET["return_url"],
+        'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
@@ -206,23 +207,23 @@ if (!empty($_POST)) {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$returnUrl}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$returnUrl}",
             'class' => '',
         ],
         [
             'text' => "Q{$question['sequence']}",
-            'href' => "/assess/question/modify/{$question['question_id']}{$return_url}",
+            'href' => "/assess/question/modify/{$question['question_id']}{$returnUrl}",
             'class' => 'active',
         ]
     ]);

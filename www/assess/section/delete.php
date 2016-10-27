@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Learning\Assessment\Redirect;
 
 /* Get a list of questions and answers to softdelete
  */
@@ -67,7 +68,7 @@ $sectionHandler->update($section);
 
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 
-$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
-SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $return_url);
+SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $returnUrl);
 

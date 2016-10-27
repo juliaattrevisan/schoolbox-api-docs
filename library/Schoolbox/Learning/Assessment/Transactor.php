@@ -133,7 +133,7 @@ class Transactor
          */
         return [
             'assessment' => $this->getAssessment(),
-            'returnUrl' => $returnUrl
+            Redirect::RETURN_URL => $returnUrl
         ];
     }
 

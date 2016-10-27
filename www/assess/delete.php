@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use \Schoolbox\Learning\Assessment\Redirect;
 
 /* Get a list of questions and answers to softdelete
  */
@@ -74,8 +75,8 @@ if (is_array($sectionList) && count($sectionList)) {
 $mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 $mapper->delete($mapper->findById($assessId));
 
-if ($_GET["return_url"] != "")
-	SitePage::localRedir(base64_decode(urldecode($_GET["return_url"])));
+if ($_GET[Redirect::RETURN_URL] != "")
+	SitePage::localRedir(Redirect::decode($_GET[Redirect::RETURN_URL]));
 else {
 	$this->setFile(TEMPLATE_content, 'assess/deleted.html');
 

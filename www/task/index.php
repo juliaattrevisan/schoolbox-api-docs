@@ -12,10 +12,11 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 // use a return URL if passed, otherwise use the referrer (which in theory could be blank)
-$return     = $_GET["return_url"] ? $_GET["return_url"] : (string)urlencode(base64_encode(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)));
-$return_url = $return ? "?return_url=$return" : '';
+$return     = $_GET[Redirect::RETURN_URL] ? $_GET[Redirect::RETURN_URL] : Redirect::encode((string)parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH));
+$returnUrl = $return ? "?".Redirect::RETURN_URL."=$return" : '';
 
 // Wrangle arguments
 // Possible argument formats: /modify/{id}, /create/{category_id}/{type}/
@@ -28,10 +29,10 @@ if ($action === 'create') {
     if (isset($this->arg[2])) {
         switch ($this->arg[2]) {
             case 'assessment':
-                $this->localRedir('/assess/create/'.$category_id.'/task/' . $return_url);
+                $this->localRedir('/assess/create/'.$category_id.'/task/' . $returnUrl);
                 break;
             case 'due_work':
-                $this->localRedir('/submission/createSubmission/new/'.$category_id.'/task/' . $return_url);
+                $this->localRedir('/submission/createSubmission/new/'.$category_id.'/task/' . $returnUrl);
                 break;
             case 'task':
             default:
@@ -47,10 +48,10 @@ elseif ($action === 'modify') {
     // Set the template type.
     // If an assess or due work task, redirect to those edit pages.
     if ($task_type_id === Task::TYPE_ONLINE_ASSESS) {
-        $this->localRedir('/assess/summary/'.$task->getAssessment()->getId() . $return_url);
+        $this->localRedir('/assess/summary/'.$task->getAssessment()->getId() . $returnUrl);
     }
     elseif ($task_type_id === Task::TYPE_DUE_WORK) {
-        $this->localRedir('/submission/createSubmission/modify/'.$task->getSubmissionBox()->getId() . $return_url);
+        $this->localRedir('/submission/createSubmission/modify/'.$task->getSubmissionBox()->getId() . $returnUrl);
     }
 }
 // Error out if you haven't redir'd by now

@@ -269,11 +269,10 @@ class Controller extends Base
         }
 
         // Do caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get('return_url');
+        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         if ($returnUrl){
-            $data['returnUrl'] = $returnUrl;
-        }
+            $data[Redirect::RETURN_URL] = $returnUrl;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
@@ -442,15 +441,15 @@ class Controller extends Base
         elseif ($assessment->getContext() instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
         }
-        elseif (strlen($this->getRequest()->post['returnUrl'])) {
-            $returnUrl = $this->getRequest()->post['returnUrl'];
+        elseif (strlen($this->getRequest()->post[Redirect::RETURN_URL])) {
+            $returnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
         }
         else {
-            $returnUrl = $assessmentInfo['returnUrl'];
+            $returnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
 
         $data = [
-            'returnUrl' => $returnUrl
+            Redirect::RETURN_URL => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -538,11 +537,11 @@ class Controller extends Base
             $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
         }
         else {
-            $returnUrl = $assessmentInfo['returnUrl'];
+            $returnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
 
         $data = [
-            'returnUrl' => $returnUrl
+            Redirect::RETURN_URL => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -631,27 +630,27 @@ class Controller extends Base
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $returnUrl = $this->getRequest()->post['returnUrl'];
+        $explicitReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
 
         // Did caller explicitly specify a returnUrl ?
-        if ($returnUrl) {
-            $redirect = $returnUrl;
+        if($explicitReturnUrl) {
+            $returnUrl = $explicitReturnUrl;
         } else {
             // Did we delete an item from a Project ?
             if($assessment->getContext() instanceof Project){
                 $data = ['assessmentId' => $assessment->getContext()->getId()];
-                $redirect = $this->getRouter()->generate('learningAssessment.getStatus', $data);
+                $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', $data);
             }
             // Must be from a Folder, UnitImpl, or UnitSpec
             else {
-                $redirect = "/homepage/{$folder->getId()}";
+                $returnUrl = "/homepage/{$folder->getId()}";
             }
         }
 
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $redirect]));
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
         } else {
-            $this->getResponse()->redirect->to($redirect);
+            $this->getResponse()->redirect->to($returnUrl);
         }
     }
 
@@ -752,7 +751,7 @@ class Controller extends Base
              * Return to summary screen with this suffix
              */
             $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-            $returnUrlSuffix = '?return_url=' . Redirect::encode($baseUrl);
+            $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
             $types = new AssessmentType();
             $twigData = [

@@ -8,6 +8,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 /** @var SitePage $this */
 
@@ -399,7 +400,7 @@ $output = array(
     'IS_TASK'           => $is_task ? 1 : 0,
     'UNIT_ID'           => $unit_id,
     'TASK_INSTANCE_ID'  => $task_instance_id,
-    'RETURN_URL'        => $_GET["return_url"],
+    'RETURN_URL'        => $_GET[Redirect::RETURN_URL],
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
         ['codeList' => $submission->getCurriculumNodes(), 'renderButton' => false,]
@@ -430,7 +431,7 @@ $this->setVar($output);
 $trail = new \Schoolbox\Breadcrumbs();
 
 // get a crunchy biscuit base
-$crumbs = $trail->getFolderCrumbs($category, $_GET['return_url']);
+$crumbs = $trail->getFolderCrumbs($category, $_GET[Redirect::RETURN_URL]);
 
 // sprinkle some crumbs on top
 $crumbs = array_merge($crumbs, [

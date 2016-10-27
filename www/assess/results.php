@@ -12,6 +12,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\Redirect;
+
 /**
  * Process an Attempt row. Functionised because it is used in an iteration to
  * process students in the class, and then later used to deal with remainder
@@ -251,7 +253,7 @@ switch($assess['mark_visibility']) {
 }
 
 $this->setVar(array(
-    'RETURN_URL' => $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "",
+    'RETURN_URL'            => $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "",
     'ASSESS_ASSESS_ID'      => $assess['assess_id'],
     'ASSESS_TITLE'          => Scrub::text($assess['title']),
     'ASSESS_DUEDATE'        => $dueDate->getLongDateOnly(),

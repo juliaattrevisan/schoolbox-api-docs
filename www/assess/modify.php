@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -101,9 +102,9 @@ if (!empty($_POST)) {
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
 
-    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
-    SitePage::localRedir('/assess/summary/' . $this->arg[0] . $return_url);
+    SitePage::localRedir('/assess/summary/' . $this->arg[0] . $returnUrl);
 }
 else if(is_numeric($_GET['mark_visibility'])) {
     /* This is used for an ajax update request of just the visibility */
@@ -119,7 +120,7 @@ else if(is_numeric($_GET['mark_visibility'])) {
 }
 else {
 
-    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
     /* Render modify page
      */
@@ -159,8 +160,8 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'modify',
-        'RETURN_URL'                => $_GET["return_url"],
-        'RETURN_URL_DECODED'        => base64_decode(urldecode($_GET["return_url"])),
+        'RETURN_URL'                => $_GET[Redirect::RETURN_URL],
+        'RETURN_URL_DECODED'        => Redirect::decode($_GET[Redirect::RETURN_URL]),
         'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',
@@ -265,13 +266,13 @@ else {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [
         [
             'text' => $assessment->getTitle(),
-            'href' => "/assess/summary/{$assessment->getId()}{$return_url}",
+            'href' => "/assess/summary/{$assessment->getId()}{$returnUrl}",
             'class' => 'active',
         ]
     ]);
