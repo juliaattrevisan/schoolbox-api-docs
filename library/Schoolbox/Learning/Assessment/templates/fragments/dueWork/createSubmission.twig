@@ -148,7 +148,7 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Due <span class="gradient-{{ urgency.gradientIndex(assessment) }}">{{ assessment.dueAt.short }}</span></li>
+            <li class="icon-calendar">Due <span class="{{ urgency.gradientClass(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
             <li class="icon-due-work">{{ assessment.typeName }}</li>
         </ul>
 

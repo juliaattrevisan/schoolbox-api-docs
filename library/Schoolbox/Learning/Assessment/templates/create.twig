@@ -24,7 +24,7 @@
                 },
 
                 onXhrDone: function (data) {
-                    window.location.href = data.return_url;
+                    window.location.href = data.returnUrl;
                 }
             });
         }
@@ -72,7 +72,6 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ formAction }}" id="assessmentForm" method="post">
-
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
@@ -95,11 +94,10 @@
 
                 <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
                     {% if returnUrl|length %}
-                        <input type="hidden" name="return_url" value="{{ return_url }}" />
+                        <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
-
 
                     {% if assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />

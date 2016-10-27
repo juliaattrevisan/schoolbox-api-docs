@@ -179,7 +179,7 @@ abstract class AbstractAssessment implements IAssessable
             }
         }
 
-        throw new \UnexpectedValueException();
+        throw new \UnexpectedValueException("{$user->getFullname()} {$user->getId()} is not a participant of {$this->getTitle()}");
     }
 
     /**

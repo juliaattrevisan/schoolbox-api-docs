@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
@@ -59,19 +60,27 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
 
+                /* Redirect url which sends people to either Status or
+                 * Summary screens depending on Role of the current user
+                 */
+                '/assessment/{assessmentId}' => 'getAssessment',
+
                 /* Assessment Summary screen
                  */
-                '/assessment/{assessmentId}' => 'getSummary',
+                '/assessment/{assessmentId}/{studentId}' => 'getSummary',
 
                 /* Submit a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/submit/{participantId}' => 'getCreateSubmission',
+                '/assessment/{assessmentId}/submit/{studentId}' => 'getCreateSubmission',
 
+                /* Staff-specific Status screens
+                 */
+                '/assessment/{assessmentId}/status' => 'getStatus',
 
                 /* Miscellaneous routes
                  */
-                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
-                '/assessment/{assessmentId}/status'             => 'getStatus',
+//                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
+
 
             ],
             'POST' => [
@@ -94,7 +103,7 @@ class Module extends BaseModule
 
                 /* Save a Response to a Due Work
                  */
-                '/assessment/{assessmentId}/submit/{participantId}' => 'postCreateSubmission'
+                '/assessment/{assessmentId}/submit/{studentId}' => 'postCreateSubmission'
             ]
         ];
 
@@ -174,7 +183,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:postDeleteAssessment)',
+            '(?:postDeleteAssessment|getAssessment)',
             function ($params) {
                 try {
                     $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -185,19 +194,39 @@ class Module extends BaseModule
             }
         );
 
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getSummary)',
+            function ($params) {
+                try {
+                    $args = [];
+
+                    $args['participant'] = $this->getParticipantMapperProxy()->findForAssessmentAndUser(
+                        $this->getAssessmentMapperProxy()->findById($params['assessmentId']),
+                        $this->getUserMapper()->findById($params['studentId'])
+                    );
+
+                    return $args;
+                } catch (\OutOfBoundsException $e) {
+                    throw new NotFound($e->getMessage());
+                } catch (\Exception $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
+            }
+        );
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummary|getStudentAssessment)',
+            '(?:getStatus|getStudentAssessment)',
             function ($params) {
 
                 $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
 
-                if (array_key_exists('participantId', $params)) {
+                if (array_key_exists('studentId', $params)) {
                     try {
-                        $args['participant'] = $this->getUserMapper()->findById($params['participantId']);
+                        $args['student'] = $this->getUserMapper()->findById($params['studentId']);
                     } catch (MapperException $e) {
-                        $args['participant'] = $this->getUserMapper()->createModel();
+                        $args['student'] = $this->getUserMapper()->createModel();
                     }
                 }
                 return $args;
@@ -218,7 +247,7 @@ class Module extends BaseModule
                     throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
                 }
 
-                $student = $this->getUserMapper()->findById($params['participantId']);
+                $student = $this->getUserMapper()->findById($params['studentId']);
 
                 $participant = new Participant($student, $assessment);
                 $assessment->getAllParticipants()->add($participant);
@@ -292,7 +321,7 @@ class Module extends BaseModule
 
                 return [
                     'assessment' => $assessment,
-                    'participant' => $student
+                    'student' => $student
                 ];
             }
         );
@@ -478,4 +507,11 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
+    /**
+     * @return Participant\DataSource
+     */
+    protected function getParticipantMapperProxy()
+    {
+        return $this->injector->get('participantDataSource');
+    }
 }

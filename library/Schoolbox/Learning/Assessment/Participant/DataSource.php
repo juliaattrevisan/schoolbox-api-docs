@@ -124,6 +124,22 @@ class DataSource
     }
 
     /**
+     * @param IAssessable $assessment
+     * @param \Schoolbox\User $user
+     * @throws \OutOfBoundsException
+     * @return Participant
+     */
+    public function findForAssessmentAndUser(Iassessable $assessment, \Schoolbox\User $user)
+    {
+        foreach ($this->findForAssessment($assessment) as $participant) {
+            if ($participant->getUser()->getId() == $user->getId()) {
+                return $participant;
+            }
+        }
+        throw new \OutOfBoundsException("{$user->getFullName()} is not a participant of {$assessment->getTitle()}");
+    }
+
+    /**
      * Sort callback: sort by surname, then first name, then ID.
      *
      * @param Participant $a
