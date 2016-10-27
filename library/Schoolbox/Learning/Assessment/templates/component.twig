@@ -55,7 +55,7 @@
         <section>
             {# TODO: Replace hrefs with routeLookup #}
             {% if user.role.isStudent %}
-                <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View Grades</a>
+                <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View Grades</a>
             {% endif %}
             {% if createRoute %}
                 <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
