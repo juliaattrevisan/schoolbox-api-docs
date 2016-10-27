@@ -4,7 +4,7 @@
 <h3>{{ event.title }}</h3>
 <ul class="meta">
     <li class="icon-calendar" title="Booking time"><time>{{ event.getFullDate()|raw }}</time></li>
-    <li class="icon-location" title="Resource">event.location</li>
+    <li class="icon-location" title="Resource">{{ event.location }}</li>
     <li class="icon-staff-students" title="Requester">Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
     <li class="icon-resource-booking" title="Resource"><a href="{{ routeLookup('resourceItem.read', {id: event.booking.resource.id}) }}?date={{ event.getStartTime().getURLDate() }}">{{ event.booking.resource.name }}</a></li>
     {% if event.categoryId %}
