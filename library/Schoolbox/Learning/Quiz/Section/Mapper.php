@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Quiz\Section;
 
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use \Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
             'type'       => self::TYPE_DATETIME,
         ));
         $this->hasJoin('quiz', array(
-            'mapper'    => Mapper::class,
+            'mapper'    => QuizMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));

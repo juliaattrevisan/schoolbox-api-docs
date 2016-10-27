@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'quiz',
             [
-                'mapper'    => Mapper::class,
+                'mapper'    => QuizMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'assessment_id'
             ]

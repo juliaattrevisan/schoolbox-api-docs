@@ -8,8 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -231,7 +230,7 @@ class MapperProxy
             }
 
         } elseif ($subObject instanceof Quiz) {
-            Mapper::getInstance()->save($subObject);
+            QuizMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
@@ -273,8 +272,8 @@ class MapperProxy
             } catch (MapperException\Deleted $e){
                 $quizDataModel = $e->getDeletedObject();
             }
-            $onlineAssessment = $quizDataModel->getQuiz();
-            Mapper::getInstance()->delete($onlineAssessment);
+            $quiz = $quizDataModel->getQuiz();
+            QuizMapper::getInstance()->delete($quiz);
         }
     }
 

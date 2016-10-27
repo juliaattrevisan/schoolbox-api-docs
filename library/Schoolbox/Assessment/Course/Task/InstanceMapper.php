@@ -11,14 +11,14 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 
-class InstanceMapper extends Mapper {
+class InstanceMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('task_instance');
@@ -112,7 +112,7 @@ class InstanceMapper extends Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => Mapper::class,
+            'mapper'    => QuizMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
@@ -206,7 +206,7 @@ class InstanceMapper extends Mapper {
     {
         // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            /** @var Mapper $mapper */
+            /** @var QuizMapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
             try {
                 $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
@@ -236,7 +236,7 @@ class InstanceMapper extends Mapper {
     {
         // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            /** @var Mapper $mapper */
+            /** @var QuizMapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
             try {
                 $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
