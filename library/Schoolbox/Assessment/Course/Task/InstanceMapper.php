@@ -112,7 +112,7 @@ class InstanceMapper extends Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
+            'mapper'    => OnlineAssessmentMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));

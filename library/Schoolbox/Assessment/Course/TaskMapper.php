@@ -111,7 +111,7 @@ class TaskMapper extends Schoolbox\Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
+            'mapper'    => Schoolbox\Assessment\Component\OnlineAssessmentMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
