@@ -1,6 +1,7 @@
 <ul class="meta">
+    <li class="icon-calendar">Due {{ assessment.dueAt.short }}</li>
+
     {% if currentUser.role.isStaff %}
-        <li class="icon-calendar">Due {{ assessment.dueAt.short }}</li>
         <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
     {% endif %}
 </ul>
