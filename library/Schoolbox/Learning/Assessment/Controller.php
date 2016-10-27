@@ -762,12 +762,14 @@ class Controller extends Base
          */
         else if ($assessment instanceof Project) {
             if ($this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent()) {
-
-                // Calculate summary totals for display purposes
                 $types = new AssessmentType();
+
+                // Load participants manually
+                $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
 
                 $counts = [];
 
+                // Calculate summary totals for display purposes
                 foreach($types->getStringValues() as $type){
                     if (AssessmentType::TYPE_PROJECT == $type){
                         continue;
