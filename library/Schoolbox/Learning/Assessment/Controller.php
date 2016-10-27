@@ -624,11 +624,6 @@ class Controller extends Base
                 }
             }
 
-            /* Manufacture a set of returnUrls since staff with perms can create
-             * IAssessables inside projects
-             */
-            $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
-
             /* Manufacture a universal returnUrl
              * Return to summary screen with this suffix
              */
@@ -637,7 +632,7 @@ class Controller extends Base
 
             $types = new AssessmentType();
             $twigData = [
-                'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
                 'counts' => $counts,
                 'assessableCounts' => $assessableCounts,
                 'assessment' => $assessment,
@@ -705,9 +700,8 @@ class Controller extends Base
         else if ($assessment instanceof DueWork) {
             $types = new AssessmentType();
 
-            $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
             $twigData          = [
-                'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
                 'currentUser' => $this->getUser(),
                 'student' => $student,
                 'assessment'  => $assessment,
@@ -769,10 +763,10 @@ class Controller extends Base
                     }
                 }
 
-                // TODO make this an instance var instead of instantiating all the time
-                $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+                // Ideally make this an instance var instead of instantiating all the time
+                // Except you can't, $this->getRouter() returns null in __construct()?
                 $twigData = [
-                    'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
+                    'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
                     'currentUser' => $this->getUser(),
                     'participant' => $this->getUser(),
                     'assessment' => $assessment,
@@ -861,11 +855,6 @@ class Controller extends Base
 //        $hodes = (new UserMapper())->findById(230);
 //        new \Alaress_Probe($assessment->getHumanReadableMark($hodes, true));
 
-        /* Manufacture a set of returnUrls since staff with perms can create
-         * IAssessables inside projects
-         */
-        $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
-
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
          */
@@ -874,7 +863,7 @@ class Controller extends Base
 
         $types = new AssessmentType();
         $twigData = [
-            'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
+            'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
             'counts' => $counts,
             'assessableCounts' => $assessableCounts,
             'assessment' => $assessment,
