@@ -93,10 +93,10 @@ class Participant
         $this->setAssessable($assessable);
 
         $responseClass = $this->getAllowedResponseType();
-        $this->allResponses = $responseClass ? new GenericCollection($responseClass) : new Collection();
+        $this->allResponses = $responseClass ? new GenericCollection($responseClass) : null;
 
         $feedbackClass = $this->getAllowedFeedbackType();
-        $this->allFeedbacks = $feedbackClass ? new GenericCollection($feedbackClass) : new Collection();
+        $this->allFeedbacks = $feedbackClass ? new GenericCollection($feedbackClass) : null;
 
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
@@ -301,4 +301,20 @@ class Participant
         $this->allFeedbacks = $allFeedbacks;
         return $this;
     }
+//
+//    public function getMark()
+//    {
+//        return [
+//            'published' => $this->getPublishedMark(),
+//            'unpublished' => $this->getUnpublishedMark()
+//        ];
+//    }
+//
+//    public function getPublishedMark()
+//    {
+//        return [
+//            'humanReadable' => '&ndash;',
+//            'normalised'    => null
+//        ];
+//    }
 }
