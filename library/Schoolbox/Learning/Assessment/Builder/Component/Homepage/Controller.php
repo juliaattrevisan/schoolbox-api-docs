@@ -118,18 +118,19 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         // Get the units details
         $access = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
+        $unit   = $this->getUnitSpecificationMapper()->findByFolderId($this->getSource()->getId());
 
-        $data['canRead'] = $access >= UserAccess::ACCESS_READ;
-        $data['canWrite'] = $access >= UserAccess::ACCESS_WRITE;
-        $data['unit'] = $this->getUnitSpecificationMapper()->findByFolderId($this->getSource()->getId());
-        $data['tasks'] = $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($data["unit"]->getId());
-        $data['usages'] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
-        $data['returnUrl'] = $_GET["page"];
+        $data = [
+            'canRead'     => $access >= UserAccess::ACCESS_READ,
+            'canWrite'    => $access >= UserAccess::ACCESS_WRITE,
+            'unit'        => $unit,
+            'tasks'       => $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($unit->getId()),
+            'usages'      => $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
+            'returnUrl'   => $_GET["page"],
+            'breadcrumbs' => [],
+        ];
 
         // Retrieve all of the parents for use as breadcrumbs
-
-        $data['breadcrumbs'] = [];
-
         if ($this->getContext() instanceof FolderModel) {
             foreach (FolderMapper::getInstance()->findParents($folder,null,true) as $parent) {
                 $data['breadcrumbs'][] = $parent;
