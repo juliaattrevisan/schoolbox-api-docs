@@ -377,10 +377,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getStatus)';
-        $this->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
-
-        $ruleRegexp = '(?:getSummary)';
+        $ruleRegexp = '(?:getSummary|getCreateSubmission)';
         $this->addRoutePermission($authorizer, $ruleRegexp,
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -392,34 +389,13 @@ class Module extends BaseModule
             )
         );
 
-        $ruleRegexp = '(?:getSubmitForm)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
-                )
-            );
+        $staffOnly = [
+            'getSummaryStaff','postCreateAssessment','postUpdateAssessment','postDeleteAssessment','getStatus', 'getSelectAssessmentInFolder',
+            'getSelectAssessmentInProject','getSelectAssessmentInUnitImplementation','getSelectAssessmentInUnitSpecification'
+        ];
 
         // TODO: postCreateAssessment|postUpdateAssessment need more logic
-        $ruleRegexp = '(?:getSummaryStaff|postCreateAssessment|postUpdateAssessment|postDeleteAssessment)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
-                )
-            );
-
-
-        $ruleRegexp = '(?:getSelectAssessmentInFolder|getSelectAssessmentInProject|getSelectAssessmentInUnitImplementation|getSelectAssessmentInUnitSpecification)';
+        $ruleRegexp = '(?:' . implode('|', $staffOnly) . ')';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
