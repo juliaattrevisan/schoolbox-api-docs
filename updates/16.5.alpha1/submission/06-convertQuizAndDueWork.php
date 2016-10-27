@@ -130,7 +130,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->info(sprintf('Converting due work "%s" (id: %d)...', $title, $boxId));
         } else {
             $log->warning('Assessment is neither a quiz or due work - not sure how that happened but it did!');
-            $failureCount++;
             continue;
         }
 
