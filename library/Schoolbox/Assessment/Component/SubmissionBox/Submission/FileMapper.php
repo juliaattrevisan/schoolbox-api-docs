@@ -82,13 +82,10 @@ class FileMapper extends Mapper
         $this->uses('marked', self::TYPE_BOOLEAN);
         $this->uses('late', self::TYPE_BOOLEAN);
         $this->uses('submitted', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
-        $this->uses('realname', self::TYPE_STRING, null, 'filename');
-        $this->uses('uuid', self::TYPE_STRING);
         $this->uses('draft', self::TYPE_BOOLEAN);
 
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
         $this->joins('owner', UserMapper::class);
-        $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
     }

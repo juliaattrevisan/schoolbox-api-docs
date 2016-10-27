@@ -12,14 +12,11 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 use Alaress_Date_Format as ADF;
 use Eportfolio\ShowcaseMapper;
-use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Mapper;
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -28,18 +25,10 @@ use Schoolbox\User;
  *
  * The name File is a misnomer, as now a submission may contain multiple files.
  */
-class File implements IFile
+class File
 {
-    use StorableTrait;
-
-    /** @var string */
-    protected $uuid;
-
     /** @var bool */
     protected $draft;
-
-    /** @var Plagscan_Document */
-    protected $plagscan;
 
     /** @var SubmissionBox */
     protected $submissionBox;
@@ -56,41 +45,20 @@ class File implements IFile
     /** @var ADF */
     protected $createdAt;
 
+    /**
+     * The list of files within this submission.
+     *
+     * @var Collection|SingleFile\Model[]
+     */
+    protected $files;
 
     /**
-     * @return string
+     * Constructor
      */
-    public function getUuid()
+    public function __construct()
     {
-        return $this->uuid;
+        $this->setFiles(new Collection());
     }
-
-    /**
-     * @param string $uuid
-     * @return static
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
-
-    /**
-     * @param Plagscan_Document $plagscan
-     */
-    public function setPlagscan($plagscan)
-    {
-        $this->plagscan = $plagscan;
-    }
-
-    /**
-     * @return Plagscan_Document
-     */
-    public function getPlagscan()
-    {
-        return $this->plagscan;
-    }
-
 
     /**
      * @return boolean
@@ -237,6 +205,24 @@ class File implements IFile
     public function setMarked($marked)
     {
         $this->marked = $marked;
+        return $this;
+    }
+
+    /**
+     * @return Collection|SingleFile\Model[]
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * @param Collection|SingleFile\Model[] $files
+     * @return static
+     */
+    public function setFiles(Collection $files)
+    {
+        $this->files = $files;
         return $this;
     }
 
