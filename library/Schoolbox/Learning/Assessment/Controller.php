@@ -319,10 +319,10 @@ class Controller extends Base
         try {
             $assessmentInfo = $this->persistAssessment();
         }
-        catch (\RuntimeException $e) {
+        catch (ControllerException $e) {
+            $this->sendError($e);
 
-            /* TODO actually handle the error
-             * Return Early to let mage deal with error messages
+            /* Return Early to let mage deal with error messages
              */
             return;
         }
@@ -408,7 +408,8 @@ class Controller extends Base
         try {
             $assessmentInfo = $this->persistAssessment($this->getAssessmentMapperProxy()->findById($assessment->getId()));
         }
-        catch (\RuntimeException $e) {
+        catch (ControllerException $e) {
+            $this->sendError($e);
 
             /* Return Early to let mage deal with error messages
              */
@@ -443,6 +444,7 @@ class Controller extends Base
      * the returnUrl is manipulated by javascript in particular contexts
      *
      * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     * @throws ControllerException
      * @return array
      */
     protected function persistAssessment(IAssessable $assessment = null)
@@ -463,8 +465,7 @@ class Controller extends Base
             /* Manually do a check
              */
             if (!$assessment->isValidDates()) {
-                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
-                throw new \RuntimeException;
+                throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
             }
 
             /* Save the $asseessment
@@ -483,16 +484,13 @@ class Controller extends Base
             $transactionSummary = $transactor->transact();
         }
         catch (\DomainException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
         catch (\InvalidArgumentException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
         catch (\UnexpectedValueException $e) {
-            $this->sendError('Could not create assessment', [$e->getMessage()]);
-            throw new \RuntimeException;
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
         }
 
         return $transactionSummary;
