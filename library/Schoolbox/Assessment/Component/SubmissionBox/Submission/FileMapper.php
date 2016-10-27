@@ -16,10 +16,8 @@ use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 
 /**
@@ -33,43 +31,6 @@ use Schoolbox\UserMapper;
  */
 class FileMapper extends Mapper
 {
-
-    /** @var Storage\Mapper */
-    protected $storageMapper;
-
-
-    /**
-     * @return Storage\Mapper
-     */
-    public function getStorageMapper()
-    {
-        return $this->storageMapper ?: Storage\Mapper::getInstance(); // TODO remove dingleton
-    }
-
-
-    /**
-     * @param Storage\Mapper $storageMapper
-     * @return static
-     */
-    public function setStorageMapper($storageMapper)
-    {
-        $this->storageMapper = $storageMapper;
-        return $this;
-    }
-
-    /**
-     * @param int $idValue
-     * @throws Mapper\Exception
-     * @return File
-     */
-    public function createModel($idValue = null)
-    {
-        /** @var File $model */
-        $model = parent::createModel($idValue);
-        $model->setStorage($this->getStorageMapper()->createModel());
-        return $model;
-    }
-
     /**
      * @return void
      */
@@ -87,7 +48,37 @@ class FileMapper extends Mapper
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
         $this->joins('owner', UserMapper::class);
 
+        $this->hasJoin(
+            'file',
+            [
+                'mapper'    => SingleFile\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'student_submission_id',
+            ]
+        );
+
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
+    }
+
+    /**
+     * Include all files that are part of this submission.
+     *
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var Collection|File[] $resultSet */
+        $resultSet = parent::hydrateSelect($statement);
+        $files     = $this->getJoinMapper('file')
+            ->findByColumnList('student_submission_id', $resultSet->getColumnValues('id'))
+            ->groupBy('id');
+        foreach ($resultSet as $result) {
+            if (isset($files[$result->getId()])) {
+                $result->setFiles($files[$result->getId()]);
+            }
+        }
+        return $resultSet;
     }
 
     /**
@@ -166,51 +157,6 @@ class FileMapper extends Mapper
 
 
     /**
-     * @param PDOStatement $statement
-     * @return Collection
-     * @throws Mapper\Exception
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        $c = $this->createCollection();
-
-        $plag = \Plagscan_DocumentMapper::getInstance();
-
-        while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
-            // can't set storage if it doesn't exist
-            if (!$r['h.hash']) {
-                continue;
-            }
-
-            $file = $this->hydrate($r);
-
-            $file->setPlagscan($plag->hydrate($r, 'p'));
-
-            // just in case we wanted this to be simple
-
-            /** @var Storage\Model $store */
-            $store = $this->hydrateJoin($r, 'storage', 'h')
-                         ->setMimetype(
-                             $this->getJoinMapper('storage')
-                                  ->hydrateJoin($r, 'allowedFileExtension', 'm')
-                         );
-
-            // ensure the path is set
-            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
-
-            $file->setStorage($store);
-
-            $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-
-            $c->add($file);
-        }
-
-        return $c;
-    }
-
-
-    /**
      * Gets the list of activities related to student submissions.
      *
      * An activity is returned for each submission that this user has made into
@@ -226,19 +172,14 @@ class FileMapper extends Mapper
     {
         $boxJoin      = $this->getJoinMapper('box_id');
         $categoryJoin = $boxJoin->getJoinMapper('category');
-        $storageJoin  = $this->getJoinMapper('storage');
 
         $query = "
             SELECT
                 {$this->getColumnString('ss')},
                 {$boxJoin->getColumnString('sb')},
                 {$categoryJoin->getColumnString('c')},
-                {$this->getJoinColumnString('storage', 'h')},
-                {$storageJoin->getJoinColumnString('allowedFileExtension', 'afe')}
             FROM {$this->getTable()} ss
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
-            LEFT JOIN {$this->getJoinSql('storage', 'ss', 'h')}
-            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe', true)}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
             AND sb.deleted IS FALSE
@@ -265,19 +206,14 @@ class FileMapper extends Mapper
     {
         $boxJoin      = $this->getJoinMapper('box_id');
         $categoryJoin = $boxJoin->getJoinMapper('category');
-        $storageJoin  = $this->getJoinMapper('storage');
 
         $query = "
             SELECT
                 {$this->getColumnString('ss')},
                 {$boxJoin->getColumnString('sb')},
-                {$categoryJoin->getColumnString('c')},
-                {$this->getJoinColumnString('storage', 'h')},
-                {$storageJoin->getJoinColumnString('allowedFileExtension', 'afe')}
+                {$categoryJoin->getColumnString('c')}
             FROM {$this->getTable()} ss
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
-            LEFT JOIN {$this->getJoinSql('storage', 'ss', 'h')}
-            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe', true)}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id
@@ -339,21 +275,13 @@ class FileMapper extends Mapper
     protected function hydrateForActivityList($row) {
         $boxJoin = $this->getJoinMapper('box_id');
         $categoryJoin = $boxJoin->getJoinMapper('category');
-        $storageJoin  = $this->getJoinMapper('storage');
-        $mimeJoin     = $storageJoin->getJoinMapper('allowedFileExtension');
 
         $submission = $this->hydrate($row, 'ss');
         $box        = $boxJoin->hydrate($row, 'sb');
         $category   = $categoryJoin->hydrate($row, 'c');
 
-        /** @var Storage\Model $storage */
-        $storage    = $storageJoin->hydrate($row, 'h');
-        $storage->setPath($this->getStorageMapper()->getManager()->calcPath($storage));
-        $storage->setMimetype($mimeJoin->hydrate($row, 'afe'));
-
         $box->setCategory($category);
         $submission->setSubmissionBox($box);
-        $submission->setStorage($storage);
 
         return $submission;
     }
