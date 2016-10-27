@@ -36,6 +36,25 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
+
+    /** @var UnitInstanceMapper */
+    protected $unitInstanceMapper;
+
+    /** @var Access */
+    protected $access;
+
+    /** @var UnitSpecificationMapper */
+    protected $unitSpecificationMapper;
+
+    /** @var UnitSpecificationTranslator */
+    protected $unitSpecificationTranslator;
+
+    /** @var UnitSpecificationMapperProxy */
+    protected $unitSpecificationMapperProxy;
+
+    /** @var AssessmentMapperProxy */
+    protected $assessmentMapperProxy;
+
     /**
      * Injectable constructor
      *
@@ -128,9 +147,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     /* Getters/Setters
      */
 
-    /** @var UnitInstanceMapper */
-    protected $unitInstanceMapper;
-
     /**
      * @return UnitInstanceMapper
      */
@@ -146,9 +162,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $this->unitInstanceMapper = $unitInstanceMapper;
     }
-
-    /** @var Access */
-    protected $access;
 
     /**
      * @return Access
@@ -168,9 +181,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this;
     }
 
-    /** @var UnitSpecificationMapper */
-    protected $unitSpecificationMapper;
-
     /**
      * @return UnitSpecificationMapper
      */
@@ -188,9 +198,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->unitSpecificationMapper = $unitSpecificationMapper;
         return $this;
     }
-
-    /** @var UnitSpecificationTranslator */
-    protected $unitSpecificationTranslator;
 
     /**
      * @return UnitSpecificationTranslator
@@ -210,9 +217,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this;
     }
 
-    /** @var UnitSpecificationMapperProxy */
-    protected $unitSpecificationMapperProxy;
-
     /**
      * @return UnitSpecificationMapperProxy
      */
@@ -230,9 +234,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
         return $this;
     }
-
-    /** @var AssessmentMapperProxy */
-    protected $assessmentMapperProxy;
 
     /**
      * @return AssessmentMapperProxy
