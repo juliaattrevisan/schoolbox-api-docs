@@ -35,6 +35,7 @@ class Mapper extends BaseMapper
             'join'       => 'attempt',
         ));
         // Intentionally does not hydrate the superfluous 'section_id' field
+        // TODO - drop this column from DB
 
         $this->hasMap(array(
             'column'     => 'question_id',

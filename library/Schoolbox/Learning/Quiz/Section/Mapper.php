@@ -75,7 +75,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Soft deletes all Answers for the specified Attempt
+     * Soft deletes all Questions for the specified Section
      *
      * @param QuizSection $section
      */
@@ -87,7 +87,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Restores all soft-deleted Answers for the specified Attempt
+     * Restores all soft-deleted Questions for the specified Section
      *
      * @param QuizSection $section
      */

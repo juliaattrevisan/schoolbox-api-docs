@@ -18,6 +18,7 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 class Mapper extends BaseMapper
 {
     protected function mapping () {
+        // TODO - update table name to 'quiz_solution'
         $this->hasTable('assess_answer');
         $this->hasModel(QuizSolution::class);
         $this->hasMap(array(
