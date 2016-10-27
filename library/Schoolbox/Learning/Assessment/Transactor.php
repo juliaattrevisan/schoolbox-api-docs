@@ -18,10 +18,10 @@ use Aura\Router\Router;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use \Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
+use \Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationMapperProxy;
 use \Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use \Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
-use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use \Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
+use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Mapper\Exception as MapperException;
 
 class Transactor
@@ -37,19 +37,19 @@ class Transactor
     protected $folderMapper;
 
     /**
-     * @var UnitImplementationDataSource
+     * @var UnitImplementationMapperProxy
      */
-    protected $unitImplementationDataSource;
+    protected $unitImplementationMapperProxy;
 
     /**
-     * @var UnitSpecificationDataSource
+     * @var UnitSpecificationMapperProxy
      */
-    protected $unitSpecificationDataSource;
+    protected $unitSpecificationMapperProxy;
 
     /**
-     * @var AssessmentDataSource
+     * @var AssessmentMapperProxy
      */
-    protected $assessmentDataSource;
+    protected $assessmentMapperProxy;
 
     /**
      * @var Router
@@ -60,24 +60,24 @@ class Transactor
      * Transactor constructor.
      * @param IAssessable $assessment
      * @param FolderMapper $folderMapper
-     * @param UnitImplementationDataSource $unitImplementationDataSource
-     * @param UnitSpecificationDataSource $unitSpecificationDataSource
-     * @param AssessmentDataSource $assessmentDataSource
+     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param $router
      */
     public function __construct(
         IAssessable $assessment,
         FolderMapper $folderMapper,
-        UnitImplementationDataSource $unitImplementationDataSource,
-        UnitSpecificationDataSource $unitSpecificationDataSource,
-        AssessmentDataSource $assessmentDataSource,
+        UnitImplementationMapperProxy $unitImplementationMapperProxy,
+        UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
+        AssessmentMapperProxy $assessmentMapperProxy,
         Router $router
     ) {
         $this->setAssessment($assessment);
         $this->setFolderMapper($folderMapper);
-        $this->setUnitImplementationDataSource($unitImplementationDataSource);
-        $this->setUnitSpecificationDataSource($unitSpecificationDataSource);
-        $this->setAssessmentDataSource($assessmentDataSource);
+        $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
+        $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
+        $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setRouter($router);
     }
 
@@ -103,16 +103,16 @@ class Transactor
         if (!$this->getAssessment()->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
-                    $returnUrl = $this->transactFolderContext();
+                    $return_url = $this->transactFolderContext();
                 }
                 elseif ($assessmentContext instanceof UnitImplementation) {
-                    $returnUrl = $this->transactUnitImplementationContext();
+                    $return_url = $this->transactUnitImplementationContext();
                 }
                 elseif ($assessmentContext instanceof UnitSpecification) {
-                    $returnUrl = $this->transactUnitSpecificationContext();
+                    $return_url = $this->transactUnitSpecificationContext();
                 }
                 elseif ($assessmentContext instanceof Project) {
-                    $returnUrl = $this->transactProjectContext();
+                    $return_url = $this->transactProjectContext();
                 } else {
                     throw new \InvalidArgumentException('select a valid context');
                 }
@@ -123,17 +123,17 @@ class Transactor
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $assessmentContext);
-            $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+            $sequence = $this->deriveSaveSequence($assessmentContext);
+            $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
+            $return_url = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
          */
         return [
             'assessment' => $this->getAssessment(),
-            'returnUrl' => $returnUrl
+            'return_url' => $return_url
         ];
     }
 
@@ -150,12 +150,12 @@ class Transactor
          * You only get contextId when you're Creating, not updating
          */
         $context   = $this->getFolderMapper()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+        $sequence = $this->deriveSaveSequence($context);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
-        $returnUrl = "/homepage/{$context->getId()}";
+        $return_url = "/homepage/{$context->getId()}";
 
-        return $returnUrl;
+        return $return_url;
     }
 
     /**
@@ -166,9 +166,9 @@ class Transactor
      */
     private function transactUnitImplementationContext()
     {
-        $context   = $this->getUnitImplementationDataSource()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+        $context   = $this->getUnitImplementationMapperProxy()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($context);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return "/homepage/{$context->getId()}";
     }
@@ -183,9 +183,9 @@ class Transactor
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context   = $this->getUnitSpecificationDataSource()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+        $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($context);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
@@ -204,9 +204,9 @@ class Transactor
         }
 
         // TODO figure out what to do about this
-        $context   = $this->getAssessmentDataSource()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentDataSource(), $this->getAssessment(), $context);
-        $this->getAssessmentDataSource()->save($this->getAssessment(), $sequence);
+        $context   = $this->getAssessmentMapperProxy()->findById($this->getContextId());
+        $sequence = $this->deriveSaveSequence($context);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return "/homepage/{$context->getId()}";
     }
@@ -220,7 +220,7 @@ class Transactor
     protected function deriveSaveSequence($context)
     {
         $sequence = 1;
-        foreach ($this->getAssessmentDataSource()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
             if ($otherAssessment->getId() == $this->getAssessment()->getId()) {
                 break;
             }
@@ -274,51 +274,51 @@ class Transactor
     }
 
     /**
-     * @return UnitImplementationDataSource
+     * @return UnitImplementationMapperProxy
      */
-    protected function getUnitImplementationDataSource()
+    protected function getUnitImplementationMapperProxy()
     {
-        return $this->unitImplementationDataSource;
+        return $this->unitImplementationMapperProxy;
     }
 
     /**
-     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      */
-    protected function setUnitImplementationDataSource($unitImplementationDataSource)
+    protected function setUnitImplementationMapperProxy($unitImplementationMapperProxy)
     {
-        $this->unitImplementationDataSource = $unitImplementationDataSource;
+        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
     }
 
     /**
-     * @return UnitSpecificationDataSource
+     * @return UnitSpecificationMapperProxy
      */
-    protected function getUnitSpecificationDataSource()
+    protected function getUnitSpecificationMapperProxy()
     {
-        return $this->unitSpecificationDataSource;
+        return $this->unitSpecificationMapperProxy;
     }
 
     /**
-     * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      */
-    protected function setUnitSpecificationDataSource($unitSpecificationDataSource)
+    protected function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
     {
-        $this->unitSpecificationDataSource = $unitSpecificationDataSource;
+        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
     }
 
     /**
-     * @return AssessmentDataSource
+     * @return AssessmentMapperProxy
      */
-    protected function getAssessmentDataSource()
+    protected function getAssessmentMapperProxy()
     {
-        return $this->assessmentDataSource;
+        return $this->assessmentMapperProxy;
     }
 
     /**
-     * @param AssessmentDataSource $assessmentDataSource
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      */
-    protected function setAssessmentDataSource($assessmentDataSource)
+    protected function setAssessmentMapperProxy($assessmentMapperProxy)
     {
-        $this->assessmentDataSource = $assessmentDataSource;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
     }
 
     /**

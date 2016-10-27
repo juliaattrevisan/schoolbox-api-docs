@@ -216,12 +216,13 @@ class Controller extends Base
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Do caller request a returnUrl?
-        $returnUrl = $this->getRequest()->query->get('returnUrl');
-        if($returnUrl){
-            $data['returnUrl'] = $returnUrl;
+        $return_url = $this->getRequest()->query->get('return_url');
+
+        if ($return_url){
+            $data['return_url'] = $return_url;
         }
 
-        if($assessment){
+        if ($assessment){
             $data = array_merge($data, [
                 'allMarkTypes'   => $this->getAllMarkTypes($assessment),
                 'assessmentType' => AssessmentType::objectToString($assessment),
@@ -316,44 +317,42 @@ class Controller extends Base
     public function postCreateAssessment()
     {
         try {
-            $assessment = $this->produceAssessment($this->getRequest()->post);
-            $this->persistAssessment($assessment);
-
-            // Was a returnUrl explicitly specified?
-            $returnUrl = $this->getRequest()->post['returnUrl'];
-            if($returnUrl) {
-                $returnUrl = $this->decodeReturnUrl($returnUrl);
-            } else {
-                // Did we create a Project ?
-                if($assessment instanceof Project){
-                    $data = ['assessmentId' => $assessment->getId()];
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', $data);
-                }
-                // Did we create an Assessment inside a Project ?
-                else if($assessment->getContext() instanceof Project){
-                    $data = ['assessmentId' => $this->getRequest()->post['contextId']];
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', $data);
-                }
-                // Else must be inside a Folder, UnitImpl, or UnitSpec
-                else {
-                    $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
-                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
-                }
-            }
-
-            if($this->getRequest()->isXhr()){
-                $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
-            } else {
-                $this->getResponse()->redirect->to($returnUrl);
-            }
-
-
-        // TODO - clean up error handling
-        } catch (ControllerException $e){
-            $this->sendError($e->getMessage(), $e->getReasons());
-        } catch (\Exception $e){
-            $this->sendError($e->getMessage());
+            $assessmentInfo = $this->persistAssessment();
         }
+        catch (ControllerException $e) {
+            $this->sendError($e);
+
+            /* Return Early to let mage deal with error messages
+             */
+            return;
+        }
+
+        /** @var IAssessable $assessment */
+        $assessment = $assessmentInfo['assessment'];
+
+        /* If you spawned a project or an assessable within a project
+         * Redirect to project summary screen
+         *
+         * Otherwise return to whatever context you came from
+         */
+        if ($assessment instanceof Project) {
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+        }
+        elseif ($assessment->getContext() instanceof Project) {
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
+        }
+        elseif (strlen($this->getRequest()->post['return_url'])) {
+            $return_url = $this->getRequest()->post['return_url'];
+        }
+        else {
+            $return_url = $assessmentInfo['return_url'];
+        }
+
+        $data = [
+            'return_url' => $return_url
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -387,7 +386,6 @@ class Controller extends Base
 
         if ($assessment instanceof Project) {
             $data['types']         = $types;
-            $data['allReturnUrls'] = $this->getAllReturnUrls($assessment);
             $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
             $data['allSummators']  = $summatorMapping;
         }
@@ -408,69 +406,94 @@ class Controller extends Base
     public function postUpdateAssessment(IAssessable $assessment)
     {
         try {
-            $assessment = $this->produceAssessment($this->getRequest()->post, $assessment);
-            $this->persistAssessment($assessment);
+            $assessmentInfo = $this->persistAssessment($this->getAssessmentMapperProxy()->findById($assessment->getId()));
+        }
+        catch (ControllerException $e) {
+            $this->sendError($e);
 
-            // Determine returnUrl
-            $returnUrl = $this->getRequest()->post['returnUrl'];
-
-            // Explicitly specified?
-            if($returnUrl) {
-                $returnUrl = $this->decodeReturnUrl($returnUrl);
-            } else {
-                // Determine appropriate location
-                $context = $assessment->getContext();
-
-                // Did we save inside a Project
-                if($context instanceof Project){
-                    $data = ['assessmentId' => $context->getId()];
-                    $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
-                }
-                // Else must be inside a Folder, UnitImpl, or UnitSpec
-                else {
-                    $assessment = $this->getAssessmentMapperProxy()->findById($assessment->getId());
-                    $returnUrl = "/homepage/{$assessment->getContext()->getFolder()->getId()}";
-                }
-            }
-
-            if($this->getRequest()->isXhr()){
-                $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $returnUrl]));
-            } else {
-                $this->getResponse()->redirect->to($returnUrl);
-            }
-        // TODO - clean up error handling
-        } catch (ControllerException $e){
-            $this->sendError($e->getMessage(), $e->getReasons());
-        } catch (\Exception $e){
-            $this->sendError($e->getMessage());
+            /* Return Early to let mage deal with error messages
+             */
+            return;
         }
 
+        /* Redirect to project summary screen instead, if you spawned a project
+         * Otherwise return to context
+         */
+        if ($assessmentInfo['assessment'] instanceof Project) {
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+        }
+        else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
+            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
+        }
+        else {
+            $return_url = $assessmentInfo['return_url'];
+        }
+
+        $data = [
+            'return_url' => $return_url
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
-     * Generic method for:
-     * * Create new assessment
-     * * Update existing assessment.
+     * Generic method for create/update of an assessment.
      *
-     * Redirects to appropriate location after successful save
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by actual controller methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
      *
-     * @param IAssessable $assessment
-     * @throws \UnexpectedValueException if attempting to save a Project within a Project
+     * @param IAssessable $assessment If null, create a new one from the form - otherwise, update this
+     * @throws ControllerException
+     * @return array
      */
-    protected function persistAssessment(IAssessable $assessment)
+    protected function persistAssessment(IAssessable $assessment = null)
     {
-        // Determine sequence
-        // If 'create' then append at end, if 'update' retain current sequence
-        $sequence = 1;
-        $context = $assessment->getContext();
-        $options = ['order' => ['sequence' => 'asc']];
-        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, $options) as $otherAssessment) {
-            if ($otherAssessment->getId() == $assessment->getId()) {
-                break;
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
+         */
+        try {
+
+            /* Figure out what kind of assessment was chosen
+             * and spawn a new instance of it to manipulate
+             */
+            $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
+            $assessment = $assessmentFactory->produce($assessment);
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
             }
-            $sequence++;
+
+            /* Save the $asseessment
+             * Try to figure out what the redirect destination should be
+             * Throw an error if some kind of context configuration is wrong
+             */
+            $transactor = new Transactor(
+                $assessment,
+                $this->getFolderMapper(),
+                $this->getUnitImplementationMapperProxy(),
+                $this->getUnitSpecificationMapperProxy(),
+                $this->getAssessmentMapperProxy(),
+                $this->getRouter()
+            );
+
+            $transactionSummary = $transactor->transact();
         }
-        $this->getAssessmentMapperProxy()->save($assessment, $sequence);
+        catch (\DomainException $e) {
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
+        }
+        catch (\InvalidArgumentException $e) {
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
+        }
+        catch (\UnexpectedValueException $e) {
+            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
+        }
+
+        return $transactionSummary;
     }
 
 
@@ -496,7 +519,7 @@ class Controller extends Base
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $returnUrl = $this->getRequest()->post['returnUrl'];
+        $returnUrl = $this->getRequest()->post['return_url'];
 
         // Did caller explicitly specify a returnUrl ?
         if($returnUrl) {
@@ -505,7 +528,7 @@ class Controller extends Base
             // Did we delete an item from a Project ?
             if($assessment->getContext() instanceof Project){
                 $data = ['assessmentId' => $assessment->getContext()->getId()];
-                $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', $data);
+                $redirect = $this->getRouter()->generate('learningAssessment.getSummary', $data);
             }
             // Must be from a Folder, UnitImpl, or UnitSpec
             else {
@@ -513,8 +536,8 @@ class Controller extends Base
             }
         }
 
-        if($this->getRequest()->isXhr()){
-            $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $redirect]));
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput(['return_url' => $redirect]));
         } else {
             $this->getResponse()->redirect->to($redirect);
         }
@@ -578,8 +601,8 @@ class Controller extends Base
 
         $counts = [];
         $assessableCounts = [];
-        foreach ($participants as $participant) {
 
+        foreach ($participants as $participant) {
             $counts[$participant->getUser()->getId()] = [
                 'total' => 0,
                 'totalCompleted' => 0,
@@ -596,12 +619,39 @@ class Controller extends Base
             foreach ($subAssessment->getAllParticipants() as $participant) {
                 $counts[$participant->getUser()->getId()]['total']++;
                 $assessableCounts[$subAssessment->getId()]['total']++;
+
                 if ($participant->getAllResponses()->count() > 0) {
                     $counts[$participant->getUser()->getId()]['totalCompleted']++;
                     $assessableCounts[$subAssessment->getId()]['totalCompleted']++;
                 }
             }
         }
+
+
+//        /* TODO: This is a temporary feedback
+//         */
+//        foreach ($assessment->getAssessables() as $currentAssessable) {
+//            if ($currentAssessable instanceof DueWork) {
+//
+//                $feedback = new DueWorkFeedback();
+//                $feedback
+//                    ->setAssessable($currentAssessable)
+//                    ->setNormalisedMark(98)
+//                    ->setComment('This is a flawed piece of work.')
+//                    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+//                    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+//                    ->setUpdatedAt(new \Alaress_Date_Format('2016-10-30 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//                /** @var Participant $currentParticipant */
+//                foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+//                    if ($currentParticipant->getUser()->getId() == 230) {
+//                        $currentParticipant->getAllFeedbacks()->add($feedback);
+//                    }
+//                }
+//            }
+//        }
+//        $hodes = (new UserMapper())->findById(230);
+//        new \Alaress_Probe($assessment->getHumanReadableMark($hodes, true));
 
         /* Manufacture a set of returnUrls since staff with perms can create
          * IAssessables inside projects
@@ -612,7 +662,7 @@ class Controller extends Base
          * Return to summary screen with this suffix
          */
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-        $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
+        $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
 
         $types = new AssessmentType();
         $twigData = [
@@ -969,66 +1019,7 @@ class Controller extends Base
     /* Utility methods - these can probably be refactored elsewhere
      */
 
-    /**
-     * When viewing a project, the system displays links to create sub-assessables.
-     *
-     * Each link to create an assessable in the project must contain a reference back
-     * to the parent project so we can return to it once we have finished created the sub-assessable.
-     *
-     * @param Project $project
-     * @return IAssessable[] Maps URL:string to an IAssessable
-     */
-    private function getAllReturnUrls(Project $project)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
-        $suffix = '?returnUrl=' . $this->encodeReturnUrl($returnUrl);
-
-        $name = 'learningAssessment.getSelectAssessmentInProject';
-        $allReturnUrls = [];
-
-        foreach(AssessmentType::getStringValues() as $assessmentType){
-
-            // Don't permit Project in Project
-            if(AssessmentType::TYPE_PROJECT == $assessmentType){
-                continue;
-            }
-            $data = ['projectId' => $project->getId(), 'assessmentTypeTitle' => $assessmentType];
-            $url = $this->getRouter()->generate($name, $data) . $suffix;
-
-            $allReturnUrls[$url] = AssessmentType::stringToObject($assessmentType);
-        }
-
-        return $allReturnUrls;
-    }
-
-    /**
-     * Encodes a returnUrl
-     *
-     * @param string $returnUrl
-     * @return string
-     */
-    private function encodeReturnUrl($returnUrl)
-    {
-        return urlencode(base64_encode($returnUrl));
-    }
-
-    /**
-     * Decodes an encoded returnUrl
-     *
-     * @param string $encodedReturnUrl
-     * @return string
-     */
-    private function decodeReturnUrl($encodedReturnUrl)
-    {
-        return base64_decode(urldecode($encodedReturnUrl));
-    }
-
-    /**
+     /**
      * All the possible Mark Types to choose from for this particular $assessmentType
      *
      * @param IAssessable $assessable

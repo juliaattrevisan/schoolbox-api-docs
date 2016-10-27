@@ -4,6 +4,21 @@
             handle:      '.grip',
             axis:        'y'
         });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this item?',
+                confirmEvent: function() {
+                    $.post($(element).attr('href'), {assessmentId: $(element).attr('data-delete')}, function(responseText) {
+                        window.location.href = responseText.return_url;
+                    });
+                }
+            });
+        });
     });
 </script>
 
@@ -25,7 +40,6 @@
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: currentUser} %}
 
         <div class="row">
-
             <div class="small-12 medium-6 island">
                 <h2 class="subheader">Activities</h2>
 
@@ -54,12 +68,11 @@
                                 </div>
                                 <nav>
                                     {% if isRouteAuthorized('learningAssessment.postUpdateAssessment', {assessmentId: assessable.id}) %}
-                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}"
-                                       class="icon-modify no-text" title="Modify"></a>
+                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
                                     {% endif %}
-                                    {# TODO: Needs a route #}
+
                                     {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
-                                        <a href="#" class="icon-delete no-text" title="Delete"></a>
+                                    <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-delete no-text" title="Delete" data-delete="{{ assessable.id }}"></a>
                                     {% endif %}
                                 </nav>
                             </li>
@@ -69,9 +82,9 @@
                     <div class="component-action">
                         <section>
                             {% for returnUrl in allReturnUrls %}
-                                <a class="button" href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
+                                <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
                             {% endfor %}
-                            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create Assessment</a>
+                            <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create Assessment</a>
                         </section>
                     </div>
                 </section>
@@ -103,9 +116,11 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
+                                            {% if participant.mark.published.humanReadable %}
                                             <span class="neutral label right">
-                                                {{ participant.findMostRecentFeedback.humanReadableMark }}
+                                                {{ participant.mark.published.humanReadable }}
                                             </span>
+                                            {% endif %}
                                             <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
@@ -116,7 +131,9 @@
                                                 {% if participant.user.year and participant.user.role.isStudent %}
                                                     Year {{ participant.user.year }}
                                                 {% endif %}
-                                                {{ counts[participant.id].totalCompleted }} / {{ counts[participant.id].total }} Completed
+                                            </p>
+                                            <p class="meta">
+                                                {{ counts[participant.user.id].totalCompleted }} / {{ counts[participant.user.id].total }} Completed
                                             </p>
                                         </div>
                                     </div>
@@ -131,7 +148,6 @@
                     </div>
                 {% endif %}
             </div>
-
         </div>
     </div>
 </div>

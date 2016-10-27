@@ -301,4 +301,27 @@ class Participant
         $this->allFeedbacks = $allFeedbacks;
         return $this;
     }
+
+    /**
+     * Get a little data structure of Unpublished marks in both Human Readable
+     * and Normalised formats
+     *
+     * Maybe this can be broken down into getMark(), getPublishedMark(), getUnpublishedMark()
+     * methods but for now, just throw them all together
+     *
+     * @return array
+     */
+    public function getMark()
+    {
+        return [
+            'published' => [
+                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), true),
+                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), true)
+            ],
+            'unpublished' => [
+                'humanReadable' => $this->getAssessable()->getHumanReadableMark($this->getUser(), false),
+                'normalised' => $this->getAssessable()->getNormalisedMark($this->getUser(), false)
+            ]
+        ];
+    }
 }

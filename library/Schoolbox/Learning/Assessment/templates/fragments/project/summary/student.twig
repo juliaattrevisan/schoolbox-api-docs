@@ -15,8 +15,8 @@
         {% include '@learningAssessment/fragments/project/timeline.twig' with {assessment: assessment, currentUser: currentUser, type: 'student'} %}
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, currentUser: currentUser} %}
 
+        {% if assessment.assessables|length %}
         <h2 class="subheader">Activities</h2>
-
         <section>
             <ul class="information-list">
                 {% for assessable in assessment.assessables %}
@@ -24,5 +24,11 @@
                 {% endfor %}
             </ul>
         </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-project"></i>
+            <p>There are no assessments in this project at the moment.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
