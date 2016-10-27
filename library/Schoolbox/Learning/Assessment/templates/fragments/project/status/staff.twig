@@ -121,7 +121,7 @@
                                                 {{ participant.mark.published.humanReadable }}
                                             </span>
                                             {% endif %}
-                                            <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                            <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                                 <h3>
                                                     {{ participant.user.formatName }}

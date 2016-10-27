@@ -72,11 +72,14 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/submit/{studentId}' => 'getCreateSubmission',
 
+                /* Staff-specific Status screens
+                 */
+                '/assessment/{assessmentId}/status' => 'getStatus',
 
                 /* Miscellaneous routes
                  */
 //                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
-                '/assessment/{assessmentId}/status'             => 'getStatus',
+
 
             ],
             'POST' => [

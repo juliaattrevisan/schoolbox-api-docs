@@ -565,31 +565,111 @@ class Controller extends Base
     }
 
     /**
+     * This gives you a summary of progress made within an Assessment
+     *
+     * This place is Staff Only
+     *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
      */
-    public function getStatusTemp(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment)
     {
-
-        /* TODO: This place is Staff Only
+        /* Staff Only
          */
+        if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isSuperuser()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
 
         /* There are no Summary views for Tasks; 404 them instead
          */
         if ($assessment instanceof Task) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
-
-        /* Quiz redirects somewhere else
+        /* TODO: Quiz needs to redirect to whatever their intro screen is
          */
+        else if ($assessment instanceof Quiz) {
 
+        }
         /* If you're a staff and you're viewing a project,
          * You get to see all the assessments and all the participants
          */
+        else if ($assessment instanceof Project) {
 
+            // Load participants manually
+            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+
+            // Calculate summary totals for display purposes
+            $participants = $assessment->getAllParticipants();
+
+            $counts = [];
+            $assessableCounts = [];
+            foreach ($participants as $participant) {
+                $counts[$participant->getUser()->getId()] = [
+                    'total' => 0,
+                    'totalCompleted' => 0,
+                ];
+            }
+
+            // This isn't necessarily a project.
+            foreach ($assessment->getAssessables() as $subAssessment) {
+                $assessableCounts[$subAssessment->getId()]['total'] = 0;
+
+                // Populate the participants for every single sub-assessment
+                // TODO can this be performed more efficiently?
+                $subAssessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($subAssessment));
+                foreach ($subAssessment->getAllParticipants() as $participant) {
+                    $counts[$participant->getUser()->getId()]['total']++;
+                    $assessableCounts[$subAssessment->getId()]['total']++;
+                    if ($participant->getAllResponses()->count() > 0) {
+                        $counts[$participant->getUser()->getId()]['totalCompleted']++;
+                        $assessableCounts[$subAssessment->getId()]['totalCompleted']++;
+                    }
+                }
+            }
+
+            /* Manufacture a set of returnUrls since staff with perms can create
+             * IAssessables inside projects
+             */
+            $breadcrumbBuilder = new BreadcrumbFactory($this->getRouter());
+
+            /* Manufacture a universal returnUrl
+             * Return to summary screen with this suffix
+             */
+            $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+            $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
+
+            $types = new AssessmentType();
+            $twigData = [
+                'breadcrumbs' => $breadcrumbBuilder->produceFromAssessment($assessment),
+                'counts' => $counts,
+                'assessableCounts' => $assessableCounts,
+                'assessment' => $assessment,
+                'types' => $types,
+                'projectAssessments' => [new DueWork(), new Quiz(), new Task()],
+                'currentUser' => $this->getUser(),
+                'returnUrlSuffix' => $returnUrlSuffix
+            ];
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    "@learningAssessment/fragments/{$types->objectToString($assessment)}/status/staff.twig",
+                    $twigData
+                )
+            );
+        }
         /* If you're a staff and you're viewing a due work,
          * You get to see all participants, quickmark them, and links to getSummary()
          */
+        else if ($assessment instanceof DueWork) {
+
+            /* TODO: Quickmark screen?
+             */
+        }
+        /* Everything else, 404
+         */
+        else {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
     }
 
     /**
@@ -1070,42 +1150,42 @@ class Controller extends Base
         return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
     }
 
-    /**
-     * Displays information regarding an assessment
-     *
-     * @api   GET /learning/assessment/:assessmentId/status
-     * @level 165
-     * @param IAssessable $assessmentId
-     * @todo implement IAssessable interface
-     */
-    public function getStatus($assessmentId)
-    {
-        // this is a teacher page to show a list of students (cohort list)
-        // with each student summarised (single column of the markbook)
-        // same data structure as mark book, for a single assessable
-
-        // Replaces /submission/viewSubmission/:dueWorkId
-        //       eg /submission/viewSubmission/56
-        // Replaces /task/progressReport/:folderId/:unitId
-        //       eg /task/progressReport/177/11
-
-
-        // ==================== test URLs: ======================
-        // http://192.168.36.10/learning/assessment/1/status   - project with 1 quiz, 1 dueWork + 3 tasks
-        // http://192.168.36.10/learning/assessment/2/status   - quiz
-        // http://192.168.36.10/learning/assessment/3/status   - dueWork
-        // http://192.168.36.10/learning/assessment/4/status   - task1
-        // http://192.168.36.10/learning/assessment/5/status   - task2
-        // http://192.168.36.10/learning/assessment/6/status   - task3
-
-        // TODO - generate data
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/status.twig', [
-            'breadcrumbs'      => self::getDummyBreadcrumbs(),
-            'cohortList'       => self::getDummyCohortList(),
-            'assessment'       => self::getDummyAssessment($assessmentId),
-        ]));
-    }
+//    /**
+//     * Displays information regarding an assessment
+//     *
+//     * @api   GET /learning/assessment/:assessmentId/status
+//     * @level 165
+//     * @param IAssessable $assessmentId
+//     * @todo implement IAssessable interface
+//     */
+//    public function getStatus($assessmentId)
+//    {
+//        // this is a teacher page to show a list of students (cohort list)
+//        // with each student summarised (single column of the markbook)
+//        // same data structure as mark book, for a single assessable
+//
+//        // Replaces /submission/viewSubmission/:dueWorkId
+//        //       eg /submission/viewSubmission/56
+//        // Replaces /task/progressReport/:folderId/:unitId
+//        //       eg /task/progressReport/177/11
+//
+//
+//        // ==================== test URLs: ======================
+//        // http://192.168.36.10/learning/assessment/1/status   - project with 1 quiz, 1 dueWork + 3 tasks
+//        // http://192.168.36.10/learning/assessment/2/status   - quiz
+//        // http://192.168.36.10/learning/assessment/3/status   - dueWork
+//        // http://192.168.36.10/learning/assessment/4/status   - task1
+//        // http://192.168.36.10/learning/assessment/5/status   - task2
+//        // http://192.168.36.10/learning/assessment/6/status   - task3
+//
+//        // TODO - generate data
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/status.twig', [
+//            'breadcrumbs'      => self::getDummyBreadcrumbs(),
+//            'cohortList'       => self::getDummyCohortList(),
+//            'assessment'       => self::getDummyAssessment($assessmentId),
+//        ]));
+//    }
 
     /**
      * Staff member view that displays a specific student's progress in relation to a specified assessment
