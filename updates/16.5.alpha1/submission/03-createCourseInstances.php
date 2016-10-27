@@ -141,13 +141,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ]);
             $log->debug('Course instance attached to component');
         } catch (PDOException $e) {
-            $log->error('Course instance could not be attached!', [$e]);
-            $log->error('What probably happened is that a single component somehow has unit instances that relate to more than one course.');
-            $log->error('The course instance has still been created, so its coursework still exists on this homepage.');
+            $log->warning('Course instance could not be attached!', [$e]);
+            $log->warning('What probably happened is that a single component somehow has unit instances that relate to more than one course.');
+            $log->warning('The course instance has still been created, so its coursework still exists on this homepage.');
             $log->warning($e->getMessage());
-            $failureCount++;
-            $database->rollBack();
-            continue;
         }
 
 
