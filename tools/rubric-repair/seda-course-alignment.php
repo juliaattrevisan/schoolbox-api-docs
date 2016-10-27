@@ -310,6 +310,8 @@ $kernel->run
 
             $instanceBoxId = $instanceBox->getId();
 
+            $logSuffix = "[unit_box_id,class_box_id]($sourceBoxId,$instanceBoxId)";
+
             /** @var Collection|SubmissionBox\ReturnedWork[] $instanceReturns */
             $instanceReturns = SubmissionBox\ReturnedWorkMapper::getInstance()->findByColumnList([
                 'box_id' => $instanceBoxId,
@@ -346,18 +348,18 @@ $kernel->run
                 $db->beginTransaction();
 
                 if (empty($dd)) {
-                    $log->debug("Indicators match between unit and class");
+                    $log->debug("Indicators match between unit and class $logSuffix");
 
                 } else {
                     list ($add, $del) = $dd;
 
                     $log->warning(sprintf(
-                        "Instance %d: indicators do not match between unit box %d and class box %d! Cleaning up difference [%d +%d/-%d = %d]",
-                        $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
+                        "Task instance %d: indicators do not match between unit and class! Cleaning up difference [%d +%d/-%d = %d] $logSuffix",
+                        $instance->getId(), count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
                     ));
 
                     if ($instanceReturns->count() && count($instanceBoxIndicators) == count($del)) {
-                        $log->debug("All indicators are being removed; caching return data for {$instanceReturns->count()} students");
+                        $log->debug("All indicators are being removed; caching return data for {$instanceReturns->count()} students $logSuffix");
 
                         $oldGrid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBox($instanceBox);
 
@@ -431,10 +433,10 @@ $kernel->run
                     ));
 
                 } else {
-                    $log->info("Invalidating any incongruous rubric marks [box_id]($instanceBoxId)");
+                    $log->info("Invalidating any incongruous rubric marks $logSuffix");
                     $massInvalidateMarkStmt->execute([ 'submission_box_id' => $instanceBoxId ]);
 
-                    $log->debug("Verifying integrity of returns");
+                    $log->debug("Verifying integrity of returns $logSuffix");
                     $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
                 }
 
@@ -444,6 +446,8 @@ $kernel->run
                 foreach ($instanceReturns as $return) {
 
                     $studentId = $return->getOwner()->getId();
+
+                    $logSuffix = "[box_id,student_id]($instanceBoxId,$studentId)";
 
                     // skip students we've already checked the most recent of
                     if (isset($userSeen[$studentId])) {
@@ -457,11 +461,11 @@ $kernel->run
 
                     // EXTREMELY SPECIFIC CASE: student returns with an submission state of 'RESUBMIT' need to be left alone
                     if ($hrMark == 'RESUBMIT') {
-                        $log->debug("Student has been flagged for resubmission; skipping [box_id,student_id]($instanceBoxId,$studentId)");
+                        $log->debug("Student has been flagged for resubmission; skipping $logSuffix");
                         continue;
                     }
 
-                    $log->debug("Checking marks for user $studentId");
+                    $log->debug("Checking marks $logSuffix");
 
                     // load into cache if absent
                     if (empty($userCache[$studentId])) {
@@ -505,19 +509,19 @@ $kernel->run
 //                    $log->debug("Existing mark given: " . $grid->getSum() . " / $markedDenominator");
 
                     if ($markedDenominator == 0 && isset($markCache[$studentId])) {
-                        $log->debug("Restoring mark from cache");
+                        $log->debug("Restoring mark from cache $logSuffix");
 
                         $averageGiven = $markCache[$studentId];
 
                     } else {
                         if ($markedDenominator == 0) {
                             // div by zero, no marks given: skip!
-                            $log->debug("No marks have been given, nothing to extrapolate");
+                            $log->debug("No marks have been given, nothing to extrapolate $logSuffix");
                             continue;
                         }
 
                         if ($unmarkedCount == 0) {
-                            $log->debug("Rubric grid is fully marked; no marks to apply");
+                            $log->debug("Rubric grid is fully marked; no marks to apply $logSuffix");
                             continue;
                         }
 
@@ -528,7 +532,7 @@ $kernel->run
 //                    $log->debug("Marks to apply: $marksToApply");
 
                     if ($marksToApply == 0) {
-                        $log->debug("No marks to apply");
+                        $log->debug("No marks to apply $logSuffix");
                         continue;
                     }
 
@@ -541,7 +545,7 @@ $kernel->run
                     // obtain the set of unmarked criteria for this student
                     $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
 
-                    $log->debug("Distribute $marksToApply marks across $unmarkedCount indicators");
+                    $log->debug("Distribute $marksToApply marks across $unmarkedCount indicators $logSuffix");
 
                     $unmarkedCritIds = $findUnmarkedCriteriaStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -560,7 +564,7 @@ $kernel->run
                     $avg = findClosestMatch($set, $marksToApply);
 
                     if (empty($avg)) {
-                        $log->error("Could not apply $marksToApply marks to rubric [box_id,student_id]($instanceBoxId,$studentId)");
+                        $log->error("Could not apply $marksToApply marks to rubric $logSuffix");
                         continue;
                     }
 
@@ -582,7 +586,7 @@ $kernel->run
 
                     $adjustment = json_encode($avg);
 
-                    $log->debug("Mark adjustment: $adjustment [box_id,student_id]($instanceBoxId,$studentId)");
+                    $log->debug("Mark adjustment: $adjustment $logSuffix");
 
                     $getLatestReturnStmt->execute([
                         'student_id' => $studentId,
