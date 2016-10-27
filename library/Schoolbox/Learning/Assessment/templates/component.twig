@@ -22,11 +22,11 @@
 
             {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}
 
-            <li class="actions-small-{{ actionCount }}">
+            <li class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}">
                 <div class="list-item">
                     <div class="card small-12">
                         {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
-                            <h3>{{ assessable.title }}</h3>
+                            <h3 data-assessment-title>{{ assessable.title }}</h3>
                             {% if viewRoute %}</a>{% endif %}
                         <p class="meta">
                             <span class="{{ urgency.gradientClass(assessment, user) }}">
@@ -63,3 +63,24 @@
         </section>
     </div>
 </section>
+<script type="text/javascript">
+    $(function () {
+        $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+
+            var itemName = $(this).closest('[data-assessment]').find('[data-assessment-title]').text();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete ' + itemName + '?',
+                confirmLabel: 'Yes, delete it',
+                cancelLabel: 'No, keep it',
+                confirmEvent: function (anchor) {
+                    $.post(anchor.attr('href')).done(function() {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    })
+</script>
+
