@@ -1,3 +1,6 @@
+{% if folder.hasHomepage %}
+    <li><a class="icon-home"   data-action="folder"   href="/homepage/{{ folder.id }}">Homepage</a></li>
+{% endif %}
 {% if folder.id == 0 %}
     <li><a class="icon-folder"   data-action="folder"   href="/resource/folder/create/{{ folder.id }}">Add Folder</a></li>
 {% else %}
