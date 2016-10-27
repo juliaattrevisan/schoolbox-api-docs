@@ -103,16 +103,16 @@ class Transactor
         if (!$this->getAssessment()->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
-                    $return_url = $this->transactFolderContext();
+                    $returnUrl = $this->transactFolderContext();
                 }
                 elseif ($assessmentContext instanceof UnitImplementation) {
-                    $return_url = $this->transactUnitImplementationContext();
+                    $returnUrl = $this->transactUnitImplementationContext();
                 }
                 elseif ($assessmentContext instanceof UnitSpecification) {
-                    $return_url = $this->transactUnitSpecificationContext();
+                    $returnUrl = $this->transactUnitSpecificationContext();
                 }
                 elseif ($assessmentContext instanceof Project) {
-                    $return_url = $this->transactProjectContext();
+                    $returnUrl = $this->transactProjectContext();
                 } else {
                     throw new \InvalidArgumentException('select a valid context');
                 }
@@ -126,14 +126,14 @@ class Transactor
             $sequence = $this->deriveSaveSequence($assessmentContext);
             $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
-            $return_url = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
          */
         return [
             'assessment' => $this->getAssessment(),
-            'return_url' => $return_url
+            'returnUrl' => $returnUrl
         ];
     }
 
@@ -153,9 +153,9 @@ class Transactor
         $sequence = $this->deriveSaveSequence($context);
         $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
-        $return_url = "/homepage/{$context->getId()}";
+        $returnUrl = "/homepage/{$context->getId()}";
 
-        return $return_url;
+        return $returnUrl;
     }
 
     /**
