@@ -714,8 +714,21 @@ class Controller extends Base
         }
         /* TODO: Quiz needs to redirect to whatever their intro screen is
          */
-        else if ($assessment instanceof Quiz) {
+        if ($assessment instanceof Quiz) {
+            // redirect away
         }
+
+        /* Only staff and students are allowed here for now
+         */
+        if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->getRole()->isStudent()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        $types = new AssessmentType();
+
+        // Load participants manually
+        $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+
         /* If you're a staff and you're viewing a due work for a particular student
          * see the details of the due work and have a Submit On Behalf Of button available
          * OR
@@ -725,25 +738,22 @@ class Controller extends Base
          * If you're a parent
          * You don't get a button
          */
-        else if ($assessment instanceof DueWork) {
-            $types = new AssessmentType();
-
-            // Load participants manually
-            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+        if ($assessment instanceof DueWork) {
 
             /* Figure out if this student is actually participating
              */
             try {
                 $assessment->getParticipant($student);
-            }
-            catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
-            $twigData          = [
-                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '']),
+            $twigData = [
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment(
+                    $assessment
+                )->add([$assessment->getTitle(), '']),
                 'currentUser' => $this->getUser(),
-                'student' => $student,
+                'student'     => $student,
                 'assessment'  => $assessment,
             ];
 
@@ -760,75 +770,70 @@ class Controller extends Base
          * If you're a student and you're viewing a project
          * so you get to see your own progress in that project
          */
-        else if ($assessment instanceof Project) {
-            if ($this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent()) {
-                $types = new AssessmentType();
+        elseif ($assessment instanceof Project) {
+            $counts = [];
 
-                // Load participants manually
-                $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
-
-                $counts = [];
-
-                // Calculate summary totals for display purposes
-                foreach($types->getStringValues() as $type){
-                    if (AssessmentType::TYPE_PROJECT == $type){
-                        continue;
-                    }
-
-                    $counts[$type] = 0;
-                    $counts["{$type}Completed"] = 0;
+            // Calculate summary totals for display purposes
+            foreach ($types->getStringValues() as $type) {
+                if (AssessmentType::TYPE_PROJECT == $type) {
+                    continue;
                 }
 
-                $counts['total'] = 0;
-                $counts['totalCompleted'] = 0;
-
-                $assessables = $assessment->getAssessables();
-
-                /** @var IAssessable $assessable */
-                foreach ($assessables as $assessable) {
-                    // Load participants manually
-                    // TODO: Do it faster and cheaperer
-                    // $assessable->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessable));
-
-                    try {
-                        $participant = $assessable->getParticipant($student);
-                    } catch (\UnexpectedValueException $e) {
-                        // This student isn't a participant.
-                        // This is fine - when PBL is implemented not all students
-                        // will participate in all sub-assessments
-                        continue;
-                    }
-
-                    // If the student has submitted at least one response we will assume it is completed
-                    $counts[$types->objectToString($assessable)]++;
-                    $counts['total']++;
-
-                    if ($participant->getAllResponses()->count() > 0) {
-                        $counts["{$types->objectToString($assessable)}Completed"]++;
-                        $counts['totalCompleted']++;
-                    }
-                }
-
-                // Ideally make this an instance var instead of instantiating all the time
-                // Except you can't, $this->getRouter() returns null in __construct()?
-                $twigData = [
-                    'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
-                    'currentUser' => $this->getUser(),
-                    'student' => $student,
-                    'assessment' => $assessment,
-                    'counts' => $counts,
-                ];
-
-                $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig", $twigData));
+                $counts[$type]              = 0;
+                $counts["{$type}Completed"] = 0;
             }
+
+            $counts['total']          = 0;
+            $counts['totalCompleted'] = 0;
+
+            $assessables = $assessment->getAssessables();
+
+            /** @var IAssessable $assessable */
+            foreach ($assessables as $assessable) {
+                // Load participants manually
+                // TODO: Do it faster and cheaperer
+                // $assessable->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessable));
+
+                try {
+                    $participant = $assessable->getParticipant($student);
+                } catch (\UnexpectedValueException $e) {
+                    // This student isn't a participant.
+                    // This is fine - when PBL is implemented not all students
+                    // will participate in all sub-assessments
+                    continue;
+                }
+
+                // If the student has submitted at least one response we will assume it is completed
+                $counts[$types->objectToString($assessable)]++;
+                $counts['total']++;
+
+                if ($participant->getAllResponses()->count() > 0) {
+                    $counts["{$types->objectToString($assessable)}Completed"]++;
+                    $counts['totalCompleted']++;
+                }
+            }
+
+            // Ideally make this an instance var instead of instantiating all the time
+            // Except you can't, $this->getRouter() returns null in __construct()?
+            $twigData = [
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment(
+                    $assessment
+                ),
+                'currentUser' => $this->getUser(),
+                'student'     => $student,
+                'assessment'  => $assessment,
+                'counts'      => $counts,
+            ];
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    "@learningAssessment/fragments/{$types->objectToString($assessment)}/summary/student.twig",
+                    $twigData
+                )
+            );
+
             /* For parents, do other things?
              */
-        }
-        else {
-
-            /* Everything else, 404
-             */
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 
@@ -846,7 +851,6 @@ class Controller extends Base
         try {
             $assessmentFactory = new Factory($this->getUser(), $postData);
             $assessment = $assessmentFactory->produce($existingAssessment);
-
         }
         catch (\DomainException $e) {
             throw new ControllerException('Could not create assessment', [$e->getMessage()]);
