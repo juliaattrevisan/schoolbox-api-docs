@@ -147,10 +147,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->debug('Created assessment/unit specification relation');
             } catch (PDOException $e) {
                 // If this failed - most likely there WAS a course builder here, but there is no longer.
-                // Consider trying to rebuild it, but create it as deleted.
                 $log->warning('Could not create assessment/unit specification relation!');
                 $log->warning('What probably happened is that the course builder that was here was deleted.');
+                $log->warning($e->getMessage());
 
+                // Try to rebuild the course/unit that was here, but create it as deleted.
                 $selectCourseIdQuery->execute(['folderId' => $folderId]);
                 $courseId = $selectCourseIdQuery->fetchColumn();
                 if (!$courseId) {
