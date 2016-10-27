@@ -166,18 +166,18 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $insertAssessmentFolderRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
                 $log->debug('Created assessment/folder relation');
             } catch (PDOException $e) {
-                $log->warning($e->getMessage());
                 $log->warning('Could not create assessment/folder relation!');
                 $log->warning('This is probably because the folder in which this assessment lives has been deleted.');
                 $log->warning('This assessment will be orphaned (it likely was already).');
+                $log->warning($e->getMessage());
             }
 
             $successCount++;
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->warning($e->getMessage());
             $log->error(sprintf('%s "%s" could not be converted!', ($quizId ? 'Quiz' : 'Due Work'), $title), [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $db->rollBack();
 

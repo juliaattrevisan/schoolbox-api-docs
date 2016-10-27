@@ -190,8 +190,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->warning($e->getMessage());
             $log->error(sprintf('Task "%s" could not be converted!', $title), [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $db->rollBack();
 
