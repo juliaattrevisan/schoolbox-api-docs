@@ -390,9 +390,9 @@ class Controller extends Base
 
         /* Special treatment for projects for now
          */
-        $summatorMapping = new SummatorMapping();
-
         if ($assessment instanceof Project) {
+            $summatorMapping = new SummatorMapping();
+
             $data['types']         = $types;
             $data['selectedSummator'] = $summatorMapping->decompose($assessment->getSummator());
             $data['allSummators']  = $summatorMapping;
