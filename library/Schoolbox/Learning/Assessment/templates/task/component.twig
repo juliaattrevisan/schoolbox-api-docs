@@ -1,4 +1,10 @@
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+{% set createRoute = isRouteAuthorized('learningAssessment.getSelectAssessmentInFolder')
+    ? routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'task'})
+    : ''
+%}
+
 <section>
     <ul class="action-list">
         {% for assessable in assessables %}
@@ -10,7 +16,7 @@
                             <h3>{{ assessable.title }}</h3>
                         </a>
                         <p class="meta">
-                            <span class="gradient-{{ urgency.gradientIndex(assessment) }}">
+                            <span class="{{ urgency.gradientClass(assessment, user) }}">
                                 Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
                             </span>
                         </p>
@@ -58,9 +64,11 @@
             </li>
         {% endfor %}
     </ul>
-    {% if isRouteAuthorized('learningAssessment.postCreateAssessment') %}
-        <div class="content">
-            <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'task'}) }}" class="button icon-add">Create Task</a>
+    {% if createRoute %}
+        <div class="component-action">
+            <section>
+                <a href="{{ createRoute }}" class="button">Create Task</a>
+            </section>
         </div>
     {% endif %}
 </section>
