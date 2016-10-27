@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Breadcrumbs;
+
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Redirect;
 
@@ -31,7 +31,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
-
+$folder = null;
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assess['category_id']);
@@ -58,6 +58,8 @@ $this->setVar(array(
     'FIRST_SECTION'        => $allSections[0]['section_id'],
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+    'ASSESSMENT_ID'        => $assess['assessment_id'],
+    'RETURN_URL_MODIFY'    => $returnUrl ?: '?'.Redirect::RETURN_URL.'='.Redirect::encode('/assess/summary/'.$assess['assess_id']),
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
