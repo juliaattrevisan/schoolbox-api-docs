@@ -431,7 +431,7 @@ class Controller extends Base
             $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
         }
         else {
             $returnUrl = $assessmentInfo['returnUrl'];
