@@ -23,6 +23,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 
 /**
  * Class OnlineAssessmentMapper
@@ -143,7 +144,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			'other_key' => 'id',
 		));
 		$this->hasJoin('attempt', array(
-			'mapper'    => Attempt\Mapper::class,
+			'mapper'    => QuizAttemptMapper::class,
 			'multiple'  => true,
 			'this_key'  => 'assess_id',
 			'other_key' => 'assess_id',
@@ -176,6 +177,9 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSections'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAttempts'));
+
+        // When a Quiz is deleted from old Assess pages, we must ensure we also delete from new 'assessment' table
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessment'));
 	}
 
     /**
@@ -205,6 +209,25 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->delete($attempts);
     }
+
+    /**
+     * Soft deletes the specified Quiz from the Assessment table
+     *
+     * @param Model $quiz
+     */
+    public function softDeleteAssessment(Model $quiz)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        try{
+            // Intentionally doesn't re-delete already deleted assessment.
+            $assessment = $assessmentMapper->findById($quiz->getAssessmentModel()->getId());
+            $assessmentMapper->delete($assessment);
+        } catch (MapperDeletedException $e){
+            // noop
+        }
+    }
+
+
 
     /**
      * Soft deletes all Attempts for the specified Quiz

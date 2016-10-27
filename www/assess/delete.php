@@ -73,7 +73,12 @@ if (is_array($sectionList) && count($sectionList)) {
 
 // Delete thru the mapper so that callbacks apply
 $mapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
-$mapper->delete($mapper->findById($assessId));
+try {
+    $quiz = $mapper->findById($assessId);
+} catch (\Schoolbox\Mapper\Exception\Deleted $e){
+    $quiz = $e->getDeletedObject();
+}
+$mapper->delete($quiz);
 
 if ($_GET[Redirect::RETURN_URL] != "")
 	SitePage::localRedir(Redirect::decode($_GET[Redirect::RETURN_URL]));
