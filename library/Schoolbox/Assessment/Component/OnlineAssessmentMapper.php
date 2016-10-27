@@ -14,7 +14,6 @@ use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -22,7 +21,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 
 /**
@@ -54,21 +53,6 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			'property'   => 'user',
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'user',
-		));
-		// Probably redundant to store task ID in this table and assess ID in
-		// task table. Oh well, it will make querying on whether a relation is a
-		// task easier.
-		$this->hasMap(array(
-			'column'     => 'task_id',
-			'property'   => 'task',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'task',
-		));
-		$this->hasMap(array(
-			'column'     => 'task_instance_id',
-			'property'   => 'taskInstance',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'task_instance',
 		));
 		$this->hasMap(array(
 			'column'     => 'type',
@@ -158,22 +142,13 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
-		$this->hasJoin('task', array(
-			'mapper'    => Schoolbox\Assessment\Course\TaskMapper::class,
-			'this_key'  => 'task_id',
-			'other_key' => 'id',
-		));
 		$this->hasJoin('attempt', array(
 			'mapper'    => Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class,
 			'multiple'  => true,
 			'this_key'  => 'assess_id',
 			'other_key' => 'assess_id',
 		));
-		$this->hasJoin('task_instance', array(
-			'mapper'    => Task\InstanceMapper::class,
-			'this_key'  => 'task_instance_id',
-			'other_key' => 'id',
-		));
+
 
        $this->joinsVia(
             'curriculum_node_for_assess',
@@ -193,8 +168,6 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
 		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
@@ -213,7 +186,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     public function softDeleteSections(OnlineAssessment $quiz)
     {
         $quizSectionMapper = QuizSectionMapper::getInstance();
-        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId());
+        // Force cascade on non-leaf nodes to ensure whole tree is deleted.
+        // However this will also updated the 'deleted_at' field for already deleted items.
+        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizSectionMapper->delete($sections);
     }
 
@@ -224,8 +199,10 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
      */
 	public function softDeleteAttempts(OnlineAssessment $quiz)
     {
-        $quizAttemptMapper = QuizAttemptMapper::getInstance();
-        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId());
+        $quizAttemptMapper = Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::getInstance();
+        // Force cascade on non-leaf nodes to ensure whole tree is deleted.
+        // However this will also updated the 'deleted_at' field for already deleted items.
+        $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->delete($attempts);
     }
 
@@ -256,22 +233,12 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	/**
 	 * Pre-save callback.
 	 * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
-	 * * if a task, sets start time and finish time to current date to avoid
-	 *   SQL errors
 	 *
 	 * @param  OnlineAssessment $object
 	 * @return bool             Always returns true
 	 */
 	public function preSave(OnlineAssessment $object) {
 		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
-		if (!$object->getId()) {
-			$task    = $object->getTask();
-			$task_id = ($task instanceof Task) ? $task->getId() : $task;
-			if ($task_id) {
-				$time = new \Alaress_Date_Format(time(), 'U');
-				$object->setStart($time)->setFinish($time);
-			}
-		}
 	}
 
     /**
@@ -293,64 +260,6 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
         }
         else {
             $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object,'upcoming'));
-        }
-    }
-
-    /**
-     * Post-softdelete hook.
-     *
-     * * If this quiz belongs to a task in a course instance, delete that task
-     * * Otherwise if it belongs to a task in a course builder, delete that task
-     *
-     * @param OnlineAssessment $object
-     */
-    public function softDeleteTask(OnlineAssessment $object)
-    {
-        $taskInstanceId = null;
-        if ($object->getTaskInstance()) {
-            $taskInstanceId = $object->getTaskInstance()->getId();
-            if ($taskInstanceId) {
-                $this->getJoinMapper('task_instance')->softDelete(
-                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-                );
-            }
-        }
-        if (!$taskInstanceId && $object->getTask()) {
-            $taskId = $object->getTask()->getId();
-            if ($taskId) {
-                $this->getJoinMapper('task')->softDelete(
-                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
-                );
-            }
-        }
-    }
-
-    /**
-     * Post-delete hook.
-     *
-     * * If this quiz belongs to a task in a course instance, delete that task
-     * * Otherwise if it belongs to a task in a course builder, delete that task
-     *
-     * @param OnlineAssessment $object
-     */
-    public function hardDeleteTask(OnlineAssessment $object)
-    {
-        $taskInstanceId = null;
-        if ($object->getTaskInstance()) {
-            $taskInstanceId = $object->getTaskInstance()->getId();
-            if ($taskInstanceId) {
-                $this->getJoinMapper('task_instance')->hardDelete(
-                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-                );
-            }
-        }
-        if (!$taskInstanceId && $object->getTask()) {
-            $taskId = $object->getTask()->getId();
-            if ($taskId) {
-                $this->getJoinMapper('task')->hardDelete(
-                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
-                );
-            }
         }
     }
 
@@ -479,7 +388,6 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND a.finish BETWEEN :from_date AND :to_date
 			AND a.deleted_at IS NULL
-			AND a.task_id IS NULL
 			AND a.availability = 'assess'
 			ORDER BY a.finish ASC
 		";
