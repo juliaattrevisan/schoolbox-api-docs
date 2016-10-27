@@ -1,4 +1,5 @@
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 
 <li class="actions-small-1">
     <div class="list-item">
@@ -9,7 +10,7 @@
                 <h3>{{ assessable.title }}</h3>
             </a>
             <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                Due "{{ assessable.getDueAt.getRelativeTime }}
+                Due <span class="{{ urgency.gradientClass(assessable, student) }}">{{ assessable.getDueAt.getRelativeTime }}</span>
             </p>
         </div>
     </div>

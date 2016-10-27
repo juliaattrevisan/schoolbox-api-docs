@@ -786,6 +786,10 @@ class Controller extends Base
 
                 /** @var IAssessable $assessable */
                 foreach ($assessables as $assessable) {
+                    // Load participants manually
+                    // TODO: Do it faster and cheaperer
+                    // $assessable->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessable));
+
                     try {
                         $participant = $assessable->getParticipant($student);
                     } catch (\UnexpectedValueException $e) {
