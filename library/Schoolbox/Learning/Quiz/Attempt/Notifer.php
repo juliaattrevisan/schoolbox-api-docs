@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Learning\Quiz\Attempt;
 
-
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
@@ -38,7 +37,7 @@ class Notifer extends AbstractModuleNotifier {
 	protected $assessMapper;
 
     /** @var FolderMapper */
-    protected $categoryMapper;
+    protected $folderMapper;
 
     /** @var UserAccessMapper */
     protected $userAccessMapper;
@@ -68,26 +67,28 @@ class Notifer extends AbstractModuleNotifier {
 
 	/**
 	 * @param QuizMapper $mapper
+     * @return static
 	 */
-	protected function setAssessMapper($mapper) {
+	protected function setQuizMapper($mapper) {
 		$this->assessMapper = $mapper;
+        return $this;
 	}
 
 
     /**
-     * @param FolderMapper $categoryMapper
-     * @return Notifer
+     * @param FolderMapper $folderMapper
+     * @return static
      */
-    protected function setCategoryMapper($categoryMapper)
+    protected function setFolderMapper(FolderMapper $folderMapper)
     {
-        $this->categoryMapper = $categoryMapper;
+        $this->folderMapper = $folderMapper;
         return $this;
     }
 
 
     /**
      * @param UserAccessMapper $userAccessMapper
-     * @return Notifer
+     * @return static
      */
     protected function setUserAccessMapper($userAccessMapper)
     {
@@ -98,7 +99,7 @@ class Notifer extends AbstractModuleNotifier {
 
     /**
      * @param UserMapper $userMapper
-     * @return Notifer
+     * @return static
      */
     protected function setUserMapper($userMapper)
     {
@@ -146,7 +147,7 @@ class Notifer extends AbstractModuleNotifier {
 		$assessId = $attempt->getAssessment()->getId();
 		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$href = "/assess/results/".$attempt->getAssessment()->getId();
 
@@ -191,7 +192,7 @@ class Notifer extends AbstractModuleNotifier {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'student'));
         }
 
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
 
@@ -235,7 +236,7 @@ class Notifer extends AbstractModuleNotifier {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'parent'));
         }
 
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
         $student   = $this->userMapper->findById($studentId);

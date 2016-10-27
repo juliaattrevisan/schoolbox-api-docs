@@ -7,7 +7,7 @@
 
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
@@ -78,7 +78,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param ReturnedWork|Model $returnedWork
+     * @param ReturnedWork|QuizAttempt $returnedWork
      * @return bool
      */
     public function setMark( $returnedWork)

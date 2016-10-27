@@ -12,7 +12,8 @@ namespace Schoolbox\Assessment;
 use \Alaress_Date_Format;
 use Schoolbox\User;
 use Schoolbox\Resource;
-use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -25,7 +26,7 @@ class Activity {
 	protected $event;
 
 	/**
-	 * @var Resource\Folder\Model
+	 * @var Folder
 	 */
 	protected $category;
 
@@ -35,7 +36,7 @@ class Activity {
 	protected $submission_box;
 
 	/**
-	 * @var Model
+	 * @var Quiz
 	 */
 	protected $assessment;
 
@@ -194,7 +195,7 @@ class Activity {
     }
 
 	/**
-	 * @param  Resource\Folder\Model $category
+	 * @param  Folder $category
 	 *
 	 * @return $this
 	 */
@@ -204,14 +205,14 @@ class Activity {
 	}
 
 	/**
-	 * @return Resource\Folder\Model
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;
 	}
 
 	/**
-	 * @param  Model $assessment
+	 * @param  Quiz $assessment
 	 *
 	 * @return $this
 	 */
@@ -221,7 +222,7 @@ class Activity {
 	}
 
 	/**
-	 * @return Model
+	 * @return Quiz
 	 */
 	public function getAssessment() {
 		return $this->assessment;

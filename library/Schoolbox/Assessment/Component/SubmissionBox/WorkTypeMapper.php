@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
 /**
  * @method WorkType findById($identifierValue)

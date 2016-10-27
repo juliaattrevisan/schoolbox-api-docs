@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -112,7 +112,7 @@ class TaskMapper extends Schoolbox\Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => Mapper::class,
+            'mapper'    => QuizMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));

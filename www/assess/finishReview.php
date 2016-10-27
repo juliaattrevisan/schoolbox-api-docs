@@ -1,7 +1,8 @@
 <?php
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
-use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 
 /**
  * Review completion. Marks when an assessment review is finished.
@@ -31,11 +32,11 @@ if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
 	$this->pageNotFound();
 }
 
-$assessMapper = Mapper::getInstance();
-$attemptMapper = Mapper::getInstance();
+$assessMapper = QuizMapper::getInstance();
+$attemptMapper = QuizAttemptMapper::getInstance();
 
 try {
-	/** @var Model $assess */
+	/** @var Quiz $assess */
 	$assess = $assessMapper->findById($this->arg[0]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {
@@ -44,7 +45,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 }
 
 try {
-	/** @var \Schoolbox\Learning\Quiz\Attempt\Model $attempt */
+	/** @var QuizAttempt $attempt */
 	$attempt = $attemptMapper->findById($this->arg[1]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {

@@ -10,9 +10,9 @@
 namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
@@ -100,7 +100,7 @@ class StudentReportCard
     protected $showcaseMapper;
     protected $assessMapper;
 
-    /** @var Mapper */
+    /** @var QuizAttemptMapper */
     protected $attemptMapper;
 
     /**
@@ -131,7 +131,7 @@ class StudentReportCard
         // dependencies
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
-        $this->assessMapper     = new Mapper();
+        $this->assessMapper     = new QuizMapper();
         $this->attemptMapper    = Mapper::getInstance();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
@@ -706,7 +706,7 @@ class StudentReportCard
                         $page->setVar('action_publish_block', '');
                     }
                     $page->parse('work_clickable_block', 'work_clickable', true);
-                } elseif ($object instanceof Model) {
+                } elseif ($object instanceof Quiz) {
 
                     $allNames[] = $object->getTitle();
                     if($marks[0]['mark'] !== '') {
@@ -813,13 +813,13 @@ class StudentReportCard
     }
 
     /**
-     * @param Model $oa
+     * @param Quiz $oa
      * @param                  $marks
      * @param \SitePage        $page  The page unto which to parse blocks
      *
      * @return array
      */
-    protected function outputOnlineAssessRow(Model $oa, $marks, \SitePage $page)
+    protected function outputOnlineAssessRow(Quiz $oa, $marks, \SitePage $page)
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
@@ -1036,7 +1036,7 @@ class StudentReportCard
          * @var $attemptMapper Mapper
          */
         $returnMapper  = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $attemptMapper = Mapper::getInstance();
+        $attemptMapper = QuizAttemptMapper::getInstance();
         $returnHandler = new \SubmissionReturn();
         $groupHandler  = new \Group();
         $synClass      = new \External_Class;

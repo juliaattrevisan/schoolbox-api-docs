@@ -8,9 +8,9 @@
 namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -64,12 +64,12 @@ class Statistics
     protected $returnMapper;
 
     /**
-     * @var Mapper
+     * @var QuizMapper
      */
     protected $assessMapper;
 
     /**
-     * @var Mapper
+     * @var QuizAttemptMapper
      */
     protected $attemptMapper;
 
@@ -97,8 +97,8 @@ class Statistics
         $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
         $this->submissionMapper    = Submission\FileMapper::getInstance();
         $this->returnMapper        = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $this->assessMapper        = Mapper::getInstance();
-        $this->attemptMapper       = Mapper::getInstance();
+        $this->assessMapper        = QuizMapper::getInstance();
+        $this->attemptMapper       = QuizAttemptMapper::getInstance();
 
         /* Visibility
          * Exclude hidden quizzes from the Assessments cube
@@ -185,14 +185,14 @@ class Statistics
     /**
      * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
      *
-     * @param SubmissionBox|Model $work
+     * @param SubmissionBox|Quiz $work
      * @param UnitInstance                   $unit The unit that this work originated from.
      *
      * @return bool
      */
     protected function addWork($work, UnitInstance $unit)
     {
-        if ($work instanceof Model) {
+        if ($work instanceof Quiz) {
             $marks = $this->attemptMapper->getAllAttempts(
                 $work->getId(),
                 [
@@ -340,7 +340,7 @@ class Statistics
         $workFolderIds = [];
         foreach ($task['work'] as $work) {
             $object = $work['object'];
-            if ($object instanceof SubmissionBox || $object instanceof Model) {
+            if ($object instanceof SubmissionBox || $object instanceof Quiz) {
                 $workFolderIds[$object->getCategory()->getId()] = true;
             }
         }
@@ -386,7 +386,7 @@ class Statistics
                     if ($object instanceof SubmissionBox) {
                         $marks['work_id']   = $object->getId();
                         $marks['work_type'] = 'sb';
-                    } elseif ($object instanceof Model) {
+                    } elseif ($object instanceof Quiz) {
                         $marks['work_id']   = $object->getId();
                         $marks['work_type'] = 'oa';
                     } else {
@@ -428,7 +428,7 @@ class Statistics
                 $object = $work['object'];
                 if ($object instanceof SubmissionBox) {
                     $allData[$taskId] = $object->getName();
-                } elseif ($object instanceof Model) {
+                } elseif ($object instanceof Quiz) {
                     $allData[$taskId] = $object->getTitle();
                 } else {
                     $allData[$taskId] = '';

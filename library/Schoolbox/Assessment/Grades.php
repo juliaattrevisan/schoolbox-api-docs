@@ -8,9 +8,9 @@
 namespace Schoolbox\Assessment;
 
 use Alaress_Date_Format;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -44,8 +44,8 @@ class Grades
     *
     * @param Collection<User> $students
     * @param Folder $subject
-    * @param int $year
-    * @param int $semester
+    * @param Alaress_Date_Format $from
+    * @param Alaress_Date_Format $to
     * @param array $outputFormats
     * @return array
     */
@@ -72,7 +72,7 @@ class Grades
             /** @var User $user */
 
             // get all OA marks for this student in this category
-            $marks['oa'][$user->getId()] = Mapper::getInstance()->getStudentMarks(
+            $marks['oa'][$user->getId()] = QuizAttemptMapper::getInstance()->getStudentMarks(
                 $subject->getId(),
                 $user->getId(),
                 $params
@@ -136,8 +136,8 @@ class Grades
 
         // sort all the things by their respective due-date fields
         $assessments->sortByCallback(function($a, $b) {
-            $x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimestamp() : $a->getFinish()->getUnixTimestamp();
-            $y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimestamp() : $b->getFinish()->getUnixTimestamp();
+            $x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimeStamp() : $a->getFinish()->getUnixTimestamp();
+            $y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimeStamp() : $b->getFinish()->getUnixTimestamp();
             return $x == $y ? 0 : ($x > $y ? 1 : -1);
         });
 

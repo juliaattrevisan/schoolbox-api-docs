@@ -2,9 +2,8 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
@@ -311,7 +310,7 @@ $j        = 0;
 $synClass = new External_Class;
 
 $return_mapper = new SubmissionBox\ReturnedWorkMapper();
-$attempt_mapper = new Mapper();
+$attempt_mapper = new QuizAttemptMapper();
 
 $restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
 
@@ -646,7 +645,7 @@ if (empty($feedItems)) {
 function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
 {
     $box_mapper    = new SubmissionBoxMapper();
-    $assess_mapper = new Mapper();
+    $assess_mapper = new QuizMapper();
     $submit_mapper = new SubmissionBox\Submission\FileMapper();
     $return_mapper = new SubmissionBox\ReturnedWorkMapper();
     $activities    = $box_mapper
