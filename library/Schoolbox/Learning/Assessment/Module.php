@@ -182,7 +182,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:postDeleteAssessment)',
+            '(?:postDeleteAssessment|getAssessment)',
             function ($params) {
                 try {
                     $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -192,7 +192,6 @@ class Module extends BaseModule
                 return ['assessment' => $assessment];
             }
         );
-
 
         $this->addRoutePreload(
             $matcher,

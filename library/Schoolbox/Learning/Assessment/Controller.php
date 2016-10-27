@@ -552,13 +552,33 @@ class Controller extends Base
     }
 
     /**
+     * Redirect method
+     *
+     * Sends you to a status or summary screen depending on who is
+     * currently logged in and what they are viewing
+     *
      * @api GET /learning/assessment/:assessmentId
+     * @param IAssessable $assessment
      */
-    public function getAssessment()
+    public function getAssessment(IAssessable $assessment)
     {
-        /* If you're a staff and you're viewing a due work,
-         * redirect to the Status screen
+        /* If you're a staff, get redirected to a Status overview
          */
+        if ($this->getUser()->getRole()->isStaff()) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]));
+            return;
+        }
+        /* If you're a student, get redirected to your specific view
+         * /learning/assessment/:assessmentId/:studentId
+         */
+        else if ($this->getUser()->getRole()->isStudent()) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]));
+            return;
+        }
+
+        /* Everyone else sees The Nothing
+         */
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 
     /**
@@ -651,9 +671,21 @@ class Controller extends Base
          * You get to see all participants, quickmark them, and links to getSummary()
          */
         else if ($assessment instanceof DueWork) {
+            $types = new AssessmentType();
 
-            /* TODO: Quickmark screen?
+            /* TODO: Quickmark screen
              */
+            $twigData = [
+                'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
+                'assessment' => $assessment,
+            ];
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    "@learningAssessment/fragments/{$types->objectToString($assessment)}/status/staff.twig",
+                    $twigData
+                )
+            );
         }
         /* Everything else, 404
          */
