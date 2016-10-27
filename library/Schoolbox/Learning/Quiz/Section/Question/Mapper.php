@@ -57,12 +57,12 @@ class Mapper extends BaseMapper
             'type'       => self::TYPE_DATETIME,
         ));
 
-        $this->hasJoin('quiz', array(
+        $this->hasJoin('section', array(
             'mapper'    => QuizSectionMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
-        $this->hasJoin('quiz', array(
+        $this->hasJoin('type', array(
             'mapper'    => QuizQuestionTypeMapper::class,
             'this_key'  => 'type_id',
             'other_key' => 'type_id',
@@ -82,6 +82,7 @@ class Mapper extends BaseMapper
     public function softDeleteSolution(QuizQuestion $question)
     {
         $quizSolutionMapper = QuizSolutionMapper::getInstance();
+        // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
         $solution = $quizSolutionMapper->findByColumn('question_id', $question->getId());
         $quizSolutionMapper->delete($solution);
     }

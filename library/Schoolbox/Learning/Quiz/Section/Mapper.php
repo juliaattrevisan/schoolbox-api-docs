@@ -30,7 +30,7 @@ class Mapper extends BaseMapper
             'column'     => 'assess_id',
             'property'   => 'quiz',
             'type'       => self::TYPE_MODEL,
-            'join'       => 'assess',
+            'join'       => 'quiz',
         ));
         $this->hasMap(array(
             'column'     => 'sequence',
@@ -82,7 +82,8 @@ class Mapper extends BaseMapper
     public function softDeleteQuestions(QuizSection $section)
     {
         $quizQuestionMapper = QuizQuestionMapper::getInstance();
-        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId());
+        // Force cascade. However this will also updated the 'deleted_at' field for already deleted items.
+        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId(), ['deleted' => true]);
         $quizQuestionMapper->delete($questions);
     }
 
