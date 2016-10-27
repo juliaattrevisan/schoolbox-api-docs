@@ -46,15 +46,16 @@ class Event extends DayEvent implements EventInterface {
     }
 
     public function getTitle() {
-        $title = $this->getBooking()->getResource()->getName();
-        if ($this->getBooking()->getResource()->getRoomCode()) {
-            $title .= ' ['.$this->getBooking()->getResource()->getRoomCode().']';
-        }
-        if ($this->getBooking()->getName()) {
-            $title .= ': '.$this->getBooking()->getName();
-        }
+        return $this->getBooking()->getName() ?: $this->getBooking()->getResource()->getName();
+    }
 
-        return $title;
+    public function getLocation()
+    {
+        $location = $this->getBooking()->getResource()->getName();
+        if ($this->getBooking()->getResource()->getRoomCode()) {
+            $location .= ' ['.$this->getBooking()->getResource()->getRoomCode().']';
+        }
+        return $location;
     }
 
     public function getCategory() {
