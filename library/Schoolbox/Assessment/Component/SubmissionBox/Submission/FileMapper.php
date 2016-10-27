@@ -103,7 +103,10 @@ class FileMapper extends Mapper
         // Fetch and hydrate files
         $files = $this->getJoinMapper('file')
             ->findByColumn('student_submission_id', $ids)
-            ->groupBy('id');
+            ->groupByCallback(function($f) {
+                /** @var SingleFile\Model $f */
+                return $f->getSubmission()->getId();
+            });
         foreach ($resultSet as $result) {
             if (isset($files[$result->getId()])) {
                 $result->setFiles($files[$result->getId()]);
