@@ -630,28 +630,28 @@ class Controller extends Base
         }
 
 
-//        foreach ($assessment->getAssessables() as $currentAssessable) {
-//            if ($currentAssessable instanceof DueWork) {
-//
-//                $feedback = new DueWorkFeedback();
-//                $feedback
-//                    ->setAssessable($currentAssessable)
-//                    ->setNormalisedMark(98)
-//                    ->setComment('This is a flawed piece of work.')
-//                    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
-//                    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-//                    ->setUpdatedAt(new \Alaress_Date_Format('2016-10-30 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//                /** @var Participant $currentParticipant */
-//                foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-//                    if ($currentParticipant->getUser()->getId() == 230) {
-//                        $currentParticipant->getAllFeedbacks()->add($feedback);
-//                    }
-//                }
-//            }
-//        }
-//        $hodes = (new UserMapper())->findById(230);
-//        new \Alaress_Probe($assessment->getHumanReadableMark($hodes, true));
+        foreach ($assessment->getAssessables() as $currentAssessable) {
+            if ($currentAssessable instanceof DueWork) {
+
+                $feedback = new DueWorkFeedback();
+                $feedback
+                    ->setAssessable($currentAssessable)
+                    ->setNormalisedMark(98)
+                    ->setComment('This is a flawed piece of work.')
+                    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setUpdatedAt(new \Alaress_Date_Format('2016-10-30 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+                /** @var Participant $currentParticipant */
+                foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+                    if ($currentParticipant->getUser()->getId() == 230) {
+                        $currentParticipant->getAllFeedbacks()->add($feedback);
+                    }
+                }
+            }
+        }
+        $hodes = (new UserMapper())->findById(230);
+        new \Alaress_Probe($assessment->getHumanReadableMark($hodes, true));
 
         /* Manufacture a set of returnUrls since staff with perms can create
          * IAssessables inside projects

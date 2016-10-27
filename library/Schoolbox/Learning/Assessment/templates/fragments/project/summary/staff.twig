@@ -116,23 +116,10 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            {#{{ participant.humanReadableMark }}#}
-                                            {#{{ participant.normalisedMark }}#}
-
-                                            {#{{ participant.humanReadableMark.published }}#}
-                                            {#{{ participant.humanReadableMark.unpublished }}#}
-
-                                            {#{{ participant.publishedMark.humanReadable }}#}
-                                            {#{{ participant.unpublishedMark.humanReadable }}#}
-                                            {##}
-                                            {#{{ participant.mark.published.humanReadable }}#}
-                                            {#{{ participant.mark.unpublished.normalised }}#}
-
-                                            {% set humanReadable = assessment.getHumanReadableMark(participant.user, false) %}
-
-                                            {% if humanReadable %}
+                                            {{ participant.mark.unpublished.normalised }}
+                                            {% if participant.mark.published.humanReadable %}
                                             <span class="neutral label right">
-                                            {{ humanReadable }}
+                                                {{ participant.mark.published.humanReadable }}
                                             </span>
                                             {% endif %}
                                             <a href="{{ routeLookup('learningAssessment.getStudentAssessment', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
