@@ -731,6 +731,15 @@ class Controller extends Base
             // Load participants manually
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
 
+            /* Figure out if this student is actually participating
+             */
+            try {
+                $assessment->getParticipant($student);
+            }
+            catch (\UnexpectedValueException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
             $twigData          = [
                 'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
                 'currentUser' => $this->getUser(),
