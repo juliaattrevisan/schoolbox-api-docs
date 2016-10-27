@@ -525,7 +525,11 @@ class Controller extends Base
         /* Redirect to project summary screen instead, if you spawned a project
          * Otherwise return to context
          */
-        if ($assessmentInfo['assessment'] instanceof Project) {
+        $explicitReturnUrl = $this->getRequest()->post->get('return_url');
+        if($explicitReturnUrl){
+            $returnUrl = Redirect::decode($explicitReturnUrl);
+        }
+        elseif ($assessmentInfo['assessment'] instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
