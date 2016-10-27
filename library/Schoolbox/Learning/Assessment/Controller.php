@@ -227,10 +227,10 @@ class Controller extends Base
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Do caller request a returnUrl?
-        $return_url = $this->getRequest()->query->get('return_url');
+        $returnUrl = $this->getRequest()->query->get('return_url');
 
-        if ($return_url){
-            $data['return_url'] = $return_url;
+        if ($returnUrl){
+            $data['returnUrl'] = $returnUrl;
         }
 
         if ($assessment){
@@ -311,10 +311,7 @@ class Controller extends Base
 
         /* Select the fragment to return
          */
-        $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/create.twig";
-        $content = $this->buildUnthemedHtmlOutput($template, $data);
-        $this->getResponse()->content->set($content);
-
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->objectToString($assessment)}/create.twig", $data));
     }
 
     /**
@@ -347,20 +344,20 @@ class Controller extends Base
          * Otherwise return to whatever context you came from
          */
         if ($assessment instanceof Project) {
-            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
         }
         elseif ($assessment->getContext() instanceof Project) {
-            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getContext()->getId()]);
         }
-        elseif (strlen($this->getRequest()->post['return_url'])) {
-            $return_url = $this->getRequest()->post['return_url'];
+        elseif (strlen($this->getRequest()->post['returnUrl'])) {
+            $returnUrl = $this->getRequest()->post['returnUrl'];
         }
         else {
-            $return_url = $assessmentInfo['return_url'];
+            $returnUrl = $assessmentInfo['returnUrl'];
         }
 
         $data = [
-            'return_url' => $return_url
+            'returnUrl' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -431,17 +428,17 @@ class Controller extends Base
          * Otherwise return to context
          */
         if ($assessmentInfo['assessment'] instanceof Project) {
-            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
-            $return_url = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessmentInfo['assessment']->getContext()->getId()]);
         }
         else {
-            $return_url = $assessmentInfo['return_url'];
+            $returnUrl = $assessmentInfo['returnUrl'];
         }
 
         $data = [
-            'return_url' => $return_url
+            'returnUrl' => $returnUrl
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
@@ -530,10 +527,10 @@ class Controller extends Base
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $returnUrl = $this->getRequest()->post['return_url'];
+        $returnUrl = $this->getRequest()->post['returnUrl'];
 
         // Did caller explicitly specify a returnUrl ?
-        if($returnUrl) {
+        if ($returnUrl) {
             $redirect = $returnUrl;
         } else {
             // Did we delete an item from a Project ?
@@ -548,7 +545,7 @@ class Controller extends Base
         }
 
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput(['return_url' => $redirect]));
+            $this->getResponse()->content->set($this->buildJsonOutput(['returnUrl' => $redirect]));
         } else {
             $this->getResponse()->redirect->to($redirect);
         }
@@ -636,7 +633,7 @@ class Controller extends Base
              * Return to summary screen with this suffix
              */
             $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-            $returnUrlSuffix = '?returnUrl=' . (new Redirect())->encode($baseUrl);
+            $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
 
             $types = new AssessmentType();
             $twigData = [

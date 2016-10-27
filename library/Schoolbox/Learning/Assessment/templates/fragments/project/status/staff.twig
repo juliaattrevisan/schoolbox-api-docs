@@ -14,7 +14,7 @@
                 text: 'Are you sure you want to delete this item?',
                 confirmEvent: function() {
                     $.post($(element).attr('href'), {assessmentId: $(element).attr('data-delete')}, function(responseText) {
-                        window.location.href = responseText.return_url;
+                        window.location.href = responseText.returnUrl;
                     });
                 }
             });
