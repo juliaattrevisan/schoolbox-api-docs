@@ -835,34 +835,6 @@ class Controller extends Base
     }
 
     /**
-     * Generic method for create/update of an assessment.
-     *
-     * @param $postData
-     * @param IAssessable|null $existingAssessment
-     * @return IAssessable $assessment
-     * @throws ControllerException
-     */
-    protected function produceAssessment($postData, IAssessable $existingAssessment = null)
-    {
-        $assessment = null;
-        try {
-            $assessmentFactory = new Factory($this->getUser(), $postData);
-            $assessment = $assessmentFactory->produce($existingAssessment);
-        }
-        catch (\DomainException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-        catch (\UnexpectedValueException $e) {
-            throw new ControllerException('Could not create assessment', [$e->getMessage()]);
-        }
-
-        return $assessment;
-    }
-
-    /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
