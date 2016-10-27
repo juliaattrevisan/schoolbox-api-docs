@@ -728,6 +728,9 @@ class Controller extends Base
         else if ($assessment instanceof DueWork) {
             $types = new AssessmentType();
 
+            // Load participants manually
+            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+
             $twigData          = [
                 'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add([$assessment->getTitle(), '#']),
                 'currentUser' => $this->getUser(),
