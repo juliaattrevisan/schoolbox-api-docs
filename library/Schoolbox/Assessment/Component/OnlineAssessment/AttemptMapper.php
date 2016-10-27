@@ -18,6 +18,7 @@ use Schoolbox\Mapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
 /**
  * Class AttemptMapper
@@ -85,7 +86,37 @@ class AttemptMapper extends Mapper
             'other_key' => 'id'
         ));
 
-        $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
+
+    }
+
+
+    /**
+     * Soft deletes all Answers (formerly known as Responses) for the specified Attempt
+     *
+     * @param Attempt $attempt
+     */
+    public function softDeleteAnswers(Attempt $attempt)
+    {
+        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
+        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId());
+        $quizAnswerMapper->delete($answers);
+    }
+
+    /**
+     * Restores all Answers (formerly known as Responses) for the specified Attempt
+     *
+     * @param Attempt $attempt
+     */
+    public function restoreAnswers(Attempt $attempt)
+    {
+        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
+        $quizAnswerMapper->restoreSoftDeleted($answers);
     }
 
     /**
