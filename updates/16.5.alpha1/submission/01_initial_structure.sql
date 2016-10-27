@@ -7,6 +7,11 @@ ALTER TABLE `folder_code` ENGINE = InnoDB;
 ALTER TABLE `folder_code`
 CHANGE COLUMN `categoryID` `folder_id` INT(11) UNSIGNED NOT NULL ;
 
+-- Delete orphaned folder codes completely, so that the constraint below can be applied
+DELETE `fc` FROM `folder_code` `fc`
+LEFT JOIN `folder` `f` ON `fc`.`folder_id` = `f`.`id`
+WHERE `f`.`id` IS NULL;
+
 ALTER TABLE `folder_code`
 ADD CONSTRAINT `fk_folder_id`
   FOREIGN KEY (`folder_id`)
