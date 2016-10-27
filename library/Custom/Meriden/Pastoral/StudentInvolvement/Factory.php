@@ -10,7 +10,7 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -343,7 +343,7 @@ class Factory
             $folder->getId(),
             $student->getId()
         ) ?: array();
-        $quizGrades = AttemptMapper::getInstance()->getStudentMarks(
+        $quizGrades = Mapper::getInstance()->getStudentMarks(
             $folder->getId(),
             $student->getId()
         ) ?: array();

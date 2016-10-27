@@ -14,7 +14,7 @@ define('PERMISSION_DENIED', false);
 
 use Schoolbox\Assessment\StudentReportCard;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 
 // require sitepage context
 if(!isset($this)) {
@@ -89,7 +89,7 @@ if($subject) {
         // Still not granted ?
         if(PERMISSION_GRANTED !== $permission){
             // Did this user complete any quizzes which had a finish in specified term ?
-            $quizzesAttempted = AttemptMapper::getInstance()->getAttemptCountForStudentInTerm($userId, $subject, $term->getStart(), $term->getActualFinish());
+            $quizzesAttempted = Mapper::getInstance()->getAttemptCountForStudentInTerm($userId, $subject, $term->getStart(), $term->getActualFinish());
 
             if($quizzesAttempted > 0){
                 $permission = PERMISSION_GRANTED;

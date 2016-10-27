@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -52,7 +52,7 @@ class ClassStatistics {
 	protected $assessMapper;
 
 	/**
-	 * @var AttemptMapper
+	 * @var Mapper
 	 */
 	protected $attemptMapper;
 
@@ -73,7 +73,7 @@ class ClassStatistics {
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
 		$this->assessMapper = new Mapper();
-		$this->attemptMapper = new AttemptMapper();
+		$this->attemptMapper = new Mapper();
 
 		/* Visibility
 		 * Exclude hidden quizzes from the Assessments cube

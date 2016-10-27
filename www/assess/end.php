@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Learning\Quiz\Attempt\Attempt;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Breadcrumbs;
 
@@ -77,12 +77,12 @@ $this->setVar(array(
 if (!$attempt['finish']) {
     $attemptFinishDate = Alaress_Date_Format::now();
 
-    /** @var Attempt $attempt */
-    $attempt = AttemptMapper::getInstance()->findById($attemptId);
+    /** @var Model $attempt */
+    $attempt = Mapper::getInstance()->findById($attemptId);
 
     $attempt->setFinish($attemptFinishDate);
 
-    AttemptMapper::getInstance()->save($attempt);
+    Mapper::getInstance()->save($attempt);
 
     $this->setVar('ATTEMPT_END', $attemptFinishDate->getShort());
     $this->setVar('alreadyEnded_block', '');

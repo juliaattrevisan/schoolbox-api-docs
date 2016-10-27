@@ -13,8 +13,8 @@ namespace Schoolbox\Learning\Quiz;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Monolog\Logger;
-use Schoolbox\Learning\Quiz\Attempt\Attempt;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -47,7 +47,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	/** @var FolderMapper */
 	protected $categoryMapper;
 
-	/** @var AttemptMapper */
+	/** @var Mapper */
 	protected $attemptMapper;
 
 	/** @var WorkTypeMapper */
@@ -72,7 +72,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->categoryMapper = FolderMapper::getInstance();
-		$this->attemptMapper = AttemptMapper::getInstance();
+		$this->attemptMapper = Mapper::getInstance();
 		$this->workTypeMapper = WorkTypeMapper::getInstance();
 		$dependencies['userAccessMapper'] = isset($dependencies['userAccessMapper'])
 			? $dependencies['userAccessMapper']
@@ -589,7 +589,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 			list($new, $old) = $diff['markVisibility'];
 			if ($new > $old) {
 				// for anyone who has been marked, raise the assess.marked notification
-				/** @var Collection|Attempt[] $attempts */
+				/** @var Collection|Model[] $attempts */
 				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
 				foreach ($attempts as $attempt) {
 					$this->raiseNotification($quiz->getUser(), BaseMapper::METHOD_UPDATE, $attempt, $this->attemptMapper);

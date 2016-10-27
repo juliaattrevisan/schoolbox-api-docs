@@ -18,7 +18,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Assessment\Course\Task;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -26,7 +26,7 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel("Quiz Attempt Automatic Closer", array('level'=>200));
 
 $log             = $kernel->logger();
-$attemptMapper   = new AttemptMapper();
+$attemptMapper   = new Mapper();
 $responseHandler = new Assess_Response();
 
 $taskMapper      = new Task\CompletionMapper();

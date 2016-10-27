@@ -12,9 +12,9 @@ namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -24,16 +24,16 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
 /**
- * @method Attempt createModel()
- * @method Attempt hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel()
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class AttemptMapper extends BaseMapper
+class Mapper extends BaseMapper
 {
 
     protected function mapping()
     {
         $this->hasTable('assess_attempt');
-        $this->hasModel(Attempt::class);
+        $this->hasModel(Model::class);
         $this->hasMap(array(
             'column'     => 'attempt_id',
             'property'   => 'id',
@@ -75,7 +75,7 @@ class AttemptMapper extends BaseMapper
         $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin('assessment', array(
-            'mapper'    => Mapper::class,
+            'mapper'    => QuizMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id'
         ));
@@ -97,9 +97,9 @@ class AttemptMapper extends BaseMapper
     /**
      * Soft deletes all Answers (formerly known as Responses) for the specified Attempt
      *
-     * @param Attempt $attempt
+     * @param Model $attempt
      */
-    public function softDeleteAnswers(Attempt $attempt)
+    public function softDeleteAnswers(Model $attempt)
     {
         $quizAnswerMapper = QuizAnswerMapper::getInstance();
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
@@ -110,9 +110,9 @@ class AttemptMapper extends BaseMapper
     /**
      * Restores all Answers (formerly known as Responses) for the specified Attempt
      *
-     * @param Attempt $attempt
+     * @param Model $attempt
      */
-    public function restoreAnswers(Attempt $attempt)
+    public function restoreAnswers(Model $attempt)
     {
         $quizAnswerMapper = QuizAnswerMapper::getInstance();
         $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
@@ -152,10 +152,10 @@ class AttemptMapper extends BaseMapper
 
     /**
      * On post save, write mark data back into remote markbook
-     * @param Attempt $object
-     * @param Attempt|null $previous
+     * @param Model $object
+     * @param Model|null $previous
      */
-    public function postSave(Attempt $object, $previous = null) {
+    public function postSave(Model $object, $previous = null) {
         //Copy data to remote system
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
@@ -498,7 +498,7 @@ class AttemptMapper extends BaseMapper
     /**
      * Gets all attempts which are are not yet finished, but have expired.
      *
-     * @return Attempt[]
+     * @return Model[]
      */
     public function findUnfinishedExpiredAttempts()
     {
@@ -529,7 +529,7 @@ class AttemptMapper extends BaseMapper
                 $quiz = $this->hydrateJoin($row, 'assessment', 'as');
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                /** @var Attempt $model */
+                /** @var Model $model */
                 return $model
                     ->setAssessment($quiz)
                     ->setUser($user)

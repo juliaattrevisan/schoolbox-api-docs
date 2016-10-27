@@ -9,7 +9,7 @@ use \Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Model;
 use \Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Learning\Quiz\Model;
@@ -231,7 +231,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param Attempt|ReturnedWork $result
+     * @param Model|ReturnedWork $result
      * @return bool
      * @throws Exception
      */
@@ -257,7 +257,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             $comment = $result->getComment();
             $dueDate = $box->getDueDate();
-        } elseif ($result instanceof Attempt) {
+        } elseif ($result instanceof Model) {
             /* Handle quiz attempt */
             $quiz = Mapper::getInstance()->findByID($result->getAssessment()->getId());
             $activity->setAssessment($quiz);

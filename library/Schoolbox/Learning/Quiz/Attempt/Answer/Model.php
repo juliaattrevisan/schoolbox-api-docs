@@ -6,7 +6,7 @@
  */
 namespace Schoolbox\Learning\Quiz\Attempt\Answer;
 
-use Schoolbox\Learning\Quiz\Attempt\Attempt as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Alaress_Date_Format;
 

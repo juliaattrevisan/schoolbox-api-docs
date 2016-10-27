@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Quiz\Attempt;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -28,7 +28,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class AttemptNotifier extends AbstractModuleNotifier {
+class Notifer extends AbstractModuleNotifier {
 
 	const TRIGGER_ATTEMPTED = 'attempted';
 	const TRIGGER_MARKED    = 'marked';
@@ -77,7 +77,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     /**
      * @param FolderMapper $categoryMapper
-     * @return self
+     * @return Notifer
      */
     protected function setCategoryMapper($categoryMapper)
     {
@@ -88,7 +88,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     /**
      * @param UserAccessMapper $userAccessMapper
-     * @return self
+     * @return Notifer
      */
     protected function setUserAccessMapper($userAccessMapper)
     {
@@ -99,7 +99,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     /**
      * @param UserMapper $userMapper
-     * @return self
+     * @return Notifer
      */
     protected function setUserMapper($userMapper)
     {
@@ -136,7 +136,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	/* ASYNC */
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User $student
 	 * @return Envelope
 	 */
@@ -172,7 +172,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User    $teacher
 	 * @param array   $diff
 	 * @return Envelope
@@ -217,7 +217,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User    $teacher
 	 * @param array   $diff
 	 * @return Envelope

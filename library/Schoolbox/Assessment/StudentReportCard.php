@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
@@ -100,7 +100,7 @@ class StudentReportCard
     protected $showcaseMapper;
     protected $assessMapper;
 
-    /** @var AttemptMapper */
+    /** @var Mapper */
     protected $attemptMapper;
 
     /**
@@ -132,7 +132,7 @@ class StudentReportCard
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
         $this->assessMapper     = new Mapper();
-        $this->attemptMapper    = AttemptMapper::getInstance();
+        $this->attemptMapper    = Mapper::getInstance();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
         $this->termMapper       = Term\Mapper::getInstance();
@@ -1033,10 +1033,10 @@ class StudentReportCard
 
         /**
          * @var $returnMapper  SubmissionBox\ReturnedWorkMapper
-         * @var $attemptMapper AttemptMapper
+         * @var $attemptMapper Mapper
          */
         $returnMapper  = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $attemptMapper = AttemptMapper::getInstance();
+        $attemptMapper = Mapper::getInstance();
         $returnHandler = new \SubmissionReturn();
         $groupHandler  = new \Group();
         $synClass      = new \External_Class;

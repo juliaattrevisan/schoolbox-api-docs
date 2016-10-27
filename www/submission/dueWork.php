@@ -4,7 +4,7 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
@@ -311,7 +311,7 @@ $j        = 0;
 $synClass = new External_Class;
 
 $return_mapper = new SubmissionBox\ReturnedWorkMapper();
-$attempt_mapper = new AttemptMapper();
+$attempt_mapper = new Mapper();
 
 $restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
 

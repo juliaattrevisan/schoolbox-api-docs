@@ -1,5 +1,5 @@
 <?php
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Learning\Quiz\Model;
 
@@ -32,7 +32,7 @@ if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
 }
 
 $assessMapper = Mapper::getInstance();
-$attemptMapper = AttemptMapper::getInstance();
+$attemptMapper = Mapper::getInstance();
 
 try {
 	/** @var Model $assess */
@@ -44,7 +44,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 }
 
 try {
-	/** @var \Schoolbox\Learning\Quiz\Attempt\Attempt $attempt */
+	/** @var \Schoolbox\Learning\Quiz\Attempt\Model $attempt */
 	$attempt = $attemptMapper->findById($this->arg[1]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {

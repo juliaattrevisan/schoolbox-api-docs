@@ -14,7 +14,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 
 use Alaress\Lumberjack\Logger;
 
@@ -46,7 +46,7 @@ HELP;
 $folderMapper = new FolderMapper();
 $submissionMapper = new SubmissionBoxMapper();
 $onlineAssessmentMapper = new Mapper();
-$attemptMapper = new AttemptMapper();
+$attemptMapper = new Mapper();
 
 $resultMapper = new ReturnedWorkMapper();
 $markbookHandler = new SubmissionReturn();
@@ -158,7 +158,7 @@ foreach($categoryList as $category) {
         foreach($classList as $studentID => $result) {
 
             // Pretending to be a mapper, even though I dont have one yet.
-            $return = new \Schoolbox\Learning\Quiz\Attempt\Attempt();
+            $return = new \Schoolbox\Learning\Quiz\Attempt\Model();
             $return->setAssessment($quiz);
             $return->setId($result[0]['attempt_id']);
             $return->setUser(new \Schoolbox\User);

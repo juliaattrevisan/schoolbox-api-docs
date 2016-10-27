@@ -8,7 +8,7 @@ namespace Schoolbox\Learning\Quiz\Attempt\Answer;
 
 use \Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 
 

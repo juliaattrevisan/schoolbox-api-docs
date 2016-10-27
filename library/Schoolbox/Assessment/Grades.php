@@ -9,7 +9,7 @@ namespace Schoolbox\Assessment;
 
 use Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -72,7 +72,7 @@ class Grades
             /** @var User $user */
 
             // get all OA marks for this student in this category
-            $marks['oa'][$user->getId()] = AttemptMapper::getInstance()->getStudentMarks(
+            $marks['oa'][$user->getId()] = Mapper::getInstance()->getStudentMarks(
                 $subject->getId(),
                 $user->getId(),
                 $params

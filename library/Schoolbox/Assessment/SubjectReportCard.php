@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox\Assessment;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -140,7 +140,7 @@ class SubjectReportCard {
 		if(!is_array($this->_gradeAverage)) {
 			// populate cache
 			$returnMapper = new ReturnedWorkMapper();
-			$assessMapper = new AttemptMapper();
+			$assessMapper = new Mapper();
 
 			/* Visibilities
 			 */

@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 
 $page = new SitePage;
 
@@ -16,7 +16,7 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
     $action = '';
     $output = array();
     if ($_REQUEST['is_assess']) {
-        $attempt_mapper    = new AttemptMapper();
+        $attempt_mapper    = new Mapper();
         $assessment_mapper = new Mapper();
         try {
             $assessment        = $assessment_mapper->findById($_REQUEST['id']);

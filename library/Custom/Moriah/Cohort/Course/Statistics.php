@@ -9,7 +9,7 @@ namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
 use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -69,7 +69,7 @@ class Statistics
     protected $assessMapper;
 
     /**
-     * @var AttemptMapper
+     * @var Mapper
      */
     protected $attemptMapper;
 
@@ -98,7 +98,7 @@ class Statistics
         $this->submissionMapper    = Submission\FileMapper::getInstance();
         $this->returnMapper        = SubmissionBox\ReturnedWorkMapper::getInstance();
         $this->assessMapper        = Mapper::getInstance();
-        $this->attemptMapper       = AttemptMapper::getInstance();
+        $this->attemptMapper       = Mapper::getInstance();
 
         /* Visibility
          * Exclude hidden quizzes from the Assessments cube

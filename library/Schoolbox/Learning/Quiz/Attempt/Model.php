@@ -8,11 +8,11 @@
  */
 
 namespace Schoolbox\Learning\Quiz\Attempt;
-use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
-class Attempt implements ISoftDeletable {
+class Model implements ISoftDeletable {
 
 	/**
 	 * @var int
@@ -20,7 +20,7 @@ class Attempt implements ISoftDeletable {
 	protected $id;
 
 	/**
-	 * @var Model
+	 * @var Quiz
 	 */
 	protected $assessment;
 
@@ -50,7 +50,7 @@ class Attempt implements ISoftDeletable {
 	protected $deleted;
 
 	/**
-	 * @param  Model $assessment
+	 * @param  Quiz $assessment
 	 *
 	 * @return $this
 	 */
@@ -60,7 +60,7 @@ class Attempt implements ISoftDeletable {
 	}
 
 	/**
-	 * @return Model
+	 * @return Quiz
 	 */
 	public function getAssessment() {
 		return $this->assessment;
