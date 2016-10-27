@@ -810,7 +810,7 @@ class Controller extends Base
                 $twigData = [
                     'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment),
                     'currentUser' => $this->getUser(),
-                    'participant' => $this->getUser(),
+                    'student' => $student,
                     'assessment' => $assessment,
                     'counts' => $counts,
                 ];
