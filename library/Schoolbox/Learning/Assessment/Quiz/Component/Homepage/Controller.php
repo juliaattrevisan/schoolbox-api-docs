@@ -9,25 +9,29 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Component\Homepage;
 
-use Component_Homepage_ControllerAbstract;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class Controller extends Component_Homepage_ControllerAbstract
+class Controller extends \Schoolbox\Learning\Assessment\Component\Homepage\Controller
 {
     /**
-     * @param String $templateHandle
+     * @return string
+     */
+    protected function getTwigTemplate()
+    {
+        return '@learningAssessment/quiz/component.twig';
+    }
+
+
+    /**
+     * Return whether or not this assessment is of the relevant type for the current controller
+     *
+     * @param IAssessable $assessment
      * @return bool
      */
-    public function renderTemplate($templateHandle)
+    protected function filterAssessment(IAssessable $assessment)
     {
-        $componentRenderer = new \Schoolbox\Learning\Assessment\Component\Homepage\Controller($this);
-        $result = $componentRenderer->render();
-
-        return $this->renderTwigTemplate(
-            $templateHandle,
-            $result['template'],
-            array_merge(['user' => $this->getUser()], $result['data']),
-            true
-        );
+        return $assessment instanceof Quiz\Model;
     }
 }

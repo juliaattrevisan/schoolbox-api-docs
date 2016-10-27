@@ -10,111 +10,136 @@
 namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Component_Instance;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentDataMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\User;
+use SitePage;
 
-class Controller
+abstract class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var Component_Homepage_ControllerAbstract  */
-    private $component;
+    /** @var IAssessable[] */
+    protected $assessments = [];
+
+    /** @var AssessmentMapperProxy $assessmentMapper */
+    private $assessmentMapper;
+
+    /** @var TermMapper $termMapper */
+    private $termMapper;
 
     /**
-     * Controller constructor.
-     * @param $component
-     * @param $templateHandle
+     * Constructor
+     *
+     * @param Component_Instance $instance
+     * @param User               $user
+     * @param SitePage           $sitepage
      */
-    public function __construct($component) {
-        $this->component = $component;
-        $this->setAssessmentDataMapper(AssessmentDataMapper::getInstance());
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
+        parent::__construct($instance, $user, $sitepage);
+
+        /** @var AssessmentMapperProxy $assMap */
+        $assMap = $this->getSitePage()->getDi()->get('assessmentDataSource');
+
+        $this->setAssessmentMapper($assMap);
         $this->setTermMapper(TermMapper::getInstance());
+    }
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        if (!parent::execute()) {
+            return false;
+        }
+
+        try {
+            $this->assessments = $this->getAssessmentMapper()
+                ->findAllForContext($this->getSource())
+                ->filter(
+                    function (IAssessable $assessment)
+                    {
+                        return $this->filterAssessment($assessment)/* && $assessment->getCloseAt()->isFuture()*/;
+                    }
+                )
+                ->limit($this->getConfig('size'));
+
+        } catch (\DomainException $e) {
+            // if something goes wrong, this componenet will not be displayed
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * @return array
      */
-    public function render()
+    private function getTwigContext()
     {
-        $assessables = [];
-
-        $template = '';
-
-        switch (get_class($this->component)) {
-            case 'Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller':
-
-                $template = '@learningAssessment/dueWork/component.twig';
-
-                $allAssessable = $this->getAssessmentDataMapper()
-                    ->findByColumn('d.category', $this->component->getSource()->getId())
-                    ->limit($this->component->getConfig('size'));
-
-                /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessable */
-                foreach ($allAssessable as $assessable) {
-                    if (true || $assessable->getCloseDate()->isFuture()) {
-                        $assessables[] = $assessable;
-                    }
-                }
-                break;
-
-            case 'Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller':
-
-                $template = '@learningAssessment/quiz/component.twig';
-
-                $allAssessable = $this->getAssessmentDataMapper()
-                    ->findByColumn('q.category_id', $this->component->getSource()->getId())
-                    ->limit($this->component->getConfig('size'));
-
-                /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessable */
-                foreach ($allAssessable as $assessable) {
-                    if (true || $assessable->getCloseDate()->isFuture()) {
-                        $assessables[] = $assessable;
-                    }
-                }
-
-                break;
-
-            case 'Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller':
-
-                $template = '@learningAssessment/task/component.twig';
-
-                $assessables = $this->getAssessmentDataMapper()->findByColumn('t.category_id', $this->component->getSource()->getId());
-
-                break;
-        }
-
         return [
-            'template' => $template,
-            'data' => [
-                'component_id'          => $this->component->getInstance()->getId(),
-                'compact'               => $this->component->getConfig('compactMode'),
-                'folder'                => $this->component->getSource(),
-                'assessables'           => $assessables,
-                'termCode'              => $this->getTermMapper()->findForToday()->getCode()
-                ]
+            'component_id' => $this->getInstance()->getId(),
+            'compact'      => $this->getConfig('compactMode'),
+            'folder'       => $this->getSource(),
+            'assessables'  => $this->assessments,
+            'termCode'     => $this->getTermMapper()->findForToday()->getCode()
         ];
     }
 
-    /** @var AssessmentDataMapper $assessmentDataMapper */
-    private $assessmentDataMapper;
+    /**
+     * Renders view using Component_AbstractController::$templateObject.
+     *
+     * Responsible just for rendering objects already retrieved during execute()
+     *
+     * Should never be called if some sort of rendering is not to take place.
+     *
+     * @param String $templateHandle
+     * @return boolean
+     */
+    public function renderTemplate($templateHandle)
+    {
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            $this->getTwigTemplate(),
+            array_merge(['user' => $this->getUser()], $this->getTwigContext()),
+            true
+        );
+    }
 
     /**
-     * @param $assessmentDataMapper
+     * @return string
+     */
+    protected abstract function getTwigTemplate();
+
+    /**
+     * Return whether or not this assessment is of the relevant type for the current controller
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected abstract function filterAssessment(IAssessable $assessment);
+
+
+    /**
+     * @param AssessmentMapperProxy $assessmentDataMapper
      * @return $this
      */
-    public function setAssessmentDataMapper($assessmentDataMapper) {
-        $this->assessmentDataMapper = $assessmentDataMapper;
+    public function setAssessmentMapper(AssessmentMapperProxy $assessmentDataMapper) {
+        $this->assessmentMapper = $assessmentDataMapper;
         return $this;
     }
 
     /**
-     * @return AssessmentDataMapper
+     * @return AssessmentMapperProxy
      */
-    public function getAssessmentDataMapper() {
-        return $this->assessmentDataMapper;
+    public function getAssessmentMapper() {
+        return $this->assessmentMapper;
     }
-
-    /** @var TermMapper $termMapper */
-    private $termMapper;
 
     /**
      * @param $termMapper
