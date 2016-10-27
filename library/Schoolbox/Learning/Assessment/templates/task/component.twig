@@ -11,13 +11,13 @@
             <li class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12">
-                        <a href="{{ assessable.task.link }}">
-                            <div class="icon-quiz icon-32"></div>
+                        <a href="{{ assessable.url }}">
+                            <div class="icon-task icon-32"></div>
                             <h3>{{ assessable.title }}</h3>
                         </a>
                         <p class="meta">
                             <span class="{{ urgency.gradientClass(assessment, user) }}">
-                                Due {{ assessable.dueDate.relativeTime }} on {{ assessable.dueDate.dateOnly }}
+                                Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
                             </span>
                         </p>
                     </div>
@@ -34,7 +34,7 @@
                         {% if true %}
                             {# Pending #}
                             {% set progressClass = 'pending' %}
-                            {% set url = assessable.task.link %}
+                            {% set url = assessable.url %}
                         {% else %}
                             {# Completed #}
                             {% set progressClass = 'complete' %}
@@ -50,12 +50,12 @@
                         {% if true %}
                             {# Pending #}
                             {% set progressClass = 'pending' %}
-                            {% set url = assessable.task.link %}
+                            {% set url = assessable.url %}
                         {% else %}
                             {# Completed #}
                             {% set progressClass = 'complete' %}
                             {% set progressText = progressText ~ ', Click To Undo' %}
-                            {% set url = '/task/start/' ~ assessable.task.id ~ '/undo' %}
+                            {% set url = '/task/start/' ~ assessable.id ~ '/undo' %}
                         {% endif %}
                     {% endif %}
 
