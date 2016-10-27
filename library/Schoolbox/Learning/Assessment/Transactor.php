@@ -123,7 +123,7 @@ class Transactor
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $sequence = $this->deriveSaveSequence($this->getAssessmentMapperProxy(), $this->getAssessment(), $assessmentContext);
+            $sequence = $this->deriveSaveSequence($assessmentContext);
             $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
             $return_url = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
@@ -150,7 +150,7 @@ class Transactor
          * You only get contextId when you're Creating, not updating
          */
         $context   = $this->getFolderMapper()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentMapperProxy(), $this->getAssessment(), $context);
+        $sequence = $this->deriveSaveSequence($context);
         $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         $return_url = "/homepage/{$context->getId()}";
@@ -167,7 +167,7 @@ class Transactor
     private function transactUnitImplementationContext()
     {
         $context   = $this->getUnitImplementationMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentMapperProxy(), $this->getAssessment(), $context);
+        $sequence = $this->deriveSaveSequence($context);
         $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return "/homepage/{$context->getId()}";
@@ -184,7 +184,7 @@ class Transactor
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
         $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentMapperProxy(), $this->getAssessment(), $context);
+        $sequence = $this->deriveSaveSequence($context);
         $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
@@ -205,7 +205,7 @@ class Transactor
 
         // TODO figure out what to do about this
         $context   = $this->getAssessmentMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($this->getAssessmentMapperProxy(), $this->getAssessment(), $context);
+        $sequence = $this->deriveSaveSequence($context);
         $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
         return "/homepage/{$context->getId()}";
