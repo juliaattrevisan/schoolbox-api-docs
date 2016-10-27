@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Assessment\Component\OnlineAssessment as Quiz;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper as QuizMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -17,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
@@ -264,8 +266,15 @@ class MapperProxy
 
         // In the case of Quiz, we do need to delete sub-objects. This is because the old Quiz screens
         // are not aware of the assessment table
-        if($dataModel instanceof Quiz){
-            QuizMapper::getInstance()->delete($dataModel);
+        if($assessable instanceof QuizDomainModel){
+            // Deletion is idempotent. Force deletion of already deleted to ensure weak entities are all deleted.
+            try {
+                $quizDataModel = $this->baseMapper->findById($dataModel->getId());
+            } catch (MapperException\Deleted $e){
+                $quizDataModel = $e->getDeletedObject();
+            }
+            $onlineAssessment = $quizDataModel->getQuiz();
+            OnlineAssessmentMapper::getInstance()->delete($onlineAssessment);
         }
     }
 
