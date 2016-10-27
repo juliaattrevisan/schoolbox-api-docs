@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 
 class Registry {
 

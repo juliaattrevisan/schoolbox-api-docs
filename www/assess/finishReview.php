@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
 
 /**
  * Review completion. Marks when an assessment review is finished.
@@ -34,7 +35,7 @@ $assessMapper = OnlineAssessmentMapper::getInstance();
 $attemptMapper = AttemptMapper::getInstance();
 
 try {
-	/** @var Schoolbox\Assessment\Component\OnlineAssessment $assess */
+	/** @var OnlineAssessment $assess */
 	$assess = $assessMapper->findById($this->arg[0]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {

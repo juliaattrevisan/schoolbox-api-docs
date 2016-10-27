@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment;
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;

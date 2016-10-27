@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Learning\Quiz;
 
 
 use Alaress\Async\Notification\Instance\Instance;

@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Quiz\Section;
 
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 use \Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;

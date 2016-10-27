@@ -9,7 +9,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
 use Schoolbox\Assessment\Course;
-use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;

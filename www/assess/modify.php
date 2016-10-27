@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -63,14 +63,14 @@ if (!empty($_POST)) {
         );
     }
 
-    // Is this a task? If so, just set the start and finish to now.
-    $task_id = $assessment->getTask()->getId();
-    if ($task_id) {
-        $task = TaskMapper::getInstance()->findById($task_id);
-        $task->setTitle($_POST['title']);
-        TaskMapper::getInstance()->save($task);
-    }
-    else {
+//    // Is this a task? If so, just set the start and finish to now.
+//    $task_id = null;
+//    if ($task_id) {
+//        $task = TaskMapper::getInstance()->findById($task_id);
+//        $task->setTitle($_POST['title']);
+//        TaskMapper::getInstance()->save($task);
+//    }
+//    else {
         /* Format date, time
          */
         $start = Alaress_Date_Format::newLocalShort($_POST['start']['date'])
@@ -94,13 +94,14 @@ if (!empty($_POST)) {
             error(145);
         }
         $assessment->setStart($start)->setFinish($finish);
-    }
+//    }
     OnlineAssessmentMapper::getInstance()->save($assessment);
-    if ($assessment->getTaskInstance()->getId()) {
-        $task_instance = Task\InstanceMapper::getInstance()->findById($assessment->getTaskInstance()->getId());
-        $task_instance->setTitle($_POST['title']);
-        Task\InstanceMapper::getInstance()->save($task_instance);
-    }
+//    if ($assessment->getTaskInstance()->getId()) {
+//        $task_instance = Task\InstanceMapper::getInstance()->findById($assessment->getTaskInstance()->getId());
+//        $task_instance->setTitle($_POST['title']);
+//        Task\InstanceMapper::getInstance()->save($task_instance);
+//    }
+
 
     $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
@@ -143,7 +144,6 @@ else {
     $task_id = null;
     try {
         $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
-        $task_id    = $assessment->getTask()->getId();
     }
     catch (Exception $ex) {
         error(112);
@@ -167,7 +167,7 @@ else {
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',
         'ASSESS_KIND'               => 'Quiz',
-        'ASSESS_IS_TASK'            => !empty($task_id) ? 1 : 0,
+        'ASSESS_IS_TASK'            => 0,
         'ASSESS_ASSESS_ID'          => $assessment->getId(),
         'ASSESS_CATEGORY_ID'        => $assessment->getCategory()->getId(),
         'ASSESS_CATEGORY_NAME'      => $assessment->getCategory()->getName(),

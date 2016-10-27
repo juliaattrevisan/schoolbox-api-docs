@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Learning\Quiz;
 
 use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;

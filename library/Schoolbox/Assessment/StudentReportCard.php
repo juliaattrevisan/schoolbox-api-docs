@@ -10,8 +10,8 @@
 namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -1033,10 +1033,10 @@ class StudentReportCard
 
         /**
          * @var $returnMapper  SubmissionBox\ReturnedWorkMapper
-         * @var $attemptMapper OnlineAssessment\AttemptMapper
+         * @var $attemptMapper AttemptMapper
          */
         $returnMapper  = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $attemptMapper = OnlineAssessment\AttemptMapper::getInstance();
+        $attemptMapper = AttemptMapper::getInstance();
         $returnHandler = new \SubmissionReturn();
         $groupHandler  = new \Group();
         $synClass      = new \External_Class;

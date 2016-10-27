@@ -8,7 +8,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 
@@ -28,7 +28,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector)
     {
-        parent::__construct($injector, $injector->get('mapperFactory')->get(OnlineAssessmentMapper::class), 'quiz', null, 'learningQuiz');
+        parent::__construct($injector, $injector->get('mapperFactory')->get(QuizMapper::class), 'quiz', null, 'learningQuiz');
     }
 
     /**

@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
+use Schoolbox\Learning\Quiz\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Course\Task as TaskModel;

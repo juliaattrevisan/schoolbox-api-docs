@@ -11,6 +11,8 @@ use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use \Schoolbox\UserMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
 use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
@@ -215,7 +217,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $weight = 0;
         if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
             $weight = $assessment->getSubmissionBox()->getWeight();
-        } elseif($assessment->getAssessment() instanceof Schoolbox\Assessment\Component\OnlineAssessment) {
+        } elseif($assessment->getAssessment() instanceof OnlineAssessment) {
             $weight = $assessment->getAssessment()->getWeight();
         }
         return [
@@ -257,7 +259,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $dueDate = $box->getDueDate();
         } elseif ($result instanceof Attempt) {
             /* Handle quiz attempt */
-            $quiz = \Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId());
+            $quiz = OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId());
             $activity->setAssessment($quiz);
             $activity->setCategory($quiz->getCategory());
             $student = UserMapper::getInstance()->findById($result->getUser()->getId());

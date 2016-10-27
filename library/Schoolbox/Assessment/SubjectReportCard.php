@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;

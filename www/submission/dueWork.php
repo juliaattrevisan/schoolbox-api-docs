@@ -2,8 +2,9 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
@@ -310,7 +311,7 @@ $j        = 0;
 $synClass = new External_Class;
 
 $return_mapper = new SubmissionBox\ReturnedWorkMapper();
-$assess_mapper = new OnlineAssessment\AttemptMapper();
+$attempt_mapper = new AttemptMapper();
 
 $restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
 
@@ -361,7 +362,7 @@ foreach ($categoryList as $category) {
     if (!$restrict_grades) {
         $studentGrades = array_merge(
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
-            $assess_mapper->getStudentMarks($category['id'], $userID)
+            $attempt_mapper->getStudentMarks($category['id'], $userID)
         );
         usort(
             $studentGrades,

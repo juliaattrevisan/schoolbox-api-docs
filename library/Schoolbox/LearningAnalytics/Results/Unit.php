@@ -13,7 +13,7 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Learning\Quiz\OnlineAssessment;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;

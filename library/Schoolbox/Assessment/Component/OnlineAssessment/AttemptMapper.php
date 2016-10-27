@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -21,9 +21,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
 /**
- * Class AttemptMapper
- * @package Schoolbox\Assessment\Component\OnlineAssessment
- *
  * @method Attempt createModel()
  * @method Attempt hydrate(array $row, $alias = '', $callback = null)
  */

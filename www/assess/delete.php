@@ -72,7 +72,7 @@ if (is_array($sectionList) && count($sectionList)) {
 }
 
 // Delete thru the mapper so that callbacks apply
-$mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+$mapper = \Schoolbox\Learning\Quiz\OnlineAssessmentMapper::getInstance();
 $mapper->delete($mapper->findById($assessId));
 
 if ($_GET[Redirect::RETURN_URL] != "")

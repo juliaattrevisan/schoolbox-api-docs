@@ -8,8 +8,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 
