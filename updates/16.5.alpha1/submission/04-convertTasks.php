@@ -141,34 +141,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');
 
-            // Associate this assessment with the task's course spec
-            try {
-                $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
-                $log->debug('Created assessment/unit specification relation');
-            } catch (PDOException $e) {
-                // If this failed - most likely there WAS a course builder here, but there is no longer.
-                $log->warning('Could not create assessment/unit specification relation!');
-                $log->warning('What probably happened is that the course builder that was here was deleted.');
-                $log->warning($e->getMessage());
-
-                // Try to rebuild the course/unit that was here, but create it as deleted.
-                $selectCourseIdQuery->execute(['folderId' => $folderId]);
-                $courseId = $selectCourseIdQuery->fetchColumn();
-                if (!$courseId) {
-                    $log->debug('Course specification does not exist - attempting to create it');
-                    $insertNewCourseQuery->execute(['folderId' => $folderId]);
-                    $courseId = $db->lastInsertId();
-                } else {
-                    $log->debug('Course specification already exists');
-                }
-
-                $log->debug('Attempting to create unit specification');
-                $insertNewUnitQuery->execute(['folderId' => $folderId, 'courseId' => $courseId]);
-
-                $log->debug('Attempting to create assessment/unit specification relation again');
-                $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
-            }
-
             // Associate this task with the assessment
             $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $taskId]);
             $log->debug('Created task/assessment relation');
@@ -184,6 +156,44 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $boxId]);
                 $deleteTaskQuery->execute(['taskId' => $taskId]);
                 $log->debug('Task has due work - created due work/assessment relation, deleted task');
+            }
+
+            // Associate this assessment with the task's course spec
+            try {
+                $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+                $log->debug('Created assessment/unit specification relation');
+            } catch (PDOException $e) {
+                // If this failed - most likely there WAS a course builder here, but there is no longer.
+                $log->warning('Could not create assessment/unit specification relation!');
+                $log->warning('This is probably because the course builder that was here was deleted.');
+                $log->warning('Attempting to recreate the relation.');
+                $log->warning($e->getMessage());
+
+                // Try to rebuild the course/unit that was here, but create it as deleted.
+                $selectCourseIdQuery->execute(['folderId' => $folderId]);
+                $courseId = $selectCourseIdQuery->fetchColumn();
+
+                try {
+                    if (!$courseId) {
+                        $log->debug('Course specification does not exist - attempting to create it');
+                        $insertNewCourseQuery->execute(['folderId' => $folderId]);
+                        $courseId = $db->lastInsertId();
+                    } else {
+                        $log->debug('Course specification already exists');
+                    }
+
+                    $log->debug('Attempting to create unit specification');
+                    $insertNewUnitQuery->execute(['folderId' => $folderId, 'courseId' => $courseId]);
+
+                    $log->debug('Attempting to create assessment/unit specification relation again');
+                    $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+
+                } catch (PDOException $e) {
+                    $log->warning('Could not recreate assessment/unit specification relation!');
+                    $log->warning('This is probably because either the course or unit specification folder was deleted.');
+                    $log->warning('This assessment will be orphaned (it likely was already).');
+                    $log->warning($e->getMessage());
+                }
             }
 
             $successCount++;
