@@ -10,10 +10,11 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
-use Alaress_Date_Format as ADF;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -27,6 +28,9 @@ use Schoolbox\User;
  */
 class File
 {
+    use Id;
+    use CreatedAtDate;
+
     /** @var bool */
     protected $draft;
 
@@ -41,9 +45,6 @@ class File
 
     /** @var User */
     protected $owner;
-
-    /** @var ADF */
-    protected $createdAt;
 
     /**
      * The list of files within this submission.
@@ -86,26 +87,6 @@ class File
     public function setDraft($draft)
     {
         $this->draft = $draft;
-        return $this;
-    }
-
-
-    /**
-     * @return ADF
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param ADF $createdAt
-     * @return static
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
         return $this;
     }
 

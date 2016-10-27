@@ -61,6 +61,23 @@ class FileMapper extends Mapper
     }
 
     /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        // much join.
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('box_id', 'b')},
+                {$this->getJoinColumnString('owner', 'u')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('box_id', '', 'b')}
+            LEFT JOIN {$this->getJoinSql('owner', '', 'u')}
+        ";
+    }
+
+    /**
      * Include all files that are part of this submission.
      *
      * @param PDOStatement $statement
@@ -69,9 +86,23 @@ class FileMapper extends Mapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Collection|File[] $resultSet */
-        $resultSet = parent::hydrateSelect($statement);
-        $files     = $this->getJoinMapper('file')
-            ->findByColumnList('student_submission_id', $resultSet->getColumnValues('id'))
+        $resultSet = $this->createCollection();
+        $ids       = [];
+
+        // Default hydration
+        foreach ($statement as $row) {
+            $result = $this->hydrate($row);
+            $ids[]  = $result->getId();
+            $resultSet->add(
+                $result
+                    ->setSubmissionBox($this->hydrateJoin($row, 'box_id', 'b'))
+                    ->setOwner($this->hydrateJoin($row, 'owner', 'u'))
+            );
+        }
+
+        // Fetch and hydrate files
+        $files = $this->getJoinMapper('file')
+            ->findByColumn('student_submission_id', $ids)
             ->groupBy('id');
         foreach ($resultSet as $result) {
             if (isset($files[$result->getId()])) {
@@ -129,32 +160,6 @@ class FileMapper extends Mapper
             }
         }
     }
-
-    /**
-     * @return string
-     */
-    protected function getSelectString()
-    {
-        $hashJoin = $this->getJoinMapper('storage');
-        $plag = \Plagscan_DocumentMapper::getInstance();
-
-        $table = $this->getTable();
-
-        // much join.
-        return "
-            SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('storage', 'h')},
-                   {$hashJoin->getJoinColumnString('allowedFileExtension', 'm')},
-                   {$this->getJoinColumnString('owner', 'u')},
-                   {$plag->getColumnString('p')}
-            FROM `$table`
-            LEFT JOIN {$this->getJoinSql('storage', $table, 'h')}
-            LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
-            LEFT JOIN {$plag->getTable()} AS `p` ON `{$table}`.`id` = `p`.`file_id`
-        ";
-    }
-
 
     /**
      * Gets the list of activities related to student submissions.
