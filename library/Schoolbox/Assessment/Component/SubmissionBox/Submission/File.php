@@ -18,6 +18,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -25,8 +26,10 @@ use Schoolbox\User;
  * A student's submission to a due work.
  *
  * The name File is a misnomer, as now a submission may contain multiple files.
+ *
+ * TODO remove IStorage once all uses are found and removed
  */
-class File
+class File implements IStorage
 {
     use Id;
     use CreatedAtDate;
@@ -282,5 +285,78 @@ class File
             'uid'               => $this->getOwner()->getId(),
             'submission_box_id' => $this->getSubmissionBox()->getId(),
         ]) > 0;
+    }
+
+    // Deliberately broken implementation of IStorage.
+    // Added only so that uses of this object which assume it's still an IStorage can be rewritten.
+
+    public function getFilename()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setFilename($filename)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getExtension()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setExtension($extension)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getBasename()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setBasename($basename)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getMime()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getMimetype()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getSize()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getHash()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getLastAccessed()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function exists()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function read()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function readStream()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
     }
 }
