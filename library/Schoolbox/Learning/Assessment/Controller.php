@@ -197,8 +197,7 @@ class Controller extends Base
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
         /* Set defaults */
-        if(empty($assessment->getId())) {
-
+        if($assessment != null && empty($assessment->getId())) {
             $assessment
                 ->setPublishAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
                 ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
