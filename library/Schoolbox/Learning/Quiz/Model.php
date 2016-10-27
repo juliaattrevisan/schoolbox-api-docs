@@ -23,7 +23,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
-class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
+class Model implements ISoftDeletable, IAssessableDataModel
 {
     use HasCurriculumNodes;
     use AssessmentModelTrait;

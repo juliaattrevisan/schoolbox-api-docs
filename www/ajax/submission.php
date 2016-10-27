@@ -3,7 +3,7 @@
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 $page = new SitePage;
@@ -17,7 +17,7 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
     $output = array();
     if ($_REQUEST['is_assess']) {
         $attempt_mapper    = new AttemptMapper();
-        $assessment_mapper = new OnlineAssessmentMapper();
+        $assessment_mapper = new Mapper();
         try {
             $assessment        = $assessment_mapper->findById($_REQUEST['id']);
 

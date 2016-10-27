@@ -6,7 +6,7 @@
  */
 
 // disallow SitePage context
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -119,7 +119,7 @@ function setAssessmentWeight($weights) {
 	$count = 0;
 
 	foreach($weights as $type => $idList) {
-		$mapper = $type ? OnlineAssessmentMapper::getInstance() : SubmissionBoxMapper::getInstance();
+		$mapper = $type ? Mapper::getInstance() : SubmissionBoxMapper::getInstance();
 		foreach($idList as $id => $weight) {
 			try {
 				$object = $mapper->findById($id);

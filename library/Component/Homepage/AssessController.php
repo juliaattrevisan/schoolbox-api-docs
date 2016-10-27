@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 
 class Component_Homepage_AssessController extends Component_Homepage_ControllerAbstract
 {
@@ -207,7 +207,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                                 )
                             );
                         } else {
-                            $quizMapper = OnlineAssessmentMapper::getInstance();
+                            $quizMapper = Mapper::getInstance();
                             $quiz       = $quizMapper->findById($currentAssess['assess_id']);
 
                             $urgency = $quiz->getGradientIndex();

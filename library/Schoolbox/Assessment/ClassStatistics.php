@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Assessment;
 
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -47,7 +47,7 @@ class ClassStatistics {
 	protected $returnMapper;
 
 	/**
-	 * @var OnlineAssessmentMapper
+	 * @var Mapper
 	 */
 	protected $assessMapper;
 
@@ -72,7 +72,7 @@ class ClassStatistics {
 		$this->submissionMapper = Submission\FileMapper::getInstance();
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
-		$this->assessMapper = new OnlineAssessmentMapper();
+		$this->assessMapper = new Mapper();
 		$this->attemptMapper = new AttemptMapper();
 
 		/* Visibility
@@ -123,11 +123,11 @@ class ClassStatistics {
 	/**
 	 * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
 	 *
-	 * @param SubmissionBox|OnlineAssessment $work
+	 * @param SubmissionBox|Model $work
 	 * @return bool
 	 */
 	protected function addWork($work) {
-		if($work instanceof OnlineAssessment) {
+		if($work instanceof Model) {
 			$stamp = $work->getFinish()->getUnixTimestamp();
 			$marks = $this->attemptMapper->getAllAttempts($work->getId(), array(
 				'most_recent' => true,
@@ -250,7 +250,7 @@ class ClassStatistics {
 			/* Stack results
              */
 			foreach ($allMarks as $userId => $currentMark) {
-				if ($box instanceof OnlineAssessment) {
+				if ($box instanceof Model) {
 					if ($userId !== 'avg') {
 						if (count($currentMark)) {
 							$latestAttempt = array_pop($currentMark);

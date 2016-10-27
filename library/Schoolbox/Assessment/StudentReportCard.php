@@ -10,8 +10,8 @@
 namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -131,7 +131,7 @@ class StudentReportCard
         // dependencies
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
-        $this->assessMapper     = new OnlineAssessmentMapper();
+        $this->assessMapper     = new Mapper();
         $this->attemptMapper    = AttemptMapper::getInstance();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
@@ -706,7 +706,7 @@ class StudentReportCard
                         $page->setVar('action_publish_block', '');
                     }
                     $page->parse('work_clickable_block', 'work_clickable', true);
-                } elseif ($object instanceof OnlineAssessment) {
+                } elseif ($object instanceof Model) {
 
                     $allNames[] = $object->getTitle();
                     if($marks[0]['mark'] !== '') {
@@ -813,13 +813,13 @@ class StudentReportCard
     }
 
     /**
-     * @param OnlineAssessment $oa
+     * @param Model $oa
      * @param                  $marks
      * @param \SitePage        $page  The page unto which to parse blocks
      *
      * @return array
      */
-    protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks, \SitePage $page)
+    protected function outputOnlineAssessRow(Model $oa, $marks, \SitePage $page)
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());

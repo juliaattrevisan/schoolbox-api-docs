@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -43,8 +43,8 @@ if (!empty($_POST)) {
         $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
-    /** @var OnlineAssessment $assessment */
-    $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
+    /** @var Model $assessment */
+    $assessment = Mapper::getInstance()->findById($this->arg[0]);
     $assessment
         ->setCategory($_POST['category_id'])
         ->setUser($_SESSION['id'])
@@ -95,7 +95,7 @@ if (!empty($_POST)) {
         }
         $assessment->setStart($start)->setFinish($finish);
 //    }
-    OnlineAssessmentMapper::getInstance()->save($assessment);
+    Mapper::getInstance()->save($assessment);
 //    if ($assessment->getTaskInstance()->getId()) {
 //        $task_instance = Task\InstanceMapper::getInstance()->findById($assessment->getTaskInstance()->getId());
 //        $task_instance->setTitle($_POST['title']);
@@ -110,9 +110,9 @@ if (!empty($_POST)) {
 else if(is_numeric($_GET['mark_visibility'])) {
     /* This is used for an ajax update request of just the visibility */
     try {
-        $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
+        $assessment = Mapper::getInstance()->findById($this->arg[0]);
         $assessment->setMarkVisibility($_GET['mark_visibility']);
-        OnlineAssessmentMapper::getInstance()->save($assessment);
+        Mapper::getInstance()->save($assessment);
         print "success";
     } catch (Exception $e) {
         print "failure";
@@ -140,10 +140,10 @@ else {
 
     $this->setTitle('Manage Quiz');
 
-    /** @var OnlineAssessment $assessment */
+    /** @var Model $assessment */
     $task_id = null;
     try {
-        $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
+        $assessment = Mapper::getInstance()->findById($this->arg[0]);
     }
     catch (Exception $ex) {
         error(112);

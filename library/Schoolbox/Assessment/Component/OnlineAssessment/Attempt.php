@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
@@ -20,7 +20,7 @@ class Attempt implements ISoftDeletable {
 	protected $id;
 
 	/**
-	 * @var OnlineAssessment
+	 * @var Model
 	 */
 	protected $assessment;
 
@@ -50,7 +50,7 @@ class Attempt implements ISoftDeletable {
 	protected $deleted;
 
 	/**
-	 * @param  OnlineAssessment $assessment
+	 * @param  Model $assessment
 	 *
 	 * @return $this
 	 */
@@ -60,7 +60,7 @@ class Attempt implements ISoftDeletable {
 	}
 
 	/**
-	 * @return OnlineAssessment
+	 * @return Model
 	 */
 	public function getAssessment() {
 		return $this->assessment;

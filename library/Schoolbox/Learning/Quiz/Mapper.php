@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -28,14 +28,14 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
  * Class OnlineAssessmentMapper
  *
  * @package Schoolbox\Assessment\Component
- * @method OnlineAssessment createModel($id=null)
- * @method Collection|OnlineAssessment[] findByColumnList($columnList, $options = [])
+ * @method Model createModel($id=null)
+ * @method Collection|Model[] findByColumnList($columnList, $options = [])
  */
-class OnlineAssessmentMapper extends Mapper implements IActivityMapper, FeedableMapperInterface {
+class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface {
 
 	protected function mapping () {
 		$this->hasTable('assess');
-		$this->hasModel(OnlineAssessment::class);
+		$this->hasModel(Model::class);
 		$this->hasMap(array(
 			'column'     => 'assess_id',
 			'property'   => 'id',
@@ -181,9 +181,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      */
-    public function softDeleteSections(OnlineAssessment $quiz)
+    public function softDeleteSections(Model $quiz)
     {
         $quizSectionMapper = QuizSectionMapper::getInstance();
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
@@ -195,9 +195,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      */
-	public function softDeleteAttempts(OnlineAssessment $quiz)
+	public function softDeleteAttempts(Model $quiz)
     {
         $quizAttemptMapper = Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::getInstance();
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
@@ -209,9 +209,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      */
-    public function restoreSections(OnlineAssessment $quiz)
+    public function restoreSections(Model $quiz)
     {
         $quizSectionMapper = QuizSectionMapper::getInstance();
         $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
@@ -221,9 +221,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      */
-    public function restoreAttempts(OnlineAssessment $quiz)
+    public function restoreAttempts(Model $quiz)
     {
         $quizAttemptMapper = QuizAttemptMapper::getInstance();
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
@@ -234,10 +234,10 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	 * Pre-save callback.
 	 * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
 	 *
-	 * @param  OnlineAssessment $object
+	 * @param  Model $object
 	 * @return bool             Always returns true
 	 */
-	public function preSave(OnlineAssessment $object) {
+	public function preSave(Model $object) {
 		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
 	}
 
@@ -245,11 +245,11 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
      * Post-save callback.
      * Creates record in external markbook system
      *
-     * @param  OnlineAssessment $object
-     * @param  OnlineAssessment|null $previous
+     * @param  Model $object
+     * @param  Model|null $previous
      * @return bool             Always returns true
      */
-    public function postSave(OnlineAssessment $object, $previous = null) {
+    public function postSave(Model $object, $previous = null) {
         /**
          * This saves the assessment to the remote system
          */
@@ -268,9 +268,9 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
      *
      * This is used as a post-delete hook.
      *
-     * @param OnlineAssessment $object
+     * @param Model $object
      */
-    public function deleteFromMarkbook(OnlineAssessment $object)
+    public function deleteFromMarkbook(Model $object)
     {
         $externalMarkbook = new \External_Markbook();
         $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
@@ -476,7 +476,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	 * @return array
 	 */
 	public function getStatistics($assess) {
-		if($assess instanceof OnlineAssessment) {
+		if($assess instanceof Model) {
 			$assess_id = $assess->getId();
 		}
 		else {
@@ -528,7 +528,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	 * @return array
 	 */
 	public function getProgress($assess) {
-		if($assess instanceof OnlineAssessment) {
+		if($assess instanceof Model) {
 			$assess_id = $assess->getId();
 		}
 		else {
@@ -564,7 +564,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	 * @param int $limit
 	 * @param int $offset
 	 * @param int $time
-	 * @return Collection|OnlineAssessment[]
+	 * @return Collection|Model[]
 	 */
 	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
 		$time = date('Y-m-d H:i:s', $time ?: time());
@@ -598,7 +598,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 		$c = $this->createCollection();
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			/** @var OnlineAssessment $quiz */
+			/** @var Model $quiz */
 			$quiz = $this->hydrate($r, 'a');
 			$quiz->setCategory($this->hydrateJoin($r, 'category',  'c'));
 			$quiz->setUser(    $this->hydrateJoin($r, 'user',      'u'));
@@ -612,8 +612,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
     /**
      * @param int $identifierValue
-     * @throws Mapper\Exception
-     * @return OnlineAssessment
+     * @throws BaseMapper\Exception
+     * @return Model
      */
     public function findById($identifierValue)
     {
@@ -647,7 +647,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
         $quiz = null;
         $curriculumNodes = [];
         foreach ($stmt as $row) {
-            if (!($quiz instanceof OnlineAssessment)) {
+            if (!($quiz instanceof Model)) {
                 $quiz = $this->hydrate($row, 'a');
                 $quiz->setCategory($this->hydrateJoin($row, 'category', 'c'));
                 $quiz->setWorkType($this->hydrateJoin($row, 'work_type', 't'));
@@ -662,8 +662,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
             }
         }
 
-        if (!($quiz instanceof OnlineAssessment)) {
-            throw new Mapper\Exception("Instance of object not found");
+        if (!($quiz instanceof Model)) {
+            throw new BaseMapper\Exception("Instance of object not found");
         }
 
         $this->throwIfDeleted($quiz);

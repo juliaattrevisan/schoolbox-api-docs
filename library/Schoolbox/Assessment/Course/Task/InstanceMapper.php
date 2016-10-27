@@ -11,7 +11,7 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -112,7 +112,7 @@ class InstanceMapper extends Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => OnlineAssessmentMapper::class,
+            'mapper'    => Mapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
@@ -206,7 +206,7 @@ class InstanceMapper extends Mapper {
     {
         // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            /** @var OnlineAssessmentMapper $mapper */
+            /** @var Mapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
             try {
                 $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
@@ -236,7 +236,7 @@ class InstanceMapper extends Mapper {
     {
         // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            /** @var OnlineAssessmentMapper $mapper */
+            /** @var Mapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
             try {
                 $object->setAssessment($mapper->findById($object->getAssessment()->getId()));

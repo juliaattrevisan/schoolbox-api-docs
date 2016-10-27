@@ -8,7 +8,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 

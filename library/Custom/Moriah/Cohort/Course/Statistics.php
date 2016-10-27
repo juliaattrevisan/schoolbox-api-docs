@@ -8,9 +8,9 @@
 namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -64,7 +64,7 @@ class Statistics
     protected $returnMapper;
 
     /**
-     * @var OnlineAssessmentMapper
+     * @var Mapper
      */
     protected $assessMapper;
 
@@ -97,7 +97,7 @@ class Statistics
         $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
         $this->submissionMapper    = Submission\FileMapper::getInstance();
         $this->returnMapper        = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $this->assessMapper        = OnlineAssessmentMapper::getInstance();
+        $this->assessMapper        = Mapper::getInstance();
         $this->attemptMapper       = AttemptMapper::getInstance();
 
         /* Visibility
@@ -185,14 +185,14 @@ class Statistics
     /**
      * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
      *
-     * @param SubmissionBox|OnlineAssessment $work
+     * @param SubmissionBox|Model $work
      * @param UnitInstance                   $unit The unit that this work originated from.
      *
      * @return bool
      */
     protected function addWork($work, UnitInstance $unit)
     {
-        if ($work instanceof OnlineAssessment) {
+        if ($work instanceof Model) {
             $marks = $this->attemptMapper->getAllAttempts(
                 $work->getId(),
                 [
@@ -340,7 +340,7 @@ class Statistics
         $workFolderIds = [];
         foreach ($task['work'] as $work) {
             $object = $work['object'];
-            if ($object instanceof SubmissionBox || $object instanceof OnlineAssessment) {
+            if ($object instanceof SubmissionBox || $object instanceof Model) {
                 $workFolderIds[$object->getCategory()->getId()] = true;
             }
         }
@@ -386,7 +386,7 @@ class Statistics
                     if ($object instanceof SubmissionBox) {
                         $marks['work_id']   = $object->getId();
                         $marks['work_type'] = 'sb';
-                    } elseif ($object instanceof OnlineAssessment) {
+                    } elseif ($object instanceof Model) {
                         $marks['work_id']   = $object->getId();
                         $marks['work_type'] = 'oa';
                     } else {
@@ -428,7 +428,7 @@ class Statistics
                 $object = $work['object'];
                 if ($object instanceof SubmissionBox) {
                     $allData[$taskId] = $object->getName();
-                } elseif ($object instanceof OnlineAssessment) {
+                } elseif ($object instanceof Model) {
                     $allData[$taskId] = $object->getTitle();
                 } else {
                     $allData[$taskId] = '';

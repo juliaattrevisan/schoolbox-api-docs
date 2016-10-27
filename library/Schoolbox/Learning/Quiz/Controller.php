@@ -23,10 +23,10 @@ class Controller extends AbstractController
     private $errorMapper;
 
     /**
-     * @param OnlineAssessmentMapper $quizMapper
+     * @param Mapper $quizMapper
      * @param ErrorMapper $errorMapper
      */
-    public function __construct(OnlineAssessmentMapper $quizMapper, ErrorMapper $errorMapper)
+    public function __construct(Mapper $quizMapper, ErrorMapper $errorMapper)
     {
         parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
@@ -44,10 +44,10 @@ class Controller extends AbstractController
      */
     public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
     {
-        /** @var OnlineAssessment $quiz */
+        /** @var Model $quiz */
         $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
 
-        if (OnlineAssessment::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
         $assessId = $quiz->getId();

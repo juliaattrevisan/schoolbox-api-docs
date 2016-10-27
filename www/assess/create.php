@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
@@ -35,7 +35,7 @@ if (!empty($_POST)) {
         $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
-    $assessment = new OnlineAssessment();
+    $assessment = new Model();
     $assessment
         ->setCategory($_POST['category_id'])
         ->setUser($_SESSION['id'])
@@ -107,7 +107,7 @@ if (!empty($_POST)) {
         $assessment->setTaskInstance($task_instance);
     }
 
-    OnlineAssessmentMapper::getInstance()->save($assessment);
+    Mapper::getInstance()->save($assessment);
 
     // Is there a task for this item? If so, create it and link it back to this
     // new item.

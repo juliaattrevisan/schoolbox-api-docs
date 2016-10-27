@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'quiz',
             [
-                'mapper'    => OnlineAssessmentMapper::class,
+                'mapper'    => Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'assessment_id'
             ]

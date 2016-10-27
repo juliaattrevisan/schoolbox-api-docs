@@ -2,8 +2,8 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -646,7 +646,7 @@ if (empty($feedItems)) {
 function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
 {
     $box_mapper    = new SubmissionBoxMapper();
-    $assess_mapper = new OnlineAssessmentMapper();
+    $assess_mapper = new Mapper();
     $submit_mapper = new SubmissionBox\Submission\FileMapper();
     $return_mapper = new SubmissionBox\ReturnedWorkMapper();
     $activities    = $box_mapper

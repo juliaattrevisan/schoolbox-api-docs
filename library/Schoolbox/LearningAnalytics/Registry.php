@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 
 class Registry {
 
@@ -54,7 +54,7 @@ class Registry {
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $submissionBoxMapper = new SubmissionBoxMapper();
-        $quizMapper = new OnlineAssessmentMapper();
+        $quizMapper = new Mapper();
 
         /* A registry of unitId-studentList relations
          */

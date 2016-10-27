@@ -7,8 +7,8 @@
  */
 
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Learning\Quiz\OnlineAssessment as Quiz;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;

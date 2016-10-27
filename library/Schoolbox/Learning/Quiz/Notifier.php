@@ -32,7 +32,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceInterface {
+class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_CLOSED    = 'closed';
 	const TRIGGER_OPEN      = 'open';
@@ -97,12 +97,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 *
 	 * @todo Remove this when mapper findBy methods can specify joins to hydrate
 	 *
-	 * @param  OnlineAssessment $quiz
-	 * @return OnlineAssessment
+	 * @param  Model $quiz
+	 * @return Model
 	 */
-	protected function fullyHydrateQuiz(OnlineAssessment $quiz) {
+	protected function fullyHydrateQuiz(Model $quiz) {
 		// @mattday I've got a surprise for you - it's poop!
-		/** @var OnlineAssessment $quiz */
+		/** @var Model $quiz */
 		$quiz = $this->mapper->findById($quiz->getId());
 		$quiz
 			->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()))
@@ -117,7 +117,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return void
 	 */
 	public function bundleTriggers($bundle) {
-		/** @var OnlineAssessment $quiz */
+		/** @var Model $quiz */
 		$quiz = $bundle->getEvent()->getObject();
 
         // the mere fact that this is required is ludicrous
@@ -189,7 +189,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $c;
 		}
 
-		/** @var OnlineAssessment[]|Collection $quizzes */
+		/** @var Model[]|Collection $quizzes */
 		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
@@ -214,7 +214,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @return User[]|Collection
 	 */
 	public function getStudentsUnattemptedList($quiz) {
@@ -242,7 +242,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/* ASYNC METHODS */
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -276,7 +276,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -321,7 +321,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -357,7 +357,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -403,7 +403,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @return Messenger
 	 * @param array $diff
@@ -440,7 +440,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -491,7 +491,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -620,7 +620,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	}
 
     /**
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      * @param User $owner
      * @param array $diff
      * @return Messenger
@@ -742,7 +742,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/**
 	 * Notify the feed of box closures
 	 *
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger

@@ -9,7 +9,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
 use Schoolbox\Assessment\Course;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
@@ -649,8 +649,8 @@ class UnitInstanceMapper extends BaseMapper {
     public function saveTaskIntoUnitInstance(UnitInstance $unit, Task $task, User $owner) {
         // Protection for if the assessment or box aren't objects at all.
         // TODO: make the hydrator at least hydrate null objects?
-        if (!($task->getAssessment() instanceof OnlineAssessment)) {
-            $task->setAssessment(new OnlineAssessment());
+        if (!($task->getAssessment() instanceof Model)) {
+            $task->setAssessment(new Model());
         }
         if (!($task->getSubmissionBox() instanceof SubmissionBox)) {
             $task->setSubmissionBox(new SubmissionBox());

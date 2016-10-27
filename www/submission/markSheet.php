@@ -1,6 +1,6 @@
 <?php
 
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Marksheet;
 
@@ -61,7 +61,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
     'term' => $termMapper,
     'category' => \Schoolbox\Resource\Folder\Mapper::getInstance(),
     'sb' => SubmissionBoxMapper::getInstance(),
-    'oa' => OnlineAssessmentMapper::getInstance(),
+    'oa' => Mapper::getInstance(),
     'error' => DueWork_ErrorMapper::getInstance(),
 ), new \Schoolbox\Config\Loader());
 

@@ -13,8 +13,8 @@ namespace Schoolbox\Assessment\Component\OnlineAssessment;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -34,7 +34,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
 
-	/** @var OnlineAssessmentMapper */
+	/** @var Mapper */
 	protected $assessMapper;
 
     /** @var FolderMapper */
@@ -51,7 +51,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		if(empty($dependencies['assessMapper'])) {
-			$dependencies['assessMapper'] = OnlineAssessmentMapper::getInstance();
+			$dependencies['assessMapper'] = Mapper::getInstance();
 		}
         if (empty($dependencies['categoryMapper'])) {
             $dependencies['categoryMapper'] = FolderMapper::getInstance();
@@ -144,7 +144,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Model $assess */
 		$assess   = $this->assessMapper->findById($assessId);
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
@@ -181,7 +181,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Model $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
@@ -225,7 +225,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Model $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {

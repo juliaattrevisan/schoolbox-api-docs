@@ -20,7 +20,7 @@ use Component_Homepage_CourseOutlineController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
@@ -76,7 +76,7 @@ class Controller extends Base\Base
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
 
-    /** @var OnlineAssessmentMapper */
+    /** @var Mapper */
     protected $onlineAssessmentMapper;
 
     /** @var TaskMapper */
@@ -192,7 +192,7 @@ class Controller extends Base\Base
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
+        $this->setOnlineAssessmentMapper(Mapper::getInstance());
         $this->setComponentDefinitionMapper(Component_DefinitionMapper::getInstance());
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
@@ -1421,7 +1421,7 @@ class Controller extends Base\Base
     /**
      * Get online assessment mapper
      *
-     * @return OnlineAssessmentMapper
+     * @return Mapper
      */
     protected function getOnlineAssessmentMapper()
     {
@@ -1431,7 +1431,7 @@ class Controller extends Base\Base
     /**
      * Set online assessment mapper
      *
-     * @param OnlineAssessmentMapper $onlineAssessmentMapper
+     * @param Mapper $onlineAssessmentMapper
      */
     public function setOnlineAssessmentMapper($onlineAssessmentMapper)
     {

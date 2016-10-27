@@ -71,7 +71,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         }
 
         $box_mapper    = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
-        $assess_mapper = \Schoolbox\Learning\Quiz\OnlineAssessmentMapper::getInstance();
+        $assess_mapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
 
         /** @var \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[] $activities */
         $activities    = $box_mapper->getDueActivities($folder_id_list, $startTimestamp, $endTimestamp);

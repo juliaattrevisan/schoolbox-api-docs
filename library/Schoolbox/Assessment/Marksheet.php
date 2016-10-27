@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Assessment;
 
-use Schoolbox\Learning\Quiz\OnlineAssessment;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Exception as AssessmentException;
@@ -70,7 +70,7 @@ class Marksheet
     protected $categoryMapper;
     /** @var UserMapper */
     protected $userMapper;
-    /** @var OnlineAssessmentMapper */
+    /** @var Mapper */
     protected $oaMapper;
     /** @var SubmissionBoxMapper */
     protected $sbMapper;
@@ -257,7 +257,7 @@ class Marksheet
                     if ($object->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
                         $extraParams['gradeGroup'][] = $this->gradeGroups[] = $object->getGradeGroup()->getId();
                     }
-                } elseif ($object instanceof OnlineAssessment) {
+                } elseif ($object instanceof Model) {
                     $maxMark = 100;
                 }
 
@@ -592,7 +592,7 @@ class Marksheet
                         'WORK_ID'           => $item['id'],
                         'WORK_STAT_VALUE'   => is_numeric($value) ? (float)round($value, 3) : $value,
                         // truncate to 3 decimals, then strip extraneous 0s
-                        'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/' . $item['id'] : '/submission/submissionForm.php?id=' . $item['id'],
+                        'ASSESS_MODIFY_URL' => $item['object'] instanceof Model ? '/assess/modify/' . $item['id'] : '/submission/submissionForm.php?id=' . $item['id'],
                     )
                 );
 
@@ -677,7 +677,7 @@ class Marksheet
             foreach ($this->displayOrder as $item) {
                 // also, if this is the first pass, render the column headers as well
                 if ($i == 1) {
-                    if ($item['object'] instanceof OnlineAssessment) {
+                    if ($item['object'] instanceof Model) {
                         $page->setVar(
                             array(
                                 'WORK_TITLE' => $item['object']->getTitle(),
@@ -772,7 +772,7 @@ class Marksheet
         $header    = array('External ID', 'Surname', 'Firstname', 'Email');
         $subheader = array('', '', '','');
         foreach ($this->displayOrder as $item) {
-            if ($item['object'] instanceof OnlineAssessment) {
+            if ($item['object'] instanceof Model) {
                 // Online assess has only two columns
                 $header[]    = $item['object']->getTitle();
                 $header[]    = '';
@@ -825,7 +825,7 @@ class Marksheet
                     }
                 }
 
-                if ($item['object'] instanceof OnlineAssessment) {
+                if ($item['object'] instanceof Model) {
                     $output[] = $actualMark;
                     $output[] = $totalMark;
                 } elseif ($item['object'] instanceof SubmissionBox) {

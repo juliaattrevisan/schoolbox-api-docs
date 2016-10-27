@@ -12,9 +12,9 @@ namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
@@ -24,7 +24,7 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
  * @method Attempt createModel()
  * @method Attempt hydrate(array $row, $alias = '', $callback = null)
  */
-class AttemptMapper extends Mapper
+class AttemptMapper extends BaseMapper
 {
 
     protected function mapping()
@@ -72,7 +72,7 @@ class AttemptMapper extends Mapper
         $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin('assessment', array(
-            'mapper'    => OnlineAssessmentMapper::class,
+            'mapper'    => Mapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id'
         ));

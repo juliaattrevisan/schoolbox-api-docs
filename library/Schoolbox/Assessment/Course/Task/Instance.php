@@ -16,7 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Learning\Quiz\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 
@@ -73,7 +73,7 @@ class Instance implements ISoftDeletable {
     protected $submission_box;
 
     /**
-     * @var OnlineAssessment
+     * @var Model
      */
     protected $assessment;
 
@@ -236,7 +236,7 @@ class Instance implements ISoftDeletable {
     }
 
     /**
-     * @param  OnlineAssessment $assessment
+     * @param  Model $assessment
      * @return $this
      */
     public function setAssessment($assessment) {
@@ -245,7 +245,7 @@ class Instance implements ISoftDeletable {
     }
 
     /**
-     * @return OnlineAssessment
+     * @return Model
      */
     public function getAssessment() {
         return $this->assessment;

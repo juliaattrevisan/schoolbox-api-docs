@@ -1,11 +1,11 @@
 <?php
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
 
 try {
-    $quizMapper = new OnlineAssessmentMapper();
+    $quizMapper = new Mapper();
     $quiz = $quizMapper->findById($this->arg[1]);
 }
 catch (\Exception $e) {

@@ -13,7 +13,7 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Learning\Quiz\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 use Alaress\Lumberjack\Logger;
@@ -45,7 +45,7 @@ HELP;
 }
 $folderMapper = new FolderMapper();
 $submissionMapper = new SubmissionBoxMapper();
-$onlineAssessmentMapper = new OnlineAssessmentMapper();
+$onlineAssessmentMapper = new Mapper();
 $attemptMapper = new AttemptMapper();
 
 $resultMapper = new ReturnedWorkMapper();
