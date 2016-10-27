@@ -21,7 +21,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 
 /**
@@ -143,7 +143,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			'other_key' => 'id',
 		));
 		$this->hasJoin('attempt', array(
-			'mapper'    => Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class,
+			'mapper'    => Attempt\AttemptMapper::class,
 			'multiple'  => true,
 			'this_key'  => 'assess_id',
 			'other_key' => 'assess_id',
@@ -199,7 +199,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
 	public function softDeleteAttempts(Model $quiz)
     {
-        $quizAttemptMapper = Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::getInstance();
+        $quizAttemptMapper = Attempt\AttemptMapper::getInstance();
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // However this will also updated the 'deleted_at' field for already deleted items.
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);

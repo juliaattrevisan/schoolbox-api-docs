@@ -1,5 +1,5 @@
 <?php
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Learning\Quiz\Model;
 
@@ -44,7 +44,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 }
 
 try {
-	/** @var \Schoolbox\Assessment\Component\OnlineAssessment\Attempt $attempt */
+	/** @var \Schoolbox\Learning\Quiz\Attempt\Attempt $attempt */
 	$attempt = $attemptMapper->findById($this->arg[1]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {

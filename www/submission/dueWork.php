@@ -4,7 +4,7 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Learning\Quiz\Mapper;
-use \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 

@@ -14,7 +14,7 @@ define('PERMISSION_DENIED', false);
 
 use Schoolbox\Assessment\StudentReportCard;
 use Schoolbox\Assessment\Term;
-use \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
 
 // require sitepage context
 if(!isset($this)) {

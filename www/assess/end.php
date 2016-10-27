@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Breadcrumbs;
 

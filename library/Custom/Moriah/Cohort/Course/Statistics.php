@@ -9,7 +9,7 @@ namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
 use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\AttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;

@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\OnlineAssessment;
+namespace Schoolbox\Learning\Quiz\Attempt;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;

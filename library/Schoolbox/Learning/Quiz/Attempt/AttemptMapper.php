@@ -8,15 +8,18 @@
  */
 
 
-namespace Schoolbox\Assessment\Component\OnlineAssessment;
+namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
 use PDOStatement;
+use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
@@ -522,10 +525,14 @@ class AttemptMapper extends BaseMapper
             $statement,
             'aa',
             function ($mapper, $model, $row) {
+                /** @var Quiz $quiz */
+                $quiz = $this->hydrateJoin($row, 'assessment', 'as');
+                /** @var User $user */
+                $user = $this->hydrateJoin($row, 'user', 'u');
                 /** @var Attempt $model */
                 return $model
-                    ->setAssessment($this->hydrateJoin($row, 'assessment', 'as'))
-                    ->setUser($this->hydrateJoin($row, 'user', 'u'))
+                    ->setAssessment($quiz)
+                    ->setUser($user)
                 ;
             }
         );

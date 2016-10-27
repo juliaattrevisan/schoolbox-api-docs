@@ -7,15 +7,16 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Component\OnlineAssessment;
+namespace Schoolbox\Learning\Quiz\Attempt;
 
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Schoolbox\Learning\Quiz\Model;
-use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Mapper;
+use Schoolbox\Learning\Quiz\Attempt\Attempt;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -34,7 +35,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
 
-	/** @var Mapper */
+	/** @var QuizMapper */
 	protected $assessMapper;
 
     /** @var FolderMapper */
@@ -51,7 +52,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		if(empty($dependencies['assessMapper'])) {
-			$dependencies['assessMapper'] = Mapper::getInstance();
+			$dependencies['assessMapper'] = QuizMapper::getInstance();
 		}
         if (empty($dependencies['categoryMapper'])) {
             $dependencies['categoryMapper'] = FolderMapper::getInstance();
@@ -67,7 +68,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Mapper $mapper
+	 * @param QuizMapper $mapper
 	 */
 	protected function setAssessMapper($mapper) {
 		$this->assessMapper = $mapper;
@@ -120,7 +121,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
      * @return void
      */
     public function bundleTriggers($bundle) {
-        if ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+        if ($bundle->getMethod() == BaseMapper::METHOD_UPDATE) {
 			$diff = $bundle->getEvent()->getDiff();
             if (isset($diff['finish'])) {
                 $bundle->attach(self::TRIGGER_ATTEMPTED, self::IMMEDIATELY);
@@ -144,7 +145,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var Model $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
@@ -181,7 +182,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var Model $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
@@ -225,7 +226,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var Model $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {

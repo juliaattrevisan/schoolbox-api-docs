@@ -8,7 +8,7 @@
 
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Attempt;
 
 
 interface External_MarkbookInterface
