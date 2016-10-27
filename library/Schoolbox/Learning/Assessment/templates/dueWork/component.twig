@@ -20,9 +20,26 @@
                     </div>
                 </div>
                 <nav>
+
                     {% if isRouteAuthorized('learningAssessment.postUpdateAssessment', {assessmentId: assessable.id}) %}
                         <a class="icon-modify" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}" title="Modify"></a>
                     {% endif %}
+
+                    {% if assessment is quiz %}
+
+                        {# TODO: Replace hrefs with routeLookup #}
+                        {% if isRouteAuthorized('learningAssessment.postDeleteAssessment') %}
+                            <a class="icon-delete" href="/assess/delete/{{ assessable.quiz.id }}" data-action="delete" title="Delete Quiz"></a>
+                        {% endif %}
+                        <a class="icon-poll" href="/assess/results/{{ assessable.quiz.id }}" title="View Results"></a>
+
+                        {# TODO: Find way to work out if there are any attempts #}
+                        {% if true %}
+                            <a class="icon-list" href="/assess/attempts/{{ assessable.quiz.id }}/{{ user.id }}" title="See previous attempts"></a>
+                        {% endif %}
+
+                    {% endif %}
+
                 </nav>
                 <article {% if compact %}class="hide"{% endif %}>
                     {{ assessable.dueWork.description | purify }}

@@ -1,3 +1,6 @@
+{% include '@learningAssessment/dueWork/component.twig' %}
+
+{#
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
     <ul class="action-list">
@@ -6,7 +9,7 @@
                 <div class="list-item">
                     <div class="card small-12">
                         <h3>
-                            {# TODO: Replace href with routeLookup #}
+                            <!-- TODO: Replace href with routeLookup -->
                             {% if assessable.dueDate.isFuture %}<a href="/assess/intro/{{ assessable.quiz.id }}">{% endif %}
                                 {{ assessable.title }}
                             {% if assessable.dueDate.isFuture %}</a>{% endif %}
@@ -19,7 +22,7 @@
                     </div>
                 </div>
                 <nav>
-                    {# TODO: Replace hrefs with routeLookup #}
+                    <!-- TODO: Replace hrefs with routeLookup -->
                     {% if isRouteAuthorized('learningAssessment.postDeleteAssessment') %}
                         <a class="icon-delete" href="/assess/delete/{{ assessable.quiz.id }}" data-action="delete" title="Delete Quiz"></a>
                     {% endif %}
@@ -28,7 +31,7 @@
                     {% endif %}
                     <a class="icon-poll" href="/assess/results/{{ assessable.quiz.id }}" title="View Results"></a>
 
-                    {# TODO: Find way to work out if there are any attempts #}
+                    <!-- TODO: Find way to work out if there are any attempts -->
                     {% if true %}
                         <a class="icon-list" href="/assess/attempts/{{ assessable.quiz.id }}/{{ user.id }}" title="See previous attempts"></a>
                     {% endif %}
@@ -66,3 +69,4 @@
         });
     });
 </script>
+#}
