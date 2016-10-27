@@ -699,13 +699,12 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/:assessmentId/:userId
      * @level 165
-     * @param IAssessable $assessment
-     * @param User $student
+     * @param Participant $participant
      */
-    public function getSummary(IAssessable $assessment, User $student)
+    public function getSummary(Participant $participant)
     {
-        /* TODO load $participant in Module.php
-         */
+        $assessment = $participant->getAssessable();
+        $student    = $participant->getUser();
 
         /* There are no Summary views for Tasks; 404 them instead
          */
@@ -739,14 +738,6 @@ class Controller extends Base
          * You don't get a button
          */
         if ($assessment instanceof DueWork) {
-
-            /* Figure out if this student is actually participating
-             */
-            try {
-                $assessment->getParticipant($student);
-            } catch (\UnexpectedValueException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-            }
 
             $twigData = [
                 'breadcrumbs' => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment(

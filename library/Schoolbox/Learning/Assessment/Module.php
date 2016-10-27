@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
@@ -195,7 +196,28 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getStatus|getSummary|getStudentAssessment)',
+            '(?:getSummary)',
+            function ($params) {
+                try {
+                    $args = [];
+
+                    $args['participant'] = $this->getParticipantMapperProxy()->findForAssessmentAndUser(
+                        $this->getAssessmentMapperProxy()->findById($params['assessmentId']),
+                        $this->getUserMapper()->findById($params['studentId'])
+                    );
+
+                    return $args;
+                } catch (\OutOfBoundsException $e) {
+                    throw new NotFound($e->getMessage());
+                } catch (\Exception $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
+            }
+        );
+
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getStatus|getStudentAssessment)',
             function ($params) {
 
                 $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -485,4 +507,11 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
+    /**
+     * @return Participant\DataSource
+     */
+    protected function getParticipantMapperProxy()
+    {
+        return $this->injector->get('participantDataSource');
+    }
 }
