@@ -1,10 +1,6 @@
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
 
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
-<!-- END custom_head -->
-
 <ul class="breadcrumb">
     <li><a href="/">Schoolbox</a></li>
     <li class="active"><a href="{{ routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id }) }}" title="Pending Assessments">Pending Assessments</a></li>

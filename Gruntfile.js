@@ -14,10 +14,7 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js',
-                sourceMapRoot: '/',
-                sourceMapPrefix: 1,
-                sourceMappingURL: '<%= pkg.name %>.map.js'
+                sourceMap: true
             },
             main: {
                 // Bower files
@@ -63,6 +60,8 @@ module.exports = function(grunt) {
                     'www/javascript/components/foundation/js/foundation/foundation.tab.js',
                     'www/javascript/components/foundation/js/foundation/foundation.tooltip.js',
                     'www/javascript/shared/foundation.dropdown.js',
+                    'www/javascript/shared/jquery.tab-activator.js',
+                    'www/javascript/shared/jquery.collapsable.js',
 
                     // Side Navigation
                     // This includes the Flyout menu, on user profile drop down
@@ -78,8 +77,9 @@ module.exports = function(grunt) {
                     // DateTime
                     'www/javascript/components/moment/moment.js',
 
-                    // Fullcalendar
-                    'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
+                    // Calendar-related popups
+                    // (included in main because this can be used outside of a fullcalendar)
+                    'www/javascript/shared/calendar/jquery.calendar.js',
 
                     // Files And Resource Browser
                     'www/socialstream/browser/browser.js',
@@ -100,6 +100,18 @@ module.exports = function(grunt) {
                     // Data tables
                     'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
 
+                    // Toasts, popups to notify something has happened
+                    'www/javascript/shared/jquery.toast-timeout.js',
+
+                    // File uploading
+                    'www/javascript/resource/jquery.resourceAttach.js',
+
+                    // Image/File previewing
+                    'www/javascript/preview/preview.js',
+
+                    // Course selector
+                    'www/javascript/shared/course/jquery.course-selector.js',
+
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
                     // their own files/plugins
@@ -110,15 +122,34 @@ module.exports = function(grunt) {
                     //'www/javascript/math/jqmath-0.4.0.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
+            },
+            masonry: {
+                src:  [
+                    // Colour handling
+                    'www/javascript/components/spectrum/spectrum.js',
+
+                    // homepage editing
+                    'www/javascript/shared/masonry/jquery.masonry.js',
+                    'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
+                ],
+                dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js'
+            },
+            fullcalendar: {
+                src:  [
+                    // System for displaying calendars and associated popups
+                    'www/javascript/components/fullcalendar/dist/fullcalendar.js',
+                    'www/javascript/shared/calendar/jquery.fullcalendar.js'
+                ],
+                dest: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js'
             }
         },
         clean: {
-            js: ['www/javascript/components/schoolbox.{min,map}.js'],
+            js: ['www/javascript/components/schoolbox*.min.js*'],
             css: ['www/css/*/chrome.css']
         }
     });
 
-    require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
+    require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     // Build tasks
     grunt.registerTask('build.js',   ['uglify']);

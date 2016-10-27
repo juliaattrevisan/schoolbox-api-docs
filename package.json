@@ -1,23 +1,19 @@
 {
   "name": "schoolbox",
-  "version": "14.0.0",
+  "version": "16.5.0",
   "author": "Alaress Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {},
   "devDependencies": {
-    "bless": "^3.0.3",
-    "bower": "~1.3.12",
-    "glob": "~3.2.7",
-    "grunt": "~0.4.2",
-    "grunt-bless": "^0.2.0",
-    "grunt-bower-task": "~0.4.0",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-mincss": "~0.3.2",
-    "grunt-contrib-uglify": "~0.2.7",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-shell": "~0.6.1",
-    "jit-grunt": "~0.2.0",
-    "shelljs": "~0.2.6"
+    "bless": "^4.0.4",
+    "bower": "^1.7.9",
+    "grunt": "^1.0.1",
+    "grunt-bower-task": "^0.4.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-shell": "^2.0.0",
+    "jit-grunt": "^0.10.0",
+    "shelljs": "^0.2.6"
   },
   "license": "Commercial",
   "repository": {
