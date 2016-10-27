@@ -56,9 +56,18 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Select queries
     $selectTaskQuery = $db->prepare("
-        SELECT id, category_id, title, assess_id, box_id, created_at, deleted_at
-        FROM task
-        WHERE COALESCE(assessment_id, 0) = 0
+        SELECT 
+            t.id,
+            t.category_id,
+            t.title,
+            `as`.assess_id,
+            sb.id AS box_id,
+            t.created_at,
+            t.deleted_at
+        FROM task t
+        LEFT JOIN submission_box sb ON t.id = sb.task_id
+        LEFT JOIN assess `as` ON t.id = `as`.task_id
+        WHERE COALESCE(t.assessment_id, 0) = 0
     ");
     $selectQuizWeightQuery    = $db->prepare("SELECT weight FROM assess WHERE assess_id = :assessId");
     $selectDueWorkWeightQuery = $db->prepare("SELECT weight FROM submission_box WHERE id = :boxId");
