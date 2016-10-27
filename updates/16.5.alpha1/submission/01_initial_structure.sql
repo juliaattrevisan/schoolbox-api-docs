@@ -202,7 +202,9 @@ ALTER TABLE `task`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
 ALTER TABLE `submission_box`
-ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
+ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`,
+CHANGE COLUMN `date` `date` DATETIME NULL;
+
 
 -- New component configuration type for a course outline component's Imported Courses
 INSERT INTO `component_config_definition` (

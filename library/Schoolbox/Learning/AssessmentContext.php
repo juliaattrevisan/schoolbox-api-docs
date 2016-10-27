@@ -48,4 +48,12 @@ interface AssessmentContext
      * @return FolderModel
      */
     public function getFolder();
+
+    /**
+     * Get the base level context for finding where you are actually located
+     * This is only really provide something different for projects which have multiple parents
+     *
+     * @return AssessmentContext
+     */
+    public function getBaseContext();
 }

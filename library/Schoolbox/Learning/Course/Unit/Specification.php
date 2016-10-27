@@ -139,6 +139,14 @@ class Specification implements AssessmentContext, ISoftDeletable
     }
 
     /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
+    }
+
+    /**
      * Deep clone object properties.
      */
     public function __clone()

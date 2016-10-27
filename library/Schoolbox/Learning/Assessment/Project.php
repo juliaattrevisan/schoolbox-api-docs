@@ -262,4 +262,14 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         return $this->getContext()->getFolder();
     }
+
+    /** Retreives the parent context of this project
+     *
+     * @return AssessmentContext
+     */
+    public function getBaseContext()
+    {
+        return $this->getContext();
+    }
+
 }

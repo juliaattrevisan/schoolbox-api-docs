@@ -15,11 +15,44 @@
     Title
     <input type="text" name="title" value="{{ assessment.title }}" required />
 </label>
-
+<label>
+    Type
+    <select name="type">
+    </select>
+</label>
 <label>
     Description
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
+
+<div class="row">
+    <div class="small-12 columns">
+        <label>Attach Files</label>
+        {% include 'sub/attachzone.twig' %}
+    </div>
+</div>
+<legend>Submissions</legend>
+<div class="row">
+    <div class="small-12 columns">
+        <label for="acceptOnline">Accepts Online Submissions?</label>
+        <select name="acceptOnline">
+            {% set options = {
+            0: 'None',
+            1: 'Single',
+            2: 'Multiple'
+            }
+            %}
+            {% for index, title in options %}
+                <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% if baseContextType != 'unitspec'  %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
+<legend>Grading</legend>
 
 <label>
     Weight
@@ -29,35 +62,8 @@
 {% import 'sub/visibility.twig' as visibility %}
 {{ visibility.dropdown(assessment.visibility) }}
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
-{% include '@learningAssessment/fragments/dates.twig' %}
-
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-
-<div class="row">
-    <div class="small-12 columns">
-        <label>Attach Files</label>
-        {% include 'sub/attachzone.twig' %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <label for="acceptOnline">Accepts Online Submissions?</label>
-        <select name="acceptOnline">
-            {% set options = {
-                0: 'None',
-                1: 'Single',
-                2: 'Multiple'
-            }
-            %}
-            {% for index, title in options %}
-            <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
 
 {% include '@learningAssessment/fragments/markType.twig' %}
 
@@ -93,5 +99,8 @@
         </div>
     </div>
 </div>
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+
 
 {{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}

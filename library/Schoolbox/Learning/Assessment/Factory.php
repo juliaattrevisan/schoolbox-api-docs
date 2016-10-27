@@ -33,7 +33,7 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
-
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 class Factory
 {
@@ -256,35 +256,33 @@ class Factory
             throw new \InvalidArgumentException('set an assessment title');
         }
 
-        /* Check dates are provided
-         * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
-         */
-        try {
-            $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('set a publish date');
-        }
+        if(!$assessment->getContext()->getBaseContext() instanceof UnitSpecification) {
+            /* Check dates are provided
+             * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
+             */
+            try {
+                $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException('set a publish date');
+            }
 
-        try {
-            $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('set a open date');
-        }
+            try {
+                $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException('set a open date');
+            }
 
-        try {
-            $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('set a due date');
-        }
+            try {
+                $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException('set a due date');
+            }
 
-        try {
-            $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
-        }
-        catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('set a close date');
+            try {
+                $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException('set a close date');
+            }
         }
 
         /* Start manufacturing
