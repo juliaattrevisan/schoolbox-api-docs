@@ -7,6 +7,8 @@
 
 {% if assessment.description|length %}
 <section class="content">
-    {{ assessment.description | purify }}
+    <article>
+        {{ assessment.description | purify }}
+    </article>
 </section>
 {% endif %}

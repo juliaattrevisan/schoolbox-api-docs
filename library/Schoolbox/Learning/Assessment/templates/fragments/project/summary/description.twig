@@ -8,21 +8,13 @@
     {% endif %}
 </ul>
 
-<section data-more="150">
-    <ul class="information-list">
-        <li class="description">
-            <div class="list-item"></div>
-            <article>
-                {{ assessment.description | purify }}
-            </article>
-        </li>
-    </ul>
-    <div class="component-action more hide">
-        <section>
-            <a style="width:100%" class="button icon-down-arrow" href="#">Show Full Description</a>
-        </section>
-    </div>
+{% if assessment.description|length %}
+<section class="content">
+    <article>
+        {{ assessment.description | purify }}
+    </article>
 </section>
+{% endif %}
 
 <script>
     $(function () {
