@@ -436,24 +436,26 @@ class Controller extends Base
          *
          * Otherwise return to whatever context you came from
          */
-        if ($assessment instanceof Project) {
+        // Was a return_url explicitly specified?
+        $explicitReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
+        if ($explicitReturnUrl) {
+            $returnUrl = Redirect::decode($explicitReturnUrl);
+        }
+        elseif ($assessment instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
         }
         elseif ($assessment->getContext() instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
         }
-        elseif (strlen($this->getRequest()->post[Redirect::RETURN_URL])) {
-            $returnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
-        }
         else {
             $returnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
 
-        $data = [
-            Redirect::RETURN_URL => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        if($this->getRequest()->isXhr()){
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+        } else {
+            $this->getResponse()->redirect->to($returnUrl);
+        }
     }
 
     /**
@@ -475,6 +477,7 @@ class Controller extends Base
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
+            'return_url'      => $this->getRequest()->query->get('return_url'),
         ];
 
         /* Special treatment for projects for now
@@ -498,7 +501,7 @@ class Controller extends Base
             $data['allSummators']  = $summatorMapping;
         }
 
-        $template = "@learningAssessment/fragments/{$types->objectToString($assessment)}/update.twig";
+        $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
 
     }
@@ -509,6 +512,8 @@ class Controller extends Base
      * This happens after the common details are saved and after
      * you've chosen one of project, due work, task, or quiz
      *
+     * @api POST /learning/assessment/{assessmentId}/update
+     * @level 165
      * @param IAssessable $assessment
      */
     public function postUpdateAssessment(IAssessable $assessment)
@@ -541,11 +546,11 @@ class Controller extends Base
             $returnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
 
-        $data = [
-            Redirect::RETURN_URL => $returnUrl
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        if($this->getRequest()->isXhr()){
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
+        } else {
+            $this->getResponse()->redirect->to($returnUrl);
+        }
     }
 
     /**
@@ -633,7 +638,7 @@ class Controller extends Base
         $folder = $assessment->getContext()->getFolder();
         $explicitReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
 
-        // Did caller explicitly specify a returnUrl ?
+        // Did caller explicitly specify a return_url ?
         if($explicitReturnUrl) {
             $returnUrl = $explicitReturnUrl;
         } else {
