@@ -640,7 +640,7 @@ class Controller extends Base
 
         // Did caller explicitly specify a return_url ?
         if($explicitReturnUrl) {
-            $returnUrl = $explicitReturnUrl;
+            $returnUrl = Redirect::decode($explicitReturnUrl);
         } else {
             // Did we delete an item from a Project ?
             if($assessment->getContext() instanceof Project){
