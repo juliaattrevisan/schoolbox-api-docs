@@ -397,11 +397,6 @@ $kernel->run
                                 continue;
                             }
 
-                            if ($unmarkedCount == 0) {
-                                // rubric grid is fully marked; skip!
-                                continue;
-                            }
-
                             $markCache[$studentId] = $oldGrid->getSum() / $markedDenominator;
                         }
                     }
