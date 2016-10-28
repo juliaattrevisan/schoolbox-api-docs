@@ -63,7 +63,7 @@
 
                         // Is this the last match in an archived season ?
                         if( $season.data('archived') && 1 == $season.find('[data-match]').length){
-                            $season.fadeOut({ done: $season.remove() });
+                            $season.fadeOut({ done: function(){$season.remove();} });
 
                             var currentSeasonId = $seasonDropdown.val();
 
@@ -80,7 +80,7 @@
                         if( 1 == $('[data-match]').length){
                             window.location.href = window.location.href;
                         } else {
-                            $match.fadeOut({ done: $match.remove() });
+                            $match.fadeOut({ done: function(){$match.remove();} });
                         }
                     });
                 }
