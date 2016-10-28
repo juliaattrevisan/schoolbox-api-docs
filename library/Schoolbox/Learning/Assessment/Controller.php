@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -236,6 +237,7 @@ class Controller extends Base
 
         if ($assessment){
             $data = array_merge($data, [
+                'allWorkTypes'   => $this->getAllWorkTypes(),
                 'allMarkTypes'   => $this->getAllMarkTypes($assessment),
                 'assessmentType' => AssessmentType::objectToString($assessment),
             ]);
@@ -385,6 +387,7 @@ class Controller extends Base
             'attachzone'      => $zone->getTwigContext(),
             'folder'          => $assessment->getContext()->getFolder(),
             'curriculumNodes' => $assessment->getContext()->getFolder()->getCurriculumNodes(),
+            'allWorkTypes'    => $this->getAllWorkTypes(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
@@ -1047,6 +1050,18 @@ class Controller extends Base
     private function getAllMarkTypes(IAssessable $assessable)
     {
         return MarkSchemeFactory::getAvailableMarkTypes($assessable);;
+    }
+
+    /**
+     * Gets all work types for due work.
+     *
+     * TODO DI this if you feel like it
+     *
+     * @return WorkType[]|Collection
+     */
+    private function getAllWorkTypes()
+    {
+        return WorkTypeMapper::getInstance()->findAll();
     }
 
     /**
