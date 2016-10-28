@@ -68,15 +68,20 @@
         $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
             event.preventDefault();
 
-            var itemName = $(this).closest('[data-assessment]').find('[data-assessment-title]').text();
+            var $item = $(this).closest('[data-assessment]');
+            var itemName = $item.find('[data-assessment-title]').text();
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete ' + itemName + '?',
                 confirmLabel: 'Yes, delete it',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function (anchor) {
-                    $.post(anchor.attr('href')).done(function() {
-                        location.reload();
+                    $.post(anchor.attr('href')).done(function () {
+                        $item.fadeOut({
+                            done: function () {
+                                $item.remove();
+                            }
+                        });
                     });
                 }
             });
