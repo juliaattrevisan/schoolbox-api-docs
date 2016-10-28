@@ -18,7 +18,7 @@
 </label>
 <label>
     Type
-    <select name="type">
+    <select name="workType">
         {% for workType in allWorkTypes %}
             <option value="{{ workType.id }}" {% if assessment.type.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
         {% endfor %}
