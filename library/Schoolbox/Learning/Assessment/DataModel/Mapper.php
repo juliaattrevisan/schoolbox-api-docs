@@ -171,6 +171,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
+                {$this->getJoinColumnString('duework.work_type', 'dt')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
@@ -181,11 +182,11 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
-                -- May need to hydrate project's context too!
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            -- Allow join onto deleted objects
+            -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('duework.work_type', 'd', 'dt')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
@@ -224,7 +225,10 @@ class Mapper extends BaseMapper
 
             // Due work?
             if ($row['d.id']) {
-                $model->setDueWork($this->hydrateJoin($row, 'duework', 'd'));
+                $model->setDueWork(
+                    $this->hydrateJoin($row, 'duework', 'd')
+                         ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
+                );
                 $dueWorkIds[] = $row['d.id'];
             } else {
                 $model->setDueWork(null);
