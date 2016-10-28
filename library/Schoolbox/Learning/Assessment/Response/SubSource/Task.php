@@ -7,23 +7,15 @@
 
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy;
-use Schoolbox\Learning\Assessment\Task\Completion\Model;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 
 /**
  * Sub-source for task responses.
  */
-class Task implements IResponseDataSource
+class Task extends AbstractSubSource
 {
-    /**
-     * @var MapperProxy
-     */
-    protected $mapperProxy;
-
     /**
      * Constructor
      *
@@ -31,29 +23,14 @@ class Task implements IResponseDataSource
      */
     public function __construct(MapperProxy $mapperProxy)
     {
-        $this->mapperProxy = $mapperProxy;
+        parent::__construct($mapperProxy);
     }
+
     /**
      * @inheritdoc
      */
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof TaskObject;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     * @return Collection|Model[]
-     */
-    public function findForAssessment(IAssessable $assessment)
-    {
-        if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
-                                     ->map(function ($item) use ($assessment) {
-                                         /** @var Model $item*/
-                                         return $item->setAssessable($assessment);
-                                     });
-        }
-        return new Collection();
     }
 }
