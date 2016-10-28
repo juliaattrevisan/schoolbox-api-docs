@@ -243,7 +243,7 @@ class Controller extends Base
             // Due Work can have Rubrics
             if ($assessment instanceof DueWork) {
                 $data['allWorkTypes'] = $this->getAllWorkTypes();
-                $data = array_merge($data, $this->generateRubricTwigData($assessment);
+                $data = array_merge($data, $this->generateRubricTwigData($assessment));
             }
 
             /* Projects have a Summator
@@ -485,7 +485,7 @@ class Controller extends Base
         // Due Work can have Rubrics
         if ($assessment instanceof DueWork) {
             $data['allWorkTypes'] = $this->getAllWorkTypes();
-            $data = array_merge($data, $this->generateRubricTwigData($assessment);
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
         }
 
         if ($assessment instanceof Project) {
