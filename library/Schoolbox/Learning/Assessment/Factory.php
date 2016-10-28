@@ -133,6 +133,7 @@ class Factory
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline(trim($post['acceptOnline']));
+        $this->setWorkType(trim($post['workType']));
         $this->setMarkType(trim($post['markType']));
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUsesRubric(trim($post['useRubric']));
@@ -227,6 +228,7 @@ class Factory
         } elseif ($assessment instanceof DueWork) {
             $decorator = new DueWorkDecorator(
                 $this->getAcceptOnline(),
+                $this->getWorkType(),
                 $this->getMarkType(),
                 $this->getGradingScheme(),
                 $this->getUsesRubric(),
