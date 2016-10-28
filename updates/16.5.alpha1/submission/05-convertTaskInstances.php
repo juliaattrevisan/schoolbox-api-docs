@@ -128,6 +128,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectTaskInstanceQuery->execute();
     $log->debug(sprintf('%d task instances found', $selectTaskInstanceQuery->rowCount()));
     $successCount = 0;
+    $warningCount = 0;
     $failureCount = 0;
     foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $taskId               = $row['id'];
@@ -216,6 +217,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->warning('This is probably because this implementation of an assessment has no specification.');
                 $log->warning('This is probably okay, because an assessment to be added to an implementation separate from its specification.');
                 $log->warning($e->getMessage());
+                $warningCount++;
             }
 
             // Create the task out of this assessment
@@ -256,6 +258,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
     }
 
-    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    $log->info(sprintf('%d task instances converted (%d warnings), %d failed to convert', $successCount, $warningCount, $failureCount));
     exit($failureCount > 0 ? 1 : 0);
 });

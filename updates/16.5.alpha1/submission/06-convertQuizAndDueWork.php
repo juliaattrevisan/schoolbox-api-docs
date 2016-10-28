@@ -108,6 +108,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         )
     );
     $successCount = 0;
+    $warningCount = 0;
     $failureCount = 0;
     $rows = array_merge($selectDueWorksQuery->fetchAll(PDO::FETCH_ASSOC), $selectQuizzesQuery->fetchAll(PDO::FETCH_ASSOC));
     foreach ($rows as $row) {
@@ -170,6 +171,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->warning('This is probably because the folder in which this assessment lives has been deleted.');
                 $log->warning('This assessment will be orphaned (it likely was already).');
                 $log->warning($e->getMessage());
+                $warningCount++;
             }
 
             $successCount++;
@@ -184,6 +186,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
     }
 
-    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    $log->info(sprintf('%d tasks converted (%d warnings), %d failed to convert', $successCount, $warningCount, $failureCount));
     exit($failureCount > 0 ? 1 : 0);
 });

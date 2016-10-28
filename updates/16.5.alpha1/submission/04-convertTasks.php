@@ -113,6 +113,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectTaskQuery->execute();
     $log->debug(sprintf('%d tasks found', $selectTaskQuery->rowCount()));
     $successCount = 0;
+    $warningCount = 0;
     $failureCount = 0;
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $taskId   = $row['id'];
@@ -173,10 +174,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->debug('Created assessment/unit specification relation');
             } catch (PDOException $e) {
                 // If this failed - most likely there WAS a course builder here, but there is no longer.
-                $log->warning('Could not create assessment/unit specification relation!');
-                $log->warning('This is probably because the course builder that was here was deleted.');
-                $log->warning('Attempting to recreate the relation.');
-                $log->warning($e->getMessage());
+                // I won't count this as a warning yet.
+                $log->info('Could not create assessment/unit specification relation.');
+                $log->info('This is probably because the course builder that was here was deleted.');
+                $log->info('Attempting to recreate the relation.');
 
                 // Try to rebuild the course/unit that was here, but create it as deleted.
                 $selectCourseIdQuery->execute(['folderId' => $folderId]);
@@ -202,6 +203,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     $log->warning('This is probably because either the course or unit specification folder was deleted.');
                     $log->warning('This assessment will be orphaned (it likely was already).');
                     $log->warning($e->getMessage());
+                    $warningCount++;
                 }
             }
 
@@ -217,6 +219,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
     }
 
-    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    $log->info(sprintf('%d tasks converted (%d warnings), %d failed to convert', $successCount, $warningCount, $failureCount));
     exit($failureCount > 0 ? 1 : 0);
 });

@@ -80,6 +80,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $successCount++;
         } catch (PDOException $e) {
             $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse['name']), [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             continue;
         }
@@ -103,6 +104,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $unitSuccessCount++;
             } catch (PDOException $e) {
                 $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit['name']), [$e]);
+                $log->warning($e->getMessage());
                 $unitFailureCount++;
             }
         }
