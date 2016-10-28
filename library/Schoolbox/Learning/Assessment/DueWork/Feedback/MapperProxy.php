@@ -40,7 +40,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private $internalQuery = 'SELECT id FROM submission_box';
+    private $selectString = 'SELECT id FROM submission_box';
 
     /**
      * This only works with the Due Work Return mapper
@@ -71,9 +71,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @return string
      */
-    protected function getInternalQuery()
+    protected function getSelectString()
     {
-        return $this->internalQuery;
+        return $this->selectString;
     }
 
     /**

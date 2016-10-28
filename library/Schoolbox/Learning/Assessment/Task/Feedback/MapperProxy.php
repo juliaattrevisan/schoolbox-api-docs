@@ -40,7 +40,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private $internalQuery = 'SELECT id FROM task';
+    private $selectString = 'SELECT id FROM task';
 
     /**
      * This only works with the Task Completion mapper
@@ -85,9 +85,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @return string
      */
-    protected function getInternalQuery()
+    protected function getSelectString()
     {
-        return $this->internalQuery;
+        return $this->selectString;
     }
 
     /**

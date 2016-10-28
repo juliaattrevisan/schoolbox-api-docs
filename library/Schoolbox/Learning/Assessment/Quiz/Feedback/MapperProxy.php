@@ -40,7 +40,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private $internalQuery = 'SELECT assess_id FROM assess';
+    private $selectString = 'SELECT assess_id FROM assess';
 
     /**
      * This only works with the Quiz Attempt mapper
@@ -84,9 +84,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @return string
      */
-    protected function getInternalQuery()
+    protected function getSelectString()
     {
-        return $this->internalQuery;
+        return $this->selectString;
     }
 
     /**

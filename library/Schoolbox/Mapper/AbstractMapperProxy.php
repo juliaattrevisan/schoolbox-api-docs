@@ -97,7 +97,7 @@ abstract class AbstractMapperProxy
     /**
      * @return string
      */
-    protected abstract function getInternalQuery();
+    protected abstract function getSelectString();
 
     /**
      * @param $externalValues
@@ -115,7 +115,7 @@ abstract class AbstractMapperProxy
         $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($externalValues);
 
         $query = "
-            {$this->getInternalQuery()}
+            {$this->getSelectString()}
             WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
