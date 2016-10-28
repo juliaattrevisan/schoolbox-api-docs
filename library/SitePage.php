@@ -421,7 +421,7 @@ class SitePage extends \Page
                     }
                 }
                 //Skip if user account is disable
-                if($linkedUser->getEnabled() != 1) {
+                if(!$linkedUser->getEnabled()) {
                     continue;
                 }
                 /* Fully hydrate, note this stores back in session so it only happens once */
