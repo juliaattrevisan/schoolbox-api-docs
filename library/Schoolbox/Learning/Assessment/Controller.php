@@ -919,7 +919,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
             'breadcrumbs'    => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
-            'participant'    => $student,
+            'student'    => $student,
             'currentUser'    => $this->getUser(),
             'attachzone'     => $zone->getTwigContext(),
             'response'       => $latestResponse,
