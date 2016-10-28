@@ -56,7 +56,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, participantId: participant.id}) }}',
+                url: '{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}',
                 data: formContents,
                 complete: function () {
                     // Re-init the autosave
@@ -205,9 +205,9 @@
         </div>
         <div class="row">
             <div class="small-12 island">
-                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, participantId: participant.id}) }}" enctype="multipart/form-data">
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}" enctype="multipart/form-data">
                     <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
-                    <input type="hidden" name="participantId" value="{{ participant.id }}" />
+                    <input type="hidden" name="studentId" value="{{ student.id }}" />
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
@@ -215,7 +215,7 @@
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if currentUser.id != participant.id %}On Behalf Of {{ participant.formatName }}{% endif %}" data-action-save />
+                    <input type="submit" value="Submit for Assessment {% if currentUser.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
