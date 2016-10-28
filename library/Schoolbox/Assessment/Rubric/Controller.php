@@ -10,14 +10,15 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Model as File;
 use Url;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 class Controller extends BaseController
 {
@@ -72,7 +73,7 @@ class Controller extends BaseController
     /**
      * AJAX method for creating a new group or criterion
      *
-     * @api POST /rubric/create
+     * @api POST /rubric
      * @level 156
      */
     public function create()
@@ -133,7 +134,7 @@ class Controller extends BaseController
      * @api POST /rubric/import/{storageTuple}
      * @level 156
      *
-     * @param IStorage      $file
+     * @param File $file
      */
     public function import($file)
     {
@@ -148,11 +149,9 @@ class Controller extends BaseController
             if ($boxId = $post->get('boxId')) {
                 $box = SubmissionBoxMapper::getInstance()->findById($boxId);
                 $folderId = $box->getCategory()->getId();
-                $taskMode = $box->getTask()->getId() > 0;
 
             } elseif ($folderId = $post->get('folderId')) {
                 $box = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
-                $taskMode = $post->get('task', false);
 
             } else {
                 // can't work with that
@@ -161,7 +160,7 @@ class Controller extends BaseController
 
             // attempt to build the grid
             $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
-            $grid = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels, $taskMode)->setSubmissionBox($box);
+            $grid = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels)->setSubmissionBox($box);
 
         } catch (\Exception $e) {
 
@@ -475,7 +474,17 @@ class Controller extends BaseController
     }
     public function testFolder($folderId)
     {
-        $this->outputTest($this->getMapper()->findByFolderId($folderId));
+        $folderLookup = [$folderId];
+
+        // Determine if the specified folder has a UnitSpec
+        /** @var UnitSpecification $unitSpec */
+        $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+        if($unitSpec){
+            // Add the Unit's Course's Folder's ID
+            $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
+        }
+
+        $this->outputTest($this->getMapper()->createForFolder($folderLookup[0], $folderLookup[1]));
     }
 
     protected function outputTest(Rubric $grid)

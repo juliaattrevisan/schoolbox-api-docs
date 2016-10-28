@@ -11,7 +11,7 @@
             var wrap   = $(this),
                 target = wrap.find('[data-replaceable]'),
                 body   = $('body'),
-                boxIdInput, catIdInput, isTaskInput, postdata;
+                boxIdInput, folderIdInput, isTaskInput, postdata;
 
 
             // perform an ajax-replace of the target via the hash we've been given
@@ -26,11 +26,11 @@
                 };
 
             } else {
-                catIdInput = body.find('input[name="category"]');
+                folderIdInput = body.find('input[name=folderId]');
 
-                if (catIdInput.length == 1 && catIdInput.val() > 0) {
+                if (folderIdInput.length == 1 && folderIdInput.val() > 0) {
                     postdata = {
-                        folderId: catIdInput.val()
+                        folderId: folderIdInput.val()
                     };
 
                 } else {
@@ -102,6 +102,7 @@
     });
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
+    <input type="hidden" name="folderId" value="{{ folderId }}" />
     {% if test %}<input type="hidden" name="id" value="{{ test }}" />{% endif %}
     <div data-hideable>
         <div data-replaceable>

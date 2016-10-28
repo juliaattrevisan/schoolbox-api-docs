@@ -33,12 +33,17 @@ trait DueWorkTrait
     /**
      * @var bool
      */
-    protected $hasRubric = false;
+    protected $useRubric = false;
+
+    /**
+     * @var array|null
+     */
+    protected $rubricData;
 
     /**
      * @var bool
      */
-    protected $hasMarkPerCapability = false;
+    protected $markPerCapability = false;
 
     /**
      * @var array|string[]
@@ -102,36 +107,36 @@ trait DueWorkTrait
     /**
      * @return boolean
      */
-    protected function getHasRubric()
+    protected function getUsesRubric()
     {
-        return $this->hasRubric;
+        return $this->useRubric;
     }
 
     /**
-     * @param boolean $hasRubric
+     * @param boolean $usesRubric
      * @return $this
      */
-    protected function setHasRubric($hasRubric)
+    protected function setUsesRubric($usesRubric)
     {
-        $this->hasRubric = $hasRubric;
+        $this->useRubric = $usesRubric;
         return $this;
     }
 
     /**
      * @return boolean
      */
-    protected function getHasMarkPerCapability()
+    protected function getMarkPerCapability()
     {
-        return $this->hasMarkPerCapability;
+        return $this->markPerCapability;
     }
 
     /**
-     * @param boolean $hasMarkPerCapability
+     * @param boolean $markPerCapability
      * @return $this
      */
-    protected function setHasMarkPerCapability($hasMarkPerCapability)
+    protected function setMarkPerCapability($markPerCapability)
     {
-        $this->hasMarkPerCapability = $hasMarkPerCapability;
+        $this->markPerCapability = $markPerCapability;
         return $this;
     }
 
@@ -149,6 +154,24 @@ trait DueWorkTrait
     protected function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
+    }
+
+    /**
+     * @return array|null $rubricData
+     */
+    protected function getRubricData()
+    {
+        return $this->rubricData;
+    }
+
+    /**
+     * @param array|null $rubricData
+     * @return static
+     */
+    protected function setRubricData(array $rubricData = null)
+    {
+        $this->rubricData = $rubricData;
+        return $this;
     }
 
     /**

@@ -8,8 +8,12 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result as RubricResult;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\ResultMapper as RubricResultMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
@@ -22,7 +26,6 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
@@ -89,6 +92,11 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
@@ -97,6 +105,7 @@ class Controller extends Base
      * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      * @param Participant\DataSource $participantDataSource
+     * @param RubricMapper $rubricMapper
      */
     public function __construct(
         FolderMapper $folderMapper,
@@ -105,7 +114,8 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentMapperProxy,
         UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
         UnitImplementationMapperProxy $unitImplementationMapperProxy,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        RubricMapper $rubricMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
@@ -114,6 +124,7 @@ class Controller extends Base
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
         $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
         $this->setParticipantDataSource($participantDataSource);
+        $this->setRubricMapper($rubricMapper);
     }
 
     /**
@@ -195,9 +206,6 @@ class Controller extends Base
      */
     private function getSelectAssessmentData(AssessmentContext $context, IAssessable $assessment = null)
     {
-        $zoneFactory = new ZoneFactory();
-        $zone = $zoneFactory->buildForAssessmentType($assessment);
-
         /* Set defaults */
         if($assessment != null && empty($assessment->getId())) {
             $assessment
@@ -215,18 +223,50 @@ class Controller extends Base
             'contextType'     => AssessmentContextType::objectToString($context),
             'baseContextType' => AssessmentContextType::objectToString($context->getBaseContext()),
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromContext($context, $assessment),
-            'attachzone'      => $zone->getTwigContext(),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
             'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
-            'types' => [
+        ];
+
+        // Did caller specify the AssessmentType ?
+        if($assessment instanceof AbstractAssessment){
+            $data['assessmentType'] = AssessmentType::objectToString($assessment);
+            $data['allMarkTypes'] = $this->getAllMarkTypes($assessment);
+            $data['allGradeSchemes'] = $this->getAllGradeSchemes();
+
+            // DueWork and Tasks can have files attached
+            if($assessment instanceof DueWork || $assessment instanceof Task){
+                $zoneFactory = new ZoneFactory();
+                $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
+            }
+
+            // Due Work can have Rubrics
+            if ($assessment instanceof DueWork) {
+                $data['allWorkTypes'] = $this->getAllWorkTypes();
+                $data = array_merge($data, $this->generateRubricTwigData($assessment));
+            }
+
+            /* Projects have a Summator
+             */
+            if ($assessment instanceof Project) {
+                $data['allSummators'] = new SummatorMapping();
+            }
+
+        } else {
+            $data['types'] = [
                 ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work'],
                 ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
                 ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
-            ]
-        ];
-        // TODO, 'types' should just be the 3 objects, and twig can do the rest
-        // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+            ];
+            // TODO, 'types' should just be the 3 objects, and twig should do the rest
+            // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+
+            // Ensure we don't provide an option to spawn a Project inside a Project context
+            if (!$context instanceof Project) {
+                $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
+                array_unshift($data['types'], $item);
+            }
+        }
 
         // Do caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get('return_url');
@@ -235,29 +275,38 @@ class Controller extends Base
             $data['returnUrl'] = $returnUrl;
         }
 
-        if ($assessment){
-            $data = array_merge($data, [
-                'allWorkTypes'   => $this->getAllWorkTypes(),
-                'allMarkTypes'   => $this->getAllMarkTypes($assessment),
-                'assessmentType' => AssessmentType::objectToString($assessment),
-            ]);
-        }
-
-        /* Used to hide a ui element, preventing Projects being an option
-         * to spawn inside a Project context
-         */
-        if (!$context instanceof Project) {
-            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
-            array_unshift($data['types'], $item);
-        }
-
-        /* Special treatment for projects for now
-         */
-        if ($assessment instanceof Project) {
-            $data['allSummators'] = new SummatorMapping();
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
+    }
+
+    /**
+     * Common logic when generating Rubrics
+     *
+     * @param DueWork $dueWork
+     * @return array
+     */
+    private function generateRubricTwigData(DueWork $dueWork)
+    {
+        $data = [];
+
+        $data['rubric'] = $dueWork->getRubric()->toContext();
+
+        $rubricZone = new Zone('rubric');
+        // JS file.type isn't set reliably enough to use text/csv mime filter
+        $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
+        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+        /** @var RubricResult[] $resultSets */
+        $resultSets = RubricResultMapper::getInstance()->findAll();
+        $rs = new Collection();
+        foreach ($resultSets as $result) {
+            if (!$rs[$result->getResultSetId()] instanceof Collection) {
+                $rs[$result->getResultSetId()] = new Collection();
+            }
+            $rs[$result->getResultSetId()][$result->getValue()] = $result;
+        }
+        $data['rubricResultSets'] = $rs;
+
+        return $data;
     }
 
     /**
@@ -268,16 +317,15 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
-        /* TODO: Check against ($contextId, $contextType) as well
-         */
         try {
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
-        }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid folder' ]);
+        } catch (MapperException $e) {
+            $this->sendError('Could not create assessment', ['select a valid folder']);
             return;
         }
 
+        $contextType = $this->getRequest()->post['contextType'];
+        $contextId = $this->getRequest()->post['contextId'];
         $assessmentType = $this->getRequest()->post['assessmentType'];
 
         /* Common data among all assessmentType fragments
@@ -293,23 +341,63 @@ class Controller extends Base
                 ->setWeight(0);
 
         if($assessment instanceof DueWork){
-            $assessment
-                ->useRubric()
+            /** @var DueWork $dueWork */
+            $dueWork = $assessment;
+            $dueWork
+                ->setUseRubric(false)
                 ->setAcceptsMultiple();
+
+            switch($contextType) {
+                case AssessmentContextType::TYPE_FOLDER:
+                    $context = $this->getFolderMapper()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION:
+                    $context = $this->getUnitImplementationMapperProxy()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_UNIT_SPECIFICATION:
+                    $context = $this->getUnitSpecificationMapperProxy()->findById($contextId);
+                    break;
+                case AssessmentContextType::TYPE_PROJECT:
+                    $context = $this->getAssessmentMapperProxy()->findById($contextId);
+                    break;
+                default:
+                    $context = null;
+            }
+            $dueWork->setContext($context);
+
+            // Create an empty Rubric with appropriate Indicators
+            $folderIds = [$context->getFolder()->getId()];
+            if($context instanceof UnitSpecification){
+                $folderIds[] = $context->getCourse()->getFolder()->getId();
+            }
+            $rubric = $this->getRubricMapper()->createForFolder($folderIds[0], $folderIds[1]);
+            $rubric->setSubmissionBox(new SubmissionBox());
+            $dueWork->setRubric($rubric);
         }
 
         $data = [
             'attachzone'      => (new ZoneFactory())->buildForAssessment($assessment)->getTwigContext(),
             'assessment'      => $assessment,
-            'assessmentType'  => $types->objectToString($assessment),
             'curriculumNodes' => $folder->getCurriculumNodes(),
+            'assessmentType'  => $types->objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment)
         ];
+
+        // DueWork and Task can have files attached
+        if($assessment instanceof DueWork || $assessment instanceof Task){
+            $data['attachzone'] = (new ZoneFactory($types))->buildForAssessmentType($assessment)->getTwigContext();
+        }
 
         /* Special treatment for projects for now
          */
         if ($assessment instanceof Project) {
             $data['allSummators'] = new SummatorMapping();
+        }
+
+        // DueWork can have rubric
+        if ($assessment instanceof DueWork ) {
+            /** @var DueWork $assessment */
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
         }
 
         /* Select the fragment to return
@@ -375,25 +463,31 @@ class Controller extends Base
     {
         $types = new AssessmentType();
 
-        $zoneFactory = new ZoneFactory();
-        $zone = $zoneFactory->buildForAssessment($assessment);
-
         /* Twig payload
          */
         $data = [
             'breadcrumbs'     => (new BreadcrumbFactory($this->getRouter()))->produceFromAssessment($assessment)->add(['Update', '']),
             'assessment'      => $assessment,
-            'assessmentType'  => AssessmentType::objectToString($assessment),
-            'attachzone'      => $zone->getTwigContext(),
             'folder'          => $assessment->getContext()->getFolder(),
             'curriculumNodes' => $assessment->getContext()->getFolder()->getCurriculumNodes(),
-            'allWorkTypes'    => $this->getAllWorkTypes(),
+            'assessmentType'  => AssessmentType::objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
 
         /* Special treatment for projects for now
          */
+        if($assessment instanceof DueWork || $assessment instanceof Task){
+            $zoneFactory = new ZoneFactory();
+            $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
+        }
+
+        // Due Work can have Rubrics
+        if ($assessment instanceof DueWork) {
+            $data['allWorkTypes'] = $this->getAllWorkTypes();
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        }
+
         if ($assessment instanceof Project) {
             $summatorMapping = new SummatorMapping();
 
@@ -431,7 +525,11 @@ class Controller extends Base
         /* Redirect to project summary screen instead, if you spawned a project
          * Otherwise return to context
          */
-        if ($assessmentInfo['assessment'] instanceof Project) {
+        $explicitReturnUrl = $this->getRequest()->post->get('return_url');
+        if($explicitReturnUrl){
+            $returnUrl = Redirect::decode($explicitReturnUrl);
+        }
+        elseif ($assessmentInfo['assessment'] instanceof Project) {
             $returnUrl = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
         }
         else if ($assessmentInfo['assessment']->getContext() instanceof Project) {
@@ -652,7 +750,7 @@ class Controller extends Base
              * Return to summary screen with this suffix
              */
             $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
-            $returnUrlSuffix = '?return_url=' . (new Redirect())->encode($baseUrl);
+            $returnUrlSuffix = '?return_url=' . Redirect::encode($baseUrl);
 
             $types = new AssessmentType();
             $twigData = [
@@ -1049,7 +1147,7 @@ class Controller extends Base
      */
     private function getAllMarkTypes(IAssessable $assessable)
     {
-        return MarkSchemeFactory::getAvailableMarkTypes($assessable);;
+        return MarkSchemeFactory::getAvailableMarkTypes($assessable);
     }
 
     /**
@@ -1161,9 +1259,9 @@ class Controller extends Base
 
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student' => $student,
-            'assessment' => $project,
-            'counts' => $counts
+            'student'     => $student,
+            'assessment'  => $project,
+            'counts'      => $counts
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summary/staff.twig", $twigData));
@@ -1292,6 +1390,24 @@ class Controller extends Base
         return $this;
     }
 
+    /**
+     * @return RubricMapper
+     */
+    public function getRubricMapper()
+    {
+        return $this->rubricMapper;
+    }
+
+    /**
+     * @param RubricMapper $rubricMapper
+     * @return static
+     */
+    public function setRubricMapper(RubricMapper $rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
+        return $this;
+    }
+
 
 
     // ================ DUMMY DATA GENERATION ===============================================
@@ -1303,7 +1419,8 @@ class Controller extends Base
      * @todo remove this method when no longer required
      * @return array
      */
-    public static function getDummyBreadcrumbs(){
+    public static function getDummyBreadcrumbs()
+    {
         return [
             [
                 'href'  => '/learning/assessment/1/status',
@@ -1325,7 +1442,8 @@ class Controller extends Base
      * @todo remove when done
      * @return Collection|User[]
      */
-    public static function getDummyCohortList(){
+    public static function getDummyCohortList()
+    {
         $internalIds = [
             230,
             239,
@@ -1338,7 +1456,7 @@ class Controller extends Base
     /**
      * Temp method to generate dummy assessment
      *
-     * @param $assessmentId      1 => project (7 => object)
+     * @param $assessmentId 1 => project (7 => object)
      *                           2 => dueWork
      *                           3 => quiz
      *                           4 => task1
@@ -1347,25 +1465,26 @@ class Controller extends Base
      * @todo remove this method when no longer required
      * @return array|\Schoolbox\Learning\Assessment\Project
      */
-    public static function getDummyAssessment($assessmentId){
+    public static function getDummyAssessment($assessmentId)
+    {
         $creator = UserMapper::getInstance()->findById(151);    // Zane Smith (teacher)
 
         $assessment = [
             'id'              => $assessmentId,
-            'publish_date'    => new Alaress_Date_Format('2016/08/01','Y/m/d'),
-            'open_date'       => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'due_date'        => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-            'close_date'      => new Alaress_Date_Format('2016/08/22','Y/m/d'),
+            'publish_date'    => new Alaress_Date_Format('2016/08/01', 'Y/m/d'),
+            'open_date'       => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'due_date'        => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+            'close_date'      => new Alaress_Date_Format('2016/08/22', 'Y/m/d'),
             'weight'          => 40,
             'creator'         => $creator,
             'mark_visibility' => 2,
             'responses'       => self::getDummyResponses($assessmentId),
-            'created_at'      => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'      => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+            'created_at'      => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at'      => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
             'deleted_at'      => new Alaress_Date_NullDate(),
         ];
 
-        switch($assessmentId){
+        switch ($assessmentId) {
             case 7: // project (object)
 
                 $hodes = UserMapper::getInstance()->findById(230);
@@ -1383,10 +1502,10 @@ class Controller extends Base
                 $project->setDescription('This is a project. It contains assessables');
                 $project->setMarkScheme(new Percentage());
                 $project->setId($assessmentId);
-                $project->setPublishAt(new Alaress_Date_Format('2016/08/01','Y/m/d'));
-                $project->setOpenAt(new Alaress_Date_Format('2016/08/08','Y/m/d'));
-                $project->setDueAt(new Alaress_Date_Format('2016/11/08','Y/m/d'));
-                $project->setCloseAt(new Alaress_Date_Format('2016/11/09','Y/m/d'));
+                $project->setPublishAt(new Alaress_Date_Format('2016/08/01', 'Y/m/d'));
+                $project->setOpenAt(new Alaress_Date_Format('2016/08/08', 'Y/m/d'));
+                $project->setDueAt(new Alaress_Date_Format('2016/11/08', 'Y/m/d'));
+                $project->setCloseAt(new Alaress_Date_Format('2016/11/09', 'Y/m/d'));
                 $project->setWeight(40);
                 $project->setCreator($creator);
 
@@ -1447,11 +1566,11 @@ class Controller extends Base
                     'mark_scheme'     => self::getDummyMarkScheme(2),
                 ]);
                 return array_merge($assessment, [
-                    'accept_submission'  => true,
-                    'multi_submission'   => true,
-                    'skip_unsubmitted'   => 0,
-                    'work_type'          => WorkTypeMapper::getInstance()->findById(1),
-                    'files'              => [
+                    'accept_submission' => true,
+                    'multi_submission'  => true,
+                    'skip_unsubmitted'  => 0,
+                    'work_type'         => WorkTypeMapper::getInstance()->findById(1),
+                    'files'             => [
                         self::getDummyDueWorkFile(1),
                         self::getDummyDueWorkFile(2),
                     ],
@@ -1482,8 +1601,8 @@ class Controller extends Base
                     'mark_scheme'     => self::getDummyMarkScheme(3),
                 ]);
                 return array_merge($assessment, [
-                    'link'            => 'https://www.youtube.com/watch?v=vShCnTY1-T0',
-                    'isSelfMarkable'  => false,
+                    'link'           => 'https://www.youtube.com/watch?v=vShCnTY1-T0',
+                    'isSelfMarkable' => false,
                 ]);
             case 5: // task2
                 $assessment = array_merge($assessment, [
@@ -1493,8 +1612,8 @@ class Controller extends Base
                     'mark_scheme'     => self::getDummyMarkScheme(4),
                 ]);
                 return array_merge($assessment, [
-                    'link'            => '',
-                    'isSelfMarkable'  => true,
+                    'link'           => '',
+                    'isSelfMarkable' => true,
                 ]);
             case 6: // task3
             default:
@@ -1505,8 +1624,8 @@ class Controller extends Base
                     'mark_scheme'     => self::getDummyMarkScheme(5),
                 ]);
                 return array_merge($assessment, [
-                    'link'            => 'https://www.youtube.com/watch?v=vShCnTY1-T0',
-                    'isSelfMarkable'  => true,
+                    'link'           => 'https://www.youtube.com/watch?v=vShCnTY1-T0',
+                    'isSelfMarkable' => true,
                 ]);
         }
     }
@@ -1514,7 +1633,7 @@ class Controller extends Base
     /**
      * Temp method to generate dummy student responses
      *
-     * @param $assessmentId      1 => project
+     * @param $assessmentId 1 => project
      *                           2 => dueWork
      *                           3 => quiz
      *                           4 => task1
@@ -1525,7 +1644,7 @@ class Controller extends Base
      */
     public static function getDummyResponses($assessmentId)
     {
-        switch($assessmentId){
+        switch ($assessmentId) {
             case 1: // project
                 return array_merge(
                     self::getDummyResponses(2),
@@ -1547,7 +1666,7 @@ class Controller extends Base
                     self::getDummyQuizAttempt(3),
                 ];
             case 4: // task1
-                return [ ];
+                return [];
             case 5: // task2
                 return [
                     self::getDummyTaskCompletion(1),
@@ -1565,18 +1684,18 @@ class Controller extends Base
 
     /**
      *
-     * @param int $dueWorkFileId   enum {1,2}
+     * @param int $dueWorkFileId enum {1,2}
      * @return array
      */
     public static function getDummyDueWorkFile($dueWorkFileId)
     {
         $dueWorkFile = [
-            'id'      => $dueWorkFileId,
-            'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+            'id'         => $dueWorkFileId,
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
             'deleted_at' => new Alaress_Date_NullDate(),
         ];
-        switch($dueWorkFileId) {
+        switch ($dueWorkFileId) {
             case 1:
                 return array_merge($dueWorkFile, [
                     'hash'     => '8dc741fccc7a612bc0643caa0f1ced422497f3ae',
@@ -1595,7 +1714,7 @@ class Controller extends Base
     /**
      * Generates a dummy dueWork Submission
      *
-     * @param int $dueWorkFeedbackId    enum {1,2,3,4}
+     * @param int $dueWorkFeedbackId enum {1,2,3,4}
      * @todo remove when done
      * @return array
      */
@@ -1605,11 +1724,11 @@ class Controller extends Base
             'id'           => $dueWorkFeedbackId,
             'feedbackType' => 'dueWorkFeedback',
             'reviewer'     => UserMapper::getInstance()->findById(151),
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'   => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+            'created_at'   => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at'   => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
             'deleted_at'   => new Alaress_Date_NullDate(),
         ];
-        switch($dueWorkFeedbackId) {
+        switch ($dueWorkFeedbackId) {
             case 1:
                 return array_merge($dueWorkFeedback, [
                     'mark'         => 'A+',
@@ -1624,9 +1743,9 @@ class Controller extends Base
                 return array_merge($dueWorkFeedback, [
                     'mark'         => 'C',
                     'norm_mark'    => 70.00000,
-                    'published_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+                    'published_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
                     'comment'      => 'You are going ok',
-                    'files' => [
+                    'files'        => [
                         self::getDummyDueWorkFeedbackFile(2),
                         self::getDummyDueWorkFeedbackFile(3),
                     ],
@@ -1637,35 +1756,35 @@ class Controller extends Base
                     'norm_mark'    => 30.00000,
                     'published_at' => new Alaress_Date_NullDate(),
                     'comment'      => 'You need help (this is a draft)',
-                    'files'        => [ ],
+                    'files'        => [],
                 ]);
             case 4:
             default:
                 return array_merge($dueWorkFeedback, [
-                'mark'             => 'F',
-                'norm_mark'        => 30.00000,
-                'published_at'     => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-                'comment'          => 'You need help (this is published)',
-                'files'            => [ ],
-            ]);
+                    'mark'         => 'F',
+                    'norm_mark'    => 30.00000,
+                    'published_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+                    'comment'      => 'You need help (this is published)',
+                    'files'        => [],
+                ]);
         }
     }
 
 
     /**
-     * @param int $dueWorkFeedbackFileId   enum {1,2,3}
+     * @param int $dueWorkFeedbackFileId enum {1,2,3}
      * @todo remove when done
      * @return array
      */
     public static function getDummyDueWorkFeedbackFile($dueWorkFeedbackFileId)
     {
         $dueWorkFeedbackFile = [
-            'id'           => $dueWorkFeedbackFileId,
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'   => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-            'deleted_at'   => new Alaress_Date_NullDate(),
+            'id'         => $dueWorkFeedbackFileId,
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+            'deleted_at' => new Alaress_Date_NullDate(),
         ];
-        switch($dueWorkFeedbackFileId){
+        switch ($dueWorkFeedbackFileId) {
             case 1:
                 return array_merge($dueWorkFeedbackFile, [
                     'crocodocUUID' => null,
@@ -1692,7 +1811,7 @@ class Controller extends Base
     /**
      * Generates a dummy dueWork Submission
      *
-     * @param int $dueWorkSubmissionId    enum {1,2,3}
+     * @param int $dueWorkSubmissionId enum {1,2,3}
      * @todo remove when done
      * @return array
      */
@@ -1701,7 +1820,7 @@ class Controller extends Base
         $submission = [
             'id'           => $dueWorkSubmissionId,
             'responseType' => 'dueWorkSubmission',
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
+            'created_at'   => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
             'deleted_at'   => new Alaress_Date_NullDate(),
         ];
         switch ($dueWorkSubmissionId) {
@@ -1709,7 +1828,7 @@ class Controller extends Base
                 return array_merge($submission, [
                     'submitted_by'  => UserMapper::getInstance()->findById(230),
                     'submitted_for' => UserMapper::getInstance()->findById(245),
-                    'updated_at'   => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+                    'updated_at'    => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
                     'files'         => [
                         self::getDummyDueWorkSubmissionFile(1),
                         self::getDummyDueWorkSubmissionFile(2),
@@ -1722,7 +1841,7 @@ class Controller extends Base
                 return array_merge($submission, [
                     'submitted_by'  => UserMapper::getInstance()->findById(230),
                     'submitted_for' => UserMapper::getInstance()->findById(245),
-                    'updated_at'   => new Alaress_Date_Format('2016/08/16','Y/m/d'),
+                    'updated_at'    => new Alaress_Date_Format('2016/08/16', 'Y/m/d'),
                     'files'         => [
                         self::getDummyDueWorkSubmissionFile(1),
                         self::getDummyDueWorkSubmissionFile(2),
@@ -1736,7 +1855,7 @@ class Controller extends Base
                 return array_merge($submission, [
                     'submitted_by'  => UserMapper::getInstance()->findById(230),
                     'submitted_for' => UserMapper::getInstance()->findById(245),
-                    'updated_at'   => new Alaress_Date_Format('2016/08/17','Y/m/d'),
+                    'updated_at'    => new Alaress_Date_Format('2016/08/17', 'Y/m/d'),
                     'files'         => [
                         self::getDummyDueWorkSubmissionFile(1),
                         self::getDummyDueWorkSubmissionFile(2),
@@ -1751,26 +1870,26 @@ class Controller extends Base
     /**
      * Get dummy dueWork Submission File
      *
-     * @param int $dueWorkSubmissionFileId      enum {1,2,3}
+     * @param int $dueWorkSubmissionFileId enum {1,2,3}
      * @todo remove when done
      * @return array
      */
     public static function getDummyDueWorkSubmissionFile($dueWorkSubmissionFileId)
     {
         $dueWorkSubmissionFile = [
-            'id'           => $dueWorkSubmissionFileId,
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'   => new Alaress_Date_Format('2016/08/17','Y/m/d'),
-            'deleted_at'   => new Alaress_Date_NullDate(),
+            'id'         => $dueWorkSubmissionFileId,
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/17', 'Y/m/d'),
+            'deleted_at' => new Alaress_Date_NullDate(),
         ];
 
-        switch($dueWorkSubmissionFileId) {
+        switch ($dueWorkSubmissionFileId) {
             case 1:
                 return array_merge($dueWorkSubmissionFile, [
                     'crocodocUUID' => 'e367160c-0202-4034-83f7-e4643a953bbb',
                     'hash'         => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                     'fileName'     => 'portfolio',
-                    'plagScan'     => [ ],
+                    'plagScan'     => [],
                     'storage'      => self::getDummyStorage(1),
                 ]);
             case 2:
@@ -1798,81 +1917,83 @@ class Controller extends Base
     }
 
     /**
-     * @param int $storageId        enum {1,2,3,4,5,6,7}
+     * @param int $storageId enum {1,2,3,4,5,6,7}
      * @return array
      */
-    public static function getDummyStorage($storageId){
+    public static function getDummyStorage($storageId)
+    {
         $storage = [
-            'id'           => $storageId,
-            'mimetype'     => self::getDummyMimeType($storageId),
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'   => new Alaress_Date_Format('2016/08/17','Y/m/d'),
-            'deleted_at'   => new Alaress_Date_NullDate(),
+            'id'         => $storageId,
+            'mimetype'   => self::getDummyMimeType($storageId),
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/17', 'Y/m/d'),
+            'deleted_at' => new Alaress_Date_NullDate(),
         ];
-        switch($storageId){
+        switch ($storageId) {
             case 1:
                 return array_merge($storage, [
-                    'extension'  => 'docx',
-                    'filename'   => 'someFile',
-                    'basename'   => 'someFile.docx',
-                    'mime'       => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'size'       => 25000,
-                    'hash'       => '4b50da92d887f9e05804f7425125b5064f5cb385',
+                    'extension' => 'docx',
+                    'filename'  => 'someFile',
+                    'basename'  => 'someFile.docx',
+                    'mime'      => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'size'      => 25000,
+                    'hash'      => '4b50da92d887f9e05804f7425125b5064f5cb385',
                 ]);
             case 2:
                 return array_merge($storage, [
-                    'extension'  => 'gif',
-                    'filename'   => 'abc',
-                    'basename'   => 'abc.gif',
-                    'mime'       => 'image/gif',
-                    'size'       => 25000,
-                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                    'extension' => 'gif',
+                    'filename'  => 'abc',
+                    'basename'  => 'abc.gif',
+                    'mime'      => 'image/gif',
+                    'size'      => 25000,
+                    'hash'      => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                 ]);
             case 3:
                 return array_merge($storage, [
-                    'extension'  => 'mpeg',
-                    'filename'   => 'myVideo',
-                    'basename'   => 'myVideo.mpeg',
-                    'mime'       => 'video/mpeg',
-                    'size'       => 25000,
-                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                    'extension' => 'mpeg',
+                    'filename'  => 'myVideo',
+                    'basename'  => 'myVideo.mpeg',
+                    'mime'      => 'video/mpeg',
+                    'size'      => 25000,
+                    'hash'      => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                 ]);
             case 4:
                 return array_merge($storage, [
-                    'extension'  => 'mpeg',
-                    'filename'   => 'mAudio',
-                    'basename'   => 'mAudio.mpeg',
-                    'mime'       => 'audio/mpeg',
-                    'size'       => 25000,
-                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                    'extension' => 'mpeg',
+                    'filename'  => 'mAudio',
+                    'basename'  => 'mAudio.mpeg',
+                    'mime'      => 'audio/mpeg',
+                    'size'      => 25000,
+                    'hash'      => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                 ]);
             case 5:
                 return array_merge($storage, [
-                    'extension'  => 'html',
-                    'filename'   => 'index',
-                    'basename'   => 'index.html',
-                    'mime'       => 'text/html',
-                    'size'       => 4000,
-                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                    'extension' => 'html',
+                    'filename'  => 'index',
+                    'basename'  => 'index.html',
+                    'mime'      => 'text/html',
+                    'size'      => 4000,
+                    'hash'      => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                 ]);
             case 6:
             default:
                 return array_merge($storage, [
-                    'extension'  => 'zip',
-                    'filename'   => 'mArchive',
-                    'basename'   => 'mArchive.zip',
-                    'mime'       => 'application/x-7z-compressed',
-                    'size'       => 25000,
-                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                    'extension' => 'zip',
+                    'filename'  => 'mArchive',
+                    'basename'  => 'mArchive.zip',
+                    'mime'      => 'application/x-7z-compressed',
+                    'size'      => 25000,
+                    'hash'      => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                 ]);
         }
     }
 
     /**
-     * @param int $mimeTypeId        enum {1,2,3,4,5,6,7}
+     * @param int $mimeTypeId enum {1,2,3,4,5,6,7}
      * @return array
      */
-    public static function getDummyMimeType($mimeTypeId){
+    public static function getDummyMimeType($mimeTypeId)
+    {
         $mimeType = [
             'id'                => $mimeTypeId,
             'actualMaxFileSize' => 1000000,
@@ -1882,91 +2003,91 @@ class Controller extends Base
             'deleted'           => false,
             'isDeleted'         => false,
         ];
-        switch($mimeTypeId){
+        switch ($mimeTypeId) {
             case 1:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 46,
-                    'class'             => 'docx',
-                    'description'       => 'Microsoft Word 2007 Document',
-                    'iconFile'          => 'msword_doc.png',
-                    'iconClass'         => 'msworddoc',
-                    'inline'            => false,
-                    'mime'              => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'isAudio'           => false,
-                    'isVideo'           => false,
-                    'isImage'           => false,
-                    'type'              => 'application',
+                    'fileTypeId'  => 46,
+                    'class'       => 'docx',
+                    'description' => 'Microsoft Word 2007 Document',
+                    'iconFile'    => 'msword_doc.png',
+                    'iconClass'   => 'msworddoc',
+                    'inline'      => false,
+                    'mime'        => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'isAudio'     => false,
+                    'isVideo'     => false,
+                    'isImage'     => false,
+                    'type'        => 'application',
                 ]);
             case 2:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 1,
-                    'class'             => 'gif',
-                    'description'       => 'GIF Image',
-                    'iconFile'          => 'image_gif.png',
-                    'iconClass'         => 'imagegif',
-                    'inline'            => true,
-                    'mime'              => 'image/gif',
-                    'isAudio'           => false,
-                    'isVideo'           => false,
-                    'isImage'           => true,
-                    'type'              => 'image',
+                    'fileTypeId'  => 1,
+                    'class'       => 'gif',
+                    'description' => 'GIF Image',
+                    'iconFile'    => 'image_gif.png',
+                    'iconClass'   => 'imagegif',
+                    'inline'      => true,
+                    'mime'        => 'image/gif',
+                    'isAudio'     => false,
+                    'isVideo'     => false,
+                    'isImage'     => true,
+                    'type'        => 'image',
                 ]);
             case 3:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 27,
-                    'class'             => 'video',
-                    'description'       => 'MPEG Video',
-                    'iconFile'          => 'video_alt.png',
-                    'iconClass'         => 'videoalt',
-                    'inline'            => false,
-                    'mime'              => 'video/mpeg',
-                    'isAudio'           => false,
-                    'isVideo'           => true,
-                    'isImage'           => false,
-                    'type'              => 'video',
+                    'fileTypeId'  => 27,
+                    'class'       => 'video',
+                    'description' => 'MPEG Video',
+                    'iconFile'    => 'video_alt.png',
+                    'iconClass'   => 'videoalt',
+                    'inline'      => false,
+                    'mime'        => 'video/mpeg',
+                    'isAudio'     => false,
+                    'isVideo'     => true,
+                    'isImage'     => false,
+                    'type'        => 'video',
                 ]);
             case 4:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 23,
-                    'class'             => 'mpeg',
-                    'description'       => 'MPEG Audio',
-                    'iconFile'          => 'sound_mp3.png',
-                    'iconClass'         => 'soundmp3',
-                    'inline'            => false,
-                    'mime'              => 'audio/mpeg',
-                    'isAudio'           => true,
-                    'isVideo'           => false,
-                    'isImage'           => false,
-                    'type'              => 'audio',
+                    'fileTypeId'  => 23,
+                    'class'       => 'mpeg',
+                    'description' => 'MPEG Audio',
+                    'iconFile'    => 'sound_mp3.png',
+                    'iconClass'   => 'soundmp3',
+                    'inline'      => false,
+                    'mime'        => 'audio/mpeg',
+                    'isAudio'     => true,
+                    'isVideo'     => false,
+                    'isImage'     => false,
+                    'type'        => 'audio',
                 ]);
             case 5:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 2,
-                    'class'             => 'html',
-                    'description'       => 'HTML Document',
-                    'iconFile'          => 'html.png',
-                    'iconClass'         => 'html',
-                    'inline'            => true,
-                    'mime'              => 'text/html',
-                    'isAudio'           => false,
-                    'isVideo'           => false,
-                    'isImage'           => false,
-                    'type'              => 'text',
+                    'fileTypeId'  => 2,
+                    'class'       => 'html',
+                    'description' => 'HTML Document',
+                    'iconFile'    => 'html.png',
+                    'iconClass'   => 'html',
+                    'inline'      => true,
+                    'mime'        => 'text/html',
+                    'isAudio'     => false,
+                    'isVideo'     => false,
+                    'isImage'     => false,
+                    'type'        => 'text',
                 ]);
             case 6:
             default:
                 return array_merge($mimeType, [
-                    'fileTypeId'        => 80,
-                    'class'             => 'zip',
-                    'description'       => '7-Zip',
-                    'iconFile'          => 'archive.png',
-                    'iconClass'         => 'archive',
-                    'inline'            => false,
-                    'mime'              => 'application/x-7z-compressed',
-                    'isAudio'           => false,
-                    'isVideo'           => false,
-                    'isImage'           => false,
-                    'type'              => 'application',
+                    'fileTypeId'  => 80,
+                    'class'       => 'zip',
+                    'description' => '7-Zip',
+                    'iconFile'    => 'archive.png',
+                    'iconClass'   => 'archive',
+                    'inline'      => false,
+                    'mime'        => 'application/x-7z-compressed',
+                    'isAudio'     => false,
+                    'isVideo'     => false,
+                    'isImage'     => false,
+                    'type'        => 'application',
                 ]);
         }
     }
@@ -1974,18 +2095,19 @@ class Controller extends Base
     /**
      * Generate a dummy plag scan doc
      *
-     * @param int $plagScanId    enum {1,2}
+     * @param int $plagScanId enum {1,2}
      * @todo remove when done
      * @return array
      */
-    public static function getDummyPlagScan($plagScanId){
+    public static function getDummyPlagScan($plagScanId)
+    {
         $plagScan = [
-            'id'           => $plagScanId,
-            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at'   => new Alaress_Date_Format('2016/08/17','Y/m/d'),
-            'deleted_at'   => new Alaress_Date_NullDate(),
+            'id'         => $plagScanId,
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/17', 'Y/m/d'),
+            'deleted_at' => new Alaress_Date_NullDate(),
         ];
-        switch($plagScanId){
+        switch ($plagScanId) {
             case 1:
                 return array_merge($plagScan, [
                     'plagscan_id' => 4396294,
@@ -2010,7 +2132,7 @@ class Controller extends Base
     /**
      * Temp method to generate dummy mark scheme
      *
-     * @param $scheme    1 => percentage
+     * @param $scheme 1 => percentage
      *                   2 => letterGrade
      *                   3 => totalMark
      *                   4 => none
@@ -2018,8 +2140,9 @@ class Controller extends Base
      * @todo remove this method when no longer required
      * @return array
      */
-    public static function getDummyMarkScheme($scheme){
-        switch($scheme){
+    public static function getDummyMarkScheme($scheme)
+    {
+        switch ($scheme) {
             case 1:
                 return [
                     'name'             => 'Percentage',
@@ -2147,79 +2270,80 @@ class Controller extends Base
      * @param $sectionId
      * @return array
      */
-    public static function getDummyQuizSection($sectionId){
-        switch($sectionId){
+    public static function getDummyQuizSection($sectionId)
+    {
+        switch ($sectionId) {
             case 1:
                 return [
-                    'id'            => 1,
-                    'title'         => 'mFirstSection',
-                    'description'   => 'This is the first section of this quiz',
-                    'random'        => 0,
-                    'pool'          => 0,
-                    'questions'     => [
-                        self::getDummyQuizQuestion(1,true),
+                    'id'          => 1,
+                    'title'       => 'mFirstSection',
+                    'description' => 'This is the first section of this quiz',
+                    'random'      => 0,
+                    'pool'        => 0,
+                    'questions'   => [
+                        self::getDummyQuizQuestion(1, true),
                     ],
-                    'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-                    'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-                    'deleted_at' => new Alaress_Date_NullDate(),
+                    'created_at'  => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+                    'updated_at'  => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+                    'deleted_at'  => new Alaress_Date_NullDate(),
                 ];
             case 2:
             default:
                 return [
-                    'id'            => 2,
-                    'title'         => 'mSecondSection',
-                    'description'   => 'This is the second section of this quiz',
-                    'random'        => 0,
-                    'pool'          => 0,
-                    'questions'     => [
-                        self::getDummyQuizQuestion(2,true),
-                        self::getDummyQuizQuestion(3,true),
+                    'id'          => 2,
+                    'title'       => 'mSecondSection',
+                    'description' => 'This is the second section of this quiz',
+                    'random'      => 0,
+                    'pool'        => 0,
+                    'questions'   => [
+                        self::getDummyQuizQuestion(2, true),
+                        self::getDummyQuizQuestion(3, true),
                     ],
-                    'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-                    'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-                    'deleted_at' => new Alaress_Date_NullDate(),
+                    'created_at'  => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+                    'updated_at'  => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+                    'deleted_at'  => new Alaress_Date_NullDate(),
                 ];
         }
     }
 
 
-
     /**
      * Generates a dummy quiz attempt for the specified user
      *
-     * @param int $attemptId      enum {1,2,3}
+     * @param int $attemptId enum {1,2,3}
      * @todo remove when done
      * @return array
      */
-    public static function getDummyQuizAttempt($attemptId){
-        $attempt= [
-            'id'          => $attemptId,
-            'responseType'=> 'quizAttempt',
-            'start'       => new Alaress_Date_Format('2012/07/11 12:02:39','Y/m/d H:m:s'),
-            'finish'      => new Alaress_Date_Format('2012/07/12 12:05:20','Y/m/d H:m:s'),
-            'reviewed_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
-            'deleted_at'  => new Alaress_Date_NullDate(),
+    public static function getDummyQuizAttempt($attemptId)
+    {
+        $attempt = [
+            'id'           => $attemptId,
+            'responseType' => 'quizAttempt',
+            'start'        => new Alaress_Date_Format('2012/07/11 12:02:39', 'Y/m/d H:m:s'),
+            'finish'       => new Alaress_Date_Format('2012/07/12 12:05:20', 'Y/m/d H:m:s'),
+            'reviewed_at'  => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
+            'deleted_at'   => new Alaress_Date_NullDate(),
         ];
 
-        switch($attemptId){
+        switch ($attemptId) {
             case 1:
                 $attempt['feedbacks'] = [
-                    self::getDummyQuizAnswer(1,true),
+                    self::getDummyQuizAnswer(1, true),
                 ];
                 return $attempt;
             case 2:
                 $attempt['feedbacks'] = [
-                    self::getDummyQuizAnswer(2,true),
-                    self::getDummyQuizAnswer(3,true),
-                    self::getDummyQuizAnswer(4,true),
+                    self::getDummyQuizAnswer(2, true),
+                    self::getDummyQuizAnswer(3, true),
+                    self::getDummyQuizAnswer(4, true),
                 ];
                 return $attempt;
             case 3:
             default:
                 $attempt['feedbacks'] = [
-                    self::getDummyQuizAnswer(5,true),
-                    self::getDummyQuizAnswer(6,true),
-                    self::getDummyQuizAnswer(7,true),
+                    self::getDummyQuizAnswer(5, true),
+                    self::getDummyQuizAnswer(6, true),
+                    self::getDummyQuizAnswer(7, true),
                 ];
                 return $attempt;
         }
@@ -2228,8 +2352,8 @@ class Controller extends Base
     /**
      * Generates a dummy question, along with its solutions
      *
-     * @param int $questionId            enum {1,2}
-     * @param bool $nestAnswers          whether to nest answers inside question
+     * @param int $questionId enum {1,2}
+     * @param bool $nestAnswers whether to nest answers inside question
      * @todo remove when done
      * @return array
      */
@@ -2239,8 +2363,8 @@ class Controller extends Base
             'type'       => self::getDummyQuizQuestionType(1),
             'marks'      => 1.00,
             'config'     => null,
-            'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-            'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+            'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+            'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
             'deleted_at' => new Alaress_Date_NullDate(),
         ];
 
@@ -2251,46 +2375,46 @@ class Controller extends Base
                 $question['solution'] = [
                     'id'         => 1,
                     'solution'   => 'Happiness',
-                    'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-                    'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+                    'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+                    'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
                     'deleted_at' => new Alaress_Date_NullDate(),
                 ];
                 $question['answers'] = [
-                    self::getDummyQuizAnswer(1,false),
-                    self::getDummyQuizAnswer(2,false),
-                    self::getDummyQuizAnswer(5,false),
+                    self::getDummyQuizAnswer(1, false),
+                    self::getDummyQuizAnswer(2, false),
+                    self::getDummyQuizAnswer(5, false),
                 ];
                 return $question;
             case 2:
-                $question['id']       = 2;
+                $question['id'] = 2;
                 $question['question'] = '<<p>What is the weather in Bangalore right now?</p>';
                 $question['solution'] = [
                     'id'         => 2,
                     'solution'   => 'Cloudy with a chance of meatballs',
-                    'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-                    'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+                    'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+                    'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
                     'deleted_at' => new Alaress_Date_NullDate(),
                 ];
                 $question['answers'] = [
-                    self::getDummyQuizAnswer(3,false),
-                    self::getDummyQuizAnswer(6,false),
+                    self::getDummyQuizAnswer(3, false),
+                    self::getDummyQuizAnswer(6, false),
                 ];
                 return $question;
             case 3:
             default:
-                $question['id']       = 3;
+                $question['id'] = 3;
                 $question['question'] = '<<p>What is the color of the sky at night?</p>';
                 $question['solution'] = [
                     'id'         => 3,
                     'solution'   => 'Black',
-                    'created_at' => new Alaress_Date_Format('2016/08/08','Y/m/d'),
-                    'updated_at' => new Alaress_Date_Format('2016/08/15','Y/m/d'),
+                    'created_at' => new Alaress_Date_Format('2016/08/08', 'Y/m/d'),
+                    'updated_at' => new Alaress_Date_Format('2016/08/15', 'Y/m/d'),
                     'deleted_at' => new Alaress_Date_NullDate(),
                 ];
-            $question['answers'] = [
-                self::getDummyQuizAnswer(4,false),
-                self::getDummyQuizAnswer(7,false),
-            ];
+                $question['answers'] = [
+                    self::getDummyQuizAnswer(4, false),
+                    self::getDummyQuizAnswer(7, false),
+                ];
                 return $question;
 
         }
@@ -2304,8 +2428,9 @@ class Controller extends Base
      * @todo remove when done
      * @return array
      */
-    public static function getDummyQuizQuestionType($questionType){
-        switch ($questionType){
+    public static function getDummyQuizQuestionType($questionType)
+    {
+        switch ($questionType) {
             case 1:
             default:
                 return [
@@ -2326,8 +2451,8 @@ class Controller extends Base
      * Returns a QuizAnswer. (Formerly known as 'QuizResponse')
      * This represents a student answer to a question. Their answer may be right or wrong.
      *
-     * @param int $answerId       enum {1,2,3,4,5,6,7}
-     * @param bool $nestQuestion  Whether to return nested questions for this answer
+     * @param int $answerId enum {1,2,3,4,5,6,7}
+     * @param bool $nestQuestion Whether to return nested questions for this answer
      * @todo remove when not needed
      * @return array
      */
@@ -2340,48 +2465,48 @@ class Controller extends Base
             'deleted_at'   => new Alaress_Date_NullDate(),
         ];
 
-        switch($answerId){
+        switch ($answerId) {
             case 1:
                 return array_merge($answer, [
                     'answer'   => 'Sadness',
                     'comment'  => '',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1, false) : null,
                 ]);
             case 2:
                 return array_merge($answer, [
                     'answer'   => 'Happiness',
                     'comment'  => 'Very good',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1, false) : null,
                 ]);
             case 3:
                 return array_merge($answer, [
                     'answer'   => 'I think it is raining',
                     'comment'  => 'No you are wrong',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(2,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(2, false) : null,
                 ]);
             case 4:
                 return array_merge($answer, [
                     'answer'   => 'Blue',
                     'comment'  => 'Not quite',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(3,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(3, false) : null,
                 ]);
             case 5:
                 return array_merge($answer, [
                     'answer'   => 'Happiness',
                     'comment'  => 'Good work',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(1, false) : null,
                 ]);
             case 6:
                 return array_merge($answer, [
                     'answer'   => 'I think it is sunny',
                     'comment'  => 'Pretty close',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(2,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(2, false) : null,
                 ]);
             case 7:
                 return array_merge($answer, [
                     'answer'   => 'Yellow',
                     'comment'  => '',
-                    'question' => $nestQuestion ? self::getDummyQuizQuestion(3,false) : null,
+                    'question' => $nestQuestion ? self::getDummyQuizQuestion(3, false) : null,
                 ]);
         }
 
@@ -2391,16 +2516,17 @@ class Controller extends Base
     /**
      * Generate a dummy task completion
      *
-     * @param int $taskCompletionId    enum {1,2}
+     * @param int $taskCompletionId enum {1,2}
      * @todo remove when done
      * @return array
      */
-    public static function getDummyTaskCompletion($taskCompletionId){
+    public static function getDummyTaskCompletion($taskCompletionId)
+    {
         $taskCompletion = [
             'id'           => $taskCompletionId,
             'responseType' => 'taskCompletion',
         ];
-        switch($taskCompletionId){
+        switch ($taskCompletionId) {
             case 1:
                 return array_merge($taskCompletion, [
                     'student'   => UserMapper::getInstance()->findById(230),
@@ -2410,13 +2536,13 @@ class Controller extends Base
                 ]);
             case 2:
             default:
-            return array_merge($taskCompletion, [
-                'student'   => UserMapper::getInstance()->findById(245),
-                'feedbacks' => [
-                    self::getDummyTaskFeedback(2),
-                    self::getDummyTaskFeedback(3),
-                ]
-            ]);
+                return array_merge($taskCompletion, [
+                    'student'   => UserMapper::getInstance()->findById(245),
+                    'feedbacks' => [
+                        self::getDummyTaskFeedback(2),
+                        self::getDummyTaskFeedback(3),
+                    ]
+                ]);
         }
     }
 
@@ -2424,16 +2550,17 @@ class Controller extends Base
     /**
      * Generate a dummy task feedback
      *
-     * @param int $taskFeedbackId   enum {1,2,3}
+     * @param int $taskFeedbackId enum {1,2,3}
      * @todo remove when done
      * @return array
      */
-    public static function getDummyTaskFeedback($taskFeedbackId){
+    public static function getDummyTaskFeedback($taskFeedbackId)
+    {
         $taskFeedback = [
             'id'           => $taskFeedbackId,
             'feedbackType' => 'taskFeedback',
         ];
-        switch($taskFeedbackId){
+        switch ($taskFeedbackId) {
             case 1:
                 return array_merge($taskFeedback, [
                     'reviewer' => UserMapper::getInstance()->findById(230),
@@ -2532,31 +2659,31 @@ class Controller extends Base
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($hodes)->getAllResponses()->add($submission);
             $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($sberryhill)->getAllResponses()->add($submission);
             $dueWork->getParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($slucier)->getAllResponses()->add($submission);
             $dueWork->getParticipant($slucier)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($bsalem)->getAllResponses()->add($submission);
             $dueWork->getParticipant($bsalem)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($asaxon)->getAllResponses()->add($submission);
             $dueWork->getParticipant($asaxon)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($celia)->getAllResponses()->add($submission);
             $dueWork->getParticipant($celia)->getAllFeedbacks()->add($feedback);
         }
-        if (rand(1,3) <= 1) {
+        if (rand(1, 3) <= 1) {
             $dueWork->getParticipant($somodio)->getAllResponses()->add($submission);
             $dueWork->getParticipant($somodio)->getAllFeedbacks()->add($feedback);
         }
@@ -2679,37 +2806,37 @@ class Controller extends Base
 
         $completion->getAllFeedback()->add($feedback);
 
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($hodes)->getAllResponses()->add($completion);
             $task->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($sberryhill)->getAllResponses()->add($completion);
             $task->getParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($sberryhill)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($slucier)->getAllResponses()->add($completion);
             $task->getParticipant($slucier)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($slucier)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($bsalem)->getAllResponses()->add($completion);
             $task->getParticipant($bsalem)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($bsalem)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($asaxon)->getAllResponses()->add($completion);
             $task->getParticipant($asaxon)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($asaxon)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($celia)->getAllResponses()->add($completion);
             $task->getParticipant($celia)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($celia)->getAllFeedbacks()->add($floatingFeedback);
         }
-        if (rand(1,2) <= 1) {
+        if (rand(1, 2) <= 1) {
             $task->getParticipant($somodio)->getAllResponses()->add($completion);
             $task->getParticipant($somodio)->getAllFeedbacks()->add($feedback);
             $task->getParticipant($somodio)->getAllFeedbacks()->add($floatingFeedback);
@@ -2743,24 +2870,24 @@ class Controller extends Base
 
         $responses = [
             [
-                'mark' => 1, // Question 1
+                'mark'      => 1, // Question 1
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 2
+                'mark'      => 1, // Question 2
                 'available' => 5,
             ],
             [
-                'mark' => 5, // Question 3
+                'mark'      => 5, // Question 3
                 'available' => 5,
             ],
             [
-                'mark' => 5, // Question 4
+                'mark'      => 5, // Question 4
                 'available' => 5,
             ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }
@@ -2773,7 +2900,6 @@ class Controller extends Base
             ->setDescription($description)
             ->setCreator($somodio)
             ->setWeight(8)
-
             ->setAllParticipants((new Collection())
                 ->add(new Participant($hodes, $quiz))
                 ->add(new Participant($sberryhill, $quiz))
@@ -2783,8 +2909,6 @@ class Controller extends Base
                 ->add(new Participant($celia, $quiz))
                 ->add(new Participant($somodio, $quiz))
             )
-
-
             ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
             ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
@@ -2803,38 +2927,70 @@ class Controller extends Base
             ->setMarksAvailable($marksAvailable)
             ->setMarksGiven($marksGiven);
 
-/*
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99759)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable)
-            ->setReviewer($celia)
-            ->setResponse($attempt)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+        /*
+                $feedback = new QuizReview();
+                $feedback
+                    ->setId(99759)
+                    ->setAssessable($quiz)
+                    ->setNormalisedMark(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable)
+                    ->setReviewer($celia)
+                    ->setResponse($attempt)
+                    ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $attempt->getAllFeedback()->add($feedback);
-*/
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($hodes)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($sberryhill)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($slucier)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($bsalem)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($asaxon)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($celia)->getAllResponses()->add($attempt);
-        if (rand(1,2) <= 1)
-        $quiz->getParticipant($somodio)->getAllResponses()->add($attempt);
+                $attempt->getAllFeedback()->add($feedback);
+        */
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($hodes)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($sberryhill)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($slucier)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($bsalem)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($asaxon)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($celia)->getAllResponses()->add($attempt);
+        }
+        if (rand(1, 2) <= 1) {
+            $quiz->getParticipant($somodio)->getAllResponses()->add($attempt);
+        }
 
 
         //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
         return $quiz;
+    }
+
+    /**
+     * Insert an attach zone into the template
+     *
+     * @param Collection $attachments|IStorage
+     * @return array
+     */
+    private function getAttachZone($attachments = null)
+    {
+        $zone = new Zone('attachment');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select attachment')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload attachment')
+            ->setMimeFilter('*/*')
+            ->setReadOnly(false)
+            ->setMulti(true);
+
+        if ($attachments != null)
+            foreach ($attachments as $attachment)
+                $zone->attachFiles(array($attachment->getHash()));
+
+        return $zone->getTwigContext();
     }
 }

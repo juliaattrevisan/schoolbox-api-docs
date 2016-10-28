@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
@@ -219,6 +220,13 @@ class MapperProxy
             // Thereafter, it's ignored.
             $subObject->setRubricResultSet(0);
             DueWorkMapper::getInstance()->save($subObject);
+
+            // Save the Rubric
+            /** @var DueWorkModel $dueWork */
+            $dueWork = $assessable;
+            if($dueWork->getRubric()){
+                DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
+            }
 
         } elseif ($subObject instanceof Quiz) {
             QuizMapper::getInstance()->save($subObject);

@@ -20,7 +20,7 @@ class Redirect
      * @param $url
      * @return string
      */
-    public function encode($url)
+    public static function encode($url)
     {
         return urlencode(base64_encode($url));
     }
@@ -31,7 +31,7 @@ class Redirect
      * @param $encoded
      * @return string
      */
-    public function decode($encoded)
+    public static function decode($encoded)
     {
         return base64_decode(urldecode($encoded));
     }

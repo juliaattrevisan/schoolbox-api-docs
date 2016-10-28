@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -65,18 +66,26 @@ class Model extends AbstractAssessment
     protected $showSubmittedOnly = false;
 
     /**
-     * This DueWork has an associated Rubric
+     * This DueWork uses a Rubric
+     *
+     * This property IS required. We cannot just inspect the attached Rubric because in some
+     * scenarios (eg Collections) we don't hydrate the Rubric.
      *
      * @var bool
      */
-    protected $hasRubric = false;
+    protected $useRubric = false;
 
     /**
-     * This DueWork has Mark Per Capability on
+     * @var Rubric|null
+     */
+    private $rubric;
+
+    /**
+     * This DueWork's Rubric has Mark Per Capability on
      *
      * @var bool
      */
-    protected $hasMarkPerCapability = false;
+    protected $markPerCapability = false;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
@@ -264,64 +273,38 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * This DueWork has an associated Rubric
+     * @return boolean
      */
-    public function hasRubric()
+    public function getUseRubric()
     {
-        return $this->getHasRubric();
+        return $this->useRubric;
     }
 
     /**
-     * Use rubrics
-     *
-     * @return $this
+     * @param boolean $useRubric
+     * @return static
      */
-    public function useRubric()
+    public function setUseRubric($useRubric)
     {
-        $this->setHasRubric(true);
+        $this->useRubric = $useRubric;
         return $this;
     }
 
     /**
-     * Don't use rubrics
-     *
-     * @return $this
+     * @return Rubric|null
      */
-    public function noRubric()
+    public function getRubric()
     {
-        $this->setHasRubric(false);
-        return $this;
+        return $this->rubric;
     }
 
     /**
-     * This DueWork has Mark Per Capability on
-     *
-     * @return bool
+     * @param Rubric|null $rubric
+     * @return static
      */
-    public function hasMarkPerCapbility()
+    public function setRubric(Rubric $rubric = null)
     {
-        return $this->getHasMarkPerCapability();
-    }
-
-    /**
-     * This DueWork's Rubrics uses Mark Per Capability
-     *
-     * @return $this
-     */
-    public function useMarkPerCapability()
-    {
-        $this->setHasMarkPerCapability(true);
-        return $this;
-    }
-
-    /**
-     * This DueWork's Rubrics does not use Mark Per Capability
-     *
-     * @return $this
-     */
-    public function noMarkPerCapability()
-    {
-        $this->setHasMarkPerCapability(false);
+        $this->rubric = $rubric;
         return $this;
     }
 
@@ -380,24 +363,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return boolean
-     */
-    protected function getHasRubric()
-    {
-        return $this->hasRubric;
-    }
-
-    /**
-     * @param boolean $hasRubric
-     * @return $this
-     */
-    protected function setHasRubric($hasRubric)
-    {
-        $this->hasRubric = $hasRubric;
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getMaxMark()
@@ -418,18 +383,18 @@ class Model extends AbstractAssessment
     /**
      * @return boolean
      */
-    public function getHasMarkPerCapability()
+    public function getMarkPerCapability()
     {
-        return $this->hasMarkPerCapability;
+        return $this->markPerCapability;
     }
 
     /**
-     * @param boolean $hasMarkPerCapability
+     * @param boolean $markPerCapability
      * @return $this
      */
-    public function setHasMarkPerCapability($hasMarkPerCapability)
+    public function setMarkPerCapability($markPerCapability)
     {
-        $this->hasMarkPerCapability = $hasMarkPerCapability;
+        $this->markPerCapability = $markPerCapability;
         return $this;
     }
 

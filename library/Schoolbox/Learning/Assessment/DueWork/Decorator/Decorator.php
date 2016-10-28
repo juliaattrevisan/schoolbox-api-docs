@@ -28,19 +28,21 @@ class Decorator implements DecoratorInterface
      * @param $acceptOnline
      * @param $markType
      * @param $gradingScheme
-     * @param $hasRubric
-     * @param $hasMarkPerCapability
+     * @param $usesRubric
+     * @param $markPerCapability
      * @param $maxMark
+     * @param $rubricData
      * @param $attachedFiles
      */
-    public function __construct($acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark, $attachedFiles)
+    public function __construct($acceptOnline, $markType, $gradingScheme, $usesRubric, $markPerCapability, $maxMark, $rubricData, $attachedFiles)
     {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
-        $this->setHasRubric(trim($hasRubric));
-        $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
+        $this->setUsesRubric(trim($usesRubric));
+        $this->setMarkPerCapability(trim($markPerCapability));
         $this->setMaxMark(trim($maxMark));
+        $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
     }
 
@@ -65,7 +67,6 @@ class Decorator implements DecoratorInterface
          */
         $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
         $markType->setId($this->getMarkType());
-
         $assessment->setMarkType($markType);
 
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
@@ -79,19 +80,16 @@ class Decorator implements DecoratorInterface
         $gradingGroup->setId($this->getGradingScheme());
 
         $assessment->setGradeGroup($gradingGroup);
+        $assessment->setUseRubric($this->getUsesRubric());
+        $assessment->setMarkPerCapability($this->getMarkPerCapability());
 
-        if ($this->getHasRubric()) {
-            $assessment->useRubric();
-        }
-        else {
-            $assessment->noRubric();
-        }
 
-        if ($this->getHasMarkPerCapability()) {
-            $assessment->useMarkPerCapability();
-        }
-        else {
-            $assessment->noMarkPerCapability();
+        if($this->getUsesRubric()){
+            $rubric = new \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric();
+            $rubric    = (new \Schoolbox\Assessment\Rubric\Factory($rubric))->buildFromPostData($this->getRubricData(), false);
+            $markMax = $rubric->getTotal();
+            $assessment->setMaxMark($markMax);
+            $assessment->setRubric($rubric);
         }
 
         /* If there were attachments, accumulate them

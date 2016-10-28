@@ -182,7 +182,7 @@ $dueWork2
     ->setTitle('My Second Due Work')
     ->setType($type)
     ->setWeight(4)
-    ->setHasRubric(true)
+    ->setUseRubric(true)
     ->setAcceptsSingle()
     ->showOnlySubmittedStudents()
     ->setAllParticipants($allParticipants);
@@ -761,7 +761,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getAcceptOnline(),
             $currentAssessable->isAcceptMulti(),
             !$currentAssessable->getShowSubmittedOnly(),
-            $currentAssessable->hasRubric()
+            $currentAssessable->useRubric()
         );
     }
     else {

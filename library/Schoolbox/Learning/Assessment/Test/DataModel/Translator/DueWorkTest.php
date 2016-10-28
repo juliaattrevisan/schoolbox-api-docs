@@ -72,7 +72,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->setName('A dumb type')
             )
             ->setMarkScheme(new None())
-            ->useRubric()
+            ->setUseRubric(true)
         ;
 
         /** @var DueWorkModel $dueWorkModel */

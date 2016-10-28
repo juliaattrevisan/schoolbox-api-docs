@@ -5,15 +5,16 @@
 <script type="text/javascript">
     $(function () {
 
-        /* Description
-         */
-        $.fn.alaressEditor();
+        // 'Description' TextArea only
+        $.fn.alaressEditor({
+            targetElements: $('[name=description]')
+        });
     });
 </script>
 
 <label>
     Title
-    <input type="text" name="title" value="{{ assessment.title }}" required />
+    <input type="text" name="title" value="{{ assessment.title }}" required/>
 </label>
 <label>
     Type
@@ -38,15 +39,14 @@
 <div class="row">
     <div class="small-12 columns">
         <label for="acceptOnline">Accepts Online Submissions?</label>
-        <select name="acceptOnline">
+        <select name="acceptOnline" id="acceptOnline">
             {% set options = {
             0: 'None',
             1: 'Single',
             2: 'Multiple'
-            }
-            %}
+            } %}
             {% for index, title in options %}
-                <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
+                <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
             {% endfor %}
         </select>
     </div>
@@ -69,39 +69,64 @@
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
 {% include '@learningAssessment/fragments/markType.twig' %}
+{% include '@learningAssessment/fragments/rubric.twig' with {
+rubric: rubric,
+rubricAttachZone: rubricAttachZone,
+resultSets: rubricResultSets,
+assessment: assessment
+} only %}
 
-<div class="row">
-    <div class="small-12 medium-6 columns">
-        <label for="hasRubric">Use Rubric?</label>
-        <div class="switch round">
-            <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
-            <label for="hasRubric">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-    <div class="small-12 medium-6 columns">
-        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}">
-            <label for="hasMarkPerCapability">Mark Per-Capability</label>
-            <div class="switch round">
-                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
-                <label for="hasMarkPerCapability">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
+{# Letter Grade enables Grading Scheme
+ # Total Mark enables Maximum Available Marks
+ #}
+{% set markTypeLetterGrade = 2 %}
+{% set markTypeTotalMark = 3 %}
 
-<div class="row">
-    <div class="small-12 columns">
-        <div class="rubrics">
-            <!--Rubric Here-->
-        </div>
-    </div>
-</div>
+<script type="text/javascript">
+    $(function () {
+
+        var $maxMarkInput = $('#maxMark');
+        var $useRubricSwitch = $('#useRubric');
+
+        /**
+         * Disable the field, but allow us to show its value
+         * which will be programmatically generated
+         */
+        function disableMaxMark() {
+            $maxMarkInput.prop('disabled', true);
+        }
+
+        /**
+         * Enable the field for humans to change its value
+         */
+        function enableMaxMark() {
+            $maxMarkInput.prop('disabled', false);
+        }
+
+        /**
+         * Callback when the 'Has Rubric' switch is clicked
+         */
+        function processUseRubricClick($element)
+        {
+            if ($element.is(':checked')) {
+                disableMaxMark();
+            } else {
+                enableMaxMark();
+            }
+        }
+
+        /* Rubrics switcher
+         */
+        $useRubricSwitch.on('click', function () {
+            processUseRubricClick($(this));
+        });
+
+
+        // Initiate
+        processUseRubricClick($useRubricSwitch);
+    });
+</script>
+
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 

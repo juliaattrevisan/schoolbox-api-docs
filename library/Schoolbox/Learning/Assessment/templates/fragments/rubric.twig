@@ -1,0 +1,150 @@
+{#
+Usage:
+
+{% include '@learningAssessment/fragments/rubric.twig' with {
+    rubric: rubric,
+    rubricAttachZone: rubricAttachZone,
+    resultSets: rubricResultSets,
+    assessment: assessment
+} only %}
+
+#}
+<div class="reveal-modal" data-reveal id="reveal-resultset">
+    <h2>Apply Result Set</h2>
+    <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
+    <p><em><strong>Warning:</strong> this is a destructive action. Any existing level and descriptor data will be replaced with the chosen result set.</em></p>
+    <fieldset>
+        <legend>Available Result Sets</legend>
+        <div class="small-12 columns no-pad">
+            {% for resultSetId, resultSet in resultSets %}
+                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
+                <label for="rs-{{ resultSetId }}" class="radio-label">
+                    {%- for result in resultSet -%}
+                        {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
+                    {%- endfor -%}
+                </label>
+            {% endfor %}
+        </div>
+    </fieldset>
+    <a href="#" data-action="applyResultSet" class="submit button">Apply</a>
+    <a href="#" data-action="close" class="button">Cancel</a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    <div data-overlay class="wait-overlay hide">
+        <p>
+            Working...
+            <span class="loader"></span>
+        </p>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        // Rubric ResultSets Modal
+
+        var $rsReveal     = $('#reveal-resultset');
+        var $interactions = $rsReveal.find('input,a');
+        var $overlay      = $rsReveal.find('[data-overlay]');
+
+        $rsReveal.on('closed.fndtn.reveal', function () {
+            // un-check the selected radio
+            $rsReveal.find('[type=radio]').prop('checked', false);
+
+            // re-enable all inputs and links
+            $interactions.prop('disabled', false);
+
+            $overlay.addClass('hide');
+
+        });
+
+        $('#apply-resultset').on('click', function (e) {
+            e.preventDefault();
+            $rsReveal.foundation('reveal', 'open');
+        });
+
+        $rsReveal.on('click', 'a', function (e) {
+            e.preventDefault();
+
+            var $button = $(this), rubricEditable, value, $input, $label, options ;
+
+            switch ($button.data('action')) {
+                case 'applyResultSet':
+
+                    rubricEditable = $('table[data-rubric]').data('plugin_rubricEditable');
+
+                    if (rubricEditable) {
+
+                        $input = $rsReveal.find('input:checked');
+
+                        if ($input.length) {
+                            value  = $input.val();
+                            $label = $input.siblings('[for=' + $input.attr('id') + ']');
+
+                            // ensure value
+                            if (value > 0) {
+                                // get the list of options we're going to populate
+                                options = $label.text().split(',').map(function (v) { return v.trim(); });
+
+                                // prevent multi-submit
+                                $interactions.prop('disabled', true);
+                                $overlay.removeClass('hide');
+
+                                // break this out of main execution
+                                setTimeout(function () {
+                                    // apply the set
+                                    rubricEditable.applyResultSet(options);
+                                    $rsReveal.foundation('reveal', 'close');
+                                }, 100);
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    // only other known option is 'close'
+                    $rsReveal.foundation('reveal', 'close');
+                    break;
+            }
+        });
+
+    });
+</script>
+
+
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <label for="useRubric">Use Rubric?</label>
+        <div class="switch round">
+            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
+            <label for="useRubric">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+            <label for="markPerCapability">Mark Per-Capability</label>
+            <div class="switch round">
+                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
+                <label for="markPerCapability">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
+        <div class="small-12 columns no-pad">
+            <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
+        </div>
+        <div class="small-12 columns no-pad">
+            {% include '@rubric/grid-csv.twig' with {rubric: rubric, attachzone: rubricAttachZone, folderId: assessment.context.folder.id } only %}
+        </div>
+    </div>
+</div>

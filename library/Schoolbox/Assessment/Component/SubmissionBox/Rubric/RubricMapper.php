@@ -14,12 +14,14 @@ use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\IMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -71,18 +73,26 @@ class RubricMapper
 
 
     /**
-     * Given a folder ID, return the base rubric, including criteria inherited from parents
+     * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
      *
-     * @param int   $folderId
-     * @param bool  $forceTaskMode - if you need task-level criteria showing
-     * @param array $levelNames
+     * @param int $folderId
+     * @param int|null $parentFolderId
+     * @param string[] $levelNames
      * @return Rubric
      */
-    public function findByFolderId($folderId, $forceTaskMode = false, array $levelNames = [])
+    public function createForFolder($folderId, $parentFolderId = null, array $levelNames = [])
     {
+        /**
+         * Indexed by normalised Capability name
+         * @var Criteria\Group[] $capabilityCache
+         */
+        $capabilityCache = [];
 
-        /** @var Criteria\Group[] $groupCache */
-        $groupCache = [];
+        /**
+         * Indexed by normalised Capability name, then normalised Indicator name
+         * @var Criteria\Criterion $indicatorCache
+         */
+        $indicatorCache = [];
 
         $rubric = new Rubric();
 
@@ -96,23 +106,15 @@ class RubricMapper
             $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
-        $args = [ 'folderId' => $folderId ];
-        $in   = [ 'folderId' ];
-
-        if ($forceTaskMode) {
-            $key      = 'parentFolderId';
-            $parentId = Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
-
-            $args[$key] = $parentId;
-            $in[] = $key;
+        $args = ['folderId' => $folderId];
+        if($parentFolderId){
+            $args['parentFolderId'] = $parentFolderId;
         }
-
-        $in = implode(', :', $in);
-
+        $in = implode(', :', array_keys($args));
 
         // TODO DI and mapperise
         $stmt = \Database::getInstance()->query("
-            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count
+            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id  AND (b.deleted IS NOT TRUE OR b.deleted IS NULL)
@@ -124,24 +126,47 @@ class RubricMapper
 
         $groupId = 21;
 
+        // De-duplicate into caches, prioritising parent if duplicate between
+        // folder + parentFolder (eg UnitSpec vs CourseSpec)
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
-            $groupName = $r['grouping'];
+            // Trim + collapse internal whitespace
+            $capabilityNormalisedName = preg_replace('`\s+`', ' ', trim($r['grouping']));
 
-            if (!array_key_exists($groupName, $groupCache)) {
-                $groupCache[$groupName] = new Criteria\Group($groupId++, $groupName);
+            // If first instance of Capability
+            if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
+                // Save the Capability
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $capabilityNormalisedName);
+
+                // Instantiate Indicator cache for the Capability
+                $indicatorCache[$capabilityNormalisedName] = [];
             }
 
-            $crit = new Criteria\Criterion($r['id'], $r['name']);
+            $indicatorNormalisedName = preg_replace('`\s+`', ' ', trim($r['name']));
 
-            $crit->setReadOnly($r['usage_count'] > 0);
-
-            // cascade the read-onlyness up to the Group
-            if ($crit->isReadOnly()) {
-                $groupCache[$groupName]->setReadOnly(true);
+            // First time we've seen this Capability + Indicator, or Indicator
+            // is from the parentFolder (higher priority) ?
+            if(!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
+            || ($parentFolderId && $parentFolderId == $r['parent_id'])
+            ) {
+                $indicator = new Criteria\Criterion($r['id'], $indicatorNormalisedName);
+                $indicator->setReadOnly($r['usage_count'] > 0);
+                $indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName] = $indicator;
             }
+        }
 
-            $rubric->putCriterion($groupCache[$groupName], $crit);
+        // For each group of Indicators
+        foreach($indicatorCache as $capabilityNormalisedName => $indicators){
+
+            // For each Indicator in the Capability
+            foreach($indicators as $indicatorNormalisedName => $indicator){
+                /** @var Criteria\Criterion $indicator */
+                // cascade the read-onlyness up to the Capability
+                if ($indicator->isReadOnly()) {
+                    $capabilityCache[$capabilityNormalisedName]->setReadOnly(true);
+                }
+                $rubric->putCriterion($capabilityCache[$capabilityNormalisedName], $indicator);
+            }
         }
 
         return $rubric;
@@ -276,7 +301,7 @@ class RubricMapper
 
             if (!$parentId) {
                 // insufficient hydration
-                $parentId = Folder\Mapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
+                $parentId = FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
             }
 
             $args[$key] = $parentId;
@@ -502,19 +527,21 @@ class RubricMapper
      * @param IStorage $file
      * @param int      $folderId
      * @param int      $maxLevels
-     * @param bool     $taskMode
      * @throws \Schoolbox\Resource\Exception
      * @return Rubric
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels, $taskMode)
+    public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
     {
         $square = [];
 
         $folderLookup = [ $folderId ];
 
-        // if we're looking at a task, be observant of the parent folder as well
-        if ($taskMode) {
-            $folderLookup[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
+        // Determine if the specified folder has a UnitSpec
+        /** @var UnitSpecification $unitSpec */
+        $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+        if($unitSpec){
+            // Add the Unit's Course's Folder's ID
+            $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
         }
 
         $fp = $file->readStream();
@@ -601,7 +628,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
-        $postdata = $this->findByFolderId($folderId, $taskMode, $levelNames)->toPostData();
+        $postdata = $this->createForFolder($folderLookup[0], $folderLookup[1], $levelNames)->toPostData();
 
         // overlay descriptor data
         for ($i = 1; $i < count($square); $i += 2) {

@@ -135,9 +135,12 @@ class Factory
         $this->setAcceptOnline(trim($post['acceptOnline']));
         $this->setMarkType(trim($post['markType']));
         $this->setGradingScheme(trim($post['gradingScheme']));
-        $this->setHasRubric(trim($post['hasRubric']));
-        $this->setHasMarkPerCapability(trim($post['hasMarkPerCapability']));
+        $this->setUsesRubric(trim($post['useRubric']));
+        $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
+
+        $this->setRubricData($post[$post['formField']]);
+
         /* Check if any attached files existed in POST data
          * Use their array if it existed
          */
@@ -226,9 +229,10 @@ class Factory
                 $this->getAcceptOnline(),
                 $this->getMarkType(),
                 $this->getGradingScheme(),
-                $this->getHasRubric(),
-                $this->getHasMarkPerCapability(),
+                $this->getUsesRubric(),
+                $this->getMarkPerCapability(),
                 $this->getMaxMark(),
+                $this->getRubricData(),
                 $this->getAttachedFiles()
             );
 
