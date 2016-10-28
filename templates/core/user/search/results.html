@@ -30,7 +30,7 @@
 						<!-- BEGIN modify -->
 						<li><a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="icon-modify" title="Modify User">Modify</a></li>
 						<li><form method="POST" action="/adminv2/userForm.php" data-assimilator-form>
-								<a class="icon-staff-students" title="Log in as user" data-assimilator>Impersonate</a>
+								<a class="icon-staff-students {USER_ASSUME_CLASS}" title="{USER_ASSUME_PROMPT}" {USER_ASSUME_DATA}>Impersonate</a>
 								<input type="hidden" name="login" value="{USER_SEARCH_USERNAME}" />
 							</form>
 						</li>
