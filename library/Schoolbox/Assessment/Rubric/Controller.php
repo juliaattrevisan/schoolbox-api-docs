@@ -484,7 +484,7 @@ class Controller extends BaseController
             $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
         }
 
-        $this->outputTest($this->getMapper()->createForFolder($folderLookup));
+        $this->outputTest($this->getMapper()->createForFolder($folderLookup[0], $folderLookup[1]));
     }
 
     protected function outputTest(Rubric $grid)

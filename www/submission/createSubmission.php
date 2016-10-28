@@ -6,6 +6,8 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 /** @var SitePage $this */
 
@@ -288,7 +290,18 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             $grid = $map->findBySubmissionBox($submission, $is_task, true);
         } else {
             // otherwise, just collect all the criteria for the folder the box is about to be created in
-            $grid = $map->createForFolder([$submission->getCategory()->getId()])->setSubmissionBox($submission);
+            $folderId = $submission->getCategory()->getId();
+            $folderIds = [$folderId];
+
+            // Determine if the specified folder has a UnitSpec
+            /** @var UnitSpecification $unitSpec */
+            $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+            if($unitSpec){
+                // Add the Unit's Course's Folder's ID
+                $folderIds[] = $unitSpec->getCourse()->getFolder()->getId();
+            }
+
+            $grid = $map->createForFolder($folderIds[0], $folderIds[1])->setSubmissionBox($submission);
         }
 
         $rubricZone = new Zone('rubric');

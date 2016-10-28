@@ -172,7 +172,7 @@ class Module extends BaseModule
                         if($context instanceof UnitSpecification){
                             $folderIds[] = $context->getCourse()->getFolder()->getId();
                         }
-                        $rubric = $this->getRubricMapper()->createForFolder($folderIds);
+                        $rubric = $this->getRubricMapper()->createForFolder($folderIds[0], $folderIds[1]);
                         $rubric->setSubmissionBox(new SubmissionBox());
                         $args['assessment']->setRubric($rubric);
                     }
