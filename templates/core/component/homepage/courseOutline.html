@@ -119,9 +119,9 @@
 
                             <!-- BEGIN unit_add_task_actions -->
                             <li class="separator">Create</li>
-                            <li><a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}?return_url={RETURN_URL}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
-                            <li><a href="/assess/create/{ID}/unit:{UNIT_ID}?return_url={RETURN_URL}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-                            <li><a href="/task/createInstance/{UNIT_ID}?return_url={RETURN_URL}" class="icon-task" data-reveal-id="createTask-{UNIT_ID}">Task</a></li>
+                            <li><a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+                            <li><a href="/assess/create/{ID}/unit:{UNIT_ID}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+                            <li><a href="/task/createInstance/{UNIT_ID}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-task" data-reveal-id="createTask-{UNIT_ID}">Task</a></li>
                             <!-- END unit_add_task_actions -->
                             <li class="separator">Manage</li>
                             <!-- BEGIN unit_report_actions -->
@@ -188,7 +188,7 @@
                                     <li><a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a></li>
                                     <!-- END unit_task_duework_results -->
                                     <!-- BEGIN unit_task_modify -->
-                                    <li><a href="{UNIT_TASK_MODIFY_URL}?return_url={RETURN_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+                                    <li><a href="{UNIT_TASK_MODIFY_URL}?{RETURN_URL_NAME}={RETURN_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
                                     <!-- END unit_task_modify -->
                                     <!-- BEGIN unit_task_delete -->
                                     <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>

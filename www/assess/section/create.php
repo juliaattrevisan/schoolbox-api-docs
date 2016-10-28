@@ -95,6 +95,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'RETURN_URL_NAME'      => Redirect::RETURN_URL,
         'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',

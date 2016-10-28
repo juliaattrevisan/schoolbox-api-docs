@@ -44,9 +44,10 @@ $this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block'
 $this->setVar(
     array(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
-        'RETURN_URL' => $_GET[Redirect::RETURN_URL],
-        'ASSESS_ID' => $quiz->getId(),
-        'SECTION_ID' => $this->arg[2],
+        'RETURN_URL_NAME'          => Redirect::RETURN_URL,
+        'RETURN_URL'               => $_GET[Redirect::RETURN_URL],
+        'ASSESS_ID'                => $quiz->getId(),
+        'SECTION_ID'               => $this->arg[2],
     )
 );
 

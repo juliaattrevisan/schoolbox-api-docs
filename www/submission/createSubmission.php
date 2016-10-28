@@ -400,6 +400,7 @@ $output = array(
     'IS_TASK'           => $is_task ? 1 : 0,
     'UNIT_ID'           => $unit_id,
     'TASK_INSTANCE_ID'  => $task_instance_id,
+    'RETURN_URL_NAME'   => Redirect::RETURN_URL,
     'RETURN_URL'        => $_GET[Redirect::RETURN_URL],
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',

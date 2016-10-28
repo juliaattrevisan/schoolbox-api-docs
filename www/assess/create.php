@@ -207,6 +207,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'create',
+        'RETURN_URL_NAME'           => Redirect::RETURN_URL,
         'RETURN_URL'                => $_GET[Redirect::RETURN_URL],
         'ASSESS_HEADING'            => 'New Quiz',
         'ASSESS_ACTION'             => 'Create',

@@ -139,6 +139,7 @@ else {
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => 0,
+        'RETURN_URL_NAME' => Redirect::RETURN_URL,
 		'RETURN_URL' => $_GET[Redirect::RETURN_URL],
 		'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->arg[1],
 		'SECTION_ID' => $this->arg[2],

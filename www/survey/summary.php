@@ -9,6 +9,7 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Learning\Assessment\Redirect;
 
 $surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -55,6 +56,7 @@ $this->setVar(array(
     'FIRST_SECTION'        => $allSections[0]['section_id'],
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => $folder->getName(),
+    'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
 ));

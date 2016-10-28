@@ -160,6 +160,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'modify',
+        'RETURN_URL_NAME'           => Redirect::RETURN_URL,
         'RETURN_URL'                => $_GET[Redirect::RETURN_URL],
         'RETURN_URL_DECODED'        => Redirect::decode($_GET[Redirect::RETURN_URL]),
         'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),

@@ -253,6 +253,7 @@ switch($assess['mark_visibility']) {
 }
 
 $this->setVar(array(
+    'RETURN_URL_NAME'       => Redirect::RETURN_URL,
     'RETURN_URL'            => $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "",
     'ASSESS_ASSESS_ID'      => $assess['assess_id'],
     'ASSESS_TITLE'          => Scrub::text($assess['title']),
