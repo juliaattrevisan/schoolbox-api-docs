@@ -7,23 +7,15 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback\SubSource;
 
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 
 /**
  * Sub-source for quiz feedback.
  */
-class Quiz implements IFeedbackDataSource
+class Quiz extends AbstractSubSource
 {
-    /**
-     * @var MapperProxy
-     */
-    protected $mapperProxy;
-
     /**
      * Constructor
      *
@@ -31,7 +23,7 @@ class Quiz implements IFeedbackDataSource
      */
     public function __construct(MapperProxy $mapperProxy)
     {
-        $this->mapperProxy = $mapperProxy;
+        parent::__construct($mapperProxy);
     }
 
     /**
@@ -40,21 +32,5 @@ class Quiz implements IFeedbackDataSource
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof QuizObject;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     * @return Collection|Model[]
-     */
-    public function findForAssessment(IAssessable $assessment)
-    {
-        if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
-                                     ->map(function ($item) use ($assessment) {
-                                         /** @var Model $item*/
-                                         return $item->setAssessable($assessment);
-                                     });
-        }
-        return new Collection();
     }
 }

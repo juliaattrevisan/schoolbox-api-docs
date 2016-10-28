@@ -7,23 +7,15 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback\SubSource;
 
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
-use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
  * Sub-source for due work responses.
  */
-class DueWork implements IFeedbackDataSource
+class DueWork extends AbstractSubSource
 {
-    /**
-     * @var MapperProxy
-     */
-    protected $mapperProxy;
-
     /**
      * Constructor
      *
@@ -31,7 +23,7 @@ class DueWork implements IFeedbackDataSource
      */
     public function __construct(MapperProxy $mapperProxy)
     {
-        $this->mapperProxy = $mapperProxy;
+        parent::__construct($mapperProxy);
     }
 
     /**
@@ -40,21 +32,5 @@ class DueWork implements IFeedbackDataSource
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof DueWorkObject;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     * @return Collection|Model[]
-     */
-    public function findForAssessment(IAssessable $assessment)
-    {
-        if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
-                                     ->map(function ($item) use ($assessment) {
-                                         /** @var Model $item*/
-                                         return $item->setAssessable($assessment);
-                                     });
-        }
-        return new Collection();
     }
 }
