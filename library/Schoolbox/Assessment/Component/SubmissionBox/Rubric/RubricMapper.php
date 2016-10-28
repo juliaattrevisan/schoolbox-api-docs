@@ -75,14 +75,24 @@ class RubricMapper
     /**
      * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
      *
-     * @param int[] $folderIds
+     * @param int $folderId
+     * @param int|null $parentFolderId
      * @param string[] $levelNames
      * @return Rubric
      */
-    public function createForFolder(array $folderIds, array $levelNames = [])
+    public function createForFolder($folderId, $parentFolderId = null, array $levelNames = [])
     {
-        /** @var Criteria\Group[] $groupCache */
-        $groupCache = [];
+        /**
+         * Indexed by normalised Capability name
+         * @var Criteria\Group[] $capabilityCache
+         */
+        $capabilityCache = [];
+
+        /**
+         * Indexed by normalised Capability name, then normalised Indicator name
+         * @var Criteria\Criterion $indicatorCache
+         */
+        $indicatorCache = [];
 
         $rubric = new Rubric();
 
@@ -96,15 +106,15 @@ class RubricMapper
             $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
-        $args = [];
-        foreach($folderIds as $idx => $folderId){
-            $args["arg$idx"] = $folderId;
+        $args = ['folderId' => $folderId];
+        if($parentFolderId){
+            $args['parentFolderId'] = $parentFolderId;
         }
         $in = implode(', :', array_keys($args));
 
         // TODO DI and mapperise
         $stmt = \Database::getInstance()->query("
-            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count
+            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id  AND (b.deleted IS NOT TRUE OR b.deleted IS NULL)
@@ -116,27 +126,47 @@ class RubricMapper
 
         $groupId = 21;
 
-        // TODO - if UnitSpec and CourseSpec return duplicate indicators
-        // (duplicate includes matches via preg_replace('`\s+`', ' ', trim($object->getName())))
-        // Then discard UnitSpec Indicator
+        // De-duplicate into caches, prioritising parent if duplicate between
+        // folder + parentFolder (eg UnitSpec vs CourseSpec)
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
-            $groupName = $r['grouping'];
+            // Trim + collapse internal whitespace
+            $capabilityNormalisedName = preg_replace('`\s+`', ' ', trim($r['grouping']));
 
-            if (!array_key_exists($groupName, $groupCache)) {
-                $groupCache[$groupName] = new Criteria\Group($groupId++, $groupName);
+            // If first instance of Capability
+            if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
+                // Save the Capability
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $capabilityNormalisedName);
+
+                // Instantiate Indicator cache for the Capability
+                $indicatorCache[$capabilityNormalisedName] = [];
             }
 
-            $crit = new Criteria\Criterion($r['id'], $r['name']);
+            $indicatorNormalisedName = preg_replace('`\s+`', ' ', trim($r['name']));
 
-            $crit->setReadOnly($r['usage_count'] > 0);
-
-            // cascade the read-onlyness up to the Group
-            if ($crit->isReadOnly()) {
-                $groupCache[$groupName]->setReadOnly(true);
+            // First time we've seen this Capability + Indicator, or Indicator
+            // is from the parentFolder (higher priority) ?
+            if(!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
+            || ($parentFolderId && $parentFolderId == $r['parent_id'])
+            ) {
+                $indicator = new Criteria\Criterion($r['id'], $indicatorNormalisedName);
+                $indicator->setReadOnly($r['usage_count'] > 0);
+                $indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName] = $indicator;
             }
+        }
 
-            $rubric->putCriterion($groupCache[$groupName], $crit);
+        // For each group of Indicators
+        foreach($indicatorCache as $capabilityNormalisedName => $indicators){
+
+            // For each Indicator in the Capability
+            foreach($indicators as $indicatorNormalisedName => $indicator){
+                /** @var Criteria\Criterion $indicator */
+                // cascade the read-onlyness up to the Capability
+                if ($indicator->isReadOnly()) {
+                    $capabilityCache[$capabilityNormalisedName]->setReadOnly(true);
+                }
+                $rubric->putCriterion($capabilityCache[$capabilityNormalisedName], $indicator);
+            }
         }
 
         return $rubric;
@@ -598,7 +628,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
-        $postdata = $this->createForFolder($folderLookup, $levelNames)->toPostData();
+        $postdata = $this->createForFolder($folderLookup[0], $folderLookup[1], $levelNames)->toPostData();
 
         // overlay descriptor data
         for ($i = 1; $i < count($square); $i += 2) {
