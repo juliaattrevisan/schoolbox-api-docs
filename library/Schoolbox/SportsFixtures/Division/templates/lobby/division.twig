@@ -8,9 +8,9 @@
 
             {% for playerData in players %}
                 <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="{% if playerData.player.id in assigned %}1{% else %}0{% endif %}">
+                    <div class="grip compact"></div>
                     <div class="list-item">
-                        <div class="grip compact"></div>
-                        <div class="small-11 compact card wrap-down">
+                        <div class="compact card small-12 wrap-down">
                             <a href="/search/user/{{ playerData.player.id }}">
                                 <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
                                 <p>{{ playerData.player.formatName() }}</p>

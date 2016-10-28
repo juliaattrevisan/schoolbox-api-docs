@@ -111,7 +111,6 @@ ul.az-error-list {
 
     > li {
         clear: none;
-        height: 0;
         @include easy-transition(
             color $attachzone-overlay-duration $attachzone-overlay-timing,
             opacity $attachzone-duration-half $attachzone-overlay-timing,
@@ -167,12 +166,6 @@ ul.az-error-list {
 
 /* 64px version */
 .s64 {
-    .filename {
-        line-height: 2.5rem;
-        @media #{$medium-up} {
-            line-height: 3rem;
-        }
-    }
     .dzone {
         @extend .icon-attach;
         &:before {
