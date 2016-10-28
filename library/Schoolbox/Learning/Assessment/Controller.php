@@ -271,8 +271,9 @@ class Controller extends Base
         // Do caller request a returnUrl?
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
-        if ($returnUrl){
+        if ($returnUrl) {
             $data[Redirect::RETURN_URL] = $returnUrl;
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
