@@ -3,6 +3,10 @@
 <ul class="meta">
     <li class="icon-calendar">Due <span class="{{ urgency.gradientClass(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
     <li class="icon-due-work">{{ assessment.typeName }}</li>
+
+    {% if currentUser.role.isStaff %}
+    <li class="icon-staff-students">{{ student.fullname }}</li>
+    {% endif %}
 </ul>
 
 {% if assessment.description|length %}
