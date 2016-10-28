@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Model as File;
 use Url;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -133,7 +134,7 @@ class Controller extends BaseController
      * @api POST /rubric/import/{storageTuple}
      * @level 156
      *
-     * @param IStorage      $file
+     * @param File $file
      */
     public function import($file)
     {
