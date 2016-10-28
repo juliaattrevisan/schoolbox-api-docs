@@ -5,6 +5,7 @@
 
     {% if currentUser.role.isStaff %}
         <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
+        <li class="icon-staff-students">{{ student.fullname }}</li>
     {% endif %}
 </ul>
 
