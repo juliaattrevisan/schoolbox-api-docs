@@ -146,6 +146,7 @@ class CliFormatter extends NormalizerFormatter {
             '+' => array('+', self::green,      ''),
             '?' => array('?', self::yellow,     ''),
             'e' => array('e', self::yellow,     ''),
+            '~' => array('~', self::light_red,  '')
         );
 
         $severity = $level;

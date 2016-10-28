@@ -16,7 +16,7 @@ interface Calculable
     /**
      * Return the calculated sum value of this Calculable (NOT the total possible value)
      *
-     * @return float
+     * @return float|null
      */
     public function getSum();
 

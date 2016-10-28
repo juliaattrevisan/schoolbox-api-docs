@@ -64,6 +64,23 @@ $kernel->run
     // prepare statements
     $db = Database::getInstance();
 
+    $selectNonInnoDbRubricTablesStmt = $db->prepare("
+        SELECT `TABLE_NAME`
+        FROM `information_schema`.`TABLES`
+        WHERE `TABLE_SCHEMA` = :db
+        AND `TABLE_NAME` LIKE 'rubric_%'
+        AND `ENGINE` != 'InnoDB'
+    ");
+
+    $updateTableToInnoDbTemplate = "
+        ALTER TABLE %s.%s
+        ENGINE=INNODB
+    ";
+
+    $indexDescriptorIdStmt = $db->prepare("
+        ALTER TABLE `rubric_mark` ADD INDEX (`descriptor_id`);
+    ");
+
     $selectedIndicatorStmt = $db->prepare("
         SELECT DISTINCT CONCAT_WS(' :: ', c.grouping, c.name) fullname, c.* 
         FROM rubric_descriptor d
@@ -94,6 +111,14 @@ $kernel->run
         AND submission_box_id = :submission_box_id
     ");
 
+    $massInvalidateMarkStmt = $db->prepare("
+        UPDATE rubric_mark m
+        LEFT JOIN rubric_descriptor d ON m.descriptor_id = d.id
+        SET m.valid = FALSE
+        WHERE d.valid != m.valid
+        AND d.submission_box_id = :submission_box_id
+    ");
+
     $duplicateCriterionStmt = $db->prepare("
         INSERT INTO rubric_criterion (grouping, `name`, parent_id, parent_type)
         SELECT grouping, `name`, :parent_id, 'category'
@@ -108,6 +133,7 @@ $kernel->run
         RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
         WHERE c.id = :source_crit_id 
         AND d.submission_box_id = :source_box_id
+        ORDER BY l.sequence ASC
     ");
 
     $findLevelIdStmt = $db->prepare("
@@ -124,11 +150,15 @@ $kernel->run
     ");
 
     $findNextAvailableSequenceStmt = $db->prepare("
-      SELECT MAX(sequence) + 1 FROM rubric_usage WHERE submission_box_id = :box_id
+      SELECT COALESCE(MAX(sequence) + 1, 1) FROM rubric_usage WHERE submission_box_id = :box_id
     ");
 
     $insertRubricUsageStmt = $db->prepare("
         INSERT INTO rubric_usage VALUES (:crit_id, :box_id, :seq)
+    ");
+
+    $insertRubricLevelStmt = $db->prepare("
+        INSERT INTO rubric_level (box_id, name, sequence) VALUES (:box_id, '', :seq)
     ");
 
     $findUnmarkedCriteriaStmt = $db->prepare("
@@ -172,6 +202,24 @@ $kernel->run
         SET mark = :visibleMark
         WHERE id = :return_id
     ");
+
+
+    // verify that the tables are all in InnoDB format
+    $selectNonInnoDbRubricTablesStmt->execute([ 'db' => SQL_db ]);
+
+    while ($tableName = $selectNonInnoDbRubricTablesStmt->fetch(\PDO::FETCH_COLUMN)) {
+        try {
+            $log->warning("WARNING: $tableName changed to InnoDB");
+            $db->query(sprintf($updateTableToInnoDbTemplate, SQL_db, $tableName));
+
+        } catch (PDOException $e) {
+            $log->emergency($e->getMessage(), [ $e ]);
+            exit(1);
+        }
+    }
+
+    // set the missing index so queries actually execute in non-molasses time
+    $indexDescriptorIdStmt->execute();
 
     $searchStmt = $db->query("
         SELECT COUNT(t.box_id) unit_boxes, COUNT(ti.box_id) class_boxes, ui.* 
@@ -245,6 +293,10 @@ $kernel->run
 
         // obtain rubric data and cross-reference
         foreach ($classTaskInstances as $classTaskInstance) {
+
+            // ensure this is blank
+            $markCache = null;
+
             /** @var Task $sourceTask */
             $sourceTask = $sourceTasks[$classTaskInstance->getTask()->getId()]->first();
 
@@ -258,6 +310,8 @@ $kernel->run
 
             $instanceBoxId = $instanceBox->getId();
 
+            $logSuffix = "[unit_box_id,class_box_id]($sourceBoxId,$instanceBoxId)";
+
             /** @var Collection|SubmissionBox\ReturnedWork[] $instanceReturns */
             $instanceReturns = SubmissionBox\ReturnedWorkMapper::getInstance()->findByColumnList([
                 'box_id' => $instanceBoxId,
@@ -268,15 +322,6 @@ $kernel->run
                     'returned' => 'DESC'
                 ]
             ]);
-
-            // return count check
-            if ($instanceReturns->count() == 0) {
-                $log->debug(sprintf(
-                    "[class.instance.box](%d.%d.%d): no returns exist; skipping",
-                    $class->getId(), $classTaskInstance->getId(), $instanceBoxId
-                ));
-                continue;
-            }
 
             $log->debug(sprintf(
                 "[class.instance.box](%d.%d.%d): %d returns exist",
@@ -298,41 +343,98 @@ $kernel->run
             // find out the patch-difference between these two arrays
             $dd = doubleDiff($sourceBoxIndicators, $instanceBoxIndicators, $log);
 
-            if (empty($dd)) {
-                $log->debug("Indicators match between unit and class");
-                continue;
-            }
-
-            list ($add, $del) = $dd;
-
-            $log->warning(sprintf(
-                "Instance %d: indicators do not match between unit box %d and class box %d! Cleaning up difference [%d +%d/-%d = %d]",
-                $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
-            ));
-
             try {
-                $log->debug("BEGIN TX$instanceBoxId");
+                $log->info("BEGIN TX$instanceBoxId", [ 'char' => '>' ]);
                 $db->beginTransaction();
 
-                foreach ($del as $deletion) {
-                    removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
-                }
+                if (empty($dd)) {
+                    $log->debug("Indicators match between unit and class $logSuffix");
 
-                try {
-                    foreach ($add as $addition) {
-                        insertIndicators(
-                            $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
-                            $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
-                            $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $db, $log
-                        );
+                } else {
+                    list ($add, $del) = $dd;
+
+                    $log->warning(sprintf(
+                        "Task instance %d: indicators do not match between unit and class! Cleaning up difference [%d +%d/-%d = %d] $logSuffix",
+                        $instance->getId(), count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
+                    ));
+
+                    if ($instanceReturns->count() && count($instanceBoxIndicators) == count($del)) {
+                        $log->debug("All indicators are being removed; caching return data for {$instanceReturns->count()} students $logSuffix");
+
+                        $oldGrid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBox($instanceBox);
+
+                        foreach ($instanceReturns as $return) {
+                            $student = $return->getOwner();
+                            $studentId = $student->getId();
+
+                            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($oldGrid, $student);
+                            $array = $oldGrid->toContext();
+
+                            $markedDenominator   = 0;
+                            $unmarkedCount       = 0;
+                            $markedCount         = 0;
+                            $unmarkedDenominator = 0;
+
+                            foreach ($array['groups'] as $gid => $group) {
+                                foreach ($group['criteria'] as $critId => $criterion) {
+                                    $critMax    = $criterion['total'];
+                                    $critMarked = !is_null($criterion['sum']);
+
+                                    if ($critMarked) {
+                                        $markedDenominator += $critMax;
+                                        ++$markedCount;
+
+                                    } else {
+                                        ++$unmarkedCount;
+                                        $unmarkedDenominator += $critMax;
+                                    }
+                                }
+                            }
+
+                            if ($markedDenominator == 0) {
+                                // div by zero, no marks given: skip!
+                                $log->debug("Cannot cache, no marks given [box_id,student_id]($instanceBoxId,$studentId)");
+                                continue;
+                            }
+
+                            $markCache[$studentId] = $oldGrid->getSum() / $markedDenominator;
+                        }
                     }
-                } catch (InvalidArgumentException $e) {
-                    throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
+
+                    foreach ($del as $deletion) {
+                        removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
+                    }
+
+                    try {
+                        foreach ($add as $addition) {
+                            insertIndicators(
+                                $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
+                                $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
+                                $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $insertRubricLevelStmt, $db, $log
+                            );
+                        }
+                    } catch (InvalidArgumentException $e) {
+                        throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
+                    }
                 }
 
-                $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
+                /** @var SubmissionBox\Rubric\Rubric $grid */
+                $grid = null;
 
-                $log->debug("Verifying integrity of returns");
+                // return count check
+                if ($instanceReturns->count() == 0) {
+                    $log->debug(sprintf(
+                        "[class.instance.box](%d.%d.%d): no returns exist; no further work to do",
+                        $class->getId(), $classTaskInstance->getId(), $instanceBoxId
+                    ));
+
+                } else {
+                    $log->info("Invalidating any incongruous rubric marks $logSuffix");
+                    $massInvalidateMarkStmt->execute([ 'submission_box_id' => $instanceBoxId ]);
+
+                    $log->debug("Verifying integrity of returns $logSuffix");
+                    $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
+                }
 
                 $userSeen = [];
 
@@ -341,6 +443,8 @@ $kernel->run
 
                     $studentId = $return->getOwner()->getId();
 
+                    $logSuffix = "[box_id,student_id]($instanceBoxId,$studentId)";
+
                     // skip students we've already checked the most recent of
                     if (isset($userSeen[$studentId])) {
                         continue;
@@ -348,6 +452,16 @@ $kernel->run
 
                     // add to seen list so we don't parse them again
                     $userSeen[$studentId] = true;
+
+                    $hrMark = $return->getMark();
+
+                    // EXTREMELY SPECIFIC CASE: student returns with an submission state of 'RESUBMIT' need to be left alone
+                    if ($hrMark == 'RESUBMIT') {
+                        $log->debug("Student has been flagged for resubmission; skipping $logSuffix");
+                        continue;
+                    }
+
+                    $log->debug("Checking marks $logSuffix");
 
                     // load into cache if absent
                     if (empty($userCache[$studentId])) {
@@ -371,7 +485,7 @@ $kernel->run
 //                            $log->debug("TEST Criterion $critId");
 
                             $critMax    = $criterion['total'];
-                            $critMarked = $criterion['sum'] > 0;
+                            $critMarked = !is_null($criterion['sum']);
 
                             if ($critMarked) {
 
@@ -390,15 +504,33 @@ $kernel->run
 
 //                    $log->debug("Existing mark given: " . $grid->getSum() . " / $markedDenominator");
 
-                    if ($markedDenominator == 0) {
-                        // div by zero, no marks given: skip!
-                        continue;
-                    }
+                    if ($markedDenominator == 0 && isset($markCache[$studentId])) {
+                        $log->debug("Restoring mark from cache $logSuffix");
 
-                    $averageGiven = $grid->getSum() / $markedDenominator;
+                        $averageGiven = $markCache[$studentId];
+
+                    } else {
+                        if ($markedDenominator == 0) {
+                            // div by zero, no marks given: skip!
+                            $log->debug("No marks have been given, nothing to extrapolate $logSuffix");
+                            continue;
+                        }
+
+                        if ($unmarkedCount == 0) {
+                            $log->debug("Rubric grid is fully marked; no marks to apply $logSuffix");
+                            continue;
+                        }
+
+                        $averageGiven = $grid->getSum() / $markedDenominator;
+                    }
 
                     $marksToApply = round($averageGiven * $unmarkedDenominator);
 //                    $log->debug("Marks to apply: $marksToApply");
+
+                    if ($marksToApply == 0) {
+                        $log->debug("No marks to apply $logSuffix");
+                        continue;
+                    }
 
                     $newDenom  = $grid->getTotal();
                     $newNum    = $grid->getSum() + $marksToApply;
@@ -409,7 +541,7 @@ $kernel->run
                     // obtain the set of unmarked criteria for this student
                     $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
 
-                    $log->debug("Distribute $marksToApply marks across $unmarkedCount indicators");
+                    $log->debug("Distribute $marksToApply marks across $unmarkedCount indicators $logSuffix");
 
                     $unmarkedCritIds = $findUnmarkedCriteriaStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -427,6 +559,11 @@ $kernel->run
 
                     $avg = findClosestMatch($set, $marksToApply);
 
+                    if (empty($avg)) {
+                        $log->error("Could not apply $marksToApply marks to rubric $logSuffix");
+                        continue;
+                    }
+
                     $getLatestStampStmt->execute([
                         'box_id' => $instanceBoxId,
                         'student_id' => $studentId
@@ -443,7 +580,9 @@ $kernel->run
                         ]);
                     }
 
-                    $log->debug(json_encode($avg));
+                    $adjustment = json_encode($avg);
+
+                    $log->debug("Mark adjustment: $adjustment $logSuffix");
 
                     $getLatestReturnStmt->execute([
                         'student_id' => $studentId,
@@ -460,12 +599,12 @@ $kernel->run
                     ]);
 
                 }
-                $log->debug("COMMIT TX$instanceBoxId");
+                $log->info("COMMIT TX$instanceBoxId", [ 'char' => '+' ]);
                 $db->commit();
 
             } catch (PDOException $e) {
-                $log->error('PDOException: ' . $e->getMessage());
-                $log->debug("ABORT TX$instanceBoxId");
+                $log->alert('PDOException: ' . $e->getMessage(), [ $e ]);
+                $log->info("ABORT TX$instanceBoxId", [ 'char' => '~' ]);
                 $db->rollBack();
             }
         }
@@ -537,7 +676,7 @@ function computeMostAveragestDelta(array $set, $targetValue, $append = [])
     }
 
     // no work can be achieved
-    if (count($set) == 0) {
+    if (count($set) == 0 || $targetValue <= 0) {
 //        echo "NO CAN DO WORK\n";
         return $append;
     }
@@ -648,9 +787,9 @@ function removeIndicators(
  * @param PDOStatement    $insertDescriptorStmt
  * @param PDOStatement    $findNextAvailableSequenceStmt
  * @param PDOStatement    $insertRubricUsageStmt
+ * @param PDOStatement    $insertRubricLevelStmt
  * @param Database        $db
  * @param LoggerInterface $log
- * @throws InvalidArgumentException
  */
 function insertIndicators(
     array $addition,
@@ -663,11 +802,11 @@ function insertIndicators(
     PDOStatement $insertDescriptorStmt,
     PDOStatement $findNextAvailableSequenceStmt,
     PDOStatement $insertRubricUsageStmt,
+    PDOStatement $insertRubricLevelStmt,
     Database $db,
     LoggerInterface $log
 ) {
     $log->notice(sprintf("ADD indicator %5d into box %5d: %s", $addition['id'], $instanceBoxId, $addition['fullname']), [ 'char' => '+' ]);
-    // TODO
 
     // DUPLICATE the rubric_criterion record from the unit folder into the class folder, compensating for parent_id
     $log->info("DUPLICATE rubric_criterion {$addition['id']} into folder $classId");
@@ -679,15 +818,24 @@ function insertIndicators(
     // step 1: retrieve value, description, and the SEQUENCE of the level of the source descriptors
     $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'], 'source_box_id' => $sourceBoxId ]);
 
+    $minus = 1;
+    $first = true;
+    $errors = [];
+
     // step 2: iterate results and insert with new criterion, box and level values
     while ($r = $findSourceDescriptors->fetch(PDO::FETCH_NUM)) {
         list ($id, $value, $description, $levelSequence) = $r;
 
         if ($levelSequence == 0) {
-            throw new InvalidArgumentException("Level sequence cannot be zero: failed to retrieve sequence for [descriptor_id]($id)");
+            if ($first) {
+                $log->warning("Encountered a sequence value of zero for [descriptor_id]($id); assuming zero-indexed rather than one-indexed");
+                $minus = 0;
+            } else {
+                throw new InvalidArgumentException("Level sequence cannot be zero in non-zero-indexed set: failed to retrieve sequence for [descriptor_id]($id)");
+            }
         }
 
-        $offset = $levelSequence - 1;
+        $offset = $levelSequence - $minus;
 
         $findLevelIdStmt->bindValue(':nth', $offset, PDO::PARAM_INT);
         $findLevelIdStmt->bindValue(':box_id', $instanceBoxId);
@@ -696,16 +844,43 @@ function insertIndicators(
         $levelId = $findLevelIdStmt->fetchColumn();
 
         if ($levelId == 0) {
-            throw new InvalidArgumentException("Level ID cannot be zero: failed to retrieve an ID for [box,desc,seq]($instanceBoxId,$id,$levelSequence)");
+            $log->warning("Failed to retrieve an ID for [box_id,desc_id,seq]($instanceBoxId,$id,$levelSequence) - generating new level");
+
+            $insertRubricLevelStmt->execute([ 'box_id' => $instanceBoxId, 'seq' => $levelSequence ]);
+
+            $levelId = $db->lastInsertId();
         }
 
-        $insertDescriptorStmt->execute([
+        $payload = [
             'crit_id'  => $newCriterionId,
             'box_id'   => $instanceBoxId,
             'level_id' => $levelId,
             'val'      => $value,
             'des'      => $description
-        ]);
+        ];
+
+        $paystring = json_encode($payload);
+
+        try {
+            $log->debug("Attempting insertion of $paystring");
+            $insertDescriptorStmt->execute($payload);
+
+        } catch (PDOException $e) {
+
+            $message = "Could not insert descriptor $paystring";
+
+            if (preg_match('`^SQLSTATE\[\d+\]: (.+)$`', $e->getMessage(), $matches)) {
+                $message .= ": " . $matches[1];
+            }
+
+            $errors[] = $message;
+        }
+
+        $first = false;
+    }
+
+    if (count($errors)) {
+        throw new PDOException("Errors encountered: \n" . implode("\n   ", $errors));
     }
 
     // find the next available sequence

@@ -135,14 +135,17 @@ abstract class DescriptorList implements Twiggable, Calculable
     /**
      * Return the calculated sum value of this Calculable (NOT the total possible value)
      *
-     * @return float
+     * @return float|null
      */
     public function getSum()
     {
-        $sum = 0;
+        $sum = null;
 
         foreach ($this->descriptors as $descriptor) {
-            $sum += $descriptor->getSum();
+            $ds = $descriptor->getSum();
+            if (!is_null($ds)) {
+                $sum += $descriptor->getSum();
+            }
         }
 
         return $sum;
