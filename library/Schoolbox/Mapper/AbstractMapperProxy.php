@@ -134,7 +134,7 @@ abstract class AbstractMapperProxy
      */
 
     /**
-     * @return IDatabase|\Database
+     * @return IDatabase
      */
     protected function getDatabase()
     {
