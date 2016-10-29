@@ -158,12 +158,12 @@ class Module extends \Alaress\Module\Module
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
-                'setUnitSpecificationMapperProxy'   => $injector->lazyNew(Unit\SpecificationMapperProxy::class),
-                'setFolderMapper'                   => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-                'setCourseSpecificationMapperProxy' => $injector->lazyNew(Course\SpecificationMapperProxy::class),
-                'setCourseImplementationMapperProxy' => $injector->lazyNew(Course\ImplementationMapperProxy::class),
-                'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'setAccess'                         => $injector->lazyNew(Access::class),
+                'setUnitSpecificationMapperProxy'   => $injector->lazyGet('unitSpecificationDataSource'),
+                'setFolderMapper'                   => $this->getFolderMapper(),
+                'setCourseSpecificationMapperProxy' => $this->getCourseSpecificationMapperProxy(),
+                'setCourseImplementationMapperProxy' => $this->getCourseImplementationMapperProxy(),
+                'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
+                'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
                 'setAssessmentMapper'               => $injector->lazyGet('assessmentDataSource'),
                 'setCourseImplementationFactory'    => $injector->lazyNew(Course\ImplementationFactory::class, [
@@ -172,5 +172,29 @@ class Module extends \Alaress\Module\Module
             ])
         );
 
+    }
+
+    /**
+     * @return Course\ImplementationMapperProxy
+     */
+    protected function getCourseImplementationMapperProxy()
+    {
+        return $this->injector->get('courseImplementationDataSource');
+    }
+
+    /**
+     * @return Course\SpecificationMapperProxy
+     */
+    protected function getCourseSpecificationMapperProxy()
+    {
+        return $this->injector->get('courseSpecificationDataSource');
+    }
+
+    /**
+     * @return Folder\Mapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
     }
 }
