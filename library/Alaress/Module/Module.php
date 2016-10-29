@@ -89,7 +89,9 @@ class Module {
         $injector = $this->getInjector();
         if ($this->installModule($injector)) {
             $this->initSubmodules($injector, $basePath);
-            $this->initRoutes($injector->get('router'), $basePath);
+
+            // manual route init
+            $this->initRoutes($this->getRouter(), $basePath);
         }
     }
 
@@ -108,9 +110,15 @@ class Module {
         $injector                                = $this->getInjector();
         $this->preInitControllerDependencies($injector);
         $this->initDependingModules();
-        $this->initRoutePreloads($injector->get('preloader'));
-        $this->initRoutePermissions($injector->get('authorizer'));
-        $this->initTemplatePaths($injector->get('templateEngine:loader'));
+
+        // manual preloads
+        $this->initRoutePreloads($this->getPathMatcher());
+
+        // manual permissions
+        $this->initRoutePermissions($this->getAuthorizer());
+
+        // initialise templates
+        $this->initTemplatePaths($this->getTemplateLoader());
     }
 
     /**
@@ -385,6 +393,45 @@ class Module {
         return $this->getInjector()->get('externalTimetable');
     }
 
+    /**
+     * Typehinted convenience method for obtaining router reference
+     *
+     * @return Router
+     */
+    protected function getRouter()
+    {
+        return $this->injector->get('router');
+    }
+
+    /**
+     * Typehinted convenience method for obtaining preloader reference
+     *
+     * @return PathMatcher
+     */
+    protected function getPathMatcher()
+    {
+        return $this->injector->get('preloader');
+    }
+
+    /**
+     * Typehinted convenience method for obtaining authorizer router reference
+     *
+     * @return Authorizer
+     */
+    protected function getAuthorizer()
+    {
+        return $this->injector->get('authorizer');
+    }
+
+    /**
+     * Typehinted convenience method for obtaining template loader reference
+     *
+     * @return Twig_Loader_Chain
+     */
+    protected function getTemplateLoader()
+    {
+        return $this->injector->get('templateEngine:loader');
+    }
 
 
     /**
