@@ -61,6 +61,28 @@ class Module {
     protected $isControllerDependenciesInstalled = false;
 
     /**
+     * List of routes that can be pre-configured for registration
+     *
+     * @var array
+     */
+    protected $routeIndex   = [];
+
+    /**
+     * List of preloads indexed by callable, for pre-registered routes
+     *
+     * @var array
+     */
+    protected $preloadIndex = [];
+
+    /**
+     * List of permissions indexed by Rule, for pre-registered routes
+     *
+     * @var array
+     */
+    protected $permissionIndex  = [];
+
+
+    /**
      * Constructor
      *
      * TODO don't set $injector here, pass as a param to init() instead.
@@ -77,6 +99,77 @@ class Module {
         }
     }
 
+
+    /**
+     * Shorthand for all the things you can configure on a route
+     *
+     * @param string   $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
+     * @param string   $path                  parameterised form of the URL that accepts tokens in-line
+     *                                         - the notation for setting a token is {param:regex}
+     * @param string   $controllerMethodName  the method on the controller to which this route points
+     * @param Rule     $permissions           an optional rule to use to define the permissions allowed on this route
+     * @param callable $preload               an optional callable used to preload this route
+     */
+    protected function register($httpMethod, $path, $controllerMethodName, Rule $permissions = null, callable $preload = null)
+    {
+        $tokens = [];
+
+        // extract tokens from path, if any
+        if (preg_match_all('`{(/?[^:]+):([^}]+)}`', $path, $matches)) {
+            $count = count($matches[0]);
+
+            list($fullMatch, $param, $token) = $matches;
+
+            for ($i = 0; $i < $count; ++$i) {
+                // obtain token reference
+                $tokens[$param[$i]] = $token[$i];
+
+                // make shorthanded route aura friendly
+                $path = str_replace($fullMatch[$i], "{{$param[$i]}}", $path);
+            }
+        }
+
+        // index the route
+        $this->routeIndex[$controllerMethodName] = [ $httpMethod, $path, $tokens ];
+
+        if ($preload) {
+            // index the preloader
+            $this->putIntoIndex($this->preloadIndex, $preload, $controllerMethodName);
+        }
+
+        if ($permissions) {
+            // index the permission callable
+            $this->putIntoIndex($this->permissionIndex, $permissions, $controllerMethodName);
+        }
+    }
+
+
+    /**
+     * Poor man's SplObjectStorage (or, particularly, when you need to index by closure...)
+     * Indexes the given "string" by the given "object" into the given "storage"
+     *
+     * @param array  $storage
+     * @param mixed  $object
+     * @param string $string
+     * @return void
+     */
+    private function putIntoIndex(array &$storage, $object, $string)
+    {
+        foreach ($storage as $i => list($stored, $usages)) {
+            if ($stored === $object) {
+                $index = $i;
+                break;
+            }
+        }
+
+        if (isset($index)) {
+            $storage[$index][1][] = $string;
+        } else {
+            $storage[] = [ $object, [ $string ] ];
+        }
+    }
+
+
     /**
      * Installs module with its most basic configuration.
      *
@@ -90,6 +183,18 @@ class Module {
         $injector = $this->getInjector();
         if ($this->installModule($injector)) {
             $this->initSubmodules($injector, $basePath);
+
+            // perform any route registration available
+            $this->registerRoutes();
+
+            // preload registered routes
+            foreach ($this->routeIndex as $controllerMethod => list ($method, $path, $tokens)) {
+                $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
+                    ->setMethod($method)
+                    ->setTokens($tokens);
+            }
+            // no need that no more
+            unset($this->routeIndex);
 
             // manual route init
             $this->initRoutes($this->getRouter(), $basePath);
@@ -111,6 +216,23 @@ class Module {
         $injector                                = $this->getInjector();
         $this->preInitControllerDependencies($injector);
         $this->initDependingModules();
+
+        // configure pre-registered preloaders
+        foreach ($this->preloadIndex as list ($preload, $methods)) {
+            $regex = '(?:' . implode('|', $methods) . ')';
+            $this->addRoutePreload($this->getPathMatcher(), $regex, $preload);
+        }
+        // no need that no more
+        unset($this->preloadIndex);
+
+        // configure pre-registered permissions
+        foreach ($this->permissionIndex as list ($rule, $methods)) {
+            /** @var IAuthorizationRule $rule */
+            $regex = '(?:' . implode('|', $methods) . ')';
+            $this->addRoutePermission($this->getAuthorizer(), $regex, $rule);
+        }
+        // no need that no more
+        unset($this->permissionIndex);
 
         // manual preloads
         $this->initRoutePreloads($this->getPathMatcher());
@@ -166,6 +288,15 @@ class Module {
      * @param string             $basePath The base route for this module
      */
     public function initSubmodules(ContainerInterface $injector, $basePath)
+    {
+    }
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes()
     {
     }
 
