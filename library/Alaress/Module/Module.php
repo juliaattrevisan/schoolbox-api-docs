@@ -10,6 +10,7 @@
 namespace Alaress\Module;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Alaress\Rules\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Route;
 use Aura\Router\Router;
@@ -431,6 +432,20 @@ class Module {
     protected function getTemplateLoader()
     {
         return $this->injector->get('templateEngine:loader');
+    }
+
+    /**
+     * @param string $name
+     * @throws \InvalidArgumentException
+     * @return Rule
+     */
+    protected function getAuthRule($name)
+    {
+        try {
+            return $this->injector->get("rule:$name");
+        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+            throw new \InvalidArgumentException("Auth rule '$name' does not exist", 0, $e);
+        }
     }
 
 

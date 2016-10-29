@@ -11,6 +11,7 @@ namespace Schoolbox\Application\WebRequest;
 
 
 use Alaress\Application\Boot\BootstrapInterface;
+use Alaress\Authorizer\Rule;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
@@ -61,6 +62,7 @@ use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Scrub;
 use Twig_Extension_Debug;
@@ -716,6 +718,16 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+        // injectable module auth rules
+        $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));
+        $di->set('rule:isSuperuser', $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\IsSuperuser::class) ]));
+        $di->set('rule:isStaff',     $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]) ]));
+        $di->set('rule:isStudent',   $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]) ]));
+        $di->set('rule:isParent',    $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]) ]));
+
+        // composite rules
+        $di->set('rule:isStaffOrSuper',   $di->lazyNew(Rule\Any::class, [ $di->lazyGet('rule:isSuperuser'), $di->lazyGet('rule:isStaff')   ]));
+        $di->set('rule:isStaffOrStudent', $di->lazyNew(Rule\Any::class, [ $di->lazyGet('rule:isStaff'),     $di->lazyGet('rule:isStudent') ]));
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
