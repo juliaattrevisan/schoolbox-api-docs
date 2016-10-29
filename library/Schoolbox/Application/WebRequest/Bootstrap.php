@@ -395,6 +395,10 @@ class Bootstrap implements BootstrapInterface {
         $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
         $di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
 
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
+        $di->set('templateEngine:routeLookupIfAuthorized', $di->lazyNew(TwigMethod\RouteLookupIfAuthorized::class));
+
         $di->set(
             'templateEngine',
             $di->lazy(
@@ -494,6 +498,8 @@ class Bootstrap implements BootstrapInterface {
                             array($di->get('templateEngine:isRouteAuthorized'), 'execute')
                         )
                     );
+
+                    $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     return $twig;
                 }
