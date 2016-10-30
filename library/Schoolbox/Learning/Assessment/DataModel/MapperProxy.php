@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
@@ -47,16 +48,21 @@ class MapperProxy
      */
     protected $translator;
 
+    /** @var Participant\DataSource */
+    private $participantDataSource;
+
     /**
      * Constructor
      *
-     * @param Mapper     $baseMapper
+     * @param Mapper $baseMapper
      * @param Translator $translator
+     * @param Participant\DataSource $participantDataSource
      */
-    public function __construct(Mapper $baseMapper, Translator $translator)
+    public function __construct(Mapper $baseMapper, Translator $translator, Participant\DataSource $participantDataSource)
     {
         $this->baseMapper = $baseMapper;
         $this->translator = $translator;
+        $this->participantDataSource = $participantDataSource;
     }
 
     /**
@@ -140,7 +146,7 @@ class MapperProxy
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options), isset($options['hydrateParticipants']));
     }
 
     /**
@@ -152,7 +158,7 @@ class MapperProxy
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options), isset($options['hydrateParticipants']));
     }
 
     /**
@@ -164,7 +170,7 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options), isset($options['hydrateParticipants']));
     }
 
     /**
@@ -176,7 +182,7 @@ class MapperProxy
      */
     public function findAllForProjectId($projectId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options), isset($options['hydrateParticipants']));
     }
 
     /**
@@ -294,9 +300,10 @@ class MapperProxy
      * Any broken data models just get skipped.
      *
      * @param Collection|Model[] $collection
+     * @param bool               $hydrateParticipants
      * @return Collection|IAssessable[]
      */
-    public function translateToDomainModelCollection(Collection $collection)
+    public function translateToDomainModelCollection(Collection $collection, $hydrateParticipants = false)
     {
         $newCollection = new Collection();
         foreach ($collection as $model) {
@@ -309,6 +316,15 @@ class MapperProxy
                 }
             }
         }
+
+        if ($hydrateParticipants) {
+            // TODO this shouldn't need to be done like this
+            $newCollection->map(function (IAssessable $a) {
+                // manuel hydration -_-
+                return $a->setAllParticipants($this->participantDataSource->findForAssessment($a));
+            });
+        }
+
         return $newCollection;
     }
 

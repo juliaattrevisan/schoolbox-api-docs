@@ -637,6 +637,7 @@ class Bootstrap implements BootstrapInterface {
                 [
                     'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
                     'translator' => $di->lazyGet('assessmentTranslator'),
+                    'participantDataSource' => $di->lazyGet('participantDataSource')
                 ]
             )
         );
