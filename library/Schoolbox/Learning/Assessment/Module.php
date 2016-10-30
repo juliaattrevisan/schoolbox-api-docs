@@ -25,6 +25,7 @@ use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperPro
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
@@ -369,6 +370,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'folderMapper'                  => $this->getFolderMapper(),
+                'access'                        => $this->getAccess(),
                 'errorMapper'                   => $this->getErrorMapper(),
                 'submissionFileMapper'          => $this->getStudentSubmissionMapper(),
                 'assessmentMapperProxy'         => $this->getAssessmentMapperProxy(),
@@ -426,6 +428,14 @@ class Module extends BaseModule
 
     /* Getters / Setters
      */
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->getMapperFactory()->get(Access::class);
+    }
 
     /**
      * @return UserMapper

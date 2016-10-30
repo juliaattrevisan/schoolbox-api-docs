@@ -26,6 +26,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
@@ -96,9 +97,13 @@ class Controller extends Base
      */
     private $rubricMapper;
 
+    /** @var Access */
+    private $access;
+
     /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
+     * @param Access $access
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
@@ -109,6 +114,7 @@ class Controller extends Base
      */
     public function __construct(
         FolderMapper $folderMapper,
+        Access $access,
         ErrorMapper $errorMapper,
         SubmissionFileMapper $submissionFileMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -119,6 +125,7 @@ class Controller extends Base
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
+        $this->setAccess($access);
         $this->setSubmissionFileMapper($submissionFileMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
@@ -1409,6 +1416,25 @@ class Controller extends Base
         $this->rubricMapper = $rubricMapper;
         return $this;
     }
+
+    /**
+     * @return Access
+     */
+    public function getAccess()
+    {
+        return $this->access;
+    }
+
+    /**
+     * @param Access $access
+     * @return $this
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
+    }
+
 
 
 
