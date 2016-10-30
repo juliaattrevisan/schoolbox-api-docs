@@ -368,14 +368,14 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'folderMapper'                  => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'submissionFileMapper'          => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class),
-                'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
-                'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
-                'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
-                'participantDataSource'         => $injector->lazyGet('participantDataSource'),
-                'rubricMapper'                  => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'folderMapper'                  => $this->getFolderMapper(),
+                'errorMapper'                   => $this->getErrorMapper(),
+                'submissionFileMapper'          => $this->getStudentSubmissionMapper(),
+                'assessmentMapperProxy'         => $this->getAssessmentMapperProxy(),
+                'unitSpecificationMapperProxy'  => $this->getUnitSpecMapperProxy(),
+                'unitImplementationMapperProxy' => $this->getUnitImplMapperProxy(),
+                'participantDataSource'         => $this->getParticipantMapperProxy(),
+                'rubricMapper'                  => $this->getRubricMapper()
             ])
         );
     }
