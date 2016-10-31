@@ -35,7 +35,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -2613,7 +2613,7 @@ class Controller extends Base
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($somodio)
