@@ -20,7 +20,7 @@
                             </p>
                             <ul>
                                 <!-- BEGIN detentionLine -->
-                                <li class="comment">{DETENTION_COMMENT_LINE}</li>
+                                <li class="awards-comment">{DETENTION_COMMENT_LINE}</li>
                                 <!-- END detentionLine -->
                             </ul>
                         </li>
@@ -36,11 +36,9 @@
                             <p>{ABSENCE_COUNT} {ABSENCE_HEADER}</p>
                             <ul>
                                 <!-- BEGIN absence -->
-                                <li class="comment">
-                                    <p>
-                                        <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
-                                        <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
-                                    </p>
+                                <li class="awards-comment">
+                                    <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                                    <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
                                 </li>
                                 <!-- END absence -->
                             </ul>
@@ -56,12 +54,10 @@
                             <p>{LATE_ARRIVAL_COUNT} {LATE_ARRIVAL_HEADER}</p>
                             <ul>
                                 <!-- BEGIN lateArrival -->
-                                <li class="comment">
-                                    <p>
-                                        <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
-                                        <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
-                                        <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>
-                                    </p>
+                                <li class="awards-comment">
+                                    <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                                    <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
+                                    <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>
                                 </li>
                                 <!-- END lateArrival -->
                             </ul>
@@ -83,7 +79,7 @@
                             </p>
                             <ul>
                                 <!-- BEGIN awardLine -->
-                                <li class="comment">{AWARD_COMMENT_LINE}</li>
+                                <li class="awards-comment">{AWARD_COMMENT_LINE}</li>
                                 <!-- END awardLine -->
                             </ul>
                         </li>
