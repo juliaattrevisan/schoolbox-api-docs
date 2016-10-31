@@ -712,7 +712,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getFeedbacks()
     {
-        return $this->responses;
+        return $this->feedbacks;
     }
 
     /**
