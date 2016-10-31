@@ -23,7 +23,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSu
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 
 class DueWorkTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +38,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Collection::class, $dueWork->getAllParticipants());
         $this->assertInstanceOf(Collection::class, $dueWork->getAttachedFiles());
-        $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
+        $this->assertInstanceOf(DueWorkType::class, $dueWork->getWorkType());
         $this->assertSame(DueWork::ACCEPT_ONLINE_NONE, $dueWork->getAcceptOnline());
     }
 
@@ -72,7 +72,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)

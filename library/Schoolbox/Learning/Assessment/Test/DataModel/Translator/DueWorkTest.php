@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
@@ -67,7 +67,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                     ->setHash('0000000000000000000000000000000000000001')
                 )
             )
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(12)
                 ->setName('A dumb type')
             )
@@ -295,9 +295,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a sound.mp3', $dueWork->getAttachedFiles()[2]->getFilename());
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAttachedFiles()[2]->getHash());
 
-        $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
-        $this->assertEquals(12, $dueWork->getType()->getId());
-        $this->assertEquals('A dumb type', $dueWork->getType()->getName());
+        $this->assertInstanceOf(DueWorkType::class, $dueWork->getWorkType());
+        $this->assertEquals(12, $dueWork->getWorkType()->getId());
+        $this->assertEquals('A dumb type', $dueWork->getWorkType()->getName());
     }
 
     /**

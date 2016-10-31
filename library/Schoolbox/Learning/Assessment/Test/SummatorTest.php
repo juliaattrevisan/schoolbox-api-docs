@@ -26,7 +26,6 @@ use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -35,7 +34,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSu
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use \Schoolbox\Learning\Assessment\DueWork\WorkType as DueWorkType;
 
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
@@ -935,7 +934,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1006,7 +1005,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1066,7 +1065,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1469,7 +1468,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1540,7 +1539,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1600,7 +1599,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1709,7 +1708,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1758,7 +1757,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1847,7 +1846,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(3)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1918,7 +1917,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(3)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -1959,7 +1958,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(5)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -2011,7 +2010,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(5)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -2045,7 +2044,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -2205,7 +2204,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -2260,7 +2259,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
@@ -2315,7 +2314,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
-            ->setType((new DueWorkType())
+            ->setWorkType((new DueWorkType())
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
