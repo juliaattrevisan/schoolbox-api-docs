@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component;
 
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
@@ -148,6 +149,12 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     /** @var bool */
     protected $markedPerRubricGroup;
 
+    /**
+     * The actual rubric grid in use for this submission box.
+     *
+     * @var Rubric
+     */
+    protected $rubric;
 
     /**
      * @var int
@@ -772,6 +779,24 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     public function setPublishDate($publish_date)
     {
         $this->publish_date = $publish_date;
+        return $this;
+    }
+
+    /**
+     * @return Rubric
+     */
+    public function getRubric()
+    {
+        return $this->rubric;
+    }
+
+    /**
+     * @param Rubric $rubric
+     * @return static
+     */
+    public function setRubric(Rubric $rubric = null)
+    {
+        $this->rubric = $rubric;
         return $this;
     }
 

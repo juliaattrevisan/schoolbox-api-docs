@@ -157,8 +157,7 @@ class DueWork implements IAssessmentTypeTranslator
             );
 
             // Attach a (possibly empty) Rubric
-            $rubricMapper = RubricMapper::getInstance();
-            $assessable->setRubric($rubricMapper->findBySubmissionBox($model));
+            $assessable->setRubric($model->getRubric());
 
             return $assessable;
         }
