@@ -527,7 +527,7 @@ class Controller extends Base
         /* Redirect to project summary screen instead, if you spawned a project
          * Otherwise return to context
          */
-        $explicitReturnUrl = $this->getRequest()->post->get('return_url');
+        $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
         if($explicitReturnUrl){
             $returnUrl = Redirect::decode($explicitReturnUrl);
         }
