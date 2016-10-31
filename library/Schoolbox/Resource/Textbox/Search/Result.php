@@ -40,13 +40,18 @@ class Result extends Base
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
-                t.deleted IS NULL
-                AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
+                t.deleted IS NULL AND 
+                (
+                  MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
+                  `heading` LIKE ?
+                )
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
         ";
 
+        $quotedLike = $mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword());
+
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
+        $stmt->execute(['%' . $quotedLike . '%']);
 
         $collection = $mapper->createCollection();
 
@@ -79,12 +84,17 @@ class Result extends Base
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
-                t.deleted IS NULL
-                AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
+                t.deleted IS NULL AND 
+                (
+                  MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
+                  `heading` LIKE ?
+                )
         ";
 
+        $quotedLike = $mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword());
+
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
+        $stmt->execute(['%' . $quotedLike . '%']);
 
         return $this->buildSearchCount($stmt, $user, 'id');
     }
