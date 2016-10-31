@@ -24,19 +24,24 @@
                     {% if currentResponse.allFiles %}
                     <ul class="information-list">
                         {% for currentFile in currentResponse.allFiles %}
-                        <li>
-                            <div class="card small-12 compact">
-                                <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-                                    <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
-                                    <p>{{ currentFile.filename }}</p>
-                                    <p class="meta">
-                                        {% if currentFile.plagscan %}
-                                        <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
-                                        <span class="meta">plagiarised</span>
-                                        {% endif %}
-                                    </p>
-                                </a>
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12 compact">
+                                    <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
+                                        <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                                        <p>{{ currentFile.filename }}</p>
+                                        <p class="meta">
+                                            {% if currentFile.plagscan %}
+                                            <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
+                                            <span class="meta">plagiarised</span>
+                                            {% endif %}
+                                        </p>
+                                    </a>
+                                </div>
                             </div>
+                            <nav>
+                                <a class="icon-next"></a>
+                            </nav>
                         </li>
                         {% endfor %}
                     </ul>
@@ -47,16 +52,16 @@
                         {% for currentFeedback in currentResponse.allFeedback %}
                         <li>
                             <div class="list-item">
-                                <div class="card small-10">
+                                <div class="card small-12 medium-8">
                                     <a href="/search/user/230" title="View Profile">
                                         <img src="/portrait.php?userId=485&amp;size=square64" alt="" class="hide-for-small-only">
                                         <p>Alaress Admin</p>
                                         <p class="meta">Posted 43 seconds ago</p>
                                     </a>
                                 </div>
-                                <div class="small-2 columns text-right">
+                                <div class="small-12 medium-4 columns text-right">
                                     <div class="grade content">
-                                        <span class="gradient-7">B+</span>
+                                        <span class="gradient-7">Not Satisfactory</span>
                                     </div>
                                 </div>
                             </div>
