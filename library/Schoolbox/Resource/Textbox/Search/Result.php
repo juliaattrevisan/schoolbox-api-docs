@@ -40,8 +40,11 @@ class Result extends Base
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
-                t.deleted IS NULL
-                AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
+                t.deleted IS NULL AND 
+                (
+                  MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
+                  `heading` LIKE '%{$sanitiser->getUnquotedKeyword()}%'
+                )
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
         ";
 
