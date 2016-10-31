@@ -84,7 +84,7 @@ class RubricMapper
         $parentFolderId = null;
 
         if ($context instanceof UnitSpecification) {
-            $parentFolderId = $context->getBaseContext()->getFolder()->getId();
+            $parentFolderId = $context->getCourse()->getFolder()->getId();
         }
 
         return $this->createForFolder($folderId, $parentFolderId, $levelNames);
