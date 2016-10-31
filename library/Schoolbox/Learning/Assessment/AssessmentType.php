@@ -26,7 +26,7 @@ use Schoolbox\Learning\AssessmentContext;
  * Does not belong on IAssessable as interface cannot have behaviour (and shouldn't know about implementors)
  * Does not belong on AbstractAssessment as parent class should not know about children
  */
-class AssessmentType
+class AssessmentType implements IType
 {
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
@@ -35,6 +35,7 @@ class AssessmentType
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
 
+    use TypeTrait;
 
     /**
      * Get twig template directory for a given IAssessable
@@ -95,7 +96,7 @@ class AssessmentType
      * Returns the available string values
      * @return string[]
      */
-    public static function getStringValues()
+    protected function toArray()
     {
         return [
             self::TYPE_PROJECT,
