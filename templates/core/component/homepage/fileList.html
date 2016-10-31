@@ -62,51 +62,52 @@
                         <!-- END files -->
                     </ul>
                 </article>
+                <div class="component-action">
+                    <section>
+                        <a href="/resources/{FILE_CAT_ID}" class="button">View All Files</a>
 
-                <div class="content">
-                    <a href="/resources/{FILE_CAT_ID}" class="button icon-view">View All Files</a>
+                        <!-- BEGIN submit_file -->
+                        <a href="/cms/file/new/{FILE_CAT_ID}" class="button">Post File</a>
+                        <script type="text/javascript">
+                            $(function() {
+                                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                                    wrapClass: 'dragging',
+                                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                                    tplWrap: '<li class="dz-preview" />',
+                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                                    dictDefaultMessage: 'You can drag files into this space.',
+                                    addedfile: function (file) {
+                                        $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+                                    },
+                                    sending: function (file, xhr, formData) {
+                                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                        formData.append('category', $(file.previewElement).data('node'));
+                                        formData.append('comment', '');
+                                        formData.append('hidden', 0);
+                                    },
+                                    complete: function (file) {
+                                        $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                                    },
+                                    success: function (file, response) {
+                                        var el = $(file.previewElement);
 
-                    <!-- BEGIN submit_file -->
-                    <a href="/cms/file/new/{FILE_CAT_ID}" class="button icon-upload">Post File</a>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                                wrapClass: 'dragging',
-                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                                tplWrap: '<li class="dz-preview" />',
-                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                                dictDefaultMessage: 'You can drag files into this space.',
-                                addedfile: function (file) {
-                                    $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-                                },
-                                sending: function (file, xhr, formData) {
-                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                    formData.append('category', $(file.previewElement).data('node'));
-                                    formData.append('comment', '');
-                                    formData.append('hidden', 0);
-                                },
-                                complete: function (file) {
-                                    $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
-                                },
-                                success: function (file, response) {
-                                    var el = $(file.previewElement);
+                                        el.attr('data-file', response.id)
+                                                .removeClass('dz-processing')
+                                                .find('span.dz-upload')
+                                                .addClass('complete');
 
-                                    el.attr('data-file', response.id)
-                                        .removeClass('dz-processing')
-                                        .find('span.dz-upload')
-                                        .addClass('complete');
-
-                                    el.find('[data-dz-status]').text('Success');
-                                },
-                                error: function (file, response) {
-                                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
-                                }
+                                        el.find('[data-dz-status]').text('Success');
+                                    },
+                                    error: function (file, response) {
+                                        $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                                    }
+                                });
                             });
-                        });
-                    </script>
-                    <!-- END submit_file -->
+                        </script>
+                        <!-- END submit_file -->
+                    </section>
                 </div>
                 <!-- END source_folder_exists -->
             </section>

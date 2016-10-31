@@ -26,28 +26,38 @@
                     <!-- END person -->
                 </ul>
 
-                <div class="content">
-                    <ul class="inline-list no-margin">
+
+                <div class="component-action">
+                    <section>
                         <!-- BEGIN student_email -->
-                        <li class="no-margin">
-                            <form action="/mail/createMail.php" method="post" class="no-margin">
+                            <form id='form-students' action="/mail/createMail.php" method="post" class="no-margin">
                                 <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
                                 <input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
-                                <button type="submit" class="button icon-email">Email Students</button>
                             </form>
-                        </li>
+                            <script>
+                                $(function() {
+                                    $('[data-students-email]').click(function() {
+                                        $('#form-students').submit();
+                                    });
+                                })
+                            </script>
+                            <a href="#" data-students-email class="button">Email Students</a>
                         <!-- END student_email -->
-
                         <!-- BEGIN parent_email -->
-                        <li class="no-margin">
-                            <form action="/mail/createMail.php" method="post" class="no-margin">
+                            <a href="#" data-parents-email class="button">Email Parents</a>
+                            <form id='form-parents' action="/mail/createMail.php" method="post" class="no-margin">
                                 <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
                                 <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-                                &nbsp;<button type="submit" class="button icon-email">Email Parents</button>
                             </form>
-                        </li>
+                        <script>
+                            $(function() {
+                                $('[data-parents-email]').click(function() {
+                                    $('#form-parents').submit();
+                                });
+                            })
+                        </script>
                         <!-- END parent_email -->
-                    </ul>
+                    </section>
                 </div>
             </section>
         </div>

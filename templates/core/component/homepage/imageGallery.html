@@ -11,11 +11,12 @@
                 <!-- BEGIN source_folder_exists -->
                 <div class="dropzone-wrap">
                     <div class="content">
-                        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"
+                              data-accepts="image"></form>
                         <ul class="hide" data-dz-template>
                             <li>
                                 <span class="th">
-                                    <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif" />
+                                    <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif"/>
                                 </span>
                                 <div class="progress dz-progress">
                                     <span class="meter dz-upload" style="width:0;"></span>
@@ -28,48 +29,53 @@
                                 <a href="/cms/image.php?id={THUMBNAIL_ID}&height=1024&width=1024"
                                    rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;"
                                    alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                                    <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" />
+                                    <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
+                                         alt="{THUMBNAIL_DESCRIPTION}"/>
                                 </a>
                             </li>
                             <!-- END image_gallery -->
                         </ul>
-                        <!-- BEGIN submit_image_gallery -->
-                        <script type="text/javascript">
-                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                                wrapClass: 'dragging',
-                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                                acceptedFiles: 'image/*',
-                                createImageThumbnails: true,
-                                dictDefaultMessage: 'You can drag images into this space.',
-                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                    </div>
+                    <div class="component-action">
+                        <section>
+                            <!-- BEGIN submit_image_gallery -->
+                            <script type="text/javascript">
+                                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                                    wrapClass: 'dragging',
+                                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                                    acceptedFiles: 'image/*',
+                                    createImageThumbnails: true,
+                                    dictDefaultMessage: 'You can drag images into this space.',
+                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                    refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
 
-                                addedfile: function (file) {
-                                    $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                                },
-                                sending: function (file, xhr, formData) {
-                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                    formData.append('category', $(file.previewElement).data('node'));
-                                    formData.append('comment', '');
-                                    formData.append('hidden', 0);
-                                },
-                                complete: function (file) {
-                                    $(file.previewElement).find('img.dz-pending').remove();
-                                }
-                            });
-                            $('[data-image-gallery] li').magnificPopup({
-                                delegate: 'a',
-                                type: 'image'
-                            });
-                        </script>
-                        <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}" class="button icon-add">Post Image</a>
-                        <!-- END submit_image_gallery -->
-                        <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button icon-view">View Full Gallery</a>
+                                    addedfile: function (file) {
+                                        $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
+                                    },
+                                    sending: function (file, xhr, formData) {
+                                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                        formData.append('category', $(file.previewElement).data('node'));
+                                        formData.append('comment', '');
+                                        formData.append('hidden', 0);
+                                    },
+                                    complete: function (file) {
+                                        $(file.previewElement).find('img.dz-pending').remove();
+                                    }
+                                });
+                                $('[data-image-gallery] li').magnificPopup({
+                                    delegate: 'a',
+                                    type: 'image'
+                                });
+                            </script>
+                            <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}" class="button">Post Image</a>
+                            <!-- END submit_image_gallery -->
+                            <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button">View Full Gallery</a>
+                        </section>
                     </div>
                 </div>
-                <!-- END source_folder_exists -->
             </section>
         </div>
+        <!-- END source_folder_exists -->
     </div>
 </div>

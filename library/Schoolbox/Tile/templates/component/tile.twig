@@ -6,12 +6,11 @@
     }
 %}
 {% if showButtons %}
-<div class="content">
-    <div class="row">
-        <div class="small-12 columns">
-            <a href="/tile/add/{{ tile_component_instance_id }}" class="button icon-add">Add Tile</a>
-            <a href="/tile/layout/{{ tile_component_instance_id }}" class="button icon-modify">Modify Layout</a>
-        </div>
-    </div>
+
+<div class="component-action">
+    <section>
+        <a href="/tile/add/{{ tile_component_instance_id }}" class="button">Add Tile</a>
+        <a href="/tile/layout/{{ tile_component_instance_id }}" class="button">Modify Layout</a>
+    </section>
 </div>
 {% endif %}

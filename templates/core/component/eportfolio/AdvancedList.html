@@ -127,35 +127,39 @@
                 </ul>
 
                 <!-- BEGIN has_create_form -->
-                <div class="content">
-                    <a href="#" class="button icon-add" data-create>Add to List</a>
-
-                    <div class="hide" data-create-panel="new">
-                        <form action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
-                            <input type='hidden' name='action' value='addItem' />
-                            <input type='hidden' name='userId' value='{ID}' />
-                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-
-                            <label>
-                                Title
-                                <input type='text' name='title' value='' />
-                            </label>
-
-                            <label>
-                                Content
-                                <textarea id='createList-{COMPONENT_INSTANCE_ID}' name='content' data-html-editor></textarea>
-                            </label>
-
-                            <label>
-                                Image
-                                <input type='file' name='imagehash' value='' />
-                            </label>
-
-                            <input type='submit' value='Add item' />
-                        </form>
-                    </div>
+                <div class="component-action">
+                    <section>
+                        <a href="#" class="button" data-create>Add to List</a>
+                    </section>
                 </div>
+
+                <div class="hide content" data-create-panel="new">
+                    <form action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
+                        <input type='hidden' name='action' value='addItem' />
+                        <input type='hidden' name='userId' value='{ID}' />
+                        <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                        <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+
+                        <label>
+                            Title
+                            <input type='text' name='title' value='' />
+                        </label>
+
+                        <label>
+                            Content
+                            <textarea id='createList-{COMPONENT_INSTANCE_ID}' name='content' data-html-editor></textarea>
+                        </label>
+
+                        <label>
+                            Image
+                            <input type='file' name='imagehash' value='' />
+                        </label>
+
+                        <input type='submit' value='Add item' />
+                    </form>
+
+                </div>
+
                 <!-- END has_create_form -->
             </section>
         </div>
