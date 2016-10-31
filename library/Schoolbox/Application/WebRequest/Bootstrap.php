@@ -721,14 +721,14 @@ class Bootstrap implements BootstrapInterface {
 
         // injectable module auth rules
         $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));
-        $di->set('rule:isSuperuser', $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\IsSuperuser::class) ]));
-        $di->set('rule:isStaff',     $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]) ]));
-        $di->set('rule:isStudent',   $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]) ]));
-        $di->set('rule:isParent',    $di->lazyNew(Rule\All::class, [ $di->lazyGet('rule:isLoggedIn'), $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]) ]));
+        $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
+        $di->set('rule:isStaff',     $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
+        $di->set('rule:isStudent',   $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
+        $di->set('rule:isParent',    $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
 
         // composite rules
-        $di->set('rule:isStaffOrSuper',   $di->lazyNew(Rule\Any::class, [ $di->lazyGet('rule:isSuperuser'), $di->lazyGet('rule:isStaff')   ]));
-        $di->set('rule:isStaffOrStudent', $di->lazyNew(Rule\Any::class, [ $di->lazyGet('rule:isStaff'),     $di->lazyGet('rule:isStudent') ]));
+        $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
+        $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
