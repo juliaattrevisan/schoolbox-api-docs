@@ -43,13 +43,15 @@ class Result extends Base
                 t.deleted IS NULL AND 
                 (
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
-                  `heading` LIKE '%{$sanitiser->getUnquotedKeyword()}%'
+                  `heading` LIKE ?
                 )
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
         ";
 
+        $quotedLike = $mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword());
+
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
+        $stmt->execute(['%' . $quotedLike . '%']);
 
         $collection = $mapper->createCollection();
 
