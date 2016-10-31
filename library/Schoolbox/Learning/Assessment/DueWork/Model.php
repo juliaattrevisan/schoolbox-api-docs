@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Model extends AbstractAssessment
@@ -47,9 +46,9 @@ class Model extends AbstractAssessment
      * The "type" of the Due Work
      * (Essay, Homework, etc)
      *
-     * @var DueWorkType
+     * @var WorkType
      */
-    protected $type;
+    protected $workType;
 
     /**
      * An enum for accepting submissions online
@@ -105,7 +104,7 @@ class Model extends AbstractAssessment
         parent::__construct();
 
         $this->setAttachedFiles(new Collection());
-        $this->setType(new DueWorkType());
+        $this->setWorkType(new WorkType());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }
@@ -156,7 +155,7 @@ class Model extends AbstractAssessment
      */
     public function getTypeName()
     {
-        $subTypeName = $this->type->getName();
+        $subTypeName = $this->getWorkType()->getName();
         return $subTypeName ?: 'Due Work';
     }
 
@@ -309,20 +308,20 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return DueWorkType
+     * @return WorkType
      */
-    public function getType()
+    public function getWorkType()
     {
-        return $this->type;
+        return $this->workType;
     }
 
     /**
-     * @param DueWorkType $type
+     * @param WorkType $workType
      * @return self
      */
-    public function setType($type)
+    public function setWorkType($workType)
     {
-        $this->type = $type;
+        $this->workType = $workType;
         return $this;
     }
 

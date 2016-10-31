@@ -16,7 +16,7 @@ use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\Type;
+use Schoolbox\Learning\Assessment\DueWork\WorkType;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Decorator implements DecoratorInterface
@@ -64,7 +64,7 @@ class Decorator implements DecoratorInterface
             $assessment->setAcceptsMultiple();
         }
 
-        $assessment->setType((new Type())->setId($this->getWorkType()));
+        $assessment->setWorkType((new WorkType())->setId($this->getWorkType()));
 
         $assessment->setMaxMark($this->getMaxMark());
 

@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\DueWork\WorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
@@ -83,8 +83,8 @@ class DueWork implements IAssessmentTypeTranslator
             // Translate work type
             $model->setWorkType(
                 (new DueWorkModel\WorkType())
-                    ->setId($assessment->getType()->getId())
-                    ->setName($assessment->getType()->getName())
+                    ->setId($assessment->getWorkType()->getId())
+                    ->setName($assessment->getWorkType()->getName())
             );
 
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
@@ -144,8 +144,8 @@ class DueWork implements IAssessmentTypeTranslator
             }
 
             // Convert work type
-            $assessable->setType(
-                (new DueWorkType())
+            $assessable->setWorkType(
+                (new WorkType())
                     ->setId($model->getWorkType()->getId())
                     ->setName($model->getWorkType()->getName())
             );
