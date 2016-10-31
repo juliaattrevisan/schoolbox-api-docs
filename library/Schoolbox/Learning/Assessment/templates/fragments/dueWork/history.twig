@@ -1,11 +1,22 @@
+<script type="text/javascript">
+    $(function() {
+        $('#view-history').on('click', function(event) {
+            event.preventDefault();
+
+            $('#history').find('[data-history]').show();
+
+            $(this).remove();
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
 
         <section>
-             <ul class="information-list social-stream">
+             <ul id='history' class="information-list social-stream">
                 {% for currentResponse in assessment.responses %}
-                <li class="actions-small-1">
+                <li class="actions-small-1" {% if loop.index > 1 %}style="display:none"{% endif %} data-history>
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/search/user/3" title="View Profile">
@@ -94,5 +105,9 @@
                 {% endfor %}
             </ul>
         </section>
+
+        {% if assessment.responses|length > 1 %}
+        <a id="view-history" class="button icon-add">View {{ assessment.responses|length -1 }} More Submissions</a>
+        {% endif %}
     </div>
 </div>
