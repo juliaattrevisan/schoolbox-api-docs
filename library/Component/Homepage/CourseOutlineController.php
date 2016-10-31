@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Learning\Assessment\Redirect;
 
 class Component_Homepage_CourseOutlineController extends Component_Homepage_ControllerAbstract
 {
@@ -298,7 +299,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->setVar(
             array(
                 'UNIT_ID'                     => Scrub::text($unit->getId()),
-                'RETURN_URL'                  => urlencode(base64_encode($_GET["page"])),
+                'RETURN_URL_NAME'             => Redirect::RETURN_URL,
+                'RETURN_URL'                  => Redirect::encode($_GET["page"]),
                 'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getUnitCategory()->getId()),
                 'UNIT_NAME'                   => Scrub::text($unit->getTitle()),
                 'UNIT_OPEN_DATE'              => Scrub::text($unit->getOpenDate()->getDatabaseDate()),

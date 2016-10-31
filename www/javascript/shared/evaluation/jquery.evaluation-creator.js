@@ -94,12 +94,12 @@
                         error.insertAfter(element)
                     }
                 }
-            }
+            };
 
             var derived = {
-            }
+            };
 
-            var merged = $.extend(true,defaults, derived, options);
+            var merged = $.extend(true, defaults, derived, options);
 
             return merged;
         }
@@ -140,7 +140,7 @@
                 }
             });
         }
-    }
+    };
 
     /**
      * Multiple Choice/Radio Creator
@@ -225,6 +225,9 @@
                  */
                 generateAnswer: null,
 
+                // Input name attribute for a returnUrl
+                returnUrlName: 'returnUrl',
+
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
@@ -260,10 +263,10 @@
                 messages: {
                     question: "Please enter a question."
                 }
-            }
+            };
 
             var derived = {
-            }
+            };
 
             var merged = $.extend(true,defaults, derived, options);
 
@@ -444,18 +447,18 @@
 
                     // Whack the return URL on if we have one
 
-                    var return_url = theForm.find('input[name=return_url]').val();
+                    var returnUrl = theForm.find('input[name='+config.returnUrlName+']').val();
 
-                    if (return_url === '' || return_url === undefined) {
-                        return_url = '';
+                    if (returnUrl === '' || returnUrl === undefined) {
+                        returnUrl = '';
                     } else {
-                        return_url = "?return_url=" + return_url;
+                        returnUrl = "?"+config.returnUrlName+"=" + returnUrl;
                     }
 
                     /* Submit via POST and redirect to question creation screen upon done
                      */
                     $.post(theForm.attr('action'), data, function(responseText) {
-                        window.location = redirect + return_url;
+                        window.location = redirect + returnUrl;
                     });
 
                     return false;

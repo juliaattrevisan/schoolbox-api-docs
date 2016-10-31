@@ -12,10 +12,10 @@
 </ul>
 
 <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
-    <input type="hidden" name="action" value="reorder"/>
-    <input type="hidden" name="category" value="{{ unit.id }}"/>
+    <input type="hidden" name="action"    value="reorder"/>
+    <input type="hidden" name="category"  value="{{ unit.id }}"/>
     <input type="hidden" name="component" value="{{ reveals.component.id }}"/>
-    <input type="hidden" name="return_url" value="{{ returnUrl }}"/>
+    <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
 </form>
 
 {% include '@learningAssessment/builder/task/reveal-modal.twig' with { reveal: reveals } %}

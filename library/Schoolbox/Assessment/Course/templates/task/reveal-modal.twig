@@ -101,7 +101,7 @@ $data = {
         <input type="hidden" name="id"         value="{{ reveal.method == 'modify' ? reveal.id : '' }}"/>
         <input type="hidden" name="category"   value="{{ reveal.component.identifier }}"/>
         <input type="hidden" name="component"  value="{{ reveal.component.id }}"/>
-        <input type="hidden" name="return_url" value="{{ reveal.returnUrl }}"/>
+        <input type="hidden" name="returnUrl"  value="{{ reveal.returnUrl }}"/>
         <input type="hidden" name="type"       value="{% if reveal.url %}url{% else %}attach{% endif %}"/>
 
         <label for="title-new_task-{{ reveal.id }}">Title</label>

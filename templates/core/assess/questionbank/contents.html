@@ -27,7 +27,7 @@
         <!-- BEGIN category_selected -->
         <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
             <input name='section_id' type='hidden' value='{SECTION_ID}'/>
-            <input name='return_url' type='hidden' value='{RETURN_URL}'/>
+            <input name={RETURN_URL_NAME} type='hidden' value='{RETURN_URL}'/>
 
             <h2 class="subheader">{QUESTION_CATEGORY}</h2>
             <section>
@@ -64,9 +64,9 @@
                         <nav>
                             <a class="icon-view" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}" ></a>
                             <!-- BEGIN show_delete -->
-                            <a class="icon-delete" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}?return_url={RETURN_URL}" title="Delete" data-delete-question ></a>
+                            <a class="icon-delete" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Delete" data-delete-question ></a>
                             <!-- END show_delete -->
-                            <a class="icon-modify" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}?return_url={RETURN_URL}" title="Modify" ></a>
+                            <a class="icon-modify" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Modify" ></a>
                         </nav>
                         <div class="small-12 columns">
                             <div class="alert-box hide" data-answer-content="{QUESTION_BANK_ID}">
@@ -105,7 +105,7 @@
 
                         <!-- BEGIN category_list_item -->
                         <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
-                            <a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}/?return_url={RETURN_URL}'>
+                            <a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}/?{RETURN_URL_NAME}={RETURN_URL}'>
                                 {CATEGORY_LIST_ITEM_NAME}
                                 <!-- BEGIN item_count -->
                                     ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
@@ -126,7 +126,7 @@
                 <div id="edit-category-modal" class='reveal-modal' data-reveal>
                     <form action='/assess/questionbank/modify.php' class='top' method='post'>
                         <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-                        <input name='return_url' type='hidden' value='{RETURN_URL}'/>
+                        <input name='{RETURN_URL_NAME}' type='hidden' value='{RETURN_URL}'/>
 
                         <label>
                             Subcategory Name
@@ -147,7 +147,7 @@
                 <div id="add-subcategory-modal" class='reveal-modal' data-reveal>
                     <form action='/assess/questionbank/create' class="top" method='post'>
                         <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-                        <input name='return_url' type='hidden' value='{RETURN_URL}'/>
+                        <input name={RETURN_URL_NAME} type='hidden' value='{RETURN_URL}'/>
 
                         <label>
                             Subcategory Name

@@ -3,6 +3,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 try {
     $quizMapper = new OnlineAssessmentMapper();
@@ -43,9 +44,10 @@ $this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block'
 $this->setVar(
     array(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
-        'RETURN_URL' => $_GET["return_url"],
-        'ASSESS_ID' => $quiz->getId(),
-        'SECTION_ID' => $this->arg[2],
+        'RETURN_URL_NAME'          => Redirect::RETURN_URL,
+        'RETURN_URL'               => $_GET[Redirect::RETURN_URL],
+        'ASSESS_ID'                => $quiz->getId(),
+        'SECTION_ID'               => $this->arg[2],
     )
 );
 
@@ -184,7 +186,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
     $this->parse('welcome_block', 'welcome');
 }
 
-$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+$redirectUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
 
 /* Render out breadcrumbs
  */
@@ -197,12 +199,12 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => Scrub::text($quiz->getTitle()),
-        'href' => "/assess/summary/{$quiz->getId()}{$return_url}",
+        'href' => "/assess/summary/{$quiz->getId()}{$redirectUrl}",
         'class' => '',
     ],
     [
         'text' => Scrub::text($section['title']),
-        'href' => "/assess/summary/{$quiz->getId()}{$return_url}",
+        'href' => "/assess/summary/{$quiz->getId()}{$redirectUrl}",
         'class' => '',
     ],
     [

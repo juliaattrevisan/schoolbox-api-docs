@@ -14,6 +14,7 @@
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use \Schoolbox\Learning\Assessment\Redirect;
 
 $surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -162,6 +163,7 @@ if (!empty($_POST)) {
             'QUESTION'              => '',
             'MARKS'                 => '',
             'SUBMIT_DISABLED'       => '',
+            'RETURN_URL_NAME'       => Redirect::RETURN_URL,
             'RETURN_URL'            => ''
         )
     );

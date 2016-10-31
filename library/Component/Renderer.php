@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Redirect;
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
  *
@@ -129,7 +130,8 @@ class Component_Renderer
         $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
         $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
-        $component->getPageTemplate()->setVar('RETURN_URL', urlencode(base64_encode('/homepage/' . $_POST["cid"])));
+        $component->getPageTemplate()->setVar('RETURN_URL_NAME', Redirect::RETURN_URL);
+        $component->getPageTemplate()->setVar('RETURN_URL', Redirect::encode('/homepage/' . $_POST["cid"]));
         $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 

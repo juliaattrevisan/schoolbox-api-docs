@@ -9,6 +9,7 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
@@ -36,18 +37,18 @@ if (!empty($_POST)) {
      */
     $sectionHandler = new Assess_Section();
 
-    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
-    // Have to unset the return_url from the POST array, otherwise it tries to shove it in the SQL query when creating
+    // Have to unset the returnUrl from the POST array, otherwise it tries to shove it in the SQL query when creating
     // the section
 
-    unset($_POST["return_url"]);
+    unset($_POST[Redirect::RETURN_URL]);
 
     $section_id = $sectionHandler->create($_POST);
 
     /* Redirect to question creation for this section
      */
-    SitePage::localRedir('/assess/question/create/' . $section_id . $return_url);
+    SitePage::localRedir('/assess/question/create/' . $section_id . $returnUrl);
 } else {
     if (empty($this->arg[0])) {
         error(51);
@@ -94,7 +95,8 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
-        'RETURN_URL'           => $_GET["return_url"],
+        'RETURN_URL_NAME'      => Redirect::RETURN_URL,
+        'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
@@ -112,7 +114,7 @@ if (!empty($_POST)) {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [

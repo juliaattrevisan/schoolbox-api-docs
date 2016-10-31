@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Learning\Assessment\Redirect;
+
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 // DETERMINE A COURSE OF ACTION
@@ -300,8 +302,8 @@ if (isset($grid)) {
     }
 }
 
-if ($_POST["return_url"] != '') {
-    $page->localRedir(base64_decode(urldecode($_POST["return_url"])));
+if ($_POST[Redirect::RETURN_URL] != '') {
+    $page->localRedir(Redirect::decode($_POST[Redirect::RETURN_URL]));
 } else {
     $term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submission->getDueDate());
     $page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$term->getCode()}/");

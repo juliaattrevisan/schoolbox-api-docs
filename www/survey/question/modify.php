@@ -73,7 +73,7 @@ if (!empty($_POST)) {
         exit;
     }
     else {
-        SitePage::localRedir('/survey/summary/' . $section['assess_id'] . $return_url);
+        SitePage::localRedir('/survey/summary/' . $section['assess_id'] . $returnUrl);
     }
 }
 else {

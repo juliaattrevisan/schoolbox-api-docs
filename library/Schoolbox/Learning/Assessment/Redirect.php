@@ -13,6 +13,10 @@ namespace Schoolbox\Learning\Assessment;
 
 class Redirect
 {
+    /**
+     * @const string GET parameter
+     */
+    const RETURN_URL = 'returnUrl';
 
     /**
      * Encode a url

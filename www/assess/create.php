@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -125,9 +126,9 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
 
-    SitePage::localRedir('/assess/section/create/' . $assess_id . $return_url);
+    SitePage::localRedir('/assess/section/create/' . $assess_id . $returnUrl);
 }
 else {
     // Params:
@@ -206,7 +207,8 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'create',
-        'RETURN_URL'                => $_GET["return_url"],
+        'RETURN_URL_NAME'           => Redirect::RETURN_URL,
+        'RETURN_URL'                => $_GET[Redirect::RETURN_URL],
         'ASSESS_HEADING'            => 'New Quiz',
         'ASSESS_ACTION'             => 'Create',
         'ASSESS_KIND_LC'            => 'assess',
@@ -316,7 +318,7 @@ else {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [

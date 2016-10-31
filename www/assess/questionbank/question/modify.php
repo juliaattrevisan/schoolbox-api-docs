@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -138,7 +139,8 @@ else {
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => 0,
-		'RETURN_URL' => $_GET["return_url"],
+        'RETURN_URL_NAME' => Redirect::RETURN_URL,
+		'RETURN_URL' => $_GET[Redirect::RETURN_URL],
 		'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->arg[1],
 		'SECTION_ID' => $this->arg[2],
 		'QUESTION_BANK_ID' => $question['question_bank_id'],
