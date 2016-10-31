@@ -8,17 +8,9 @@
  * @version     SVN: $Id$
  */
 
-// Didn't specify an article ID?
+// Check there's actually a news ID in the URL
 if (!is_numeric($this->arg[0])) {
-    // get the most recent one, and redirect
-    $newsHandler = new News();
-    $allNews = $newsHandler->getNewsListing(false);
-    $itemID = $allNews[0]['item_id'];
-    if ($itemID) {
-        self::localRedir("/news/item/$itemID");
-    } else {
-        self::localRedir("/news");
-    }
+    error(156, '', 404);
 }
 
 /* @var $user \Schoolbox\User */
@@ -51,7 +43,7 @@ foreach ($article['groupList'] as $groupId) {
 }
 
 // Check user is in one of the selected campuses
-$inCampus = false;
+$hasCampus = false;
 foreach ($article['campusList'] as $articleCampusId) {
     foreach ($user->getCampusCollection() as $userCampus) {
         if ($userCampus->getId() == $articleCampusId) {
@@ -68,9 +60,11 @@ if ($hasRole && $hasCampus) {
 
 // Check if user has been added individually for access to this
 $hasIndividualAccess = false;
-foreach ($article['userList'] as $accessUser) {
-    if ($accessUser['id'] == $user->getId()) {
-        $hasIndividualAccess = true;
+if (!empty($article['userList'])) {
+    foreach ($article['userList'] as $accessUser) {
+        if ($accessUser['id'] == $user->getId()) {
+            $hasIndividualAccess = true;
+        }
     }
 }
 
