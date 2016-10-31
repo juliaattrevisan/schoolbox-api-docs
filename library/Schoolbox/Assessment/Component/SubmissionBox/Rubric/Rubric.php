@@ -364,7 +364,7 @@ class Rubric extends Core\Rubric
             if (!$sessionUser || $box->canViewRubric($sessionUser)) {
 
                 // set the human readable mark
-                if ($box->isMarkedPerRubricGroup()) {
+                if ($box && $box->isMarkedPerRubricGroup()) {
                     $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
                         $context['groups'][$groupId]['percentage'],
                         $context['groups'][$groupId]['total']
@@ -388,7 +388,7 @@ class Rubric extends Core\Rubric
 
         }
 
-        if ($sessionUser && !$box->canViewRubric($sessionUser)) {
+        if (!$box || ($sessionUser && !$box->canViewRubric($sessionUser))) {
             unset(
                 $context['sum'],
                 $context['total'],
@@ -397,7 +397,7 @@ class Rubric extends Core\Rubric
             );
         }
 
-        $context['boxId'] = $this->box->getId();
+        $context['boxId'] = $this->box ? $this->box->getId() : 0;
 
         return $context;
     }
@@ -471,6 +471,10 @@ class Rubric extends Core\Rubric
     protected function calculateHumanReadable($percentage, $total)
     {
         // ugh. handlers...
+        if (!$this->box) {
+            return '';
+        }
+
         $marksheet = \Marksheet_Factory::build($this->box->getMarkType()->getSlug(), $this->box);
         $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
 
