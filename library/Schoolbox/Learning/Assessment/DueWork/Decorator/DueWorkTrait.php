@@ -23,6 +23,11 @@ trait DueWorkTrait
     /**
      * @var int
      */
+    protected $workType;
+
+    /**
+     * @var int
+     */
     protected $markType;
 
     /**
@@ -65,6 +70,24 @@ trait DueWorkTrait
     protected function setAcceptOnline($acceptOnline)
     {
         $this->acceptOnline = $acceptOnline;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWorkType()
+    {
+        return $this->workType;
+    }
+
+    /**
+     * @param int $workType
+     * @return static
+     */
+    public function setWorkType($workType)
+    {
+        $this->workType = $workType;
         return $this;
     }
 

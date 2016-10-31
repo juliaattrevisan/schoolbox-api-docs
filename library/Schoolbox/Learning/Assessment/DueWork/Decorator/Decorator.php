@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\WorkType;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Decorator implements DecoratorInterface
@@ -26,6 +27,7 @@ class Decorator implements DecoratorInterface
      * Decorator constructor.
      *
      * @param $acceptOnline
+     * @param $workType
      * @param $markType
      * @param $gradingScheme
      * @param $usesRubric
@@ -34,9 +36,10 @@ class Decorator implements DecoratorInterface
      * @param $rubricData
      * @param $attachedFiles
      */
-    public function __construct($acceptOnline, $markType, $gradingScheme, $usesRubric, $markPerCapability, $maxMark, $rubricData, $attachedFiles)
+    public function __construct($acceptOnline, $workType, $markType, $gradingScheme, $usesRubric, $markPerCapability, $maxMark, $rubricData, $attachedFiles)
     {
         $this->setAcceptOnline(trim($acceptOnline));
+        $this->setWorkType(intval($workType));
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
         $this->setUsesRubric(trim($usesRubric));
@@ -60,6 +63,8 @@ class Decorator implements DecoratorInterface
         else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
             $assessment->setAcceptsMultiple();
         }
+
+        $assessment->setWorkType((new WorkType())->setId($this->getWorkType()));
 
         $assessment->setMaxMark($this->getMaxMark());
 

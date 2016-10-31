@@ -11,7 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 
-class Type
+class WorkType
 {
 
     /**
