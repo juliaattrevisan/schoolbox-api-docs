@@ -54,7 +54,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $year        = 0;
         $month       = 0;
         $index       = 0;
-        $limit       = $this->config['size']['value'];
+        $limit       = $this->getConfig('size','value');
         $orderByDate = true;
 
         $this->headlineList = $this->news->getNewsListing($archive, $topic, $year, $month, $index, $limit, $orderByDate);
@@ -109,7 +109,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'news'                  => $newsByTopic,
                 'newsAll'               => $newsAll,
                 'topics'                => $topics,
-                'heading'               => $this->config['componentname']['value']
+                'heading'               => $this->getConfig('componentname','value')
             ],
             true,
             false,
