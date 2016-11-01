@@ -15,14 +15,14 @@ CREATE TABLE `student_submission_file` (
     CONSTRAINT `fk_student_submission_file_student_submission`
     FOREIGN KEY (`student_submission_id`)
     REFERENCES `student_submission` (`id`)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
     INDEX `student_submission_file_hash` (`hash` ASC),
     CONSTRAINT `fk_student_submission_file_hash`
     FOREIGN KEY (`hash`)
     REFERENCES `storage` (`hash`)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT
     )
     ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
