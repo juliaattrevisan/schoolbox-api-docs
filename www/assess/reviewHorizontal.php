@@ -79,10 +79,10 @@ if (!isset($this->arg[1])) {
 	$assessHandler->renderAssessContents($assess['assess_id'], $this);
 
 	$this->setVar(array(
-        'ASSESS_TITLE'         => $assess['title'],
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
         'ASSESS_ASSESS_ID'     => $assess['assess_id'],
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
-        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
 	));
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
@@ -149,7 +149,7 @@ else {
 	$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 	$this->setVar('writable_finalise_block', '');
 	$this->setVar('writable_finalise_button_block', '');
-	$this->setTitle('Assessment: ' . $assess['title']);
+	$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 	/* Correct answer displayed once, at the top of the page, under the question
 	 * Each answer is handled uniquely by each answerHandler
@@ -177,7 +177,7 @@ else {
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 		'ASSESS_CATEGORY_ID' => $category->getId(),
-		'ASSESS_CATEGORY_NAME' => $category->getName(),
+		'ASSESS_CATEGORY_NAME' => Scrub::text($category->getName()),
 		'visible_staff_block'                  => '',
 		'visible_staff_students_block'         => '',
 		'visible_staff_students_parents_block' => '',

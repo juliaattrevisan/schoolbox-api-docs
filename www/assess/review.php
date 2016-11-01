@@ -98,7 +98,7 @@ $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
 $this->setBlock('endAssess', 'writable_resubmit', 'writable_resubmit_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.

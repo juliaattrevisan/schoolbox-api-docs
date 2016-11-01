@@ -103,7 +103,7 @@ if (!empty($_POST)) {
         'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
         'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
-        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
         'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
         'SECTION_ID'           => '',
         'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])

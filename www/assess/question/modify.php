@@ -188,7 +188,7 @@ if (!empty($_POST)) {
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
-        'ASSESS_SECTION_TITLE' => $section['title'],
+        'ASSESS_SECTION_TITLE' => Scrub::text($section['title']),
         'RETURN_URL_NAME'      => Redirect::RETURN_URL,
         'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
         'ASSESS_ASSESS_ID'     => $section['assess_id'],

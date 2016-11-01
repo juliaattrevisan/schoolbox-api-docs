@@ -31,7 +31,7 @@ class Breadcrumbs
 
         foreach ($data as $crumb) {
             $page->setVar('BREADCRUMB_HREF',  $crumb['href']);
-            $page->setVar('BREADCRUMB_TEXT',  $crumb['text']);
+            $page->setVar('BREADCRUMB_TEXT',  \Scrub::text($crumb['text']));
             $page->setVar('BREADCRUMB_CLASS', $crumb['class']);
 
             $page->parse('breadcrumb_block', 'breadcrumb', true);

@@ -103,7 +103,7 @@ $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 try {
     $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);

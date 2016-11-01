@@ -149,7 +149,7 @@ if (!empty($_POST)) {
 	));
 
     $this->setVar(array(
-        'ASSESS_TITLE'          => $assess['title'],
+        'ASSESS_TITLE'          => Scrub::text($assess['title']),
         'RETURN_URL_NAME'       => Redirect::RETURN_URL,
         'RETURN_URL'            => $_GET[Redirect::RETURN_URL],
         'ASSESS_ASSESS_ID'      => $section['assess_id'],
@@ -158,7 +158,7 @@ if (!empty($_POST)) {
         'ASSESS_START'          => $assessStartDate->getShort(),
         'ASSESS_FINISH'         => $assessFinishDate->getShort(),
         'ASSESS_CATEGORY_ID'    => $folder->getId(),
-        'ASSESS_CATEGORY_NAME'  => $folder->getName(),
+        'ASSESS_CATEGORY_NAME'  => Scrub::text($folder->getName()),
         'ASSESS_DURATION'       => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
         'SECTION_ID'            => $this->arg[0],
         'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),

@@ -55,7 +55,7 @@ $this->setVar(array(
     'ASSESS_FINISH'        => $assessFinishDate->getShort(),
     'FIRST_SECTION'        => $allSections[0]['section_id'],
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
-    'ASSESS_CATEGORY_NAME' => $folder->getName(),
+    'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
@@ -66,7 +66,7 @@ $this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
-$this->setTitle('Assessment: ' . $survey['title']);
+$this->setTitle('Assessment: ' . Scrub::text($survey['title']));
 
 $survey['description'] = trim($survey['description']);
 

@@ -156,7 +156,7 @@ if (!empty($_POST)) {
             'ASSESS_START'          => $assessStartDate->getShort(),
             'ASSESS_FINISH'         => $assessFinishDate->getShort(),
             'ASSESS_CATEGORY_ID'    => $folder->getId(),
-            'ASSESS_CATEGORY_NAME'  => $folder->getName(),
+            'ASSESS_CATEGORY_NAME'  => Scrub::text($folder->getName()),
             'SECTION_ID'            => $this->arg[0],
             'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
             'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),

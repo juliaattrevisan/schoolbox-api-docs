@@ -66,7 +66,7 @@ $this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block'
 $this->setBlock(TEMPLATE_content, 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'view_attempt', 'view_attempt_block');
 
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $this->setVar(array(
     'ASSESS_TITLE' => Scrub::text($assess['title']),
