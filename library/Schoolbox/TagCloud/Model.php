@@ -9,48 +9,28 @@
 
 namespace Schoolbox\TagCloud;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class Model implements \JsonSerializable
+class Model implements \JsonSerializable, ISoftDeletable
 {
-    /** @var int */
-    protected $id;
+    use DeletedAtDate;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use Id;
 
     /** @var string */
     protected $name;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
 
     /**
      * Model constructor.
      */
     public function __construct()
     {
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -69,60 +49,6 @@ class Model implements \JsonSerializable
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @param string $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param string $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param string $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 
     /**
