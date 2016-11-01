@@ -8,30 +8,43 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
+
 // Check there's actually a news ID in the URL
 if (!is_numeric($this->arg[0])) {
-    error(156, '', 404);
+    $this->pageNotFound();
 }
 
 /* @var $user \Schoolbox\User */
 $user = $_SESSION['user'];
 
 $groupHandler = new Group(NEWS_SERVICE);
-$userHandler = new User();
 $newsHandler = new News();
 $article = null;
 
 if (!($article = $newsHandler->getByID($this->arg[0]))) {
-    error(19);
+    $this->pageNotFound();
 }
 
 /* Check user has permission to see this news item
  */
+$newsAccess = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_NEWS);
 
 // Check superuser
 $isSuperuser = false;
-if ($user->isSuperuser()) {
+
+if ($user->isSuperuser() ) {
     $isSuperuser = true;
+}
+
+// Check if user has moderate access
+foreach ($article['campusList'] as $articleCampusId) {
+    foreach($newsAccess as $access) {
+        if($access->getServiceIdentifier() == $articleCampusId ) {
+            $isSuperuser = true;
+        }
+    }
 }
 
 // Check if user is in one of the selected roles
@@ -70,7 +83,7 @@ if (!empty($article['userList'])) {
 
 // If user is not a super user & does not have normal access - error out
 if (!$isSuperuser && !$hasNormalAccess && !$hasIndividualAccess) {
-    error(185);
+    error(19);
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
@@ -89,8 +102,7 @@ $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
 $url = new Url($topic['name'], '');
 
-$user = $userHandler->getByID($article['item_owner']);
-$fullname = $userHandler->formatName($user);
+$owner = UserMapper::getInstance()->findByID($article['item_owner']);
 
 $d = new Alaress_Date_Format($article['item_datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
 $e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -100,9 +112,9 @@ $output = array(
     'NEWS_TITLE' => Scrub::text($article['item_heading']),
     'NEWS_BODY' => Scrub::html($article['item_body']),
     'NEWS_IMAGE' => $article['item_image'],
-    'POSTER' => $fullname,
-    'POSTER_EXTERNAL_ID' => $user['synergy_id'],
-    'POSTER_ID' => $article['item_owner'],
+    'POSTER' => $owner->getFullName(),
+    'POSTER_EXTERNAL_ID' => $owner->getExternalId(),
+    'POSTER_ID' => $owner->getId(),
     'TOPIC_NAME' => Scrub::text($topic['name']),
     'TOPIC_CLEAN' => $url->getSlug(),
     'DATETIME' => $d->getLong(),
