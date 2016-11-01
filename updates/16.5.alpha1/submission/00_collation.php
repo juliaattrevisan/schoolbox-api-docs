@@ -1,4 +1,8 @@
 <?php
 
 // execute this before any of the new tables are created
-exit(shell_exec(__DIR__  . '/../../../tools/schema/collation.sh'));
+exec(__DIR__  . '/../../../tools/schema/collation.sh', $output, $return);
+foreach($output as $line) {
+    print $line."\n";
+}
+exit($return);
