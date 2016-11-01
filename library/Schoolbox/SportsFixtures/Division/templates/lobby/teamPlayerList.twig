@@ -1,7 +1,7 @@
 {% for teamPlayer in players %}
     <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
+        <div class="grip compact"></div>
         <div class="list-item">
-            <div class="grip compact"></div>
             <div class="small-10 compact card wrap-down">
                 <a href="/search/user/{{ teamPlayer.id }}">
                     <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />

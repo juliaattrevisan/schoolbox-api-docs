@@ -172,15 +172,15 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
-                                toFeedback.toastTimeout({text: 'Added!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Added from team' , css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.toastTimeout({text: 'Add failed!', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Add failed', css: 'alert'});
                                 player.remove();
                             });
                     }
@@ -242,15 +242,15 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
-                                toFeedback.toastTimeout({text: 'Added!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Added to team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.toastTimeout({text: 'Add failed!', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Add failed', css: 'alert'});
                                 player.remove();
                             });
                     }
@@ -295,14 +295,14 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                fromFeedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
+                                fromFeedback.toastTimeout({text: 'Remove failed', css: 'alert'});
                             });
                     }
                 }
@@ -370,14 +370,14 @@
                         updateDivisionLobby(response.divisionLobby);
                     })
                     .done(function() {
-                        feedback.toastTimeout({text: 'Added!', css: 'success'});
+                        feedback.toastTimeout({text: 'Added to team', css: 'success'});
 
                         /* Reapply filter settings to division player list
                          */
                         applyPlayerFilter();
                     })
                     .fail(function() {
-                        feedback.toastTimeout({text: 'Add failed!', css: 'alert'});
+                        feedback.toastTimeout({text: 'Add failed', css: 'alert'});
                     });
             });
         }
@@ -401,14 +401,14 @@
                                 updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
-                                feedback.toastTimeout({text: 'Removed!', css: 'success'});
+                                feedback.toastTimeout({text: 'Removed from team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                feedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
+                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
                             });
                     }
                 });
@@ -440,14 +440,14 @@
                                 $('[data-division-player-list], [data-team-player-list]').find('[data-player='+playerId+']').remove();
                             })
                             .done(function() {
-                                feedback.toastTimeout({text: 'Removed!', css: 'success'});
+                                feedback.toastTimeout({text: 'Removed from division', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                feedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
+                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
                             });
                     }
                 });

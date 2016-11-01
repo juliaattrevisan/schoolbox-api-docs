@@ -4,8 +4,8 @@
     {% set doReveal %}data-reveal-id="modifyTask-{{ task.id }}"{% endset %}
 {% endif %}
 <li class="actions-small-1 actions-large-3" data-task_id="{{ task.id }}">
+    <div class="grip"></div>
     <div class="list-item">
-        <div class="grip"></div>
         <div class="compact card small-11 wrap-down">
             {% if task.link -%}
             <a data-plugin="preview" href="{{ task.link }}">

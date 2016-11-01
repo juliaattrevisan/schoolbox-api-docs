@@ -19,9 +19,13 @@ $f-dropdown-icon-align: 0.25rem;
 // Dropdown
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-	li a:hover {
-		background-color: $content-ui-hover;
-		text-decoration: none;
+	li{
+		display: block;
+		width: 100%;
+		a:hover {
+			background-color: $content-ui-hover;
+			text-decoration: none;
+		}
 	}
 	a.menu_disabled {
 		cursor: not-allowed;
