@@ -1,0 +1,58 @@
+<section>
+    <ul class="information-list">
+
+        {% if compact %}
+
+            {# Compact view #}
+
+            {% for item in news %}
+                <li {% if modify %}class="actions-small-1"{% endif %}>
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <h3><a href="/homepage/news/{{ item.code }}/{{ item.id }}">{{ item.heading }}</a></h3>
+                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
+                        </div>
+                    </div>
+                    {% if modify %}
+                        <nav>
+                            <a class="icon-modify" href="/news/homepage/{{ item.id }}" title="Modify News"></a>
+                        </nav>
+                    {% endif %}
+                </li>
+           {% endfor %}
+
+        {% else %}
+
+            {# Non compact view #}
+
+            {% for item in news %}
+                <li {% if modify %}class="actions-small-1"{% endif %}>
+                    <div class="list-item">
+                        <div class="avatar card small-12">
+                            <a href="/search/user/{{ item.owner }}">
+                                <img src="/portrait.php?userId={{ item.synid }}&size=square64" alt="View Profile" />
+                            </a>
+                            <h3>{{ item.heading }}</h3>
+                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
+                        </div>
+                    </div>
+                    {% if modify %}
+                        <nav>
+                            <a class="icon-modify" href="/news/homepage/{{ item.id }}" title="Modify News"></a>
+                        </nav>
+                    {% endif %}
+                    <article>{{ item.body | raw }}</article>
+                </li>
+            {% endfor %}
+        {% endif %}
+
+    </ul>
+
+    <div class="content">
+        <a href="/homepage/newsArchive/{{ code }}" class="button icon-archive">View Archive</a>
+        {% if modify %}
+            <a href="/news/homepage/new/{{ code }}" class="button icon-upload">Post News</a>
+        {% endif %}
+    </div>
+
+</section>

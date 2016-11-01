@@ -604,6 +604,19 @@ abstract class Component_ControllerAbstract
      *
      * Call from $this->renderTemplate($templateHandle)
      *
+     * @param string $templateHandle    Some PHPLib BS which I don't understand.
+     *                                  Just pass $templateHandle from
+     *                                  $this->renderTemplate($templateHandle).
+     * @param string $twigTemplate      The path to a Twig template.
+     * @param array  $twigData          Data to pass into the Twig template.
+     * @param bool   $renderHeader      Set to false if you don't want the PHPLib
+     *                                  controlled header to show.
+     * @param bool   $renderConfig      Set to false if you don't want the PHPLib
+     *                                  controlled configuration to show.
+     *                                  (Dashboard components show the collapse
+     *                                  controls if this is true.)
+     * @param bool   $contentRaw        This is a flag that lets you dump the twig raw
+     *                                  rather than using standard header block
      * @param string $templateHandle Some PHPLib BS which I don't understand.
      *                               Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
@@ -623,7 +636,8 @@ abstract class Component_ControllerAbstract
         $twigTemplate,
         $twigData = [],
         $renderHeader = true,
-        $renderConfig = true
+        $renderConfig = true,
+        $contentRaw = false
     ) {
         if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
             return false;
@@ -653,7 +667,18 @@ abstract class Component_ControllerAbstract
             return false;
         }
 
-        $this->setVar('COMPONENT_CONTENT', $content);
+        // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
+        if ($contentRaw) {
+            if ($this->getInstance()->getModule() == 'dashboard') {
+                $this->setVar('dashboard_header_block', $content);
+            } else {
+                $this->setVar('header_block', $content);
+            }
+            $this->setVar('COMPONENT_CONTENT', '');
+        } else {
+            $this->setVar('COMPONENT_CONTENT', $content);
+        }
+
         return true;
     }
 
