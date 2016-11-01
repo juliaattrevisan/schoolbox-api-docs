@@ -85,14 +85,14 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $newsPermission = $this->contentPermission;
-
-        if ($newsPermission < READ_ACCESS)
+        if ($this->getContentPermission() < READ_ACCESS)
             $news = null;
         else
             $news = $this->newsHandler->getAllForCategory($this->source->getId(), array('size' => $this->getConfig('size')));
 
-        $modify = $news['owner'] == $_SESSION['id'] || $this->contentPermission >= FULL_ACCESS || ($this->contentPermission >= WRITE_ACCESS && $this->getConfig('news_edit_other'));
+        $modify =   $_SESSION['user']->isSuperuser() ||
+                    $news['owner'] == $_SESSION['user']->getId() ||
+                    $this->getContentPermission() >= FULL_ACCESS || ($this->getContentPermission() >= WRITE_ACCESS && $this->getConfig('news_edit_other'));
 
         if (is_array($news)) {
             foreach ($news as &$item) {
@@ -110,7 +110,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'news'                  => $news,
                 'modify'                => $modify,
                 'code'                  => $this->source->getId(),
-                'compact'               => $this->config['compactMode']['value']
+                'compact'               => $this->getConfig('compactMode','value')
             ]
         );
     }

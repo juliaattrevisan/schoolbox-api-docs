@@ -10,8 +10,7 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <h3><a href="/homepage/news/{{ item.code }}/{{ item.id }}">{{ item.heading }}</a></h3>
-                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> {{ item.posted.getRelativeTime }}</p>
-                            <p class="meta">(Published on {{ item.published.getLongDateOnly }})</p>
+                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
                         </div>
                     </div>
                     {% if modify %}
@@ -34,8 +33,7 @@
                                 <img src="/portrait.php?userId={{ item.synid }}&size=square64" alt="View Profile" />
                             </a>
                             <h3>{{ item.heading }}</h3>
-                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> {{ item.posted.getRelativeTime }}</p>
-                            <p class="meta">(Published on {{ item.published.getLongDateOnly }})</p>
+                            <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
                         </div>
                     </div>
                     {% if modify %}
