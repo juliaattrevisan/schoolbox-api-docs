@@ -53,7 +53,6 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * @param float $totalMark
      * @throws RangeException if $totalMark is less than permitted minimum
-     * @throws RangeException if $totalMark is greater than original total mark
      */
     protected function validateTotalMark($totalMark)
     {
@@ -66,10 +65,12 @@ class TotalMarkFractional extends TotalMarkAbstract
             throw new RangeException("Total mark must be greater than or equal to $totalMarkMin: $totalMark");
         }
 
-        $originalTotalMark = $this->getOriginalTotalMark();
-        if($totalMark > $originalTotalMark){
-            throw new RangeException("Total mark cannot exceed original total mark. Original: $originalTotalMark, Total: $totalMark");
-        }
+        // $totalMark is now allowed to be greater than original total mark.
+        // This is because the original total mark can change if a question is changed or deleted.
+//        $originalTotalMark = $this->getOriginalTotalMark();
+//        if($totalMark > $originalTotalMark){
+//            throw new RangeException("Total mark cannot exceed original total mark. Original: $originalTotalMark, Total: $totalMark");
+//        }
     }
 
     /**
