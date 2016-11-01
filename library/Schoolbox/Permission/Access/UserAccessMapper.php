@@ -159,7 +159,7 @@ class UserAccessMapper extends Mapper
         // TODO get rid of this
         $_DEPRECATED_EXTERNAL_USER_HANDLER = new \External_User();
 
-        $extSubjs = $_DEPRECATED_EXTERNAL_USER_HANDLER->getSubjectList($user->getExternalId(), $user->getId());
+        $extSubjs = $_DEPRECATED_EXTERNAL_USER_HANDLER->getSubjectList($user);
 
         $external = new Collection();
 
@@ -500,7 +500,7 @@ class UserAccessMapper extends Mapper
 
         if ($user->getExternalId()) {
             $externalUser = new \External_User;
-            $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
+            $externalSubjectList = $externalUser->getSubjectList($user);
 
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {

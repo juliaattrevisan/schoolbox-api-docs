@@ -7,6 +7,8 @@
  *                                                           *
  ************************************************************/
 
+use Schoolbox\User;
+
 class External_Denbigh_User implements External_UserInterface {
 
     private $internalDatabase;
@@ -344,11 +346,21 @@ class External_Denbigh_User implements External_UserInterface {
         return date('Y');
     }
 
-    function getSubjectList($externalUserId, $userId) {
-        if (empty($externalUserId)) {
-            return false;
+    /**
+     * Get a list of subjects and their types
+     *
+     * @param User $user
+     * @return array
+     */
+    function getSubjectList(User $user)
+    {
+        $externalId = $user->getExternalId();
+
+        if (empty($externalId)) {
+            return [];
         }
-        if ($this->getGroup()->isStaff($userId)) {
+
+        if ($user->getRole()->isStaff()) {
             $statement = $this->getExternalDatabase()->query(
                 "
 				SELECT cl.classCode as code, co.subjectName as name
@@ -356,11 +368,11 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
 				RIGHT JOIN Classes cl ON cl.staffCode = s.staffCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalId)}
 				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
-        } else {
+        } else if ($user->getRole()->isStudent()) {
             $statement = $this->getExternalDatabase()->query(
                 "
 				SELECT cl.classCode as code, co.subjectName as name
@@ -368,11 +380,13 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
 				RIGHT JOIN Classes cl ON cl.classCode = e.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalId)}
 				GROUP BY code
 				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
+        } else {
+            return [];
         }
 
         $subjectList = $statement->fetchAll(PDO::FETCH_ASSOC);

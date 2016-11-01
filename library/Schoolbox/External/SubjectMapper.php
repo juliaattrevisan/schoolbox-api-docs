@@ -80,9 +80,9 @@ class SubjectMapper extends Schoolbox\External\Mapper
     *
     * @return SubjectCollection
     */
-    public function findAllForStudent(Schoolbox\User $user)
+    public function findAllForStudent(\Schoolbox\User $user)
     {
-        $subjects = $this->external_user->getSubjectList($user->getExternalId(), $user->getId());
+        $subjects = $this->external_user->getSubjectList($user);
 
         // if no subjects, just return an empty collection
         if ($subjects === false) {

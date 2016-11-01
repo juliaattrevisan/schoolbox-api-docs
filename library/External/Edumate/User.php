@@ -8,6 +8,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+
 class External_Edumate_User extends External_Edumate_Connection implements External_UserInterface {
 
     /**
@@ -267,15 +270,19 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
     /**
      * Returns list of subjects the user is enrolled in
-     * @param $externalUserId
-     * @param $userId
-     * @return array|bool
+     *
+     * @param User $user
+     * @return array
      */
-    public function getSubjectList($externalUserId, $userId) {
-        if (empty($externalUserId)) {
-            return false;
+    public function getSubjectList(User $user)
+    {
+        $externalId = $user->getExternalId();
+
+        if (empty($externalId)) {
+            return [];
         }
-        if($this->getGroupHandler()->isStaff($userId)) {
+
+        if ($user->getRole()->isStaff()) {
             $sql = "
                 SELECT c.class_code AS code, class AS name, class_type as classType
                 FROM db2inst1.schoolbox_teacherclass tc
@@ -284,7 +291,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 ORDER BY class_type, name
             ";
         }
-        elseif($this->getGroupHandler()->isStudent($userId)) {
+        else if ($user->getRole()->isStudent()) {
             $sql = "
                 SELECT c.class_code AS code, class AS name, class_type as classType
                 FROM db2inst1.schoolbox_studentclass sc
@@ -294,13 +301,13 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             ";
         }
         else {
-            return false;
+            return [];
         }
 
         $stmt = $this->getDatabase()->prepare($sql);
 
         $stmt->execute(array(
-            'id' => $externalUserId
+            'id' => $externalId
         ));
 
         $classes = array();

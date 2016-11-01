@@ -8,6 +8,7 @@
  ************************************************************/
 
 use Alaress\DebugBar\Instance as DebugBar;
+use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
 {
@@ -742,18 +743,18 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * Get a list of subjects and their types
      *
-     * @param $synergyID
-     * @param $userID
-     *
-     * @return array|bool
+     * @param User $user
+     * @return array
      */
-    public function getSubjectList($synergyID, $userID)
+    public function getSubjectList(User $user)
     {
-        if (!$this->isExternalIdValid($synergyID)) {
+        $externalId = $user->getExternalId();
+
+        if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
 
-        if ($this->getGroup()->isStudent($userID)) {
+        if ($user->getRole()->isStudent()) {
             $sql = "
                 SELECT
                     StudentClasses.ClassCode,
@@ -767,16 +768,16 @@ class External_Synergetic_User implements External_UserInterface
                     StudentClasses.FileSemester = SubjectClasses.FileSemester AND
                     StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                     StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                    StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
-                    StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
-                    StudentClasses.ID = '{$this->database->quote($synergyID)}'
+                    StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
+                    StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
+                    StudentClasses.ID = '{$this->database->quote($externalId)}'
                 LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE
                     StudentClasses.StartDate <= getdate()
                     AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                 ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
             ";
-        } else {
+        } else if ($user->getRole()->isStaff()) {
             $sql = "
                 SELECT
                     DISTINCT(c1.ClassCode),
@@ -790,12 +791,15 @@ class External_Synergetic_User implements External_UserInterface
                     c1.FileSemester = c2.FileSemester AND
                     c1.ClassCampus = c2.ClassCampus AND
                     c1.ClassCode = c2.ClassCode AND
-                    c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
-                    c1.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
-                    c1.StaffID = '{$this->database->quote($synergyID)}'
+                    c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($externalId)) . "' AND
+                    c1.FileYear = '" . $this->database->quote($this->getCurrentYear($externalId)) . "' AND
+                    c1.StaffID = '{$this->database->quote($externalId)}'
                 LEFT JOIN luFileType ON c2.FileType = luFileType.Code
             ";
+        } else {
+            return [];
         }
+
         $this->getDatabase()->query($sql);
         $subjectList = array();
         while ($subject = $this->getDatabase()->getNextArray()) {
@@ -809,7 +813,7 @@ class External_Synergetic_User implements External_UserInterface
         if (is_array($subjectList)) {
             return $subjectList;
         } else {
-            return false;
+            return [];
         }
     }
 

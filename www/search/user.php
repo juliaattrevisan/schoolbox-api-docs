@@ -114,12 +114,14 @@ function renderStudent(
         PREG_SPLIT_NO_EMPTY
     );
 
+    $userObject = $userMapper->findById($user['uid']);
+
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];
     $splitSubjects = \Config::get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
-    foreach ($synUserHandler->getSubjectList($user['synergy_id'], $user['uid']) as $subject) {
+    foreach ($synUserHandler->getSubjectList($userObject) as $subject) {
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
 
         // Load a bunch of category and teacher info too
@@ -246,7 +248,6 @@ function renderStudent(
     // TODO make preg_replace available to Twig
     // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
     // TODO make $now available to Twig by default
-    $userObject = $userMapper->findById($user['uid']);
     $userObject->loadParents();
 
     $page->setFile(TEMPLATE_content, 'output.html');

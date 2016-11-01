@@ -75,7 +75,7 @@ class IsInvolvedInClass extends All
             }
 
             // Check each subject
-            foreach ($this->externalDb->getSubjectList($user->getExternalId(), $user->getId()) as $subject) {
+            foreach ($this->externalDb->getSubjectList($user) as $subject) {
                 foreach ($classCodes as $classCode) {
                     if (is_numeric($classCode) && $classCode == $subject['id']) {
                         return true;
