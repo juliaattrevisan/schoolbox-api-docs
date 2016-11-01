@@ -90,7 +90,7 @@ touch /vagrant/tools/browscap/browscap.ini;
 cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
 
 echo "$vag Loading Schoolbox MySQL Demo data";
-mysql -u root -ptnp879 -e "create database schoolbox";
+mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
 
 mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";

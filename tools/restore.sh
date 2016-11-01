@@ -508,7 +508,7 @@ echo -e "\nStarting restore of the database";
 mysqldump --allow-keywords -i -e -q -a --skip-extended-insert -c -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb config > /tmp/$sqldb-config-`date -I`.sql;
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "DROP DATABASE $sqldb;";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb;";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
 ## Unpack if gzipped
 gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;

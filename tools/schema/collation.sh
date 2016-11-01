@@ -19,9 +19,12 @@ sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d
 sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 
+# ensure the DB itself is defaulting to UTF8
+mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "ALTER DATABASE $sqldb CHARACTER SET utf8 COLLATE utf8_general_ci; "
+
 # select all tables that are UTF8, but are NOT collated 'general'
-QUERY="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$sqldb' AND TABLE_COLLATION != 'utf8_general_ci' AND TABLE_COLLATION LIKE 'utf8%'"
-AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci; SET foreign_key_checks = 1; "}'
+QUERY="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$sqldb' AND TABLE_COLLATION NOT LIKE 'utf8_general_ci'"
+AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CHARSET=utf8 COLLATE=utf8_general_ci; SET foreign_key_checks = 1; "}'
 
 # log intention
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
@@ -29,13 +32,15 @@ mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKS
 # execute
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
 
+
+## Removed because some columns need to remain latin
 
 # now doublecheck for any remnant non-default fields
-QUERY="SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '$sqldb' AND COLLATION_NAME != 'utf8_general_ci' AND COLLATION_NAME LIKE 'utf8%'"
-AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "MODIFY", $2, $3, "CHARACTER SET utf8 COLLATE utf8_general_ci; SET foreign_key_checks = 1; "}'
+#QUERY="SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '$sqldb' AND COLLATION_NAME NOT LIKE 'utf8%'"
+#AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "MODIFY", $2, $3, "CHARACTER SET utf8 COLLATE utf8_general_ci; SET foreign_key_checks = 1; "}'
 
 # log intention
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
+#mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
 
 # execute
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
+#mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
