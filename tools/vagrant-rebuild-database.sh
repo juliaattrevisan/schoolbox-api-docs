@@ -29,7 +29,7 @@ echo "$vag Removing current Schoolbox MySQL database";
 mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
 echo "$vag Loading Schoolbox MySQL Demo data";
-mysql -u root -ptnp879 -e "create database schoolbox";
+mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql
 
 echo "$vag Generating data dir sql fixes";

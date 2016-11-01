@@ -63,7 +63,7 @@ touch /vagrant/tools/browscap/browscap.ini;
 cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
-mysql --defaults-extra-file=/root/.my.cnf -e "create database schoolbox";
+mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
 
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
