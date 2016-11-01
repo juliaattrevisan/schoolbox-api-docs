@@ -10,12 +10,11 @@ namespace Schoolbox\Admin\User;
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
-use Group;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Campus;
-use Schoolbox\CampusCollection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -72,6 +71,11 @@ class Controller extends Base
     protected $roleMapper;
 
     /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
      * @var \HouseResidentialMapper
      */
     protected $houseResidentialMapper;
@@ -109,6 +113,7 @@ class Controller extends Base
         UserLogMapper $userLogMapper,
         FolderMapper $folderMapper,
         UserMapper $userMapper,
+        ErrorMapper $errorMapper,
         UserAccessMapper $userAccessMapper,
         UserTitleMapper $userTitleMapper,
         CampusMapper $campusMapper,
@@ -120,6 +125,7 @@ class Controller extends Base
         $this->userLogMapper = $userLogMapper;
         $this->folderMapper = $folderMapper;
         $this->userMapper = $userMapper;
+        $this->errorMapper = $errorMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->userTitleMapper = $userTitleMapper;
         $this->campusMapper = $campusMapper;
@@ -134,8 +140,8 @@ class Controller extends Base
      */
     public function getModify($user)
     {
-        if (\Cfg::get('external_enable') && \Cfg::get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
-            $externalUser = new \External_Synergetic_User();
+        if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
+            $externalUser = $this->di->get('externalUser');
             $fileSemester = $externalUser->getCurrentSemester($user->getExternalId());
             $fileYear = $externalUser->getCurrentYear($user->getExternalId());
         } else {
@@ -146,10 +152,10 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'pageCurrent' => user,
+                'pageCurrent' => 'user',
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
-                'externalDatabase' => ucfirst(\Cfg::get('external_type')),
+                'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
@@ -160,7 +166,7 @@ class Controller extends Base
                 'currentUser' => $this->getUser(),
                 'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
                 'userPermissions' => $this->userAccessMapper->findAllForUser($user),
-                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername())->sortBy('date', 'desc')->limit(0, 10),
+                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
                 'cmsLog' => $this->cmsLogMapper->findByUser($user, 10)->sortBy('time', 'desc')
             ],
             'title' => 'Admin - Users'
@@ -179,7 +185,7 @@ class Controller extends Base
                 'pageCurrent' => 'user',
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
-                'externalDatabase' => ucfirst(\Cfg::get('external_type')),
+                'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
@@ -203,6 +209,7 @@ class Controller extends Base
             $userAccess->setServiceIdentifier($post['sid']);
             $this->userAccessMapper->save($userAccess);
         } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
         $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#groups");
@@ -223,6 +230,7 @@ class Controller extends Base
             $userAccess->setServiceIdentifier(empty($post['sid']) ? 0 : $post['sid']);
             $this->userAccessMapper->save($userAccess);
         } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
         $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#permissions");

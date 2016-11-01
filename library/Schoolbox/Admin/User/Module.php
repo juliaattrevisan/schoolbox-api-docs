@@ -17,6 +17,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
@@ -104,6 +105,7 @@ class Module extends BaseModule
                 [
                     'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                     'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
                     'houseMapper' => $this->getMapperFactory()->getLazy(HouseMapper::class),
                     'houseResidentialMapper' => $this->getMapperFactory()->getLazy(HouseResidentialMapper::class),
