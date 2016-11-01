@@ -108,6 +108,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         )
     );
     $successCount = 0;
+    $warningCount = 0;
     $failureCount = 0;
     $rows = array_merge($selectDueWorksQuery->fetchAll(PDO::FETCH_ASSOC), $selectQuizzesQuery->fetchAll(PDO::FETCH_ASSOC));
     foreach ($rows as $row) {
@@ -130,7 +131,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->info(sprintf('Converting due work "%s" (id: %d)...', $title, $boxId));
         } else {
             $log->warning('Assessment is neither a quiz or due work - not sure how that happened but it did!');
-            $failureCount++;
             continue;
         }
 
@@ -153,10 +153,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');
 
-            // Associate this assessment with its folder
-            $insertAssessmentFolderRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
-            $log->debug('Created assessment/folder relation');
-
             // Create the quiz or due work
             if ($quizId) {
                 $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $quizId]);
@@ -166,17 +162,30 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->debug('Created due work/assessment relation');
             }
 
+            // Associate this assessment with its folder
+            try {
+                $insertAssessmentFolderRelationQuery->execute(['assessmentId' => $assessmentId, 'folderId' => $folderId]);
+                $log->debug('Created assessment/folder relation');
+            } catch (PDOException $e) {
+                $log->warning('Could not create assessment/folder relation!');
+                $log->warning('This is probably because the folder in which this assessment lives has been deleted.');
+                $log->warning('This assessment will be orphaned (it likely was already).');
+                $log->warning($e->getMessage());
+                $warningCount++;
+            }
+
             $successCount++;
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->warning($e->getMessage());
             $log->error(sprintf('%s "%s" could not be converted!', ($quizId ? 'Quiz' : 'Due Work'), $title), [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $db->rollBack();
 
         }
     }
 
-    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    $log->info(sprintf('%d tasks converted (%d warnings), %d failed to convert', $successCount, $warningCount, $failureCount));
+    exit($failureCount > 0 ? 1 : 0);
 });

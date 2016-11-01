@@ -98,18 +98,23 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $updateQuizQuery    = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
 
     // Select tasks queries
+    // Use IDs from due work and quiz tables, because the task instance's quiz/duework IDs
+    // can actually disappear, even though they have a duework/quiz.
+    // I think this occurs when the duework/quiz is deleted, but the task instance isn't?
     $selectTaskInstanceQuery = $db->prepare("
         SELECT 
             ti.id,
             ti.course_unit_instance_id,
             ti.title,
-            ti.assess_id,
-            ti.box_id,
+            `as`.assess_id,
+            sb.id AS box_id,
             ti.created_at,
             ti.deleted_at,
             ci.category_id
         FROM task_instance ti
         INNER JOIN course_unit_implementation ci ON ti.course_unit_instance_id = ci.id
+        LEFT JOIN submission_box sb ON ti.id = sb.task_instance_id
+        LEFT JOIN assess `as` ON ti.id = `as`.task_instance_id
         ORDER BY ti.id ASC
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
@@ -123,6 +128,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectTaskInstanceQuery->execute();
     $log->debug(sprintf('%d task instances found', $selectTaskInstanceQuery->rowCount()));
     $successCount = 0;
+    $warningCount = 0;
     $failureCount = 0;
     foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $taskId               = $row['id'];
@@ -200,11 +206,19 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created assessment/course implementation relation');
 
             // Add a relation between assessment spec and implementation
-            $insertAssessmentImplementationRelationQuery->execute([
-                'assessmentId'   => $assessmentId,
-                'taskInstanceId' => $taskId,
-            ]);
-            $log->debug('Created implementation/specification assessment relation');
+            try {
+                $insertAssessmentImplementationRelationQuery->execute([
+                    'assessmentId'   => $assessmentId,
+                    'taskInstanceId' => $taskId,
+                ]);
+                $log->debug('Created implementation/specification assessment relation');
+            } catch (PDOException $e) {
+                $log->warning('Could not create implementation/specification assessment relation!');
+                $log->warning('This is probably because this implementation of an assessment has no specification.');
+                $log->warning('This is probably okay, because an assessment to be added to an implementation separate from its specification.');
+                $log->warning($e->getMessage());
+                $warningCount++;
+            }
 
             // Create the task out of this assessment
             if ($quizId) {
@@ -236,13 +250,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->warning($e->getMessage());
             $log->error(sprintf('Task instance "%s" could not be converted!', $title), [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $db->rollBack();
 
         }
     }
 
-    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
+    $log->info(sprintf('%d task instances converted (%d warnings), %d failed to convert', $successCount, $warningCount, $failureCount));
+    exit($failureCount > 0 ? 1 : 0);
 });
