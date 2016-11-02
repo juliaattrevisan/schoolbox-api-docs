@@ -219,7 +219,16 @@ class Controller extends Base
         // TODO - generate data
         // Participants (for all assessments)
         // Assessments
-        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
+        $participants = new Collection();
+        $assessments  = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
+        foreach ($assessments as $assessment) {
+            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+            // Put students into a participant list
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $student = $participant->getUser();
+                $participants[$student->getId()] = $student;
+            }
+        }
         // Statistics
         $marksheet = [];
 
@@ -227,6 +236,7 @@ class Controller extends Base
             'class'     => $class,
             'marksheet' => $marksheet,
             'assessments' => $assessments,
+            'participants' => $participants,
         ]));
     }
 
