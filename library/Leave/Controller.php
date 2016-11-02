@@ -192,37 +192,35 @@ class Leave_Controller extends Controller
 
         $allHouses = $this->getRequestMapper()->getCateringReport($today);
 
-        $leaving_today = 0;
-        $returning_today = 0;
+        $leavingToday = 0;
+        $returningToday = 0;
 
         foreach ($allHouses as $house) {
 
-            $summary_house_absent = 0;
+            $absentToday = 0;
             if ($house['absent_morning'] > 0 || $house['absent_day'] > 0 || $house['absent_night'] > 0) {
-                $summary_house_absent= max(Array($house['absent_morning'],$house['absent_day'],$house['absent_night']));
+                $absentToday = max(Array($house['absent_morning'], $house['absent_day'], $house['absent_night']));
             }
 
             $requestList = $this->getRequestMapper()->findAllByHouseId($house['houseId']);
-            $summary_house_approved = 0;
-            $summary_house_rejected = 0;
-            $summary_house_pending = 0;
+            $totalApproved = 0;
+            $totalRejected = 0;
+            $totalPending = 0;
 
             foreach ($requestList as $request) {
 
                 if ($request->isApproved()) {
-                    $summary_house_approved ++;
+                    $totalApproved++;
+                } elseif ($request->isRejected()) {
+                    $totalRejected++;
+                } else {
+                    $totalPending++;
                 }
-                if ($request->isRejected()) {
-                    $summary_house_rejected ++;
+                if ($request->getStart()->getDatabaseDate() == $today->getDatabaseDate()) {
+                    $leavingToday++;
                 }
-                if ($request->isPending()) {
-                    $summary_house_pending ++;
-                }
-                if($request->getStart()->getDatabaseDate() == $today->getDatabaseDate()) {
-                    $leaving_today ++;
-                }
-                if($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()) {
-                    $returning_today ++;
+                if ($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()) {
+                    $returningToday++;
                 }
             }
 
@@ -230,7 +228,7 @@ class Leave_Controller extends Controller
                 array(
                     'SUMMARY_HOUSE_ID' => $house['houseId'],
                     'SUMMARY_HOUSE_NAME' => $house['name'],
-                    'SUMMARY_HOUSE_PENDING' => $summary_house_pending,
+                    'SUMMARY_HOUSE_PENDING' => $totalPending,
                 )
             );
             $this->getPage()->parse('reports_menu_block', 'reports_menu', true);
@@ -241,10 +239,10 @@ class Leave_Controller extends Controller
                     'SUMMARY_HOUSE_ID' => $house['houseId'],
                     'SUMMARY_HOUSE_NAME' => $house['name'],
                     'SUMMARY_HOUSE_TOTAL' => $house['absent_morning'] + $house['present_morning'],
-                    'SUMMARY_HOUSE_ONLEAVE' => $summary_house_absent,
-                    'SUMMARY_HOUSE_APPROVED' => $summary_house_approved,
-                    'SUMMARY_HOUSE_PENDING' => $summary_house_pending,
-                    'SUMMARY_HOUSE_REJECTED' => $summary_house_rejected,
+                    'SUMMARY_HOUSE_ONLEAVE' => $absentToday,
+                    'SUMMARY_HOUSE_APPROVED' => $totalApproved,
+                    'SUMMARY_HOUSE_PENDING' => $totalPending,
+                    'SUMMARY_HOUSE_REJECTED' => $totalRejected,
                 )
             );
 
@@ -254,17 +252,21 @@ class Leave_Controller extends Controller
         $this->getPage()->setVar(Array(
             'SUMMARY_TODAY' => $today->getURLDate(),
             'SUMMARY_WEEK' => $today->addDays(7)->getURLDate(),
-            'SUMMARY_DEPARTING' => $leaving_today,
-            'SUMMARY_RETURNING' => $returning_today,
+            'SUMMARY_DEPARTING' => $leavingToday,
+            'SUMMARY_RETURNING' => $returningToday,
         ));
 
-        $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 6));
-
-        foreach($colourList as $i=>$colour){
-            $this->getPage()->setVar(
-                array(
-                'SUMMARY_COLOR_'.$i => $colour->getHexColour(),
-            ));
+        $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 5));
+        if (!empty($colourList)) {
+            foreach ($colourList as $i => $colour) {
+                $this->getPage()->setVar(
+                    array(
+                        'SUMMARY_COLOR_' . $i => $colour->getHexColour(),
+                    ));
+            }
+        }
+        else {
+            $colourList = Array();
         }
 
     }

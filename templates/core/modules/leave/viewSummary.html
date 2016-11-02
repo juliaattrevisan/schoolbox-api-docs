@@ -1,40 +1,52 @@
 <style>
-div.leave_summary p {
+div.leave-summary p {
     text-align: center;
     font-size: large;
 }
-div.leave_summary a {
+div.leave-summary a {
     color: inherit;
 }
-div.leave_summary section.summary_tile span {
+div.leave-summary section.summary-tile span {
     font-size: 1000%;
     line-height: 100%;
     display: block;
     width: 100%;
 }
-div.leave_summary section.summary_tile span.icon-progress:before {
+div.leave-summary section.summary-tile span.icon-progress:before {
     font-size: 100%;
 }
-div.leave_summary section.summary_line span.icon-progress:before {
+div.leave-summary section.summary-line span.icon-progress:before {
     display: inline!important;
     font-size: 100%;
 }
-section.summary_tile {
+section.summary-tile {
     min-height: 220px;
 }
-section.summary_house_tile {
+section.summary-house-tile {
     min-height: 150px;
 }
-div.leave_summary section.summary_house_tile span {
+div.leave-summary section.summary-house-tile span {
     width: 100%;
     display: block;
     font-size: 600%;
     line-height: 100%;
 }
-section.summary_line {
+section.summary-line {
     min-hight: 50px;
 }
-section.summary_line p {
+section.summary-line.approved {
+    background-color: #c3e2c3;
+    color: #1a901a;
+}
+section.summary-line.rejected {
+    background-color: #ffc1c0;
+    color: #ff1310;
+}
+section.summary-line.pending {
+    background-color: #fff1e3;
+    color: #ff7d00;
+}
+section.summary-line p {
     margin: 0px;
     line-height: 40px;
 }
@@ -61,10 +73,10 @@ section.summary_line p {
         <!-- END reports_menu -->
     </ul>
 </div>
-<div class="leave_summary">
+<div class="leave-summary">
     <div class="row">
         <div class="small-6 medium-4 island">
-            <section class="summary_tile" style="background-color:{SUMMARY_COLOR_0}">
+            <section class="summary-tile" style="background-color:{SUMMARY_COLOR_0}">
 
                 <p>
                     <span class="departing">{SUMMARY_DEPARTING}</span> Departing Today
@@ -73,7 +85,7 @@ section.summary_line p {
             </section>
         </div>
         <div class="small-6 medium-4 island">
-            <section class="summary_tile" style="background-color:{SUMMARY_COLOR_1}">
+            <section class="summary-tile" style="background-color:{SUMMARY_COLOR_1}">
 
                 <p>
                     <span class="returning">{SUMMARY_RETURNING}</span> Returning Today
@@ -83,7 +95,7 @@ section.summary_line p {
         </div>
         <div class="small-12 medium-4 hide-for-small-only island">
             <a href="/modules/leave/report/catering" title="View Catering Report">
-            <section class="summary_tile" style="background-color:{SUMMARY_COLOR_2}">
+            <section class="summary-tile" style="background-color:{SUMMARY_COLOR_2}">
                 <p>
                   <span class="icon-progress"></span>View Catering Report
                 </p>
@@ -92,7 +104,7 @@ section.summary_line p {
         </div>
         <div class="small-12 medium-4 show-for-small-only island">
             <a href="/modules/leave/report/catering">
-                <section class="summary_line" style="background-color:{SUMMARY_COLOR_2}">
+                <section class="summary-line" style="background-color:{SUMMARY_COLOR_2}">
                     <p>
                         <span class="icon-progress"></span>View Catering Report
                     </p>
@@ -107,7 +119,7 @@ section.summary_line p {
         </div>
         <div class="small-6 medium-4 island">
             <a href="/modules/leave/report/house/{SUMMARY_HOUSE_ID}/range/{SUMMARY_TODAY}/{SUMMARY_WEEK}" title="View House Report for the next 7 days">
-            <section class="summary_house_tile" style="background-color:{SUMMARY_COLOR_2}">
+            <section class="summary-house-tile" style="background-color:{SUMMARY_COLOR_2}">
                 <p>
                     <span>{SUMMARY_HOUSE_TOTAL}</span> Total
                 </p>
@@ -116,7 +128,7 @@ section.summary_line p {
         </div>
         <div class="small-6 medium-4 island">
             <a href="/modules/leave/report/house/{SUMMARY_HOUSE_ID}/day/{SUMMARY_TODAY}/" title="View House Report for today">
-            <section class="summary_house_tile" style="background-color:{SUMMARY_COLOR_4}">
+            <section class="summary-house-tile" style="background-color:{SUMMARY_COLOR_4}">
 
                     <p>
                         <span>{SUMMARY_HOUSE_ONLEAVE}</span> On Leave Today
@@ -127,7 +139,7 @@ section.summary_line p {
         </div>
         <div class="small-12 medium-4 island">
             <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}" title="Manage Leave Reqiests">
-            <section class="summary_line" style="background-color: {SUMMARY_COLOR_3}">
+            <section class="summary-line pending">
 
                 <p>
                     {SUMMARY_HOUSE_PENDING} Pending
@@ -135,14 +147,14 @@ section.summary_line p {
             </section>
             </a>
             <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}" title="Manage Leave Reqiests">
-            <section class="summary_line" style="background-color: {SUMMARY_COLOR_4}">
+            <section class="summary-line approved">
                 <p>
                     {SUMMARY_HOUSE_APPROVED} Approved
                 </p>
             </section>
             </a>
             <a href="/modules/leave/house/{SUMMARY_HOUSE_ID}" title="Manage Leave Reqiests">
-            <section class="summary_line" style="background-color: {SUMMARY_COLOR_5}">
+            <section class="summary-line rejected">
                 <p>
                     {SUMMARY_HOUSE_REJECTED} Rejected
                 </p>
