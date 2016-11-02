@@ -1243,9 +1243,16 @@ p{
 		background-color: rgba(0,0,0,0.02);
 		border-top: 1px solid $body-bg;
 		clear: both;
+		padding-left: 2rem;
+
+		@media #{$small-only} {
+			padding-left: 2.5rem;
+		}
 
 		.reply{
 			background-color: transparent;
+			padding-left: 1rem;
+			margin-left: 1rem;
 		}
 	}
 
@@ -1260,6 +1267,12 @@ p{
 	@extend .threaded;
 
 	.reply {
+		padding-left: 1rem;
+
+		@media #{$small-only} {
+			padding-left: 0.5rem;
+		}
+
 		li,
 		.component-form{
 			clear: both;
