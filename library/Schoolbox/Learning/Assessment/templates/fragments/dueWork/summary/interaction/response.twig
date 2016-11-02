@@ -27,11 +27,11 @@
                                     <p class="meta">
                                         {% if currentFile.plagscan.isComplete %}
                                             <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
-                                            <span class="meta">plagiarised</span>
+                                            <span class="meta" title="Plagiarism check completed.">plagiarised</span>
                                         {% elseif currentFile.plagscan.isProcessing %}
-                                            <span class="meta">Processing</span>
+                                            <span class="meta" title="Plagiarism check is currently processing - check back again soon.">Processing</span>
                                         {% elseif currentFile.plagscan.isPending %}
-                                            <span class="meta">Pending</span>
+                                            <span class="meta" title="Plagiarism check is pending.">Pending</span>
                                         {% endif %}
                                     </p>
                                 {% endif %}
