@@ -240,7 +240,7 @@ CREATE TABLE `project` (
   INDEX `fk_project_grade_group_id_idx` (`grade_group_id` ASC),
   CONSTRAINT `fk_project_grade_group_id`
   FOREIGN KEY (`grade_group_id`)
-  REFERENCES `schoolbox`.`submission_grade_group` (`id`)
+  REFERENCES `submission_grade_group` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   UNIQUE INDEX `fk_project_assessment_id_idx` (`assessment_id` ASC),
