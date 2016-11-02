@@ -44,15 +44,39 @@ class Controller extends AbstractController
      */
     public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
     {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/review/$assessId/$firstSectionId/$responseId");
+    }
+
+    /**
+     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
+     * @api   GET /learning/quiz/summary/{assessmentId}
+     * @level 165
+     * @param int $assessmentId
+     * @todo Rebuild with twig
+     */
+    public function getQuizSummary($assessmentId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/summary/$assessId");
+    }
+
+    /**
+     * Converts an assessment_id to an assess_id
+     *
+     * @param int $assessmentId
+     * @return int
+     */
+    private function getQuizIdForAssessmentId($assessmentId)
+    {
         /** @var Model $quiz */
         $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
 
         if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
-        $assessId = $quiz->getId();
-
-        $this->getResponse()->redirect->to("/assess/review/$assessId/$firstSectionId/$responseId");
+        return $quiz->getId();
     }
 
 
