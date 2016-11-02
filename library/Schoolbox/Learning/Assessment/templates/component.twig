@@ -8,8 +8,10 @@
     <ul class="action-list">
         {% for assessable in assessables %}
 
-            {% if isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% if assessable is quiz and not isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
                 {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% else %}
+                {% set viewRoute = routeLookup('learningQuiz.getQuizIntro', {assessmentId: assessable.id}) %}
             {% endif %}
 
             {% if assessable is quiz %}
