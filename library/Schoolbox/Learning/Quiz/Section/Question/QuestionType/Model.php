@@ -185,7 +185,7 @@ class Model
     /**
      * @return boolean
      */
-    public function isHasLegend()
+    public function getHasLegend()
     {
         return $this->hasLegend;
     }
@@ -203,7 +203,7 @@ class Model
     /**
      * @return boolean
      */
-    public function isHasConfig()
+    public function getHasConfig()
     {
         return $this->hasConfig;
     }

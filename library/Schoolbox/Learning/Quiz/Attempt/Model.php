@@ -16,7 +16,6 @@ use \Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
-
     /**
      * @var int
      */
@@ -25,7 +24,7 @@ class Model implements ISoftDeletable
     /**
      * @var Quiz
      */
-    protected $assessment;
+    protected $quiz;
 
     /**
      * @var User
@@ -66,13 +65,12 @@ class Model implements ISoftDeletable
      */
 
     /**
-     * @param  Quiz $assessment
-     *
+     * @param  Quiz $quiz
      * @return $this
      */
-    public function setAssessment(Quiz $assessment)
+    public function setAssessment(Quiz $quiz)
     {
-        $this->assessment = $assessment;
+        $this->quiz = $quiz;
         return $this;
     }
 
@@ -81,12 +79,11 @@ class Model implements ISoftDeletable
      */
     public function getAssessment()
     {
-        return $this->assessment;
+        return $this->quiz;
     }
 
     /**
      * @param  Alaress_Date_Format $finish
-     *
      * @return $this
      */
     public function setFinish(Alaress_Date_Format $finish)
