@@ -243,7 +243,8 @@ class TemporaryDueWorkDecorator
             ->setId(111)
             ->setAssessable($assessment)
             ->setReviewer($this->celia)
-            ->setNormalisedMark(86)
+            ->setNormalisedMark(76)
+            ->setHumanReadableMark('LOL @ U')
             ->setComment('This is a floating feedback.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
