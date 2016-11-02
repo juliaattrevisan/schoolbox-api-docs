@@ -20,195 +20,195 @@ use \Schoolbox\User;
 class TimelineTest extends \PHPUnit_Framework_TestCase
 {
 
-//    /**
-//     * No Responses
-//     * No Feedbacks
-//     */
-//    public function testEmptyStacks()
-//    {
-//        $assessment = new DueWork();
-//
-//        $this->assertCount(0, (new Timeline($assessment))->getTimeline());
-//    }
-//
-//    /**
-//     * One Response
-//     * No Feedback
-//     */
-//    public function testOneResponse()
-//    {
-//        $assessment = new DueWork();
-//
-//        $response1 = new Submission();
-//        $response1
-//            ->setId(1)
-//            ->setAssessable($assessment)
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-04 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $assessment->setResponses((new Collection())->add($response1));
-//
-//        /* Compare these
-//         */
-//        $expected = (new Collection())->add($response1);
-//
-//        $timeline = (new Timeline($assessment))->getTimeline();
-//
-//        $this->assertEquals($expected, $timeline);
-//    }
-//
-//
-//    /**
-//     * One Response
-//     * One Feedback
-//     */
-//    public function testOneResponseOneFeedback()
-//    {
-//        $assessment = new DueWork();
-//
-//        $response1 = new Submission();
-//        $response1
-//            ->setId(1)
-//            ->setAssessable($assessment)
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback1 = new Feedback();
-//        $feedback1
-//            ->setId(11)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $response1->getAllFeedback()->add($feedback1);
-//
-//        $assessment->setResponses((new Collection())
-//            ->add($response1)
-//        );
-//
-//        /* Compare these
-//         */
-//        $expected = (new Collection())
-//            ->add($response1)
-//        ;
-//
-//        $timeline = (new Timeline($assessment))->getTimeline();
-//
-//        $this->assertEquals($expected, $timeline);
-//    }
-//
-//    /**
-//     * One Response
-//     * One Feedback
-//     */
-//    public function testOneResponseMultipleFeedback()
-//    {
-//        $assessment = new DueWork();
-//
-//        $response1 = new Submission();
-//        $response1
-//            ->setId(1)
-//            ->setAssessable($assessment)
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback1 = new Feedback();
-//        $feedback1
-//            ->setId(11)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback2 = new Feedback();
-//        $feedback2
-//            ->setId(22)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $response1->setAllFeedback((new Collection())
-//            ->add($feedback1)
-//            ->add($feedback2)
-//        );
-//
-//        $assessment->setResponses((new Collection())
-//            ->add($response1)
-//        );
-//
-//        /* Compare these
-//         */
-//        $expected = (new Collection())
-//            ->add($response1)
-//        ;
-//
-//        $timeline = (new Timeline($assessment))->getTimeline();
-//
-//        $this->assertEquals($expected, $timeline);
-//    }
-//
-//    /**
-//     * Multiple Responses
-//     * One Feedback
-//     */
-//    public function testMultipleResponsesMultipleFeedback()
-//    {
-//        $assessment = new DueWork();
-//
-//        $response1 = new Submission();
-//        $response1
-//            ->setId(1)
-//            ->setAssessable($assessment)
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback1 = new Feedback();
-//        $feedback1
-//            ->setId(11)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $response1->getAllFeedback()->add($feedback1);
-//
-//        $response2 = new Submission();
-//        $response2
-//            ->setId(2)
-//            ->setAssessable($assessment)
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback2 = new Feedback();
-//        $feedback2
-//            ->setId(22)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $response1->getAllFeedback()->add($feedback2);
-//
-//        $response3 = new Submission();
-//        $response3
-//            ->setId(3)
-//            ->setAssessable($assessment)
-//            ->setSubmittedAt(new \Alaress_Date_Format('2016-10-31 04:34:34', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback3 = new Feedback();
-//        $feedback3
-//            ->setId(33)
-//            ->setAssessable($assessment)
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $response1->getAllFeedback()->add($feedback3);
-//
-//        $assessment->setResponses((new Collection())
-//            ->add($response1)
-//            ->add($response2)
-//            ->add($response3)
-//        );
-//
-//        /* Compare these
-//         */
-//        $expected = (new Collection())
-//            ->add($response2)
-//            ->add($response1)
-//            ->add($response3);
-//
-//        $timeline = (new Timeline($assessment))->getTimeline();
-//
-//        $this->assertEquals($expected, $timeline);
-//    }
+    /**
+     * No Responses
+     * No Feedbacks
+     */
+    public function testEmptyStacks()
+    {
+        $assessment = new DueWork();
+
+        $this->assertCount(0, (new Timeline($assessment))->getTimeline());
+    }
+
+    /**
+     * One Response
+     * No Feedback
+     */
+    public function testOneResponse()
+    {
+        $assessment = new DueWork();
+
+        $response1 = new Submission();
+        $response1
+            ->setId(1)
+            ->setAssessable($assessment)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-04 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $assessment->setResponses((new Collection())->add($response1));
+
+        /* Compare these
+         */
+        $expected = (new Collection())->add($response1);
+
+        $timeline = (new Timeline($assessment))->getTimeline();
+
+        $this->assertEquals($expected, $timeline);
+    }
+
+
+    /**
+     * One Response
+     * One Feedback
+     */
+    public function testOneResponseOneFeedback()
+    {
+        $assessment = new DueWork();
+
+        $response1 = new Submission();
+        $response1
+            ->setId(1)
+            ->setAssessable($assessment)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback1 = new Feedback();
+        $feedback1
+            ->setId(11)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->getAllFeedback()->add($feedback1);
+
+        $assessment->setResponses((new Collection())
+            ->add($response1)
+        );
+
+        /* Compare these
+         */
+        $expected = (new Collection())
+            ->add($response1)
+        ;
+
+        $timeline = (new Timeline($assessment))->getTimeline();
+
+        $this->assertEquals($expected, $timeline);
+    }
+
+    /**
+     * One Response
+     * One Feedback
+     */
+    public function testOneResponseMultipleFeedback()
+    {
+        $assessment = new DueWork();
+
+        $response1 = new Submission();
+        $response1
+            ->setId(1)
+            ->setAssessable($assessment)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback1 = new Feedback();
+        $feedback1
+            ->setId(11)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback2 = new Feedback();
+        $feedback2
+            ->setId(22)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->setAllFeedback((new Collection())
+            ->add($feedback1)
+            ->add($feedback2)
+        );
+
+        $assessment->setResponses((new Collection())
+            ->add($response1)
+        );
+
+        /* Compare these
+         */
+        $expected = (new Collection())
+            ->add($response1)
+        ;
+
+        $timeline = (new Timeline($assessment))->getTimeline();
+
+        $this->assertEquals($expected, $timeline);
+    }
+
+    /**
+     * Multiple Responses
+     * One Feedback
+     */
+    public function testMultipleResponsesMultipleFeedback()
+    {
+        $assessment = new DueWork();
+
+        $response1 = new Submission();
+        $response1
+            ->setId(1)
+            ->setAssessable($assessment)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback1 = new Feedback();
+        $feedback1
+            ->setId(11)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->getAllFeedback()->add($feedback1);
+
+        $response2 = new Submission();
+        $response2
+            ->setId(2)
+            ->setAssessable($assessment)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback2 = new Feedback();
+        $feedback2
+            ->setId(22)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->getAllFeedback()->add($feedback2);
+
+        $response3 = new Submission();
+        $response3
+            ->setId(3)
+            ->setAssessable($assessment)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-10-31 04:34:34', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback3 = new Feedback();
+        $feedback3
+            ->setId(33)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->getAllFeedback()->add($feedback3);
+
+        $assessment->setResponses((new Collection())
+            ->add($response1)
+            ->add($response2)
+            ->add($response3)
+        );
+
+        /* Compare these
+         */
+        $expected = (new Collection())
+            ->add($response2)
+            ->add($response1)
+            ->add($response3);
+
+        $timeline = (new Timeline($assessment))->getTimeline();
+
+        $this->assertEquals($expected, $timeline);
+    }
 
     /**
      * Multiple Responses
