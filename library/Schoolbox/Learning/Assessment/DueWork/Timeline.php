@@ -134,7 +134,7 @@ class Timeline
             /* Chooze wisely
              */
             if ($date1 && $date2) {
-                return ($date1->eq($date2)) ? 0 : (($date1->gt($date2)) ? 1 : -1);
+                return ($date1->eq($date2)) ? 0 : (($date1->gt($date2)) ? -1 : 1);
             }
 
             /* In some random way you might end up here
