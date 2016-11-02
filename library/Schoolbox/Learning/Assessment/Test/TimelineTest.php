@@ -245,7 +245,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $response1->getAllFeedback()->add($feedback2);
+        $response2->getAllFeedback()->add($feedback2);
 
         $response3 = new Submission();
         $response3
@@ -259,7 +259,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $response1->getAllFeedback()->add($feedback3);
+        $response3->getAllFeedback()->add($feedback3);
 
         /* Floaters
          */
@@ -348,7 +348,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $response1->getAllFeedback()->add($feedback2);
+        $response2->getAllFeedback()->add($feedback2);
 
         $response3 = new Submission();
         $response3
@@ -362,7 +362,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $response1->getAllFeedback()->add($feedback3);
+        $response3->getAllFeedback()->add($feedback3);
 
         /* Floaters
          */
