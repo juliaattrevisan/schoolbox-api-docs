@@ -35,6 +35,8 @@ class Controller extends AbstractController
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
      *
+     * GETs the page where a Teacher can review a Student's attempt
+     *
      * @api   GET /learning/quiz/review/{assessmentId}/{firstSectionId}/{responseId}
      * @level 165
      * @param int $assessmentId
@@ -51,6 +53,8 @@ class Controller extends AbstractController
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
      *
+     * GETs the page where a Teacher can add Section and Questions to the Quiz
+     *
      * @api   GET /learning/quiz/summary/{assessmentId}
      * @level 165
      * @param int $assessmentId
@@ -61,6 +65,23 @@ class Controller extends AbstractController
         $assessId = $this->getQuizIdForAssessmentId($assessmentId);
         $this->getResponse()->redirect->to("/assess/summary/$assessId");
     }
+
+    /**
+     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
+     * Enables a Student to begin a Quiz
+     *
+     * @api   GET /learning/quiz/intro/{assessmentId}
+     * @level 165
+     * @param int $assessmentId
+     * @todo Rebuild with twig
+     */
+    public function getQuizIntro($assessmentId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/intro/$assessId");
+    }
+
 
     /**
      * Converts an assessment_id to an assess_id

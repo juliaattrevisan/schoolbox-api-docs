@@ -53,6 +53,7 @@ class Module extends RestfulModule
             'GET' => [
                 '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection',
                 '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
+                '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
             ],
             'POST' => []
         ];
