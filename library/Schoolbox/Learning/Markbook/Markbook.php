@@ -79,6 +79,16 @@ class Markbook
     }
 
     /**
+     * Gets all stats for this markbook.
+     *
+     * @return array
+     */
+    public function getStatistics()
+    {
+        return $this->statistics;
+    }
+
+    /**
      * Collates statistics for each assessment into an array.
      */
     protected function collateStatistics()
