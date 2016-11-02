@@ -120,8 +120,9 @@ class Markbook
                     foreach ($assessmentMarks as $mark) {
                         $variance += pow($mark - $statistics['average'], 2);
                     }
-                    // Assuming a sample standard deviation
-                    $statistics['sd'] = sqrt($variance / ($statistics['count'] - 1));
+                    // Old markbook used population standard deviation, rather than sample
+                    // To use sample SD: subtract 1 from denominator
+                    $statistics['sd'] = sqrt($variance / $statistics['count']);
                 }
             }
 
