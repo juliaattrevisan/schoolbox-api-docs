@@ -8,173 +8,193 @@
  */
 
 namespace Schoolbox\Learning\Quiz\Attempt;
+
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
+use \Alaress_Date_Format;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable
+{
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var Quiz
-	 */
-	protected $assessment;
+    /**
+     * @var Quiz
+     */
+    protected $assessment;
 
-	/**
-	 * @var User
-	 */
-	protected $user;
+    /**
+     * @var User
+     */
+    protected $user;
 
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $start;
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $start;
 
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $finish;
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $finish;
 
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $reviewed;
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $reviewed;
 
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $deleted;
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $deleted;
 
-	/**
-	 * @param  Quiz $assessment
-	 *
-	 * @return $this
-	 */
-	public function setAssessment($assessment) {
-		$this->assessment = $assessment;
-		return $this;
-	}
+    /**
+     * Is this deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return !$this->getDeleted()->isNull();
+    }
 
-	/**
-	 * @return Quiz
-	 */
-	public function getAssessment() {
-		return $this->assessment;
-	}
+    /* Getters / Setters
+     */
 
-	/**
-	 * @param  \Alaress_Date_Format $finish
-	 *
-	 * @return $this
-	 */
-	public function setFinish($finish) {
-		$this->finish = $finish;
-		return $this;
-	}
+    /**
+     * @param  Quiz $assessment
+     *
+     * @return $this
+     */
+    public function setAssessment(Quiz $assessment)
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getFinish() {
-		return $this->finish;
-	}
+    /**
+     * @return Quiz
+     */
+    public function getAssessment()
+    {
+        return $this->assessment;
+    }
 
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param  Alaress_Date_Format $finish
+     *
+     * @return $this
+     */
+    public function setFinish(Alaress_Date_Format $finish)
+    {
+        $this->finish = $finish;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getFinish()
+    {
+        return $this->finish;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $reviewed
-	 *
-	 * @return $this
-	 */
-	public function setReviewed($reviewed) {
-		$this->reviewed = $reviewed;
-		return $this;
-	}
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getReviewed() {
-		return $this->reviewed;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $start
-	 *
-	 * @return $this
-	 */
-	public function setStart($start) {
-		$this->start = $start;
-		return $this;
-	}
+    /**
+     * @param  Alaress_Date_Format $reviewed
+     *
+     * @return $this
+     */
+    public function setReviewed(Alaress_Date_Format $reviewed)
+    {
+        $this->reviewed = $reviewed;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getStart() {
-		return $this->start;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getReviewed()
+    {
+        return $this->reviewed;
+    }
 
-	/**
-	 * @param  \Schoolbox\User $user
-	 *
-	 * @return $this
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-		return $this;
-	}
+    /**
+     * @param  Alaress_Date_Format $start
+     *
+     * @return $this
+     */
+    public function setStart(Alaress_Date_Format $start)
+    {
+        $this->start = $start;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $deleted
-	 *
-	 * @return $this
-	 */
-	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
-		return $this;
-	}
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDeleted() {
-		return $this->deleted;
-	}
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * Is this deleted? (added so there's a consistent method for determining if
-	 * a model is deleted)
-	 *
-	 * @return bool
-	 */
-	public function isDeleted() {
-		return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
-	}
+    /**
+     * @param  Alaress_Date_Format $deleted
+     *
+     * @return $this
+     */
+    public function setDeleted(Alaress_Date_Format $deleted)
+    {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
 }

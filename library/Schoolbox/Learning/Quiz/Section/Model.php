@@ -7,13 +7,14 @@
 
 namespace Schoolbox\Learning\Quiz\Section;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Alaress_Date_Format;
 
 /**
  * Represents a set of Questions in a Quiz
  */
-class Model
+class Model implements ISoftDeletable
 {
     /**
      * @var int
@@ -54,6 +55,19 @@ class Model
      * @var Alaress_Date_Format
      */
     private $deletedAt;
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return !$this->getDeletedAt()->isNull();
+    }
+
+    /* Getters / Setters
+     */
 
     /**
      * @return int
@@ -198,6 +212,4 @@ class Model
         $this->deletedAt = $deletedAt;
         return $this;
     }
-
-
 }

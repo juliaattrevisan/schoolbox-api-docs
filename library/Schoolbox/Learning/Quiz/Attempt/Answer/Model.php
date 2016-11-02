@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Quiz\Attempt\Answer;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Alaress_Date_Format;
@@ -15,7 +16,7 @@ use Alaress_Date_Format;
  * 'Answers' were formerly known as 'Responses'.
  * Name changed to avoid naming collision with Quiz IResponse
  */
-class Model
+class Model implements ISoftDeletable
 {
     /**
      * @var int
@@ -63,6 +64,17 @@ class Model
      * @var Alaress_Date_Format
      */
     private $deletedAt;
+
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return !$this->getDeletedAt()->isNull();
+    }
 
 
     /* Getters / Setters

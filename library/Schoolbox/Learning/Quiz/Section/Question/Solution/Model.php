@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Quiz\Section\Question\Solution;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Alaress_Date_Format;
 
@@ -14,7 +15,7 @@ use Alaress_Date_Format;
  * Represents the correct Solution to a Quiz Questions
  * 'Solutions' were formerly known as 'Answers'.
  */
-class Model
+class Model implements ISoftDeletable
 {
     /**
      * @var int
@@ -40,6 +41,19 @@ class Model
      * @var Alaress_Date_Format
      */
     private $deletedAt;
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return !$this->getDeletedAt()->isNull();
+    }
+
+    /* Getters / Setters
+     */
 
     /**
      * @return int
