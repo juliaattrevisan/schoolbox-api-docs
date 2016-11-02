@@ -15,7 +15,7 @@
                         if( 1 == $('[data-division]').length){
                             window.location.href = window.location.href;
                         } else {
-                            $division.fadeOut({ done: function(){$division.remove();} });
+                            $division.fadeOut({ done: $division.remove });
                         }
                     });
                 }

@@ -15,7 +15,7 @@
                         if( 1 == $('[data-team]').length){
                             window.location.href = window.location.href;
                         } else {
-                            $team.fadeOut({ done: function(){$team.remove();} });
+                            $team.fadeOut({ done: $team.remove });
                         }
                     });
                 }

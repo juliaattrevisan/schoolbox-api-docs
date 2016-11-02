@@ -77,11 +77,7 @@
                 cancelLabel: 'No, keep it',
                 confirmEvent: function (anchor) {
                     $.post(anchor.attr('href')).done(function () {
-                        $item.fadeOut({
-                            done: function () {
-                                $item.remove();
-                            }
-                        });
+                        $item.fadeOut({ done: $item.remove });
                     });
                 }
             });

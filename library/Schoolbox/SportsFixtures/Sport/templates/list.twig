@@ -15,7 +15,7 @@
                         if( 1 == $('[data-sport]').length){
                             window.location.href = window.location.href;
                         } else {
-                            $sport.fadeOut({ done: function(){$sport.remove();} });
+                            $sport.fadeOut({ done: $sport.remove });
                         }
 
                     });
