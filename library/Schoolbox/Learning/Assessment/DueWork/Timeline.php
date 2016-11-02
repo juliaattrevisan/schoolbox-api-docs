@@ -80,14 +80,19 @@ class Timeline
 
         /** @var Submission $currentResponse */
         foreach ($this->getAssessment()->getResponses() as $currentResponse) {
-            $this->getRecombined()->add($currentResponse);
 
-            /* Maintain a list of all the Feedbacks that were discovered
-             * as being part of Responses to ensure they don't get duped
-             * in the timeline
+            /* Only show Submitted submissions (ignore drafts)
              */
-            foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                $processedFeedback[] = $currentFeedback->getId();
+            if ($currentResponse->isSubmitted()) {
+                $this->getRecombined()->add($currentResponse);
+
+                /* Maintain a list of all the Feedbacks that were discovered
+                 * as being part of Responses to ensure they don't get duped
+                 * in the timeline
+                 */
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $processedFeedback[] = $currentFeedback->getId();
+                }
             }
         }
 
@@ -95,7 +100,12 @@ class Timeline
          */
         foreach ($this->getAssessment()->getFeedbacks() as $currentFeedback) {
             if (!in_array($currentFeedback->getId(), $processedFeedback)) {
-                $this->getRecombined()->add($currentFeedback);
+
+                /* Only show Published feedbacks
+                 */
+                if ($currentFeedback->isPublished()) {
+                    $this->getRecombined()->add($currentFeedback);
+                }
             }
         }
 

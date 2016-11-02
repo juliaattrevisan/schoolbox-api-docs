@@ -83,6 +83,22 @@ class Model extends AbstractResponse
         return '';
     }
 
+    /**
+     * This response is submitted (no longer a draft)
+     *
+     * @return bool
+     */
+    public function isSubmitted()
+    {
+        /* If it's a nulldate instance, it's not submitted
+         */
+        if ($this->getSubmittedAt() instanceof \Alaress_Date_NullDate) {
+            return false;
+        }
+
+        return $this->getSubmittedAt() !== null;
+    }
+
     /* Getters/Setters
      */
 
