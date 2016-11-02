@@ -15,102 +15,15 @@
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
 
-        {% for currentInteraction in timeline %}
-            {% if currentInteraction is response %}
-            {% elseif currentInteraction is feedback %}
-            {% endif %}
-        {% endfor %}
-
         <section>
              <ul id='history' class="information-list threaded">
-                {% for currentResponse in assessment.responses %}
-                <li class="actions-small-1" {% if loop.index > 1 %}style="display:none"{% endif %} data-history>
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="/search/user/{{ student.id }}" title="View Profile">
-                                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
-                                <p>{{ student.fullname }}</p>
-                                <p class="meta">{{ currentResponse.submittedAt.short }}</p>
-                            </a>
-                        </div>
-                    </div>
-
-                    <article>
-                        {{ currentResponse.onlineSubmissionContent|purify }}
-                    </article>
-
-                    {% if currentResponse.allFiles %}
-                    <ul class="information-list">
-                        {% for currentFile in currentResponse.allFiles %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12 compact">
-                                    <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-                                        <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
-                                        <p>{{ currentFile.filename }}</p>
-
-                                        {% if currentFile.plagscan %}
-                                        <p class="meta">
-                                            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
-                                            <span class="meta">plagiarised</span>
-                                        </p>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="" class="icon-next" title="View in Inline Grader"></a>
-                            </nav>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-
-                    {% if currentResponse.allFeedback|length %}
-                    <ul class="information-list reply">
-                        {% for currentFeedback in currentResponse.allFeedback %}
-                        <li>
-                            <div class="list-item">
-                                <div class="card small-12 medium-8">
-                                    <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">
-                                        <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
-                                        <p>{{ currentFeedback.reviewer.fullname }}</p>
-                                        <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
-                                    </a>
-                                </div>
-                                <div class="small-12 medium-4 columns text-right">
-                                    <div class="grade content">
-                                        <span class="gradient-7">Not Satisfactory</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {% if currentFeedback.comment|length %}
-                            <article>
-                                {{ currentFeedback.comment|purify }}
-                            </article>
-                            {% endif %}
-
-                            {% if currentFeedback.allFiles %}
-                            <ul class="information-list">
-                                {% for currentFile in currentFeedback.allFiles %}
-                                <li>
-                                    <div class="card small-12 compact">
-                                        <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" rel="external" data-plugin="preview">
-                                            <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
-                                            <p>{{ currentFile.filename }}</p>
-                                        </a>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </li>
-                {% endfor %}
+                 {% for currentInteraction in timeline %}
+                     {% if currentInteraction is response %}
+                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
+                     {% elseif currentInteraction is feedback %}
+                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' %}
+                     {% endif %}
+                 {% endfor %}
             </ul>
         </section>
 

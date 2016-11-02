@@ -1,0 +1,37 @@
+<li>
+    <div class="list-item">
+        <div class="card small-12 medium-8">
+            <a href="/search/user/{{ currentInteraction.reviewer.id}}" title="View Profile">
+                <img src="/portrait.php?userId={{ currentInteraction.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
+                <p>{{ currentInteraction.reviewer.fullname }}</p>
+                <p class="meta">Published {{ currentInteraction.publishedAt.short }}</p>
+            </a>
+        </div>
+        <div class="small-12 medium-4 columns text-right">
+            <div class="grade content">
+                <span class="gradient-7">Not Satisfactory</span>
+            </div>
+        </div>
+    </div>
+
+    {% if currentInteraction.comment|length %}
+        <article>
+            {{ currentInteraction.comment|purify }}
+        </article>
+    {% endif %}
+
+    {% if currentInteraction.allFiles %}
+        <ul class="information-list">
+            {% for currentFile in currentInteraction.allFiles %}
+                <li>
+                    <div class="card small-12 compact">
+                        <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" rel="external" data-plugin="preview">
+                            <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                            <p>{{ currentFile.filename }}</p>
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
