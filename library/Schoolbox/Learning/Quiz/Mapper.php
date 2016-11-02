@@ -200,7 +200,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
 	public function softDeleteAttempts(Model $quiz)
     {
-        $quizAttemptMapper = Attempt\Mapper::getInstance();
+        $quizAttemptMapper = QuizAttemptMapper::getInstance();
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // However this will also updated the 'deleted_at' field for already deleted items.
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);

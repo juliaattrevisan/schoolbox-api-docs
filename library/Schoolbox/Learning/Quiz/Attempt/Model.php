@@ -106,7 +106,7 @@ class Model implements ISoftDeletable
      *
      * @return $this
      */
-    public function setReviewed(Alaress_Date_Format $reviewed)
+    public function setReviewedAt(Alaress_Date_Format $reviewed)
     {
         $this->reviewed = $reviewed;
         return $this;
@@ -115,7 +115,7 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getReviewed()
+    public function getReviewedAt()
     {
         return $this->reviewed;
     }
