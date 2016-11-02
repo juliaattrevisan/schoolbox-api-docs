@@ -1,1 +1,138 @@
-<h1>TODO - Marksheet.twig</h1>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Controls for Averages and Dynamic updates for input fields
+         */
+        $.fn.marksheetAverages();
+        $('[data-mark-sheet]').marksheetInputs();
+    });
+</script>
+<!-- END custom_head -->
+
+{BREADCRUMB}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Marksheet</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'dueWork') }}'
+               class='icon-progress'>Create Due Work</a></li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'quiz') }}'
+               class='icon-quiz'>Create Quiz</a></li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'task') }}'
+               class='icon-task'>Create Task</a></li>
+        {#<li><a href='/submission/markSheet/{CID}/{WORK_TERM}/export' class='icon-download'>Download Spreadsheet</a>#}
+    </ul>
+</div>
+
+<div class="row">
+    {CONTEXT_SELECTOR}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="scrollable">
+            <table data-mark-sheet>
+                <thead>
+                <tr class="rotate-headers">
+                    <th>&nbsp;</th>
+                    {% for assessment in assessments %}
+                    <th>
+                        <div>
+                                <span>
+                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br />
+                                    <span class="meta">{{ assessment.typeName }}</span>
+                                </span>
+                        </div>
+                    </th>
+                    {% endfor %}
+                    <th>
+                        <div>
+                            <span>Student Average</span>
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>
+                        <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
+                        Class Average
+                    </th>
+                    <td>TODO: class average</td>
+                    {#<td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">#}
+                        {#<a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>#}
+                    {#</td>#}
+                    <td>&nbsp;</td>
+                </tr>
+
+                {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
+                {#<!-- BEGIN stat -->#}
+                {#<tr class="sub-row {WORK_STAT_CLASS}" data-sub-table-row>#}
+                    {#<th>{WORK_STAT_TITLE}</th>#}
+                    {#<!-- BEGIN stat_item -->#}
+                    {#<td>#}
+                        {#<!-- BEGIN stat_editable -->#}
+                        {#<input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>#}
+                        {#<span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-weight" class="label success full-width hide"></span>#}
+                        {#<!-- END stat_editable -->#}
+                        {#<!-- BEGIN stat_visible -->#}
+                        {#<select data-visibility-selector="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="visibility show-icon-only">#}
+                            {#<!-- BEGIN stat_visibility_drop -->#}
+                            {#<option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>#}
+                                {#{MARK_VISIBILITY_TEXT}#}
+                            {#</option>#}
+                            {#<!-- END stat_visibility_drop -->#}
+                        {#</select>#}
+                        {#<span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="label success full-width hide"></span>#}
+                        {#<!-- END stat_visible -->#}
+                        {#<!-- BEGIN stat_readonly -->#}
+                        {#{WORK_STAT_VALUE}#}
+                        {#<!-- END stat_readonly -->#}
+                    {#</td>#}
+                    {#<!-- END stat_item -->#}
+                    {#<td></td>#}
+                {#</tr>#}
+                {#<!-- END stat -->#}
+
+                {# Need all students that ever participated in any assessments #}
+                {% for student in participants %}
+                <tr data-id="{{ student.id }}">
+                    <th class="no-pad">
+                        <div class="card small-12">
+                            <a href="/search/user/{{ student.id }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile" />
+                                <p>{{ student.formatName }}</p>
+                            </a>
+                        </div>
+                    </th>
+                    {% for assessment in assessments %}
+                        {% set participant = assessment.getParticipant(student) %}
+                    <td class="column-{{ assessment.id }}">
+                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                           title="{{ participant.mostRecentFeedback.comment }}">{{ participant.mostRecentFeedback.mark }}</a>
+                    </td>
+                    <td>
+                        TODO add gradient
+                    </td>
+                    {#<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">#}
+                        {#<a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">{STUDENT_AVG_CLEAN}</a>#}
+                    {#</td>#}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
