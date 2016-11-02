@@ -232,10 +232,10 @@ class Controller extends Base
         // Statistics
         $marksheet = [];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/marksheet.twig', [
-            'class'     => $class,
-            'marksheet' => $marksheet,
-            'assessments' => $assessments,
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/markbook.twig', [
+            'class'        => $class,
+            'marksheet'    => $marksheet,
+            'assessments'  => $assessments,
             'participants' => $participants,
         ]));
     }
