@@ -1,4 +1,4 @@
-<li>
+<li {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
     <div class="list-item">
         <div class="card small-12 medium-8">
             <a href="/search/user/{{ currentInteraction.reviewer.id}}" title="View Profile">

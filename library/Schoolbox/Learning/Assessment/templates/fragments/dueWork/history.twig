@@ -5,9 +5,13 @@
         $('#view-history').on('click', function(event) {
             event.preventDefault();
 
-            $('#history').find('[data-history]').show();
-
             $(this).remove();
+
+            $('#history')
+                .find('[data-history-row]:hidden')
+                .css({opacity:0})
+                .show()
+                .animate({opacity:1}, 2000);
         });
     });
 </script>
@@ -28,7 +32,7 @@
         </section>
 
         {% if timeline|length > 1 %}
-        <a id="view-history" class="button icon-add">View {{ timeline|length -1 }} More</a>
+        <a id="view-history" class="button icon-add">View {{ timeline|length -1 }} older interaction</a>
         {% endif %}
     </div>
 </div>
