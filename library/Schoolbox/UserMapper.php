@@ -23,6 +23,7 @@ use UnexpectedValueException;
  * @method User findOneByColumn($columnName, $columnValue, $order = [])
  * @method User findOneByColumnList($columnList, $order = [])
  * @method User hydrate($row, $alias = '', $callback = null)
+ * @method User createModel($idValue = null)
  */
 class UserMapper extends Mapper
 {
