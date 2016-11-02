@@ -95,7 +95,7 @@ class Timeline
          */
         foreach ($this->getAssessment()->getFeedbacks() as $currentFeedback) {
             if (!in_array($currentFeedback->getId(), $processedFeedback)) {
-                $this->getRecombined()->add($processedFeedback);
+                $this->getRecombined()->add($currentFeedback);
             }
         }
 
