@@ -895,26 +895,6 @@ nav {
 			}
 		}
 	}
-	.reply{
-		background-color: rgba(0,0,0,0.02);
-		border-top: 1px solid $body-bg;
-		clear: both;
-		.reply{
-			background-color: transparent;
-			@media #{$medium-up} {
-				margin-left: rem-calc((4.3 * $base-font-size));
-			}
-
-			@media #{$small-up} {
-				margin-left: rem-calc((2 * $base-font-size));
-			}
-		}
-
-		li,
-		.component-form{
-			clear: both;
-		}
-	}
 	form {
 		margin: 0;
 	}
@@ -1258,6 +1238,17 @@ p{
 			margin: $paragraph-margin-bottom 0;
 		}
 	}
+
+	.reply{
+		background-color: rgba(0,0,0,0.02);
+		border-top: 1px solid $body-bg;
+		clear: both;
+
+		.reply{
+			background-color: transparent;
+		}
+	}
+
 	@media #{$small-only} {
 		.body{
 			margin: rem-calc(($base-font-size - 8)) 0;
@@ -1267,6 +1258,23 @@ p{
 
 .social-stream {
 	@extend .threaded;
+
+	.reply {
+		li,
+		.component-form{
+			clear: both;
+		}
+
+		.reply {
+			@media #{$medium-up} {
+				margin-left: rem-calc((4.3 * $base-font-size));
+			}
+
+			@media #{$small-up} {
+				margin-left: rem-calc((2 * $base-font-size));
+			}
+		}
+	}
 }
 
 // Tables
