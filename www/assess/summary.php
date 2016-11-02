@@ -71,6 +71,8 @@ $this->setBlock('assessContentsFragment', 'has_section_description', 'has_sectio
 $this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
+$this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $assess['description'] = trim($assess['description']);
@@ -87,6 +89,9 @@ $this->parse('allQuestions_block', 'assessContentsFragment', true);
 $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
+
+$this->parse('delete_quiz_block', 'delete_quiz');
+$this->setVar('delete_survey_block', '');
 
 /* Render out breadcrumbs
  */
