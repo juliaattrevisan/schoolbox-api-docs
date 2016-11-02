@@ -34,60 +34,15 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('assess_attempt');
         $this->hasModel(Model::class);
-        $this->hasMap(array(
-            'column'     => 'attempt_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'   => 'assess_id',
-            'property' => 'assessment',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'assessment',
-        ));
-        $this->hasMap(array(
-            'column'   => 'user_id',
-            'property' => 'user',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'user',
-        ));
-        $this->hasMap(array(
-            'column'   => 'start',
-            'property' => 'start',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'finish',
-            'property' => 'finish',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'reviewed_at',
-            'property' => 'reviewed',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'deleted_at',
-            'property' => 'deleted',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasSoftDeleteDateField('deleted_at');
-
-        $this->hasJoin('assessment', array(
-            'mapper'    => QuizMapper::class,
-            'this_key'  => 'assess_id',
-            'other_key' => 'assess_id'
-        ));
-
-        $this->hasJoin('user', array(
-            'mapper'    => UserMapper::class,
-            'this_key'  => 'user_id',
-            'other_key' => 'id'
-        ));
+        $this->uses('attempt_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'assessment', 'assessment');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('start', self::TYPE_DATETIME);
+        $this->uses('finish', self::TYPE_DATETIME);
+        $this->uses('reviewed_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
-
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
 

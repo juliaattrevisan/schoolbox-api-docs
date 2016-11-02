@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Quiz\Section\Question\Solution;
 
 use \Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 
 /**
@@ -17,43 +16,18 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
  */
 class Mapper extends BaseMapper
 {
-    protected function mapping () {
-        // TODO - update table name to 'quiz_solution'
+    protected function mapping()
+    {
+        // TODO 17.0 - update table name to 'quiz_solution' to disambiguate, then delete this comment
         $this->hasTable('assess_answer');
-        $this->hasModel(QuizSolution::class);
-        $this->hasMap(array(
-            'column'     => 'answer_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'question_id',
-            'property'   => 'question',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'question',
-        ));
-        $this->hasMap(array(
-            'column'     => 'sequence',
-            'property'   => 'sequence',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'answer',
-            'property'   => 'solution',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'deleted_at',
-            'property'   => 'deletedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasJoin('question', array(
-            'mapper'    => QuizQuestionMapper::class,
-            'this_key'  => 'question_id',
-            'other_key' => 'question_id',
-        ));
+        $this->hasModel(Model::class);
+        $this->uses('answer_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('question_id', QuizQuestionMapper::class, 'question_id', null, null, 'question', 'question');
+        $this->uses('sequence', self::TYPE_INTEGER);
 
-        $this->hasSoftDeleteDateField('deleted_at');
+        // TODO 17.0 - rename table col name 'answer' to 'solution' to disambiguate, then delete this comment
+        $this->uses('answer', self::TYPE_STRING, null, 'solution');
+
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }

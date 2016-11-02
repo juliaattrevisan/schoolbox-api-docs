@@ -19,72 +19,21 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
  */
 class Mapper extends BaseMapper
 {
-    protected function mapping () {
+    protected function mapping()
+    {
         $this->hasTable('assess_response');
         $this->hasModel(QuizAnswer::class);
-        $this->hasMap(array(
-            'column'     => 'response_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'attempt_id',
-            'property'   => 'attempt',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'attempt',
-        ));
+        $this->uses('response_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('attempt_id', QuizAttemptMapper::class, 'attempt_id', null, null, 'attempt', 'attempt');
+
         // Intentionally does not hydrate the superfluous 'section_id' field
-        // TODO - drop this column from DB
+        // TODO 17.0 - drop 'section_id' column from DB and remove this comment
 
-        $this->hasMap(array(
-            'column'     => 'question_id',
-            'property'   => 'question',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'question',
-        ));
-        $this->hasMap(array(
-            'column'     => 'response',
-            'property'   => 'answer',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'comment',
-            'property'   => 'comment',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'mark',
-            'property'   => 'mark',
-            'type'       => self::TYPE_DECIMAL
-        ));
-        $this->hasMap(array(
-            'column'     => 'automarked_already',
-            'property'   => 'automarkedAlready',
-            'type'       => self::TYPE_BOOL_ENUM
-        ));
-        $this->hasMap(array(
-            'column'     => 'updated_at',
-            'property'   => 'updatedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'     => 'updated_at',
-            'property'   => 'updatedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
-
-        $this->hasJoin('attempt', array(
-            'mapper'    => QuizAttemptMapper::class,
-            'this_key'  => 'attempt_id',
-            'other_key' => 'attempt_id',
-        ));
-        $this->hasJoin('question', array(
-            'mapper'    => QuizQuestionMapper::class,
-            'this_key'  => 'question_id',
-            'other_key' => 'question_id',
-        ));
-
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->joins('question_id', QuizQuestionMapper::class, 'question_id', null, null, 'question', 'question');
+        $this->uses('response', self::TYPE_STRING, null, 'answer');
+        $this->uses('comment', self::TYPE_STRING);
+        $this->uses('mark', self::TYPE_DECIMAL);
+        $this->uses('automarked_already', self::TYPE_BOOL_ENUM);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
 }

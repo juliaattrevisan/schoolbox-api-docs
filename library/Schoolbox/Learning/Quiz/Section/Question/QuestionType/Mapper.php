@@ -14,54 +14,18 @@ use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Model as QuizQuestionT
  */
 class Mapper extends BaseMapper
 {
-    protected function mapping () {
+    protected function mapping()
+    {
         $this->hasTable('assess_luQuestionType');
         $this->hasModel(QuizQuestionType::class);
-        $this->hasMap(array(
-            'column'     => 'type_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'classname',
-            'property'   => 'className',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'filename',
-            'property'   => 'fileName',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'moodle',
-            'property'   => 'moodle',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'automated_marking',
-            'property'   => 'automatedMarking',
-            'type'       => self::TYPE_BOOL_ENUM,
-        ));
-        $this->hasMap(array(
-            'column'     => 'availability',
-            'property'   => 'availability',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'has_legend',
-            'property'   => 'hasLegend',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
-        $this->hasMap(array(
-            'column'     => 'has_config',
-            'property'   => 'hasConfig',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
+        $this->uses('type_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('classname', self::TYPE_STRING, null, 'className');
+        $this->uses('filename', self::TYPE_STRING, null, 'fileName');
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('moodle', self::TYPE_STRING);
+        $this->uses('automated_marking', self::TYPE_BOOL_ENUM);
+        $this->uses('availability', self::TYPE_STRING);
+        $this->uses('has_legend', self::TYPE_BOOLEAN);
+        $this->uses('has_config', self::TYPE_BOOLEAN);
     }
 }

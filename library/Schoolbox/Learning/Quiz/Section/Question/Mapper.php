@@ -15,60 +15,17 @@ use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapp
 
 class Mapper extends BaseMapper
 {
-    protected function mapping () {
+    protected function mapping()
+    {
         $this->hasTable('assess_question');
         $this->hasModel(QuizQuestion::class);
-        $this->hasMap(array(
-            'column'     => 'question_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'section_id',
-            'property'   => 'section',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'section',
-        ));
-        $this->hasMap(array(
-            'column'     => 'sequence',
-            'property'   => 'sequence',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'type_id',
-            'property'   => 'type',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'type',
-        ));
-        $this->hasMap(array(
-            'column'     => 'marks',
-            'property'   => 'marks',
-            'type'       => self::TYPE_DECIMAL,
-        ));
-        $this->hasMap(array(
-            'column'     => 'config',
-            'property'   => 'config',
-            'type'       => self::TYPE_STRING
-        ));
-        $this->hasMap(array(
-            'column'     => 'deleted_at',
-            'property'   => 'deletedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
-
-        $this->hasJoin('section', array(
-            'mapper'    => QuizSectionMapper::class,
-            'this_key'  => 'assess_id',
-            'other_key' => 'assess_id',
-        ));
-        $this->hasJoin('type', array(
-            'mapper'    => QuizQuestionTypeMapper::class,
-            'this_key'  => 'type_id',
-            'other_key' => 'type_id',
-        ));
-
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('question_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('section_id', QuizSectionMapper::class, 'section_id', null, null, 'section', 'section');
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->joins('type_id', QuizQuestionTypeMapper::class, 'type_id', null, null, 'type', 'type');
+        $this->uses('marks', self::TYPE_DECIMAL);
+        $this->uses('config', self::TYPE_STRING);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSolution'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSolution'));
