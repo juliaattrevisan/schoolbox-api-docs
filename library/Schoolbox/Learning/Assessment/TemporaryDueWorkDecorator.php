@@ -111,8 +111,8 @@ class TemporaryDueWorkDecorator
             ->setFilename('online-submission.html')
             ->setPlagscan($plagscan2);
 
-        $response1 = new Submission();
-        $response1
+        $response = new Submission();
+        $response
             ->setId(1)
             ->setAssessable($assessment)
             ->setSubmittedBy($this->hodes)
@@ -148,8 +148,8 @@ class TemporaryDueWorkDecorator
             ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
             ->setFilename('This is the correct response.txt');
 
-        $feedback1 = new Feedback();
-        $feedback1
+        $feedback = new Feedback();
+        $feedback
             ->setId(11)
             ->setReviewer($this->celia)
             ->setAssessable($assessment)
@@ -162,10 +162,10 @@ class TemporaryDueWorkDecorator
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $response1->getAllFeedback()->add($feedback1);
+        $response->getAllFeedback()->add($feedback);
 
-        $assessment->getResponses()->add($response1);
-        $assessment->getFeedbacks()->add($feedback1);
+        $assessment->getResponses()->add($response);
+        $assessment->getFeedbacks()->add($feedback);
     }
 
     /**
@@ -175,8 +175,10 @@ class TemporaryDueWorkDecorator
      */
     private function generateResponse2(DueWork $assessment)
     {
-        $plagscan2 = new Plagscan();
-        $plagscan2
+        /* First file
+         */
+        $plagscan1 = new Plagscan();
+        $plagscan1
             ->setId(1234)
             ->setStatus(1)
             ->setScore('45%')
@@ -190,29 +192,60 @@ class TemporaryDueWorkDecorator
         $mime2->setEnable(1);
         $mime2->setMaxFileSize(0);
 
-        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+        $storage1 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+
+        $submissionFile1 = new SubmissionFile();
+        $submissionFile1
+            ->setId(5233)
+            ->setStorage($storage1)
+            ->setCrocodocId('slkjl2j3589uslk23jl4')
+            ->setFilename('online-submission.html')
+            ->setPlagscan($plagscan1);
+
+        /* Second file
+         */
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
 
         $submissionFile2 = new SubmissionFile();
         $submissionFile2
-            ->setId(12)
+            ->setId(13345)
             ->setStorage($storage2)
-            ->setCrocodocId('slkjl2j3589uslk23jl4')
-            ->setFilename('online-submission.html')
-            ->setPlagscan($plagscan2);
+            ->setCrocodocId('dfue45636')
+            ->setFilename('some-unplaggable-file.pdf');
 
-        $response2 = new Submission();
-        $response2
+        /* Third file
+         */
+        $plagscan3 = new Plagscan();
+        $plagscan3
+            ->setId(9999)
+            ->setStatus(-1);
+
+        $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('efb4b418c6c963dc8760e9676986a4e99706f636');
+
+        $submissionFile3 = new SubmissionFile();
+        $submissionFile3
+            ->setId(13345)
+            ->setStorage($storage3)
+            ->setCrocodocId('36dg36')
+            ->setFilename('thingy.jpg');
+
+        $response = new Submission();
+        $response
             ->setId(2)
             ->setAssessable($assessment)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setAllFiles((new Collection())->add($submissionFile2))
+            ->setAllFiles((new Collection())
+                ->add($submissionFile1)
+                ->add($submissionFile2)
+                ->add($submissionFile3)
+            )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback2 = new Feedback();
-        $feedback2
+        $feedback = new Feedback();
+        $feedback
             ->setId(22)
             ->setAssessable($assessment)
             ->setReviewer($this->celia)
@@ -223,10 +256,10 @@ class TemporaryDueWorkDecorator
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-03 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $response2->getAllFeedback()->add($feedback2);
+        $response->getAllFeedback()->add($feedback);
 
-        $assessment->getResponses()->add($response2);
-        $assessment->getFeedbacks()->add($feedback2);
+        $assessment->getResponses()->add($response);
+        $assessment->getFeedbacks()->add($feedback);
     }
 
     /**
@@ -255,12 +288,24 @@ class TemporaryDueWorkDecorator
             ->setComment('A Feedback upon which it doth float.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
+        /* Let's give this one a file
+         */
+        $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('78b04bf16ecf16550ec20d8df26b700ff22e6756');
+
+        $feedbackFile1 = new FeedbackFile();
+        $feedbackFile1
+            ->setId(4598903)
+            ->setStorage($storage3)
+            ->setCrocodocId('34068-33836-3860386-sdf')
+            ->setFilename('Some feedback in a random file I uploaded for you.txt');
+
         $floating3 = new Feedback();
         $floating3
             ->setId(333)
             ->setAssessable($assessment)
             ->setReviewer($this->celia)
             ->setComment('Antigravity Feedbackery.')
+            ->setAllFiles((new Collection())->add($feedbackFile1))
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $assessment
