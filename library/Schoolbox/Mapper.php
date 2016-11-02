@@ -1914,7 +1914,7 @@ abstract class Mapper implements IMapper, Serializable
         // Trigger all on collection before attempting to run?
         // Must for now, because otherwise transactions would be nested.
         foreach ($collection as $model) {
-            if (!($this->triggerCallbacks('preSave', $model))) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PRESAVE, $model))) {
                 return false;
             }
         }
@@ -2027,7 +2027,7 @@ abstract class Mapper implements IMapper, Serializable
             $previous = null;
             if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
                 $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                $this->triggerCallbacks('postSave', $model, $previous);
+                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
             }
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }
