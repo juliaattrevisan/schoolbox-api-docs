@@ -710,7 +710,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * The concise, typesafe version of hasMap() + hasJoin()
+     * The concise, type-safe version of hasMap() + hasJoin()
      *
      * @param string      $column
      * @param string      $foreignMapper
@@ -741,7 +741,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * The concise, typesave version of hasMap() + hasJoin(['multi'])
+     * The concise, type-safe version of hasMap() + hasJoin(['multi'])
      *
      * @param string          $viaTable      the manymany jointable
      * @param string          $foreignMapper the target Mapper on the other side (not a jointable Mapper)
