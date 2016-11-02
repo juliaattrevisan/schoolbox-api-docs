@@ -1249,8 +1249,8 @@ p{
 
 }
 
-// Social Stream
-.social-stream{
+// Threaded / Social Stream
+.threaded {
 	@include information-list;
 	.body{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
@@ -1262,12 +1262,14 @@ p{
 		.body{
 			margin: rem-calc(($base-font-size - 8)) 0;
 		}
-		.reply{
-			margin-left: 1rem;
-		}
 	}
 }
 
+.social-stream {
+	@extend .threaded;
+}
+
+// Tables
 .table-actions{
 	[class^="icon-"]:before,
 	[class*=" icon-"]:before{
