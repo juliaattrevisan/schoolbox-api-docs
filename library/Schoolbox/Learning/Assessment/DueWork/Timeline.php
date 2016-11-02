@@ -133,7 +133,11 @@ class Timeline
 
             /* Chooze wisely
              */
-            return $date2->compare($date1);
+            if ($date1 && $date2) {
+                return $date2->compare($date1);
+            }
+
+            throw new \InvalidArgumentException('Null date provided');
         });
     }
 
