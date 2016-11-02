@@ -315,8 +315,6 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Null dates should burn your soul with an exception
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testNulls()
     {
@@ -411,8 +409,13 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($floating3) // 333
             ->add($response3); // 3
 
-        /* Throws exception due to null values
+        /* Does nothing - draft submissions and unpublished feedbacks
+         * are both ignored by Timeline
          */
         $timeline = (new Timeline($assessment))->getTimeline();
+
+        $expected = new Collection();
+
+        $this->assertEquals($expected, $timeline);
     }
 }
