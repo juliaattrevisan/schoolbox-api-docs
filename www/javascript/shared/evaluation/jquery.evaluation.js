@@ -23,19 +23,23 @@
 		});
 
 		/* When someone finishes an assessment, loop through each question
-		 * and submit its values - then redirect. This avoids a wierd timing
+		 * and submit its values - then redirect. This avoids a weird timing
 		 * problem which sometimes happens, where it redirects before it
 		 * submits all the questionForm elements. This causes, in particular,
 		 * Matching Pairs to remain untouched resulting in NULL values.
 		 */
 		$('[data-evaluation-finish]').click(function(event) {
 			event.preventDefault();
-			$(this).attr('disabled', 'disabled').attr('readonly', 'readonly');
-			var href = $(this).data('href');
+			var $finishButton = $(this);
+			$finishButton.attr('disabled', 'disabled').attr('readonly', 'readonly');
+			var href = $finishButton.data('href');
 
-			$(this).confirmDialog({
+			$finishButton.confirmDialog({
 				confirmEvent: function() {
 					$.fn.evaluation.saveAll(href);
+				},
+				cancelEvent: function() {
+					$finishButton.removeAttr('disabled readonly');
 				}
 			});
 		});
