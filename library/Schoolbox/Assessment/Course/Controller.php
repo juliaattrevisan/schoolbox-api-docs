@@ -19,7 +19,6 @@ use Component_Homepage_CourseBuilderController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
@@ -74,9 +73,6 @@ class Controller extends Base\Base
 
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
-
-    /** @var QuizMapper */
-    protected $quizMapper;
 
     /** @var TaskMapper */
     protected $taskMapper;
@@ -191,7 +187,6 @@ class Controller extends Base\Base
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setQuizMapper(QuizMapper::getInstance());
         $this->setComponentDefinitionMapper(Component_DefinitionMapper::getInstance());
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
@@ -1415,26 +1410,6 @@ class Controller extends Base\Base
     protected function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
-    }
-
-    /**
-     * Get online assessment mapper
-     *
-     * @return QuizMapper
-     */
-    protected function getQuizMapper()
-    {
-        return $this->quizMapper;
-    }
-
-    /**
-     * Set online assessment mapper
-     *
-     * @param QuizMapper $quizMapper
-     */
-    public function setQuizMapper($quizMapper)
-    {
-        $this->quizMapper = $quizMapper;
     }
 
     /**
