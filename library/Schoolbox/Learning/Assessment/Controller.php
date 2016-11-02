@@ -268,7 +268,7 @@ class Controller extends Base
             }
         }
 
-        // Do caller request a returnUrl?
+        // Do caller request a URL to return to?
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         if ($returnUrl) {
@@ -436,7 +436,7 @@ class Controller extends Base
          *
          * Otherwise return to whatever context you came from
          */
-        // Was a return_url explicitly specified?
+        // Did caller specify a URL to return to?
         $explicitReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
         if ($explicitReturnUrl) {
             $returnUrl = Redirect::decode($explicitReturnUrl);
@@ -477,7 +477,8 @@ class Controller extends Base
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
-            'return_url'      => $this->getRequest()->query->get('return_url'),
+            'returnUrlName'   => Redirect::RETURN_URL,
+            Redirect::RETURN_URL => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ];
 
         /* Special treatment for projects for now
@@ -638,7 +639,7 @@ class Controller extends Base
         $folder = $assessment->getContext()->getFolder();
         $explicitReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
 
-        // Did caller explicitly specify a return_url ?
+        // Did caller explicitly specify a URL to return to ?
         if($explicitReturnUrl) {
             $returnUrl = Redirect::decode($explicitReturnUrl);
         } else {
