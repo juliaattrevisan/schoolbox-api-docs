@@ -10,14 +10,14 @@
     });
 </script>
 
-{# Crumbz: Class > Marksheet #}
+{# Crumbz: Class > Markbook #}
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs([class.name, '/homepage/'~class.id], ['Marksheet', '#']) }}
+{{ bread.crumbs([class.name, '/homepage/'~class.id], ['Markbook', '#']) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Marksheet</h1>
+            <h1>Markbook</h1>
         </div>
     </div>
     <nav>
@@ -49,7 +49,7 @@
                 <thead>
                 <tr class="rotate-headers">
                     <th>&nbsp;</th>
-                    {% for assessment in assessments %}
+                    {% for assessment in markbook.assessments %}
                     <th>
                         <div>
                                 <span>
@@ -109,7 +109,7 @@
                 {#<!-- END stat -->#}
 
                 {# Need all students that ever participated in any assessments #}
-                {% for student in participants %}
+                {% for student in markbook.students %}
                 <tr data-id="{{ student.id }}">
                     <th class="no-pad">
                         <div class="card small-12">
@@ -119,7 +119,7 @@
                             </a>
                         </div>
                     </th>
-                    {% for assessment in assessments %}
+                    {% for assessment in markbook.assessments %}
                         {% set participant = assessment.getParticipant(student) %}
                     <td class="column-{{ assessment.id }}">
                         <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"

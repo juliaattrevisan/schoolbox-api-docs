@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -216,27 +217,17 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        // TODO - generate data
-        // Participants (for all assessments)
-        // Assessments
-        $participants = new Collection();
-        $assessments  = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
+        // Generate data: assessments and their Participants
+        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
         foreach ($assessments as $assessment) {
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
-            // Put students into a participant list
-            foreach ($assessment->getAllParticipants() as $participant) {
-                $student = $participant->getUser();
-                $participants[$student->getId()] = $student;
-            }
         }
-        // Statistics
-        $marksheet = [];
+        // The markbook will handle statistics
+        $markbook = new Markbook($assessments);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/markbook.twig', [
-            'class'        => $class,
-            'marksheet'    => $marksheet,
-            'assessments'  => $assessments,
-            'participants' => $participants,
+            'class'    => $class,
+            'markbook' => $markbook,
         ]));
     }
 
