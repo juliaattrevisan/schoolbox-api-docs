@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\Redirect;
+
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
