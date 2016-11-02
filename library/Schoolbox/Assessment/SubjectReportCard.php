@@ -8,12 +8,11 @@
  */
 
 namespace Schoolbox\Assessment;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -138,8 +137,8 @@ class SubjectReportCard {
 	public function getGradeAverage() {
 		if(!is_array($this->_gradeAverage)) {
 			// populate cache
-			$returnMapper = new ReturnedWorkMapper();
-			$assessMapper = new QuizMapper();
+			$returnMapper = ReturnedWorkMapper::getInstance();
+			$attemptMapper = QuizAttemptMapper::getInstance();
 
 			/* Visibilities
 			 */
@@ -154,7 +153,7 @@ class SubjectReportCard {
 					'from'       => $this->targetTerm->getStart(),
 					'to'         => $this->targetTerm->getActualFinish(),
 				)),
-				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
+                $attemptMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
 					'visibility' => $quizVisibilities,
 					'from'       => $this->targetTerm->getStart(),
 					'to'         => $this->targetTerm->getActualFinish(),
