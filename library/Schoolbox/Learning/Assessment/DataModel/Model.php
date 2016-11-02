@@ -310,9 +310,6 @@ class Model implements ISoftDeletable
      */
     public function getSubObject()
     {
-        if ($this->hasTask()) {
-            return $this->getTask();
-        }
         if ($this->hasDueWork()) {
             return $this->getDueWork();
         }
@@ -321,6 +318,10 @@ class Model implements ISoftDeletable
         }
         if ($this->hasProject()) {
             return $this->getProject();
+        }
+        if ($this->hasTask()) {
+            // this test must go last because old course-based quizzes and works register as "task == true" :(
+            return $this->getTask();
         }
         throw new \UnexpectedValueException('This object has no sub-object');
     }
