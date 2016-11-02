@@ -3,15 +3,15 @@ $table-cell-highlight-background: $content-ui-selected;
 /* Plagscan
  */
 .plagscan-ok {
-    @include label;
+    @extend .gradient-10;
 }
 
 .plagscan-warning {
-    @include label;
+    @extend .gradient-4;
 }
 
 .plagscan-critical {
-    @include label;
+    @extend .gradient-0;
 }
 
 table.rubric {
