@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
 <script type="text/javascript">
     $(function() {
         $('#view-history').on('click', function(event) {
@@ -43,7 +45,7 @@
                                         <p>{{ currentFile.filename }}</p>
                                         <p class="meta">
                                             {% if currentFile.plagscan %}
-                                            <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
+                                            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
                                             <span class="meta">plagiarised</span>
                                             {% endif %}
                                         </p>
