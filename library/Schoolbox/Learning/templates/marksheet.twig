@@ -1,4 +1,3 @@
-<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 <script type="text/javascript">
@@ -10,9 +9,10 @@
         $('[data-mark-sheet]').marksheetInputs();
     });
 </script>
-<!-- END custom_head -->
 
-{BREADCRUMB}
+{# Crumbz: Class > Marksheet #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs([class.name, '/homepage/'~class.id], ['Marksheet', '#']) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -24,18 +24,22 @@
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'dueWork') }}'
-               class='icon-progress'>Create Due Work</a></li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'quiz') }}'
-               class='icon-quiz'>Create Quiz</a></li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id}, assessmentTypeTitle: 'task') }}'
-               class='icon-task'>Create Task</a></li>
-        {#<li><a href='/submission/markSheet/{CID}/{WORK_TERM}/export' class='icon-download'>Download Spreadsheet</a>#}
+        <li class="separator">Create New Assessment</li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'dueWork'}) }}'
+               class='icon-due-work'>Due Work</a></li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'quiz'}) }}'
+               class='icon-quiz'>Quiz</a></li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'task'}) }}'
+               class='icon-task'>Task</a></li>
+        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'project'}) }}'
+               class='icon-project'>Project</a></li>
+        <li class="separator">Report</li>
+        <li><a href='#' class='icon-download'>TODO: Download Spreadsheet</a>
     </ul>
 </div>
 
 <div class="row">
-    {CONTEXT_SELECTOR}
+    TODO: context selector
 </div>
 
 <div class="row">
