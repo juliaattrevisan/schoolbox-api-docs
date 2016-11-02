@@ -41,3 +41,12 @@
     {% endif %}
 {% endspaceless %}
 {% endmacro %}
+
+{##
+ # Decide urgency of normalised marks
+ #}
+{% macro marks(normalisedMark) %}
+{% spaceless %}
+    gradient-{{ (normalisedMark/10)|round(0, 'floor') }}
+{% endspaceless %}
+{% endmacro %}

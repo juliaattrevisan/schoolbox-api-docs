@@ -1,6 +1,6 @@
 <?php
 /**
- * TemporaryDueWorkDecorator
+ * TemporaryDataDecorator
  *
  * A temporary decorator for the submission history screen
  * because this is so huge and convoluted
@@ -11,7 +11,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\DueWork;
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
@@ -19,12 +19,11 @@ use \Schoolbox\File\Mimetype;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
-use \Schoolbox\Learning\Assessment\DueWork\WorkType as WorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
-class TemporaryDueWorkDecorator
+class TemporaryDataDecorator
 {
 
     /**
@@ -303,7 +302,8 @@ class TemporaryDueWorkDecorator
             ->setId(111)
             ->setAssessable($assessment)
             ->setReviewer($this->celia)
-            ->setNormalisedMark(86)
+            ->setNormalisedMark(76)
+            ->setHumanReadableMark('LOL @ U')
             ->setComment('This is a floating feedback.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:01', \Alaress_Date_Format::DATABASE_FORMAT));
 

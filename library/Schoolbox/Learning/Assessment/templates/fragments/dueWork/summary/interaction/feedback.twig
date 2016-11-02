@@ -9,7 +9,7 @@
         </div>
         <div class="small-12 medium-4 columns text-right">
             <div class="grade content">
-                <span class="gradient-7">Not Satisfactory</span>
+                <span class="{{ urgency.marks(currentInteraction.normalisedMark) }}">{{ currentInteraction.humanReadableMark }}</span>
             </div>
         </div>
     </div>
