@@ -11,15 +11,16 @@ namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use \Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    use Id;
+
+    // TODO 17.0 update calls to getDelete() to getDeletedAt() and uncomment next line
+    //use DeletedAtDate;
 
     /**
      * @var Quiz
@@ -98,25 +99,6 @@ class Model implements ISoftDeletable
     public function getFinish()
     {
         return $this->finish;
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**

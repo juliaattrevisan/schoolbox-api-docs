@@ -9,17 +9,16 @@ namespace Schoolbox\Learning\Quiz\Section;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * Represents a set of Questions in a Quiz
  */
 class Model implements ISoftDeletable
 {
-    /**
-     * @var int
-     */
-    private $id;
+    use Id;
+    use DeletedAtDate;
 
     /**
      * @var Quiz
@@ -51,41 +50,8 @@ class Model implements ISoftDeletable
      */
     private $pool;
 
-    /**
-     * @var Alaress_Date_Format
-     */
-    private $deletedAt;
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return !$this->getDeletedAt()->isNull();
-    }
-
     /* Getters / Setters
      */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return Quiz
@@ -192,24 +158,6 @@ class Model implements ISoftDeletable
     public function setPool($pool)
     {
         $this->pool = $pool;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $deletedAt
-     * @return static
-     */
-    public function setDeletedAt(Alaress_Date_Format $deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
         return $this;
     }
 }
