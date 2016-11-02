@@ -61,6 +61,13 @@ class DataSource
     protected $feedbackDataSource;
 
     /**
+     * A cached list of users; the key is the folder's ID.
+     *
+     * @var User[]
+     */
+    protected $cacheForFolder;
+
+    /**
      * Constructor
      *
      * @param External_ClassInterface $externalDb
@@ -81,6 +88,7 @@ class DataSource
         $this->userMapper               = $userMapper;
         $this->responseDataSource       = $responseDataSource;
         $this->feedbackDataSource       = $feedbackDataSource;
+        $this->cacheForFolder           = new Collection();
     }
 
     /**
@@ -117,25 +125,28 @@ class DataSource
 
         $folder = $context->getFolder();
 
-        $users = new Collection();
+        // Use cached list of users for a folder
+        if (!isset($this->cacheForFolder[$folder->getId()])) {
+            // Cache isn't set - populate
+            $users = new Collection();
 
-        // Class members: convert to list of users
-        $classCodes = $this->externalDb->getStudents($folder->getCodeString());
-        if (!empty($classCodes)) {
-            $users->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+            // Class members: convert to list of users
+            $classCodes = $this->externalDb->getStudents($folder->getCodeString());
+            if (!empty($classCodes)) {
+                $users->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+            }
+
+            // I want to search for ALL read-level users, not just students
+            // Deliberately don't search external DB, I have already done that
+            $users->mergeUnique(
+                $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
+                'id'
+            );
+            $this->cacheForFolder[$folder->getId()] = $users;
         }
 
-        // I want to search for ALL read-level users, not just students
-        // Deliberately don't search external DB, I have already done that
-        $users->mergeUnique(
-            $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
-            'id'
-        );
-
-        // Consider caching $users
-
         // Convert $users into a participant list
-        foreach ($users as $user) {
+        foreach ($this->cacheForFolder[$folder->getId()]  as $user) {
             $participants->add(
                 new Participant($user, $assessment)
             );
