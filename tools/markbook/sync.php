@@ -13,8 +13,8 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Learning\Quiz\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 use Alaress\Lumberjack\Logger;
 
@@ -45,8 +45,8 @@ HELP;
 }
 $folderMapper = new FolderMapper();
 $submissionMapper = new SubmissionBoxMapper();
-$onlineAssessmentMapper = new Mapper();
-$attemptMapper = new Mapper();
+$onlineAssessmentMapper = QuizMapper::getInstance();
+$attemptMapper = QuizAttemptMapper::getInstance();
 
 $resultMapper = new ReturnedWorkMapper();
 $markbookHandler = new SubmissionReturn();
