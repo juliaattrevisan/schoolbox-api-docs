@@ -13,6 +13,25 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
 
 class Plagscan
 {
+    /**
+     * Plagscan queued for processing
+     */
+    const STATUS_QUEUED = 1;
+
+    /**
+     * Plagscan currently in progress
+     */
+    const STATUS_PROCESSING = 2;
+
+    /**
+     * Plagscan completed, with results
+     */
+    const STATUS_COMPLETE = 3;
+
+    /**
+     * Status of the document, if it's returned as unscannable?
+     */
+    const STATUS_UNSCANNABLE = -1;
 
     /**
      * @var int
@@ -39,6 +58,46 @@ class Plagscan
      */
     public function __construct()
     {
+    }
+
+    /**
+     * Plagscan queued for processing
+     *
+     * @return bool
+     */
+    public function isPending()
+    {
+        return $this->getStatus() == self::STATUS_QUEUED;
+    }
+
+    /**
+     * Plagscan currently in progress
+     *
+     * @return bool
+     */
+    public function isProcessing()
+    {
+        return $this->getStatus() == self::STATUS_PROCESSING;
+    }
+
+    /**
+     * Plagscan completed
+     *
+     * @return bool
+     */
+    public function isComplete()
+    {
+        return $this->getStatus() == self::STATUS_COMPLETE;
+    }
+
+    /**
+     * This document is unplaggable
+     *
+     * @return bool
+     */
+    public function isUnscannable()
+    {
+        return $this->getStatus() == self::STATUS_UNSCANNABLE;
     }
 
     /* Getters/Setters

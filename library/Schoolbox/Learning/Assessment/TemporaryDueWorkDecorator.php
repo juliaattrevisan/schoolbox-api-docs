@@ -58,7 +58,7 @@ class TemporaryDueWorkDecorator
         $plagscan1 = new Plagscan();
         $plagscan1
             ->setId(1234)
-            ->setStatus(1)
+            ->setStatus(3)
             ->setScore('93%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
 
@@ -89,7 +89,7 @@ class TemporaryDueWorkDecorator
         $plagscan2 = new Plagscan();
         $plagscan2
             ->setId(1234)
-            ->setStatus(1)
+            ->setStatus(3)
             ->setScore('14%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
 
@@ -101,7 +101,7 @@ class TemporaryDueWorkDecorator
         $mime2->setEnable(1);
         $mime2->setMaxFileSize(0);
 
-        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('c68af9f8084969afe55335989a0c8f58e9eec923');
 
         $submissionFile2 = new SubmissionFile();
         $submissionFile2
@@ -180,7 +180,7 @@ class TemporaryDueWorkDecorator
         $plagscan1 = new Plagscan();
         $plagscan1
             ->setId(1234)
-            ->setStatus(1)
+            ->setStatus(3)
             ->setScore('45%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
 
@@ -204,6 +204,11 @@ class TemporaryDueWorkDecorator
 
         /* Second file
          */
+        $plagscan2 = new Plagscan();
+        $plagscan2
+            ->setId(888)
+            ->setStatus(-1);
+
         $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
 
         $submissionFile2 = new SubmissionFile();
@@ -211,14 +216,15 @@ class TemporaryDueWorkDecorator
             ->setId(13345)
             ->setStorage($storage2)
             ->setCrocodocId('dfue45636')
-            ->setFilename('some-unplaggable-file.pdf');
+            ->setFilename('some-unplaggable-file.pdf')
+            ->setPlagscan($plagscan2);
 
         /* Third file
          */
         $plagscan3 = new Plagscan();
         $plagscan3
             ->setId(9999)
-            ->setStatus(-1);
+            ->setStatus(1);
 
         $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('efb4b418c6c963dc8760e9676986a4e99706f636');
 
@@ -227,8 +233,28 @@ class TemporaryDueWorkDecorator
             ->setId(13345)
             ->setStorage($storage3)
             ->setCrocodocId('36dg36')
-            ->setFilename('thingy.jpg');
+            ->setFilename('thingy.jpg')
+            ->setPlagscan($plagscan3);
 
+        /* Fourth file
+         */
+        $plagscan4 = new Plagscan();
+        $plagscan4
+            ->setId(7777)
+            ->setStatus(2);
+
+        $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('a351bf467f221eead2d0a184db35d13cc86a43e3');
+
+        $submissionFile4 = new SubmissionFile();
+        $submissionFile4
+            ->setId(64267)
+            ->setStorage($storage4)
+            ->setCrocodocId('3d33lkjl2590')
+            ->setFilename('chemistry.pptx')
+            ->setPlagscan($plagscan4);
+
+        /* Accumulate
+         */
         $response = new Submission();
         $response
             ->setId(2)
@@ -239,6 +265,7 @@ class TemporaryDueWorkDecorator
                 ->add($submissionFile1)
                 ->add($submissionFile2)
                 ->add($submissionFile3)
+                ->add($submissionFile4)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
