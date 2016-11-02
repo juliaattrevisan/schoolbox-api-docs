@@ -24,6 +24,20 @@ class Markbook
     protected $assessments;
 
     /**
+     * Statistics for each assessment.
+     *
+     * key:   assessment ID
+     * value: an array of statistics:
+     *        * average
+     *        * sd
+     *        * min
+     *        * max
+     *
+     * @var array
+     */
+    protected $statistics = [];
+
+    /**
      * Build a markbook out of a list of assessments.
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
@@ -33,6 +47,7 @@ class Markbook
     public function __construct(Collection $assessments)
     {
         $this->assessments = $assessments;
+        $this->collateStatistics();
     }
 
     /**
@@ -53,7 +68,7 @@ class Markbook
     public function getStudents()
     {
         $participants = new Collection();
-        foreach ($this->assessments as $assessment) {
+        foreach ($this->getAssessments() as $assessment) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 $student = $participant->getUser();
                 $participants[$student->getId()] = $student;
@@ -61,5 +76,59 @@ class Markbook
         }
         // Sort by name?
         return $participants;
+    }
+
+    /**
+     * Collates statistics for each assessment into an array.
+     */
+    protected function collateStatistics()
+    {
+        // Current stats:
+        // average, SD, min/max
+        foreach ($this->getAssessments() as $assessment) {
+
+            // Collate marks for each assessment
+            $assessmentMarks = [];
+            $statistics      = [
+                'average' => null,
+                'sd'      => null,
+                'min'     => null,
+                'max'     => null,
+                'count'   => 0,
+            ];
+            foreach ($assessment->getAllParticipants() as $participant) {
+                // Use only most recent published feedback
+                $feedback = $participant->findMostRecentPublishedFeedback();
+                if (isset($feedback)) {
+                    $normMark = $feedback->getNormalisedMark();
+                    if (isset($normMark)) {
+                        $assessmentMarks[] = $normMark;
+                        $statistics['count']++;
+                    }
+                }
+            }
+
+            // Calculate stats for this assessment
+            if ($statistics['count'] > 0) {
+                $statistics['average'] = array_sum($assessmentMarks) / $statistics['count'];
+                $statistics['min']     = min($assessmentMarks);
+                $statistics['max']     = max($assessmentMarks);
+
+                if ($statistics['count'] > 1) {
+                    // Standard deviation only makes sense for a sample size of at least 2
+                    $variance = 0;
+                    foreach ($assessmentMarks as $mark) {
+                        $variance += pow($mark - $statistics['average'], 2);
+                    }
+                    // Assuming a sample standard deviation
+                    $statistics['sd'] = sqrt($variance / ($statistics['count'] - 1));
+                }
+            }
+
+            $this->statistics[$assessment->getId()] = $statistics;
+        }
+
+        // Possible extra stats (for box plots):
+        // median, Q1, Q3, lower and upper fence
     }
 }
