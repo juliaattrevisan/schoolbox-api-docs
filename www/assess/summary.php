@@ -43,7 +43,9 @@ catch (\Exception $e) {
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
-$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
+$returnUrl = $_GET[Redirect::RETURN_URL]
+    ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}"
+    : '';
 
 $this->setVar(array(
     'RETURN_URL'           => $returnUrl,
@@ -59,6 +61,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'ASSESSMENT_ID'        => $assess['assessment_id'],
+    'MODIFY_URL'           => "/learning/assessment/{$assess['assessment_id']}/update",
     'RETURN_URL_MODIFY'    => $returnUrl ?: '?'.Redirect::RETURN_URL.'='.Redirect::encode('/assess/summary/'.$assess['assess_id']),
 ));
 

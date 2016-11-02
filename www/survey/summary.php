@@ -58,6 +58,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
+    'MODIFY_URL'           => "/survey/modify/{$this->arg[0]}",
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
 ));
 
