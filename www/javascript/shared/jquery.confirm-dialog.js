@@ -10,8 +10,9 @@
  * * dialogOptions: passthru to $.fn.dialog
  * * confirmLabel:  Label for "Yes" button
  * * cancelLabel:   Label for "No" button
- * * confirmEvent:  Callback that is run when Yes is clicked. Defaults to
+ * * confirmEvent:  Callback that is run when 'Yes' is clicked. Defaults to
  *                  following whatever link is on this element.
+ * * confirmEvent:  Callback that is run when 'No' is clicked. Defaults to no op.
  * * destroyDialog: True if dialog is to be destroyed when it's closed.
  */
 (function($){
@@ -58,6 +59,7 @@
             text: 'Are you sure?',
             confirmLabel: 'Yes',
             confirmEvent: $.confirmDialog.followHref,
+            cancelEvent: $.noop,
             cancelLabel: 'No',
             format: 'text'
         };
@@ -74,6 +76,7 @@
         });
         var cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel).on('click.confirmDialog', function(e) {
             e.preventDefault();
+            settings.cancelEvent(element);
             modal.foundation('reveal', 'close');
         });
 
