@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use \Schoolbox\User as User;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
