@@ -259,24 +259,10 @@ class MapperProxy
     public function delete(IAssessable $assessable)
     {
         // Delete assessment
-        $dataModel = $this->translateToDataModel($assessable, 0);
-        $this->baseMapper->delete($dataModel);
+        $this->baseMapper->delete($this->translateToDataModel($assessable, 0));
 
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
-
-        // In the case of Quiz, we do need to delete sub-objects. This is because the old Quiz screens
-        // are not aware of the assessment table
-        if($assessable instanceof QuizDomainModel){
-            // Deletion is idempotent. Force deletion of already deleted to ensure weak entities are all deleted.
-            try {
-                $quizDataModel = $this->baseMapper->findById($dataModel->getId());
-            } catch (MapperException\Deleted $e){
-                $quizDataModel = $e->getDeletedObject();
-            }
-            $quiz = $quizDataModel->getQuiz();
-            QuizMapper::getInstance()->delete($quiz);
-        }
     }
 
     /**

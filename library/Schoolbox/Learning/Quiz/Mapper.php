@@ -26,7 +26,7 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 
 /**
- * Class OnlineAssessmentMapper
+ * Formerly known as OnlineAssessmentMapper
  *
  * @package Schoolbox\Assessment\Component
  * @method Model createModel($id=null)
