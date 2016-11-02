@@ -17,7 +17,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -86,7 +88,7 @@ class StudentReportCard
     /**
      * A collection of Folder models belonging to the term set in $this->setTerm().
      *
-     * @var \Schoolbox\Collection|Folder\Model
+     * @var \Schoolbox\Collection|Folder[]
      */
     protected $categoriesInTerm = array();
 
@@ -109,7 +111,7 @@ class StudentReportCard
     protected $termMapper;
 
     /**
-     * @var Folder\Mapper
+     * @var FolderMapper
      */
     protected $folderMapper;
 
@@ -129,12 +131,12 @@ class StudentReportCard
         $this->targetUserId  = $studentUserId;
 
         // dependencies
-        $this->submissionMapper = new SubmissionBoxMapper();
-        $this->showcaseMapper   = new ShowcaseMapper();
-        $this->assessMapper     = new QuizMapper();
-        $this->attemptMapper    = Mapper::getInstance();
+        $this->submissionMapper = SubmissionBoxMapper::getInstance();
+        $this->showcaseMapper   = ShowcaseMapper::getInstance();
+        $this->assessMapper     = QuizMapper::getInstance();
+        $this->attemptMapper    = QuizAttemptMapper::getInstance();
         $this->groupHandler     = new \Group();
-        $this->folderMapper     = new Folder\Mapper();
+        $this->folderMapper     = FolderMapper::getInstance();
         $this->termMapper       = Term\Mapper::getInstance();
         $this->userMapper       = UserMapper::getInstance();
         $this->roleMapper       = RoleMapper::getInstance();
@@ -1033,7 +1035,7 @@ class StudentReportCard
 
         /**
          * @var $returnMapper  SubmissionBox\ReturnedWorkMapper
-         * @var $attemptMapper Mapper
+         * @var $attemptMapper QuizAttemptMapper
          */
         $returnMapper  = SubmissionBox\ReturnedWorkMapper::getInstance();
         $attemptMapper = QuizAttemptMapper::getInstance();
@@ -1261,7 +1263,7 @@ class StudentReportCard
         $this->categoriesInTerm->mergeUnique($attemptedSubjects, 'id');
 
         // Ensure folder codes are populated
-        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
+        FolderCodeMapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
     }
 
     /**
