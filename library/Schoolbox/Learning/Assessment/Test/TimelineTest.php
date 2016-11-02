@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Timeline;
 use \Schoolbox\User;
 
@@ -101,6 +102,47 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response2)
             ->add($response1)
             ->add($response3);
+
+        $timeline = (new Timeline($assessment))->getTimeline();
+
+        $this->assertEquals($expected, $timeline);
+    }
+
+    /**
+     * One Response
+     * One Feedback
+     */
+    public function testOneResponseOneFeedback()
+    {
+        $assessment = new DueWork();
+
+        $response1 = new Submission();
+        $response1
+            ->setId(1)
+            ->setAssessable($assessment)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback1 = new Feedback();
+        $feedback1
+            ->setId(11)
+            ->setAssessable($assessment)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $response1->getAllFeedback()->add($feedback1);
+
+        $assessment->setResponses((new Collection())
+            ->add($response1)
+        );
+
+        /* Compare these
+         */
+        $expected = (new Collection())
+            ->add($response1)
+        ;
 
         $timeline = (new Timeline($assessment))->getTimeline();
 
