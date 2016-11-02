@@ -1261,7 +1261,7 @@ class PendingFactory
             }
         } else {
             // Get Classes Taught from External_DB
-            $classes = $this->externalUser->getSubjectList($this->viewee->getExternalId(), $this->viewee->getId());
+            $classes = $this->externalUser->getSubjectList($this->viewee);
 
             // Get ClassCodes + SB FolderIds
             if (is_array($classes) && !empty($classes)) {
