@@ -102,9 +102,6 @@ class Kernel extends \Alaress\Application\Kernel
                     $session->updateLastTime();
                 }
 
-                /** @var \Alaress\Web\Controller\Base $controller */
-                $controller = $this->di->get('controller:'.$controllerName);
-
                 /** @var \Aura\Web\Response $response */
                 $response = null;
 
@@ -125,6 +122,9 @@ class Kernel extends \Alaress\Application\Kernel
                 } catch (\Exception $preloaderException) {
                     // Store the preloader exception for later
                 }
+
+                /** @var \Alaress\Web\Controller\Base $controller */
+                $controller = $this->di->get('controller:'.$controllerName);
 
                 // Authorize, throwing whatever exceptions might be thrown.
                 /** @var \Alaress\Authorizer\Authorizer $authorizer */
