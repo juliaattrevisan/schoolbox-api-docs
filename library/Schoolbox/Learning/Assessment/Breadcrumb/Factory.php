@@ -22,12 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use \Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
-use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Factory
 {
