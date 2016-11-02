@@ -12,9 +12,16 @@
                 {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
             {% endif %}
 
-            {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
-                {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+            {% if assessable is quiz %}
+                {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                    {% set modifyRoute = routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                {% endif %}
+            {% else %}
+                {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+                    {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+                {% endif %}
             {% endif %}
+
 
             {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
                 {% set deleteRoute = routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
