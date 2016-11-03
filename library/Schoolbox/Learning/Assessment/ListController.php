@@ -117,8 +117,8 @@ class ListController extends Web\Controller\Base
             'context'         => $context,
             'hasContextWrite' => $hasContextWrite,
             'assessments'     => $assessments,
-            'contextType'     => new AssessmentContextType(),
-            'assessmentType'  => new AssessmentType(),
+            'contextType'     => AssessmentContextType::objectToString($context) . 's',
+            'assessmentType'  => $q['type'],
             '_is_xhr'         => $this->getRequest()->isXhr(),
         ];
 
@@ -213,6 +213,9 @@ class ListController extends Web\Controller\Base
             $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
             array_unshift($data['types'], $item);
         }
+
+        $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
+        $data['context']     = $context;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }

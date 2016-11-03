@@ -1,33 +1,19 @@
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
 
-    {% if isRouteAuthorized('learningAssessment.getSelectAssessmentInFolder') %}
-        {% set createRoute = routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: type }) %}
-    {% endif %}
+    {% set createRoute -%}
+        {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
+        {%- if assessmentType -%}
+            ?type={{ assessmentType }}
+        {%- endif -%}
+    {%- endset %}
 
     <ul class="action-list">
         {% for assessable in assessables %}
 
-            {% if assessable is quiz and not isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-                {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-            {% else %}
-                {% set viewRoute = routeLookup('learningQuiz.getQuizIntro', {assessmentId: assessable.id}) %}
-            {% endif %}
-
-            {% if assessable is quiz %}
-                {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
-                    {% set modifyRoute = routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
-                {% endif %}
-            {% else %}
-                {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
-                    {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
-                {% endif %}
-            {% endif %}
-
-
-            {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
-                {% set deleteRoute = routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
-            {% endif %}
+            {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+            {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
 
             {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}
 

@@ -69,7 +69,7 @@
 {% if assessmentType|length %}
     {% set formAction = routeLookup('learningAssessment.postCreateAssessment') %}
 {% else %}
-    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType~"s", contextId: context.id }) %}
+    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id }) %}
 {% endif %}
 
 <div class="row">
