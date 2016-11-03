@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Learning\Quiz\Model as Quiz;
 /**
  * Assess_Main
  *
@@ -158,6 +160,6 @@ class Assess_Main extends Evaluation_Main {
      */
     protected function getAvailabilityType()
     {
-        return 'assess';
+        return Quiz::AVAILABILITY_ASSESS;
     }
 }

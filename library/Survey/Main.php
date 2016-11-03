@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Learning\Quiz\Model as Quiz;
 /**
  * Survey
  *
@@ -166,6 +168,6 @@ class Survey_Main extends Evaluation_Main
      */
     protected function getAvailabilityType()
     {
-        return 'survey';
+        return Quiz::AVAILABILITY_SURVEY;
     }
 }
