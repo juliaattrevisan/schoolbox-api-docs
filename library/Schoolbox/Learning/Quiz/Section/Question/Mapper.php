@@ -24,7 +24,7 @@ class Mapper extends BaseMapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('type_id', QuizQuestionTypeMapper::class, 'type_id', null, null, 'type', 'type');
         $this->uses('marks', self::TYPE_DECIMAL);
-        $this->uses('config', self::TYPE_STRING);
+        $this->uses('config', self::TYPE_JSON);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSolution'));

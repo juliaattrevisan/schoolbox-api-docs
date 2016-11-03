@@ -44,8 +44,7 @@ class Model implements ISoftDeletable
     private $question;
 
     /**
-     * @var string
-     * @todo Unserialise on first use and cache
+     * @var array
      */
     private $config;
 
@@ -143,7 +142,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getConfig()
     {
@@ -151,10 +150,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $config
+     * @param array $config
      * @return static
      */
-    public function setConfig($config)
+    public function setConfig(array $config)
     {
         $this->config = $config;
         return $this;
