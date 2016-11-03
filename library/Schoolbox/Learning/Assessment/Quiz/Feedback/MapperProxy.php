@@ -115,6 +115,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setReviewee($attempt->getUser())
                 // TODO implement reviewer for quizzes
                 ->setReviewer(new User())
+                ->setPublishedAt($attempt->getReviewed())
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
