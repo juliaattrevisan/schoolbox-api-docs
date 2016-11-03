@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Markbook;
 
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -17,10 +17,7 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\User;
 
 /**
@@ -34,6 +31,13 @@ class Markbook
      * @var Collection|IAssessable[]
      */
     protected $assessments;
+
+    /**
+     * The grade group to use when summarising a student's overall grade for these assessments.
+     *
+     * @var GradeGroup
+     */
+    protected $gradeGroup;
 
     /**
      * Statistics for the whole markbook.
@@ -78,10 +82,12 @@ class Markbook
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
      * @param Collection|IAssessable[] $assessments
+     * @param GradeGroup               $gradeGroup
      */
-    public function __construct(Collection $assessments)
+    public function __construct(Collection $assessments, GradeGroup $gradeGroup)
     {
         $this->assessments = $assessments;
+        $this->gradeGroup  = $gradeGroup;
         $this->collateStatistics();
     }
 
@@ -184,13 +190,8 @@ class Markbook
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
+        $overallMarkScheme = new LetterGrade($this->gradeGroup);
 
-        // Inject whatever the default grade group is
-        // TODO inject all of this
-        $defaultGradeGroup = \Config::get('default_grade_group');
-        $overallMarkScheme = new LetterGrade(
-            GradeGroupMapper::getInstance()->findById($defaultGradeGroup)
-        );
 
         foreach ($this->getStudents() as $student) {
             $this->studentStatistics[$student->getId()]['mean'] =

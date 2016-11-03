@@ -28,6 +28,7 @@ use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
@@ -77,6 +78,11 @@ class Controller extends Base
     protected $assessableDataSource;
 
     /**
+     * @var GradeGroupMapper
+     */
+    protected $gradeGroupMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper            $errorMapper
@@ -87,6 +93,7 @@ class Controller extends Base
      * @param GradeGroup             $gradeGroup
      * @param ShowcaseMapper         $showcaseMapper
      * @param AssessableDataSource   $assessableDataSource
+     * @param GradeGroupMapper       $gradeGroupMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -96,7 +103,8 @@ class Controller extends Base
         TermMapper $termMapper,
         GradeGroup $gradeGroup,
         ShowcaseMapper $showcaseMapper,
-        AssessableDataSource $assessableDataSource
+        AssessableDataSource $assessableDataSource,
+        GradeGroupMapper $gradeGroupMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -106,6 +114,7 @@ class Controller extends Base
         $this->setGradeGroup($gradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setAssessableDataSource($assessableDataSource);
+        $this->setGradeGroupMapper($gradeGroupMapper);
     }
 
     /**
@@ -273,7 +282,10 @@ class Controller extends Base
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
         }
         // The markbook will handle statistics
-        $markbook = new Markbook($assessments);
+        $markbook = new Markbook(
+            $assessments,
+            $this->getGradeGroupMapper()->findById($this->getConfigLoader()->get('default_grade_group'))
+        );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/markbook.twig', [
             'class'    => $class,
@@ -630,6 +642,24 @@ class Controller extends Base
     protected function setShowcaseMapper(ShowcaseMapper $showcaseMapper)
     {
         $this->showcaseMapper = $showcaseMapper;
+        return $this;
+    }
+
+    /**
+     * @return GradeGroupMapper
+     */
+    public function getGradeGroupMapper()
+    {
+        return $this->gradeGroupMapper;
+    }
+
+    /**
+     * @param GradeGroupMapper $gradeGroupMapper
+     * @return static
+     */
+    public function setGradeGroupMapper(GradeGroupMapper $gradeGroupMapper)
+    {
+        $this->gradeGroupMapper = $gradeGroupMapper;
         return $this;
     }
 }
