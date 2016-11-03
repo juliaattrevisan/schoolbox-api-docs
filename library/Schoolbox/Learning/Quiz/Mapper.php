@@ -167,7 +167,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 
 		$this->hasSoftDeleteDateField('deleted_at');
 
-		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
