@@ -14,7 +14,7 @@
                         if( 1 == $('[data-venue]').length){
                             window.location.href = window.location.href;
                         } else {
-                            $venue.fadeOut({ done: $venue.remove });
+                            $venue.fadeOut({ done: $venue.remove() });
                         }
                     });
                 }

@@ -98,7 +98,7 @@
                                     $otherSeason.attr('data-division-count', parseInt($otherSeason.attr('data-division-count')) + parseInt($season.attr('data-division-count')));
                                     $otherSeason.attr('data-match-count', parseInt($otherSeason.attr('data-match-count')) + parseInt($season.attr('data-match-count')));
                                 }
-                                $season.fadeOut({ done: $season.remove });
+                                $season.fadeOut({ done: $season.remove() });
 
                                 // Was this the last season ?
                                 checkEmptyState();
@@ -149,7 +149,7 @@
                             .done(function(data) {
                                 switch (action) {
                                     case 'delete':
-                                        $season.fadeOut({ done: $season.remove });
+                                        $season.fadeOut({ done: $season.remove() });
                                         checkEmptyState();
                                         break;
                                     case 'archive':
