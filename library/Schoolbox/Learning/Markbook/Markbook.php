@@ -38,6 +38,20 @@ class Markbook
     protected $assessmentStatistics = [];
 
     /**
+     * Statistics for each student.
+     *
+     * key:   student ID
+     * value: an array of statistics:
+     *        * average
+     *        * sd
+     *        * min
+     *        * max
+     *
+     * @var array
+     */
+    protected $studentStatistics = [];
+
+    /**
      * Build a markbook out of a list of assessments.
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
@@ -93,53 +107,64 @@ class Markbook
      */
     protected function collateStatistics()
     {
-        // Current stats:
-        // average, SD, min/max
+        $studentMarks = [];
         foreach ($this->getAssessments() as $assessment) {
 
             // Collate marks for each assessment
             $assessmentMarks = [];
-            $statistics      = [
-                'mean'  => null,
-                'sd'    => null,
-                'min'   => null,
-                'max'   => null,
-                'count' => 0,
-            ];
             foreach ($assessment->getAllParticipants() as $participant) {
                 // Use only most recent published feedback
+//                $assessment->getMarkScheme();
                 $feedback = $participant->findMostRecentPublishedFeedback();
                 if (isset($feedback)) {
                     $normMark = $feedback->getNormalisedMark();
                     if (isset($normMark)) {
                         $assessmentMarks[] = $normMark;
-                        $statistics['count']++;
+                        $studentMarks[$participant->getUser()->getId()][] = $normMark;
                     }
                 }
             }
 
-            // Calculate stats for this assessment
-            if ($statistics['count'] > 0) {
-                $statistics['mean'] = array_sum($assessmentMarks) / $statistics['count'];
-                $statistics['min']  = min($assessmentMarks);
-                $statistics['max']  = max($assessmentMarks);
-
-                if ($statistics['count'] > 1) {
-                    // Standard deviation only makes sense for a sample size of at least 2
-                    $variance = 0;
-                    foreach ($assessmentMarks as $mark) {
-                        $variance += pow($mark - $statistics['mean'], 2);
-                    }
-                    // Old markbook used population standard deviation, rather than sample
-                    // To use sample SD: subtract 1 from denominator
-                    $statistics['sd'] = sqrt($variance / $statistics['count']);
-                }
-            }
-
-            $this->assessmentStatistics[$assessment->getId()] = $statistics;
+            $this->assessmentStatistics[$assessment->getId()] = $this->calculateStatistics($assessmentMarks);
         }
 
+        $this->studentStatistics = array_map([$this, 'calculateStatistics'], $studentMarks);
+    }
+
+    /**
+     * Calculates generic statistics for a list of values.
+     *
+     * @param array $values
+     * @return array
+     */
+    protected function calculateStatistics($values)
+    {
         // Possible extra stats (for box plots):
         // median, Q1, Q3, lower and upper fence
+        $statistics = [
+            'mean'  => null,
+            'sd'    => null,
+            'min'   => null,
+            'max'   => null,
+            'count' => count($values),
+        ];
+        if ($statistics['count'] > 0) {
+            // These need to be converted back into human-readable versions
+            $statistics['mean'] = array_sum($values) / $statistics['count'];
+            $statistics['min']  = min($values);
+            $statistics['max']  = max($values);
+
+            if ($statistics['count'] > 1) {
+                // Standard deviation only makes sense for a sample size of at least 2
+                $variance = 0;
+                foreach ($values as $mark) {
+                    $variance += pow($mark - $statistics['mean'], 2);
+                }
+                // Old markbook used population standard deviation, rather than sample
+                // To use sample SD: subtract 1 from denominator
+                $statistics['sd'] = sqrt($variance / $statistics['count']);
+            }
+        }
+        return $statistics;
     }
 }
