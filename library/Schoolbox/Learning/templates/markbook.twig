@@ -72,10 +72,13 @@
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
-                    <td>TODO: class average</td>
-                    {#<td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">#}
-                        {#<a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>#}
-                    {#</td>#}
+                    {% for assessment in markbook.assessments %}
+                    <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+                        <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                            {{ markbook.assessmentStatistics[assessment.id].mean }}
+                        </a>
+                    </td>
+                    {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
 

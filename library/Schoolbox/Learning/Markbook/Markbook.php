@@ -35,7 +35,7 @@ class Markbook
      *
      * @var array
      */
-    protected $statistics = [];
+    protected $assessmentStatistics = [];
 
     /**
      * Build a markbook out of a list of assessments.
@@ -79,13 +79,13 @@ class Markbook
     }
 
     /**
-     * Gets all stats for this markbook.
+     * Gets all stats for the assessments in this markbook.
      *
      * @return array
      */
-    public function getStatistics()
+    public function getAssessmentStatistics()
     {
-        return $this->statistics;
+        return $this->assessmentStatistics;
     }
 
     /**
@@ -136,7 +136,7 @@ class Markbook
                 }
             }
 
-            $this->statistics[$assessment->getId()] = $statistics;
+            $this->assessmentStatistics[$assessment->getId()] = $statistics;
         }
 
         // Possible extra stats (for box plots):
