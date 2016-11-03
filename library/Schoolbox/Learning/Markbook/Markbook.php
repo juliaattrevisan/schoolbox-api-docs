@@ -114,7 +114,6 @@ class Markbook
             $assessmentMarks = [];
             foreach ($assessment->getAllParticipants() as $participant) {
                 // Use only most recent published feedback
-//                $assessment->getMarkScheme();
                 $feedback = $participant->findMostRecentPublishedFeedback();
                 if (isset($feedback)) {
                     $normMark = $feedback->getNormalisedMark();
@@ -125,10 +124,17 @@ class Markbook
                 }
             }
 
+            // Summator for assessment statistics:
+            // a relative of ISummator which takes an assessment instead of a user
             $this->assessmentStatistics[$assessment->getId()] = $this->calculateStatistics($assessmentMarks);
         }
 
+        // Summator for student statistics:
+        // weighted average
         $this->studentStatistics = array_map([$this, 'calculateStatistics'], $studentMarks);
+
+        // Summator for overall statistics:
+        // relative of weighted average, which takes no user
     }
 
     /**
