@@ -2690,6 +2690,10 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         throw new InvalidArgumentException("Unknown markType id: $markTypeId");
     }
 
+
+    /**
+     * @return GradeGroup
+     */
     private function getDummyLetterGradeGroup()
     {
         $data = [
