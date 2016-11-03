@@ -5,7 +5,18 @@
         {{ currentInteraction.onlineSubmissionContent|purify }}
     </article>
 
-    {% include '@learning/dueWork/interaction/response/files.twig' %}
+    {% if currentInteraction.allFiles %}
+    <ul class="information-list">
+        {% for currentFile in currentInteraction.allFiles %}
+        <li class="actions-small-1">
+            {% include '@learning/dueWork/interaction/response/files.twig' %}
+            <nav>
+                <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: currentInteraction.id}) }}?fileId={{ currentFile.id }}" class="icon-next" title="View in Inline Grader"></a>
+            </nav>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
     {% if currentInteraction.allFeedback|length %}
         <ul class="information-list reply">

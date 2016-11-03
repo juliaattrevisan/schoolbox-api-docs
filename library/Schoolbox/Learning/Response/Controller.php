@@ -15,6 +15,12 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
+use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
 class Controller extends Base
 {
@@ -68,11 +74,114 @@ class Controller extends Base
      */
     public function getParticularResponse($response)
     {
+        /* TODO: Generate a populated response for now
+         */
+        $response = $this->generateResponse1();
+
         $data = [
             'response' => $response
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+    }
+
+    /**
+     * Temporary populator
+     *
+     * @return Submission
+     */
+    private function generateResponse1()
+    {
+        $hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
+
+        /* First file
+         */
+        $plagscan1 = new Plagscan();
+        $plagscan1
+            ->setId(1234)
+            ->setStatus(3)
+            ->setScore('45%')
+            ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+        $storage1 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+
+        $submissionFile1 = new SubmissionFile();
+        $submissionFile1
+            ->setId(5233)
+            ->setStorage($storage1)
+            ->setCrocodocId('slkjl2j3589uslk23jl4')
+            ->setFilename('online-submission.html')
+            ->setPlagscan($plagscan1);
+
+        /* Second file
+         */
+        $plagscan2 = new Plagscan();
+        $plagscan2
+            ->setId(888)
+            ->setStatus(-1);
+
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
+
+        $submissionFile2 = new SubmissionFile();
+        $submissionFile2
+            ->setId(13345)
+            ->setStorage($storage2)
+            ->setCrocodocId('dfue45636')
+            ->setFilename('some-unplaggable-file.pdf')
+            ->setPlagscan($plagscan2);
+
+        /* Third file
+         */
+        $plagscan3 = new Plagscan();
+        $plagscan3
+            ->setId(9999)
+            ->setStatus(1);
+
+        $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('efb4b418c6c963dc8760e9676986a4e99706f636');
+
+        $submissionFile3 = new SubmissionFile();
+        $submissionFile3
+            ->setId(13345)
+            ->setStorage($storage3)
+            ->setCrocodocId('36dg36')
+            ->setFilename('thingy.jpg')
+            ->setPlagscan($plagscan3);
+
+        /* Fourth file
+         */
+        $plagscan4 = new Plagscan();
+        $plagscan4
+            ->setId(7777)
+            ->setStatus(2);
+
+        $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('a351bf467f221eead2d0a184db35d13cc86a43e3');
+
+        $submissionFile4 = new SubmissionFile();
+        $submissionFile4
+            ->setId(64267)
+            ->setStorage($storage4)
+            ->setCrocodocId('3d33lkjl2590')
+            ->setFilename('chemistry.pptx')
+            ->setPlagscan($plagscan4);
+
+        /* Accumulate
+         */
+        $response = new Submission();
+        $response
+            ->setId(2)
+            ->setSubmittedBy($hodes)
+            ->setSubmittedOnBehalfOf($hodes)
+            ->setAllFiles((new \Schoolbox\Collection())
+                ->add($submissionFile1)
+                ->add($submissionFile2)
+                ->add($submissionFile3)
+                ->add($submissionFile4)
+            )
+            ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        return $response;
     }
 
     /* Getters/Setters

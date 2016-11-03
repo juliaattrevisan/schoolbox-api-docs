@@ -1,1 +1,21 @@
 <h1>Inline Grader Magick</h1>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Files</h2>
+        <section>
+            {% if response.allFiles %}
+                <ul class="information-list">
+                    {% for currentFile in response.allFiles %}
+                        <li class="actions-small-1">
+                            {% include '@learning/dueWork/interaction/response/files.twig'  with {currentInteraction: response} %}
+                            <nav>
+                                <a>Load</a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+    </div>
+</div>

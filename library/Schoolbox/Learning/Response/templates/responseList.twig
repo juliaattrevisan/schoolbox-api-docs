@@ -17,7 +17,7 @@
             <ul id='history' class="information-list threaded">
                 {% for currentInteraction in timeline %}
                     {% if currentInteraction is response %}
-                        {% include '@learningResponse/inlineGrading/interaction/response.twig' %}
+                        {% include '@learningResponse/inlineGrading/interaction/response.twig' with {response: currentInteraction} %}
 
                         {# I have the feeling people will want Feedbacks displayed here too
                          #

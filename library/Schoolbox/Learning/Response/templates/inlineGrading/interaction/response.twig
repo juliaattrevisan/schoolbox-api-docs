@@ -1,4 +1,16 @@
 <li class="actions-small-1">
     {% include '@learning/dueWork/interaction/response/creator.twig' %}
-    {% include '@learning/dueWork/interaction/response/files.twig' %}
+
+    {% if response.allFiles %}
+        <ul class="information-list">
+            {% for currentFile in response.allFiles %}
+                <li class="actions-small-1">
+                    {% include '@learning/dueWork/interaction/response/files.twig' %}
+                    <nav>
+                        <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?fileId={{ currentFile.id }}" class="icon-next" title="View in Inline Grader"></a>
+                    </nav>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </li>
