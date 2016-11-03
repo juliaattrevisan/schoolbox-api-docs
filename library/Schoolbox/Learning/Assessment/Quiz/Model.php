@@ -143,15 +143,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @deprecated concept is unsupported by quiz: max mark is per-attempt only
-     * @return null
-     */
-    public function getMaxMark()
-    {
-        return null;
-    }
-
-    /**
      * @return int
      */
     public function getDuration()

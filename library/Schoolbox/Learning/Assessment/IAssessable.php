@@ -321,16 +321,6 @@ interface IAssessable extends ISoftDeletable
     public function setCloseAt($closeAt);
 
     /**
-     * Quiz    - null
-     * DueWork - int: max mark
-     * Task    - null
-     * Project - null
-     *
-     * @return float|int|null
-     */
-    public function getMaxMark();
-
-    /**
      * Get the weight
      *
      * A multiplier applied to a Normalised Mark
