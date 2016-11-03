@@ -56,7 +56,7 @@ class Maximum extends AbstractSummator
      */
     protected function finalise()
     {
-        return floatval($this->max);
+        return isset($this->max) ? floatval($this->max) : null;
     }
 
     /**
