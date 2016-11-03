@@ -1128,7 +1128,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_totalMarkFraction_getHR()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        $quiz->setMarkScheme(new TotalMarkFractional());
         if(Participant::FAVOR_FLOATING){
             return [
                 [$quiz, $this->getDummyStudent(1), null],
@@ -1152,7 +1152,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_totalMarkFraction_getHR_publishedOnly()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        $quiz->setMarkScheme(new TotalMarkFractional());
         return [
             [$quiz, $this->getDummyStudent(1), null],
             [$quiz, $this->getDummyStudent(2), '1 / 2'],
@@ -1165,7 +1165,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_totalMarkFraction_getNorm()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        $quiz->setMarkScheme(new TotalMarkFractional());
 
         if(Participant::FAVOR_FLOATING){
             return [
@@ -1191,7 +1191,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_totalMarkFraction_getNorm_publishedOnly()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        $quiz->setMarkScheme(new TotalMarkFractional());
         return [
             [$quiz, $this->getDummyStudent(1), null],
             [$quiz, $this->getDummyStudent(2), 50.0],
