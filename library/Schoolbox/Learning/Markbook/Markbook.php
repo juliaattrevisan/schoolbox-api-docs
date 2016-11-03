@@ -9,7 +9,6 @@ namespace Schoolbox\Learning\Markbook;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
-use Schoolbox\Config\Config;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Count;
@@ -17,7 +16,6 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\MarkScheme\AbstractMarkScheme;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
@@ -36,11 +34,20 @@ class Markbook
     protected $assessments;
 
     /**
+     * Statistics for the whole markbook.
+     *
+     * Currently only contains a weighted mean.
+     *
+     * @var array
+     */
+    protected $markbookStatistics = [];
+
+    /**
      * Statistics for each assessment.
      *
      * key:   assessment ID
      * value: an array of statistics:
-     *        * average
+     *        * mean
      *        * sd
      *        * min
      *        * max
@@ -54,7 +61,7 @@ class Markbook
      *
      * key:   student ID
      * value: an array of statistics:
-     *        * average
+     *        * mean
      *        * sd
      *        * min
      *        * max
@@ -102,6 +109,16 @@ class Markbook
         }
         // Sort by name?
         return $participants;
+    }
+
+    /**
+     * Gets all stats that span the entire markbook.
+     *
+     * @return array
+     */
+    public function getMarkbookStatistics()
+    {
+        return $this->markbookStatistics;
     }
 
     /**
@@ -195,6 +212,13 @@ class Markbook
         // Summator for overall statistics:
         // relative of weighted average, which takes no user.
         // Again, average is all we care about
+        $this->markbookStatistics['mean'] = $overallMarkScheme->getHumanReadableMark(
+            $weightedSummator->summateAllAssessables(
+                $this->getAssessments(),
+                true,
+                $meanSummator
+            )
+        );
     }
 
     /**

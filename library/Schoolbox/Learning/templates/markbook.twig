@@ -79,7 +79,7 @@
                         </a>
                     </td>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <td>{{ markbook.markbookStatistics.mean | default('–') }}</td>
                 </tr>
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
