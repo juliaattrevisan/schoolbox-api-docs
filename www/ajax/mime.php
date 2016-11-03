@@ -67,7 +67,7 @@ foreach(array_reverse($filenames) as $filename) {
     $maxAge = 2419200; // 28 days
 
     // send the right headers
-    header('Content-Type: image/svg');
+    header('Content-Type: image/svg+xml');
     header('Content-Length: ' . filesize($filename));
     header('Pragma: public');
     header("Cache-Control: public, max-age=$maxAge");
