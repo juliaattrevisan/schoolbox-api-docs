@@ -82,7 +82,7 @@
                     <div class="component-action">
                         <section>
                             {% for returnUrl in allReturnUrls %}
-                                <a class="button" href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
+                                <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
                             {% endfor %}
                             <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create Assessment</a>
                         </section>
