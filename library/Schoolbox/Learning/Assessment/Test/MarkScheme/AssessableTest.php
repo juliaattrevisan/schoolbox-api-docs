@@ -2192,7 +2192,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $quiz = (new Quiz())
             ->setId(2)
             ->setMaxMark(3.0)
-            ->setHasFixedTotalMarks(false);
+        ;
 
         $student1 = $this->getDummyStudent(1);
         $student2 = $this->getDummyStudent(2);

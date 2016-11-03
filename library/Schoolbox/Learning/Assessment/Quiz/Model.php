@@ -33,6 +33,8 @@ class Model extends AbstractAssessment
      * If so, we must pass a QuizResponse to the MarkScheme when calculating marks.
      * This is determined on construction by evaluating whether (section.pool) < count(question.*) GROUP BY section_id
      *
+     * @deprecated Always assume that this is true
+     *
      * @var bool
      */
     private $hasFixedTotalMarks;
@@ -98,7 +100,7 @@ class Model extends AbstractAssessment
         $markScheme = $this->getMarkScheme();
 
         // Special Case: If a Quiz has sections with questions pools, the total marks available may change per attempt
-        if($markScheme instanceof TotalMarkFractional && !$this->getHasFixedTotalMarks()) {
+        if ($markScheme instanceof TotalMarkFractional) {
             $participant = $this->getParticipant($user);
 
             $feedback = $publishedOnly
@@ -108,6 +110,11 @@ class Model extends AbstractAssessment
             $response = $feedback
                 ? $feedback->getResponse()
                 : null;
+
+            // Response
+            if (!isset($response)) {
+                return null;
+            }
 
             return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
         }
