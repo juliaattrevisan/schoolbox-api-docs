@@ -8,12 +8,48 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-
+use Alaress\Web;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\AssessmentContext;
 
 interface IAssessmentController
 {
+
+    /**
+     * Retrieve a list of assessments that exist, by context
+     *
+     * NOTE: this is a debug route that is only available to supers, so don't go referencing this route in twigs...
+     * It shows the functionality of the common "assessment component" logic for any context
+     *
+     * @api GET /learning/{contextType}/{contextId}/assessments?user&readOnly
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     */
+    public function getAssessmentsByContext(AssessmentContext $context);
+
+    /**
+     * Get the form for creating a new assessment in a particular context
+     *
+     * @api   GET /learning/{contextType}/{contextId}/assessments/new?type
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     */
+    public function getCreateAssessmentForm(AssessmentContext $context);
+
+    /**
+     * Create a new assessment in the given context
+     *
+     * @api   POST /learning/{:contextType}/{:contextId}/assessments
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     * @throws Web\Controller\Exception
+     */
+    public function postCreateAssessment(AssessmentContext $context);
+
     /**
      * @api   GET /learning/assessments/:assessmentId
      * @level 165
