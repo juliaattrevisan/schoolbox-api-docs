@@ -44,9 +44,9 @@ if (!$permissionDenied) {
     $student = UserMapper::getInstance()->findById($_POST['student_id']);
 
     // Update the user's completion
-    $completion = new Task\InstanceCompletion();
+    $completion = new Task\Completion();
     $completion
-        ->setTaskInstance($task)
+        ->setTask($task)
         ->setStudent($student)
         ->setCompletionDate(new Alaress_Date_Format(new DateTime('now')))
         ->setCompletionStatus($_POST['status'])
@@ -59,14 +59,14 @@ if (!$permissionDenied) {
     }
     elseif (isset($_POST['current_status'])) {
         switch ($_POST['current_status']) {
-            case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
-                $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE;
+            case Task\Completion::COMPLETION_STATUS_INCOMPLETE:
+                $newStatus = Task\Completion::COMPLETION_STATUS_COMPLETE;
                 break;
-            case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE;
+            case Task\Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                $newStatus = Task\Completion::COMPLETION_STATUS_COMPLETE;
                 break;
-            case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE;
+            case Task\Completion::COMPLETION_STATUS_COMPLETE:
+                $newStatus = Task\Completion::COMPLETION_STATUS_INCOMPLETE;
                 break;
             default:
                 break;
@@ -76,7 +76,7 @@ if (!$permissionDenied) {
         $completion->setCompletionStatus($newStatus);
     }
 
-    Task\InstanceCompletionMapper::getInstance()->save($completion);
+    Task\CompletionMapper::getInstance()->save($completion);
 }
 
 // Output the new status via JSON

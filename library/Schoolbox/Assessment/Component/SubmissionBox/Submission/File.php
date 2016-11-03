@@ -10,31 +10,32 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
-use Alaress_Date_Format as ADF;
 use Eportfolio\ShowcaseMapper;
-use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Mapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class File implements IFile
+/**
+ * A student's submission to a due work.
+ *
+ * The name File is a misnomer, as now a submission may contain multiple files.
+ *
+ * TODO remove IStorage once all uses are found and removed
+ */
+class File implements IStorage
 {
-    use StorableTrait;
-
-    /** @var string */
-    protected $uuid;
+    use Id;
+    use CreatedAtDate;
 
     /** @var bool */
     protected $draft;
-
-    /** @var Plagscan_Document */
-    protected $plagscan;
 
     /** @var SubmissionBox */
     protected $submissionBox;
@@ -48,44 +49,20 @@ class File implements IFile
     /** @var User */
     protected $owner;
 
-    /** @var ADF */
-    protected $createdAt;
-
+    /**
+     * The list of files within this submission.
+     *
+     * @var Collection|SingleFile\Model[]
+     */
+    protected $files;
 
     /**
-     * @return string
+     * Constructor
      */
-    public function getUuid()
+    public function __construct()
     {
-        return $this->uuid;
+        $this->setFiles(new Collection());
     }
-
-    /**
-     * @param string $uuid
-     * @return static
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
-
-    /**
-     * @param Plagscan_Document $plagscan
-     */
-    public function setPlagscan($plagscan)
-    {
-        $this->plagscan = $plagscan;
-    }
-
-    /**
-     * @return Plagscan_Document
-     */
-    public function getPlagscan()
-    {
-        return $this->plagscan;
-    }
-
 
     /**
      * @return boolean
@@ -113,26 +90,6 @@ class File implements IFile
     public function setDraft($draft)
     {
         $this->draft = $draft;
-        return $this;
-    }
-
-
-    /**
-     * @return ADF
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param ADF $createdAt
-     * @return static
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
         return $this;
     }
 
@@ -236,6 +193,24 @@ class File implements IFile
     }
 
     /**
+     * @return Collection|SingleFile\Model[]
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * @param Collection|SingleFile\Model[] $files
+     * @return static
+     */
+    public function setFiles(Collection $files)
+    {
+        $this->files = $files;
+        return $this;
+    }
+
+    /**
      * Does this user have permission to view this submission?
      * Users can view if:
      * * Is SuperUser
@@ -310,5 +285,78 @@ class File implements IFile
             'uid'               => $this->getOwner()->getId(),
             'submission_box_id' => $this->getSubmissionBox()->getId(),
         ]) > 0;
+    }
+
+    // Deliberately broken implementation of IStorage.
+    // Added only so that uses of this object which assume it's still an IStorage can be rewritten.
+
+    public function getFilename()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setFilename($filename)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getExtension()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setExtension($extension)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getBasename()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function setBasename($basename)
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getMime()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getMimetype()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getSize()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getHash()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getLastAccessed()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function exists()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function read()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function readStream()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
     }
 }

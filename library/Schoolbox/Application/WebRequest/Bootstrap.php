@@ -631,16 +631,80 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
-        // Register participant data source
+        // Register participant data source (with responses and feedback)
         $di->set(
             'participantDataSource',
             $di->lazyNew(
                 ParticipantDataSource::class,
                 [
-                    'externalDb'       => $di->lazyGet('externalClass'),
-                    'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'userMapper'       => $mapperFactory->getLazy(UserMapper::class),
+                    'externalDb'         => $di->lazyGet('externalClass'),
+                    'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
+                    'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
+                    'responseDataSource' => $di->lazyGet('responseDataSource'),
+                    'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
                 ]
+            )
+        );
+
+        // Register response data source
+        $di->set(
+            'responseDataSource',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    return (new \Schoolbox\Learning\Assessment\Response\DataSource())
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Response\SubSource\DueWork(
+                                new \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Response\SubSource\Task(
+                                new \Schoolbox\Learning\Assessment\Task\Completion\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Course\Task\CompletionMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Response\SubSource\Quiz(
+                                new \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class)
+                                )
+                            )
+                        );
+                }
+            )
+        );
+
+        // Register feedback data source
+        $di->set(
+            'feedbackDataSource',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    return (new \Schoolbox\Learning\Assessment\Feedback\DataSource())
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork(
+                                new \Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\Task(
+                                new \Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Course\Task\CompletionMapper::class)
+                                )
+                            )
+                        )
+                        ->addSubSource(
+                            new \Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz(
+                                new \Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy(
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class)
+                                )
+                            )
+                        );
+                }
             )
         );
 

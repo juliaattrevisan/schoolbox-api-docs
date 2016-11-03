@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use PDOStatement;
+use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -211,6 +212,7 @@ class Mapper extends BaseMapper
         /** @var Collection|Model[] $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
+        $quizIds           = [];
         $contextProjectIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
@@ -237,6 +239,7 @@ class Mapper extends BaseMapper
             // Quiz?
             if ($row['q.assess_id']) {
                 $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
+                $quizIds[] = $row['q.assess_id'];
             } else {
                 $model->setQuiz(null);
             }

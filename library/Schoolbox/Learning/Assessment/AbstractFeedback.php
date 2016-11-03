@@ -57,6 +57,14 @@ class AbstractFeedback implements IFeedback
     protected $comment;
 
     /**
+     * The person for whom this Feedback was created for.
+     * Usually a Student.
+     *
+     * @var User
+     */
+    protected $reviewee;
+
+    /**
      * The person who reviewed (created) this Feedback
      * Typically a Teacher
      *
@@ -151,6 +159,24 @@ class AbstractFeedback implements IFeedback
     public function setComment($comment)
     {
         $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getReviewee()
+    {
+        return $this->reviewee;
+    }
+
+    /**
+     * @param User $reviewee
+     * @return static
+     */
+    public function setReviewee($reviewee)
+    {
+        $this->reviewee = $reviewee;
         return $this;
     }
 

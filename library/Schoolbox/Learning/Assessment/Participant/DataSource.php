@@ -9,13 +9,14 @@ namespace Schoolbox\Learning\Assessment\Participant;
 
 use External_ClassInterface;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
@@ -45,20 +46,40 @@ class DataSource
     protected $userMapper;
 
     /**
+     * Data source for assessment responses
+     *
+     * @var ResponseDataSource
+     */
+    protected $responseDataSource;
+
+    /**
+     * Data source for assessment feedback
+     *
+     * @var FeedbackDataSource
+     */
+    protected $feedbackDataSource;
+
+    /**
      * Constructor
      *
      * @param External_ClassInterface $externalDb
      * @param UserAccessMapper        $userAccessMapper
      * @param UserMapper              $userMapper
+     * @param ResponseDataSource      $responseDataSource
+     * @param FeedbackDataSource      $feedbackDataSource
      */
     public function __construct(
         External_ClassInterface $externalDb,
         UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        ResponseDataSource $responseDataSource,
+        FeedbackDataSource $feedbackDataSource
     ) {
-        $this->externalDb       = $externalDb;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper       = $userMapper;
+        $this->externalDb         = $externalDb;
+        $this->userAccessMapper   = $userAccessMapper;
+        $this->userMapper         = $userMapper;
+        $this->responseDataSource = $responseDataSource;
+        $this->feedbackDataSource = $feedbackDataSource;
     }
 
     /**
@@ -69,6 +90,9 @@ class DataSource
      * * any read-level members of the context's folder's group
      * * anyone who has submitted a Response for this assessment
      * * anyone who has been given Feedback for this assessment
+     *
+     * Currently, this method sets the participants into $assessment as well as
+     * returning them.
      *
      * @param IAssessable $assessment
      * @return Collection|Participant[]
@@ -84,8 +108,8 @@ class DataSource
         $participants = new Collection();
 
         $context = $assessment->getContext();
-        if ($context instanceof UnitImplementation) {
-            // Unit implementations have no participants
+        if ($context instanceof UnitSpecification) {
+            // Unit specifications have no participants
             return $participants;
         }
 
@@ -115,10 +139,64 @@ class DataSource
             );
         }
 
-        // Sort by name
-        $participants = $participants->sortByCallback([$this, 'sortCallback']);
+        // Need to add them into the assessment
+        $assessment->setAllParticipants($participants);
 
-        // TODO add feedback and responses
+        // Add responses
+        foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
+
+            // Currently submitted by and on behalf of are always the same.
+            $responseUser = $response->getSubmittedOnBehalfOf();
+
+            // Find participant, creating if required
+            try {
+                $responseParticipant = $assessment->getParticipant($responseUser);
+
+            } catch (\UnexpectedValueException $e) {
+                // Not a participant: add them
+                $responseParticipant = new Participant($responseUser, $assessment);
+                $assessment->getAllParticipants()->add($responseParticipant);
+            }
+
+            $responseParticipant->getAllResponses()->add($response);
+        }
+
+        // Add feedback
+        foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
+
+            $feedbackUser = $feedback->getReviewee();
+
+            // Find participant, creating if required
+            try {
+                $responseParticipant = $assessment->getParticipant($feedbackUser);
+
+            } catch (\UnexpectedValueException $e) {
+                // Not a participant: add them
+                $responseParticipant = new Participant($feedbackUser, $assessment);
+                $assessment->getAllParticipants()->add($responseParticipant);
+            }
+
+            // Feedbacks may have a stub response.
+            // If so, use it to find the actual response, and associate them together.
+            $stubResponse = $feedback->getResponse();
+            if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                $stubResponseId = $stubResponse->getId();
+                foreach ($responseParticipant->getAllResponses() as $response) {
+                    // For now assume that the types of response and feedback match
+                    if ($stubResponseId == $response->getId()) {
+                        $response->getAllFeedback()->add($feedback);
+                        $feedback->setResponse($response);
+                        break;
+                    }
+                }
+            }
+
+            $responseParticipant->getAllFeedbacks()->add($feedback);
+        }
+
+        // Sort by name after all that
+        $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
+        $assessment->setAllParticipants($participants);
 
         return $participants;
     }

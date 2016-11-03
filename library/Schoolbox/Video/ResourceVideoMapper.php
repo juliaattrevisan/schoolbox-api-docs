@@ -79,7 +79,7 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasJoin(
             'student_submission', array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\FileMapper',
+                'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::class,
                 'this_key'  => 'hash',
                 'other_key' => 'hash',
             )

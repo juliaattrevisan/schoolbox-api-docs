@@ -205,8 +205,6 @@ class PredicateBuilder
         if ($negate) {
             $whereNot = "NOT ";
             $operand  = "<>";
-            $field    = substr($field, 1);
-
         } else {
             $whereNot = "";
         }

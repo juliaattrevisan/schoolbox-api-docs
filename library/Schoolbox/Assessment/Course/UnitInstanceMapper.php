@@ -744,15 +744,15 @@ class UnitInstanceMapper extends BaseMapper {
         $task_list = $this->findJoinedModelList('task', $unit_instance_list, ['order' => ['order' => 'asc',],]);
 
         // Load completions for each unit, and load into task list
-        /** @var Task\InstanceCompletion[]|Collection $completion_list */
+        /** @var Task\Completion[]|Collection $completion_list */
         $completion_list = $this->getJoinMapper('task')
             ->getJoinMapper('completion')
             ->findLatestForList($task_list->getColumnValues('id'));
 
         $grouped_completion_list = $completion_list->groupByCallback(
             function ($item) {
-                /** @var Task\InstanceCompletion $item */
-                return $item->getTaskInstance()->getId();
+                /** @var Task\Completion $item */
+                return $item->getTask()->getId();
             }
         );
         foreach ($task_list as $task) {

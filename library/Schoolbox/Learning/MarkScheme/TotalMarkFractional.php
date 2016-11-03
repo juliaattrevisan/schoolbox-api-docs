@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 
 /**
  * Permits fractional TotalMark suitable for Quiz.
@@ -37,23 +36,20 @@ class TotalMarkFractional extends TotalMarkAbstract
 
     const TOTAL_MARK_MIN = 0.0;
 
-    /** @var float */
-    private $originalTotalMark;
 
     /**
-     * @param int|float $totalMark
+     * TotalMarkFractional constructor.
      */
-    public function __construct($totalMark)
+    public function __construct()
     {
-        $this->setOriginalTotalMark($totalMark);
-        parent::__construct($totalMark);
+        // there is no default total mark value for this implementation
+        parent::__construct(0);
     }
 
 
     /**
      * @param float $totalMark
      * @throws RangeException if $totalMark is less than permitted minimum
-     * @throws RangeException if $totalMark is greater than original total mark
      */
     protected function validateTotalMark($totalMark)
     {
@@ -65,11 +61,6 @@ class TotalMarkFractional extends TotalMarkAbstract
         if($totalMark < $totalMarkMin){
             throw new RangeException("Total mark must be greater than or equal to $totalMarkMin: $totalMark");
         }
-
-        $originalTotalMark = $this->getOriginalTotalMark();
-        if($totalMark > $originalTotalMark){
-            throw new RangeException("Total mark cannot exceed original total mark. Original: $originalTotalMark, Total: $totalMark");
-        }
     }
 
     /**
@@ -78,18 +69,22 @@ class TotalMarkFractional extends TotalMarkAbstract
      * @param float          $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
+     * @throws InvalidArgumentException if $response isn't set
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if (!$response instanceof QuizAttempt) {
+            throw new InvalidArgumentException("Cannot retrieve human-readable mark from an empty response");
+        }
         if(is_null($normalisedMark)){
             return null;
         }
         $this->checkQuizAttempt($response);
         $result = parent::getHumanReadableMark($normalisedMark, $response);
 
-        // Restore total mark, as checkQuizAttempt can change it
-        $this->setTotalMark($this->getOriginalTotalMark());
+        // Restore "total mark" back to zero, as checkQuizAttempt can change it
+        $this->setTotalMark(0);
 
         return $result;
     }
@@ -100,15 +95,19 @@ class TotalMarkFractional extends TotalMarkAbstract
      *
      * @param string         $humanReadableMark
      * @param IResponse|null $response
+     * @throws InvalidArgumentException if $response isn't set
      * @return float
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
+        if (!$response instanceof QuizAttempt) {
+            throw new InvalidArgumentException("Cannot retrieve normalised mark from an empty response");
+        }
         $this->checkQuizAttempt($response);
         $result = parent::getNormalisedMark($humanReadableMark, $response);
 
-        // Restore total mark, as checkQuizAttempt can change it
-        $this->setTotalMark($this->getOriginalTotalMark());
+        // Restore "total mark" back to zero, as checkQuizAttempt can change it
+        $this->setTotalMark(0);
 
         return $result;
     }
@@ -116,9 +115,9 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * Checks if the response is a QuizAttempt, if so, update $totalMark with max marks available in the attempt.
      *
-     * @param IResponse|null $response
+     * @param IResponse $response
      */
-    protected function checkQuizAttempt(IResponse $response = null)
+    protected function checkQuizAttempt(IResponse $response)
     {
         // Special Case for Quiz where total marks available can vary per Attempt
         if ($response instanceof QuizAttempt) {
@@ -129,37 +128,6 @@ class TotalMarkFractional extends TotalMarkAbstract
 
     /* Getters / Setters
      */
-
-    /**
-     * @return float
-     */
-    protected function getOriginalTotalMark()
-    {
-        return $this->originalTotalMark;
-    }
-
-    /**
-     * @param float $totalMark
-     * @return static
-     */
-    protected function setOriginalTotalMark($totalMark)
-    {
-        $this->originalTotalMark = $totalMark;
-        return $this;
-    }
-
-    /**
-     * May have fractional part
-     *
-     * @param float $totalMark
-     * @return static
-     */
-    protected function setTotalMark($totalMark)
-    {
-        $this->validateTotalMark($totalMark);
-        parent::setTotalMark($totalMark);
-        return $this;
-    }
 
     /**
      * @return float

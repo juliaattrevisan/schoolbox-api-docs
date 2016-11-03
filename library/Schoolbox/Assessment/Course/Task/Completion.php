@@ -10,9 +10,10 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\User;
 
-class InstanceCompletion {
+class Completion {
 
     const COMPLETION_STATUS_INCOMPLETE            = 1;
     const COMPLETION_STATUS_REQUIRES_CONFIRMATION = 2;
@@ -24,9 +25,9 @@ class InstanceCompletion {
     protected $id;
 
     /**
-     * @var Instance
+     * @var Task
      */
-    protected $task_instance;
+    protected $task;
 
     /**
      * @var User
@@ -132,18 +133,18 @@ class InstanceCompletion {
     }
 
     /**
-     * @param  \Schoolbox\Assessment\Course\Task\Instance $task_instance
+     * @param  Task $task
      * @return $this
      */
-    public function setTaskInstance($task_instance) {
-        $this->task_instance = $task_instance;
+    public function setTask($task) {
+        $this->task = $task;
         return $this;
     }
 
     /**
-     * @return \Schoolbox\Assessment\Course\Task\Instance
+     * @return Task
      */
-    public function getTaskInstance() {
-        return $this->task_instance;
+    public function getTask() {
+        return $this->task;
     }
 }

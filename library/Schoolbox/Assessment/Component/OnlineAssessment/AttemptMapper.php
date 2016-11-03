@@ -11,10 +11,13 @@
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
+use PDOStatement;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\UserMapper;
 
 /**
  * Class AttemptMapper
@@ -29,7 +32,7 @@ class AttemptMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('assess_attempt');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\Attempt');
+        $this->hasModel(Attempt::class);
         $this->hasMap(array(
             'column'     => 'attempt_id',
             'property'   => 'id',
@@ -71,13 +74,13 @@ class AttemptMapper extends Mapper
         $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin('assessment', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
+            'mapper'    => OnlineAssessmentMapper::class,
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id'
         ));
 
         $this->hasJoin('user', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'user_id',
             'other_key' => 'id'
         ));
@@ -85,6 +88,36 @@ class AttemptMapper extends Mapper
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var Attempt $attempt */
+            $attempt = $this->hydrate($row);
+            $attempt->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $c->add($attempt);
+        }
+        return $c;
+    }
 
     /**
      * On post save, write mark data back into remote markbook
@@ -116,6 +149,44 @@ class AttemptMapper extends Mapper
         return '(' . implode(',', $placeholders) . ')';
     }
 
+    /**
+     * Retrieves mark, max_mark and first_section for all given attempt IDs.
+     *
+     * TODO consider removing this sum method when mappers for responses and questions exist
+     *
+     * @param array $attemptIds
+     * @return Collection|array[]
+     */
+    public function findSupplementaryInformation($attemptIds)
+    {
+        $result = $this->createCollection();
+        if (empty($attemptIds)) {
+            return $result;
+        }
+        $query = "
+            SELECT
+                aa.attempt_id,
+                SUM(ar.mark)  AS mark,
+                SUM(aq.marks) AS max_mark,
+                (
+                    SELECT `as`.section_id
+                    FROM assess_section `as`
+                    WHERE `as`.section_id = aq.section_id
+                    ORDER BY `as`.sequence ASC
+                    LIMIT 1
+                ) AS first_section
+            FROM assess_attempt aa
+            LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+            LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+            WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
+            GROUP BY aa.assess_id, aa.attempt_id
+            ORDER BY aa.start DESC
+        ";
+        foreach ($this->getDatabase()->query($query, $this->getArrayParameters($attemptIds)) as $row) {
+            $result[$row['attempt_id']] = $row;
+        }
+        return $result;
+    }
 
     /**
      * Builds list of student's marks for all attempts in the given category.

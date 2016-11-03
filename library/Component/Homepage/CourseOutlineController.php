@@ -38,7 +38,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
     /**
      * A list of students who have completed the tasks within the course.
      *
-     * @var Collection|Task\InstanceCompletion[]
+     * @var Collection|Task\Completion[]
      */
     protected $completion_list;
 
@@ -127,7 +127,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             if ($this->readOnly) {
                 $this_student_id = $this->getUser()->getId();
             }
-            $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
+            $this->completion_list = Task\CompletionMapper::getInstance()->findLatestForList(
                 $task_list, $this_student_id
             );
         } else {
@@ -270,7 +270,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             // Only add students who are in the list of students for this homepage.
             $student_id = $item->getStudent()->getId();
             if (in_array($student_id, $studentIdList)) {
-                $task_instance_id                             = $item->getTaskInstance()->getId();
+                $task_instance_id                             = $item->getTask()->getId();
                 $grouped_list[$task_instance_id][$student_id] = $item;
             }
         }
@@ -283,8 +283,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             $is_completed = true;
             foreach ($unit->getTasks() as $task) {
                 $completion = $grouped_list[$task->getId()][$_SESSION['id']];
-                if (!($completion instanceof Task\InstanceCompletion)
-                    || $completion->getCompletionStatus() != Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE
+                if (!($completion instanceof Task\Completion)
+                    || $completion->getCompletionStatus() != Task\Completion::COMPLETION_STATUS_COMPLETE
                 ) {
                     $is_completed = false;
                     break;
@@ -430,7 +430,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      *
      * @param Task\Instance $task The task that is being rendered
      * @param UnitInstance $unit The unit that the task is rendered into
-     * @param Task\InstanceCompletion[] $completion_list The list of completions, keyed by student
+     * @param Task\Completion[] $completion_list The list of completions, keyed by student
      */
     public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list)
     {
@@ -445,18 +445,18 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             $unit_task_class = 'progress-tick incomplete';
             $unit_task_title = 'Incomplete, click to mark completed';
             $completion_item = $completion_list[$_SESSION['id']];
-            if ($completion_item instanceof Task\InstanceCompletion) {
+            if ($completion_item instanceof Task\Completion) {
                 switch ($completion_item->getCompletionStatus()) {
-                    case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
+                    case Task\Completion::COMPLETION_STATUS_COMPLETE:
                         $unit_task_class  = 'progress-tick complete';
                         $unit_task_title  = 'Teacher Approved';
                         break;
-                    case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                    case Task\Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
                         $unit_task_class  = 'progress-tick pending';
                         $unit_task_title  = 'Self Assessed, click to undo';
                         $undoable         = true;
                         break;
-                    case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
+                    case Task\Completion::COMPLETION_STATUS_INCOMPLETE:
                     default:
                         $completable = true;
                         break;

@@ -85,16 +85,6 @@ if (!$attempt['finish']) {
     AttemptMapper::getInstance()->save($attempt);
 
     $this->setVar('ATTEMPT_END', $attemptFinishDate->getShort());
-
-    // Does this item have a task instance associated? if so, set it as
-    // completed (pending, instead of completed?)
-    if (!empty($assess['task_instance_id'])) {
-        Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-            $assess['task_instance_id'],
-            $attempt->getUser()->getId()
-        );
-    }
-
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
 } else {

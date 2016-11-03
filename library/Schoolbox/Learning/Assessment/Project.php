@@ -231,14 +231,6 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * @return null
-     */
-    public function getMaxMark()
-    {
-        return null;
-    }
-
-    /**
      * @param AssessmentContext $context
      * @throws \InvalidArgumentException
      * @return static
