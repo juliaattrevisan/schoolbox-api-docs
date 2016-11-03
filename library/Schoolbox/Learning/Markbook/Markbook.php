@@ -7,8 +7,18 @@
 
 namespace Schoolbox\Learning\Markbook;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\Config;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Count;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\MarkScheme\AbstractMarkScheme;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\User;
 
 /**
@@ -103,38 +113,72 @@ class Markbook
     }
 
     /**
+     * Gets all stats for the students in this markbook.
+     *
+     * @return array
+     */
+    public function getStudentStatistics()
+    {
+        return $this->studentStatistics;
+    }
+
+    /**
      * Collates statistics for each assessment into an array.
      */
     protected function collateStatistics()
     {
-        $studentMarks = [];
+        $meanSummator     = new Average();
+        $stdevSummator    = new StandardDeviation();
+        $minSummator      = new Minimum();
+        $maxSummator      = new Maximum();
+        $weightedSummator = new WeightedAverage();
+        $countSummator    = new Count();
         foreach ($this->getAssessments() as $assessment) {
-
-            // Collate marks for each assessment
-            $assessmentMarks = [];
-            foreach ($assessment->getAllParticipants() as $participant) {
-                // Use only most recent published feedback
-                $feedback = $participant->findMostRecentPublishedFeedback();
-                if (isset($feedback)) {
-                    $normMark = $feedback->getNormalisedMark();
-                    if (isset($normMark)) {
-                        $assessmentMarks[] = $normMark;
-                        $studentMarks[$participant->getUser()->getId()][] = $normMark;
-                    }
-                }
-            }
 
             // Summator for assessment statistics:
             // a relative of ISummator which takes an assessment instead of a user
-            $this->assessmentStatistics[$assessment->getId()] = $this->calculateStatistics($assessmentMarks);
+            // The summator will get all normalized marks out, then convert the outputs to mean/min/max/sd
+            // Render as whatever type of mark scheme this is?
+
+            // Special case for quiz total mark:
+            // fall back to something else.
+            $this->assessmentStatistics[$assessment->getId()] = [
+                'title' => $assessment->getTitle(),
+                'min'   => $assessment->getMarkScheme()->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
+                'max'   => $assessment->getMarkScheme()->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
+                'count' => $countSummator->summateSingleAssessable($assessment, true),
+                'mean'  => $assessment->getMarkScheme()->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true)),
+                'sd'    => $assessment->getMarkScheme()->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true)),
+            ];
         }
 
-        // Summator for student statistics:
-        // weighted average
-        $this->studentStatistics = array_map([$this, 'calculateStatistics'], $studentMarks);
+        // Summator for a student's statistics:
+        // weighted average.
+        // The average is all we care about for student stats
+        // Render as a grade scheme
+//        $this->studentStatistics = array_map([$this, 'calculateStatistics'], $studentMarks);
+
+        // Inject whatever the default grade group is
+        // TODO inject all of this
+        $defaultGradeGroup = \Config::get('default_grade_group');
+        $overallMarkScheme = new LetterGrade(
+            GradeGroupMapper::getInstance()->findById($defaultGradeGroup)
+        );
+        foreach ($this->getStudents() as $student) {
+            $this->studentStatistics[$student->getId()]['mean'] =
+                $overallMarkScheme->getHumanReadableMark(
+                    $weightedSummator->summate($this->getAssessments(), $student, true)
+                );
+        }
+
+//        var_dump(
+//            $this->assessmentStatistics,
+//            $this->studentStatistics
+//        );
 
         // Summator for overall statistics:
-        // relative of weighted average, which takes no user
+        // relative of weighted average, which takes no user.
+        // Again, average is all we care about
     }
 
     /**

@@ -128,16 +128,18 @@
                                title="{{ participant.mostRecentFeedback.comment }}">
                                 {% if assessment.isParticipant(student) %}
                                     {{ assessment.getParticipant(student).mostRecentFeedback.humanReadableMark }}
-                        TODO add gradient
+                                    TODO add gradient
                                 {% else %}
                                     –
                                 {% endif %}
                             </a>
                         </td>
-                    {#<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">#}
-                        {#<a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">{STUDENT_AVG_CLEAN}</a>#}
-                    {#</td>#}
                     {% endfor %}
+                    <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+                        <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">
+                            {{ markbook.studentStatistics[student.id].mean }}
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>
