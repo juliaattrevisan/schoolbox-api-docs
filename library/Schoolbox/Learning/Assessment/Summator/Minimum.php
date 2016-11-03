@@ -66,7 +66,7 @@ class Minimum extends AbstractSummator
      */
     protected function finalise()
     {
-        return $this->min;
+        return floatval($this->min);
     }
 
     /**
