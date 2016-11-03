@@ -23,6 +23,7 @@ try {
     $export_type = $_GET['export'];
     $api = null;
     $filename = 'calendar';
+
     if (empty($token)) {
         throw new SchoolboxException('No token provided', 401);
     }
@@ -97,6 +98,11 @@ try {
             $filename = 'timetabledays';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+            break;
+
+        case 'resources':
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array());
+            $filename = 'resources';
             break;
 
         case 'all':
