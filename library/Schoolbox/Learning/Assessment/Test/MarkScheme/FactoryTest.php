@@ -426,8 +426,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $attempt->setAssessable($quiz);
 
         // Inject data
-        $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
-
         $responses = [
             [
                 'mark' => $response1['mark'],

@@ -137,16 +137,6 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
      */
     protected $mark_visibility = 0;
 
-    /**
-     * Unmapped field for storing the quiz's total mark (if it has one).
-     *
-     * This will eventually be replaced with the collection of all this quiz's
-     * sections and their constituent questions.
-     *
-     * @var float
-     */
-    protected $totalMark = 0;
-
     public function __construct()
     {
         $this->setCurriculumNodes(new Collection());
@@ -593,26 +583,6 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
     public function getMarkVisibility()
     {
         return $this->mark_visibility;
-    }
-
-    /**
-     * TODO implement setting of max marks from this quiz's question set
-     *
-     * @return float
-     */
-    public function getTotalMark()
-    {
-        return $this->totalMark;
-    }
-
-    /**
-     * @param float $totalMark
-     * @return static
-     */
-    public function setTotalMark($totalMark)
-    {
-        $this->totalMark = $totalMark;
-        return $this;
     }
 
     /**

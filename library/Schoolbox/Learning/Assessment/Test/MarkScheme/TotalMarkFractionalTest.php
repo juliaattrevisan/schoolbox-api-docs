@@ -155,9 +155,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
 
     public function test_getNormalised_Quiz()
     {
-        // Quiz has total marks of 3.0
         $quiz = $this->getDummyQuiz();
-        $quizTotalMarks = $quiz->getMaxMark();
 
         // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
@@ -173,15 +171,9 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * A quiz's max mark no longer affects the human-readable or normalized mark,
-     * nor does it determine whether the mark is valid.
-     */
     public function test_getNormalised_Quiz_OriginalTotalExceedsAttemptTotal()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMaxMark(1);
-        $quizTotalMarks = $quiz->getMaxMark();
 
         // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
@@ -197,17 +189,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * This is distinct from test above in that it does NOT pass in the Quiz
-     * response. So although the attempt total available marks = 2.0, if the attempt is not present,
-     * the MarkScheme uses the quiz total marks = 3.0 instead.
-     */
     public function test_getNormalised_Quiz_Total()
     {
-        // Quiz has total marks of 3.0
-        $quiz = $this->getDummyQuiz();
-        $quizTotalMarks = $quiz->getMaxMark();
-
         $humanReadable = 1;
 
         // 1 / 3.0 * 100.0
@@ -215,7 +198,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $delta = 0.00001;
 
         $markScheme = new TotalMarkFractional();
-        $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($quizTotalMarks));
+        $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt(3));
 
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertLessThan($delta, abs($expected - $actual), $message);
@@ -224,8 +207,6 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getHumanReadable_Quiz()
     {
         $quiz = $this->getDummyQuiz();
-
-        $quizTotalMarks = $quiz->getMaxMark();
 
         // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
@@ -243,8 +224,6 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $quiz = $this->getDummyQuiz();
 
-        $quizTotalMarks = $quiz->getMaxMark();
-
         // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
         $normalised = 87.6;
@@ -258,15 +237,11 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * A quiz's max mark no longer affects the human-readable or normalized mark,
-     * nor does it determine whether the mark is valid.
+     * A quiz does not have a max mark
      */
     public function test_getHumanReadable_Quiz_Fractional_OriginalTotalExceedsAttemptTotal()
     {
         $quiz = $this->getDummyQuiz();
-        $quiz->setMaxMark(1);
-
-        $quizTotalMarks = $quiz->getMaxMark();
 
         // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
@@ -440,9 +415,6 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $feedback->setAssessable($quiz);
         $attempt->getAllFeedback()->add($feedback);
         $attempt->setAssessable($quiz);
-
-        // Inject data
-        $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
 
         $responses = [
             [

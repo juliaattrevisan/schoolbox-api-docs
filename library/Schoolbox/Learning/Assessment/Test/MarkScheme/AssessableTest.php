@@ -2191,7 +2191,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // Create everything
         $quiz = (new Quiz())
             ->setId(2)
-            ->setMaxMark(3.0)
         ;
 
         $student1 = $this->getDummyStudent(1);
