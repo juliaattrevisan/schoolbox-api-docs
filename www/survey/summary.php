@@ -59,6 +59,7 @@ $this->setVar(array(
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
     'MODIFY_URL'           => "/survey/modify/{$this->arg[0]}",
+    'RETURN_URL_MODIFY'    => "?".Redirect::RETURN_URL.'='.Redirect::encode("/survey/summary/{$this->arg[0]}"),
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
 ));
 
