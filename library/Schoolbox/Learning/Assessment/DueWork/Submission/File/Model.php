@@ -81,7 +81,7 @@ class Model implements IStorage
          */
         $knownFilenames = ['online-submission.html', 'Online Submission.html'];
 
-        if (in_array($this->getFilename(), $knownFilenames)) {
+        if (in_array($this->getFilename(), $knownFilenames) && ($this->getStorage()->getMimetype() == 'text/html')) {
             return true;
         }
 
