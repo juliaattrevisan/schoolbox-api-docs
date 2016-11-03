@@ -38,7 +38,12 @@ class Controller extends Base
      */
     public function getResponseList(IAssessable $assessment, User $student)
     {
-        echo 'test';
+        $data = [
+            'assessment' => $assessment,
+            'student' => $student,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/temp.twig', $data));
     }
 
     /* Getters/Setters

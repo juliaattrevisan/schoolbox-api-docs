@@ -21,6 +21,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \External_UserInterface;
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+
 class Module extends BaseModule
 {
     /**
@@ -78,8 +80,6 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher, '(?:getResponseList)', function ($params) {
-            $assessment = [$params['assessmentId']];
-
             try {
                 $student = $this->getUserMapper()->findById($params['studentId']);
             } catch (MapperException $e) {
@@ -87,7 +87,7 @@ class Module extends BaseModule
             }
 
             return [
-                'assessment' => $assessment,
+                'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId']),
                 'student'    => $student,
             ];
         });
@@ -96,7 +96,7 @@ class Module extends BaseModule
             $response = $params['responseId'];
 
             return [
-                'rseponse' => $response,
+                'response' => $response,
             ];
         });
     }
@@ -140,5 +140,13 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @return AssessmentMapperProxy
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
     }
 }
