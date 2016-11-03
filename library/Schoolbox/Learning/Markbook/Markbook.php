@@ -19,6 +19,8 @@ use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\AbstractMarkScheme;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\User;
 
 /**
@@ -140,16 +142,30 @@ class Markbook
             // The summator will get all normalized marks out, then convert the outputs to mean/min/max/sd
             // Render as whatever type of mark scheme this is?
 
+            $markScheme = $assessment->getMarkScheme();
+
             // Special case for quiz total mark:
-            // fall back to something else.
-            $this->assessmentStatistics[$assessment->getId()] = [
-                'title' => $assessment->getTitle(),
-                'min'   => $assessment->getMarkScheme()->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
-                'max'   => $assessment->getMarkScheme()->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
+            // fall back to a different summator
+            // TODO figure out a better way to do this
+            if ($markScheme instanceof TotalMarkFractional) {
+                $markScheme = new TotalMarkWholeNumber($markScheme->getTotalMark());
+            }
+
+            $statistics = [
+                'mean'  => null,
+                'sd'    => null,
+                'min'   => $markScheme->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
+                'max'   => $markScheme->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
                 'count' => $countSummator->summateSingleAssessable($assessment, true),
-                'mean'  => $assessment->getMarkScheme()->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true)),
-                'sd'    => $assessment->getMarkScheme()->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true)),
             ];
+
+            // mean and SD are only meaningful for quantitative marks
+            if ($markScheme->isQuantitative()) {
+                $statistics['mean'] = $markScheme->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true));
+                $statistics['sd']   = $markScheme->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true));
+            }
+
+            $this->assessmentStatistics[$assessment->getId()] = $statistics;
         }
 
         // Summator for a student's statistics:
