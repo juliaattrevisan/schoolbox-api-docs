@@ -49,7 +49,7 @@
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function(data) {
                 $('#assessmentForm')
-                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType~"s", contextId: context.id }) }}')
                     .find('[data-assessment-details]')
                     .html(data);
 
@@ -69,7 +69,7 @@
 {% if assessmentType|length %}
     {% set formAction = routeLookup('learningAssessment.postCreateAssessment') %}
 {% else %}
-    {% set formAction = routeLookup('learningAssessment.postSelectAssessment') %}
+    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType~"s", contextId: context.id }) %}
 {% endif %}
 
 <div class="row">
@@ -78,22 +78,22 @@
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
-                    <input type="hidden" name="contextType" value="{{ contextType }}" />
-                    <input type="hidden" name="contextId" value="{{ context.id }}" />
+                    {#<input type="hidden" name="contextType" value="{{ contextType }}" />#}
+                    {#<input type="hidden" name="contextId" value="{{ context.id }}" />#}
 
                     <legend>Choose Assessment Type</legend>
 
                     <fieldset class="radiolist">
                         <div class="column small-12">
-                            <input type="hidden" name="folderId" value="{{ folder.id }}" />
+                            {#<input type="hidden" name="folderId" value="{{ folder.id }}" />#}
                             {% for type in types %}
-                                <input type="radio" name="assessmentType" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
+                                <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
                             {% endfor %}
                         </div>
                     </fieldset>
 
                     <div class="small-12 column">
-                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'Working...') }}
+                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'GET') }}
                     </div>
                 </fieldset>
                 {% endif %}
