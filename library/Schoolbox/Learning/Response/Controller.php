@@ -56,6 +56,23 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
     }
 
+    /**
+     * Get the contents of a particular $response
+     *
+     * Show the specified $_GET['fileId'] in iframe window
+     * or other preview mechanism
+     *
+     * I can't call it getResponse() lol wups
+     *
+     * @param IResponse $response
+     */
+    public function getParticularResponse($response)
+    {
+        $data = [];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+    }
+
     /* Getters/Setters
      */
 

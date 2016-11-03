@@ -38,7 +38,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/assessment/{assessmentId}/{studentId}/responses' => 'getResponseList',
-                '/responses/{responseId}'                          => 'getResponse',
+                '/responses/{responseId}'                          => 'getParticularResponse',
             ],
             'POST' => []
         ];
@@ -92,7 +92,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getResponse)', function ($params) {
+        $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
             $response = $params['responseId'];
 
             return [
