@@ -100,11 +100,11 @@ class Markbook
             // Collate marks for each assessment
             $assessmentMarks = [];
             $statistics      = [
-                'average' => null,
-                'sd'      => null,
-                'min'     => null,
-                'max'     => null,
-                'count'   => 0,
+                'mean'  => null,
+                'sd'    => null,
+                'min'   => null,
+                'max'   => null,
+                'count' => 0,
             ];
             foreach ($assessment->getAllParticipants() as $participant) {
                 // Use only most recent published feedback
@@ -120,15 +120,15 @@ class Markbook
 
             // Calculate stats for this assessment
             if ($statistics['count'] > 0) {
-                $statistics['average'] = array_sum($assessmentMarks) / $statistics['count'];
-                $statistics['min']     = min($assessmentMarks);
-                $statistics['max']     = max($assessmentMarks);
+                $statistics['mean'] = array_sum($assessmentMarks) / $statistics['count'];
+                $statistics['min']  = min($assessmentMarks);
+                $statistics['max']  = max($assessmentMarks);
 
                 if ($statistics['count'] > 1) {
                     // Standard deviation only makes sense for a sample size of at least 2
                     $variance = 0;
                     foreach ($assessmentMarks as $mark) {
-                        $variance += pow($mark - $statistics['average'], 2);
+                        $variance += pow($mark - $statistics['mean'], 2);
                     }
                     // Old markbook used population standard deviation, rather than sample
                     // To use sample SD: subtract 1 from denominator
