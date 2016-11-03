@@ -67,7 +67,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $normalised = -1.0;
         $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->getHumanReadableMark($normalised);
+        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
     }
 
     /**
@@ -78,7 +78,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $normalised = 100.0001;
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->getHumanReadableMark($normalised);
+        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
     }
 
     /**
@@ -89,7 +89,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $humanReadable = null;
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->getNormalisedMark($humanReadable);
+        $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
     /**
@@ -100,7 +100,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $humanReadable = '';
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->getNormalisedMark($humanReadable);
+        $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
     /**
@@ -111,7 +111,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $humanReadable = 'ten';
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->getNormalisedMark($humanReadable);
+        $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
     /**
@@ -123,7 +123,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getNormalised($humanReadable, $totalMark, $expected)
     {
         $markScheme = new TotalMarkFractional($totalMark);
-        $actual = $markScheme->getNormalisedMark($humanReadable);
+        $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -138,7 +138,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $delta = 0.00001;
         $markScheme = new TotalMarkFractional($totalMark);
-        $actual = $markScheme->getNormalisedMark($humanReadable);
+        $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertLessThan($delta, abs($expected - $actual), $message);
     }
@@ -152,7 +152,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional($totalMark);
-        $actual = $markScheme->getHumanReadableMark($normalised);
+        $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
         $this->assertEquals($humanReadable, $actual, $message);
     }
@@ -166,7 +166,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional($totalMark);
-        $actual = $markScheme->getHumanReadableMark($normalised);
+        $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
         $this->assertEquals($humanReadable, $actual, $message);
     }
@@ -234,7 +234,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $delta = 0.00001;
 
         $markScheme = new TotalMarkFractional($quizTotalMarks);
-        $actual = $markScheme->getNormalisedMark($humanReadable);
+        $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($quizTotalMarks));
 
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertLessThan($delta, abs($expected - $actual), $message);
@@ -483,5 +483,16 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $attempt->setMarksGiven($marksGiven);
 
         return $quiz;
+    }
+
+    /**
+     * Generates a quiz attempt for use in getNormalised/getHumanReadable.
+     *
+     * @param int $totalMark
+     * @return QuizAttempt
+     */
+    private function getDummyQuizAttempt($totalMark)
+    {
+        return (new QuizAttempt())->setMarksAvailable($totalMark);
     }
 }
