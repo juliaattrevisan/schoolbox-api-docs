@@ -42,9 +42,7 @@ class Markbook
     /**
      * Statistics for the whole markbook.
      *
-     * Currently only contains a weighted mean.
-     *
-     * @var array
+     * @var array Currently, only contains weightedMean
      */
     protected $markbookStatistics = [];
 
@@ -62,7 +60,7 @@ class Markbook
      * Statistics for each student.
      *
      * key:   student ID
-     * value: an array of statistics (currently: mean)
+     * value: an array of statistics (currently: weightedMean)
      *
      * @var array
      */
@@ -186,7 +184,7 @@ class Markbook
 
 
         foreach ($this->getStudents() as $student) {
-            $this->studentStatistics[$student->getId()]['mean'] =
+            $this->studentStatistics[$student->getId()]['weightedMean'] =
                 $overallMarkScheme->getHumanReadableMark(
                     $weightedSummator->summateAllAssessablesForUser($this->getAssessments(), $student, true)
                 );
@@ -198,7 +196,7 @@ class Markbook
         // First, average each assessable for all participants
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $this->markbookStatistics['mean'] = $overallMarkScheme->getHumanReadableMark(
+        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark(
             $weightedSummator->summateAllAssessables(
                 $this->getAssessments(),
                 true,

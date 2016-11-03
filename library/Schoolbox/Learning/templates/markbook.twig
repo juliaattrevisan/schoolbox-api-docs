@@ -79,7 +79,7 @@
                         </a>
                     </td>
                     {% endfor %}
-                    <td>{{ markbook.markbookStatistics.mean | default('–') }}</td>
+                    <td>{{ markbook.markbookStatistics.weightedMean | default('–') }}</td>
                 </tr>
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
@@ -141,7 +141,7 @@
                     {% endfor %}
                     <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
                         <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">
-                            {{ markbook.studentStatistics[student.id].mean | default('–') }}
+                            {{ markbook.studentStatistics[student.id].weightedMean | default('–') }}
                         </a>
                     </td>
                 </tr>
