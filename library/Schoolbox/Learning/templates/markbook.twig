@@ -127,8 +127,7 @@
                             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                title="{{ participant.mostRecentFeedback.comment }}">
                                 {% if assessment.isParticipant(student) %}
-                                    {{ assessment.getParticipant(student).mostRecentFeedback.humanReadableMark }}
-                                    TODO add gradient
+                                    {{ assessment.getParticipant(student).findMostRecentPublishedFeedback.humanReadableMark }}
                                 {% else %}
                                     –
                                 {% endif %}
