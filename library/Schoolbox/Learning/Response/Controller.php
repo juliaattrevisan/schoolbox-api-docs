@@ -9,9 +9,12 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DueWork\Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+
+use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
 
 class Controller extends Base
 {
@@ -38,12 +41,19 @@ class Controller extends Base
      */
     public function getResponseList(IAssessable $assessment, User $student)
     {
+        /* TODO: Don't use temporary data
+         * Ram in some temporary responses so that I
+         * can make the Submission History section
+         */
+        (new TemporaryDataDecorator())->decorate($assessment);
+
         $data = [
             'assessment' => $assessment,
             'student' => $student,
+            'timeline' => (new Timeline($assessment))->getTimeline()
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/temp.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
     }
 
     /* Getters/Setters
