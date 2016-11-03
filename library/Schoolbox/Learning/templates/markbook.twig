@@ -93,6 +93,20 @@
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
+                    <th>% Total Weight</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>
+                            {% if markbook.markbookStatistics.totalWeight > 0 %}
+                                {{ (assessment.weight / markbook.markbookStatistics.totalWeight * 100) | round(2) }}
+                            {% else %}
+                                –
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
+
+                <tr class="sub-row" data-sub-table-row>
                     <th>Mean</th>
                     {% for assessment in markbook.assessments %}
                         <td>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</td>

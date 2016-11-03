@@ -150,6 +150,7 @@ class Markbook
         $maxSummator      = new Maximum();
         $weightedSummator = new WeightedAverage();
         $countSummator    = new Count();
+        $totalWeight      = 0;
 
         foreach ($this->getAssessments() as $assessment) {
 
@@ -176,6 +177,7 @@ class Markbook
             }
 
             $this->assessmentStatistics[$assessment->getId()] = $statistics;
+            $totalWeight += $assessment->getWeight();
         }
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
@@ -196,6 +198,7 @@ class Markbook
         // First, average each assessable for all participants
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
+        $this->markbookStatistics['totalWeight']  = $totalWeight;
         $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark(
             $weightedSummator->summateAllAssessables(
                 $this->getAssessments(),
