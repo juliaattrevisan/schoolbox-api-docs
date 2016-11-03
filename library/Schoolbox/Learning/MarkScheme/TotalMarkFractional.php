@@ -79,10 +79,14 @@ class TotalMarkFractional extends TotalMarkAbstract
      * @param float          $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
+     * @throws InvalidArgumentException if $response isn't set
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if (!isset($response)) {
+            throw new InvalidArgumentException("Cannot retrieve human-readable mark from an empty response");
+        }
         if(is_null($normalisedMark)){
             return null;
         }
@@ -101,10 +105,14 @@ class TotalMarkFractional extends TotalMarkAbstract
      *
      * @param string         $humanReadableMark
      * @param IResponse|null $response
+     * @throws InvalidArgumentException if $response isn't set
      * @return float
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
+        if (!isset($response)) {
+            throw new InvalidArgumentException("Cannot retrieve normalised mark from an empty response");
+        }
         $this->checkQuizAttempt($response);
         $result = parent::getNormalisedMark($humanReadableMark, $response);
 
