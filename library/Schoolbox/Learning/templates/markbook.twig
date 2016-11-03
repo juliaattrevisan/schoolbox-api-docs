@@ -140,7 +140,10 @@
                         </td>
                     {% endfor %}
                     <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
-                        <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">
+                        {# TODO use actual selected term code #}
+                        {# TODO use gradients #}
+                        <a class="gradient-{STUDENT_AVG_GRADIENT}"
+                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
                             {{ markbook.studentStatistics[student.id].weightedMean | default('–') }}
                         </a>
                     </td>
