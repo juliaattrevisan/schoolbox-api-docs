@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\User;
 
 interface ISummator
@@ -24,6 +25,39 @@ interface ISummator
      * @return float|null
      */
     public function summate(Collection $allAssessables, User $user, $publishedOnly);
+
+    /**
+     * Alias for summate() - created because summation of all assessables for a
+     * single user is no longer the only type of summation.
+     *
+     * @param Collection $allAssessables
+     * @param User       $user
+     * @param bool       $publishedOnly
+     * @return float|null
+     */
+    public function summateAllAssessablesForUser(Collection $allAssessables, User $user, $publishedOnly);
+
+    /**
+     * Summates a single assessable's results for all of its participants.
+     *
+     * @param IAssessable $assessable
+     * @param bool        $publishedOnly
+     * @return float|null
+     */
+    public function summateSingleAssessable(IAssessable $assessable, $publishedOnly);
+
+    /**
+     * Summates all assessable's results for all participants.
+     *
+     * This summates each assessable in turn for all of its participants using $subSummator,
+     * and then summates the the totals itself.
+     *
+     * @param Collection $allAssessables
+     * @param bool       $publishedOnly
+     * @param ISummator  $subSummator
+     * @return float|null
+     */
+    public function summateAllAssessables(Collection $allAssessables, $publishedOnly, ISummator $subSummator);
 
     /**
      * Get the public-facing title for this summator strat
