@@ -194,15 +194,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param mixed        $dateTime
      * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
-     * @return LaravelDate
-     * @throws InvalidArgumentException if date couldn't be built
+     * @return LaravelDate|null
      */
     protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
             return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
-        } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
+        } elseif ($dateTime instanceof DateTimeInterface) {
             // Build out of timestamp and timezone
             return LaravelDate::createFromTimestamp(
                 $dateTime->getTimestamp(),
@@ -215,7 +214,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 $timezone ?: clone $dateTime->getDateTimeObject()->getTimezone()
             );
         }
-        throw new InvalidArgumentException("Could not create LaravelDate from '$dateTime");
+        return null;
     }
 
     /**
@@ -250,10 +249,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             throw new InvalidArgumentException('$dateTime did not match any $inputDateFormat');
         }
 
-        try {
-            $newDateTime = $this->buildLaravelDate($dateTime, $timezone);
+        $newDateTime = $this->buildLaravelDate($dateTime, $timezone);
+        if (isset($newDateTime)) {
             $this->setDateTimeObject($newDateTime);
-        } catch (InvalidArgumentException $e) {
+        } else {
             if (!isset($inputDateFormat)) {
                 throw new InvalidArgumentException(
                     '$inputDateFormat must be supplied if $dateTime is not a date object'
@@ -1636,13 +1635,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // @codeCoverageIgnoreEnd
         }
         // Convert now to a carbon object, if I can, otherwise assume now
-        try {
-            return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
-        } catch (InvalidArgumentException $e) {
-            // @codeCoverageIgnoreStart
-            return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
-            // @codeCoverageIgnoreEnd
-        }
+        return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
     }
 
     /**
