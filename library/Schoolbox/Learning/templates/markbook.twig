@@ -75,7 +75,7 @@
                     {% for assessment in markbook.assessments %}
                     <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
                         <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
-                            {{ markbook.assessmentStatistics[assessment.id].mean }}
+                            {{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}
                         </a>
                     </td>
                     {% endfor %}
@@ -87,7 +87,7 @@
                 <tr class="sub-row mean" data-sub-table-row>
                     <th>Mean</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].mean }}</td>
+                        <td>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</td>
                     {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
@@ -95,7 +95,7 @@
                 <tr class="sub-row stdev" data-sub-table-row>
                     <th>Standard Deviation</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].sd }}</td>
+                        <td>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</td>
                     {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
@@ -103,7 +103,7 @@
                 <tr class="sub-row min" data-sub-table-row>
                     <th>Minimum</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].min }}</td>
+                        <td>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</td>
                     {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
@@ -111,7 +111,7 @@
                 <tr class="sub-row max" data-sub-table-row>
                     <th>Maximum</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].max }}</td>
+                        <td>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</td>
                     {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
@@ -132,7 +132,7 @@
                             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                title="{{ participant.mostRecentFeedback.comment }}">
                                 {% if assessment.isParticipant(student) %}
-                                    {{ assessment.getParticipant(student).findMostRecentPublishedFeedback.humanReadableMark }}
+                                    {{ assessment.getParticipant(student).findMostRecentPublishedFeedback.humanReadableMark | default('–') }}
                                 {% else %}
                                     –
                                 {% endif %}
@@ -141,7 +141,7 @@
                     {% endfor %}
                     <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
                         <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">
-                            {{ markbook.studentStatistics[student.id].mean }}
+                            {{ markbook.studentStatistics[student.id].mean | default('–') }}
                         </a>
                     </td>
                 </tr>
