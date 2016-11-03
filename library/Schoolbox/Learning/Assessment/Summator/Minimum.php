@@ -42,7 +42,7 @@ class Minimum extends AbstractSummator
     /**
      * @inheritDoc
      */
-    protected function aggregate($val, $assessableWeight, $totalWeight)
+    protected function aggregate($val, $assessableWeight)
     {
         /* $min is being set for the first time to a non-null value
          * If you don't do this check for $min == null, summate() will

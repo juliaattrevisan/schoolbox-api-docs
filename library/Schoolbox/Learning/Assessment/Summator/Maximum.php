@@ -38,7 +38,7 @@ class Maximum extends AbstractSummator
     /**
      * @inheritDoc
      */
-    protected function aggregate($val, $assessableWeight, $totalWeight)
+    protected function aggregate($val, $assessableWeight)
     {
         $this->max = max($this->max, $val);
     }

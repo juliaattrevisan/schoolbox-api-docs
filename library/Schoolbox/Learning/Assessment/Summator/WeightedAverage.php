@@ -49,7 +49,7 @@ class WeightedAverage extends AbstractSummator
     /**
      * @inheritDoc
      */
-    protected function aggregate($val, $assessableWeight, $totalWeight)
+    protected function aggregate($val, $assessableWeight)
     {
         if (!is_null($val) && $assessableWeight > 0) {
             $this->runningValues[] = [

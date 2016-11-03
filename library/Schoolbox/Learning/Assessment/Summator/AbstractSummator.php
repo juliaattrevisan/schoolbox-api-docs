@@ -31,10 +31,6 @@ abstract class AbstractSummator implements ISummator
 
         $this->reset();
 
-        /* Calculate weighting
-         */
-        $totalWeight = $this->calculateTotalWeight($allAssessables);
-
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
             try {
@@ -54,7 +50,7 @@ abstract class AbstractSummator implements ISummator
                     $val = $feedback->getNormalisedMark();
 
                     if (!is_null($val)) {
-                        $this->aggregate($val, $currentAssessable->getWeight(), $totalWeight);
+                        $this->aggregate($val, $currentAssessable->getWeight());
                     }
                 }
             }
@@ -93,7 +89,7 @@ abstract class AbstractSummator implements ISummator
 
                 if (isset($val)) {
                     // Weight doesn't matter within the context of a single assessment
-                    $this->aggregate($val, $assessable->getWeight(), $assessable->getWeight());
+                    $this->aggregate($val, $assessable->getWeight());
                 }
             }
         }
@@ -105,14 +101,12 @@ abstract class AbstractSummator implements ISummator
      */
     public function summateAllAssessables(Collection $allAssessables, $publishedOnly, ISummator $subSummator)
     {
-        $totalWeight = $this->calculateTotalWeight($allAssessables);
-
         $this->reset();
         /** @var IAssessable $assessable */
         foreach ($allAssessables as $assessable) {
             $val = $subSummator->summateSingleAssessable($assessable, $publishedOnly);
             if (isset($val)) {
-                $this->aggregate($val, $assessable->getWeight(), $totalWeight);
+                $this->aggregate($val, $assessable->getWeight());
             }
         }
         return $this->finalise();
@@ -129,10 +123,9 @@ abstract class AbstractSummator implements ISummator
     /**
      * @param float $val
      * @param int $assessableWeight
-     * @param int $totalWeight
      * @return void
      */
-    protected abstract function aggregate($val, $assessableWeight, $totalWeight);
+    protected abstract function aggregate($val, $assessableWeight);
 
     /**
      * @return void

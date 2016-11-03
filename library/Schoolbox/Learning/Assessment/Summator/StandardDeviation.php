@@ -36,7 +36,7 @@ class StandardDeviation extends AbstractSummator
     /**
      * @inheritDoc
      */
-    protected function aggregate($val, $assessableWeight, $totalWeight)
+    protected function aggregate($val, $assessableWeight)
     {
         $this->allValues[] = $val;
     }
