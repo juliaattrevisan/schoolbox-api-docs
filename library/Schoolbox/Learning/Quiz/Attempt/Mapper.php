@@ -70,6 +70,7 @@ class Mapper extends BaseMapper
     public function restoreAnswers(Model $attempt)
     {
         $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
         $quizAnswerMapper->restoreSoftDeleted($answers);
     }
