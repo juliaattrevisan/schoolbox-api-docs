@@ -80,13 +80,17 @@ class Controller extends Base
 
         /* Factory to figure out which fragment is required
          */
-        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($response->getAllFiles()->first());
+        $file = $response->getAllFiles()->first();
+
+        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
         $factory->produce();
 
         $data = [
             'assessment' => $assessment,
             'response' => $response,
-            'selectedFileId' => $this->getRequest()->query['fileId']
+            'selectedFileId' => $this->getRequest()->query['fileId'],
+            'file' => $file,
+            'strategy' => $factory->produce()
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));

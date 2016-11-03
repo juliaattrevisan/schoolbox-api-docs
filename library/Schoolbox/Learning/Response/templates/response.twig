@@ -12,14 +12,7 @@
     </div>
 </div>
 
-{% if selectedFileId %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Document Preview</h2>
-        [iframe]
-    </div>
-</div>
-{% endif %}
+{% include '@learningResponse/inlineGrading/strategy/' ~ strategy %}
 
 <div class="row">
     <div class="small-12 island">

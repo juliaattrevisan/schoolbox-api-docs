@@ -69,7 +69,7 @@ class ResponseFile
             // load video player
         }
         elseif ($this->getFile()->isOnlineSubmission()) {
-            // load purified html into div
+            return 'html.twig';
         }
         elseif ($this->isCrocodocable()) {
             // iframe crocodoc url
