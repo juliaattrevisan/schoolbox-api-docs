@@ -15,7 +15,7 @@
 
 
             // perform an ajax-replace of the target via the hash we've been given
-            var url = '{{ routeLookup('rubric.import') }}' + data.hash;
+            var url = '{{ routeLookup('rubric.import', { storageTuple: '' }) }}' + data.hash;
 
             // detect our lookup reference
             boxIdInput = body.find('input[name="id"]');
