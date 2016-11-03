@@ -68,7 +68,9 @@ class Controller extends Base
      */
     public function getParticularResponse($response)
     {
-        $data = [];
+        $data = [
+            'response' => $response
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
     }

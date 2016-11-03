@@ -13,7 +13,7 @@
                     </div>
                 </div>
                 <nav>
-                    <a href="" class="icon-next" title="View in Inline Grader"></a>
+                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: currentInteraction.id}) }}?fileId={{ currentFile.id }}" class="icon-next" title="View in Inline Grader"></a>
                 </nav>
             </li>
         {% endfor %}
