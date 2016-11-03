@@ -68,6 +68,57 @@ abstract class AbstractSummator implements ISummator
     }
 
     /**
+     * @inheritdoc
+     */
+    public function summateAllAssessablesForUser(Collection $allAssessables, User $user, $publishedOnly)
+    {
+        return $this->summate($allAssessables, $user, $publishedOnly);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function summateSingleAssessable(IAssessable $assessable, $publishedOnly)
+    {
+        $this->reset();
+        foreach ($assessable->getAllParticipants() as $participant) {
+
+            if ($publishedOnly) {
+                $feedback = $participant->findMostRecentPublishedFeedback();
+            } else {
+                $feedback = $participant->findMostRecentFeedback();
+            }
+            if ($feedback) {
+                $val = $feedback->getNormalisedMark();
+
+                if (isset($val)) {
+                    // Weight doesn't matter within the context of a single assessment
+                    $this->aggregate($val, $assessable->getWeight(), $assessable->getWeight());
+                }
+            }
+        }
+        return $this->finalise();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function summateAllAssessables(Collection $allAssessables, $publishedOnly, ISummator $subSummator)
+    {
+        $totalWeight = $this->calculateTotalWeight($allAssessables);
+
+        $this->reset();
+        /** @var IAssessable $assessable */
+        foreach ($allAssessables as $assessable) {
+            $val = $subSummator->summateSingleAssessable($assessable, $publishedOnly);
+            if (isset($val)) {
+                $this->aggregate($val, $assessable->getWeight(), $totalWeight);
+            }
+        }
+        return $this->finalise();
+    }
+
+    /**
      * The sum total weight of all the assessables
      *
      * @param Collection $allAssessables
