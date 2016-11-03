@@ -1,4 +1,25 @@
-<h1>Inline Grader Magick</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Inline Grader Magick</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        [student selector carousel]
+    </div>
+</div>
+
+{% if selectedFileId %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Document Preview</h2>
+        [iframe]
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
@@ -17,5 +38,20 @@
                 </ul>
             {% endif %}
         </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Feedback</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 medium-7 columns">
+        [grading options and dropdowns etc]
+        <textarea cols="100" rows="5">Comments and stuff</textarea>
+    </div>
+    <div class="small-12 medium-5 columns">
+        [upload files]
     </div>
 </div>

@@ -79,7 +79,9 @@ class Controller extends Base
         $response = $this->generateResponse1();
 
         $data = [
-            'response' => $response
+            'assessment' => $assessment,
+            'response' => $response,
+            'selectedFileId' => $this->getRequest()->query['fileId']
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
