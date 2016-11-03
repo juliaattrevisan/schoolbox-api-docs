@@ -52,11 +52,7 @@ class Markbook
      * Statistics for each assessment.
      *
      * key:   assessment ID
-     * value: an array of statistics:
-     *        * mean
-     *        * sd
-     *        * min
-     *        * max
+     * value: an array of statistics (currently: mean, sd, min, max, count)
      *
      * @var array
      */
@@ -66,11 +62,7 @@ class Markbook
      * Statistics for each student.
      *
      * key:   student ID
-     * value: an array of statistics:
-     *        * mean
-     *        * sd
-     *        * min
-     *        * max
+     * value: an array of statistics (currently: mean)
      *
      * @var array
      */
@@ -150,7 +142,7 @@ class Markbook
     }
 
     /**
-     * Collates statistics for each assessment into an array.
+     * Collates statistics for each assessment, student and the overall markbook.
      */
     protected function collateStatistics()
     {
@@ -213,42 +205,5 @@ class Markbook
                 $meanSummator
             )
         );
-    }
-
-    /**
-     * Calculates generic statistics for a list of values.
-     *
-     * @param array $values
-     * @return array
-     */
-    protected function calculateStatistics($values)
-    {
-        // Possible extra stats (for box plots):
-        // median, Q1, Q3, lower and upper fence
-        $statistics = [
-            'mean'  => null,
-            'sd'    => null,
-            'min'   => null,
-            'max'   => null,
-            'count' => count($values),
-        ];
-        if ($statistics['count'] > 0) {
-            // These need to be converted back into human-readable versions
-            $statistics['mean'] = array_sum($values) / $statistics['count'];
-            $statistics['min']  = min($values);
-            $statistics['max']  = max($values);
-
-            if ($statistics['count'] > 1) {
-                // Standard deviation only makes sense for a sample size of at least 2
-                $variance = 0;
-                foreach ($values as $mark) {
-                    $variance += pow($mark - $statistics['mean'], 2);
-                }
-                // Old markbook used population standard deviation, rather than sample
-                // To use sample SD: subtract 1 from denominator
-                $statistics['sd'] = sqrt($variance / $statistics['count']);
-            }
-        }
-        return $statistics;
     }
 }
