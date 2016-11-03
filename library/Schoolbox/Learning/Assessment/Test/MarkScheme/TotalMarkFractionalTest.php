@@ -18,32 +18,13 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @expectedException RangeException
-     */
-    public function test_NegativeTotal()
-    {
-        $input = -1.0;
-        new TotalMarkFractional($input);
-    }
-
-    /**
-     * @dataProvider provider_invalidTotalMarks
-     * @expectedException InvalidArgumentException
-     * @param mixed $totalMark
-     */
-    public function test_TotalWrongType($totalMark)
-    {
-        new TotalMarkFractional($totalMark);
-    }
-
-    /**
      * An attempt is now required when retrieving a human-readable mark.
      *
      * @expectedException InvalidArgumentException
      */
     public function test_getHumanReadable_WithoutAttempt()
     {
-        $markScheme = new TotalMarkFractional(50);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getHumanReadableMark(40);
     }
 
@@ -54,7 +35,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised_WithoutAttempt()
     {
-        $markScheme = new TotalMarkFractional(50);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getNormalisedMark(40);
     }
 
@@ -66,7 +47,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getHumanReadable_tooLow($totalMark)
     {
         $normalised = -1.0;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
     }
 
@@ -77,7 +58,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $normalised = 100.0001;
         $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
     }
 
@@ -88,7 +69,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $humanReadable = null;
         $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
@@ -99,7 +80,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $humanReadable = '';
         $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
@@ -110,7 +91,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     {
         $humanReadable = 'ten';
         $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
@@ -122,7 +103,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getNormalised($humanReadable, $totalMark, $expected)
     {
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
@@ -137,7 +118,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     public function test_getRecurringNormalised($humanReadable, $totalMark, $expected)
     {
         $delta = 0.00001;
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertLessThan($delta, abs($expected - $actual), $message);
@@ -151,7 +132,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
     {
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
         $this->assertEquals($humanReadable, $actual, $message);
@@ -165,7 +146,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {
-        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
         $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
         $this->assertEquals($humanReadable, $actual, $message);
@@ -185,7 +166,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         // 1 / 2.0 * 100.0
         $expected = 50.0;
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getNormalisedMark($humanReadable, $quizAttempt);
 
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
@@ -209,7 +190,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         // 1 / 2.0 * 100.0
         $expected = 50.0;
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getNormalisedMark($humanReadable, $quizAttempt);
 
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
@@ -233,7 +214,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $expected = 33.333333;
         $delta = 0.00001;
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($quizTotalMarks));
 
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
@@ -251,7 +232,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $normalised = 50.0;
         $expected = '1 / 2';
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
 
         $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
@@ -269,7 +250,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $normalised = 87.6;
         $expected = '1.75 / 2';
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
 
         $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
@@ -292,7 +273,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $normalised = 87.6;
         $expected = '1.75 / 2';
 
-        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
 
         $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
