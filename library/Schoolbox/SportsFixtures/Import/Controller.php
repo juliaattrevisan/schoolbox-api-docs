@@ -170,7 +170,7 @@ class Controller extends Base
      */
     public function getUploadTemplate($template)
     {
-        $filename = "./sportsfixtures/import/{$template}.csv";
+        $filename = "./fixtures/import/{$template}.csv";
 
         if (file_exists($filename)) {
             header('Content-Description: File Transfer');
@@ -426,13 +426,13 @@ class Controller extends Base
                 ],
             ]);
 
-            $this->getResponse()->redirect->afterPost("/sportsfixtures/import/{$this->import->getId()}");
+            $this->getResponse()->redirect->afterPost("/fixtures/import/{$this->import->getId()}");
 
         } else {
 
             // Nothing was attached, not much to do but stare at our navels
 
-            $this->getResponse()->redirect->afterPost("/sportsfixtures/upload");
+            $this->getResponse()->redirect->afterPost("/fixtures/upload");
         }
     }
 

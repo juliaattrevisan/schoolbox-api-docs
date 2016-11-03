@@ -173,7 +173,7 @@ class Notifier extends AbstractModuleNotifier
         $bob = new Builder();
         $bob->setTitle($title)
             ->setParams($params)
-            ->setHref($team->getUrl() ? : "/sportsfixtures/match/{$match->getId()}/results/{$team->getId()}")
+            ->setHref($team->getUrl() ? : "/fixtures/match/{$match->getId()}/results/{$team->getId()}")
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=64")
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $teamPlayer->getId(), self::TRIGGER_REMOVED) ])

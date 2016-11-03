@@ -83,7 +83,7 @@ class Builder implements BuilderInterface
      */
     public function buildHrefForMatch(Match $match, Team $team)
     {
-        return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
+        return "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
     }
 
     /**

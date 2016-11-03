@@ -168,7 +168,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
                     'child' => new UserParam($teamPlayer->getUser()),
@@ -184,7 +184,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
                     'child' => new UserParam($teamPlayer->getUser()),
@@ -231,7 +231,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
                     'sport' => new Param($sport->getName()),
@@ -246,7 +246,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
                     'sport' => new Param($sport->getName()),

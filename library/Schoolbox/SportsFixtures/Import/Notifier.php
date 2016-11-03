@@ -35,9 +35,9 @@ class Notifier extends AbstractModuleNotifier
         // Create the message
 
         $builder = new Builder();
-        $builder->setTitle("A sports fixture import has " . $import->getStatus())
+        $builder->setTitle("A fixture import has " . $import->getStatus())
             ->setIcon("/images/icon.php?icon=bolt&size=72")
-            ->setHref("/sportsfixtures/import-progress?id=". $import->getId())
+            ->setHref("/fixtures/import-progress?id=". $import->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->addTopic("sports_fixtures_import." . $model->getId() . ".{$method}");
@@ -46,7 +46,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $this->log->info("Sending to {$import->getOwnerId()} - A sports fixture import has {$import->getStatus()}");
+        $this->log->info("Sending to {$import->getOwnerId()} - A fixture import has {$import->getStatus()}");
         $envelope->targetToUser($import->getOwnerId(), $message);
 
         return $envelope;
