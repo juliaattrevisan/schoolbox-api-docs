@@ -90,14 +90,6 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return null
-     */
-    public function getMaxMark()
-    {
-        return null;
-    }
-
-    /**
      * Tasks do not have any weight.
      *
      * @return int

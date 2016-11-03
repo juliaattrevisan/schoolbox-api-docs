@@ -21,23 +21,6 @@ use Schoolbox\User;
 
 class Model extends AbstractAssessment
 {
-    /**
-     * Sum of all marks available across all questions in this Quiz
-     *
-     * @var float
-     */
-    private $maxMark;
-
-    /**
-     * Whether this quiz potentially has different available marks per attempt.
-     * If so, we must pass a QuizResponse to the MarkScheme when calculating marks.
-     * This is determined on construction by evaluating whether (section.pool) < count(question.*) GROUP BY section_id
-     *
-     * @deprecated Always assume that this is true
-     *
-     * @var bool
-     */
-    private $hasFixedTotalMarks;
 
     /**
      * Possible value for `$this->maxAttempts`.
@@ -157,42 +140,6 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return 'Quiz';
-    }
-
-    /**
-     * @return float
-     */
-    public function getMaxMark()
-    {
-        return $this->maxMark;
-    }
-
-    /**
-     * @param float $marksAvailable
-     * @return static
-     */
-    public function setMaxMark($marksAvailable)
-    {
-        $this->maxMark = $marksAvailable;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getHasFixedTotalMarks()
-    {
-        return $this->hasFixedTotalMarks;
-    }
-
-    /**
-     * @param bool $hasFixedTotalMarks
-     * @return static
-     */
-    public function setHasFixedTotalMarks($hasFixedTotalMarks)
-    {
-        $this->hasFixedTotalMarks = $hasFixedTotalMarks;
-        return $this;
     }
 
     /**
