@@ -78,6 +78,11 @@ class Controller extends Base
          */
         $response = $this->generateResponse1();
 
+        /* Factory to figure out which fragment is required
+         */
+        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($response->getAllFiles()->first());
+        $factory->produce();
+
         $data = [
             'assessment' => $assessment,
             'response' => $response,
