@@ -230,7 +230,7 @@ class MapperProxy
             }
 
         } elseif ($subObject instanceof Quiz) {
-            // Legacy Quiz Controllers require that we preserve this field
+            // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($dataModel->getContextFolder());
             QuizMapper::getInstance()->save($subObject);
 
