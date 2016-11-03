@@ -19,6 +19,29 @@ interface IMarkScheme
     const NORMALISED_MARK_MIN = 0.0;
     const NORMALISED_MARK_MAX = 100.0;
 
+    /**
+     * Is this mark scheme quantitative?
+     *
+     * In other words, are the human-readable marks it produces able to be compared as numbers?
+     * (Percentages and total marks are examples of quantitative data.)
+     *
+     * This should always return the opposite of `isQualitative()`.
+     *
+     * @return bool
+     */
+    public function isQuantitative();
+
+    /**
+     * Is this mark scheme qualitative?
+     *
+     * In other words, are the human-readable marks it produces unable to be compared as numbers?
+     * (Letter grades and yes/no options are examples of qualitative data.)
+     *
+     * This should always return the opposite of `isQuantitative()`.
+     *
+     * @return bool
+     */
+    public function isQualitative();
 
     /**
      * Returns a string representation of a mark.

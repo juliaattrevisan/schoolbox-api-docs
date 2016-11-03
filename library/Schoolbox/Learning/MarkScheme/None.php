@@ -15,6 +15,13 @@ class None extends AbstractMarkScheme
     const TITLE = 'None';
 
     /**
+     * This type is not comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = false;
+
+    /**
      * No human-readable mark returned
      *
      * @param float          $normalisedMark
