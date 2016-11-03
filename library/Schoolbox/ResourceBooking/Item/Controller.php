@@ -173,6 +173,7 @@ class Controller extends Base
      */
     public function read(Model $item)
     {
+
         // Show a given view and date
         $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query['date']);
         if (!($calendarDate instanceof DateTime)) {
@@ -186,7 +187,8 @@ class Controller extends Base
                     'calendar' => array(
                         'date' => $calendarDate->format('Y-m-d'),
                         'view' => $this->request->query['view'] ?: 'week',
-                    )
+                    ),
+                    'token' => $_SESSION['key']
                 ),
             )
         );
