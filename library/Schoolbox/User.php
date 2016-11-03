@@ -819,7 +819,7 @@ class User implements JsonSerializable, ISoftDeletable
      * @param CampusCollection $campusCollection
      * @return self
      */
-    public function setCampusCollection($campusCollection)
+    public function setCampusCollection(CampusCollection $campusCollection)
     {
         $this->campusCollection = $campusCollection;
         return $this;

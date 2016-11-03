@@ -7,6 +7,7 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
+use Schoolbox\CampusCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
@@ -50,12 +51,12 @@ class Campus implements HydratorInterface
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {
             // Set based on code or name? Maybe name.
-            $campusList = [];
+            $campusList = new CampusCollection();
             foreach (explode(',', $row[$this->fieldname]) as $campusName) {
                 $campusName = trim($campusName);
                 if (strlen($campusName)) {
                     if (array_key_exists($campusName, $this->lookupValues)) {
-                        $campusList[] = $this->lookupValues[$campusName];
+                        $campusList->add($this->lookupValues[$campusName]);
                     }
                 }
             }
