@@ -58,7 +58,6 @@ class Transactor
 
     /**
      * Transactor constructor.
-     * @param IAssessable $assessment
      * @param FolderMapper $folderMapper
      * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
      * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
@@ -66,14 +65,12 @@ class Transactor
      * @param $router
      */
     public function __construct(
-        IAssessable $assessment,
         FolderMapper $folderMapper,
         UnitImplementationMapperProxy $unitImplementationMapperProxy,
         UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
         AssessmentMapperProxy $assessmentMapperProxy,
         Router $router
     ) {
-        $this->setAssessment($assessment);
         $this->setFolderMapper($folderMapper);
         $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
@@ -81,17 +78,17 @@ class Transactor
         $this->setRouter($router);
     }
 
+
     /**
      * Figure out a returnUrl when creating/updating assessments
      *
      *
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     *
+     * @param IAssessable $assessment
      * @return array
      */
-    public function transact() {
+    public function transact(IAssessable $assessment)
+    {
+        $this->setAssessment($assessment);
 
         // Verify that the context of the assessment is valid
         // TODO replace returnUrl values once I know what they should actually be
