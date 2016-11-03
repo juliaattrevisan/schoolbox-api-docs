@@ -8,14 +8,12 @@
 namespace Schoolbox\Assessment;
 
 use Alaress_Date_Format;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -111,7 +109,7 @@ class Grades
         }
 
         if (count($assessmentsSeen['oa'])) {
-            $oaCollection = Mapper::getInstance()->findByColumn('assess_id', array_keys($assessmentsSeen['oa']));
+            $oaCollection = QuizMapper::getInstance()->findByColumn('assess_id', array_keys($assessmentsSeen['oa']));
             $weightArray['oa'] = array_combine($oaCollection->getColumnValues('id'), $oaCollection->getColumnValues('weight'));
         } else {
             $oaCollection = new Collection();
