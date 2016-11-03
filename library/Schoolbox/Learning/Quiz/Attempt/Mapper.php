@@ -39,7 +39,7 @@ class Mapper extends BaseMapper
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('start', self::TYPE_DATETIME);
         $this->uses('finish', self::TYPE_DATETIME);
-        $this->uses('reviewed_at', self::TYPE_DATETIME);
+        $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
