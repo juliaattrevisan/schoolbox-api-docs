@@ -630,32 +630,24 @@ class Bootstrap implements BootstrapInterface {
                 return $translator;
             })
         );
-        $di->set(
-            'assessmentDataSource',
-            $di->lazyNew(
-                AssessmentMapperProxy::class,
-                [
-                    'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
-                    'translator' => $di->lazyGet('assessmentTranslator'),
-                    'participantDataSource' => $di->lazyGet('participantDataSource')
-                ]
-            )
-        );
+
+        // Register assessment data source
+        $di->params[AssessmentMapperProxy::class] = [
+            'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
+            'translator'            => $di->lazyGet('assessmentTranslator'),
+            'participantDataSource' => $di->lazyGet('participantDataSource'),
+        ];
+        $di->set('assessmentDataSource', $di->lazyNew(AssessmentMapperProxy::class));
 
         // Register participant data source (with responses and feedback)
-        $di->set(
-            'participantDataSource',
-            $di->lazyNew(
-                ParticipantDataSource::class,
-                [
-                    'externalDb'         => $di->lazyGet('externalClass'),
-                    'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
-                    'responseDataSource' => $di->lazyGet('responseDataSource'),
-                    'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
-                ]
-            )
-        );
+        $di->params[ParticipantDataSource::class] = [
+            'externalDb'         => $di->lazyGet('externalClass'),
+            'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
+            'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
+            'responseDataSource' => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+        ];
+        $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
 
         // Register response data source
         $di->set(
