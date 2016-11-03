@@ -83,7 +83,8 @@
                 </tr>
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-                {#<!-- BEGIN stat -->#}
+
+                {# Mean #}
                 {#<tr class="sub-row {WORK_STAT_CLASS}" data-sub-table-row>#}
                     {#<th>{WORK_STAT_TITLE}</th>#}
                     {#<!-- BEGIN stat_item -->#}
@@ -109,7 +110,6 @@
                     {#<!-- END stat_item -->#}
                     {#<td></td>#}
                 {#</tr>#}
-                {#<!-- END stat -->#}
 
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
@@ -123,14 +123,17 @@
                         </div>
                     </th>
                     {% for assessment in markbook.assessments %}
-                        {% set participant = assessment.getParticipant(student) %}
-                    <td class="column-{{ assessment.id }}">
-                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                           title="{{ participant.mostRecentFeedback.comment }}">{{ participant.mostRecentFeedback.mark }}</a>
-                    </td>
-                    <td>
+                        <td class="column-{{ assessment.id }}">
+                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                               title="{{ participant.mostRecentFeedback.comment }}">
+                                {% if assessment.isParticipant(student) %}
+                                    {{ assessment.getParticipant(student).mostRecentFeedback.humanReadableMark }}
                         TODO add gradient
-                    </td>
+                                {% else %}
+                                    –
+                                {% endif %}
+                            </a>
+                        </td>
                     {#<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">#}
                         {#<a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">{STUDENT_AVG_CLEAN}</a>#}
                     {#</td>#}
