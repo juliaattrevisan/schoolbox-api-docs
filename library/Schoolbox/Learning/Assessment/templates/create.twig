@@ -49,7 +49,7 @@
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function(data) {
                 $('#assessmentForm')
-                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType~"s", contextId: context.id }) }}')
+                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
                     .find('[data-assessment-details]')
                     .html(data);
 
@@ -67,7 +67,7 @@
 </div>
 
 {% if assessmentType|length %}
-    {% set formAction = routeLookup('learningAssessment.postCreateAssessment') %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) %}
 {% else %}
     {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id }) %}
 {% endif %}
