@@ -84,7 +84,15 @@
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
 
-                <tr class="sub-row mean" data-sub-table-row>
+                <tr class="sub-row" data-sub-table-row>
+                    <th>Weight</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>{{ assessment.weight }}</td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
+
+                <tr class="sub-row" data-sub-table-row>
                     <th>Mean</th>
                     {% for assessment in markbook.assessments %}
                         <td>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</td>
@@ -92,7 +100,7 @@
                     <td>&nbsp;</td>
                 </tr>
 
-                <tr class="sub-row stdev" data-sub-table-row>
+                <tr class="sub-row" data-sub-table-row>
                     <th>Standard Deviation</th>
                     {% for assessment in markbook.assessments %}
                         <td>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</td>
@@ -100,7 +108,7 @@
                     <td>&nbsp;</td>
                 </tr>
 
-                <tr class="sub-row min" data-sub-table-row>
+                <tr class="sub-row" data-sub-table-row>
                     <th>Minimum</th>
                     {% for assessment in markbook.assessments %}
                         <td>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</td>
@@ -108,7 +116,7 @@
                     <td>&nbsp;</td>
                 </tr>
 
-                <tr class="sub-row max" data-sub-table-row>
+                <tr class="sub-row" data-sub-table-row>
                     <th>Maximum</th>
                     {% for assessment in markbook.assessments %}
                         <td>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</td>
