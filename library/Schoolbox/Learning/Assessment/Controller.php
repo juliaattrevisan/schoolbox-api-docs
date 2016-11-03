@@ -239,7 +239,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setWeight(0);
         }
 
-        $contextType = AssessmentContextType::objectToString($context);
+        $contextType = AssessmentContextType::objectToString($context) . 's';
 
         /* The usual info everything requires
          */
