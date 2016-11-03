@@ -68,7 +68,7 @@ class ResponseFile
         elseif ($mimetype->isVideo()) {
             // load video player
         }
-        elseif ($mimetype->matches('text/html') && ($this->getFile()->getFilename() == 'online-submission.html')) {
+        elseif ($this->getFile()->isOnlineSubmission()) {
             // load purified html into div
         }
         elseif ($this->isCrocodocable()) {
