@@ -443,7 +443,7 @@ class Factory
         }
         // No quizzes anymore
 //        foreach (QuizMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-//            /** @var OnlineAssessment $quiz */
+//            /** @var Quiz $quiz */
 //            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
 //        }
 

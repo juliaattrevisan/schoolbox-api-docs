@@ -7,11 +7,11 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
-use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as DomainObject;
 use Schoolbox\Mapper;
 
 /**
@@ -21,7 +21,7 @@ use Schoolbox\Mapper;
  * This class works with the new objects, and
  * wraps a traditional Mapper to interface with the database.
  *
- * @method AttemptMapper getMapper()
+ * @method QuizAttemptMapper getMapper()
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {
@@ -43,9 +43,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * This only works with the Quiz Attempt mapper
      *
-     * @param AttemptMapper $mapper
+     * @param QuizAttemptMapper $mapper
      */
-    public function __construct(AttemptMapper $mapper)
+    public function __construct(QuizAttemptMapper $mapper)
     {
         parent::__construct($mapper);
     }
@@ -77,18 +77,18 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|Attempt[] $mapperModels
-     * @return GenericCollection|QuizAttempt[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        /** @var QuizAttempt[] $quizResponses */
-        $quizResponses = new GenericCollection(QuizAttempt::class);
+        /** @var DomainObject[] $quizResponses */
+        $quizResponses = new GenericCollection(DomainObject::class);
 
         $ids = [];
         foreach ($mapperModels as $attempt) {
             $ids[] = $attempt->getId();
-            $response = (new QuizAttempt())
+            $response = (new DomainObject())
                 ->setId($attempt->getId())
                 ->setSubmittedBy($attempt->getUser())
                 ->setSubmittedOnBehalfOf($attempt->getUser())

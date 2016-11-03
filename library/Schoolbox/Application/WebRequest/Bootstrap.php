@@ -55,6 +55,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpe
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+
 use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
@@ -669,7 +671,7 @@ class Bootstrap implements BootstrapInterface {
                         ->addSubSource(
                             new \Schoolbox\Learning\Assessment\Response\SubSource\Quiz(
                                 new \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy(
-                                    $mapperFactory->get(\Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class)
+                                    $mapperFactory->get(QuizAttemptMapper::class)
                                 )
                             )
                         );
@@ -700,7 +702,7 @@ class Bootstrap implements BootstrapInterface {
                         ->addSubSource(
                             new \Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz(
                                 new \Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy(
-                                    $mapperFactory->get(\Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper::class)
+                                    $mapperFactory->get(QuizAttemptMapper::class)
                                 )
                             )
                         );

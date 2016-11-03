@@ -13,7 +13,7 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
@@ -88,7 +88,7 @@ class Unit {
 
                 $studentSubmissionList[$currentTask->getSubmissionBox()->getId()] = $detail->getSitepageData();
             }
-            else if (($currentTask->getAssessment() instanceof Model) && is_numeric($currentTask->getAssessment()->getId())) {
+            else if (($currentTask->getAssessment() instanceof Quiz) && is_numeric($currentTask->getAssessment()->getId())) {
 
                 // attempt_list is a list of all valid attempts, ordered chronologically.
                 // Filter to most recent submission only.
@@ -135,7 +135,7 @@ class Unit {
                     ));
                 }
             }
-            else if (($currentTask->getAssessment() instanceof Model) && is_numeric($currentTask->getAssessment()->getId())) {
+            else if (($currentTask->getAssessment() instanceof Quiz) && is_numeric($currentTask->getAssessment()->getId())) {
                 $users = $studentQuizList[$currentTask->getAssessment()->getId()];
 
                 if (is_array($users) && count($users)) {
