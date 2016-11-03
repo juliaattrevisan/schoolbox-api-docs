@@ -84,32 +84,37 @@
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
 
-                {# Mean #}
-                {#<tr class="sub-row {WORK_STAT_CLASS}" data-sub-table-row>#}
-                    {#<th>{WORK_STAT_TITLE}</th>#}
-                    {#<!-- BEGIN stat_item -->#}
-                    {#<td>#}
-                        {#<!-- BEGIN stat_editable -->#}
-                        {#<input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>#}
-                        {#<span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-weight" class="label success full-width hide"></span>#}
-                        {#<!-- END stat_editable -->#}
-                        {#<!-- BEGIN stat_visible -->#}
-                        {#<select data-visibility-selector="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="visibility show-icon-only">#}
-                            {#<!-- BEGIN stat_visibility_drop -->#}
-                            {#<option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>#}
-                                {#{MARK_VISIBILITY_TEXT}#}
-                            {#</option>#}
-                            {#<!-- END stat_visibility_drop -->#}
-                        {#</select>#}
-                        {#<span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="label success full-width hide"></span>#}
-                        {#<!-- END stat_visible -->#}
-                        {#<!-- BEGIN stat_readonly -->#}
-                        {#{WORK_STAT_VALUE}#}
-                        {#<!-- END stat_readonly -->#}
-                    {#</td>#}
-                    {#<!-- END stat_item -->#}
-                    {#<td></td>#}
-                {#</tr>#}
+                <tr class="sub-row mean" data-sub-table-row>
+                    <th>Mean</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>{{ markbook.assessmentStatistics[assessment.id].mean }}</td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
+
+                <tr class="sub-row stdev" data-sub-table-row>
+                    <th>Standard Deviation</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>{{ markbook.assessmentStatistics[assessment.id].sd }}</td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
+
+                <tr class="sub-row min" data-sub-table-row>
+                    <th>Minimum</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>{{ markbook.assessmentStatistics[assessment.id].min }}</td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
+
+                <tr class="sub-row max" data-sub-table-row>
+                    <th>Maximum</th>
+                    {% for assessment in markbook.assessments %}
+                        <td>{{ markbook.assessmentStatistics[assessment.id].max }}</td>
+                    {% endfor %}
+                    <td>&nbsp;</td>
+                </tr>
 
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
