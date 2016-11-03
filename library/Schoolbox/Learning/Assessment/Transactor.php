@@ -4,7 +4,7 @@
  *
  * Saves an assessment, figures out a return url, returns a url to which you may redirect
  *
- * Unfortunately return_urls depend on the saving of an assessment
+ * Unfortunately returnUrls depend on the saving of an assessment
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -82,7 +82,7 @@ class Transactor
     }
 
     /**
-     * Figure out a return_url when creating/updating assessments
+     * Figure out a returnUrl when creating/updating assessments
      *
      *
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -94,7 +94,7 @@ class Transactor
     public function transact() {
 
         // Verify that the context of the assessment is valid
-        // TODO replace return_url values once I know what they should actually be
+        // TODO replace returnUrl values once I know what they should actually be
         $assessmentContext = $this->getAssessment()->getContext();
 
         /* If you followed a creational link from a particular place,
@@ -129,7 +129,7 @@ class Transactor
             $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
         }
 
-        /* The conclusion of how $return_url was derived
+        /* The conclusion of how $returnUrl was derived
          */
         return [
             'assessment' => $this->getAssessment(),
