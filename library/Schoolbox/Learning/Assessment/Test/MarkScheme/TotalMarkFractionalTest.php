@@ -37,6 +37,28 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * An attempt is now required when retrieving a human-readable mark.
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function test_getHumanReadable_WithoutAttempt()
+    {
+        $markScheme = new TotalMarkFractional(50);
+        $markScheme->getHumanReadableMark(40);
+    }
+
+    /**
+     * An attempt is now required when retrieving a human-readable mark.
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function test_getNormalised_WithoutAttempt()
+    {
+        $markScheme = new TotalMarkFractional(50);
+        $markScheme->getNormalisedMark(40);
+    }
+
+    /**
      * @dataProvider provider_setValidTotal
      * @expectedException RangeException
      * @param float $totalMark
