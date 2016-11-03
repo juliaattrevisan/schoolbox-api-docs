@@ -1,0 +1,383 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment;
+
+use Alaress\Web;
+use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
+use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Traversable;
+use UnexpectedValueException;
+
+
+class ListController extends Web\Controller\Base
+{
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+    /**
+     * @var Error\Mapper
+     */
+    private $errorMapper;
+    /**
+     * @var MapperProxy
+     */
+    private $assessmentMapper;
+    /**
+     * @var Access
+     */
+    private $access;
+    /**
+     * @var Transactor
+     */
+    private $transactor;
+
+
+    /**
+     * @param UserMapper   $userMapper
+     * @param Error\Mapper $errorMapper
+     * @param MapperProxy  $assessmentMapper
+     * @param Access       $access
+     * @param Transactor   $transactor
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor
+    ) {
+        $this->setUserMapper($userMapper);
+        $this->setErrorMapper($errorMapper);
+        $this->setAssessmentMapper($assessmentMapper);
+        $this->setAccess($access);
+        $this->setTransactor($transactor);
+    }
+
+
+    /**
+     * Retrieve a list of assessments that exist, by context
+     *
+     * NOTE: this is a debug route that is only available to supers, so don't go referencing this route in twigs...
+     * It shows the functionality of the common "assessment component" logic for any context
+     *
+     * @api GET /learning/{contextType}/{contextId}/assessments?user&readOnly
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     */
+    public function getAssessmentsByContext(AssessmentContext $context)
+    {
+        // it's possible for Aura to bypass this typehint, so let's check again... *sigh*
+        if (!$context instanceof AssessmentContext) {
+            throw new NotFound();
+        }
+
+        $q = $this->getRequest()->query;
+
+        if ($readOnly = $q->get('readOnly')) {
+            // inject dummy to purposefully fail auth checks
+            $user = $this->userMapper->createModel();
+            $user->getRole()->setType(Role::STUDENT);
+        } elseif ($uid = $q->get('user')) {
+            // inject the given user
+            $user = UserMapper::getInstance()->findById($uid);
+        } else {
+            // default to session user
+            $user = $this->getUser();
+        }
+
+        $assessments = $this->assessmentMapper->findAllForContext($context, [ 'hydrateParticipants' => true ]);
+
+        if ($readOnly) {
+            $hasContextWrite = false;
+        } else {
+            // perms check
+            $hasContextWrite = $this->getAccess()->getFolderAccess($this->getUser(), [ $context->getFolder()->getId() ], false);
+        }
+
+        $data = [
+            'user'            => $user,
+            'context'         => $context,
+            'hasContextWrite' => $hasContextWrite,
+            'assessments'     => $assessments,
+            'contextType'     => new AssessmentContextType(),
+            'assessmentType'  => new AssessmentType(),
+            '_is_xhr'         => $this->getRequest()->isXhr(),
+        ];
+
+        $this->tpl('learningAssessment', 'component', $data);
+    }
+
+
+    /**
+     * Create a new assessment in the given context
+     *
+     * @api   POST /learning/{:contextType}/{:contextId}/assessments
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     * @throws Web\Controller\Exception
+     */
+    public function postCreateAssessment(AssessmentContext $context)
+    {
+        try {
+            // we need to perform some surgery on our "post" data before we send it through
+            $post = $this->getRequest()->post->getArrayCopy();
+
+            $post['contextId']   = $context->getId();
+            $post['contextType'] = AssessmentContextType::objectToString($context);
+
+            list ($assessment, $defaultReturnUrl) = array_values($this->persistAssessment($this->getUser(), $post));
+
+            $type          = AssessmentType::objectToString($assessment);
+            $controller    = $this->getDelegateController($type);
+
+            if ($this->getRequest()->post->get(Redirect::RETURN_URL)) {
+                // by default, always give precedence to the return URL given via POST
+                $this->redirect($post[Redirect::RETURN_URL]);
+
+            } else {
+                // failing that, decide based on what kind of assessment y'all just created
+                $this->redirect($controller->determineRedirect($assessment, $defaultReturnUrl));
+            }
+
+        } catch (Web\Controller\Exception $e) {
+            $this->sendError($e);
+            return;
+        }
+    }
+
+
+    /**
+     * @param string $type
+     * @return Controller
+     */
+    private function getDelegateController($type)
+    {
+        return $this->getDi()->get("controller:learningAssessment/$type");
+    }
+
+
+    /**
+     * Get the form for creating a new assessment in a particular context
+     *
+     * @api   GET /learning/{contextType}/{contextId}/assessments/new?type
+     * @level 165
+     *
+     * @param AssessmentContext $context
+     */
+    public function getCreateAssessmentForm(AssessmentContext $context)
+    {
+        // check for a valid type declaration
+        if ($type = $this->getRequest()->query->get('type')) {
+            try {
+                // delegate to the appropriate sub-controller
+                $this->getDelegateController($type)->getCreateAssessmentForm($context);
+                return;
+            } catch (ServiceNotFound $e) {
+                // if the client enters an invalid type: ignore
+                // and allow passthru to the "unselected" section
+            }
+        }
+
+        // show the generic first-half of the form
+        $data['types'] = [
+            ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work'],
+            ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task'],
+            ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz'],
+        ];
+        // TODO, 'types' should just be the 3 objects, and twig should do the rest
+        // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+
+        // Ensure we don't provide an option to spawn a Project inside a Project context
+        if (!$context instanceof Project) {
+            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project'];
+            array_unshift($data['types'], $item);
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
+    }
+
+
+    /**
+     * Generic method for create/update of an assessment.
+     *
+     * persistAssessment() CANNOT make any assumptions about redirects
+     * Redirects should be dealt with by actual controller methods, since
+     * the returnUrl is manipulated by javascript in particular contexts
+     *
+     * @param User              $user
+     * @param array|Traversable $postData
+     * @param IAssessable       $assessment
+     * @throws DomainException
+     * @return string
+     */
+    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null)
+    {
+        /* If an assessment couldn't be produced, bail out
+         * and let mage see the errors set by $this->sendError
+         *
+         * Controller must return early for that to happen
+         */
+        try {
+
+            /* Figure out what kind of assessment was chosen
+             * and spawn a new instance of it to manipulate
+             */
+            $assessmentFactory = new Factory($user, $postData);
+            $assessment = $assessmentFactory->produce($assessment);
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                throw new DomainException('double-check the date fields you provided');
+            }
+
+            $transactionSummary = $this->getTransactor()->transact($assessment);
+        }
+        catch (InvalidArgumentException $e) {
+            // cast
+            throw new DomainException($e->getMessage(), $e->getCode(), $e);
+        }
+        catch (UnexpectedValueException $e) {
+            // cast
+            throw new DomainException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $transactionSummary;
+    }
+
+
+    /**
+     * If XHR, return the redirect within JSON, otherwise just tell the browser to do the redirect
+     *
+     * @param $url
+     */
+    protected function redirect($url)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
+
+        } else {
+            $this->getResponse()->redirect->afterPost($url);
+        }
+    }
+
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Error\Mapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+
+    /**
+     * @param Error\Mapper $errorMapper
+     * @return static
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return MapperProxy
+     */
+    protected function getAssessmentMapper()
+    {
+        return $this->assessmentMapper;
+    }
+
+
+    /**
+     * @param MapperProxy $assessmentMapper
+     * @return static
+     */
+    protected function setAssessmentMapper($assessmentMapper)
+    {
+        $this->assessmentMapper = $assessmentMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return static
+     */
+    protected function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
+    }
+
+
+    /**
+     * @return Transactor
+     */
+    protected function getTransactor()
+    {
+        return $this->transactor;
+    }
+
+
+    /**
+     * @param Transactor $transactor
+     * @return static
+     */
+    protected function setTransactor($transactor)
+    {
+        $this->transactor = $transactor;
+        return $this;
+    }
+
+}
