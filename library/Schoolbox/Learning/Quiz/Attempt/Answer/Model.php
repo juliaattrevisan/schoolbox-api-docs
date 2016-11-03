@@ -53,7 +53,7 @@ class Model implements ISoftDeletable
     /**
      * @var bool
      */
-    private $automarkedAlready;
+    private $autoMarked;
 
     /**
      * @var Alaress_Date_Format
@@ -156,18 +156,18 @@ class Model implements ISoftDeletable
     /**
      * @return boolean
      */
-    public function getAutomarkedAlready()
+    public function getAutoMarked()
     {
-        return $this->automarkedAlready;
+        return $this->autoMarked;
     }
 
     /**
-     * @param boolean $automarkedAlready
+     * @param boolean $autoMarked
      * @return static
      */
-    public function setAutomarkedAlready($automarkedAlready)
+    public function setAutoMarked($autoMarked)
     {
-        $this->automarkedAlready = $automarkedAlready;
+        $this->autoMarked = $autoMarked;
         return $this;
     }
 
