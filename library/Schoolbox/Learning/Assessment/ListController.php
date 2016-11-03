@@ -103,7 +103,7 @@ class ListController extends Web\Controller\Base
             $user = $this->getUser();
         }
 
-        $assessments = $this->assessmentMapper->findAllForContext($context, [ 'hydrateParticipants' => true ]);
+        $assessments = $this->getAssessmentMapper()->findAllForContext($context, [ 'hydrateParticipants' => true ]);
 
         if ($readOnly) {
             $hasContextWrite = false;
@@ -116,7 +116,7 @@ class ListController extends Web\Controller\Base
             'user'            => $user,
             'context'         => $context,
             'hasContextWrite' => $hasContextWrite,
-            'assessments'     => $assessments,
+            'assessables'     => $assessments,
             'contextType'     => AssessmentContextType::objectToString($context) . 's',
             'assessmentType'  => $q['type'],
             '_is_xhr'         => $this->getRequest()->isXhr(),
