@@ -56,9 +56,9 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // preloaders to use
-        $preloadContext     = [ $this, 'preloadContext' ];
-        $preloadAssessment  = [ $this, 'preloadAssessment' ];
-        $preloadParticipant = [ $this, 'preloadParticipant' ];
+        $preloadContext     = function ($params) { return $this->preloadContext($params); };
+        $preloadAssessment  = function ($params) { return $this->preloadAssessment($params); };
+        $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
         $isSuper   = $this->getAuthRule('isSuperuser');
