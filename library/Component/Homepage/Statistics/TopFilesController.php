@@ -29,6 +29,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
             SELECT
                 f.id,
                 f.`realname`,
+                s.ext,
                 f.submitted,
                 s.filesize,
                 COUNT(f.id) AS `count`
@@ -65,25 +66,23 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
         $this->setBlock($templateHandle, 'no_top_file', 'no_top_file_block');
 
         if (count($this->files)) {
-            $allowedHandler = new AllowedFile();
-            for ($i = 0; $i < 5 && $i < count($this->files); ++$i) {
-                $mime = $allowedHandler->getMime(
-                    substr($this->files[$i]['realname'], strripos($this->files[$i]['realname'], '.') + 1)
-                );
 
-                // check the mime icon can be determined, and that it exists, and if not, use a default
-                $icon = sprintf('/images/mime/60x60/%s.png', $mime ? str_replace('/', '_', $mime) : 'source');
-                if (!file_exists(WEB_root . $icon)) {
-                    $icon = '/images/mime/60x60/source.png';
+            $mimeMapper = \Schoolbox\File\MimetypeMapper::getInstance();
+            for ($i = 0; $i < 5 && $i < count($this->files); ++$i) {
+                try {
+                    $mime = $mimeMapper->getByFilename($this->files[$i]['realname'].'.'.$this->files[$i]['ext']);
+                }
+                catch(Schoolbox\File\Exception $e) {
+                    $mime = $mimeMapper->getUnknownMime();
                 }
 
                 $rel = new Alaress_Date_Format($this->files[$i]['submitted'], 'Y-m-d H:i:s');
                 $this->setVar(
                     array(
                         'FILE_ID' => $this->files[$i]['id'],
-                        'FILE_THUMB' => $icon,
+                        'FILE_THUMB' => '/images/mime/'.$mime->getIconFile(),
                         'FILE_NAME' => $this->files[$i]['realname'],
-                        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($this->files[$i]['file_size']),
+                        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($this->files[$i]['filesize']),
                         'FILE_DATE' => $rel->getLong(),
                         'FILE_PROGRESS' => $this->files[$i]['progress'],
                         'FILE_HITS' => $this->files[$i]['hits'],

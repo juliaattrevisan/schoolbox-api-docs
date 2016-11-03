@@ -24,7 +24,7 @@ try {
     $size = empty($_GET['size']) ? 128 : (int)$_GET['size'];
 
     $root = __DIR__ . "/../images/mime";
-    $base = "$root/{$size}x{$size}";
+    $base = "$root/";
 
     // special case -_-
     if ($this->arg == array('folder')) {
@@ -67,7 +67,7 @@ foreach(array_reverse($filenames) as $filename) {
     $maxAge = 2419200; // 28 days
 
     // send the right headers
-    header('Content-Type: image/png');
+    header('Content-Type: image/svg+xml');
     header('Content-Length: ' . filesize($filename));
     header('Pragma: public');
     header("Cache-Control: public, max-age=$maxAge");

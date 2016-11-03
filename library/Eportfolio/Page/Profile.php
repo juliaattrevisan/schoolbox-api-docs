@@ -89,10 +89,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         $this->getPage()->setBlock(TEMPLATE_content, 'has_cover_photo', 'has_cover_photo_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_cover_photo', 'no_cover_photo_block');
-
-        /* Render mime types
-         */
-        $this->renderMimeTypes();
     }
 
     /**

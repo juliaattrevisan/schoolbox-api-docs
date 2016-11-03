@@ -55,12 +55,6 @@
 </script>
 
 <!-- END custom_head -->
-<style type='text/css'>
-    <!-- BEGIN allowed_files -->
-    a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
-    <!-- END allowed_files -->
-</style>
-
 <div class="row">
     <div class="small-12 columns">
         <ul class='sub-nav'>
@@ -118,7 +112,7 @@
                             <div class="small-9 column">
                                 <div class="card small-12">
                                     <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Profile">
-                                        <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" />
+                                        <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" height="60" width="60"/>
                                         <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
                                     </a>
                                     <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>

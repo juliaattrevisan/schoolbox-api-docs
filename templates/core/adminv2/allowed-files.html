@@ -157,7 +157,7 @@
                         <div class="column small-6">
                             <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
                             <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
-                                <img src="/images/mime/22x22/txt.png">
+                                <img src="/images/mime/txt.svg">
                             </a>
                             <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
                         </div>
@@ -213,11 +213,11 @@
                 <li class="actions-small-3" data-interaction-container>
                     <div class="list-item" data-interaction-display>
                         <div class="small-12 card">
-                            <img class="mime" src="/images/mime/60x60/{FILE_ICON}"/>
+                            <img class="mime" src="/images/mime/{FILE_ICON}"/>
                             <h3>{FILE_DESC}</h3>
 
                             <div class="row">
-                                <div class="small-12 medium-4 columns no-pad">
+                                <div class="small-12 medium-4 columns no-pad no-overflow">
                                     <span class="meta">{FILE_MIME}</span>
                                 </div>
                                 <div class="small-12 medium-2 columns no-pad">
@@ -260,7 +260,7 @@
                                     <div class="column">
                                         <label for="icon-choice-{FILE_ID}">Icon</label>
                                         <a href="#" class="button no-text" id="icon-choice-{FILE_ID}" data-reveal-id="allowed-file-dialog" data-file-id="{FILE_ID}">
-                                            <img src="/images/mime/22x22/{FILE_ICON}" alt="{FILE_ICON}" />
+                                            <img src="/images/mime/{FILE_ICON}" alt="{FILE_ICON}" />
                                         </a>
                                         <input type="hidden" name="iconFile" id="button-{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
                                     </div>
@@ -281,7 +281,7 @@
                                     <div class="max_size column large-3">
                                         <div>
                                             <label for="max_file_size-{FILE_ID}">Max Size</label>
-                                            <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
+                                        <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
                                         </div>
                                     </div>
                                     <div class="inline column large-3">
@@ -324,7 +324,7 @@
     <h2 id="allowed-file-dialog-title">Select an icon</h2>
     <!-- BEGIN image -->
     <button data-interaction="select-icon" value="{IMAGE_FILE}">
-        <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}" />
+        <img src="/images/mime/{IMAGE_FILE}" alt="{IMAGE_FILE}" height="64" width="64" />
     </button>
     <!-- END image -->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>

@@ -248,39 +248,6 @@ abstract class Eportfolio_Page_Abstract {
 		}
 	}
 
-	/**
-	 * Render mime types
-	 */
-	protected function renderMimeTypes() {
-		$this->getPage()->setBlock(TEMPLATE_content, 'allowed_files', 'allowed_files_block');
-
-		$allowedFiles = new AllowedFile();
-		$allowedList = $allowedFiles->getAll();
-
-		if (is_array($allowedList) && count($allowedList)) {
-
-			// append link icon to results
-			$allowedList[]['iconFile'] = "link.png";
-			$last = '';
-
-			foreach ($allowedList as $allowed) {
-				if ($last != $allowed["iconFile"]) {
-					$this->getPage()->setVar(array(
-						'NAME' => $allowedFiles->getClass($allowed["iconFile"]),
-						'ICON' => $allowed["iconFile"],
-					));
-
-					$this->getPage()->parse("allowed_files_block", "allowed_files", true);
-
-					$last = $allowed["iconFile"];
-				}
-			}
-		}
-		else {
-			$this->getPage()->setVar('allowed_files_block', '');
-		}
-	}
-
 	/* Getters/Setters
 	 */
 

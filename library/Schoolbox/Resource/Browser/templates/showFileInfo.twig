@@ -1,5 +1,5 @@
 {% set portrait = '/portrait.php?size=square48&userId=' %}
-{% set mime     = '/images/mime/128x128/' %}
+{% set mime     = '/images/mime/' %}
 
 {#
 Each delete request is an ajax request for compatibility
@@ -48,7 +48,7 @@ These are its args, which is given for you
     <div class="small-4 column text-center meta-preview">
         {% if file.mimetype.isImage %}
             <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
-                <img class="icon" src="{{ image ~ file.id }}&width=128&height=128" alt="{{ file.title }}" />
+                <img class="icon" src="{{ image ~ file.id }}&width=256&height=256" alt="{{ file.title }}" />
             </a>
         {% elseif file.mimetype.isAudio %}
             <audio id="schoolbox_video_preview"
@@ -69,7 +69,7 @@ These are its args, which is given for you
             </video>
         {% else %}
             <a href="{{ send ~ file.id }}" target="_blank">
-                <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" />
+                <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" height="128" width="128"/>
             </a>
         {% endif %}
     </div>

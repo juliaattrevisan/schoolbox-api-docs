@@ -121,7 +121,6 @@ $folderMapper->logPageView($folder);
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
 $this->setTitle($folder->getName());
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
-$this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'page_controls', 'page_controls_block');
 $this->setBlock('page_controls', 'course_actions', 'course_actions_block');
@@ -386,33 +385,6 @@ $this->setVar(array(
 ));
 
 $this->setVar($listColor);
-
-// output MIMEs
-$allowedFiles = new AllowedFile;
-$allowedList = $allowedFiles->getAll();
-
-if (is_array($allowedList)) {
-// append link icon to results
-    $allowedList[]['iconFile'] = "link.png";
-    $last = '';
-
-    foreach ($allowedList as $allowed) {
-        if ($last != $allowed["iconFile"]) {
-            $output = array(
-                "NAME" => $allowedFiles->getClass($allowed["iconFile"]),
-                "ICON" => $allowed["iconFile"],
-            );
-
-            $this->setVar($output);
-            $this->parse("allowed_files_block", "allowed_files", true);
-
-            $last = $allowed["iconFile"];
-        }
-    }
-} else {
-    $this->setVar('allowed_files_block', '');
-}
-
 
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
