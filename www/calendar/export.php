@@ -24,8 +24,12 @@ try {
     $api = null;
     $filename = 'calendar';
     $item = $_GET['item'];
+    $category = $_GET['category'];
     if($item > 0) {
         $export_type = 'item';
+    }
+    if($category >0){
+        $export_type = 'category';
     }
     if (empty($token)) {
         throw new SchoolboxException('No token provided', 401);
@@ -112,6 +116,12 @@ try {
             $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($user, array());
             $api->setResourceId($item);
             $filename =  sprintf('item%d', $item);
+            break;
+
+        case 'category':
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, array());
+            $api->setCategoryId($category);
+            $filename =  sprintf('category%d', $category);
             break;
 
         case 'all':
