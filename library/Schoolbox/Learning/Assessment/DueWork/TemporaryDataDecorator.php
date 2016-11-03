@@ -61,26 +61,14 @@ class TemporaryDataDecorator
             ->setScore('93%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
 
-        $mime1 = new Mimetype();
-        $mime1->setDescription('JPEG Image');
-        $mime1->setMime('image/jpeg');
-        $mime1->setIconFile('image_jpeg.png');
-        $mime1->setInline(1);
-        $mime1->setEnable(1);
-        $mime1->setMaxFileSize(0);
-
-        $storage1 = new \Schoolbox\Resource\Storage\Model();
-        $storage1
-            ->setHash('s89789d9hw3thsug8923u5')
-            ->setSize('12345678')
-            ->setMimeType($mime1);
+        $storage1 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('12b5824b06b21ce9b337596837995fa8c47638db');
 
         $submissionFile1 = new SubmissionFile();
         $submissionFile1
             ->setId(11)
             ->setStorage($storage1)
             ->setCrocodocId('vjfh-6677=eirj-01928333')
-            ->setFilename('mark this Sir.xlsx')
+            ->setFilename($storage1->getFilename())
             ->setPlagscan($plagscan1);
 
         /* File 2
@@ -91,14 +79,6 @@ class TemporaryDataDecorator
             ->setStatus(3)
             ->setScore('14%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
-
-        $mime2 = new Mimetype();
-        $mime2->setDescription('Microsoft Word Document');
-        $mime2->setMime('application/msword');
-        $mime2->setIconFile('msword_doc.png');
-        $mime2->setInline(1);
-        $mime2->setEnable(1);
-        $mime2->setMaxFileSize(0);
 
         $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('c68af9f8084969afe55335989a0c8f58e9eec923');
 
@@ -126,26 +106,14 @@ class TemporaryDataDecorator
 
         /* Feedback for this Response
          */
-        $mime3 = new Mimetype();
-        $mime3->setDescription('Microsoft Word Document');
-        $mime3->setMime('application/msword');
-        $mime3->setIconFile('msword_doc.png');
-        $mime3->setInline(1);
-        $mime3->setEnable(1);
-        $mime3->setMaxFileSize(0);
-
-        $storage3 = new \Schoolbox\Resource\Storage\Model();
-        $storage3
-            ->setHash('aaaabbbcccccddd')
-            ->setSize('1024')
-            ->setMimetype($mime3);
+        $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
 
         $feedbackFile1 = new FeedbackFile();
         $feedbackFile1
             ->setId(12)
             ->setStorage($storage3)
             ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
-            ->setFilename('This is the correct response.txt');
+            ->setFilename($storage3->getFilename());
 
         $feedback = new Feedback();
         $feedback
@@ -182,14 +150,6 @@ class TemporaryDataDecorator
             ->setStatus(3)
             ->setScore('45%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
-
-        $mime2 = new Mimetype();
-        $mime2->setDescription('Microsoft Word Document');
-        $mime2->setMime('application/msword');
-        $mime2->setIconFile('msword_doc.png');
-        $mime2->setInline(1);
-        $mime2->setEnable(1);
-        $mime2->setMaxFileSize(0);
 
         $storage1 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
 
