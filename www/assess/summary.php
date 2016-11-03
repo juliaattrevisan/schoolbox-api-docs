@@ -47,6 +47,9 @@ $returnUrl = $_GET[Redirect::RETURN_URL]
     ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}"
     : '';
 
+$modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
+$modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessment', $modifyRouteArgs);
+
 $this->setVar(array(
     'RETURN_URL'           => $returnUrl,
     'RETURN_URL_DECODED'   => $returnUrl == '' ? "/homepage/{$folder->getId()}" : Redirect::decode($_GET[Redirect::RETURN_URL]),
@@ -61,9 +64,10 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'ASSESSMENT_ID'        => $assess['assessment_id'],
-    'MODIFY_URL'           => "/learning/assessment/{$assess['assessment_id']}/update",
+    'MODIFY_URL'           => $modifyUrl,
     'RETURN_URL_MODIFY'    => $returnUrl ?: '?'.Redirect::RETURN_URL.'='.Redirect::encode('/assess/summary/'.$assess['assess_id']),
 ));
+
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
