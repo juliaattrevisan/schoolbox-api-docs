@@ -189,7 +189,9 @@ class ListController extends Web\Controller\Base
         if ($type = $this->getRequest()->query->get('type')) {
             try {
                 // delegate to the appropriate sub-controller
-                $this->getDelegateController($type)->getCreateAssessmentForm($context);
+                $delegate = $this->getDelegateController($type);
+                $delegate->getCreateAssessmentForm($context);
+                $this->setResponse($delegate->getResponse());
                 return;
             } catch (ServiceNotFound $e) {
                 // if the client enters an invalid type: ignore
