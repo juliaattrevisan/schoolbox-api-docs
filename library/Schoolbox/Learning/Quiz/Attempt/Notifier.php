@@ -26,7 +26,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Notifer extends AbstractModuleNotifier {
+class Notifier extends AbstractModuleNotifier {
 
 	const TRIGGER_ATTEMPTED = 'attempted';
 	const TRIGGER_MARKED    = 'marked';
