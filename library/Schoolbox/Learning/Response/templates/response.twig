@@ -19,13 +19,12 @@
         <h2 class="subheader">Files</h2>
         <section>
             {% if response.allFiles %}
-                <ul class="information-list">
+                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                     {% for currentFile in response.allFiles %}
                         <li class="actions-small-1">
                             {% include '@learning/dueWork/interaction/response/files.twig'  with {currentInteraction: response} %}
                             <nav>
                                 {% include '@learning/dueWork/plagscanLink.twig' %}
-                                <a>Load</a>
                             </nav>
                         </li>
                     {% endfor %}
