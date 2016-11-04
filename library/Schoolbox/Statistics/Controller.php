@@ -137,6 +137,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
@@ -346,6 +349,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}/topVisitors{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
@@ -387,6 +393,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}/topFiles{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
@@ -427,6 +436,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}/recentVisitors{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
@@ -467,6 +479,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}/yetToVisit{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
@@ -507,6 +522,9 @@ class Controller extends Base
 
 
     /**
+     * @api GET /statistics/homepage/{folderId}/topLinks{/startDate,endDate,roleFilter}
+     * @level 165
+     *
      * @param FolderModel $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
