@@ -1,6 +1,6 @@
 <div id="statistics-date-range" class="reveal-modal" data-reveal>
     <div class="row">
-        <form action="/statistics/homepage/{{ folder.id }}/filter" method="GET">
+        <form action="{{ routeLookup('statistics.getFilter', {folderId: folder.id}) }}" method="GET">
             <input type="hidden" name="folderId" value="{{ folder.id }}">
             <input type="hidden" name="pageRoute" value="{{ pageRoute }}">
             <section>
