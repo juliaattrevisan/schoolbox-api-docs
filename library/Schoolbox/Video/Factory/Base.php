@@ -76,8 +76,7 @@ abstract class Base {
                 return $videoMapper->findByStorageHash($file->getHash());
 
 			case QueueMapper::FILE_TYPE_SUBMISSION:
-                $submission = SubmissionMapper::getInstance()->findByID($this->getId());
-                return $videoMapper->findByStorageHash($submission->getHash());
+                return $videoMapper->findByStorageHash($this->getId());
 
 			case QueueMapper::FILE_TYPE_MYFILE:
                 return $videoMapper->findByMyFileId($this->getId());
