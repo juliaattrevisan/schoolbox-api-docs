@@ -97,6 +97,31 @@ class Controller extends Base
     }
 
     /**
+     * Dump out a plagscan report
+     *
+     * @param int $plagscanId
+     */
+    public function getPlagscanReport($plagscanId)
+    {
+
+        /* @var Plagscan $document */
+        try {
+            $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $plagscanId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Twiggle it
+         */
+        $data = [
+            'plagscanDocument' => $plagscanDocument
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
+    }
+
+    /**
      * Temporary populator
      *
      * @return Submission
@@ -109,7 +134,7 @@ class Controller extends Base
          */
         $plagscan1 = new Plagscan();
         $plagscan1
-            ->setId(1234)
+            ->setId(4396294)
             ->setStatus(3)
             ->setScore('45%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
@@ -128,7 +153,7 @@ class Controller extends Base
          */
         $plagscan2 = new Plagscan();
         $plagscan2
-            ->setId(888)
+            ->setId(4396431)
             ->setStatus(-1);
 
         $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
@@ -145,7 +170,7 @@ class Controller extends Base
          */
         $plagscan3 = new Plagscan();
         $plagscan3
-            ->setId(9999)
+            ->setId(4396443)
             ->setStatus(1);
 
         $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('efb4b418c6c963dc8760e9676986a4e99706f636');
@@ -162,7 +187,7 @@ class Controller extends Base
          */
         $plagscan4 = new Plagscan();
         $plagscan4
-            ->setId(7777)
+            ->setId(4396470)
             ->setStatus(2);
 
         $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('a351bf467f221eead2d0a184db35d13cc86a43e3');
@@ -179,7 +204,7 @@ class Controller extends Base
          */
         $plagscan5 = new Plagscan();
         $plagscan5
-            ->setId(6666)
+            ->setId(4396541)
             ->setScore('67%')
             ->setStatus(3);
 

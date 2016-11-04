@@ -17,9 +17,7 @@
                             </a>
                             <p class="meta">{{ file.storage.humanReadableSize }}</p>
 
-                            <a href="{SITE_ROOT}/modules/remote/{MOST_RECENT_SUBMISSION_FILE_PLAG_HREF}">
-                                {% include '@learning/dueWork/plagscan.twig' with {currentFile: file} %}
-                            </a>
+                            {% include '@learning/dueWork/plagscan.twig' with {currentFile: file} %}
                         </div>
                     </div>
                     <nav>

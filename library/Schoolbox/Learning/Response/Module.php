@@ -37,8 +37,19 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
+
+                /* Get a list of Responses for a particular Student and Assessment
+                 * Presented as a more succinct Submission History
+                 */
                 '/assessment/{assessmentId}/{studentId}/responses' => 'getResponseList',
+
+                /* View a Response in the Inline Grader
+                 */
                 '/responses/{responseId}'                          => 'getParticularResponse',
+
+                /* View a Response File's plagscan report
+                 */
+                '/responses/plagscan/{plagscanId}'                 => 'getPlagscanReport',
             ],
             'POST' => []
         ];

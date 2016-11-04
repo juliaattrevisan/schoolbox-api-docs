@@ -3,8 +3,10 @@
 {% if currentFile.plagscan %}
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
-            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
-            <span class="meta" title="Plagiarism check completed.">plagiarised</span>
+            <a href="{{ routeLookup('learningResponse.getPlagscanReport', {plagscanId: currentFile.plagscan.id }) }}">
+                <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
+                <span class="meta" title="Plagiarism check completed.">plagiarised</span>
+            </a>
         {% elseif currentFile.plagscan.isProcessing %}
             <span class="meta" title="Plagiarism check is currently processing - check back again soon.">Processing</span>
         {% elseif currentFile.plagscan.isPending %}
