@@ -151,7 +151,7 @@ class Controller extends Base
         $submissionFile1
             ->setId(5233)
             ->setStorage($storage1)
-            ->setCrocodocId('slkjl2j3589uslk23jl4')
+            ->setCrocodocId('bf19dba4-c36c-4a7f-9056-8abbe90c44e3')
             ->setFilename($storage1->getFilename())
             ->setPlagscan($plagscan1);
 
@@ -205,7 +205,7 @@ class Controller extends Base
         $submissionFile4
             ->setId(64267)
             ->setStorage($storage4)
-            ->setCrocodocId('3d33lkjl2590')
+            ->setCrocodocId('9bd30ca7-3b0b-471d-a887-707773533c60')
             ->setFilename($storage4->getFilename())
             ->setPlagscan($plagscan4);
 

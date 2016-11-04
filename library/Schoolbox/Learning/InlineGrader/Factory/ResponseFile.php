@@ -129,11 +129,12 @@ class ResponseFile
         }
         elseif ($this->isCrocodocable()) {
 
-            /* TODO: Test data
+            /* Figger out a crocodoc url
+             * This was previously wrapped up in Crocodoc/Facade
              */
             $url = (new Loader(
                 new Authenticator(),
-                'bf19dba4-c36c-4a7f-9056-8abbe90c44e3',
+                $this->getFile()->getCrocodocId(),
                 $this->getUser(),
                 false
             ))->render();
