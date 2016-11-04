@@ -51,12 +51,22 @@ switch ($_GET['transform_type']) {
         $path          = '/images/core/placeholder.png';
         $transform     = new \Alaress\Image\Transformation\Portrait();
         $transform_key = $_GET['transform'];
+        try {
+            $transform->retrieve($transform_key);
+        } catch (\OutOfBoundsException $e) {
+            $transform_key = 'profile';
+        }
         $cache_key     = "portrait-$transform_key";
         break;
 
     case 'storage':
         $transform     = new \Alaress\Image\Transformation\Storage();
         $transform_key = $_GET['transform'];
+        try {
+            $transform->retrieve($transform_key);
+        } catch (\OutOfBoundsException $e) {
+            $transform_key = 'maxsize';
+        }
         $cache_key     = "storage-$transform_key";
         break;
 
