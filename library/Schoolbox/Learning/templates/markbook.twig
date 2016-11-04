@@ -160,12 +160,12 @@
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}
                                     {# TODO abstract this out #}
-                                    {% if mostRecentFeedback %}
+                                    {% if mostRecentFeedback.isMarkedAsCompleted %}
                                         <a href="#"
                                            class="no-text progress-tick complete"
-                                           title="Completed – click to mark as not complete"
+                                           title="Completed – click to mark as not attempted"
                                            data-interaction="update_progress"></a>
-                                    {% elseif (assessment.getParticipant(student).findMostRecentResponse) %}
+                                    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
                                         <a href="#"
                                            class="no-text progress-tick pending"
                                            title="Self-assessed – click to mark as complete"
@@ -173,7 +173,7 @@
                                     {% else %}
                                         <a href="#"
                                            class="no-text progress-tick"
-                                           title="Not completed – click to mark as complete"
+                                           title="Not attempted – click to mark as complete"
                                            data-interaction="update_progress"></a>
                                     {% endif %}
                                 {% else %}
