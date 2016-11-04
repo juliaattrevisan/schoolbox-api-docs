@@ -107,13 +107,10 @@ class Controller extends Base
         // And what is required for a context selector
         $terms = TermMapper::getInstance()->findAll(['order' => ['start' => 'desc']]);
 
-        // Also show the courses/units that are on this homepage
-        $courses = $this->getDi()->get('courseImplementationDataSource')->findAllByFolderId($class->getId());
-
         // And output
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@learning/markbook.twig',
+                '@learningMarkbook/markbook.twig',
                 [
                     'class'       => $class,
                     'markbook'    => $markbook,

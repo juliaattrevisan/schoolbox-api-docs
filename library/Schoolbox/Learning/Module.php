@@ -39,7 +39,6 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
                 '/classes'                                => 'getClasses',
-                '/markbook/{classId}'                     => 'getMarkbook',
                 '/due/{userId}'                           => 'getDue',
                 '/grades/{userId}{/termCode}'             => 'getGrades',
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
