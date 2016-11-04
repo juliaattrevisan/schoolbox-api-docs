@@ -278,6 +278,12 @@ class Controller extends Base
 
         // Generate data: assessments and their Participants
         $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
+
+        // Also get anything in a unit spec for that folder
+        $assessments->merge(
+            $this->getAssessmentMapperProxy()->findAllInCourseImplementationForFolderId($class->getId())
+        );
+
         foreach ($assessments as $assessment) {
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
         }
