@@ -114,7 +114,11 @@ class Controller extends Base
         );
 
         // And what is required for a context selector
+        // TODO inject term mapper
         $terms = TermMapper::getInstance()->findAll(['order' => ['start' => 'desc']]);
+
+        // Also show the courses/units that are on this homepage
+        $courses = $this->getCourseImplementationDataSource()->findAllByFolderId($class->getId());
 
         // And output
         $this->getResponse()->content->set(
@@ -125,6 +129,7 @@ class Controller extends Base
                     'markbook'    => $markbook,
                     'terms'       => $terms,
                     'currentTerm' => TermMapper::getInstance()->findForToday(),
+                    'courses'     => $courses,
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );

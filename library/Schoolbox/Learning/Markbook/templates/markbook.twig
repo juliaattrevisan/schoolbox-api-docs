@@ -43,6 +43,17 @@
         <div class="context-switch">
             {% include 'sub/termSelector.twig' with {terms: terms, currentTerm: currentTerm} %}
             {# select a unit as well #}
+            <select data-unit-selector>
+                <option disabled>Select a unit</option>
+                <option>All assessments, including those not in units</option>
+                {% for course in courses %}
+                    <optgroup label="{{ course.specification.folder.title }}">
+                        {% for unit in course.units %}
+                        <option>{{ unit.specification.folder.title }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
         </div>
     </div>
 </div>
