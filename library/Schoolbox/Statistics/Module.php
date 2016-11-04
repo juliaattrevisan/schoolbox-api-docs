@@ -35,18 +35,6 @@ class Module extends BaseModule
     protected $basename = 'statistics';
 
     /**
-     * Module constructor.
-     * @param ContainerInterface $injector
-     * @param string $basename
-     */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
-        parent::__construct($injector, $basename);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
@@ -166,30 +154,12 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-    /** Here be getters and setters */
-
-    /** @var FolderMapper */
-    protected $folderMapper;
-
-    /** @var ErrorMapper */
-    protected $errorMapper;
-
     /**
      * @return FolderMapper
      */
     public function getFolderMapper()
     {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param FolderMapper $mapper
-     * @return $this
-     */
-    public function setFolderMapper(FolderMapper $mapper)
-    {
-        $this->folderMapper = $mapper;
-        return $this;
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
     /**
@@ -197,16 +167,6 @@ class Module extends BaseModule
      */
     public function getErrorMapper()
     {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $mapper
-     * @return $this
-     */
-    public function setErrorMapper(ErrorMapper $mapper)
-    {
-        $this->errorMapper = $mapper;
-        return $this;
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
