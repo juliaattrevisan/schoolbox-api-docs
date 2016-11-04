@@ -184,6 +184,19 @@ class Model extends File implements IStorage
         return $this->size;
     }
 
+    /**
+     * Get a human-readable format of this file's size
+     *
+     * Normally would have done this in twig but there seems
+     * to be more complicated logic than originally thought
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function getHumanReadableSize()
+    {
+        return \Alaress_Byte_Format::bytesToString($this->getSize());
+    }
 
     /**
      * @param int $size

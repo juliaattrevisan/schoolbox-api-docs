@@ -80,7 +80,7 @@ class Controller extends Base
 
         /* Factory to figure out which fragment is required
          */
-        $file = $response->getAllFiles()->getOffset(2);
+        $file = $response->getAllFiles()->getOffset(4);
 
         $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
         $factory->produce();
@@ -175,6 +175,24 @@ class Controller extends Base
             ->setFilename('chemistry.pptx')
             ->setPlagscan($plagscan4);
 
+        /* Fifth file
+         */
+        $plagscan5 = new Plagscan();
+        $plagscan5
+            ->setId(6666)
+            ->setScore('67%')
+            ->setStatus(3);
+
+        $storage5 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('724f3f7e395e639bfa2e5cb58589f8dcf88b4be9');
+
+        $submissionFile5 = new SubmissionFile();
+        $submissionFile5
+            ->setId(3019384)
+            ->setStorage($storage5)
+            ->setCrocodocId('3d33lkjl2590')
+            ->setFilename('chemistry.pptx')
+            ->setPlagscan($plagscan5);
+
         /* Accumulate
          */
         $response = new Submission();
@@ -187,6 +205,7 @@ class Controller extends Base
                 ->add($submissionFile2)
                 ->add($submissionFile3)
                 ->add($submissionFile4)
+                ->add($submissionFile5)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
