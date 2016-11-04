@@ -98,6 +98,22 @@ class ImplementationMapperProxy
     }
 
     /**
+     * Find all course implementations for this folder.
+     *
+     * TODO figure out whether to keep this or findByFolderId
+     *
+     * @param int $folderId
+     * @param array $options
+     * @return Collection|Implementation[]
+     */
+    public function findAllByFolderId($folderId, $options = [])
+    {
+        return $this->loadUnitsForCollection(
+            $this->mapper->findByColumn('folder_id', $folderId, $options)
+        );
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Implementation $implementation
