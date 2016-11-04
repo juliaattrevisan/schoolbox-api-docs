@@ -15,7 +15,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -179,10 +178,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'gradeGroupMapper'      => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'participantDataSource' => $injector->lazyGet('participantDataSource'),
+                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );
     }
