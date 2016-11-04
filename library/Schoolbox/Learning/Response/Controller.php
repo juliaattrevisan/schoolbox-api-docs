@@ -122,17 +122,17 @@ class Controller extends Base
      */
     public function getPlagscanReport(Plagscan $plagscan)
     {
-        $url = sprintf(
-            "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
-            $this->getRequest()->server->get('REQUEST_SCHEME'),
-            $this->getRequest()->server->get('HTTP_HOST'),
-            $plagscan->getPlagscanId()
-        );
+        /* Make an absolute url
+         *
+         * http or https, and top-level host where we are installed
+         */
+        $requestScheme = $this->getRequest()->server->get('REQUEST_SCHEME');
+        $host = $this->getRequest()->server->get('HTTP_HOST');
 
         /* Twiggle it
          */
         $data = [
-            'url' => $url
+            'url' => $plagscan->getUrl($requestScheme, $host)
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));

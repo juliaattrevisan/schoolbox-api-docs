@@ -70,6 +70,23 @@ class Plagscan
     }
 
     /**
+     * Figure out the url to the plagscan report
+     *
+     * @param $requestScheme
+     * @param $host
+     * @return string
+     */
+    public function getUrl($requestScheme, $host)
+    {
+        return sprintf(
+            "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
+            $requestScheme,
+            $host,
+            $this->getPlagscanId()
+        );
+    }
+
+    /**
      * Plagscan queued for processing
      *
      * @return bool
