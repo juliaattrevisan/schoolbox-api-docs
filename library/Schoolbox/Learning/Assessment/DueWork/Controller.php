@@ -124,6 +124,14 @@ class Controller extends Assessment\Controller
             'assessment'  => $assessment,
         ];
 
+        try {
+            // TODO this should be called 'assert', not 'is'
+            $assessment->isAcceptSubmission();
+            $twigData['submissionsBlocked'] = false;
+        } catch (DomainException $e) {
+            $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/fragments/dueWork/summary/student.twig",
@@ -333,7 +341,7 @@ class Controller extends Assessment\Controller
             // redirect after saving to Due Work Summary For Particular Student
             $rs->redirect->to(
                 $this->getRouter()->generate(
-                    'learningAssessment.getStudentAssessment',
+                    'learningAssessment.getSummary',
                     [
                         'assessmentId' => $assessment->getId(),
                         'studentId'    => $participant->getUser()->getId(),
