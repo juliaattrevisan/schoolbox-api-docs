@@ -112,10 +112,19 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Manufacture some whacky url
+         */
+        $url = sprintf(
+            "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
+            $this->getRequest()->server->get('REQUEST_SCHEME'),
+            $this->getRequest()->server->get('HTTP_HOST'),
+            $plagscanId
+        );
+
         /* Twiggle it
          */
         $data = [
-            'plagscanDocument' => $plagscanDocument
+            'url' => $url
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
