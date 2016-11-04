@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
@@ -39,23 +40,31 @@ class Controller extends Base
     protected $gradeGroupMapper;
 
     /**
-     * Controller constructor.
+     * @var CourseImplementationDataSource
+     */
+    protected $courseImplementationDataSource;
+
+    /**
+     * Constructor
      *
-     * @param ErrorMapper            $errorMapper
-     * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param Participant\DataSource $participantDataSource
-     * @param GradeGroupMapper       $gradeGroupMapper
+     * @param ErrorMapper                    $errorMapper
+     * @param AssessmentMapperProxy          $assessmentMapperProxy
+     * @param Participant\DataSource         $participantDataSource
+     * @param GradeGroupMapper               $gradeGroupMapper
+     * @param CourseImplementationDataSource $courseImplementationDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Participant\DataSource $participantDataSource,
-        GradeGroupMapper $gradeGroupMapper
+        GradeGroupMapper $gradeGroupMapper,
+        CourseImplementationDataSource $courseImplementationDataSource
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setParticipantDataSource($participantDataSource);
         $this->setGradeGroupMapper($gradeGroupMapper);
+        $this->setCourseImplementationDataSource($courseImplementationDataSource);
     }
 
     /**
@@ -193,6 +202,24 @@ class Controller extends Base
     public function setGradeGroupMapper(GradeGroupMapper $gradeGroupMapper)
     {
         $this->gradeGroupMapper = $gradeGroupMapper;
+        return $this;
+    }
+
+    /**
+     * @return CourseImplementationDataSource
+     */
+    public function getCourseImplementationDataSource()
+    {
+        return $this->courseImplementationDataSource;
+    }
+
+    /**
+     * @param CourseImplementationDataSource $courseImplementationDataSource
+     * @return static
+     */
+    public function setCourseImplementationDataSource(CourseImplementationDataSource $courseImplementationDataSource)
+    {
+        $this->courseImplementationDataSource = $courseImplementationDataSource;
         return $this;
     }
 }

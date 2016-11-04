@@ -94,10 +94,11 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'gradeGroupMapper'      => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'participantDataSource' => $injector->lazyGet('participantDataSource'),
+                'errorMapper'                    => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'gradeGroupMapper'               => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
+                'assessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
+                'participantDataSource'          => $injector->lazyGet('participantDataSource'),
+                'courseImplementationDataSource' => $injector->lazyGet('courseImplementationDataSource'),
             ])
         );
     }
