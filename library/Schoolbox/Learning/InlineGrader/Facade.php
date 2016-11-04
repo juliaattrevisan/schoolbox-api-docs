@@ -8,10 +8,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File as SubmissionFile;
+namespace Schoolbox\Learning\InlineGrader;
+use \Schoolbox\User;
 use \Schoolbox\Assessment\Term\Model as Term;
 use \Schoolbox\Assessment\Term\Mapper as TermMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use \Schoolbox\Learning\InlineGrader\Loader;
 
 class Facade
 {
@@ -19,9 +22,9 @@ class Facade
     /**
      * The file hash to upload
      *
-     * @var string
+     * @var SubmissionFile
      */
-    private $fileHash = '';
+    private $file = '';
 
     /**
      * The submission object itself
@@ -45,13 +48,13 @@ class Facade
     /**
      * Facade constructor.
      *
-     * @param $fileHash
+     * @param SubmissionFile $file
      * @param Submission $submission
      * @param User $user
      */
-    public function __construct($fileHash, Submission $submission, User $user)
+    public function __construct(SubmissionFile $file, Submission $submission, User $user)
     {
-        $this->setFileHash($fileHash);
+        $this->setFile($file);
         $this->setSubmission($submission);
         $this->setUser($user);
 
@@ -68,20 +71,21 @@ class Facade
         /* If this was previously uploaded in the past, resume scribbling
          * Otherwise upload it and start a new scribble
          */
-//        $submission = $this->getSubmission();
-//        if (!strlen($submission->getUuid())) {
+        $file = $this->getFile();
+
+//        if (!strlen($file->getCrocodocId())) {
 //            $this->upload();
 //        }
-//
-//        try {
-//            $loader = new Loader($submission->getUuid(), $this->getUser(), $this->getTerm()->getArchived());
-//            header('Location: '.$loader->render());
-//            exit;
-//        }
-//        catch (Exception $e) {
-//            echo "Error encountered: ".$e->getMessage();
-//        }
+
+        try {
+            return (new Loader(new Authenticator(), $file->getCrocodocId(), $this->getUser(), $this->getTerm()->getArchived()))->render();
+        }
+        catch (\Exception $e) {
+            echo "Error encountered: ".$e->getMessage();
+        }
     }
+
+
 
 //    /**
 //     * Uploads the submission box to Crocodoc
@@ -140,20 +144,20 @@ class Facade
      */
 
     /**
-     * @return string
+     * @return SubmissionFile
      */
-    private function getFileHash()
+    public function getFile()
     {
-        return $this->fileHash;
+        return $this->file;
     }
 
     /**
-     * @param string $fileHash
+     * @param SubmissionFile $file
      * @return $this
      */
-    private function setFileHash($fileHash)
+    public function setFile($file)
     {
-        $this->fileHash = $fileHash;
+        $this->file = $file;
         return $this;
     }
 

@@ -16,10 +16,11 @@
  */
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use Schoolbox\Learning\InlineGrader\Authenticator;
-use Schoolbox\Learning\InlineGrader\Loader;
-use Schoolbox\User;
+use \Schoolbox\Learning\InlineGrader\Authenticator;
+use \Schoolbox\Learning\InlineGrader\Facade;
+use \Schoolbox\User;
 use \Schoolbox\Video\ResourceVideoMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -38,6 +39,11 @@ class ResponseFile
     );
 
     /**
+     * @var Submission
+     */
+    private $submission;
+
+    /**
      * @var SubmissionFile
      */
     private $file;
@@ -50,11 +56,13 @@ class ResponseFile
     /**
      * ResponseFile constructor.
      *
+     * @param Submission $submission
      * @param SubmissionFile $file
      * @param User $user
      */
-    public function __construct(SubmissionFile $file, User $user)
+    public function __construct(Submission $submission, SubmissionFile $file, User $user)
     {
+        $this->setSubmission($submission);
         $this->setFile($file);
         $this->setUser($user);
     }
@@ -130,14 +138,8 @@ class ResponseFile
         elseif ($this->isCrocodocable()) {
 
             /* Figger out a crocodoc url
-             * This was previously wrapped up in Crocodoc/Facade
              */
-            $url = (new Loader(
-                new Authenticator(),
-                $this->getFile()->getCrocodocId(),
-                $this->getUser(),
-                false
-            ))->render();
+            $url = (new Facade($this->getFile(), $this->getSubmission(), $this->getUser()))->start();
 
             /* Dock this doc into the crocodoc dock
              */
@@ -170,6 +172,24 @@ class ResponseFile
 
     /* Getters/Setters
      */
+
+    /**
+     * @return Submission
+     */
+    protected function getSubmission()
+    {
+        return $this->submission;
+    }
+
+    /**
+     * @param Submission $submission
+     * @return $this
+     */
+    protected function setSubmission($submission)
+    {
+        $this->submission = $submission;
+        return $this;
+    }
 
     /**
      * @return SubmissionFile
