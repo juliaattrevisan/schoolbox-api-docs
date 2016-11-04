@@ -61,12 +61,15 @@ class ResponseFile
 
         if ($mimetype->isImage()) {
             // load image
+            return 'image.twig';
         }
         elseif ($mimetype->isAudio()) {
             // load audio player
+            return 'audio.twig';
         }
         elseif ($mimetype->isVideo()) {
             // load video player
+            return 'video.twig';
         }
         elseif ($this->getFile()->isOnlineSubmission()) {
             return 'html.twig';
@@ -76,6 +79,7 @@ class ResponseFile
         }
         else {
             // download prompt
+            return 'none.twig';
         }
     }
 

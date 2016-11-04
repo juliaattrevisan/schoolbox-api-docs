@@ -80,7 +80,7 @@ class Controller extends Base
 
         /* Factory to figure out which fragment is required
          */
-        $file = $response->getAllFiles()->first();
+        $file = $response->getAllFiles()->getOffset(2);
 
         $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
         $factory->produce();
