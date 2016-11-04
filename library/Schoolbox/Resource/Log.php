@@ -176,22 +176,4 @@ class Log {
 		return $this->timestamp;
 	}
 
-
-    /**
-     * @param \Schoolbox\File $file
-     * @return self
-     */
-    public function setFile($file) {
-        $this->file = $file;
-        return $this;
-    }
-
-
-    /**
-     * @return File
-     */
-    public function getFile() {
-        return $this->file;
-    }
-
 }
