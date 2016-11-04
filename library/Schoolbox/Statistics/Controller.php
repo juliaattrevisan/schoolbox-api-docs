@@ -108,30 +108,34 @@ class Controller extends Base
     public function getFilter()
     {
         $get = $this->getRequest()->query;
-        $redirect = '/statistics/homepage/' . $get['folderId'];
+        $chunks = [
+            'folderId' => $get['folderId']
+        ];
 
         /**
          * If they've submitted this filter from a 'view all' page-
          * send them back to that page
          */
         if ($get['pageRoute'] != '') {
-            $redirect .= '/' . $get['pageRoute'];
+            $chunks[] = $get['pageRoute'];
         }
 
         /*
          * Both date filter params must be sent for the filter to go through
          */
         if (isset($get['startDate']) && isset($get['endDate'])) {
-            $redirect .= '/' . $get['startDate'] . '/' . $get['endDate'];
+            $chunks['startDate'] = $get['startDate'];
+            $chunks['endDate'] = $get['endDate'];
 
             /**
              * Role filter is not included if they select 'All'
              */
             if (isset($get['roleFilter'])) {
-               $redirect .= '/' . $get['roleFilter'];
+                $chunks['roleFilter'] = $get['roleFilter'];
             }
         }
 
+        $redirect = $this->getRouteIfAuthorized('statistics.' .$get['pageRoute'], $chunks);
         $this->getResponse()->redirect->to($redirect);
     }
 
@@ -310,7 +314,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/index.twig',
                 'data' => [
-                    'pageRoute' => '',
+                    'pageRoute' => 'getIndex',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -421,7 +425,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/topFiles.twig',
                 'data' => [
-                    'pageRoute' => 'topFiles',
+                    'pageRoute' => 'getTopFiles',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -464,7 +468,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/recentVisitors.twig',
                 'data' => [
-                    'pageRoute' => 'topVisitors',
+                    'pageRoute' => 'getTopVisitors',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -507,7 +511,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/yetToVisit.twig',
                 'data' => [
-                    'pageRoute' => 'yetToVisit',
+                    'pageRoute' => 'getYetToVisit',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -550,7 +554,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/topLinks.twig',
                 'data' => [
-                    'pageRoute' => 'topLinks',
+                    'pageRoute' => 'getTopLinks',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -614,7 +618,7 @@ class Controller extends Base
     protected function setRoleFilter($roleFilter) {
         $this->roleFilter = $roleFilter;
     }
-    
+
     /**
      * @return mixed
      */
