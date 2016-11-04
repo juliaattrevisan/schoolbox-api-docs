@@ -17,6 +17,8 @@
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use \Schoolbox\Video\ResourceVideoMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
 
 class ResponseFile
 {
@@ -60,26 +62,71 @@ class ResponseFile
         $mimetype = $this->getFile()->getStorage()->getMimetype();
 
         if ($mimetype->isImage()) {
-            // load image
-            return 'image.twig';
+
+            /* Load an image html tag
+             */
+            return [
+                'strategy' => 'image.twig',
+            ];
         }
         elseif ($mimetype->isAudio()) {
-            // load audio player
-            return 'audio.twig';
+
+            /* Load from the ResourceVideoMapper to get extra stuff
+             * about the media file. Bundle it into a struct
+             */
+            try {
+                $audio = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
+
+                return [
+                    'strategy' => 'audio.twig',
+                    'data' => [
+                        'audio' => $audio,
+                    ]
+                ];
+            }
+            catch (MapperException $e) {
+            }
+
+            return [];
         }
         elseif ($mimetype->isVideo()) {
-            // load video player
-            return 'video.twig';
+
+            /* Load from the ResourceVideoMapper to get extra stuff
+             * about the media file. Bundle it into a struct
+             */
+            try {
+                $video = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
+
+                return [
+                    'strategy' => 'video.twig',
+                    'data' => [
+                        'video' => $video,
+                    ]
+                ];
+            }
+            catch (MapperException $e) {
+            }
+
+            return [];
         }
         elseif ($this->getFile()->isOnlineSubmission()) {
-            return 'html.twig';
+
+            /* Load purified html into a random div or suchlike
+             */
+            return [
+                'strategy' => 'html.twig'
+            ];
         }
         elseif ($this->isCrocodocable()) {
             // iframe crocodoc url
         }
         else {
-            // download prompt
-            return 'none.twig';
+
+            /* Download File prompt
+             */
+            return [
+                'strategy' => 'none.twig'
+            ];
         }
     }
 

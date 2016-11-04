@@ -12,7 +12,7 @@
     </div>
 </div>
 
-{% include '@learningResponse/inlineGrading/strategy/' ~ strategy %}
+{% include '@learningResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
 
 <div class="row">
     <div class="small-12 island">

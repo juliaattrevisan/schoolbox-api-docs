@@ -90,14 +90,14 @@ class Controller extends Base
         }
 
         $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
-        $factory->produce();
+        $subfragment = $factory->produce();
 
         $data = [
             'assessment' => $assessment,
             'response' => $response,
             'selectedFileId' => $this->getRequest()->query['fileId'],
             'file' => $file,
-            'strategy' => $factory->produce()
+            'subfragment' => $subfragment
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
@@ -228,6 +228,20 @@ class Controller extends Base
             ->setFilename($storage5->getFilename())
             ->setPlagscan($plagscan5);
 
+        /* Sixth file
+         */
+        $storage6 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9');
+
+        $submissionFile6 = new SubmissionFile();
+        $submissionFile6
+            ->setId(345906890)
+            ->setStorage($storage6)
+            ->setCrocodocId('3d33lkjl2590')
+            ->setFilename($storage6->getFilename());
+
+        /* Seventh file
+         */
+
         /* Accumulate
          */
         $response = new Submission();
@@ -241,6 +255,7 @@ class Controller extends Base
                 ->add($submissionFile3)
                 ->add($submissionFile4)
                 ->add($submissionFile5)
+                ->add($submissionFile6)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
