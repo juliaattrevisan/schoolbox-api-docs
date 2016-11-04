@@ -79,7 +79,7 @@ class Model implements IStorage
         /* Known versions of the Online Submission file which stores
          * the wizzywig contents
          */
-        $knownFilenames = ['online-submission.html', 'Online Submission.html'];
+        $knownFilenames = ['online-submission', 'Online Submission'];
 
         if (in_array($this->getFilename(), $knownFilenames) && ($this->getStorage()->getMimetype() == 'text/html')) {
             return true;
