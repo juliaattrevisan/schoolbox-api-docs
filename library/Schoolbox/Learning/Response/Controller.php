@@ -89,18 +89,29 @@ class Controller extends Base
             }
         }
 
-        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($response, $file, $this->getUser());
-        $subfragment = $factory->produce();
+        /* ResponseFile Factory might throw exceptions if you're viewing
+         * crocodocable files that somehow die
+         */
+        try {
+            $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($response, $file, $this->getUser());
+            $subfragment = $factory->produce();
 
-        $data = [
-            'assessment' => $assessment,
-            'response' => $response,
-            'selectedFileId' => $this->getRequest()->query['fileId'],
-            'file' => $file,
-            'subfragment' => $subfragment
-        ];
+            $data = [
+                'assessment' => $assessment,
+                'response' => $response,
+                'selectedFileId' => $this->getRequest()->query['fileId'],
+                'file' => $file,
+                'subfragment' => $subfragment,
+            ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+        }
+        catch (\RangeException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
     }
 
     /**

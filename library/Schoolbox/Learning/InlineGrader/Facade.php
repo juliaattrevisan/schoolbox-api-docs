@@ -65,6 +65,9 @@ class Facade
 
     /**
      * Load a crocodoc into the iframe
+     *
+     * @throws \RangeException
+     * @throws \DomainException
      */
     public function start()
     {
@@ -77,12 +80,8 @@ class Facade
 //            $this->upload();
 //        }
 
-        try {
-            return (new Loader(new Authenticator(), $file->getCrocodocId(), $this->getUser(), $this->getTerm()->getArchived()))->render();
-        }
-        catch (\Exception $e) {
-            echo "Error encountered: ".$e->getMessage();
-        }
+        return (new Loader(new Authenticator(), $file->getCrocodocId(), $this->getUser(), $this->getTerm()->getArchived()))->render();
+
     }
 
 

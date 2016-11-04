@@ -126,10 +126,10 @@ class Loader
         $result = json_decode($this->getCurl()->getResult());
 
         if ($this->getCurl()->getErrors()) {
-            throw new \Exception(implode(', ', $this->getCurl()->getErrors()));
+            throw new \DomainException(implode(', ', $this->getCurl()->getErrors()));
         }
         elseif (isset($result->error)) {
-            throw new \Exception($result->error);
+            throw new \DomainException($result->error);
         }
         else {
             return "{$this->getCrocodocViewUrl()}/{$result->session}";
