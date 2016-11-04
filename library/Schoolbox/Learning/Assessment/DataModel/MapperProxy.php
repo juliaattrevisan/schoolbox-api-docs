@@ -174,6 +174,19 @@ class MapperProxy
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
     }
     /**
+     * Finds all assessables that have been imported into a folder through a
+     * course import.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllInCourseImplementationForFolderId($folderId, $options = [])
+    {
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
+    }
+
+    /**
      * Finds all assessables that are part of the given project
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
