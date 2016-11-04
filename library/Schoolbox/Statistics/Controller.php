@@ -11,16 +11,10 @@ namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Model AS FolderModel;
-use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
-use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
-use Schoolbox\Resource\LogMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\File\Mapper AS FileMapper;
-use Schoolbox\Statistics\DataSource;
 
 class Controller extends Base
 {
@@ -75,12 +69,12 @@ class Controller extends Base
     /**
      * Controller constructor
      */
-    public function __construct()
+    public function __construct(DataSource $dataSource)
     {
         /**
          * Set DataSource
          */
-        $this->setDataSource(new DataSource(new UserMapper, new FolderLogMapper(), new VisitsMapper(), new LogMapper(), new UserAccessMapper()));
+        $this->setDataSource($dataSource);
 
         /**
          * Set the default start and end dates

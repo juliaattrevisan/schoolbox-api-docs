@@ -21,6 +21,11 @@ use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress_Date_Format;
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
+use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
+use Schoolbox\Resource\LogMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Module extends BaseModule
 {
@@ -123,6 +128,26 @@ class Module extends BaseModule
         );
 
         $this->addRoutePermission($authorizer, 'getIndex', $permissionIndex);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        // dependencies for DataSource
+        $injector->params[DataSource::class] = [
+            'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'folderLogMapper'  => $this->getMapperFactory()->getLazy(FolderLogMapper::class),
+            'visitMapper'      => $this->getMapperFactory()->getLazy(VisitsMapper::class),
+            'logMapper'        => $this->getMapperFactory()->getLazy(LogMapper::class),
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+        ];
+
+        // dependencies for Controller
+        $injector->params[Controller::class] = [
+            'dataSource' => $injector->lazyNew(DataSource::class)
+        ];
     }
 
     /**
