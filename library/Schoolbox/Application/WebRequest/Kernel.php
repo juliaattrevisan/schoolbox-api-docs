@@ -85,8 +85,6 @@ class Kernel extends \Alaress\Application\Kernel
             /** @var \Alaress\Module\Module $module */
             $module = $this->di->get('module:'.$controllerName);
             $module->initControllerDependencies();
-            $module->initControllers($this->di);
-            unset($module);
 
             try {
                 /** @var \Alaress\Session\Session $session */
@@ -122,6 +120,10 @@ class Kernel extends \Alaress\Application\Kernel
                 } catch (\Exception $preloaderException) {
                     // Store the preloader exception for later
                 }
+
+                // now the preloading is done initialise the controller
+                $module->initControllers($this->di);
+                unset($module);
 
                 /** @var \Alaress\Web\Controller\Base $controller */
                 $controller = $this->di->get('controller:'.$controllerName);
