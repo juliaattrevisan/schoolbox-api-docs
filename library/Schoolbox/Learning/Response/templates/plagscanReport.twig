@@ -1,32 +1,23 @@
+<script src="/javascript/shared/jquery.responsive-iframe.js"></script>
 <script type="text/javascript">
     $(function() {
 
         /**
          * Resize iframe dynamically ("responsively")
          */
-        function resizeIframe() {
-            $('#plagscan-report').height($(window).height() * 0.75);
-        }
-
-        $(window).resize(function() {
-            if (this.resizeTimeout) {
-                clearTimeout(this.resizeTimeout);
+        $.fn.responsiveIframe({
+            onLoad: function() {
+                $('#plagscan-report').height($(window).height() * 0.75);
+            },
+            onResize: function() {
+                $('#plagscan-report').height($(window).height() * 0.75);
             }
-
-            this.resizeTimeout = setTimeout(function () {
-                $(this).trigger('resizeEnd');
-            }, 400);
         });
-
-        $(window).bind('resizeEnd', function() {
-            resizeIframe();
-        });
-
-        resizeIframe();
     });
 </script>
 <div class="row">
     <div class="small-12 columns">
-        <iframe id='plagscan-report' src="{{ url }}"></iframe>
+        <iframe id='plagscan-report' src="{{ url }}" class="no-margin no-padding" frameborder="0"></iframe>
     </div>
 </div>
+
