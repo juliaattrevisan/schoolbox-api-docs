@@ -99,6 +99,7 @@
                         <p>No visitors in this time period.</p>
                     </div>
                 {% endif %}
+
             </div>
 
             {# Top Files #}
@@ -112,8 +113,8 @@
                             {% for topFile in topFiles %}
                                 <li class="row">
                                     <div class="avatar card small-12">
-                                        <a href="/send.php?id={FILE_ID}" title="{{ topFile.info.title }}">
-                                            <img src="/images/mime/60x60/{{ topFile.iconFile }}" alt="{{ topFile.info.title }}" class="content" />
+                                        <a href="/send.php?id={{ topFile.info.id }}" title="{{ topFile.info.title }}">
+                                            <img src="/images/mime/{{ topFile.iconFile }}" alt="{{ topFile.info.title }}" class="mime" />
 
                                             <p>{{ topFile.info.title }}</p>
                                         </a>
@@ -139,8 +140,6 @@
                         {% endif %}
                     </section>
 
-
-
                 {% else %}
                     <div class="empty-state">
                         <p>No files viewed.</p>
@@ -151,6 +150,7 @@
 
         </div>
     </div>
+
     <div class="small-12 large-6 columns">
         <div class="row">
 
