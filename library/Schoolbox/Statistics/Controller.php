@@ -18,6 +18,9 @@ use Schoolbox\File\Mapper AS FileMapper;
 
 class Controller extends Base
 {
+    /** @var DataSource $dataSource */
+    private $dataSource;
+
     /**
      * @var Alaress_Date_Format $startDate
      */
@@ -541,10 +544,6 @@ class Controller extends Base
             )
         );
     }
-
-
-    /** @var DataSource $dataSource */
-    private $dataSource;
 
 
     /**
