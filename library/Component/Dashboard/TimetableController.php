@@ -132,7 +132,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $this->setVar("campus_timetable_block", '');
         $now = new Alaress_Date_Format(time(), 'U');
-        $attendance_date = $now->getDatabaseDate();
 
         foreach ($this->timetable as $campus_id => $timetable) {
             $classCount = 0;
@@ -237,15 +236,32 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     && $this->getUser()->getRole()->isStaff()
                                     && $class['AttendanceEnabled']
                                 ) {
-                                    $this->setVar(
-                                        array(
-                                            'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
-                                            'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
-                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_TIMETABLE_CODE' =>  $campus_list[$campus_id]->getExtTimetableCode(),
-                                            'ATTENDANCE_ICON'              => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
-                                        )
-                                    );
+                                    if(Cfg::get('external_type') == 'synergetic') {
+                                        $this->setVar(
+                                            array(
+                                                'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
+                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getDatabaseDate(),
+                                                'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                                'ATTENDANCE_TIMETABLE_CODE'    => $campus_list[$campus_id]->getExtTimetableCode(),
+                                                'ATTENDANCE_ICON'              => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
+                                            )
+                                        );
+                                    }
+                                    else if(Cfg::get('external_type') == 'tass') {
+                                        list($year, $subject, $class) = explode('-',$class['code']);
+                                        list($cmp_code, $timetableCode) = explode($campus_list[$campus_id]->getExtTimetableCode());
+                                        $this->setVar(
+                                            array(
+                                                'ATTENDANCE_CLASS_CODE'        => $class,
+                                                'ATTENDANCE_SUBJECT_CODE'      => $subject,
+                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getUsingFormat('m/d/Y'),
+                                                'ATTENDANCE_ATTENDANCE_DAY'    => $this->dayNumber[$campus_id],
+                                                'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                                'ATTENDANCE_TIMETABLE_CODE'    => $timetableCode,
+                                                'ATTENDANCE_ICON'              => 'icon-class-list',
+                                            )
+                                        );
+                                    }
 
                                     if ($hasLink) {
                                         $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
