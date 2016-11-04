@@ -141,7 +141,7 @@ class Import
 
                 $data['destinations'] = [
                     'id'   => $pair['value'],
-                    'name' => $pair['label'],
+                    'name' => $pair['label']." ({$course->getCodeString()})",
                 ];
             }
         } catch (MapperException $e) {
