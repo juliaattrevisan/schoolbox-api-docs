@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -108,6 +109,21 @@ class Module extends BaseModule
 
             return [
                 'response' => $response,
+            ];
+        });
+
+        $this->addRoutePreload($matcher, '(?:getPlagscanReport)', function ($params) {
+
+            /* @var Plagscan $document */
+            try {
+                $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+            }
+            catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            return [
+                'plagscan' => $plagscanDocument,
             ];
         });
     }

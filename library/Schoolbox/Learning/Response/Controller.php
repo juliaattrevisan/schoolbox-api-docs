@@ -99,26 +99,15 @@ class Controller extends Base
     /**
      * Dump out a plagscan report
      *
-     * @param int $plagscanId
+     * @param Plagscan $plagscan
      */
-    public function getPlagscanReport($plagscanId)
+    public function getPlagscanReport(Plagscan $plagscan)
     {
-
-        /* @var Plagscan $document */
-        try {
-            $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $plagscanId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
-        /* Manufacture some whacky url
-         */
         $url = sprintf(
             "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
             $this->getRequest()->server->get('REQUEST_SCHEME'),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $plagscanId
+            $plagscan->getId()
         );
 
         /* Twiggle it
