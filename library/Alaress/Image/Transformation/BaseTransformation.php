@@ -20,7 +20,7 @@ class BaseTransformation implements Transformation
     * Get all transformations for a particular key
     *
     * @param  $key
-    * @throws \BadMethodCallException if transformation isn't found
+    * @throws \OutOfBoundsException if transformation isn't found
     * @return array
     */
     public function retrieve($key)
@@ -29,7 +29,7 @@ class BaseTransformation implements Transformation
             return $this->allTransformations[$key];
         }
 
-        throw new \BadMethodCallException('Could not load transformation list.');
+        throw new \OutOfBoundsException('Could not load transformation list.');
     }
 
     /**

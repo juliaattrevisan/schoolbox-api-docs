@@ -25,9 +25,13 @@ class Storage extends AbstractHandler
     * @param Resource\Storage\Model $resource
     * @param string                 $key
     * @param Transformation         $transformations
+    * @throws \OutOfBoundsException
     */
     public function __construct(Resource\Storage\Model $resource, $key, Transformation $transformations)
     {
+        // Test that requested transform exists before proceeding
+        $transformations->retrieve($key);
+
         // Process the given storage object
         $this->initProcessor(new Cache\Storage($resource, $key), $transformations);
     }
