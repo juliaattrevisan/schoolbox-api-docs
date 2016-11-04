@@ -284,21 +284,29 @@ class Controller extends Base
             $this->getAssessmentMapperProxy()->findAllInCourseImplementationForFolderId($class->getId())
         );
 
+        // Load participants
         foreach ($assessments as $assessment) {
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
         }
-        // The markbook will handle statistics
+
+        // Build a markbook
         $markbook = new Markbook(
             $assessments,
             $this->getGradeGroupMapper()->findById($this->getConfigLoader()->get('default_grade_group'))
         );
 
+        // And what is required for a context selector
+        $terms = TermMapper::getInstance()->findAll(['order' => ['start' => 'desc']]);
+
+        // And output
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learning/markbook.twig',
                 [
-                    'class'    => $class,
-                    'markbook' => $markbook,
+                    'class'       => $class,
+                    'markbook'    => $markbook,
+                    'terms'       => $terms,
+                    'currentTerm' => TermMapper::getInstance()->findForToday(),
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );

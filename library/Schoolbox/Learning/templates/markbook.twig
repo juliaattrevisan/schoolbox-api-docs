@@ -39,7 +39,12 @@
 </div>
 
 <div class="row">
-    TODO: context selector
+    <div class="small-12 island">
+        <div class="context-switch">
+            {% include 'sub/termSelector.twig' with {terms: terms, currentTerm: currentTerm} %}
+            {# select a unit as well #}
+        </div>
+    </div>
 </div>
 
 <div class="row">

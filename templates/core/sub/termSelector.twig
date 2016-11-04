@@ -1,0 +1,19 @@
+{# Renders a term selector. It's up to you what to do with it #}
+<nav>
+    <a data-interaction="previous-term" class="icon-previous"></a>
+</nav>
+<div class="semester">
+    <select data-term-selector>
+        <option disabled>Select a term</option>
+        {% for term in terms %}
+            <option value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
+                {% if term.archived %}(archived){% endif %}
+                {{ term.title }}
+                ({{ term.start.dateOnly }}—{{ term.displayFinish.dateOnly }})
+            </option>
+        {% endfor %}
+    </select>
+</div>
+<nav>
+    <a data-interaction="next" class="icon-next"></a>
+</nav>
