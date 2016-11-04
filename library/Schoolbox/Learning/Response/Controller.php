@@ -152,7 +152,7 @@ class Controller extends Base
             ->setId(5233)
             ->setStorage($storage1)
             ->setCrocodocId('slkjl2j3589uslk23jl4')
-            ->setFilename('online-submission.html')
+            ->setFilename($storage1->getFilename())
             ->setPlagscan($plagscan1);
 
         /* Second file
@@ -170,7 +170,7 @@ class Controller extends Base
             ->setId(13345)
             ->setStorage($storage2)
             ->setCrocodocId('dfue45636')
-            ->setFilename('some-unplaggable-file.pdf')
+            ->setFilename($storage2->getFilename())
             ->setPlagscan($plagscan2);
 
         /* Third file
@@ -188,7 +188,7 @@ class Controller extends Base
             ->setId(56456)
             ->setStorage($storage3)
             ->setCrocodocId('36dg36')
-            ->setFilename('thingy.jpg')
+            ->setFilename($storage3->getFilename())
             ->setPlagscan($plagscan3);
 
         /* Fourth file
@@ -206,7 +206,7 @@ class Controller extends Base
             ->setId(64267)
             ->setStorage($storage4)
             ->setCrocodocId('3d33lkjl2590')
-            ->setFilename('chemistry.pptx')
+            ->setFilename($storage4->getFilename())
             ->setPlagscan($plagscan4);
 
         /* Fifth file
@@ -225,7 +225,7 @@ class Controller extends Base
             ->setId(3019384)
             ->setStorage($storage5)
             ->setCrocodocId('3d33lkjl2590')
-            ->setFilename('chemistry.pptx')
+            ->setFilename($storage5->getFilename())
             ->setPlagscan($plagscan5);
 
         /* Accumulate
