@@ -53,6 +53,12 @@ class DataSource
      */
     protected $userAccessMapper;
 
+    /**
+     * Object types for filtering the log
+     */
+    const FILTER_FILE = 'file';
+    const FILTER_LINK = 'link';
+
 
     /**
      * Constructor
@@ -263,7 +269,7 @@ class DataSource
 
         $fileJoins = '';
         $fileSelects = '';
-        if ($object == 'file') {
+        if ($object == self::FILTER_FILE) {
             $fileJoins = "
                 LEFT JOIN storage ON f.hash = storage.hash
                 LEFT JOIN allowedFileExtension as afe ON storage.ext = afe.extension

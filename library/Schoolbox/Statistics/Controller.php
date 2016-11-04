@@ -248,7 +248,7 @@ class Controller extends Base
         /**
          * Top files
          */
-        $topFiles = $dataSource->getTopAccessed($folder->getId(), 'file', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
+        $topFiles = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_TOP_FILES, true);
 
         $topFileInfo = '';
         if (!empty($topFiles)) {
@@ -256,7 +256,7 @@ class Controller extends Base
         }
 
         $topFilesMore = false;
-        $topFilesAll = $dataSource->getTopAccessed($folder->getId(), 'file', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+        $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
         if (count($topFilesAll) > self::MAX_TOP_FILES) {
             $topFilesMore = true;
@@ -415,7 +415,7 @@ class Controller extends Base
             $this->setRoleFilter($roleFilter);
         }
 
-        $topFiles = $dataSource->getTopAccessed($folder->getId(), 'file', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
+        $topFiles = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
         $this->getResponse()->content->set(
             array(
@@ -544,7 +544,7 @@ class Controller extends Base
             $this->setRoleFilter($roleFilter);
         }
 
-        $topLinks = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
+        $topLinks = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_LINK, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), null, true);
 
         $this->getResponse()->content->set(
             array(
@@ -572,7 +572,6 @@ class Controller extends Base
         $this->dataSource = $dataSource;
     }
 
-
     /**
      * @return DataSource
      */
@@ -581,14 +580,12 @@ class Controller extends Base
         return $this->dataSource;
     }
 
-
     /**
      * @param Alaress_Date_Format $startDate
      */
     protected function setStartDate(Alaress_Date_Format $startDate) {
         $this->startDate = $startDate;
     }
-
 
     /**
      * @return Alaress_Date_Format
@@ -597,14 +594,12 @@ class Controller extends Base
         return $this->startDate;
     }
 
-
     /**
      * @param Alaress_Date_Format $endDate
      */
     protected function setEndDate(Alaress_Date_Format $endDate) {
         $this->endDate = $endDate;
     }
-
 
     /**
      * @return Alaress_Date_Format
@@ -613,15 +608,13 @@ class Controller extends Base
         return $this->endDate;
     }
 
-
     /**
      * @param $roleFilter
      */
     protected function setRoleFilter($roleFilter) {
         $this->roleFilter = $roleFilter;
     }
-
-
+    
     /**
      * @return mixed
      */
