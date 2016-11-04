@@ -225,11 +225,6 @@ class Controller extends Base
         }
         $colours = $colorList;
 
-        // Give empty array if needed
-        if (!count($graphData)) {
-            $graphData[] = [];
-        }
-
 
         /**
          * visitorCount is used for both top visitors and recent visitors
