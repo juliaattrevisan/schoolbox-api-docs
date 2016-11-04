@@ -1,0 +1,24 @@
+<script src="/javascript/shared/jquery.responsive-iframe.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /**
+         * Resize iframe dynamically ("responsively")
+         */
+        $.fn.responsiveIframe({
+            onLoad: function() {
+                $('#inline-grader-viewport').height($(window).height() * 0.40);
+            },
+            onResize: function() {
+                $('#inline-grader-viewport').height($(window).height() * 0.40);
+            }
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Document Preview</h2>
+        <iframe id="inline-grader-viewport" src="{{ data.url }}" frameborder="0"></iframe>
+    </div>
+</div>

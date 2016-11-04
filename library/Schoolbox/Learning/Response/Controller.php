@@ -89,7 +89,7 @@ class Controller extends Base
             }
         }
 
-        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
+        $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file, $this->getUser());
         $subfragment = $factory->produce();
 
         $data = [

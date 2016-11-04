@@ -17,6 +17,9 @@
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Learning\InlineGrader\Authenticator;
+use Schoolbox\Learning\InlineGrader\Loader;
+use Schoolbox\User;
 use \Schoolbox\Video\ResourceVideoMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -40,13 +43,20 @@ class ResponseFile
     private $file;
 
     /**
+     * @var User
+     */
+    private $user;
+
+    /**
      * ResponseFile constructor.
      *
      * @param SubmissionFile $file
+     * @param User $user
      */
-    public function __construct(SubmissionFile $file)
+    public function __construct(SubmissionFile $file, User $user)
     {
         $this->setFile($file);
+        $this->setUser($user);
     }
 
     /**
@@ -118,7 +128,24 @@ class ResponseFile
             ];
         }
         elseif ($this->isCrocodocable()) {
-            // iframe crocodoc url
+
+            /* TODO: Test data
+             */
+            $url = (new Loader(
+                new Authenticator(),
+                'bf19dba4-c36c-4a7f-9056-8abbe90c44e3',
+                $this->getUser(),
+                false
+            ))->render();
+
+            /* Dock this doc into the crocodoc dock
+             */
+            return [
+                'data' => [
+                    'url' => $url
+                ],
+                'strategy' => 'crocodoc.twig'
+            ];
         }
         else {
 
@@ -176,6 +203,24 @@ class ResponseFile
     protected function setAllowedFileTypes($allowedFileTypes)
     {
         $this->allowedFileTypes = $allowedFileTypes;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    protected function setUser($user)
+    {
+        $this->user = $user;
         return $this;
     }
 }
