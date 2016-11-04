@@ -43,12 +43,12 @@ if(isset($_POST['SAMLResponse'])) {
 
             } else {
                 $msg = 'Invalid SAML user.';
-                echo $msg;
+                error(ErrorMapper::ERROR_PROCESSING, $msg);
                 SAMLDebugLog($msg);
             }
         } else {
             $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
-            echo $msg;
+            error(ErrorMapper::ERROR_PROCESSING, $msg);
             SAMLDebugLog($msg);
         }
     } catch (Exception $e) {
