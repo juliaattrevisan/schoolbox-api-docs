@@ -1,9 +1,6 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Audio</h2>
-        <ul class="meta">
-            <li class="icon-audio">{{ file.filename }}</li>
-        </ul>
         <section>
             {% if data.audio.isComplete %}
                 <script type="text/javascript">
@@ -12,7 +9,7 @@
                     });
                 </script>
                 <div>
-                    <audio id="audio" controls preload="none">
+                    <audio id="audio" controls preload="none" width="100%">
                         <source src="/cms/sendVideo.php?type=submission&id={{ data.audio.hash }}" type='audio/mp3'>
                     </audio>
                 </div>
