@@ -155,14 +155,36 @@
                     </th>
                     {% for assessment in markbook.assessments %}
                         <td class="column-{{ assessment.id }}">
-                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                               title="{{ participant.mostRecentFeedback.comment }}">
-                                {% if assessment.isParticipant(student) %}
-                                    {{ assessment.getParticipant(student).findMostRecentPublishedFeedback.humanReadableMark | default('–') }}
+                            {% if assessment.isParticipant(student) %}
+                                {% set mostRecentFeedback = assessment.getParticipant(student).findMostRecentPublishedFeedback %}
+                                {% if assessment is task %}
+                                    {# An icon that shows if the student has attempted the task or not #}
+                                    {# TODO abstract this out #}
+                                    {% if mostRecentFeedback %}
+                                        <a href="#"
+                                           class="no-text progress-tick complete"
+                                           title="Completed – click to mark as not complete"
+                                           data-interaction="update_progress"></a>
+                                    {% elseif (assessment.getParticipant(student).findMostRecentResponse) %}
+                                        <a href="#"
+                                           class="no-text progress-tick pending"
+                                           title="Self-assessed – click to mark as complete"
+                                           data-interaction="update_progress"></a>
+                                    {% else %}
+                                        <a href="#"
+                                           class="no-text progress-tick"
+                                           title="Not completed – click to mark as complete"
+                                           data-interaction="update_progress"></a>
+                                    {% endif %}
                                 {% else %}
-                                    –
+                                    <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                       title="{{ participant.mostRecentFeedback.comment }}">
+                                        {{ mostRecentFeedback.humanReadableMark | default('–') }}
+                                    </a>
                                 {% endif %}
-                            </a>
+                            {% else %}
+                                –
+                            {% endif %}
                         </td>
                     {% endfor %}
                     <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
