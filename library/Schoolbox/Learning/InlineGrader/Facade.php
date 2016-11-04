@@ -14,7 +14,7 @@ use \Schoolbox\Assessment\Term\Model as Term;
 use \Schoolbox\Assessment\Term\Mapper as TermMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use \Schoolbox\Learning\InlineGrader\Loader;
+use \Schoolbox\Learning\InlineGrader\Document;
 
 class Facade
 {
@@ -76,42 +76,25 @@ class Facade
          */
         $file = $this->getFile();
 
-//        if (!strlen($file->getCrocodocId())) {
-//            $this->upload();
-//        }
+        if (!strlen($file->getCrocodocId())) {
+            $this->upload();
+        }
 
         return (new Loader(new Authenticator(), $file->getCrocodocId(), $this->getUser(), $this->getTerm()->getArchived()))->render();
-
     }
 
-
-
-//    /**
-//     * Uploads the submission box to Crocodoc
-//     */
-//    protected function upload()
-//    {
-//        $response = [];
-//
-//        try {
-//            $document = new Document($this->getSubmission());
-//            $response = $document->upload();
-//        } catch (\RangeException $e) {
-//            echo "Error encountered: {$e->getMessage()}";
-//        }
-//
-//        if ($response['error']) {
-//            echo json_encode($response);
-//        }
-//    }
-//
-//    /**
-//     * Start biting
-//     *
-//     * @throws Exception
-//     */
-//    public function start() {
-//
+    /**
+     * Uploads the submission box to Crocodoc
+     */
+    protected function upload()
+    {
+        try {
+            $document = new Document($this->getFile());
+            $response = $document->upload();
+        } catch (\RangeException $e) {
+            echo "Error encountered: {$e->getMessage()}";
+        }
+    }
 
 //    }
 //

@@ -162,7 +162,7 @@ class Controller extends Base
 
         $submissionFile1 = new SubmissionFile();
         $submissionFile1
-            ->setId(5233)
+            ->setId(52330000000)
             ->setStorage($storage1)
             ->setFilename($storage1->getFilename())
             ->setPlagscan($plagscan1);
@@ -180,7 +180,7 @@ class Controller extends Base
 
         $submissionFile2 = new SubmissionFile();
         $submissionFile2
-            ->setId(13345)
+            ->setId(133450000000)
             ->setStorage($storage2)
             ->setCrocodocId('768f4013-71d1-410e-bb2b-8e9d312d9dbc')
             ->setFilename($storage2->getFilename())
@@ -199,7 +199,7 @@ class Controller extends Base
 
         $submissionFile3 = new SubmissionFile();
         $submissionFile3
-            ->setId(56456)
+            ->setId(564560000000)
             ->setStorage($storage3)
             ->setFilename($storage3->getFilename())
             ->setPlagscan($plagscan3);
@@ -217,7 +217,7 @@ class Controller extends Base
 
         $submissionFile4 = new SubmissionFile();
         $submissionFile4
-            ->setId(64267)
+            ->setId(642670000000)
             ->setStorage($storage4)
             ->setCrocodocId('9bd30ca7-3b0b-471d-a887-707773533c60')
             ->setFilename($storage4->getFilename())
@@ -237,7 +237,7 @@ class Controller extends Base
 
         $submissionFile5 = new SubmissionFile();
         $submissionFile5
-            ->setId(3019384)
+            ->setId(30193840000000)
             ->setStorage($storage5)
             ->setFilename($storage5->getFilename())
             ->setPlagscan($plagscan5);
@@ -249,7 +249,7 @@ class Controller extends Base
 
         $submissionFile6 = new SubmissionFile();
         $submissionFile6
-            ->setId(345906890)
+            ->setId(3459068900000000)
             ->setStorage($storage6)
             ->setFilename($storage6->getFilename());
 
@@ -263,6 +263,18 @@ class Controller extends Base
             ->setId(5564226)
             ->setStorage($storage7)
             ->setFilename($storage7->getFilename());
+
+        /* Eighth file
+         * Crocodocable file that requires uploading
+         */
+        $storage8 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('50d1bfcdf0b16c800db2df44c6f866688f6fd50d');
+
+        $submissionFile8 = new SubmissionFile();
+        $submissionFile8
+            ->setId(364859260000000)
+            ->setStorage($storage8)
+            ->setCrocodocId(null)
+            ->setFilename($storage8->getFilename() . ' - needs crocodoc upload');
 
         /* Accumulate
          */
@@ -279,6 +291,7 @@ class Controller extends Base
                 ->add($submissionFile5)
                 ->add($submissionFile6)
                 ->add($submissionFile7)
+                ->add($submissionFile8)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
