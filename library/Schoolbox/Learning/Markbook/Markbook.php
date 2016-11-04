@@ -165,21 +165,29 @@ class Markbook
             // fall back to a different summator
             // TODO figure out a better way to do this
             if ($markScheme instanceof TotalMarkFractional) {
-                $markScheme = new TotalMarkWholeNumber($markScheme->getTotalMark());
+                if ($markScheme->getTotalMark() > 0) {
+                    $markScheme = new TotalMarkWholeNumber($markScheme->getTotalMark());
+                } else {
+                    continue;
+                }
             }
 
             $statistics = [
-                'mean'  => null,
-                'sd'    => null,
-                'min'   => $markScheme->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
-                'max'   => $markScheme->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
-                'count' => $countSummator->summateSingleAssessable($assessment, true),
+                'mean'              => null,
+                'sd'                => null,
+                'min'               => $markScheme->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
+                'minNormalized'     => $minSummator->summateSingleAssessable($assessment, true),
+                'max'               => $markScheme->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
+                'maxNormalized'     => $maxSummator->summateSingleAssessable($assessment, true),
+                'count'             => $countSummator->summateSingleAssessable($assessment, true),
             ];
 
             // mean and SD are only meaningful for quantitative marks
             if ($markScheme->isQuantitative()) {
-                $statistics['mean'] = $markScheme->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true));
-                $statistics['sd']   = $markScheme->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true));
+                $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true));
+                $statistics['meanNormalized']   = $meanSummator->summateSingleAssessable($assessment, true);
+                $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true));
+                $statistics['sdNormalized']     = $stdevSummator->summateSingleAssessable($assessment, true);
             }
 
             $this->assessmentStatistics[$assessment->getId()] = $statistics;
@@ -202,6 +210,8 @@ class Markbook
                 $overallMarkScheme->getHumanReadableMark(
                     $weightedSummator->summate($this->getAssessments(), $student, true)
                 );
+            $this->studentStatistics[$student->getId()]['meanNormalised'] =
+                    $weightedSummator->summate($this->getAssessments(), $student, true);
         }
 
 //        var_dump(
