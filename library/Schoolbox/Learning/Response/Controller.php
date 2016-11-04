@@ -230,7 +230,7 @@ class Controller extends Base
 
         /* Sixth file
          */
-        $storage6 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9');
+        $storage6 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('287d6486bce26b39b03d959d4ff8f8625d5a811b');
 
         $submissionFile6 = new SubmissionFile();
         $submissionFile6
