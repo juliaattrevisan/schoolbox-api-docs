@@ -241,6 +241,14 @@ class Controller extends Base
 
         /* Seventh file
          */
+        $storage7 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('3c3594d7a353225aed0335a78c7c829e2be4b135');
+
+        $submissionFile7 = new SubmissionFile();
+        $submissionFile7
+            ->setId(5564226)
+            ->setStorage($storage7)
+            ->setCrocodocId('3d33lkjl2590')
+            ->setFilename($storage7->getFilename());
 
         /* Accumulate
          */
@@ -256,6 +264,7 @@ class Controller extends Base
                 ->add($submissionFile4)
                 ->add($submissionFile5)
                 ->add($submissionFile6)
+                ->add($submissionFile7)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
