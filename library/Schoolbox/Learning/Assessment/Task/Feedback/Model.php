@@ -11,10 +11,12 @@
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
 class Model extends AbstractFeedback
 {
+    use CompletionStatusTrait;
 
     /**
      * Calculate the final mark for this IAssessable

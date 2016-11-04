@@ -52,23 +52,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * Overridden to only retrieve task completions that are status: complete
-     * or requires confirmation.
-     *
-     * @param array $columnList
-     * @param array $options
-     * @return GenericCollection
-     */
-    public function findByColumnList(array $columnList, $options = array())
-    {
-        $columnList['completion_status'] = [
-            Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION,
-            Completion::COMPLETION_STATUS_COMPLETE,
-        ];
-        return parent::findByColumnList($columnList, $options);
-    }
-
-    /**
      * @return string
      */
     protected function getExternalColumnName()
@@ -110,6 +93,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
                 ->setUpdatedAt($completion->getCompletionDate());
+
+            // Set completion of this feedback
+            $status = $completion->getCompletionStatus();
+            if ($status == Completion::COMPLETION_STATUS_INCOMPLETE) {
+                $taskCompletion->markAsNotAttempted();
+
+            } elseif ($status == Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION) {
+                $taskCompletion->markAsSelfAssessed();
+
+            } elseif ($status == Completion::COMPLETION_STATUS_COMPLETE) {
+                $taskCompletion->markAsCompleted();
+
+            }
+
             $taskCompletions->add($taskCompletion);
         }
 
