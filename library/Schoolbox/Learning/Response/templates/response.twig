@@ -22,7 +22,16 @@
                 <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                     {% for currentFile in response.allFiles %}
                         <li class="actions-small-1">
-                            {% include '@learning/dueWork/interaction/response/files.twig'  with {currentInteraction: response} %}
+                            <div class="list-item">
+                                <div class="card small-12 compact">
+                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?fileId={{ currentFile.id }}" title="{{ currentFile.filename }}">
+                                        <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                                        <p>{{ currentFile.filename }}</p>
+
+                                        {% include '@learning/dueWork/plagscan.twig' %}
+                                    </a>
+                                </div>
+                            </div>
                             <nav>
                                 {% include '@learning/dueWork/plagscanLink.twig' %}
                             </nav>

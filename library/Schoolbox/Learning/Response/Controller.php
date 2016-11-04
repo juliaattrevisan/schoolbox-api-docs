@@ -80,7 +80,14 @@ class Controller extends Base
 
         /* Factory to figure out which fragment is required
          */
-        $file = $response->getAllFiles()->getOffset(4);
+        $file = $response->getAllFiles()->first();
+
+        foreach ($response->getAllFiles() as $currentFile) {
+            if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
+                $file = $currentFile;
+                break;
+            }
+        }
 
         $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($file);
         $factory->produce();
@@ -178,7 +185,7 @@ class Controller extends Base
 
         $submissionFile3 = new SubmissionFile();
         $submissionFile3
-            ->setId(13345)
+            ->setId(56456)
             ->setStorage($storage3)
             ->setCrocodocId('36dg36')
             ->setFilename('thingy.jpg')
