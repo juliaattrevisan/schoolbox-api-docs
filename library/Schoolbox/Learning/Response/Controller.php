@@ -148,6 +148,7 @@ class Controller extends Base
         $hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
 
         /* First file
+         * Online Submission
          */
         $plagscan1 = new Plagscan();
         $plagscan1
@@ -163,11 +164,11 @@ class Controller extends Base
         $submissionFile1
             ->setId(5233)
             ->setStorage($storage1)
-            ->setCrocodocId('bf19dba4-c36c-4a7f-9056-8abbe90c44e3')
             ->setFilename($storage1->getFilename())
             ->setPlagscan($plagscan1);
 
         /* Second file
+         * Crocodocable pdf
          */
         $plagscan2 = new Plagscan();
         $plagscan2
@@ -175,17 +176,18 @@ class Controller extends Base
             ->setPlagscanId(4396431)
             ->setStatus(-1);
 
-        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('603b535ff1c451df9013b392c59ed60ca36d5c89');
 
         $submissionFile2 = new SubmissionFile();
         $submissionFile2
             ->setId(13345)
             ->setStorage($storage2)
-            ->setCrocodocId('dfue45636')
+            ->setCrocodocId('768f4013-71d1-410e-bb2b-8e9d312d9dbc')
             ->setFilename($storage2->getFilename())
             ->setPlagscan($plagscan2);
 
         /* Third file
+         * Image
          */
         $plagscan3 = new Plagscan();
         $plagscan3
@@ -199,11 +201,11 @@ class Controller extends Base
         $submissionFile3
             ->setId(56456)
             ->setStorage($storage3)
-            ->setCrocodocId('36dg36')
             ->setFilename($storage3->getFilename())
             ->setPlagscan($plagscan3);
 
         /* Fourth file
+         * Crocodocable pptx
          */
         $plagscan4 = new Plagscan();
         $plagscan4
@@ -222,6 +224,7 @@ class Controller extends Base
             ->setPlagscan($plagscan4);
 
         /* Fifth file
+         * Download only; cannot preview
          */
         $plagscan5 = new Plagscan();
         $plagscan5
@@ -236,11 +239,11 @@ class Controller extends Base
         $submissionFile5
             ->setId(3019384)
             ->setStorage($storage5)
-            ->setCrocodocId('3d33lkjl2590')
             ->setFilename($storage5->getFilename())
             ->setPlagscan($plagscan5);
 
         /* Sixth file
+         * Video
          */
         $storage6 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('287d6486bce26b39b03d959d4ff8f8625d5a811b');
 
@@ -248,10 +251,10 @@ class Controller extends Base
         $submissionFile6
             ->setId(345906890)
             ->setStorage($storage6)
-            ->setCrocodocId('3d33lkjl2590')
             ->setFilename($storage6->getFilename());
 
         /* Seventh file
+         * Audio
          */
         $storage7 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('3c3594d7a353225aed0335a78c7c829e2be4b135');
 
@@ -259,7 +262,6 @@ class Controller extends Base
         $submissionFile7
             ->setId(5564226)
             ->setStorage($storage7)
-            ->setCrocodocId('3d33lkjl2590')
             ->setFilename($storage7->getFilename());
 
         /* Accumulate
