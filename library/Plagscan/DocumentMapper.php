@@ -9,7 +9,7 @@
  * 
  */
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 /**
  * Class Plagscan_DocumentMapper
  * @method Plagscan_Document createModel()
@@ -38,7 +38,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 
 	protected function mapping () {
 		$this->hasTable('plagscan_document');
-		$this->hasModel('Plagscan_Document');
+		$this->hasModel(Plagscan::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
@@ -72,13 +72,13 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 
 		$this->hasMap(array(
 			'column'     => 'deleted',
-			'property'   => 'deleted',
+			'property'   => 'deletedAt',
 			'type'       => self::TYPE_DATETIME,
 		));
 
 		$this->hasSoftDeleteDateField('deleted');
 
-        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
+//        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
 
 	}
 
@@ -104,7 +104,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 			if (!empty($documentId)) {
 				$this->gateway->check($documentId);
 				$dirtyDocument->setPlagscanId($documentId);
-				$dirtyDocument->setStatus(Plagscan_Document::STATUS_QUEUED);
+				$dirtyDocument->setStatus(Plagscan::STATUS_QUEUED);
 			}
 			else {
 				return false;

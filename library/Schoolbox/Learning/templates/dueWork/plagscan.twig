@@ -3,7 +3,7 @@
 {% if currentFile.plagscan %}
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
-            <a href="{{ routeLookup('learningResponse.getPlagscanReport', {plagscanId: currentFile.plagscan.id }) }}">
+            <a href="{{ routeLookup('learningResponse.getPlagscanReport', {plagscanId: currentFile.plagscan.plagscanId }) }}">
                 <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
                 <span class="meta" title="Plagiarism check completed.">plagiarised</span>
             </a>

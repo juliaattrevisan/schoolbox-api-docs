@@ -13,6 +13,8 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
 
 class Plagscan
 {
+    use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+
     /**
      * Plagscan queued for processing
      */
@@ -37,6 +39,13 @@ class Plagscan
      * @var int
      */
     protected $id;
+
+    /**
+     * Some id used by the third-party Plagscan
+     *
+     * @var int
+     */
+    protected $plagscanId;
 
     /**
      * @var int
@@ -118,6 +127,24 @@ class Plagscan
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPlagscanId()
+    {
+        return $this->plagscanId;
+    }
+
+    /**
+     * @param int $plagscanId
+     * @return $this
+     */
+    public function setPlagscanId($plagscanId)
+    {
+        $this->plagscanId = $plagscanId;
         return $this;
     }
 

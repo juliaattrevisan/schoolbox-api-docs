@@ -119,7 +119,9 @@ class Module extends BaseModule
                 $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
             }
             catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                new \Alaress_Probe($e->getMessage());
+                die();
+//                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
             return [

@@ -107,7 +107,7 @@ class Controller extends Base
             "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
             $this->getRequest()->server->get('REQUEST_SCHEME'),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $plagscan->getId()
+            $plagscan->getPlagscanId()
         );
 
         /* Twiggle it
@@ -132,7 +132,8 @@ class Controller extends Base
          */
         $plagscan1 = new Plagscan();
         $plagscan1
-            ->setId(4396294)
+            ->setId(1)
+            ->setPlagscanId(4396294)
             ->setStatus(3)
             ->setScore('45%')
             ->setHtml('<div><strong>YOU CHEATED</strong></div>');
@@ -151,7 +152,8 @@ class Controller extends Base
          */
         $plagscan2 = new Plagscan();
         $plagscan2
-            ->setId(4396431)
+            ->setId(2)
+            ->setPlagscanId(4396431)
             ->setStatus(-1);
 
         $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('8b6b83f10b12a9f16f9c6ce0581c992fffe11ed6');
@@ -168,7 +170,8 @@ class Controller extends Base
          */
         $plagscan3 = new Plagscan();
         $plagscan3
-            ->setId(4396443)
+            ->setId(3)
+            ->setPlagscanId(4396443)
             ->setStatus(1);
 
         $storage3 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('efb4b418c6c963dc8760e9676986a4e99706f636');
@@ -185,7 +188,8 @@ class Controller extends Base
          */
         $plagscan4 = new Plagscan();
         $plagscan4
-            ->setId(4396470)
+            ->setId(4)
+            ->setPlagscanId(4396470)
             ->setStatus(2);
 
         $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('a351bf467f221eead2d0a184db35d13cc86a43e3');
@@ -202,7 +206,8 @@ class Controller extends Base
          */
         $plagscan5 = new Plagscan();
         $plagscan5
-            ->setId(4396541)
+            ->setId(5)
+            ->setPlagscanId(4396541)
             ->setScore('67%')
             ->setStatus(3);
 
