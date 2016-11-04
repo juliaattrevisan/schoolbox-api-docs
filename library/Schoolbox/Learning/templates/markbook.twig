@@ -70,19 +70,17 @@
                         </div>
                     </th>
                 </tr>
-                </thead>
-                <tbody>
                 <tr>
                     <th>
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
                     </th>
                     {% for assessment in markbook.assessments %}
-                    <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
-                        <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
-                            {{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}
-                        </a>
-                    </td>
+                        <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+                            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                                {{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}
+                            </a>
+                        </td>
                     {% endfor %}
                     <td>{{ markbook.markbookStatistics.weightedMean | default('–') }}</td>
                 </tr>
@@ -142,7 +140,8 @@
                     {% endfor %}
                     <td>&nbsp;</td>
                 </tr>
-
+                </thead>
+                <tbody>
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
                 <tr data-id="{{ student.id }}">
