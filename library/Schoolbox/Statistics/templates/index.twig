@@ -165,7 +165,7 @@
                             {% for recentVisitor in recentVisitors %}
                                 <li>
                                     <div class="avatar card small-12">
-                                        <a href="/search/user/{{ recentVisitor.user.id }}" title="{VISITOR_TOOLTIP}">
+                                        <a href="/search/user/{{ recentVisitor.user.id }}" title="{{ recentVisitor.user.fullName }} (last visited {{ recentVisitor.lastAccessTime.relativeTime }})">
                                             <img src="/portrait.php?userId={{ recentVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
 
                                             <p>{{ recentVisitor.user.fullName }}</p>
