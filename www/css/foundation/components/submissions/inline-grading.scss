@@ -1,5 +1,15 @@
+/* Deprecated
+ */
 .inline-grading-iframe {
   width: 100%;
   height: 700px;
   border: 0px;
+}
+
+/* Indicate which file you're currently viewing
+ */
+.inline-grader-filelist {
+  .selected {
+    background-color: $accent-background;
+  }
 }
