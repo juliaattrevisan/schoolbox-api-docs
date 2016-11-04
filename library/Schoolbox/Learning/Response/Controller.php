@@ -65,8 +65,9 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response
      *
-     * Show the specified $_GET['fileId'] in iframe window
-     * or other preview mechanism
+     * Show the specified $_GET['fileId'] in iframe window if it's a crocodoc-compatible
+     * file; otherwise display html/audio/video/image contents differently, inline with
+     * the dom
      *
      * I can't call it getResponse() lol wups
      *
