@@ -33,7 +33,7 @@ abstract class AbstractSummator implements ISummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
-            try {
+            if ($currentAssessable->isParticipant($user)) {
                 /** @var Participant $participant */
                 $participant = $currentAssessable->getParticipant($user);
 
@@ -53,10 +53,6 @@ abstract class AbstractSummator implements ISummator
                         $this->aggregate($val, $currentAssessable->getWeight());
                     }
                 }
-            }
-            catch (\UnexpectedValueException $e) {
-                /* noop $user not found in Assessable's Participant collection
-                 */
             }
         }
 

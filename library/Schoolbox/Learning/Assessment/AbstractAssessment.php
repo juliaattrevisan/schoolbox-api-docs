@@ -154,12 +154,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isParticipant(User $user)
     {
-        try {
-            $this->getParticipant($user);
-            return true;
-        } catch (\UnexpectedValueException $e) {
-            return false;
-        }
+        return ($this->findParticipantIfExtant($user) instanceof Participant);
     }
 
     /**
@@ -172,14 +167,35 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getParticipant(User $user)
     {
+        $participant = $this->findParticipantIfExtant($user);
+        if ($participant instanceof Participant) {
+            return $participant;
+        }
+        throw new \UnexpectedValueException("{$user->getFullName()} {$user->getId()} is not a participant of {$this->getTitle()}");
+    }
+
+    /**
+     * Find a reference to a particular Participant in this Assessable, if they exist.
+     *
+     * This was added for optimization reasons - it's far more performant to check if
+     * a value is null than to throw and immediately catch an exception.
+     *
+     * @param User $user
+     * @return Participant|null
+     */
+    protected function findParticipantIfExtant(User $user)
+    {
+        $userId = $user->getId();
+
         /** @var Participant $currentParticipant */
-        foreach ($this->getAllParticipants() as $currentParticipant) {
-            if ($currentParticipant->getUser()->getId() == $user->getId()) {
+        foreach ($this->getAllParticipants() as $i => $currentParticipant) {
+            if ($currentParticipant->getUser()->getId() == $userId) {
+                $this->participantCache[$userId] = $i;
                 return $currentParticipant;
             }
         }
 
-        throw new \UnexpectedValueException("{$user->getFullname()} {$user->getId()} is not a participant of {$this->getTitle()}");
+        return null;
     }
 
     /**
