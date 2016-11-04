@@ -293,10 +293,15 @@ class Controller extends Base
             $this->getGradeGroupMapper()->findById($this->getConfigLoader()->get('default_grade_group'))
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/markbook.twig', [
-            'class'    => $class,
-            'markbook' => $markbook,
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@learning/markbook.twig',
+                [
+                    'class'    => $class,
+                    'markbook' => $markbook,
+                ]
+            )->setTitle('Markbook for '.$class->getTitle())
+        );
     }
 
     /**
