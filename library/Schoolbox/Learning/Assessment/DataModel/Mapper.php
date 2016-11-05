@@ -8,8 +8,8 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'quiz',
             [
-                'mapper'    => OnlineAssessmentMapper::class,
+                'mapper'    => QuizMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'assessment_id'
             ]
@@ -157,6 +157,35 @@ class Mapper extends BaseMapper
             null,
             'specificationAssessment'
         );
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
+    }
+
+    /**
+     * When deleting an Assessment that is a Quiz, we need to delete all sub-objects of the Quiz
+     * @param Model $assessment
+     */
+    public function softDeleteQuiz(Model $assessment)
+    {
+        if($assessment->getQuiz() instanceof Quiz){
+            $quizMapper = QuizMapper::getInstance();
+            $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $quizMapper->delete($quiz);
+        }
+    }
+
+    /**
+     * When restoring an Assessment that is a Quiz, we need to restore all sub-objects of the Quiz
+     * @param Model $assessment
+     */
+    public function restoreQuiz(Model $assessment)
+    {
+        if($assessment->getQuiz() instanceof Quiz){
+            $quizMapper = QuizMapper::getInstance();
+            $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $quizMapper->restoreSoftDeleted($quiz);
+        }
     }
 
     /**

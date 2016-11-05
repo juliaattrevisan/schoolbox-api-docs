@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;

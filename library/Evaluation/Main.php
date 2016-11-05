@@ -410,8 +410,22 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Returns whether record exists and URL path is correct for type {Assess | Survey}
      *
-     * @param numeric $assess_id
+     * @param int $assess_id
      * @return bool
      */
-    abstract public function isValidUrlAccess($assess_id);
+    public function isValidUrlAccess($assess_id)
+    {
+        $query = "SELECT availability
+                  FROM {$this->_table}
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
+
+        return $this->getAvailabilityType() == $this->db->getOne($query);
+    }
+
+    /**
+     * Gets the enum for Evaluation subtypes
+     *
+     * @return string
+     */
+    protected abstract function getAvailabilityType();
 }

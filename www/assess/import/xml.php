@@ -9,8 +9,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
@@ -30,7 +30,7 @@ $import->import();
 
 /* For the Course Builder
  */
-/** @var OnlineAssessment $assessment */
+/** @var Quiz $assessment */
 $is_task = !empty($_POST['is_task']);
 if ($is_task) {
     $task = new Task();
@@ -41,9 +41,9 @@ if ($is_task) {
 
     TaskMapper::getInstance()->save($task);
 
-    $assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
+    $assessment = QuizMapper::getInstance()->findById($import->getAssessId());
     $assessment->setTask($task);
-    OnlineAssessmentMapper::getInstance()->save($assessment);
+    QuizMapper::getInstance()->save($assessment);
 
     $task->setAssessment($assessment);
     TaskMapper::getInstance()->save($task);
@@ -54,9 +54,9 @@ if ($is_task) {
         ->setOwner($_SESSION['id'])
         ->setTitle($import->getTitle());
 
-    $assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
+    $assessment = QuizMapper::getInstance()->findById($import->getAssessId());
     $assessment->setTaskInstance($task_instance);
-    OnlineAssessmentMapper::getInstance()->save($assessment);
+    QuizMapper::getInstance()->save($assessment);
 
     $task_instance->setAssessment($assessment);
     Task\InstanceMapper::getInstance()->save($task_instance);

@@ -272,3 +272,7 @@ CREATE TABLE `project_assessment` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+ALTER TABLE assess`
+  CHANGE COLUMN `start` `start` DATETIME NULL ,
+  CHANGE COLUMN `finish` `finish` DATETIME NULL ;

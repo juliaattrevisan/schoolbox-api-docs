@@ -8,14 +8,12 @@
 namespace Schoolbox\Assessment;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -44,8 +42,8 @@ class Grades
     *
     * @param Collection<User> $students
     * @param Folder $subject
-    * @param int $year
-    * @param int $semester
+    * @param Alaress_Date_Format $from
+    * @param Alaress_Date_Format $to
     * @param array $outputFormats
     * @return array
     */
@@ -72,7 +70,7 @@ class Grades
             /** @var User $user */
 
             // get all OA marks for this student in this category
-            $marks['oa'][$user->getId()] = AttemptMapper::getInstance()->getStudentMarks(
+            $marks['oa'][$user->getId()] = QuizAttemptMapper::getInstance()->getStudentMarks(
                 $subject->getId(),
                 $user->getId(),
                 $params
@@ -111,7 +109,7 @@ class Grades
         }
 
         if (count($assessmentsSeen['oa'])) {
-            $oaCollection = OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', array_keys($assessmentsSeen['oa']));
+            $oaCollection = QuizMapper::getInstance()->findByColumn('assess_id', array_keys($assessmentsSeen['oa']));
             $weightArray['oa'] = array_combine($oaCollection->getColumnValues('id'), $oaCollection->getColumnValues('weight'));
         } else {
             $oaCollection = new Collection();
@@ -136,8 +134,8 @@ class Grades
 
         // sort all the things by their respective due-date fields
         $assessments->sortByCallback(function($a, $b) {
-            $x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimestamp() : $a->getFinish()->getUnixTimestamp();
-            $y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimestamp() : $b->getFinish()->getUnixTimestamp();
+            $x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimeStamp() : $a->getFinish()->getUnixTimestamp();
+            $y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimeStamp() : $b->getFinish()->getUnixTimestamp();
             return $x == $y ? 0 : ($x > $y ? 1 : -1);
         });
 

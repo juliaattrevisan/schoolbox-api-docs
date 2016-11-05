@@ -58,6 +58,8 @@ $this->setVar(array(
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
+    'MODIFY_URL'           => "/survey/modify/{$this->arg[0]}",
+    'RETURN_URL_MODIFY'    => "?".Redirect::RETURN_URL.'='.Redirect::encode("/survey/summary/{$this->arg[0]}"),
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
 ));
 
@@ -66,6 +68,8 @@ $this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
+$this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
 $this->setTitle('Assessment: ' . Scrub::text($survey['title']));
 
 $survey['description'] = trim($survey['description']);
@@ -81,6 +85,9 @@ $this->parse('allQuestions_block', 'assessContentsFragment', true);
 $this->setVar(array(
     'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
+
+$this->setVar('delete_quiz_block', '');
+$this->parse('delete_survey_block', 'delete_survey');
 
 /* Render out breadcrumbs
  */

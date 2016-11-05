@@ -6,11 +6,14 @@
  */
 namespace Schoolbox\Learning\Quiz;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
+use Alaress\Authorizer\Rule;
+use Schoolbox\Role;
 
 /**
  * The Purpose of this class is to:
@@ -28,7 +31,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector)
     {
-        parent::__construct($injector, $injector->get('mapperFactory')->get(OnlineAssessmentMapper::class), 'quiz', null, 'learningQuiz');
+        parent::__construct($injector, $injector->get('mapperFactory')->get(QuizMapper::class), 'quiz', null, 'learningQuiz');
     }
 
     /**
@@ -48,7 +51,9 @@ class Module extends RestfulModule
 
         $routes = [
             'GET' => [
-                '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection'
+                '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection',
+                '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
+                '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
             ],
             'POST' => []
         ];
@@ -60,5 +65,22 @@ class Module extends RestfulModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $ruleRegexp = '(?:getQuizSummary)';
+        $this->addRoutePermission($authorizer, $ruleRegexp,
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsSuperuser()
+                )
+            )
+        );
     }
 }

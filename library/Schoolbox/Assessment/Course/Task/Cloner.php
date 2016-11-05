@@ -10,8 +10,8 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -87,7 +87,7 @@ class Cloner
      * Clones the assessment (if there is one) that is attached to this object's
      * task instance.
      *
-     * @return OnlineAssessment The assessment that was created.
+     * @return Quiz The assessment that was created.
      * @throws ClonerException  if the assessment was not able to be created
      */
     public function cloneAssessment()
@@ -95,7 +95,7 @@ class Cloner
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
 
-            $mapper   = OnlineAssessmentMapper::getInstance();
+            $mapper   = QuizMapper::getInstance();
             $handler  = new Assess_Main();
             $section  = new Assess_Section();
             $factory  = new Assess_Factory();
@@ -129,10 +129,10 @@ class Cloner
             // (yes, I currently need both the mapper and the handler version!)
 
             try {
-                /** @var OnlineAssessment $oldAssess */
+                /** @var Quiz $oldAssess */
                 $oldAssess = $mapper->findById($assess_id);
                 // And update the mapper version
-                /** @var OnlineAssessment $newAssess */
+                /** @var Quiz $newAssess */
                 $newAssess = $mapper->findById($newAssessId);
             }
             catch (\Exception $e) {
@@ -145,7 +145,7 @@ class Cloner
             $datesOverridden = false;
 
             if (is_array($quizDates)) {
-                $assessment = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                $assessment = QuizMapper::getInstance()->findById($assess_id);
                 $task_id = $assessment->getTask()->getId();
 
                 if (isset($quizDates[$task_id])) {
@@ -254,12 +254,12 @@ class Cloner
         try {
             $assess_id = $this->task_instance->getAssessment()->getId();
             if ($assess_id) {
-                /** @var OnlineAssessment $assess_object */
-                $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                /** @var Quiz $assess_object */
+                $assess_object = QuizMapper::getInstance()->findById($assess_id);
                 $assess_object->setStart($this->getOpenTimeFromTask());
-                OnlineAssessmentMapper::getInstance()->save($assess_object);
+                QuizMapper::getInstance()->save($assess_object);
             }
-        } catch (Exception $e) {
+        } catch (MapperException\Deleted $e) {
             // quiz may have been deleted. Nothing to see here, move along
         }
         try {
@@ -273,7 +273,7 @@ class Cloner
                 ;
                 SubmissionBoxMapper::getInstance()->save($box);
             }
-        } catch (Exception $e) {
+        } catch (MapperException\Deleted $e) {
             // box may have been deleted. Nothing to see here, move along
         }
         return $this;
@@ -290,15 +290,15 @@ class Cloner
         try {
             $assess_id = $this->task_instance->getAssessment()->getId();
             if ($assess_id) {
-                /** @var OnlineAssessment $assess_object */
+                /** @var Quiz $assess_object */
                 $closeTime = $this->getAssessmentCloseTimeFromTask();
-                $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                $assess_object = QuizMapper::getInstance()->findById($assess_id);
                 // If this item's close time is the same as the task's close time,
                 // update it
                 $assess_object->setFinish($closeTime);
-                OnlineAssessmentMapper::getInstance()->save($assess_object);
+                QuizMapper::getInstance()->save($assess_object);
             }
-        } catch (Exception $e) {
+        } catch (MapperException\Deleted $e) {
             // quiz may have been deleted. Nothing to see here, move along
         }
         try {
@@ -312,7 +312,7 @@ class Cloner
                 ;
                 SubmissionBoxMapper::getInstance()->save($box);
             }
-        } catch (Exception $e) {
+        } catch (MapperException\Deleted $e) {
             // box may have been deleted. Nothing to see here, move along
         }
         return $this;

@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
-use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
+use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;

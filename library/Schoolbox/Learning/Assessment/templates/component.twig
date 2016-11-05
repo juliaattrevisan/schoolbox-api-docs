@@ -8,13 +8,22 @@
     <ul class="action-list">
         {% for assessable in assessables %}
 
-            {% if isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% if assessable is quiz and not isRouteAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
                 {% set viewRoute = routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
+            {% else %}
+                {% set viewRoute = routeLookup('learningQuiz.getQuizIntro', {assessmentId: assessable.id}) %}
             {% endif %}
 
-            {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
-                {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+            {% if assessable is quiz %}
+                {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                    {% set modifyRoute = routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                {% endif %}
+            {% else %}
+                {% if isRouteAuthorized('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+                    {% set modifyRoute = routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) %}
+                {% endif %}
             {% endif %}
+
 
             {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
                 {% set deleteRoute = routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
@@ -68,15 +77,16 @@
         $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
             event.preventDefault();
 
-            var itemName = $(this).closest('[data-assessment]').find('[data-assessment-title]').text();
+            var $item = $(this).closest('[data-assessment]');
+            var itemName = $item.find('[data-assessment-title]').text();
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete ' + itemName + '?',
                 confirmLabel: 'Yes, delete it',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function (anchor) {
-                    $.post(anchor.attr('href')).done(function() {
-                        location.reload();
+                    $.post(anchor.attr('href')).done(function () {
+                        $item.fadeOut({ done: $item.remove });
                     });
                 }
             });

@@ -138,7 +138,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-drop-box;
   color: $icon-color-file-drop-box;
 }
-.icon-masonry-Component_Homepage_DueWorkListController:before {
+.icon-masonry-Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller:before {
   @extend .icon-due-work;
   color: $icon-color-due-work;
 }
@@ -189,7 +189,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-image-slideshow;
   color: $icon-color-image-slideshow;
 }
-.icon-masonry-Component_Homepage_AssessController:before {
+.icon-masonry-Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller:before {
   @extend .icon-quiz;
   color: $icon-color-quizzes;
 }
@@ -225,7 +225,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-course-outline;
   color: $icon-color-course-outline;
 }
-.icon-masonry-Component_Homepage_CourseBuilderController:before {
+.icon-masonry-Schoolbox_Learning_Assessment_Builder_Component_Homepage_Controller:before {
   @extend .icon-course-builder;
   color: $icon-color-course-builder;
 }
@@ -385,3 +385,8 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-sport;
   color: $icon-color-sport;
 }
+.icon-masonry-Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller:before {
+  @extend .icon-task;
+  color: $icon-color-task;
+}
+

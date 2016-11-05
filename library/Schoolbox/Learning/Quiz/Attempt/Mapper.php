@@ -8,84 +8,71 @@
  */
 
 
-namespace Schoolbox\Assessment\Component\OnlineAssessment;
+namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
 /**
- * Class AttemptMapper
- * @package Schoolbox\Assessment\Component\OnlineAssessment
- *
- * @method Attempt createModel()
- * @method Attempt hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel()
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class AttemptMapper extends Mapper
+class Mapper extends BaseMapper
 {
 
     protected function mapping()
     {
         $this->hasTable('assess_attempt');
-        $this->hasModel(Attempt::class);
-        $this->hasMap(array(
-            'column'     => 'attempt_id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'   => 'assess_id',
-            'property' => 'assessment',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'assessment',
-        ));
-        $this->hasMap(array(
-            'column'   => 'user_id',
-            'property' => 'user',
-            'type'     => self::TYPE_MODEL,
-            'join'     => 'user',
-        ));
-        $this->hasMap(array(
-            'column'   => 'start',
-            'property' => 'start',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'finish',
-            'property' => 'finish',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'reviewed_at',
-            'property' => 'reviewed',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'   => 'deleted_at',
-            'property' => 'deleted',
-            'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->hasModel(Model::class);
+        $this->uses('attempt_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'assessment', 'assessment');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('start', self::TYPE_DATETIME);
+        $this->uses('finish', self::TYPE_DATETIME);
+        $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
-        $this->hasJoin('assessment', array(
-            'mapper'    => OnlineAssessmentMapper::class,
-            'this_key'  => 'assess_id',
-            'other_key' => 'assess_id'
-        ));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
 
-        $this->hasJoin('user', array(
-            'mapper'    => UserMapper::class,
-            'this_key'  => 'user_id',
-            'other_key' => 'id'
-        ));
+    }
 
-        $this->registerCallback('postSave', array($this, 'postSave'));
+
+    /**
+     * Soft deletes all Answers (formerly known as Responses) for the specified Attempt
+     *
+     * @param Model $attempt
+     */
+    public function softDeleteAnswers(Model $attempt)
+    {
+        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
+        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId());
+        $quizAnswerMapper->delete($answers);
+    }
+
+    /**
+     * Restores all Answers (formerly known as Responses) for the specified Attempt
+     *
+     * @param Model $attempt
+     */
+    public function restoreAnswers(Model $attempt)
+    {
+        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
+        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
+        $quizAnswerMapper->restoreSoftDeleted($answers);
     }
 
     /**
@@ -121,10 +108,10 @@ class AttemptMapper extends Mapper
 
     /**
      * On post save, write mark data back into remote markbook
-     * @param Attempt $object
-     * @param Attempt|null $previous
+     * @param Model $object
+     * @param Model|null $previous
      */
-    public function postSave(Attempt $object, $previous = null) {
+    public function postSave(Model $object, $previous = null) {
         //Copy data to remote system
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
@@ -467,7 +454,7 @@ class AttemptMapper extends Mapper
     /**
      * Gets all attempts which are are not yet finished, but have expired.
      *
-     * @return Attempt[]
+     * @return Model[]
      */
     public function findUnfinishedExpiredAttempts()
     {
@@ -494,10 +481,14 @@ class AttemptMapper extends Mapper
             $statement,
             'aa',
             function ($mapper, $model, $row) {
-                /** @var Attempt $model */
+                /** @var Quiz $quiz */
+                $quiz = $this->hydrateJoin($row, 'assessment', 'as');
+                /** @var User $user */
+                $user = $this->hydrateJoin($row, 'user', 'u');
+                /** @var Model $model */
                 return $model
-                    ->setAssessment($this->hydrateJoin($row, 'assessment', 'as'))
-                    ->setUser($this->hydrateJoin($row, 'user', 'u'))
+                    ->setAssessment($quiz)
+                    ->setUser($user)
                 ;
             }
         );

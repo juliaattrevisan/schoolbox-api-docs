@@ -15,7 +15,7 @@ use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\User;
 
 class Task implements ISoftDeletable, IAssessableDataModel
@@ -67,7 +67,7 @@ class Task implements ISoftDeletable, IAssessableDataModel
     protected $submission_box;
 
     /**
-     * @var OnlineAssessment
+     * @var Quiz
      */
     protected $assessment;
 
@@ -226,7 +226,7 @@ class Task implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param  \Schoolbox\Assessment\Component\OnlineAssessment $assessment
+     * @param  Quiz $assessment
      * @return $this
      */
     public function setAssessment($assessment) {
@@ -235,7 +235,7 @@ class Task implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @return \Schoolbox\Assessment\Component\OnlineAssessment
+     * @return Quiz
      */
     public function getAssessment() {
         return $this->assessment;

@@ -2,8 +2,8 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
@@ -310,7 +310,7 @@ $j        = 0;
 $synClass = new External_Class;
 
 $return_mapper = new SubmissionBox\ReturnedWorkMapper();
-$assess_mapper = new OnlineAssessment\AttemptMapper();
+$attempt_mapper = new QuizAttemptMapper();
 
 $restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
 
@@ -361,7 +361,7 @@ foreach ($categoryList as $category) {
     if (!$restrict_grades) {
         $studentGrades = array_merge(
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
-            $assess_mapper->getStudentMarks($category['id'], $userID)
+            $attempt_mapper->getStudentMarks($category['id'], $userID)
         );
         usort(
             $studentGrades,
@@ -645,7 +645,7 @@ if (empty($feedItems)) {
 function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
 {
     $box_mapper    = new SubmissionBoxMapper();
-    $assess_mapper = new OnlineAssessmentMapper();
+    $assess_mapper = new QuizMapper();
     $submit_mapper = new SubmissionBox\Submission\FileMapper();
     $return_mapper = new SubmissionBox\ReturnedWorkMapper();
     $activities    = $box_mapper

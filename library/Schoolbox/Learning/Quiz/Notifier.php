@@ -7,32 +7,33 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Learning\Quiz;
 
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Monolog\Logger;
-use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
-use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\Mapper as BaseMapper;
 
-class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceInterface {
+/**
+ * @method Mapper getMapper()
+ */
+class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_CLOSED    = 'closed';
 	const TRIGGER_OPEN      = 'open';
@@ -46,7 +47,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/** @var FolderMapper */
 	protected $categoryMapper;
 
-	/** @var AttemptMapper */
+	/** @var QuizAttemptMapper */
 	protected $attemptMapper;
 
 	/** @var WorkTypeMapper */
@@ -71,7 +72,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->categoryMapper = FolderMapper::getInstance();
-		$this->attemptMapper = AttemptMapper::getInstance();
+		$this->attemptMapper = QuizAttemptMapper::getInstance();
 		$this->workTypeMapper = WorkTypeMapper::getInstance();
 		$dependencies['userAccessMapper'] = isset($dependencies['userAccessMapper'])
 			? $dependencies['userAccessMapper']
@@ -97,13 +98,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 *
 	 * @todo Remove this when mapper findBy methods can specify joins to hydrate
 	 *
-	 * @param  OnlineAssessment $quiz
-	 * @return OnlineAssessment
+	 * @param  Model $quiz
+	 * @return Model
 	 */
-	protected function fullyHydrateQuiz(OnlineAssessment $quiz) {
+	protected function fullyHydrateQuiz(Model $quiz) {
 		// @mattday I've got a surprise for you - it's poop!
-		/** @var OnlineAssessment $quiz */
-		$quiz = $this->mapper->findById($quiz->getId());
+		$quiz = $this->getMapper()->findById($quiz->getId());
 		$quiz
 			->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()))
 			->setCategory($this->categoryMapper->findById($quiz->getCategory()->getId()))
@@ -117,7 +117,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return void
 	 */
 	public function bundleTriggers($bundle) {
-		/** @var OnlineAssessment $quiz */
+		/** @var Model $quiz */
 		$quiz = $bundle->getEvent()->getObject();
 
         // the mere fact that this is required is ludicrous
@@ -125,12 +125,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $quiz = $this->fullyHydrateQuiz($quiz);
         }
 
-		$open = $quiz->getStart()->getUnixTimestamp();
-		$closed = $quiz->getFinish()->getUnixTimestamp();
+		$open = $quiz->getStart()->getUnixTimeStamp();
+		$closed = $quiz->getFinish()->getUnixTimeStamp();
 		$upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
 
 		switch($bundle->getMethod()) {
-			case Mapper::METHOD_CREATE:
+			case BaseMapper::METHOD_CREATE:
 				$bundle->attachEach(array(
 					self::TRIGGER_OPEN     => $open,
 					self::TRIGGER_UPCOMING => $upcoming,
@@ -139,7 +139,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 				));
 				break;
 
-			case Mapper::METHOD_UPDATE:
+			case BaseMapper::METHOD_UPDATE:
 
 				// don't spawn/replace an open-on-replace if it's in the past
 				if($open > time()) {
@@ -155,7 +155,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 				break;
 
-			case Mapper::METHOD_DELETE:
+			case BaseMapper::METHOD_DELETE:
 				$bundle->detachEach(array(
 					self::TRIGGER_OPEN,
 					self::TRIGGER_UPCOMING,
@@ -189,12 +189,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $c;
 		}
 
-		/** @var OnlineAssessment[]|Collection $quizzes */
+		/** @var Model[]|Collection $quizzes */
 		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
-			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll($quiz->getStart()->getUnixTimestamp())));
-			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll($quiz->getFinish()->getUnixTimestamp())));
+			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll($quiz->getStart()->getUnixTimeStamp())));
+			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll($quiz->getFinish()->getUnixTimeStamp())));
 		}
 
 		return $c;
@@ -214,7 +214,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @return User[]|Collection
 	 */
 	public function getStudentsUnattemptedList($quiz) {
@@ -242,7 +242,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/* ASYNC METHODS */
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -276,7 +276,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -321,7 +321,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -357,7 +357,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -403,7 +403,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @return Messenger
 	 * @param array $diff
@@ -440,7 +440,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -491,7 +491,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -504,8 +504,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 		// discard all update notifications if the quiz isn't open *EXCEPT mark visibility changes*
 		if (empty($diff['markVisibility'])) {
-			$openStamp = $quiz->getStart()->getUnixTimestamp();
-			$closeStamp = $quiz->getFinish()->getUnixTimestamp();
+			$openStamp = $quiz->getStart()->getUnixTimeStamp();
+			$closeStamp = $quiz->getFinish()->getUnixTimeStamp();
 			$now = time();
 
 			if($openStamp > $now || $closeStamp < $now) {
@@ -589,10 +589,10 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			list($new, $old) = $diff['markVisibility'];
 			if ($new > $old) {
 				// for anyone who has been marked, raise the assess.marked notification
-				/** @var Collection|Attempt[] $attempts */
+				/** @var Collection|QuizAttempt[] $attempts */
 				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
 				foreach ($attempts as $attempt) {
-					$this->raiseNotification($quiz->getUser(), Mapper::METHOD_UPDATE, $attempt, $this->attemptMapper);
+					$this->raiseNotification($quiz->getUser(), BaseMapper::METHOD_UPDATE, $attempt, $this->attemptMapper);
 				}
 			}
 			unset($diff['markVisibility']);
@@ -620,7 +620,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	}
 
     /**
-     * @param OnlineAssessment $quiz
+     * @param Model $quiz
      * @param User $owner
      * @param array $diff
      * @return Messenger
@@ -636,8 +636,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         $quiz   = $this->fullyHydrateQuiz($quiz);
 
         // discard all update notifications if the submissionbox isn't open
-        $openStamp = $quiz->getStart()->getUnixTimestamp();
-        $closeStamp = $quiz->getFinish()->getUnixTimestamp();
+        $openStamp = $quiz->getStart()->getUnixTimeStamp();
+        $closeStamp = $quiz->getFinish()->getUnixTimeStamp();
         $now = time();
 
         if($openStamp > $now || $closeStamp < $now) {
@@ -742,7 +742,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/**
 	 * Notify the feed of box closures
 	 *
-	 * @param OnlineAssessment $quiz
+	 * @param Model $quiz
 	 * @param User $owner
 	 * @param array $diff
 	 * @return Messenger
@@ -750,7 +750,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyFeedClosed($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		if($quiz->getFinish()->getUnixTimestamp() > time()) {
+		if($quiz->getFinish()->getUnixTimeStamp() > time()) {
 			return $msgr;
 		}
 

@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
 use RangeException;
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use UnexpectedValueException;
 
@@ -18,6 +19,7 @@ use UnexpectedValueException;
  * @package Schoolbox\Assessment\Term
  * @method Model createModel()
  * @method Model findById($identifierValue)
+ * @method Collection|Model[] findAll($options = array())
  */
 class Mapper extends BaseMapper
 {

@@ -16,11 +16,9 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
 use Component_Homepage_CourseBuilderController;
-use Component_Homepage_CourseOutlineController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
@@ -75,9 +73,6 @@ class Controller extends Base\Base
 
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
-
-    /** @var OnlineAssessmentMapper */
-    protected $onlineAssessmentMapper;
 
     /** @var TaskMapper */
     protected $taskMapper;
@@ -192,7 +187,6 @@ class Controller extends Base\Base
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
         $this->setComponentDefinitionMapper(Component_DefinitionMapper::getInstance());
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
@@ -1416,26 +1410,6 @@ class Controller extends Base\Base
     protected function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
-    }
-
-    /**
-     * Get online assessment mapper
-     *
-     * @return OnlineAssessmentMapper
-     */
-    protected function getOnlineAssessmentMapper()
-    {
-        return $this->onlineAssessmentMapper;
-    }
-
-    /**
-     * Set online assessment mapper
-     *
-     * @param OnlineAssessmentMapper $onlineAssessmentMapper
-     */
-    public function setOnlineAssessmentMapper($onlineAssessmentMapper)
-    {
-        $this->onlineAssessmentMapper = $onlineAssessmentMapper;
     }
 
     /**

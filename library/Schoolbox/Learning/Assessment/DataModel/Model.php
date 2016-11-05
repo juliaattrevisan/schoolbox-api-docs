@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Schoolbox\Assessment\Component\OnlineAssessment as Quiz;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;

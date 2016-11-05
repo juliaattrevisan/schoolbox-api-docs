@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Learning\Quiz;
 
 use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
@@ -18,15 +18,22 @@ use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
-class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
+class Model implements ISoftDeletable, IAssessableDataModel
 {
+    use Id;
+
+    // TODO. Update callers to this class to use createdAt() instead of created(), then uncomment next line
+    // use CreatedAtDate;
+
     use HasCurriculumNodes;
     use AssessmentModelTrait;
+
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';
@@ -35,10 +42,6 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
     const MARK_VISIBILITY_STUDENT = 1;
     const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
-    /**
-    * @var int
-    */
-    protected $id;
 
     /**
     * @var Folder
@@ -191,7 +194,7 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
     */
     public function getGradientIndex()
     {
-        $urgency = intval(($this->getFinish()->getUnixTimestamp() - time()) / 86400);
+        $urgency = intval(($this->getFinish()->getUnixTimeStamp() - time()) / 86400);
 
         return max(0, min(10, $urgency));
     }
@@ -387,24 +390,6 @@ class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
         return $this->finish;
     }
 
-    /**
-    * @param  int $id
-    *
-    * @return $this
-    */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-    * @return int
-    */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
     * @param  int $max_attempts

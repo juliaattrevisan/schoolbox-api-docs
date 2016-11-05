@@ -8,8 +8,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 
@@ -25,10 +23,10 @@ class Controller extends AbstractController
     private $errorMapper;
 
     /**
-     * @param OnlineAssessmentMapper $quizMapper
+     * @param Mapper $quizMapper
      * @param ErrorMapper $errorMapper
      */
-    public function __construct(OnlineAssessmentMapper $quizMapper, ErrorMapper $errorMapper)
+    public function __construct(Mapper $quizMapper, ErrorMapper $errorMapper)
     {
         parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
@@ -36,6 +34,8 @@ class Controller extends AbstractController
 
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
+     * GETs the page where a Teacher can review a Student's attempt
      *
      * @api   GET /learning/quiz/review/{assessmentId}/{firstSectionId}/{responseId}
      * @level 165
@@ -46,15 +46,58 @@ class Controller extends AbstractController
      */
     public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
     {
-        /** @var OnlineAssessment $quiz */
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/review/$assessId/$firstSectionId/$responseId");
+    }
+
+    /**
+     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
+     * GETs the page where a Teacher can add Section and Questions to the Quiz
+     *
+     * @api   GET /learning/quiz/summary/{assessmentId}
+     * @level 165
+     * @param int $assessmentId
+     * @todo Rebuild with twig
+     */
+    public function getQuizSummary($assessmentId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/summary/$assessId");
+    }
+
+    /**
+     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
+     * Enables a Student to begin a Quiz
+     *
+     * @api   GET /learning/quiz/intro/{assessmentId}
+     * @level 165
+     * @param int $assessmentId
+     * @todo Rebuild with twig
+     */
+    public function getQuizIntro($assessmentId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/intro/$assessId");
+    }
+
+
+    /**
+     * Converts an assessment_id to an assess_id
+     *
+     * @param int $assessmentId
+     * @return int
+     */
+    private function getQuizIdForAssessmentId($assessmentId)
+    {
+        /** @var Model $quiz */
         $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
 
-        if (OnlineAssessment::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
-        $assessId = $quiz->getId();
-
-        $this->getResponse()->redirect->to("/assess/review/$assessId/$firstSectionId/$responseId");
+        return $quiz->getId();
     }
 
 

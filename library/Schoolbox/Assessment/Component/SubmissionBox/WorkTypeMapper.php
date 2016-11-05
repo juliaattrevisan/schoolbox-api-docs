@@ -10,11 +10,14 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
+/**
+ * @method WorkType findById($identifierValue)
+ */
 class WorkTypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('lu_submission_type');
-		$this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkType');
+		$this->hasModel(WorkType::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

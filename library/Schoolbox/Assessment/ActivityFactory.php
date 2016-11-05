@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment;
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -48,11 +48,11 @@ class ActivityFactory {
 	}
 
 	/**
-	 * @param OnlineAssessment $assess
+	 * @param Quiz $assess
 	 * @param string        $event The event type: "new", "closed" or "upcoming"
 	 * @return null|Activity
 	 */
-	public function buildFromOnlineAssessment(OnlineAssessment $assess, $event) {
+	public function buildFromOnlineAssessment(Quiz $assess, $event) {
 		$date = null;
 		if ($event === 'new') {
 			$date = $assess->getStart();

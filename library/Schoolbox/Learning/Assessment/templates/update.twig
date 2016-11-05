@@ -26,8 +26,15 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id}) }}" id="assessmentForm" method="post">
-            {% block contents %}
-            {% endblock %}
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+                        <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
+                        {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
+                    </div>
+                </fieldset>
+            </section>
         </form>
     </div>
 </div>

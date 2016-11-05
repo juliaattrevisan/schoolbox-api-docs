@@ -710,7 +710,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * The concise, typesafe version of hasMap() + hasJoin()
+     * The concise, type-safe version of hasMap() + hasJoin()
      *
      * @param string      $column
      * @param string      $foreignMapper
@@ -741,7 +741,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * The concise, typesave version of hasMap() + hasJoin(['multi'])
+     * The concise, type-safe version of hasMap() + hasJoin(['multi'])
      *
      * @param string          $viaTable      the manymany jointable
      * @param string          $foreignMapper the target Mapper on the other side (not a jointable Mapper)
@@ -932,7 +932,7 @@ abstract class Mapper implements IMapper, Serializable
      * Overrides delete() method to call softDelete if a soft delete field was
      * set up, or hardDelete() method if it wasn't.
      *
-     * @param $object
+     * @param object|Collection $object
      *
      * @return bool
      */
@@ -948,7 +948,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Soft deletes one or more models.
      *
-     * @param object $object Model or collection of models to delete
+     * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
      */
@@ -977,7 +977,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Truly deletes an item.
      *
-     * @param object $object Model or collection of models to delete
+     * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
      */
@@ -1111,7 +1111,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Restores one or more models that were soft deleted.
      *
-     * @param object $object Model or collection of models to restore
+     * @param object|Collection $object Model or collection of models to restore
      *
      * @return bool
      */
@@ -1914,7 +1914,7 @@ abstract class Mapper implements IMapper, Serializable
         // Trigger all on collection before attempting to run?
         // Must for now, because otherwise transactions would be nested.
         foreach ($collection as $model) {
-            if (!($this->triggerCallbacks('preSave', $model))) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PRESAVE, $model))) {
                 return false;
             }
         }
@@ -2027,7 +2027,7 @@ abstract class Mapper implements IMapper, Serializable
             $previous = null;
             if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
                 $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                $this->triggerCallbacks('postSave', $model, $previous);
+                $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
             }
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }

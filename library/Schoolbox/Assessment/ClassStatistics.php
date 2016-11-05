@@ -9,13 +9,13 @@
 
 namespace Schoolbox\Assessment;
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -47,12 +47,12 @@ class ClassStatistics {
 	protected $returnMapper;
 
 	/**
-	 * @var OnlineAssessmentMapper
+	 * @var QuizMapper
 	 */
 	protected $assessMapper;
 
 	/**
-	 * @var AttemptMapper
+	 * @var QuizAttemptMapper
 	 */
 	protected $attemptMapper;
 
@@ -60,8 +60,7 @@ class ClassStatistics {
 	 * Constructor
 	 *
 	 * @param Folder $category
-	 * @param int $year
-	 * @param int $semester
+	 * @param Term\Model $term
 	 * @param User $user
 	 */
 	public function __construct($category, Term\Model $term, User $user) {
@@ -72,8 +71,8 @@ class ClassStatistics {
 		$this->submissionMapper = Submission\FileMapper::getInstance();
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
-		$this->assessMapper = new OnlineAssessmentMapper();
-		$this->attemptMapper = new AttemptMapper();
+		$this->assessMapper = new QuizMapper();
+		$this->attemptMapper = new QuizAttemptMapper();
 
 		/* Visibility
 		 * Exclude hidden quizzes from the Assessments cube
@@ -123,19 +122,19 @@ class ClassStatistics {
 	/**
 	 * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
 	 *
-	 * @param SubmissionBox|OnlineAssessment $work
+	 * @param SubmissionBox|Quiz $work
 	 * @return bool
 	 */
 	protected function addWork($work) {
-		if($work instanceof OnlineAssessment) {
-			$stamp = $work->getFinish()->getUnixTimestamp();
+		if($work instanceof Quiz) {
+			$stamp = $work->getFinish()->getUnixTimeStamp();
 			$marks = $this->attemptMapper->getAllAttempts($work->getId(), array(
 				'most_recent' => true,
 				'calc_average' => true
 			));
 		}
 		elseif($work instanceof SubmissionBox) {
-			$stamp = $work->getDueDate()->getUnixTimestamp();
+			$stamp = $work->getDueDate()->getUnixTimeStamp();
 			$marks = $this->getDueWorkMarks($work);
 		}
 		else {
@@ -250,7 +249,7 @@ class ClassStatistics {
 			/* Stack results
              */
 			foreach ($allMarks as $userId => $currentMark) {
-				if ($box instanceof OnlineAssessment) {
+				if ($box instanceof Quiz) {
 					if ($userId !== 'avg') {
 						if (count($currentMark)) {
 							$latestAttempt = array_pop($currentMark);

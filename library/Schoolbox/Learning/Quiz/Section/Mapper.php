@@ -1,0 +1,62 @@
+<?php
+/**
+ * @author    Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Quiz\Section;
+
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use \Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+
+/**
+ * Represents a set of Questions in a Quiz
+ */
+class Mapper extends BaseMapper
+{
+    protected function mapping()
+    {
+        $this->hasTable('assess_section');
+        $this->hasModel(QuizSection::class);
+        $this->uses('section_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'quiz', 'quiz');
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('random', self::TYPE_BOOLEAN);
+        $this->uses('pool', self::TYPE_INTEGER);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuestions'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuestions'));
+    }
+
+    /**
+     * Soft deletes all Questions for the specified Section
+     *
+     * @param QuizSection $section
+     */
+    public function softDeleteQuestions(QuizSection $section)
+    {
+        $quizQuestionMapper = QuizQuestionMapper::getInstance();
+        // Force cascade. However this will also updated the 'deleted_at' field for already deleted items.
+        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId(), ['deleted' => true]);
+        $quizQuestionMapper->delete($questions);
+    }
+
+    /**
+     * Restores all soft-deleted Questions for the specified Section
+     *
+     * @param QuizSection $section
+     */
+    public function restoreQuestions(QuizSection $section)
+    {
+        $quizQuestionMapper = QuizQuestionMapper::getInstance();
+        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
+        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId(), ['deleted' => true]);
+        $quizQuestionMapper->restoreSoftDeleted($questions);
+    }
+}

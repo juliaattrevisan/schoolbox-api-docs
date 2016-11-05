@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Learning\Quiz\Model as Quiz;
 /**
  * Assess_Main
  *
@@ -153,18 +155,11 @@ class Assess_Main extends Evaluation_Main {
 		);
 	}
 
-	/**
-	 * Returns whether record exists and availability == 'assess'
-	 *
-	 * @param numeric $assess_id
-	 * @return bool
-	 */
-	public function isValidUrlAccess($assess_id)
-	{
-		$query = "SELECT availability
-                  FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
-
-		return 'assess' == $this->db->getOne($query);
-	}
+    /**
+     * @return string
+     */
+    protected function getAvailabilityType()
+    {
+        return Quiz::AVAILABILITY_ASSESS;
+    }
 }

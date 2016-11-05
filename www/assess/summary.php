@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Breadcrumbs;
+
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Redirect;
 
@@ -31,7 +31,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
-
+$folder = null;
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assess['category_id']);
@@ -43,7 +43,12 @@ catch (\Exception $e) {
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
-$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
+$returnUrl = $_GET[Redirect::RETURN_URL]
+    ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}"
+    : '';
+
+$modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
+$modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessment', $modifyRouteArgs);
 
 $this->setVar(array(
     'RETURN_URL'           => $returnUrl,
@@ -58,7 +63,11 @@ $this->setVar(array(
     'FIRST_SECTION'        => $allSections[0]['section_id'],
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+    'ASSESSMENT_ID'        => $assess['assessment_id'],
+    'MODIFY_URL'           => $modifyUrl,
+    'RETURN_URL_MODIFY'    => $returnUrl ?: '?'.Redirect::RETURN_URL.'='.Redirect::encode('/assess/summary/'.$assess['assess_id']),
 ));
+
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
@@ -66,6 +75,8 @@ $this->setBlock('assessContentsFragment', 'has_section_description', 'has_sectio
 $this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
+$this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $assess['description'] = trim($assess['description']);
@@ -82,6 +93,9 @@ $this->parse('allQuestions_block', 'assessContentsFragment', true);
 $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
+
+$this->parse('delete_quiz_block', 'delete_quiz');
+$this->setVar('delete_survey_block', '');
 
 /* Render out breadcrumbs
  */

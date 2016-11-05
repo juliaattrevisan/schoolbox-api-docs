@@ -10,14 +10,16 @@
 namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -86,7 +88,7 @@ class StudentReportCard
     /**
      * A collection of Folder models belonging to the term set in $this->setTerm().
      *
-     * @var \Schoolbox\Collection|Folder\Model
+     * @var \Schoolbox\Collection|Folder[]
      */
     protected $categoriesInTerm = array();
 
@@ -100,7 +102,7 @@ class StudentReportCard
     protected $showcaseMapper;
     protected $assessMapper;
 
-    /** @var AttemptMapper */
+    /** @var QuizAttemptMapper */
     protected $attemptMapper;
 
     /**
@@ -109,7 +111,7 @@ class StudentReportCard
     protected $termMapper;
 
     /**
-     * @var Folder\Mapper
+     * @var FolderMapper
      */
     protected $folderMapper;
 
@@ -129,12 +131,12 @@ class StudentReportCard
         $this->targetUserId  = $studentUserId;
 
         // dependencies
-        $this->submissionMapper = new SubmissionBoxMapper();
-        $this->showcaseMapper   = new ShowcaseMapper();
-        $this->assessMapper     = new OnlineAssessmentMapper();
-        $this->attemptMapper    = AttemptMapper::getInstance();
+        $this->submissionMapper = SubmissionBoxMapper::getInstance();
+        $this->showcaseMapper   = ShowcaseMapper::getInstance();
+        $this->assessMapper     = QuizMapper::getInstance();
+        $this->attemptMapper    = QuizAttemptMapper::getInstance();
         $this->groupHandler     = new \Group();
-        $this->folderMapper     = new Folder\Mapper();
+        $this->folderMapper     = FolderMapper::getInstance();
         $this->termMapper       = Term\Mapper::getInstance();
         $this->userMapper       = UserMapper::getInstance();
         $this->roleMapper       = RoleMapper::getInstance();
@@ -706,7 +708,7 @@ class StudentReportCard
                         $page->setVar('action_publish_block', '');
                     }
                     $page->parse('work_clickable_block', 'work_clickable', true);
-                } elseif ($object instanceof OnlineAssessment) {
+                } elseif ($object instanceof Quiz) {
 
                     $allNames[] = $object->getTitle();
                     if($marks[0]['mark'] !== '') {
@@ -813,13 +815,13 @@ class StudentReportCard
     }
 
     /**
-     * @param OnlineAssessment $oa
+     * @param Quiz $oa
      * @param                  $marks
      * @param \SitePage        $page  The page unto which to parse blocks
      *
      * @return array
      */
-    protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks, \SitePage $page)
+    protected function outputOnlineAssessRow(Quiz $oa, $marks, \SitePage $page)
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
@@ -1033,10 +1035,10 @@ class StudentReportCard
 
         /**
          * @var $returnMapper  SubmissionBox\ReturnedWorkMapper
-         * @var $attemptMapper OnlineAssessment\AttemptMapper
+         * @var $attemptMapper QuizAttemptMapper
          */
         $returnMapper  = SubmissionBox\ReturnedWorkMapper::getInstance();
-        $attemptMapper = OnlineAssessment\AttemptMapper::getInstance();
+        $attemptMapper = QuizAttemptMapper::getInstance();
         $returnHandler = new \SubmissionReturn();
         $groupHandler  = new \Group();
         $synClass      = new \External_Class;
@@ -1261,7 +1263,7 @@ class StudentReportCard
         $this->categoriesInTerm->mergeUnique($attemptedSubjects, 'id');
 
         // Ensure folder codes are populated
-        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
+        FolderCodeMapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
     }
 
     /**

@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+
 class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 {
     /**
@@ -159,7 +162,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             if ($item['kind'] == 0) {
                 $mapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
             } else {
-                $mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+                $mapper = QuizMapper::getInstance();
             }
 
             // how many days left, 0 <= x <= 10
@@ -199,7 +202,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 $attempt = $attemptHandler->getLatestForUser($item['id'], $this->userID);
                 $attemptStartTime = strtotime($attempt['start']);
 
-                $assessMapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+                $assessMapper = QuizMapper::getInstance();
                 $assess = $assessMapper->findById($item['id']);
                 $attemptTimeRemaining = $attemptStartTime + $assess->getDuration() - time();
 

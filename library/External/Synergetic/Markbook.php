@@ -9,9 +9,12 @@ use \Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\UserMapper;
-use Alaress\DebugBar\Instance as DebugBar;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
 {
@@ -86,12 +89,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function createAssessment(Activity $assessment)
     {
         /** Fix the hydrations */
-        if($assessment->getCategory() instanceof Schoolbox\Resource\Folder\Model) {
-            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory()->getId());
-        }
-        else {
-            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory());
-        }
+        $folder = $assessment->getCategory();
+        /** @var int $folderId */
+        $folderId = $folder instanceof Folder ? $folder->getId() : $folder;
+        $folder = FolderMapper::getInstance()->findById($folderId);
 
         $externalClass = new External_Synergetic_Class();
         if($assessment->getOwner() instanceof Schoolbox\User) {
@@ -215,7 +216,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $weight = 0;
         if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
             $weight = $assessment->getSubmissionBox()->getWeight();
-        } elseif($assessment->getAssessment() instanceof Schoolbox\Assessment\Component\OnlineAssessment) {
+        } elseif($assessment->getAssessment() instanceof Quiz) {
             $weight = $assessment->getAssessment()->getWeight();
         }
         return [
@@ -229,7 +230,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param Attempt|ReturnedWork $result
+     * @param QuizAttempt|ReturnedWork $result
      * @return bool
      * @throws Exception
      */
@@ -255,9 +256,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             $comment = $result->getComment();
             $dueDate = $box->getDueDate();
-        } elseif ($result instanceof Attempt) {
+        } elseif ($result instanceof QuizAttempt) {
             /* Handle quiz attempt */
-            $quiz = \Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId());
+            $quiz = QuizMapper::getInstance()->findById($result->getAssessment()->getId());
             $activity->setAssessment($quiz);
             $activity->setCategory($quiz->getCategory());
             $student = UserMapper::getInstance()->findById($result->getUser()->getId());

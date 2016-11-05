@@ -3,8 +3,8 @@
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 $page = new SitePage;
 
@@ -16,8 +16,8 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
     $action = '';
     $output = array();
     if ($_REQUEST['is_assess']) {
-        $attempt_mapper    = new AttemptMapper();
-        $assessment_mapper = new OnlineAssessmentMapper();
+        $attempt_mapper    = new QuizAttemptMapper();
+        $assessment_mapper = new QuizMapper();
         try {
             $assessment        = $assessment_mapper->findById($_REQUEST['id']);
 
@@ -25,7 +25,7 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
             // Has this student submitted for this assessment yet?
             // Adjust the message accordingly.
             $action = 'View Results';
-            if ($_SERVER['REQUEST_TIME'] <= $assessment->getFinish()->getUnixTimestamp()) {
+            if ($_SERVER['REQUEST_TIME'] <= $assessment->getFinish()->getUnixTimeStamp()) {
                 $max_attempts = $assessment->getMaxAttempts();
                 $attempts     = $attempt_mapper->getAttemptCountForStudent($assessment->getId(), $_REQUEST['uid']);
                 if ($max_attempts <= 0 || $attempts < $max_attempts) {

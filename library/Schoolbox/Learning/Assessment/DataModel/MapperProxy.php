@@ -7,8 +7,8 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Schoolbox\Assessment\Component\OnlineAssessment as Quiz;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
@@ -231,6 +232,8 @@ class MapperProxy
             }
 
         } elseif ($subObject instanceof Quiz) {
+            // Legacy Quiz SitePage Controllers require that we preserve this field
+            $subObject->setCategory($dataModel->getContextFolder());
             QuizMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Project) {

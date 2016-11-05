@@ -9,9 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -343,7 +341,7 @@ class Factory
             $folder->getId(),
             $student->getId()
         ) ?: array();
-        $quizGrades = AttemptMapper::getInstance()->getStudentMarks(
+        $quizGrades = QuizAttemptMapper::getInstance()->getStudentMarks(
             $folder->getId(),
             $student->getId()
         ) ?: array();
@@ -444,8 +442,8 @@ class Factory
             }
         }
         // No quizzes anymore
-//        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-//            /** @var OnlineAssessment $quiz */
+//        foreach (QuizMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
+//            /** @var Quiz $quiz */
 //            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
 //        }
 

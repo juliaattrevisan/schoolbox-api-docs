@@ -7,15 +7,14 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Component\OnlineAssessment;
-
+namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
-use Schoolbox\Mapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -27,18 +26,18 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class AttemptNotifier extends AbstractModuleNotifier {
+class Notifier extends AbstractModuleNotifier {
 
 	const TRIGGER_ATTEMPTED = 'attempted';
 	const TRIGGER_MARKED    = 'marked';
 
     const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
 
-	/** @var OnlineAssessmentMapper */
+	/** @var QuizMapper */
 	protected $assessMapper;
 
     /** @var FolderMapper */
-    protected $categoryMapper;
+    protected $folderMapper;
 
     /** @var UserAccessMapper */
     protected $userAccessMapper;
@@ -51,7 +50,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		if(empty($dependencies['assessMapper'])) {
-			$dependencies['assessMapper'] = OnlineAssessmentMapper::getInstance();
+			$dependencies['assessMapper'] = QuizMapper::getInstance();
 		}
         if (empty($dependencies['categoryMapper'])) {
             $dependencies['categoryMapper'] = FolderMapper::getInstance();
@@ -67,27 +66,29 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Mapper $mapper
+	 * @param QuizMapper $mapper
+     * @return static
 	 */
-	protected function setAssessMapper($mapper) {
+	protected function setQuizMapper($mapper) {
 		$this->assessMapper = $mapper;
+        return $this;
 	}
 
 
     /**
-     * @param FolderMapper $categoryMapper
-     * @return self
+     * @param FolderMapper $folderMapper
+     * @return static
      */
-    protected function setCategoryMapper($categoryMapper)
+    protected function setFolderMapper(FolderMapper $folderMapper)
     {
-        $this->categoryMapper = $categoryMapper;
+        $this->folderMapper = $folderMapper;
         return $this;
     }
 
 
     /**
      * @param UserAccessMapper $userAccessMapper
-     * @return self
+     * @return static
      */
     protected function setUserAccessMapper($userAccessMapper)
     {
@@ -98,7 +99,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
     /**
      * @param UserMapper $userMapper
-     * @return self
+     * @return static
      */
     protected function setUserMapper($userMapper)
     {
@@ -120,7 +121,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
      * @return void
      */
     public function bundleTriggers($bundle) {
-        if ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+        if ($bundle->getMethod() == BaseMapper::METHOD_UPDATE) {
 			$diff = $bundle->getEvent()->getDiff();
             if (isset($diff['finish'])) {
                 $bundle->attach(self::TRIGGER_ATTEMPTED, self::IMMEDIATELY);
@@ -135,7 +136,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	/* ASYNC */
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User $student
 	 * @return Envelope
 	 */
@@ -144,9 +145,9 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$href = "/assess/results/".$attempt->getAssessment()->getId();
 
@@ -171,7 +172,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User    $teacher
 	 * @param array   $diff
 	 * @return Envelope
@@ -181,7 +182,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
@@ -191,7 +192,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'student'));
         }
 
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
 
@@ -216,7 +217,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * @param Attempt $attempt
+	 * @param Model $attempt
 	 * @param User    $teacher
 	 * @param array   $diff
 	 * @return Envelope
@@ -225,7 +226,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 
 		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
+		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
@@ -235,7 +236,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'parent'));
         }
 
-        $category = $this->categoryMapper->findById($assess->getCategory()->getId());
+        $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
         $student   = $this->userMapper->findById($studentId);
