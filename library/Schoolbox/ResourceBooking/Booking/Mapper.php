@@ -235,6 +235,9 @@ class Mapper extends BaseMapper
         if (!empty($extra['resource_id'])) {
             $params = array_merge($params, $this->getArrayParameters($extra['resource_id'], 'resource'));
         }
+        if (!empty($extra['category_id'])) {
+            $params = array_merge($params, $this->getArrayParameters($extra['category_id'], 'category'));
+        }
         if (!empty($extra['owner_id'])) {
             $params = array_merge($params, $this->getArrayParameters($extra['owner_id'], 'owner'));
         }
@@ -266,6 +269,10 @@ class Mapper extends BaseMapper
         if (!empty($extra['resource_id'])) {
             $query .= ' AND b.resource_id IN '
                     . $this->getArrayPlaceholders($extra['resource_id'], 'resource');
+        }
+        if (!empty($extra['category_id'])) {
+            $query .= ' AND ic.id IN '
+                    . $this->getArrayPlaceholders($extra['category_id'], 'category');
         }
         if (!empty($extra['owner_id'])) {
             $query .= ' AND eo.id IN '
@@ -324,6 +331,29 @@ class Mapper extends BaseMapper
             array('owner_id' => array($ownerId))
         );
     }
+
+    /**
+     * Retrieves all bookings for the given category.
+     *
+     * @param int   $categoryId
+     * @param int   $fromTimestamp
+     * @param int   $toTimestamp
+     * @param array $statusIds     Status IDs of events to fetch. By default,
+     *                             gets Status\Model::STATUS_PENDING and
+     *                             Status\Model::STATUS_APPROVED only.
+     *
+     * @return Collection|Model[]
+     */
+    public function findForCategory($categoryId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    {
+        return $this->findForTimespan(
+            $fromTimestamp,
+            $toTimestamp,
+            $statusIds,
+            array('category_id' => array($categoryId))
+        );
+    }
+
 
     /**
      * Retrieves all bookings for the given resource.

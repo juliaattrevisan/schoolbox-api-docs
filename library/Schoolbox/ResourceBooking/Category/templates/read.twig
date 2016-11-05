@@ -5,6 +5,8 @@
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript">
     // Do stuff here
     $(function() {
@@ -43,7 +45,7 @@
                 ajax: false,
                 // This AJAX lookup should always be a GET request
                 parentSelector: '#calendar-controls',
-                exportButtonSelector: false,
+                exportButtonSelector: true,
                 checkboxSelector: false,
                 applyFiltersSelector: false,
                 listViewButton: false
@@ -262,6 +264,33 @@
         )
 
         $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
+
+        /* Export calendar
+         */
+        $.fn.clipboardSelector({
+            exportActivator: '#fc-button-export',
+            onReady: function() {
+                var form = $('#calendar-export-form');
+                var url = $.fn.getExportCalendarLink('{{token}}', form.serializeArray())+'&resource_category_id={{item.id}}';
+
+                var dialog = $('#calendar-export-dialog');
+                var dialogUrl = $('#calendar-export-dialog-url');
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialogUrl.text(url);
+                dialog.foundation('reveal', 'open');
+
+                dialog.on('opened.fndtn.reveal', function() {
+                    dialogUrl.select();
+                });
+            },
+            onZeroClipboardReady: function() {
+                $('#copy-button').show();
+            }
+        });
+
     });
 </script>
 
@@ -385,5 +414,13 @@
         <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
         <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
     </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+{# Dialog for calendar export #}
+<div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
+    <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
+    <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
+    <div id="calendar-export-dialog-url" class="alert-box"></div>
+    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

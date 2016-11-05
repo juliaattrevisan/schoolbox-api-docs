@@ -116,6 +116,7 @@ class Controller extends Base {
                         'date' => $calendarDate->getDatabaseDate(),
                         'view' => $this->request->query->get('view', 'week'),
                     ),
+                    'token' => $_SESSION['key']
                 ),
             )
         );
