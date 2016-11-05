@@ -580,12 +580,6 @@ class Controller extends Base
             $assessmentFactory = new Factory($this->getUser(), $this->getRequest()->post);
             $assessment = $assessmentFactory->produce($assessment);
 
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                throw new ControllerException('Could not create assessment', ['double-check the date fields you provided']);
-            }
-
             /* Save the $asseessment
              * Try to figure out what the redirect destination should be
              * Throw an error if some kind of context configuration is wrong
