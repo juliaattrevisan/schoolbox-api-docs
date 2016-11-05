@@ -19,3 +19,7 @@ ALTER TABLE `task_completion`
 
 /* drop harvested table */
 DROP TABLE `task_instance`;
+
+/* Remove tasks that are quiz or due work */
+DELETE FROM task where assess_id is not null OR box_id is not null
+
