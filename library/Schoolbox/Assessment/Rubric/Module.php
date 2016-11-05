@@ -35,7 +35,7 @@ class Module extends BaseModule
     {
         $this->addPostRoute($router, 'create', $basePath, "");
         $this->addPostRoute($router, 'download', $basePath, "/csv");
-        $this->addPostRoute($router, 'import', $basePath, "/csv/{storageTuple}");
+        $this->addPostRoute($router, 'import', $basePath, "/import/{storageTuple}");
 
         $this->addGetRoute($router, 'testGeneric', $basePath, "/test");
         $this->addGetRoute($router, 'testEmpty',   $basePath, "/test/empty");

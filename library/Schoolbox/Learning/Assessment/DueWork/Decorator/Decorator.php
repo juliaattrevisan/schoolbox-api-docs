@@ -18,6 +18,8 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\WorkType;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use \Schoolbox\Assessment\Rubric\Factory as RubricFactory;
+use \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric as DueWorkRubric;
 
 class Decorator implements DecoratorInterface
 {
@@ -88,13 +90,13 @@ class Decorator implements DecoratorInterface
         $assessment->setUseRubric($this->getUsesRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
 
+        /** @var DueWorkRubric $rubric */
+        $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), false);
+        $assessment->setRubric($rubric);
 
         if($this->getUsesRubric()){
-            $rubric = new \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric();
-            $rubric    = (new \Schoolbox\Assessment\Rubric\Factory($rubric))->buildFromPostData($this->getRubricData(), false);
             $markMax = $rubric->getTotal();
             $assessment->setMaxMark($markMax);
-            $assessment->setRubric($rubric);
         }
 
         /* If there were attachments, accumulate them

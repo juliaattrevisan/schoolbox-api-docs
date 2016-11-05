@@ -224,7 +224,9 @@ class MapperProxy
             // Save the Rubric
             /** @var DueWorkModel $dueWork */
             $dueWork = $assessable;
+
             if($dueWork->getRubric()){
+                $dueWork->getRubric()->setSubmissionBox($subObject);
                 DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
             }
 
