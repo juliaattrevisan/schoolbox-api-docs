@@ -63,7 +63,7 @@
 </script>
 
 <div class="row">
-    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Assessment{% endif %}</h1></div>
+    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1></div>
 </div>
 
 {% if assessmentType|length %}
@@ -81,7 +81,7 @@
                     {#<input type="hidden" name="contextType" value="{{ contextType }}" />#}
                     {#<input type="hidden" name="contextId" value="{{ context.id }}" />#}
 
-                    <legend>Choose Assessment Type</legend>
+                    <legend>Choose activity type</legend>
 
                     <fieldset class="radiolist">
                         <div class="column small-12">
