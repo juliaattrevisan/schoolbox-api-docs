@@ -81,7 +81,7 @@
                                             <img src="/portrait.php?userId={{ topVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
                                             <p>{{ topVisitor.user.fullName }}</p>
                                         </a>
-                                        <span class="meta tally">{{ topVisitor.hitcount }}</span>
+                                        <span class="neutral label tally" title="Visit count">{{ topVisitor.hitcount }}</span>
                                         <p class="meta">{{ topVisitor.user.role.name }}</p>
                                     </div>
 
@@ -126,7 +126,7 @@
                                             <p>{{ topFile.info.title }}</p>
                                         </a>
 
-                                        <span class="meta tally">{{ topFile.accessCount }}</span>
+                                        <span class="neutral label tally" title="File access count">{{ topFile.accessCount }}</span>
                                         <p class="meta">{{ topFile.info.createdAt.long }}</p>
                                     </div>
 
@@ -250,10 +250,11 @@
                                 <li class="row">
                                     <div class="avatar card small-12">
                                         <a href="/redir.php?id={{ topLink.info.id }}" title="{{ topLink.info.url }}">
-                                            <img src="/images/icons/60x60/link.png" alt="{{ topLink.info.url }}" class="content" />
-                                            <p>{{ topLink.info.url }}</p>
+                                            <div class="icon-link icon-32"></div>
+                                            <p>{{ topLink.info.description }}</p>
                                         </a>
-                                        <span class="meta tally">{{ topLink.accessCount }}</span>
+                                        <span class="neutral label tally" title="Link access count">{{ topLink.accessCount }}</span>
+                                        <p class="meta">{{ topLink.info.url }}</p>
                                     </div>
                                     <div class="progress">
                                         <span class="meter" title="{{ topLink.accessCount }} hits" style="width: {{ (topLink.accessCount / topLinkInfo.accessCount) * 100 }}%"></span>

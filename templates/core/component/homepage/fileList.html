@@ -36,7 +36,7 @@
                                 <div class="{FILE_COMPACT} card small-12">
                                     <!-- BEGIN file_url -->
                                     <a data-plugin="preview" href="{FILE_URL}" rel="external">
-                                        <img class="mime" src="/images/mime/{FILE_MIME_IMAGE}" height="64" width="64"/>
+                                        <img class="mime" src="/images/mime/{FILE_MIME_IMAGE}" height="64" width="64" title="{FILE_MIME_TYPE}"/>
                                         <h3>{FILE_DESCRIPTION}</h3>
                                     </a>
                                     <!-- END file_url -->
@@ -50,6 +50,7 @@
                                         <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
                                         {FILE_POSTED_RELATIVE}
                                     </p>
+                                    <p class="{COMPONENT_COMPACTMODE_HIDE}">{FILE_COMMENT}</p>
                                 </div>
                             </div>
                             <nav>
@@ -57,9 +58,6 @@
                                 <a class="icon-modify" href="/cms/file/{FILE_ID}" title="Modify File"></a>
                                 <!-- END modify_file -->
                             </nav>
-                            <article class="{COMPONENT_COMPACTMODE_HIDE}">
-                                <p>{FILE_COMMENT}</p>
-                            </article>
                         </li>
                         <!-- END files -->
                     </ul>

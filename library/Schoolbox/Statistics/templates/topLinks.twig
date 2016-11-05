@@ -4,7 +4,7 @@
             info: false,
             paging: false,
             searching: false,
-            order: [[ 1, "desc" ]]
+            order: [[ 2, "desc" ]]
         });
     });
 </script>
@@ -35,6 +35,7 @@
         <table data-sortable>
             <thead>
                 <tr>
+                    <th>Title</th>
                     <th>Link</th>
                     <th>Clicks</th>
                 </tr>
@@ -42,6 +43,7 @@
             <tbody>
                 {% for topLink in topLinks %}
                     <tr>
+                        <td>{{ topLink.info.description }}</td>
                         <td>{{ topLink.info.url }}</td>
                         <td>{{ topLink.accessCount }}</td>
                     </tr>
