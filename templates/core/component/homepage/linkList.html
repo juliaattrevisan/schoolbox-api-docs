@@ -22,11 +22,12 @@
                             <div class="card small-12">
                                 <h3><a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h3>
 
-                                <p class="meta">
+                                <p class="meta {COMPONENT_COMPACTMODE_HIDE}" >
                                     Posted by
                                     <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
                                     on {LINK_POSTED_DATE}
                                 </p>
+                                <p class="{COMPONENT_COMPACTMODE_HIDE}">{LINK_COMMENT}</p>
                             </div>
                         </div>
                         <nav>
@@ -34,9 +35,6 @@
                             <a class="icon-modify" href="/cms/link/{LINK_ID}" title="Edit link"></a>
                             <!-- END modify_link -->
                         </nav>
-                        <article class="{COMPONENT_COMPACTMODE_HIDE}">
-                            {LINK_COMMENT}
-                        </article>
                     </li>
                     <!-- END link -->
                 </ul>

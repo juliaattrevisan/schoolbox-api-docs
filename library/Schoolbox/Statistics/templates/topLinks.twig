@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false,
+            order: [[ 2, "desc" ]]
+        });
+    });
+</script>
+
+{# Breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Statistics', '/statistics/homepage/' ~ folder.id ],
+    [ 'Top Links' ]
+) }}
+
+{# Page Title & Actions  #}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Top Links</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" data-reveal-id="statistics-date-range" class="icon-calendar" title="Change Date Range"></a>
+    </nav>
+</div>
+
+{# Top Links #}
+<div class="row">
+    <div class="small-12 island">
+        <table data-sortable>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Link</th>
+                    <th>Clicks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topLink in topLinks %}
+                    <tr>
+                        <td>{{ topLink.info.description }}</td>
+                        <td>{{ topLink.info.url }}</td>
+                        <td>{{ topLink.accessCount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+{# Filter Modal #}
+{% include '@statistics/fragment/filterModal.twig' %}

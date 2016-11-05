@@ -139,6 +139,7 @@ class Module extends BaseModule
         );
     }
 
+
     /* Getters / Setters
      */
 

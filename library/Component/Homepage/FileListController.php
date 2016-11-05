@@ -135,17 +135,12 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                         continue;
                     }
-                    // exclude files associated with due work
-                    // (I strongly doubt resource files are assocd with
-                    //  due work anymore, and if they are they shouldn't be)
-//                if ($file['type'] || $file['typeName']) {
-//                    continue;
-//                }
 
                     $output = array(
                         'FILE_DESCRIPTION' => Scrub::text($file->getTitle()),
                         'FILE_ID' => $file->getId(),
                         'FILE_MIME_IMAGE' => $file->getStorage()->getMimetype()->getIconFile(),
+                        'FILE_MIME_TYPE'  => $file->getStorage()->getMimetype()->getDescription(),
                         'FILE_POSTED_BY' => $file->getOwner()->formatName(),
                         'FILE_POSTED_BY_ID' => $file->getOwner()->getId(),
                         'FILE_POSTED_DATE' => $file->getCreatedAt()->getShort(),

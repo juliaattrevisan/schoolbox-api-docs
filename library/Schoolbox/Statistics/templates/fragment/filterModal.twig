@@ -1,0 +1,46 @@
+<div id="statistics-date-range" class="reveal-modal" data-reveal>
+    <div class="row">
+        <form action="{{ routeLookup('statistics.getFilter', {folderId: folder.id}) }}" method="GET">
+            <input type="hidden" name="folderId" value="{{ folder.id }}">
+            <input type="hidden" name="pageRoute" value="{{ pageRoute }}">
+            <section>
+                <fieldset class="content">
+                    <legend>Select Date Range</legend>
+                    <div class="small-12 medium-4 columns">
+                        <label for="startDate">
+                            From
+                            <select id="startDate" name="startDate">
+                                {% for dateValue, dateLabel in filterDateOptions %}
+                                    <option value="{{ dateValue }}" {{ dateValue == startDate ? 'selected="selected"' : '' }}>{{ dateLabel }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label for="endDate">
+                            To
+                            <select id="endDate" name="endDate">
+                                {% for dateValue, dateLabel in filterDateOptions %}
+                                    <option value="{{ dateValue }}" {{ dateValue == endDate ? 'selected="selected"' : '' }}>{{ dateLabel }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label for="roleFilter">
+                            Role
+                            <select id="roleFilter" name="roleFilter">
+                                <option value="">All</option>
+                                {% for role in roles %}
+                                    <option value="{{ role }}" {{ role == roleFilter ? 'selected="selected"' : '' }}>{{ role|capitalize }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" class='expand' value="Update" />
+        </form>
+        <a class="close-reveal-modal" aria-label="Close">×</a>
+    </div>
+</div>
