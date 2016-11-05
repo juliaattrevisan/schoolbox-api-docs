@@ -271,7 +271,7 @@
             exportActivator: '#fc-button-export',
             onReady: function() {
                 var form = $('#calendar-export-form');
-                var url = $.fn.getExportCalendarLink('{{token}}', form.serializeArray())+'&category={{item.id}}';
+                var url = $.fn.getExportCalendarLink('{{token}}', form.serializeArray())+'&resource_category_id={{item.id}}';
 
                 var dialog = $('#calendar-export-dialog');
                 var dialogUrl = $('#calendar-export-dialog-url');

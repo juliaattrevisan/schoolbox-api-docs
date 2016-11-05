@@ -23,13 +23,13 @@ try {
     $export_type = $_GET['export'];
     $api = null;
     $filename = 'calendar';
-    $item = $_GET['item'];
-    $category = $_GET['category'];
-    if($item > 0) {
-        $export_type = 'item';
+    $resourceId = $_GET['resource_id'];
+    $resourceCategoryId = $_GET['resource_category_id'];
+    if($resourceId > 0) {
+        $export_type = 'resource';
     }
-    if($category >0){
-        $export_type = 'category';
+    if($resourceCategoryId >0){
+        $export_type = 'resource_category';
     }
     if (empty($token)) {
         throw new SchoolboxException('No token provided', 401);
@@ -112,16 +112,16 @@ try {
             $filename = 'resources';
             break;
 
-        case 'item':
+        case 'resource':
             $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($user, array());
-            $api->setResourceId($item);
-            $filename =  sprintf('item%d', $item);
+            $api->setResourceId($resourceId);
+            $filename =  sprintf('resource%d', $resourceId);
             break;
 
-        case 'category':
+        case 'resource_category':
             $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, array());
-            $api->setCategoryId($category);
-            $filename =  sprintf('category%d', $category);
+            $api->setCategoryId($resourceCategoryId);
+            $filename =  sprintf('resourceCategory%d', $resourceCategoryId);
             break;
 
         case 'all':
