@@ -31,4 +31,18 @@ interface IResponseDataSource
      * @return Collection|IResponse[]
      */
     public function findForAssessment(IAssessable $assessment);
+
+    /**
+     * Saves a response.
+     *
+     * @param IResponse $response
+     */
+    public function save(IResponse $response);
+
+    /**
+     * Soft-deletes a response.
+     *
+     * @param IResponse $response
+     */
+    public function delete(IResponse $response);
 }
