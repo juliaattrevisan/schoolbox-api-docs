@@ -13,10 +13,10 @@ function error($ec, $message="", $code = 400) {
     /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
     global $kernel;
     global $page;
-    if ($page instanceof SitePage) {
+    if (isset($page) && $page instanceof SitePage) {
         $page->setDi($kernel->getDependencyInjector());
         $page->error($ec, $message, $code);
-    } elseif ($this instanceof SitePage) {
+    } elseif (isset($this) && $this instanceof SitePage) {
         $this->setDi($kernel->getDependencyInjector());
         $this->error($ec, $message, $code);
     } else {
