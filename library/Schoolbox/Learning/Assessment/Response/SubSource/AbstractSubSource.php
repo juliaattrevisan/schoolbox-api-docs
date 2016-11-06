@@ -48,4 +48,14 @@ abstract class AbstractSubSource implements IResponseDataSource
         }
         return new Collection();
     }
+
+    public function save(IResponse $response)
+    {
+        // TODO: Implement save() method.
+    }
+
+    public function delete(IResponse $response)
+    {
+        // TODO: Implement delete() method.
+    }
 }

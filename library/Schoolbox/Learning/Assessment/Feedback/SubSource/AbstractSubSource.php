@@ -48,4 +48,14 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         }
         return new Collection();
     }
+
+    public function save(IFeedback $feedback)
+    {
+        // TODO: Implement save() method.
+    }
+
+    public function delete(IFeedback $feedback)
+    {
+        // TODO: Implement delete() method.
+    }
 }
