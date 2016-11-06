@@ -52,7 +52,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $updateTaskQuery    = $db->prepare("UPDATE task SET assessment_id = :assessmentId WHERE id = :taskId");
     $updateDueWorkQuery = $db->prepare("UPDATE submission_box SET assessment_id = :assessmentId WHERE id = :boxId");
     $updateQuizQuery    = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
-    $deleteTaskQuery    = $db->prepare("UPDATE task SET deleted_at = NOW() WHERE id = :taskId");
+    $deleteTaskQuery    = $db->prepare("DELETE FROM task WHERE id = :taskId");
 
     // Select queries
     $selectTaskQuery = $db->prepare("
