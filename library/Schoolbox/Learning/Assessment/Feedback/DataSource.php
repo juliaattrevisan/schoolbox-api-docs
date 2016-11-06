@@ -62,4 +62,30 @@ class DataSource implements IFeedbackDataSource
         }
         return $assessments;
     }
+
+    /**
+     * @param IFeedback $feedback
+     */
+    public function save(IFeedback $feedback)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($feedback->getAssessable())) {
+                $subSource->save($feedback);
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param IFeedback $feedback
+     */
+    public function delete(IFeedback $feedback)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($feedback->getAssessable())) {
+                $subSource->delete($feedback);
+                return;
+            }
+        }
+    }
 }
