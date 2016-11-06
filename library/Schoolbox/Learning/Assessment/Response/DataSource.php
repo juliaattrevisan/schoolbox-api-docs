@@ -62,4 +62,30 @@ class DataSource implements IResponseDataSource
         }
         return $assessments;
     }
+
+    /**
+     * @param IResponse $response
+     */
+    public function save(IResponse $response)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($response->getAssessable())) {
+                $subSource->save($response);
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param IResponse $response
+     */
+    public function delete(IResponse $response)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($response->getAssessable())) {
+                $subSource->delete($response);
+                return;
+            }
+        }
+    }
 }
