@@ -81,23 +81,12 @@ class StudentCarousel
         foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
             $latestSubmission = $currentParticipant->findMostRecentResponse();
 
-            if ($this->getResponse()) {
-
-                /* Viewing a particular response for a particular student
-                 */
-                $urlValue = $this->getRouter()->generate('learningResponse.getParticularResponse', [
-                    'responseId' => $this->getResponse()->getId()
-                ]);
-            }
-            else {
-
-                /* Viewing a ResponseList for a particular student
-                 */
-                $urlValue = $this->getRouter()->generate('learningResponse.getResponseList', [
-                    'assessmentId' => $this->getAssessment()->getId(),
-                    'studentId'    => $currentParticipant->getUser()->getId()
-                ]);
-            }
+            /* Viewing a ResponseList for a particular student
+             */
+            $urlValue = $this->getRouter()->generate('learningResponse.getResponseList', [
+                'assessmentId' => $this->getAssessment()->getId(),
+                'studentId'    => $currentParticipant->getUser()->getId()
+            ]);
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
@@ -127,23 +116,12 @@ class StudentCarousel
      */
     private function getCurrentPerson()
     {
-        if ($this->getResponse()) {
-
-            /* Viewing a particular response for a particular student
-             */
-            return $this->getRouter()->generate('learningResponse.getParticularResponse', [
-                'responseId' => $this->getResponse()->getId()
-            ]);
-        }
-        else {
-
-            /* Viewing a ResponseList for a particular student
-             */
-            return $this->getRouter()->generate('learningResponse.getResponseList', [
-                'assessmentId' => $this->getAssessment()->getId(),
-                'studentId'    => $this->getStudent()->getId(),
-            ]);
-        }
+        /* Viewing a ResponseList for a particular student
+         */
+        return $this->getRouter()->generate('learningResponse.getResponseList', [
+            'assessmentId' => $this->getAssessment()->getId(),
+            'studentId'    => $this->getStudent()->getId(),
+        ]);
     }
 
     /* Getters/Setters

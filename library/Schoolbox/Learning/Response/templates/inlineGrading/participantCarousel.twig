@@ -79,21 +79,20 @@
             });
 
             var val = ize.getOption(ize.getValue());
-
             var nextUrl = ize.getAdjacentOption(val, 1);
             var prevUrl = ize.getAdjacentOption(val, -1);
 
             refreshNav(navNext, nextUrl);
             refreshNav(navPrev, prevUrl);
 
-//            // Form redirect points to next option, or home if no option selected
-//            if (nextUrl.length > 0) {
-//                nextUrl = nextUrl.data('value');
-//            } else {
-//                nextUrl = '/submission/viewSubmission/' + String(boxId);
-//            }
-//
-//            returnWorkForm.find('input[name="redirect"]').val(nextUrl)
+            {#// Form redirect points to next option, or home if no option selected#}
+            {#if (nextUrl.length > 0) {#}
+                {#nextUrl = nextUrl.data('value');#}
+            {#} else {#}
+                {#nextUrl = '/submission/viewSubmission/' + String(boxId);#}
+            {#}#}
+
+            {#returnWorkForm.find('input[name="redirect"]').val(nextUrl)#}
 
         }).trigger('change');
     });
