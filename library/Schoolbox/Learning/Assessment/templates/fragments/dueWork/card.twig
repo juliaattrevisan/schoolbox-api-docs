@@ -9,8 +9,8 @@
             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: student.id})}}">
                 <h3>{{ assessable.title }}</h3>
             </a>
-            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                Due <span class="{{ urgency.datetime(assessable, student) }}">{{ assessable.getDueAt.getRelativeTime }}</span>
+            <p class="meta" title="{{ assessable.dueAt.short }}">
+                Due <span class="{{ urgency.datetime(assessable, student) }}">{{ assessable.dueAt.relativeTime }}</span>
             </p>
         </div>
     </div>
