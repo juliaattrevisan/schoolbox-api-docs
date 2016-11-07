@@ -105,7 +105,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
             $taskCompletion = (new TaskCompletion())
                 ->setId($completion->getId())
-                ->setSubmittedBy($completion->getStudent())
+                ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
