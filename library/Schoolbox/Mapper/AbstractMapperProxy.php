@@ -39,6 +39,24 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * Proxy for $this->mapper->findById().
+     *
+     * @param int $id
+     * @return object
+     * @throws Mapper\Exception\Deleted if it was deleted
+     */
+    public function findById($id)
+    {
+        try {
+            $object = $this->transformModel($this->getMapper()->findById($id));
+        } catch (Mapper\Exception\Deleted $e) {
+            $e->setDeletedObject($this->transformModel($e->getDeletedObject()));
+            throw $e;
+        }
+        return $object;
+    }
+
+    /**
      * Gets a typed Collection of objects that match the specified column values
      *
      * @param array $columnList
@@ -167,6 +185,17 @@ abstract class AbstractMapperProxy
      * @return GenericCollection
      */
     protected abstract function transformModels(Collection $mapperModels);
+
+    /**
+     * Converts a single data model object into a domain model.
+     *
+     * @param object $model
+     * @return object
+     */
+    protected function transformModel($model)
+    {
+        return $this->transformModels(new Collection([$model]))->first();
+    }
 
     /**
      * Transforms domain model objects into data model objects.
