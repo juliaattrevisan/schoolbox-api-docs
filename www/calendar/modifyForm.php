@@ -101,6 +101,7 @@ switch ($_REQUEST['action']) {
 //                error(2);
 //            }
 //        }
+
         /* NO RETREAT
          * NO SURRENDER
          */
@@ -110,7 +111,8 @@ switch ($_REQUEST['action']) {
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
         }
-        /* Spawned further up
+
+        /* spawned further up
          */
         $event->setOwner($owner);
         $event->setAccess($_POST['level']);
@@ -122,12 +124,14 @@ switch ($_REQUEST['action']) {
         $event->setDetail($_POST['detail']);
         $event->setPublishDateTime($pubDateObject);
         $event->setAllDay($_POST['allday']);
+
         /* Collections of ids
          */
         $event->setRoleCollection(
             new \Schoolbox\Collection(isset($_POST['groupCheck']) ? $_POST['groupCheck'] : array())
         );
         $event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
          */
@@ -135,26 +139,27 @@ switch ($_REQUEST['action']) {
             $event->setAttendance($_POST['attendance']);
             $event->setAttendanceDirty(true);
         }
-        // Force events to have at least one campus value selected (if a group event)
+
         if ($event->isCampusLevel()) {
+            /* Check at least one campus has been selected
+             */
             if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
                 error(158);
                 exit;
             }
-        }
-
-        // Error out if user don't have write access to requested groups
-        if ($event->isGroupLevel()) {
+        } else if ($event->isGroupLevel()) {
+            /* Check at least one group has been selected
+             */
             if (!is_array($_POST['group']) || !count($_POST['group'])) {
                 error(2);
                 exit;
             }
-            foreach ($_POST['group'] as $group) {
-                if ($groupHandler->getPermission($group, $owner->getId()) < WRITE_ACCESS) {
-                    error(34);
-                    exit;
-                }
-            }
+        }
+
+        /* Check user has permission to write the event with the new settings
+         */
+        if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+            error(34);
         }
 
         /* Set up individual relations for each event in the series
