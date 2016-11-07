@@ -11,7 +11,9 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -22,8 +24,8 @@ use SitePage;
 
 abstract class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var IAssessable[] */
-    protected $assessments = [];
+    /** @var IAssessable[]|Collection */
+    protected $assessments;
 
     /** @var AssessmentMapperProxy $assessmentMapper */
     private $assessmentMapper;
