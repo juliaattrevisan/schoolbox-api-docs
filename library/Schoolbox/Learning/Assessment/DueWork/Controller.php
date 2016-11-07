@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Response\TemporaryResponse;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -287,7 +288,8 @@ class Controller extends Assessment\Controller
             if ($rq->isXhr()) {
                 $result['success'] = false;
                 $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-                $result['id']      = 72;
+                // Probably don't need id
+//                $result['id']      = 72;
 
                 $rs->status->setCode(403);
                 $rs->content->set($this->buildJsonOutput($result));
@@ -321,9 +323,23 @@ class Controller extends Assessment\Controller
                 ->setAssessable($assessment)
                 ->setSubmittedBy($creator)
                 ->setSubmittedOnBehalfOf($participant->getUser())
-                ->attachOnlineSubmissionContent($body)
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
+        }
+
+        // Replace files with what was actually submitted
+        $response->setAllFiles(new Collection());
+        $response->attachOnlineSubmissionContent($body);
+
+        // Make one of those factories that builds storages from hashes
+        $factory = new CollectorFactory();
+        foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
+            $response->getAllFiles()->add(
+                (new DueWorkSubmissionFile())
+                    ->setStorage($attachment)
+                    ->setFilename($attachment->getFilename())
+                    ->setEditableInline(false)
+            );
         }
 
         /* If we're saving the final version of the submission
