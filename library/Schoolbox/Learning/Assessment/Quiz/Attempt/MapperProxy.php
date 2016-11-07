@@ -87,6 +87,17 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         $ids = [];
         foreach ($mapperModels as $attempt) {
+
+            // Get the last time this record was updated
+            $updatedAt = $attempt->getStart();
+            /** @var \Alaress_Date_Format[] $interactionPoints */
+            $interactionPoints = [$attempt->getFinish(), $attempt->getReviewed()];
+            foreach ($interactionPoints as $interaction){
+                if(!is_null($interaction) && !$interaction instanceof \Alaress_Date_NullDate && $interaction->lt($updatedAt)){
+                    $updatedAt = $interaction;
+                }
+            }
+
             $ids[] = $attempt->getId();
             $response = (new DomainObject())
                 ->setId($attempt->getId())
@@ -94,7 +105,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedOnBehalfOf($attempt->getUser())
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
-                ->setUpdatedAt($attempt->getFinish())
+                ->setUpdatedAt($updatedAt)
             ;
 
             // TODO populate individual answers
