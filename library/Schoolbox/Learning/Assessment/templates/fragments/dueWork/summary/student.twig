@@ -20,42 +20,7 @@
 {% endif %}
 
 {% if assessment.responses|length %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Submission History</h2>
-        {% for currentResponse in assessment.responses %}
-
-        <h3 class="subheader">{{ currentResponse.submittedAt.short }}</h3>
-        <section>
-            <ul class="information-list">
-                <li>
-                    {% if currentResponse.allFiles %}
-                    <ul class="information-list">
-                        {% for currentFile in currentResponse.allFiles %}
-                        <li>
-                            <div class="card small-12">
-                                <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-                                    <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime" />
-                                    <p>{{ currentFile.filename }}</p>
-                                </a>
-                                <p class="meta">{{ currentFile.humanReadableSize }}</p>
-                            </div>
-                            {% if currentFile.plagscan %}
-                                <article class="grade">
-                                    <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
-                                    <p class="meta">Plagiarism Check</p>
-                                </article>
-                            {% endif %}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </li>
-            </ul>
-        </section>
-        {% endfor %}
-    </div>
-</div>
+{% include '@learningAssessment/fragments/dueWork/history.twig' %}
 {% endif %}
 
 <div class="row">
