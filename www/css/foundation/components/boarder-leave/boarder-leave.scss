@@ -153,26 +153,91 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
     }
 }
 
-/* Pending/Approved decorations
- */
-span.leave-pending, span.leave-approved {
-    @extend .label;
-}
+.leave-summary {
+    p {
+        text-align: center;
+        font-size: large;
+    }
+    a {
+        color: inherit;
+    }
+    section {
+        &.summary-tile {
+            min-height: 220px;
+            span {
 
-span.leave-pending {
-    @extend .neutral;
-}
+                font-size: 1000%;
+                line-height: 100%;
+                display: block;
+                width: 100%;
 
-span.leave-approved {
-    @extend .success;
-}
+                &.icon-progress:before {
+                    font-size: 100%;
 
-@media print {
-    #footer {
-        display:none;
+                }
+            }
+        }
+        &.summary-house-tile {
+            min-height: 150px;
+
+            span {
+                width: 100%;
+                display: block;
+                font-size: 600%;
+                line-height: 100%;
+            }
+        }
+        &.summary-line {
+            min-hight: 50px;
+
+            p {
+                margin: 0px;
+                line-height: 40px;
+            }
+            span{
+                &.icon-progress:before {
+                    display: inline !important;
+                    font-size: 100%;
+                }
+            }
+
+            &.approved {
+                background-color: #c3e2c3;
+                color: #1a901a;
+            }
+            &.rejected {
+                background-color: #ffc1c0;
+                color: #ff1310;
+            }
+            &.pending {
+                background-color: #fff1e3;
+                color: #ff7d00;
+            }
+        }
+
+    }
+
+    /* Pending/Approved decorations
+     */
+    span.leave-pending, span.leave-approved {
+        @extend .label;
     }
 
     span.leave-pending {
-        color: $boarder-leave-print-pending-color !important;
+        @extend .neutral;
+    }
+
+    span.leave-approved {
+        @extend .success;
+    }
+
+    @media print {
+        #footer {
+            display:none;
+        }
+
+        span.leave-pending {
+            color: $boarder-leave-print-pending-color !important;
+        }
     }
 }
