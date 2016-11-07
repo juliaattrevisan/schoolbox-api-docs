@@ -53,7 +53,7 @@ class Module extends BaseModule
                 /* Get a list of Responses for a particular Student and Assessment
                  * Presented as a more succinct Submission History
                  */
-                '/assessment/{assessmentId}/{studentId}/responses' => 'getResponseList',
+                '/assessments/{assessmentId}/{studentId}/responses' => 'getResponseList',
 
                 /* View a Response in the Inline Grader
                  */
