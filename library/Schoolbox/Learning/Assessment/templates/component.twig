@@ -19,7 +19,10 @@
             {% endif %}
             {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
 
-            {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}
+            {# TODO, the +1 at end of next line is a hack workaround to render the extra nav item. #}
+            {# It appears to be non-trivial to pass values from the child template back to the parent #}
+            {# @see http://stackoverflow.com/questions/17244162/symfony2-twig-how-can-i-send-parameters-to-the-parent-template #}
+            {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) + 1 %}
 
             <li class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}">
                 <div class="list-item">
@@ -36,6 +39,7 @@
                 </div>
                 {% if actionCount %}
                     <nav>{% spaceless %}
+                            {% block extraNavItems %}{% endblock %}
                             {% if modifyRoute %}
                                 <a class="icon-modify" href="{{ modifyRoute }}" title="Modify"></a>
                             {% endif %}
