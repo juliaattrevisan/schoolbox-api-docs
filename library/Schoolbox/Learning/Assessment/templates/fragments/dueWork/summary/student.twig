@@ -29,7 +29,7 @@
                         <li>
                             <div class="card small-12">
                                 <a href='#' title="{{ currentFile.filename }}">
-                                    <img src="/portrait.php?userId=485&size=square64" alt="View Profile" />
+                                    <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
                                 <p class="meta">{{ currentFile.humanReadableSize }}</p>
