@@ -25,6 +25,12 @@ class Model extends AbstractResponse
      */
     protected $allFiles;
 
+    /**
+     * The datetime at which the Student actually made the submission
+     * This is not the same as the createdAt or updatedAt datetimes
+     *
+     * @var \Alaress_Date_Format
+     */
     protected $submittedAt;
 
     /**
@@ -53,6 +59,28 @@ class Model extends AbstractResponse
         $this->getAllFiles()->add($storage);
 
         return $this;
+    }
+
+    /**
+     * Find a file called 'online-submission' or 'Online Submission'
+     * and get its content so you can pop it straight into an editor
+     *
+     * @return string
+     */
+    public function getOnlineSubmissionContent()
+    {
+        /* Known versions of the Online Submission file which stores
+         * the wizzywig contents
+         */
+        $knownFilenames = ['online-submission.html', 'Online Submission.html'];
+
+        foreach ($this->getAllFiles() as $currentFile) {
+            if (in_array($currentFile->getFilename(), $knownFilenames)) {
+                return $currentFile->getStorage()->read();
+            }
+        }
+
+        return '';
     }
 
     /* Getters/Setters

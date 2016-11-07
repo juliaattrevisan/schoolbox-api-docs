@@ -30,8 +30,7 @@
                     </div>
 
                     <article>
-                        {# TODO: put in the Wizzywig content here #}
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla risus imperdiet lacus lacinia, non vestibulum mauris fermentum. Aenean ac cursus nulla, eu mattis lorem. Ut id nisi velit. In eu congue odio. Morbi leo diam, viverra ut massa ut, lobortis tincidunt nulla. Suspendisse non neque non est tincidunt lacinia at at erat. In in varius erat. Nam vulputate est est, eu mattis eros interdum vitae. Integer leo leo, gravida bibendum dui eget, placerat sagittis libero. Nullam ac semper tortor. Mauris augue nunc, porttitor in nulla nec, consectetur ultrices ex. Vestibulum sit amet nisi scelerisque odio convallis elementum. Proin vitae varius nulla.
+                        {{ currentResponse.onlineSubmissionContent|purify }}
                     </article>
 
                     {% if currentResponse.allFiles %}
