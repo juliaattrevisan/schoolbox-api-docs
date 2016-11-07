@@ -49,13 +49,23 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         return new Collection();
     }
 
-    public function save(IFeedback $feedback)
+    /**
+     * @inheritdoc
+     */
+    public function save(IFeedback $response)
     {
-        // TODO: Implement save() method.
+        if ($this->recognizes($response->getAssessable())) {
+            $this->mapperProxy->save($response);
+        }
     }
 
-    public function delete(IFeedback $feedback)
+    /**
+     * @inheritdoc
+     */
+    public function delete(IFeedback $response)
     {
-        // TODO: Implement delete() method.
+        if ($this->recognizes($response->getAssessable())) {
+            $this->mapperProxy->delete($response);
+        }
     }
 }
