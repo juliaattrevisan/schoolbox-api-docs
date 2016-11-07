@@ -79,7 +79,10 @@ class StudentCarousel
         $allPeople = [];
 
         foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
-            $latestSubmission = $currentParticipant->findMostRecentResponse();
+            $latestFeedback = ($currentParticipant->findMostRecentPublishedFeedback() == null);
+            $latestSubmission = ($currentParticipant->findMostRecentResponse() == null);
+
+            $hasUnmarked = (!$latestSubmission || ($latestSubmission && !$latestFeedback));
 
             /* Viewing a ResponseList for a particular student
              */
@@ -100,7 +103,7 @@ class StudentCarousel
                         </div>
                     </div>
                 ",
-                'submitted' => $latestSubmission ? true : false,
+                'submitted' => $hasUnmarked,
             ];
 
             $allPeople[] = $person;
