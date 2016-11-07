@@ -108,9 +108,15 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
         }
         catch (\RangeException $e) {
+
+            /* Cannot authenticate at crocodoc
+             */
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
         catch (\DomainException $e) {
+
+            /* Some kind of curl error between us and crocodoc
+             */
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
     }
@@ -145,11 +151,20 @@ class Controller extends Base
                 $this->getResponse()->redirect->to($location);
             }
             catch (\RangeException $e) {
+
+                /* Cannot authenticate at crocodoc
+                 */
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
             }
             catch (\DomainException $e) {
+
+                /* Some kind of curl error between us and crocodoc
+                 */
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
             }
+        }
+        else {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 
