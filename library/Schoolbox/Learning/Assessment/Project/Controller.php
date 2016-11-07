@@ -124,6 +124,7 @@ class Controller extends Assessment\Controller
             'assessment'       => $assessment,
             'currentUser'      => $this->getUser(),
             'returnUrlSuffix'  => $returnUrlSuffix,
+            'returnUrl'        => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(

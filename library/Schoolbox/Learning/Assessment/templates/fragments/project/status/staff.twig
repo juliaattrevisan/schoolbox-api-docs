@@ -40,7 +40,11 @@
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: currentUser} %}
 
         <div class="row">
+            {% if assessment.baseContext is unitSpecification %}
+            <div class="small-12 island">
+            {% else %}
             <div class="small-12 medium-6 island">
+            {% endif %}
                 <h2 class="subheader">Activities</h2>
 
                 {% if assessment.assessables | length %}
@@ -82,9 +86,6 @@
                     </ul>
                     <div class="component-action">
                         <section>
-                            {% for returnUrl in allReturnUrls %}
-                                <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
-                            {% endfor %}
                             <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
                     </div>
@@ -143,5 +144,10 @@
             </div>
             {% endif %}
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 column">
+        <a href="{{ returnUrl }}" class="button submit full-width">Return</a>
     </div>
 </div>
