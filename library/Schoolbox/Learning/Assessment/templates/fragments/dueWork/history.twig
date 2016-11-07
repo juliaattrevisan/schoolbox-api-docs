@@ -21,7 +21,7 @@
                 <li class="actions-small-1" {% if loop.index > 1 %}style="display:none"{% endif %} data-history>
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="/search/user/3" title="View Profile">
+                            <a href="/search/user/{{ student.id }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
                                 <p>{{ student.fullname }}</p>
                                 <p class="meta">{{ currentResponse.submittedAt.short }}</p>
@@ -66,10 +66,10 @@
                         <li>
                             <div class="list-item">
                                 <div class="card small-12 medium-8">
-                                    <a href="/search/user/230" title="View Profile">
-                                        <img src="/portrait.php?userId=485&amp;size=square64" alt="" class="hide-for-small-only">
-                                        <p>Alaress Admin</p>
-                                        <p class="meta">Posted 43 seconds ago</p>
+                                    <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
+                                        <p>{{ currentFeedback.reviewer.fullname }}</p>
+                                        <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
                                     </a>
                                 </div>
                                 <div class="small-12 medium-4 columns text-right">
@@ -90,7 +90,7 @@
                                 {% for currentFile in currentFeedback.allFiles %}
                                 <li>
                                     <div class="card small-12 compact">
-                                        <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
+                                        <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" rel="external" data-plugin="preview">
                                             <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
                                             <p>{{ currentFile.filename }}</p>
                                         </a>
