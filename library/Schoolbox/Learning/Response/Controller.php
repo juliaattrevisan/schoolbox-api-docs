@@ -94,7 +94,28 @@ class Controller extends Base
 
         /* TODO: Get a list of possible participants and whether they've submitted stuff
          */
-//        new \Alaress_Probe($response->getAssessable()->getAllParticipants());
+        $allPeople = [];
+
+        foreach ($response->getAssessable()->getAllParticipants() as $currentParticipant) {
+            $submissionExists = $currentParticipant->findMostRecentResponse();
+
+            $person = [
+                'text' => $currentParticipant->getUser()->getFullname(),
+                'value' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $currentParticipant->getUser()->getId()]),
+                'html' => "
+                    <div class=\"row\">
+                        <div class=\"avatar card small-10\">
+                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
+                            <p>{$currentParticipant->getUser()->getFullName()}</p>
+                            <span class=\"label status unsubmitted\">Not Submitted</span>
+                        </div>
+                    </div>
+                ",
+                'unsubmitted' => $submissionExists ? false : true,
+            ];
+
+            $allPeople[] = $person;
+        }
 
         /* ResponseFile Factory might throw exceptions if you're viewing
          * crocodocable files that somehow die
@@ -107,6 +128,9 @@ class Controller extends Base
                 'selectedFileId' => $this->getRequest()->query['fileId'],
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
+
+                'currentPerson' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $response->getSubmittedBy()->getId()]),
+                'allPeople' => $allPeople,
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
@@ -169,8 +193,6 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
     }
-
-
 
     /* Getters/Setters
      */

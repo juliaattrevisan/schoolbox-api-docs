@@ -8,27 +8,7 @@
         var tgt = $('select[name=student-select]'),
                 ize,
                 skipUnsubmitted = $('#skipUnsubmitted'),
-                students = [{
-                    "text": "Admin, Alaress",
-                    "value": "\/submission\/inlineGrading\/view\/4\/19",
-                    "html": "<div class=\"row\">    <div class=\"avatar card small-10\">        <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>        <p>Admin, Alaress<\/p>        <span class=\"label status unsubmitted\">Not Submitted<\/span>    <\/div><\/div>",
-                    "unsubmitted": true
-                }, {
-                    "text": "Albert, Julia",
-                    "value": "\/submission\/inlineGrading\/view\/4\/10",
-                    "html": "<div class=\"row\">    <div class=\"avatar card small-10\">        <img src=\"\/portrait.php?userId=313&size=square64\" alt=\"View Profile\" \/>        <p>Albert, Julia<\/p>        <span class=\"label status submitted\">Submitted on Time<\/span>    <\/div>    <div class=\"small-2 columns\">        <span class=\"progress-tick no-text complete\" title=\"Marked 31\/07\/2012 9:50am\"><\/span>    <\/div><\/div>",
-                    "unsubmitted": false
-                }, {
-                    "text": "Berryhill, Scott",
-                    "value": "\/submission\/inlineGrading\/view\/4\/15",
-                    "html": "<div class=\"row\">    <div class=\"avatar card small-10\">        <img src=\"\/portrait.php?userId=280&size=square64\" alt=\"View Profile\" \/>        <p>Berryhill, Scott<\/p>        <span class=\"label status unsubmitted\">Not Submitted<\/span>    <\/div><\/div>",
-                    "unsubmitted": true
-                }, {
-                    "text": "Salem, Bobby",
-                    "value": "\/submission\/inlineGrading\/view\/4\/31",
-                    "html": "<div class=\"row\">    <div class=\"avatar card small-10\">        <img src=\"\/portrait.php?userId=169&size=square64\" alt=\"View Profile\" \/>        <p>Salem, Bobby<\/p>        <span class=\"label status unsubmitted\">Not Submitted<\/span>    <\/div><\/div>",
-                    "unsubmitted": true
-                }],
+                students = {{ allPeople|json_encode|raw }},
                 selectizeOptions = {
                     preload: true,
                     closeAfterSelect: false,
@@ -50,7 +30,7 @@
         $('.selectize-input input').prop('disabled', true).hide();
 
         // manually set the value, because selectize
-        ize[0].selectize.setValue("/submission/inlineGrading/view/4/19", true);
+        ize[0].selectize.setValue("{{ currentPerson }}", true);
 
         // add the listener AFTER we've set the value
         ize.on('change', function (e) {
