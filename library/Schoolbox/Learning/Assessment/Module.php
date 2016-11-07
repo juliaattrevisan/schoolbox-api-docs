@@ -24,6 +24,9 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Twig_Loader_Chain;
@@ -350,7 +353,11 @@ class Module extends BaseModule
         // $pc =& $injector->params[Assessment\Project\Controller::class];
 
         // quiz specific
-        // $qc =& $injector->params[Assessment\Quiz\Controller::class];
+        $qc =& $injector->params[Assessment\Quiz\Controller::class];
+        $qc['participantMapper'] = $injector->lazyGet('participantDataSource');
+        $dc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
+        $dc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
+        $dc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
 
         // task specific
         // $tc =& $injector->params[Assessment\Task\Controller::class];

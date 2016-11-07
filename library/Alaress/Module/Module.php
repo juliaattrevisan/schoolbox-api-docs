@@ -10,7 +10,6 @@
 namespace Alaress\Module;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Alaress\Rules\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Route;
 use Aura\Router\Router;
@@ -103,14 +102,14 @@ class Module {
     /**
      * Shorthand for all the things you can configure on a route
      *
-     * @param string   $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
-     * @param string   $path                  parameterised form of the URL that accepts tokens in-line
-     *                                         - the notation for setting a token is {param:regex}
-     * @param string   $controllerMethodName  the method on the controller to which this route points
-     * @param Rule     $permissions           an optional rule to use to define the permissions allowed on this route
-     * @param callable $preload               an optional callable used to preload this route
+     * @param string             $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
+     * @param string             $path                  parameterised form of the URL that accepts tokens in-line
+     *                                                   - the notation for setting a token is {param:regex}
+     * @param string             $controllerMethodName  the method on the controller to which this route points
+     * @param IAuthorizationRule $permissions           an optional rule to use to define the permissions allowed on this route
+     * @param callable           $preload               an optional callable used to preload this route
      */
-    protected function register($httpMethod, $path, $controllerMethodName, Rule $permissions = null, callable $preload = null)
+    protected function register($httpMethod, $path, $controllerMethodName, IAuthorizationRule $permissions = null, callable $preload = null)
     {
         $tokens = [];
 
@@ -568,7 +567,7 @@ class Module {
     /**
      * @param string $name
      * @throws \InvalidArgumentException
-     * @return Rule
+     * @return IAuthorizationRule
      */
     protected function getAuthRule($name)
     {

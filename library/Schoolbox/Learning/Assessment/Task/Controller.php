@@ -85,18 +85,4 @@ class Controller extends Assessment\Controller
 
         return $data;
     }
-
-
-    /**
-     * Decide which URL to send the client back to
-     *
-     * @param IAssessable $assessment
-     * @param string      $defaultReturnUrl
-     * @return string
-     */
-    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
-    {
-        return $defaultReturnUrl;
-    }
-
 }

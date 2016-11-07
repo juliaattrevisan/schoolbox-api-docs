@@ -94,6 +94,8 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * The timestamp when user clicked 'Finish' while attempting the Quiz
+     *
      * @return Alaress_Date_Format
      */
     public function getFinish()

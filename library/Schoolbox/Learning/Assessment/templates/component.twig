@@ -1,6 +1,5 @@
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
-
     {% set createRoute -%}
         {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
         {%- if assessmentType -%}
@@ -11,8 +10,13 @@
     <ul class="action-list">
         {% for assessable in assessables %}
 
+
             {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+            {% if assessable is quiz %}
+                {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+            {% else %}
+                {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+            {% endif %}
             {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
 
             {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}

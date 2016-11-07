@@ -105,12 +105,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Get the form to update an existing Assessment's details
      *
+     * @api /learning/assessments/:assessmentId/modify
+     * @level 165
      * @param IAssessable $assessment
      */
     public function getUpdateAssessmentForm(IAssessable $assessment)
     {
-        $type = AssessmentType::objectToString($assessment);
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
@@ -374,7 +377,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string      $defaultReturnUrl
      * @return string
      */
-    protected abstract function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '');
+    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    {
+        // if your context is a project, redirect back to its status screen
+        if ($assessment->getContext() instanceof Project) {
+            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+        }
+
+        return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
+    }
 
 
 

@@ -48,7 +48,7 @@ $returnUrl = $_GET[Redirect::RETURN_URL]
     : '';
 
 $modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
-$modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessment', $modifyRouteArgs);
+$modifyUrl = $this->getDi()->get('router')->generate('learningAssessment.getUpdateAssessmentForm', $modifyRouteArgs);
 
 $this->setVar(array(
     'RETURN_URL'           => $returnUrl,

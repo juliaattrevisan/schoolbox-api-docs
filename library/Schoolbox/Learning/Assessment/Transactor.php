@@ -123,7 +123,7 @@ class Transactor
             $sequence = $this->deriveSaveSequence($assessmentContext);
             $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
 
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $this->getAssessment()->getId()]);
+            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->getAssessment()->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
