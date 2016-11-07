@@ -132,6 +132,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment)
     {
+
         try {
             $assessmentInfo = $this->persistAssessment(
                 $this->getUser(),
@@ -187,7 +188,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Did caller explicitly specify a returnUrl ?
         if ($postReturnUrl) {
-            $returnUrl = $postReturnUrl;
+            $returnUrl = Redirect::decode($postReturnUrl);
 
         } else {
             $returnUrl = $this->determineRedirect($assessment, "/homepage/{$folder->getId()}");

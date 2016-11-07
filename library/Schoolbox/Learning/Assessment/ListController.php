@@ -140,9 +140,7 @@ class ListController extends Web\Controller\Base
         try {
             // we need to perform some surgery on our "post" data before we send it through
             $post = $this->getRequest()->post->getArrayCopy();
-
-            $post['contextId']   = $context->getId();
-            $post['contextType'] = AssessmentContextType::objectToString($context);
+            $post['context']   = $context;
 
             list ($assessment, $defaultReturnUrl) = array_values($this->persistAssessment($this->getUser(), $post));
 
@@ -151,7 +149,7 @@ class ListController extends Web\Controller\Base
 
             if ($this->getRequest()->post->get(Redirect::RETURN_URL)) {
                 // by default, always give precedence to the return URL given via POST
-                $this->redirect($post[Redirect::RETURN_URL]);
+                $this->redirect(Redirect::decode($post[Redirect::RETURN_URL]));
 
             } else {
                 // failing that, decide based on what kind of assessment y'all just created
@@ -197,6 +195,13 @@ class ListController extends Web\Controller\Base
                 // if the client enters an invalid type: ignore
                 // and allow passthru to the "unselected" section
             }
+        }
+
+        // Did the caller request a returnUrl?
+        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+
+        if ($returnUrl) {
+            $data[Redirect::RETURN_URL] = $returnUrl;
         }
 
         // show the generic first-half of the form
@@ -248,12 +253,6 @@ class ListController extends Web\Controller\Base
              */
             $assessmentFactory = new Factory($user, $postData);
             $assessment = $assessmentFactory->produce($assessment);
-
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                throw new DomainException('double-check the date fields you provided');
-            }
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
         }

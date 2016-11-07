@@ -29,7 +29,7 @@
 {% import 'sub/visibility.twig' as visibility %}
 {{ visibility.dropdown(assessment.visibility) }}
 
-{% if contextType != 'unitspec' %}
+{% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
 
@@ -47,7 +47,7 @@
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 
 
-{{ mage.submitRow('Next', 'part-2', 'end') }}
+{{ mage.submitRow('Create', 'part-2', 'end') }}
 
 
 

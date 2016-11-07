@@ -201,7 +201,10 @@ CREATE TABLE `assessment_specification_implementation` (
 -- with surveys (which don't have an assessment at all).
 
 ALTER TABLE `assess`
-ADD COLUMN `assessment_id` INT UNSIGNED NULL DEFAULT NULL AFTER `category_id`;
+ADD COLUMN `assessment_id` INT UNSIGNED NULL DEFAULT NULL AFTER `category_id`,
+CHANGE COLUMN `start` `start` DATETIME NULL,
+CHANGE COLUMN `finish` `finish` DATETIME NULL;
+
 
 ALTER TABLE `task`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
