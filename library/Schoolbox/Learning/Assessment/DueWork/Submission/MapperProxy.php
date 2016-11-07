@@ -138,6 +138,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = new GenericCollection(StudentSubmission::class);
 
         foreach ($domainObjects as $domainObject) {
+            // TODO add box ID
             $dataModel = (new StudentSubmission())
                 ->setOwner($domainObject->getSubmittedBy())
                 ->setCreatedAt($domainObject->getCreatedAt())
