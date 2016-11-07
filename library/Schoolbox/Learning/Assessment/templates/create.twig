@@ -78,14 +78,12 @@
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
-                    {#<input type="hidden" name="contextType" value="{{ contextType }}" />#}
-                    {#<input type="hidden" name="contextId" value="{{ context.id }}" />#}
+                    <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
                     <legend>Choose activity type</legend>
 
                     <fieldset class="radiolist">
                         <div class="column small-12">
-                            {#<input type="hidden" name="folderId" value="{{ folder.id }}" />#}
                             {% for type in types %}
                                 <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
                             {% endfor %}

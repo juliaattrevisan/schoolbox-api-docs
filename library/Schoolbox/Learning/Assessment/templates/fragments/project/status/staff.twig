@@ -52,18 +52,19 @@
                             <li class="actions-small-2">
                                 <div class="grip"></div>
                                 <div class="list-item">
-                                    <div class="card wrap-down small-12">
-                                        <div class="{{ icon.renderClass(assessable) }} icon-32" title="{{ assessable.getTypeName }}"></div>
-
+                                    <div class="compact card wrap-down small-12">
+                                        <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
                                         <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
                                             </h3>
                                         </a>
+                                        {% if assessable.getDueAt.isNull == false %}
                                         <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                                             {{ assessableCounts[assessable.id].total }} / {{ assessment.allParticipants | length }} Students,
                                             Due {{ assessable.getDueAt.getRelativeTime }}
                                         </p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <nav>
@@ -84,7 +85,7 @@
                             {% for returnUrl in allReturnUrls %}
                                 <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
                             {% endfor %}
-                            <a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}" class="button icon-project full-width" title="Create a new Assessment">Create Assessment</a>
+                            <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
                     </div>
                 </section>
@@ -92,12 +93,12 @@
                 {% else %}
                 <div class="empty-state">
                     <i class="icon-project"></i>
-                    <p>Your project is empty.</p>
-                    <p><a href="{{ routeLookup('learningAssessment.getSelectAssessmentInProject', {projectId: assessment.id}) }}{{ returnUrlSuffix }}">Add a new Assessment</a></p>
+                    <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}">create an activity</a> next.</p>
                 </div>
                 {% endif %}
             </div>
 
+            {% if assessment.baseContext is not unitSpecification %}
             <div class="small-12 medium-6 island">
                 <h2 class="subheader">Students</h2>
 
@@ -140,6 +141,7 @@
                     </div>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

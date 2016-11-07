@@ -15,6 +15,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -52,21 +53,10 @@ class Factory
     /**
      * What context is this within?
      *
-     * Forms a unique identifier along with $contextIdentifier.
      *
-     * @var string
+     * @var AssessmentContext
      */
-    protected $contextType;
-
-    /**
-     * What's the identifier of the context?
-     *
-     * Forms a unique identifier along with $contextType.
-     *
-     * @var int
-     */
-    protected $contextIdentifier;
-
+    protected $context;
 
     /**
      * @var string
@@ -115,8 +105,7 @@ class Factory
      */
     public function __construct(User $creator, $post) {
         $this->setAssessmentType(trim($post['assessmentType']));
-        $this->setContextType(trim($post['contextType']));
-        $this->setContextIdentifier(trim($post['contextId']));
+        $this->setContext($post['context']);
         $this->setTitle(trim($post['title']));
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
@@ -201,8 +190,7 @@ class Factory
         }
 
         // Attach context
-        $context = AssessmentContextType::stringToObject($this->getContextType());
-        $assessment->setContext($context->setId($this->getContextIdentifier()));
+        $assessment->setContext($this->getContext());
 
         return $this->produceFromExistingAssessment($assessment);
     }
@@ -478,38 +466,20 @@ class Factory
     }
 
     /**
-     * @return string
+     * @return AssessmentContext
      */
-    protected function getContextType()
+    protected function getContext()
     {
-        return $this->contextType;
+        return $this->context;
     }
 
     /**
-     * @param string $contextType
+     * @param AssessmentContext $context
      * @return static
      */
-    protected function setContextType($contextType)
+    protected function setContext($context)
     {
-        $this->contextType = $contextType;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getContextIdentifier()
-    {
-        return $this->contextIdentifier;
-    }
-
-    /**
-     * @param int $contextIdentifier
-     * @return static
-     */
-    protected function setContextIdentifier($contextIdentifier)
-    {
-        $this->contextIdentifier = $contextIdentifier;
+        $this->context = $context;
         return $this;
     }
 }

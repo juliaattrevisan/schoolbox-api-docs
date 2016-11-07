@@ -26,9 +26,15 @@ class Controller extends Assessment\Controller
     {
         $summatorMapping = new Assessment\Summator\Mapping();
 
+        try {
+            $selectedSummator = $summatorMapping->decompose($assessment->getSummator());
+        } catch (\InvalidArgumentException $e) {
+            //no selected summator if none exists
+        }
+
         $data = [
             'types'            => new Assessment\AssessmentType(),
-            'selectedSummator' => $summatorMapping->decompose($assessment->getSummator()),
+            'selectedSummator' => $selectedSummator,
             'allSummators'     => $summatorMapping,
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
@@ -108,7 +114,7 @@ class Controller extends Assessment\Controller
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
          */
-        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', ['assessmentId' => $assessment->getId()]);
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
         $twigData = [
@@ -122,7 +128,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/protject/status/staff.twig",
+                "@learningAssessment/fragments/project/status/staff.twig",
                 $twigData
             )
         );

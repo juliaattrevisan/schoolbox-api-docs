@@ -95,25 +95,6 @@ class Module extends BaseModule
     }
 
     /**
-     * TODO why is an actual ContextMapper composite not a thing... it should be a thing
-     *
-     * @param string $code
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @return \Schoolbox\Mapper
-     */
-    protected function getContextMapper($code)
-    {
-        switch ($code) {
-            case AssessmentContextType::TYPE_FOLDER.'s':              return $this->getFolderMapper();
-            case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION.'s': return $this->getUnitImplMapperProxy();
-            case AssessmentContextType::TYPE_PROJECT.'s':             return $this->getAssessmentMapperProxy();
-            case AssessmentContextType::TYPE_UNIT_SPECIFICATION.'s':  return $this->getUnitSpecMapperProxy();
-        }
-
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-    }
-
-    /**
      * Set the name of the controller to execute, based on the given assessment
      *
      * @param IAssessable $a
@@ -245,7 +226,8 @@ class Module extends BaseModule
     protected function preloadContext(array $params)
     {
         try {
-            $c = $this->getContextMapper($params['contextType'])->findById($params['contextId']);
+            $contextFactory = new Assessment\DataModel\Context\Factory($this->getFolderMapper(), $this->getUnitImplMapperProxy(), $this->getAssessmentMapperProxy(), $this->getUnitSpecMapperProxy());
+            $c = $contextFactory->produce($params['contextType'],$params['contextId']);
         } catch (MapperException\Deleted $e) {
             $c = $e->getDeletedObject();
         } catch (MapperException $e) {
