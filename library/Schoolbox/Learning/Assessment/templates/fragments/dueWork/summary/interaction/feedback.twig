@@ -25,8 +25,8 @@
             {% for currentFile in currentInteraction.allFiles %}
                 <li>
                     <div class="card small-12 compact">
-                        <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" rel="external" data-plugin="preview">
-                            <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
+                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                             <p>{{ currentFile.filename }}</p>
                         </a>
                     </div>
