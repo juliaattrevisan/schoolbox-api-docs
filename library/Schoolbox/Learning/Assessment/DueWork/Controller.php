@@ -354,13 +354,14 @@ class Controller extends Assessment\Controller
 
         /* TODO: Do the actual saving
          */
+        $this->getDueWorkResponseMapper()->save($response);
 
         /* Saving drafts from the wizzywig
          */
         if ($rq->isXhr()) {
             $result['success'] = true;
             $result['message'] = 'OK';
-            $result['id']      = 72;
+            $result['id']      = $response->getId();
 
             $rs->status->setCode(200);
             $rs->content->set($this->buildJsonOutput($result));
