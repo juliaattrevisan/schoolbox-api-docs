@@ -56,7 +56,12 @@ class Model extends AbstractResponse
     {
         $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $body, false);
 
-        $this->getAllFiles()->add($storage);
+        $this->getAllFiles()->add(
+            (new File\Model())
+                ->setStorage($storage)
+                ->setFilename('Online Submission')
+                ->setEditableInline(true)
+        );
 
         return $this;
     }
