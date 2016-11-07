@@ -19,14 +19,16 @@ use Schoolbox\Permission\Access\UserAccess;
 class Access
 {
     /**
-     * Checks if a given user has permission to modify a given event
+     * Checks if a given user has permission to write an event
      *
      * @param User $user
      * @param Event $event
+     * @param $groups
+     * @param $campuses
      *
      * @return bool
      */
-    public function checkAccess(User $user, Event $event)
+    public function checkAccess(User $user, Event $event, $groups, $campuses)
     {
         $userMapper = new UserMapper();
 
@@ -53,8 +55,14 @@ class Access
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
                 // Loop through the campuses selected for the event
-                foreach ($event->getCampusCollection() as $currentCampus) {
-                    if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
+                foreach ($campuses as $campus) {
+                    if (is_object($event)) {
+                        $campusId = $campus->getCampusId();
+                    } else {
+                        $campusId = $campus;
+                    }
+
+                    if ($campusId == $currentAccess->getServiceIdentifier()) {
                         return true;
                     }
                 }
@@ -64,15 +72,22 @@ class Access
         /* If the event is on a group level, check if the user is a group manager
          */
         if ($event->isGroupLevel()) {
-
             /* Loop through the groups selected for this event
              */
-            foreach ($event->getCategoryCollection() as $category) {
+            foreach ($groups as $group) {
+
+                if (is_object($group)) {
+                    $groupId = $group->getCategoryId();
+                } else {
+                    $groupId = $group;
+                }
+
+                $groupManagers = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $groupId);
 
                 /* Loop through the managers for this group and check for $user
                  */
-                $groupManagers = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $category->getCategoryId());
                 foreach ($groupManagers as $groupManager) {
+
                     if ($groupManager->getId() === $user->getId()) {
                         return true;
                     }

@@ -44,7 +44,7 @@ switch ($_REQUEST['action']) {
 
             /* Check user has permission to modify this event
              */
-            if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+            if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
                 error(34);
             }
 
@@ -158,7 +158,7 @@ switch ($_REQUEST['action']) {
 
         /* Check user has permission to write the event with the new settings
          */
-        if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+        if ($eventAccess->checkAccess($_SESSION['user'], $event, $_POST['group'], $_POST['campus']) == false) {
             error(34);
         }
 
@@ -214,7 +214,7 @@ switch ($_REQUEST['action']) {
         /**
          * Check user has permission to delete this event
          */
-        if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+        if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
             error(34);
         }
 
