@@ -72,18 +72,17 @@ class Controller extends Base\Base
     /**
      * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
-     * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
+     * @api   GET /course/import/{courseSpecId}/class{/classCode}
      * @level 160
      *
      * @param Course\Specification $courseSpec
      * @param Folder\Model         $targetClass
-     * @param int                  $componentId the ID of the component the course is to be imported into
      */
-    public function getImportForm(Course\Specification $courseSpec = null, Folder\Model $targetClass = null, $componentId = null)
+    public function getImportForm(Course\Specification $courseSpec = null, Folder\Model $targetClass = null)
     {
         $importer = new Import();
 
-        $context = array_merge($importer->importSelectize($courseSpec, $targetClass), ['componentId' => $componentId]);
+        $context = $importer->importSelectize($courseSpec, $targetClass);
 
         $this->tpl('import', $context);
     }
@@ -101,7 +100,6 @@ class Controller extends Base\Base
     {
         $ownerships  = $this->getRequest()->post["ownership"];
         $courseId    = trim($this->getRequest()->post["importCourse"]);
-        $componentId = trim($this->getRequest()->post["componentId"]);
 
         $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseId);
 
@@ -120,7 +118,6 @@ class Controller extends Base\Base
         $this->tpl('unitImportForm', [
             'homepage' => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseId,
-            'componentId'    => $componentId,
             'units'          => $unitImpls,
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
@@ -155,7 +152,6 @@ class Controller extends Base\Base
     {
         $homepage = trim($this->getRequest()->post["importFolders"]);
         $courseId = trim($this->getRequest()->post["importCourse"]);
-        $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
             $this->getCourseSpecificationMapperProxy()->findById($courseId);
@@ -208,7 +204,6 @@ class Controller extends Base\Base
             'targetFolders' => $folders,
             'importCourse' => $courseId,
             'ownershipCandidates' => $possibleOwnerships,
-            'componentId' => $componentId
         ]);
 
     }
@@ -305,7 +300,6 @@ class Controller extends Base\Base
         $this->tpl('unitImportResults', [
             'ownerships'     => $post['ownerships'],
             'homepage'       => $post["homepage"],
-            'componentId'    => $post["componentId"],
             'courseHomepage' => $post["course_homepage"],
             'unitDates'      => $post["unit"],
             'units'          => $impls,
@@ -453,12 +447,13 @@ class Controller extends Base\Base
      * This GET provides the import form, stepped in at stage 3 (since target and ownership cannot be changed)
      * Modify the Unit information for a previously imported Course
      *
-     * @api   GET /course/import/modify/{componentId}
-     * @level 160
+     * @api   GET /course/import/{courseImplId}/modify
+     * @level 165
      *
-     * @param int $componentId
+     * @param Course\Implementation $courseImplementation
+     * @throws MapperException
      */
-    public function importModify($componentId)
+    public function importModify(Course\Implementation $courseImplementation)
     {
         $compendium = [];
 

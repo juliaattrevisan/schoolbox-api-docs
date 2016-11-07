@@ -17,6 +17,7 @@ use Schoolbox\IMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
@@ -73,7 +74,25 @@ class RubricMapper
 
 
     /**
+     * @param AssessmentContext $context
+     * @param array             $levelNames
+     * @return Rubric
+     */
+    public function createForContext(AssessmentContext $context, array $levelNames = [])
+    {
+        $folderId = $context->getFolder()->getId();
+        $parentFolderId = null;
+
+        if ($context instanceof UnitSpecification) {
+            $parentFolderId = $context->getCourse()->getFolder()->getId();
+        }
+
+        return $this->createForFolder($folderId, $parentFolderId, $levelNames);
+    }
+
+    /**
      * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
+     * @deprecated use of ::createForContext() is preferable
      *
      * @param int $folderId
      * @param int|null $parentFolderId

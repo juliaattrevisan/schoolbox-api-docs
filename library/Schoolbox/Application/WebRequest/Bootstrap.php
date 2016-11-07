@@ -11,6 +11,7 @@ namespace Schoolbox\Application\WebRequest;
 
 
 use Alaress\Application\Boot\BootstrapInterface;
+use Alaress\Authorizer\Rule;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
@@ -61,6 +62,7 @@ use Schoolbox\Error;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Scrub;
 use Twig_Extension_Debug;
@@ -395,6 +397,10 @@ class Bootstrap implements BootstrapInterface {
         $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
         $di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
 
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
+        $di->set('templateEngine:routeLookupIfAuthorized', $di->lazyNew(TwigMethod\RouteLookupIfAuthorized::class));
+
         $di->set(
             'templateEngine',
             $di->lazy(
@@ -494,6 +500,8 @@ class Bootstrap implements BootstrapInterface {
                             array($di->get('templateEngine:isRouteAuthorized'), 'execute')
                         )
                     );
+
+                    $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     return $twig;
                 }
@@ -622,31 +630,24 @@ class Bootstrap implements BootstrapInterface {
                 return $translator;
             })
         );
-        $di->set(
-            'assessmentDataSource',
-            $di->lazyNew(
-                AssessmentMapperProxy::class,
-                [
-                    'baseMapper' => $mapperFactory->getLazy(AssessmentMapper::class),
-                    'translator' => $di->lazyGet('assessmentTranslator'),
-                ]
-            )
-        );
+
+        // Register assessment data source
+        $di->params[AssessmentMapperProxy::class] = [
+            'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
+            'translator'            => $di->lazyGet('assessmentTranslator'),
+            'participantDataSource' => $di->lazyGet('participantDataSource'),
+        ];
+        $di->set('assessmentDataSource', $di->lazyNew(AssessmentMapperProxy::class));
 
         // Register participant data source (with responses and feedback)
-        $di->set(
-            'participantDataSource',
-            $di->lazyNew(
-                ParticipantDataSource::class,
-                [
-                    'externalDb'         => $di->lazyGet('externalClass'),
-                    'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
-                    'responseDataSource' => $di->lazyGet('responseDataSource'),
-                    'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
-                ]
-            )
-        );
+        $di->params[ParticipantDataSource::class] = [
+            'externalDb'         => $di->lazyGet('externalClass'),
+            'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
+            'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
+            'responseDataSource' => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+        ];
+        $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
 
         // Register response data source
         $di->set(
@@ -710,6 +711,16 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+        // injectable module auth rules
+        $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));
+        $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
+        $di->set('rule:isStaff',     $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
+        $di->set('rule:isStudent',   $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
+        $di->set('rule:isParent',    $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
+
+        // composite rules
+        $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
+        $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);

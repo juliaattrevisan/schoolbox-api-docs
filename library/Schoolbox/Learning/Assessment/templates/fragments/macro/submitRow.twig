@@ -1,4 +1,4 @@
-{% macro submitRow(inputValue, inputName, mageNext, mageWorking) %}
+{% macro submitRow(inputValue, inputName, mageNext, formmethod, formaction, mageWorking) %}
 {% spaceless %}
 <div class="row">
     <div class="column small-12">
@@ -8,9 +8,11 @@
             </div>
             <div class="small-12 medium-4 column">
                 <input type="submit"
-                        {% if inputName != '' %}name="{{ inputName }}"{% endif %}
-                        {% if mageNext != '' %}data-mage-next="{{ mageNext }}"{% endif %}
-                        {% if mageWorking != '' %}data-mage-working="{{ mageWorking }}"{% endif %}
+                        {% if inputName %}name="{{ inputName }}"{% endif %}
+                        {% if mageNext %}data-mage-next="{{ mageNext }}"{% endif %}
+                        data-mage-working="{{ mageWorking ?: 'Working...' }}"
+                        {% if formmethod %}formmethod="{{ formmethod }}"{% endif %}
+                        {% if formaction %}formaction="{{ formaction }}"{% endif %}
                        value="{{ inputValue }}" />
             </div>
         </div>

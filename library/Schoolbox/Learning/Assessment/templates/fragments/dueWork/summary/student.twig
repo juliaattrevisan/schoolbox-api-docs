@@ -15,10 +15,22 @@
 
 <div class="row">
     <div class="small-12 columns">
-        {% if currentUser.role.isStaff %}
-        <a class='submit' href="{{ routeLookup('learningAssessment.getCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}">Create Submission on behalf of {{ student.fullname }}</a>
-        {% elseif currentUser.role.isStudent %}
-        <a class='submit' href="{{ routeLookup('learningAssessment.getCreateSubmission', { assessmentId: assessment.id, studentId: student.id}) }}">Create Submission</a>
+    {% if submissionsBlocked %}
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>{{ submissionsBlocked }}</p>
+        </div>
+    {% else %}
+        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: assessment.id, studentId: student.id}) %}
+        {% if submitRoute %}
+            {% set submitText %}{% spaceless %}
+                Create submission
+                {% if currentUser.role.isStaff %}
+                    on behalf of {{ student.fullname }}
+                {% endif %}
+            {% endspaceless %}{% endset %}
+            <a class="submit" href="{{ submitRoute }}">{{ submitText }}</a>
         {% endif %}
+    {% endif %}
     </div>
 </div>

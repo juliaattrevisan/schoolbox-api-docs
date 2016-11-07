@@ -1,0 +1,525 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\DueWork;
+
+use Alaress_Date_Format;
+use DomainException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Collection;
+use Schoolbox\Error;
+use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\UserMapper;
+
+class Controller extends Assessment\Controller
+{
+
+    /** @var Rubric\ResultMapper */
+    private $resultSetMapper;
+
+    /** @var Rubric\RubricMapper */
+    private $rubricMapper;
+
+    /** @var WorkTypeMapper */
+    private $workTypeMapper;
+
+    /** @var SubmissionBox\Submission\FileMapper */
+    private $submissionFileMapper;
+
+
+    /**
+     * @param UserMapper                          $userMapper
+     * @param Error\Mapper                        $errorMapper
+     * @param MapperProxy                         $assessmentMapper
+     * @param Access                              $access
+     * @param Transactor                          $transactor
+     * @param Assessment\Breadcrumb\Factory       $bakery
+     * @param Rubric\RubricMapper                 $rubricMapper
+     * @param Rubric\ResultMapper                 $resultSetMapper
+     * @param WorkTypeMapper                      $workTypeMapper
+     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor,
+        Assessment\Breadcrumb\Factory $bakery,
+        Rubric\RubricMapper $rubricMapper,
+        Rubric\ResultMapper $resultSetMapper,
+        WorkTypeMapper $workTypeMapper,
+        SubmissionBox\Submission\FileMapper $submissionFileMapper
+    ) {
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        $this->resultSetMapper      = $resultSetMapper;
+        $this->rubricMapper         = $rubricMapper;
+        $this->workTypeMapper       = $workTypeMapper;
+        $this->submissionFileMapper = $submissionFileMapper;
+    }
+
+
+    /**
+     * This gives you a summary of progress made within an Assessment
+     * It is the consolidation of pages previously known as "quickmark" and "quiz review"
+     *
+     * This place is Staff Only
+     *
+     * @api GET /learning/assessment/:assessmentId/status
+     * @param IAssessable $assessment
+     */
+    public function getStatus(IAssessable $assessment)
+    {
+        /* TODO: Quickmark screen
+         */
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
+            'assessment' => $assessment,
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/dueWork/status/staff.twig",
+                $twigData
+            )
+        );
+    }
+
+
+    /**
+     * Display appropriate landing page based on role
+     *
+     * @api   GET /learning/assessments/:assessmentId/:userId
+     * @level 165
+     *
+     * @param Participant $participant
+     * @throws NotFound
+     */
+    public function getSummary(Participant $participant)
+    {
+        $this->assertParticipantAccess($participant);
+
+        /** @var Model $assessment */
+        $assessment = $participant->getAssessable();
+        $student    = $participant->getUser();
+
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
+            'currentUser' => $this->getUser(),
+            'student'     => $student,
+            'assessment'  => $assessment,
+        ];
+
+        try {
+            // TODO this should be called 'assert', not 'is'
+            $assessment->isAcceptSubmission();
+            $twigData['submissionsBlocked'] = false;
+        } catch (DomainException $e) {
+            $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/dueWork/summary/student.twig",
+                $twigData
+            )
+        );
+    }
+
+
+    /**
+     * Displays a form enabling a student to create Submission for a Due Work
+     *
+     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
+     * @level 165
+     * @param Participant $participant
+     */
+    public function getCreateResponseForm(Participant $participant)
+    {
+        $this->assertParticipantAccess($participant);
+
+        /** @var Model $assessment */
+        $assessment = $participant->getAssessable();
+        $student    = $participant->getUser();
+
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+
+        } catch (DomainException $e) {
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
+        /* Otherwise continue
+         */
+        $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
+        $latestResponse            = null;
+        $editorContents            = '';
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         *
+         * TODO: Replace SubmissionFileMapper() usage
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
+            'owner' => $student->getId(),
+            'box_id' => 72
+        ], [
+            'order' => [
+                'submitted' => 'desc'
+            ]
+        ]);
+
+        /* Assume the most recent record is the latest submission
+         */
+        if ($allResponses->count()) {
+            $latestResponse = $allResponses->first();
+
+            /* Load in the wizzywig instead of a file attachment,
+             * if the submission uses the wizzywig editor and the
+             * submission is still a draft
+             */
+            if (in_array($latestResponse->getStorage()->getFilename(), $onlineSubmissionFilenames)) {
+                if ($latestResponse->getDraft()) {
+                    $editorContents = $latestResponse->getStorage()->read();
+                }
+            }
+        }
+
+        /* Attach files if any exist
+         */
+        $zoneFactory = new Assessment\Attachzone\Factory();
+        $zone = $zoneFactory->buildForAssessmentType($assessment);
+
+        if (!$this->getUser()->isSuperuser()) {
+            $folderIds = [];
+
+            /* Sometimes subjectCollection is null ie. when superuser
+             * [subject_collection:protected] =>
+             */
+            if (count($this->getUser()->getSubjectCollection())) {
+                foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
+                    $folderIds[] = $currentSubject['id'];
+                }
+            }
+
+            if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_PAGE_VIEW);
+            }
+        }
+
+        /* Pump into twig land
+         */
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
+            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
+            'assessment'     => $assessment,
+            'student'        => $student,
+            'currentUser'    => $this->getUser(),
+            'attachzone'     => $zone->getTwigContext(),
+            'response'       => $latestResponse,
+            'editorContents' => $editorContents,
+        ]));
+    }
+
+
+    /**
+     * Save a Response, on behalf of a User, for a particular Assessment
+     *
+     * @api POST /learning/assessments/:assessmentId/:participantId/submit
+     * @param Participant $participant
+     * @return void
+     */
+    public function postCreateResponse(Participant $participant)
+    {
+        $this->assertParticipantAccess($participant);
+
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        /** @var Model $assessment */
+        $assessment = $participant->getAssessable();
+
+        /* Work out if we are going to accept responses
+         */
+        try {
+            $assessment->isAcceptSubmission();
+        }
+        catch (DomainException $e) {
+
+            /* When asynchronously saving and suddenly you're not allowed to
+             * ie. when you've run out of time and you left this screen on
+             */
+            if ($rq->isXhr()) {
+                $result['success'] = false;
+                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
+                $result['id']      = 72;
+
+                $rs->status->setCode(403);
+                $rs->content->set($this->buildJsonOutput($result));
+                return;
+            }
+
+            throw $this->getErrorMapper()->generateException($e->getCode());
+        }
+
+        /* Creator is the currently-logged-in user
+         * Participant is the actual owner of the Response
+         *
+         * Usually the same person, unless you're a teacher creating a Response
+         * on behalf of a student (teacher is creator, student is participant)
+         */
+        $creator = $this->getUser();
+
+        /* Set in javascript when automatically saving a draft
+         * Careful the negation
+         */
+        $isFinal = !$rq->post['saveDraft'];
+        $body    = $rq->post['body'];
+
+        if ($rq->post['responseId']) {
+            // Load an existing response to update
+
+            /* TODO: Implement with Mr Sannang's data sources
+             */
+
+            $response = $this->getSubmissionFileMapper()->findById($rq->post['responseId']);
+
+        } else {
+            // Create a new response
+            $response = new DueWorkSubmission();
+            $response
+                ->setAssessable($assessment)
+                ->setSubmittedBy($creator)
+                ->setSubmittedOnBehalfOf($participant->getUser())
+                ->attachOnlineSubmissionContent($body)
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
+        }
+
+        /* If we're saving the final version of the submission
+         * (ie. not a draft) ram the current datetime in
+         */
+        if ($isFinal) {
+
+            /* TODO: this will die because it's not using an actual mapper/model
+             */
+            $response->setSubmittedAt(Alaress_Date_Format::now());
+        }
+
+        /* TODO: Do the actual saving
+         */
+
+        /* Saving drafts from the wizzywig
+         */
+        if ($rq->isXhr()) {
+            $result['success'] = true;
+            $result['message'] = 'OK';
+            $result['id']      = 72;
+
+            $rs->status->setCode(200);
+            $rs->content->set($this->buildJsonOutput($result));
+
+        } else {
+            // redirect after saving to Due Work Summary For Particular Student
+            $rs->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $participant->getUser()->getId(),
+                    ]
+                )
+            );
+        }
+    }
+
+
+    /**
+     * @param Model|IAssessable $assessment
+     * @return array
+     */
+    protected function getAssessmentTwigData(IAssessable $assessment)
+    {
+        // configure the object
+        $assessment
+            ->setUseRubric(false)
+//            ->setAcceptsMultiple()
+        ;
+
+        // create an empty Rubric with appropriate Indicators
+        $rubric = $this->getRubricMapper()->createForContext($assessment->getContext());
+        $rubric->setSubmissionBox(new SubmissionBox()); // TODO fix this with...something
+        $assessment->setRubric($rubric);
+
+        $zoneFactory = new Assessment\Attachzone\Factory();
+
+        // setup some data...
+        $data = [
+            'attachzone'      => $zoneFactory->buildForAssessmentType($assessment)->getTwigContext(),
+            'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
+            'allMarkTypes'    => $this->getAllMarkTypes($assessment),
+            'allGradeSchemes' => $this->getAllGradeSchemes(),
+        ];
+
+        // ...append rubric-related data...
+        $data = array_merge($data, $this->generateRubricTwigData($assessment));
+
+        // ...and scene.
+        return $data;
+    }
+
+
+    /**
+     * Common logic when generating Rubrics
+     *
+     * @param Model $dueWork
+     * @return array
+     */
+    private function generateRubricTwigData(Model $dueWork)
+    {
+        $data = [];
+
+        if (!$dueWork->getRubric() instanceof Rubric\Rubric) {
+            throw new \InvalidArgumentException("Rubric unspecified");
+        }
+
+        $data['rubric'] = $dueWork->getRubric()->toContext();
+
+        $rubricZone = new Zone('rubric');
+        // JS file.type isn't set reliably enough to use text/csv mime filter
+        $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
+        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+        $resultSets = $this->getResultSetMapper()->findAll();
+
+        $rs = new Collection();
+
+        foreach ($resultSets as $result) {
+            if (!$rs[$result->getResultSetId()] instanceof Collection) {
+                $rs[$result->getResultSetId()] = new Collection();
+            }
+            $rs[$result->getResultSetId()][$result->getValue()] = $result;
+        }
+
+        $data['rubricResultSets'] = $rs;
+
+        return $data;
+    }
+
+
+    /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string      $defaultReturnUrl
+     * @return string
+     */
+    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    {
+        // if your context is a project, redirect back to its status screen
+        if ($assessment->getContext() instanceof Assessment\Project) {
+            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+        }
+
+        return $defaultReturnUrl;
+    }
+
+
+    /**
+     * @return Rubric\ResultMapper
+     */
+    protected function getResultSetMapper()
+    {
+        return $this->resultSetMapper;
+    }
+
+
+    /**
+     * @param Rubric\ResultMapper $resultSetMapper
+     * @return static
+     */
+    protected function setResultSetMapper($resultSetMapper)
+    {
+        $this->resultSetMapper = $resultSetMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Rubric\RubricMapper
+     */
+    protected function getRubricMapper()
+    {
+        return $this->rubricMapper;
+    }
+
+
+    /**
+     * @param Rubric\RubricMapper $rubricMapper
+     * @return static
+     */
+    protected function setRubricMapper($rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return WorkTypeMapper
+     */
+    protected function getWorkTypeMapper()
+    {
+        return $this->workTypeMapper;
+    }
+
+
+    /**
+     * @param WorkTypeMapper $workTypeMapper
+     * @return static
+     */
+    protected function setWorkTypeMapper($workTypeMapper)
+    {
+        $this->workTypeMapper = $workTypeMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox\Submission\FileMapper
+     */
+    protected function getSubmissionFileMapper()
+    {
+        return $this->submissionFileMapper;
+    }
+
+
+    /**
+     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     * @return static
+     */
+    protected function setSubmissionFileMapper($submissionFileMapper)
+    {
+        $this->submissionFileMapper = $submissionFileMapper;
+        return $this;
+    }
+
+}

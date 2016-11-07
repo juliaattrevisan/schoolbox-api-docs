@@ -24,7 +24,7 @@ use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
  *
  * Does not belong on AssessmentContext as interface cannot have behaviour (and shouldn't know about implementors)
  */
-class AssessmentContextType
+class AssessmentContextType implements IType
 {
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
@@ -33,6 +33,7 @@ class AssessmentContextType
     const TYPE_UNIT_IMPLEMENTATION = 'unit';
     const TYPE_UNIT_SPECIFICATION = 'unitspec';
 
+    use TypeTrait;
 
     /**
      * Get twig template directory for a given AssessmentContext
@@ -82,7 +83,7 @@ class AssessmentContextType
      * Returns the available string values
      * @return string[]
      */
-    public static function getStringValues()
+    protected function toArray()
     {
         return [
             self::TYPE_FOLDER,

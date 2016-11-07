@@ -8,9 +8,11 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\AssessmentContext;
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -24,7 +26,7 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
  * Does not belong on IAssessable as interface cannot have behaviour (and shouldn't know about implementors)
  * Does not belong on AbstractAssessment as parent class should not know about children
  */
-class AssessmentType
+class AssessmentType implements IType
 {
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
@@ -33,6 +35,7 @@ class AssessmentType
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
 
+    use TypeTrait;
 
     /**
      * Get twig template directory for a given IAssessable
@@ -58,20 +61,31 @@ class AssessmentType
     /**
      * Get the numeric representation from string representation
      *
-     * @param string $stringVal
+     * @param string            $stringVal
+     * @param AssessmentContext $context
      * @return IAssessable
      */
-    public static function stringToObject($stringVal)
+    public static function stringToObject($stringVal, AssessmentContext $context = null)
     {
-        if(self::TYPE_PROJECT == $stringVal){
-            return new Project();
-        } elseif(self::TYPE_DUE_WORK == $stringVal){
-            return new DueWork();
-        } elseif(self::TYPE_TASK == $stringVal){
-            return new Task();
-        } elseif(self::TYPE_QUIZ == $stringVal){
-            return new Quiz();
+        if (self::TYPE_PROJECT == $stringVal) {
+            return (new Project())->setContext($context);
+
+        } elseif (self::TYPE_DUE_WORK == $stringVal) {
+            $object = (new DueWork())->setContext($context);
+
+            if ($context) {
+                $object->setRubric(RubricMapper::getInstance()->createForContext($context));
+            }
+
+            return $object;
+
+        } elseif (self::TYPE_TASK == $stringVal) {
+            return (new Task())->setContext($context);
+
+        } elseif (self::TYPE_QUIZ == $stringVal) {
+            return (new Quiz())->setContext($context);
         }
+
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
     }
 
@@ -82,7 +96,7 @@ class AssessmentType
      * Returns the available string values
      * @return string[]
      */
-    public static function getStringValues()
+    protected function toArray()
     {
         return [
             self::TYPE_PROJECT,

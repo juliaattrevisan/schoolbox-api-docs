@@ -6,33 +6,31 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
+use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 class Module extends BaseModule
 {
@@ -41,316 +39,265 @@ class Module extends BaseModule
      */
     protected $basename = 'learningAssessment';
 
+    /**
+     * By default, this will point to the list controller.
+     * If a preload successfully loads an Assessment, this value will
+     * be mutated to the appropriate controller class name.
+     *
+     * @var string
+     */
+    private $controllerClass = ListController::class;
 
     /**
-     * @inheritdoc
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
      */
-    public function initRoutes(Router $router, $basePath)
+    protected function registerRoutes()
     {
-        $routes = [
-            'GET' => [
+        // preloaders to use
+        $preloadContext     = function ($params) { return $this->preloadContext($params); };
+        $preloadAssessment  = function ($params) { return $this->preloadAssessment($params); };
+        $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
 
-                /* Get 'Create Assessment' form in a specific context. Optionally declare Assessment type
-                 */
-                '/assessment/folder/{folderId}{/assessmentTypeTitle}'     => 'getSelectAssessmentInFolder',
+        // rules in use
+        $isSuper   = $this->getAuthRule('isSuperuser');
+        $loggedIn  = $this->getAuthRule('isLoggedIn');
+        $isStaff   = $this->getAuthRule('isStaffOrSuper');
+        $canSubmit = $this->getAuthRule('isStaffOrStudent');
 
-                // May contain a 'returnUrl' GET parameter to return to project modification page
-                '/assessment/project/{projectId}{/assessmentTypeTitle}'   => 'getSelectAssessmentInProject',
-                '/assessment/unit/{unitId}{/assessmentTypeTitle}'         => 'getSelectAssessmentInUnitImplementation',
-                '/assessment/unitspec/{unitSpecId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
+        // pluralise for REST
+        $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
 
-                /* Get a 'Modify Assessment' form to edit an existing assessment
-                 */
-                '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
-
-                /* Redirect url which sends people to either Status or
-                 * Summary screens depending on Role of the current user
-                 */
-                '/assessment/{assessmentId}' => 'getAssessment',
-
-                /* Assessment Summary screen
-                 */
-                '/assessment/{assessmentId}/{studentId}' => 'getSummary',
-
-                /* Submit a Response to a Due Work
-                 */
-                '/assessment/{assessmentId}/submit/{studentId}' => 'getCreateSubmission',
-
-                /* Staff-specific Status screens
-                 */
-                '/assessment/{assessmentId}/status' => 'getStatus',
-
-                /* Miscellaneous routes
-                 */
-//                '/assessment/{assessmentId}/{studentId}'        => 'getStudentAssessment',
+        // tokenised route chunks
+        $assRoute     = '/assessments/{assessmentId:\d+}';
+        $assListRoute = "/{contextType:$contextTypes}/{contextId:\\d+}/assessments";
+        $studentParam = '{studentId:\d+}';
 
 
-            ],
-            'POST' => [
+        // register the routes
+        $this->register('GET',  "$assListRoute",     'getAssessmentsByContext', $isSuper, $preloadContext);
+        $this->register('POST', "$assListRoute",     'postCreateAssessment',    $isStaff, $preloadContext);
+        $this->register('GET',  "$assListRoute/new", 'getCreateAssessmentForm', $isStaff, $preloadContext);
 
-                /* Return a HTML fragment for the AssessmentType selected in Step-1
-                 */
-                '/assessment/select' => 'postSelectAssessment',
+        $this->register('GET',  "$assRoute",        'getAssessment',            $loggedIn, $preloadAssessment);
+        $this->register('POST', "$assRoute",        'postUpdateAssessment',     $isStaff,  $preloadAssessment);
+        $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $isStaff,  $preloadAssessment);
+        $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $isStaff,  $preloadAssessment);
+        $this->register('GET',  "$assRoute/status", 'getStatus',                $isStaff,  $preloadAssessment);
 
-                /* Save the Assessment's data + redirect somewhere appropriate (context or returnUrl)
-                 */
-                '/assessment/create' => 'postCreateAssessment',
+        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $canSubmit, $preloadParticipant);
+        $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant);
+        $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant);
+    }
 
-                /* Update an existing Assessment + redirect somewhere appropriate (context or returnUrl)
-                 */
-                '/assessment/{assessmentId}/update' => 'postUpdateAssessment',
+    /**
+     * TODO why is an actual ContextMapper composite not a thing... it should be a thing
+     *
+     * @param string $code
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @return \Schoolbox\Mapper
+     */
+    protected function getContextMapper($code)
+    {
+        switch ($code) {
+            case AssessmentContextType::TYPE_FOLDER.'s':              return $this->getFolderMapper();
+            case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION.'s': return $this->getUnitImplMapperProxy();
+            case AssessmentContextType::TYPE_PROJECT.'s':             return $this->getAssessmentMapperProxy();
+            case AssessmentContextType::TYPE_UNIT_SPECIFICATION.'s':  return $this->getUnitSpecMapperProxy();
+        }
 
-                /* Delete an assessment
-                 */
-                '/assessment/{assessmentId}/delete' => 'postDeleteAssessment',
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+    }
 
-                /* Save a Response to a Due Work
-                 */
-                '/assessment/{assessmentId}/submit/{studentId}' => 'postCreateSubmission'
-            ]
+    /**
+     * Set the name of the controller to execute, based on the given assessment
+     *
+     * @param IAssessable $a
+     * @return string
+     */
+    public function setControllerFromAssessment(IAssessable $a)
+    {
+        // TODO centralise this into a factory
+        $map = [
+            AssessmentType::TYPE_DUE_WORK => Assessment\DueWork\Controller::class,
+            AssessmentType::TYPE_PROJECT  => Assessment\Project\Controller::class,
+            AssessmentType::TYPE_QUIZ     => Assessment\Quiz\Controller::class,
+            AssessmentType::TYPE_TASK     => Assessment\Task\Controller::class,
         ];
 
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path)->addTokens([
-                'assessmentId' => '\d+',
-                'assessmentType' => '\d+',
-                'assessmentTypeTitle' => '('.implode('|', AssessmentType::getStringValues()).')',
-                'studentId' => '\d+',
-            ]);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
+        // set the controller class for later
+        $this->controllerClass = $map[AssessmentType::objectToString($a)];
     }
 
     /**
-     * @inheritdoc
+     * Convert route params into a participant object
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
      */
-    public function initRoutePreloads(PathMatcher $matcher)
+    protected function preloadParticipant(array $params)
     {
-        $this->addRoutePreload(
-        /**
-         * @param $params
-         * @return array
-         */
-            $matcher,
-            '(?:getSelectAssessmentInFolder|getSelectAssessmentInProject|getSelectAssessmentInUnitImplementation|getSelectAssessmentInUnitSpecification)',
-            function ($params) {
+        try {
+            // obtain the assessment from our other preload
+            $assessment  = $this->preloadAssessment($params)['assessment'];
+            $student     = $this->getUserMapper()->findById($params['studentId']);
+            $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
 
-                $args = [];
+        } catch (OutOfBoundsException $e) {
+            // given user/assessment combination is invalid: not a participant
+            throw new NotFound();
 
-                // TODO add mapper error handling
-                $context = null;
-                if(array_key_exists('folderId', $params)){
-                    $context = $this->getFolderMapper()->findById($params['folderId']);
-                    $args['folder'] = $context;
-                } elseif(array_key_exists('projectId', $params)){
-                    $context = $this->getAssessmentMapperProxy()->findById($params['projectId']);
-                    $context = ($context instanceof Project) ? $context : null;
-                    $args['project'] = $context;
-                } elseif(array_key_exists('unitId', $params)){
-                    $context = $this->getUnitImplMapperProxy()->findById($params['unitId']);
-                    $args['unitImpl'] = $context;
-                } elseif(array_key_exists('unitSpecId', $params)){
-                    $context = $this->getUnitSpecMapperProxy()->findById($params['unitSpecId']);
-                    $args['unitSpec'] = $context;
-                }
+        } catch (MapperException $e) {
+            // either assessment or user was not found
+            throw new NotFound();
+        }
 
-                if(is_null($context)){
-                    // TODO - needs more informative Exception
-                    throw new \DomainException('Unable to determine context');
-                }
+        // set the controller class for later
+        $this->setControllerFromAssessment($assessment);
 
-                if($params['assessmentTypeTitle']){
-                    $args['assessment'] = AssessmentType::stringToObject($params['assessmentTypeTitle']);
-                    $args['assessment']->setContext($context);
-                    // Is this a DueWork ?
-                    if($args['assessment'] instanceof DueWork){
-                        // Create an empty Rubric with appropriate Indicators
-                        $folderIds = [$context->getFolder()->getId()];
-                        if($context instanceof UnitSpecification){
-                            $folderIds[] = $context->getCourse()->getFolder()->getId();
-                        }
-                        $rubric = $this->getRubricMapper()->createForFolder($folderIds[0], $folderIds[1]);
-                        $rubric->setSubmissionBox(new SubmissionBox());
-                        $args['assessment']->setRubric($rubric);
-                    }
-                } else {
-                    $args['assessment'] = null;
-                }
+        // beyond this point is only relevant to duework, so bail out early in other cases
+        if (!$assessment instanceof DueWork) {
+            return [ 'participant' => $participant ];
+        }
 
-                return $args;
+        // Get all Student Submissions (IResponses)
+        $studentSubmissionMapper = $this->getStudentSubmissionMapper();
+
+        // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
+        $columnList = [
+            'box_id' => $assessment->getId(),
+            'owner' => $student->getId(),
+        ];
+
+        /** @var StudentSubmission[] $studentSubmissions */
+        $studentSubmissions = $studentSubmissionMapper->findByColumnList($columnList);
+
+        // TODO - This translation from 'StudentSubmission' to 'DueWorkResponse' should
+        // TODO - not be necessary. A StudentSubmission should BE AN IResponse
+        // TODO - Update the mappers to return the new objects
+        foreach($studentSubmissions as $studentSubmission){
+            $response = (new DueWorkSubmission())
+                ->setId($studentSubmission->getId())
+                ->setSubmittedBy($student)
+                ->setSubmittedOnBehalfOf($student)
+                ->setCreatedAt($studentSubmission->getCreatedAt())
+                ->setDeletedAt(new \Alaress_Date_NullDate())
+                ->setUpdatedAt($studentSubmission->getCreatedAt());
+
+            if($hash = $studentSubmission->getHash()){
+                $response->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
             }
-        );
+            $response->setAssessable($assessment);
+            $assessment->getResponses()->add($response);
+            $participant->getAllResponses()->add($response);
+        }
 
+        // Get all Student Returns (IFeedbacks)
+        $submissionReturnMapper = $this->getSubmissionReturnMapper();
 
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getUpdateAssessment|postUpdateAssessment)',
-            function ($params) {
-                return [
-                    'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
-                ];
+        // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
+        $columnList = [
+            'box_id' => $assessment->getId(),
+            'owner' => $student->getId(),
+        ];
+        /** @var ReturnedWork[] $submissionReturns */
+        $submissionReturns = $submissionReturnMapper->findByColumnList($columnList);
+
+        // TODO - This translation from 'ReturnedWork' to 'DueWorkFeedback' should
+        // TODO - not be necessary. A ReturnedWork should BE AN IFeedback
+        // TODO - Update the mappers to return the new objects
+        foreach($submissionReturns as $submissionReturn){
+            $feedback = (new DueWorkFeedback())
+                ->setId($submissionReturn->getId())
+                ->setComment($submissionReturn->getComment())
+                ->setNormalisedMark($submissionReturn->getNormalizedMark())
+                ->setHumanReadableMark($submissionReturn->getMark())
+                ->setReviewer($submissionReturn->getMarker())
+                ->setCreatedAt($submissionReturn->getCreatedAt())
+                ->setUpdatedAt($submissionReturn->getCreatedAt())
+                ->setPublishedAt($submissionReturn->getCreatedAt())
+                ->setDeletedAt($submissionReturn->getDeletedAt());
+
+            if($hash = $submissionReturn->getHash()){
+                $feedback->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
             }
-        );
+            $feedback->setAssessable($assessment);
+            $assessment->getFeedbacks()->add($feedback);
+            $participant->getAllFeedbacks()->add($feedback);
+        }
 
-        $this->addRoutePreload(
-            $matcher,
-            '(?:postDeleteAssessment|getAssessment)',
-            function ($params) {
-                try {
-                    $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-                } catch (MapperException\Deleted $e){
-                    $assessment = $e->getDeletedObject();
-                }
-                return ['assessment' => $assessment];
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getSummary)',
-            function ($params) {
-                try {
-                    $args = [];
-
-                    $args['participant'] = $this->getParticipantMapperProxy()->findForAssessmentAndUser(
-                        $this->getAssessmentMapperProxy()->findById($params['assessmentId']),
-                        $this->getUserMapper()->findById($params['studentId'])
-                    );
-
-                    return $args;
-                } catch (\OutOfBoundsException $e) {
-                    throw new NotFound($e->getMessage());
-                } catch (\Exception $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                }
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getStatus|getStudentAssessment)',
-            function ($params) {
-
-                $args['assessment'] = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-
-                if (array_key_exists('studentId', $params)) {
-                    try {
-                        $args['student'] = $this->getUserMapper()->findById($params['studentId']);
-                    } catch (MapperException $e) {
-                        $args['student'] = $this->getUserMapper()->createModel();
-                    }
-                }
-                return $args;
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            ['getCreateSubmission', 'postCreateSubmission'],
-            function ($params) {
-
-                /** @var DueWork $assessment */
-                $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-
-                // Route is only valid for DueWork.
-                // TODO - if $assessment exists, redirect to more appropriate page. For now just error out.
-                if(!$assessment instanceof DueWork){
-                    throw new \DomainException('TODO - You can only submit to DueWork. Found: '.get_class($assessment));
-                }
-
-                $student = $this->getUserMapper()->findById($params['studentId']);
-
-                $participant = new Participant($student, $assessment);
-                $assessment->getAllParticipants()->add($participant);
-
-                // Get all Student Submissions (IResponses)
-                $studentSubmissionMapper = $this->getStudentSubmissionMapper();
-
-                // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
-                $columnList = [
-                    'box_id' => $assessment->getId(),
-                    'owner' => $student->getId(),
-                ];
-
-
-                /** @var StudentSubmission[] $studentSubmissions */
-                $studentSubmissions = $studentSubmissionMapper->findByColumnList($columnList);
-
-                // TODO - This translation from 'StudentSubmission' to 'DueWorkResponse' should
-                // TODO - not be necessary. A StudentSubmission should BE AN IResponse
-                // TODO - Update the mappers to return the new objects
-                foreach($studentSubmissions as $studentSubmission){
-                    $response = (new DueWorkSubmission())
-                        ->setId($studentSubmission->getId())
-                        ->setSubmittedBy($student)
-                        ->setSubmittedOnBehalfOf($student)
-                        ->setCreatedAt($studentSubmission->getCreatedAt())
-                        ->setDeletedAt(new \Alaress_Date_NullDate())
-                        ->setUpdatedAt($studentSubmission->getCreatedAt());
-
-                    if($hash = $studentSubmission->getHash()){
-                        $response->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
-                    }
-                    $response->setAssessable($assessment);
-                    $assessment->getResponses()->add($response);
-                    $participant->getAllResponses()->add($response);
-                }
-
-                // Get all Student Returns (IFeedbacks)
-                $submissionReturnMapper = $this->getSubmissionReturnMapper();
-
-                // TODO - replace 'box_id' with 'assessment_id' once migration tasks are done
-                $columnList = [
-                    'box_id' => $assessment->getId(),
-                    'owner' => $student->getId(),
-                ];
-                /** @var ReturnedWork[] $submissionReturns */
-                $submissionReturns = $submissionReturnMapper->findByColumnList($columnList);
-
-                // TODO - This translation from 'ReturnedWork' to 'DueWorkFeedback' should
-                // TODO - not be necessary. A ReturnedWork should BE AN IFeedback
-                // TODO - Update the mappers to return the new objects
-                foreach($submissionReturns as $submissionReturn){
-                    $feedback = (new DueWorkFeedback())
-                        ->setId($submissionReturn->getId())
-                        ->setComment($submissionReturn->getComment())
-                        ->setNormalisedMark($submissionReturn->getNormalizedMark())
-                        ->setHumanReadableMark($submissionReturn->getMark())
-                        ->setReviewer($submissionReturn->getMarker())
-                        ->setCreatedAt($submissionReturn->getCreatedAt())
-                        ->setUpdatedAt($submissionReturn->getCreatedAt())
-                        ->setPublishedAt($submissionReturn->getCreatedAt())
-                        ->setDeletedAt($submissionReturn->getDeletedAt());
-
-                    if($hash = $submissionReturn->getHash()){
-                        $feedback->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
-                    }
-                    $feedback->setAssessable($assessment);
-                    $assessment->getFeedbacks()->add($feedback);
-                    $participant->getAllFeedbacks()->add($feedback);
-                }
-
-                return [
-                    'assessment' => $assessment,
-                    'student' => $student
-                ];
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            '(?:postCreateSubmission)',
-            function ($params) {
-                return [
-                    'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId'])
-                ];
-            }
-        );
+        return [
+            'participant' => $participant
+        ];
     }
 
+    /**
+     * Convert route params into a context object
+     *
+     * @param $params
+     * @return array
+     */
+    protected function preloadContext(array $params)
+    {
+        try {
+            $c = $this->getContextMapper($params['contextType'])->findById($params['contextId']);
+        } catch (MapperException\Deleted $e) {
+            $c = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'context' => $c
+        ];
+    }
+
+    /**
+     * Convert route params into an assessment object
+     *
+     * @param array $params
+     * @return array
+     */
+    protected function preloadAssessment(array $params)
+    {
+        try {
+            $a = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+        } catch (MapperException\Deleted $e){
+            $a = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // TODO evaluate the necessity of this expensive call here
+        $this->loadParticipantsIntoAssessment($a);
+
+        // set the controller
+        $this->setControllerFromAssessment($a);
+
+        return [
+            'assessment' => $a
+        ];
+    }
+
+    /**
+     * Recursive function for loading participation
+     * TODO put this in the mapper
+     *
+     * @param IAssessable $a
+     */
+    private function loadParticipantsIntoAssessment(IAssessable $a)
+    {
+        $a->setAllParticipants($this->getParticipantMapperProxy()->findForAssessment($a));
+
+        if ($a instanceof Project) {
+            foreach ($a->getAssessables() as $b) {
+                // recurse
+                $this->loadParticipantsIntoAssessment($b);
+            }
+        }
+    }
 
     /**
      * @inheritdoc
@@ -361,68 +308,76 @@ class Module extends BaseModule
     }
 
     /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        // NOTE the pointer magic to make things more concise
+
+        // base list controller
+        $lc =& $injector->params[ListController::class];
+        $lc['userMapper']  = $this->getMapperFactory()->getLazy(UserMapper::class);
+        $lc['errorMapper'] = $this->getMapperFactory()->getLazy(ErrorMapper::class);
+        $lc['access']      = $this->getMapperFactory()->getLazy(Access::class);
+        $lc['transactor']  = $injector->lazyNew(Transactor::class, [
+            'folderMapper'                  => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
+            'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
+            'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
+            'router'                        => $injector->lazyGet('router'),
+        ]);
+
+        // abstract controller
+        $ac =& $injector->params[Controller::class];
+        $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
+            'router' => $injector->lazyGet('router')
+        ]);
+
+        // due work specific
+        $dc =& $injector->params[Assessment\DueWork\Controller::class];
+        $dc['rubricMapper']    = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
+        $dc['resultSetMapper'] = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
+        $dc['workTypeMapper']  = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
+        $ac['submissionFileMapper'] = $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class);
+
+        // project specific
+        // $pc =& $injector->params[Assessment\Project\Controller::class];
+
+        // quiz specific
+        // $qc =& $injector->params[Assessment\Quiz\Controller::class];
+
+        // task specific
+        // $tc =& $injector->params[Assessment\Task\Controller::class];
+
+    }
+
+    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'folderMapper'                  => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'submissionFileMapper'          => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class),
-                'assessmentMapperProxy'         => $injector->lazyGet('assessmentDataSource'),
-                'unitSpecificationMapperProxy'  => $injector->lazyGet('unitSpecificationDataSource'),
-                'unitImplementationMapperProxy' => $injector->lazyGet('unitImplementationDataSource'),
-                'participantDataSource'         => $injector->lazyGet('participantDataSource'),
-                'rubricMapper'                  => $this->getMapperFactory()->getLazy(RubricMapper::class),
-            ])
-        );
+        $basename = 'controller:' . $this->basename;
+
+        // dynamically choose your poison
+        $injector->set($basename, $injector->lazyNew($this->controllerClass));
+
+        $d = AssessmentType::TYPE_DUE_WORK;
+        $p = AssessmentType::TYPE_PROJECT;
+        $q = AssessmentType::TYPE_QUIZ;
+        $t = AssessmentType::TYPE_TASK;
+
+        // declare all the options anyway
+        $injector->set("$basename/$d", $injector->lazyNew(Assessment\DueWork\Controller::class));
+        $injector->set("$basename/$p", $injector->lazyNew(Assessment\Project\Controller::class));
+        $injector->set("$basename/$q", $injector->lazyNew(Assessment\Quiz\Controller::class));
+        $injector->set("$basename/$t", $injector->lazyNew(Assessment\Task\Controller::class));
     }
-
-    /**
-     * These pages may be accessed by:
-     *
-     * * superusers
-     * * staff
-     * * the child themselves
-     * * the child's parents
-     *
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $ruleRegexp = '(?:getSummary|getCreateSubmission)';
-        $this->addRoutePermission($authorizer, $ruleRegexp,
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\HasRole(Role::STUDENT),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsSuperuser()
-                )
-            )
-        );
-
-        $staffOnly = [
-            'getSummaryStaff','postCreateAssessment','postUpdateAssessment','postDeleteAssessment','getStatus', 'getSelectAssessmentInFolder',
-            'getSelectAssessmentInProject','getSelectAssessmentInUnitImplementation','getSelectAssessmentInUnitSpecification', 'getUpdateAssessment'
-        ];
-
-        // TODO: postCreateAssessment|postUpdateAssessment need more logic
-        $ruleRegexp = '(?:' . implode('|', $staffOnly) . ')';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
-                )
-            );
-    }
-
 
     /* Getters / Setters
      */
@@ -505,13 +460,6 @@ class Module extends BaseModule
     protected function getParticipantMapperProxy()
     {
         return $this->injector->get('participantDataSource');
-    }
-    /**
-     * @return RubricMapper
-     */
-    protected function getRubricMapper()
-    {
-        return $this->getMapperFactory()->get(RubricMapper::class);
     }
 
 }

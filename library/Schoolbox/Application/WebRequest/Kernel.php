@@ -85,8 +85,6 @@ class Kernel extends \Alaress\Application\Kernel
             /** @var \Alaress\Module\Module $module */
             $module = $this->di->get('module:'.$controllerName);
             $module->initControllerDependencies();
-            $module->initControllers($this->di);
-            unset($module);
 
             try {
                 /** @var \Alaress\Session\Session $session */
@@ -101,9 +99,6 @@ class Kernel extends \Alaress\Application\Kernel
                 if ($session->isAuthSessionAlive()) {
                     $session->updateLastTime();
                 }
-
-                /** @var \Alaress\Web\Controller\Base $controller */
-                $controller = $this->di->get('controller:'.$controllerName);
 
                 /** @var \Aura\Web\Response $response */
                 $response = null;
@@ -125,6 +120,13 @@ class Kernel extends \Alaress\Application\Kernel
                 } catch (\Exception $preloaderException) {
                     // Store the preloader exception for later
                 }
+
+                // now the preloading is done initialise the controller
+                $module->initControllers($this->di);
+                unset($module);
+
+                /** @var \Alaress\Web\Controller\Base $controller */
+                $controller = $this->di->get('controller:'.$controllerName);
 
                 // Authorize, throwing whatever exceptions might be thrown.
                 /** @var \Alaress\Authorizer\Authorizer $authorizer */
