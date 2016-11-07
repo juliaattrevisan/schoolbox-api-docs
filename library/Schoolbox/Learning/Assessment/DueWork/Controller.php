@@ -19,6 +19,8 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -41,20 +43,20 @@ class Controller extends Assessment\Controller
     /** @var WorkTypeMapper */
     private $workTypeMapper;
 
-    /** @var SubmissionBox\Submission\FileMapper */
-    private $submissionFileMapper;
+    /** @var DueWorkResponseMapper */
+    private $dueWorkResponseMapper;
 
     /**
-     * @param UserMapper                          $userMapper
-     * @param Error\Mapper                        $errorMapper
-     * @param MapperProxy                         $assessmentMapper
-     * @param Access                              $access
-     * @param Transactor                          $transactor
-     * @param Assessment\Breadcrumb\Factory       $bakery
-     * @param Rubric\RubricMapper                 $rubricMapper
-     * @param Rubric\ResultMapper                 $resultSetMapper
-     * @param WorkTypeMapper                      $workTypeMapper
-     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param MapperProxy                   $assessmentMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     * @param Rubric\RubricMapper           $rubricMapper
+     * @param Rubric\ResultMapper           $resultSetMapper
+     * @param WorkTypeMapper                $workTypeMapper
+     * @param DueWorkResponseMapper         $dueWorkResponseMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -66,13 +68,13 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         WorkTypeMapper $workTypeMapper,
-        SubmissionBox\Submission\FileMapper $submissionFileMapper
+        DueWorkResponseMapper $dueWorkResponseMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
-        $this->resultSetMapper      = $resultSetMapper;
-        $this->rubricMapper         = $rubricMapper;
-        $this->workTypeMapper       = $workTypeMapper;
-        $this->submissionFileMapper = $submissionFileMapper;
+        $this->resultSetMapper       = $resultSetMapper;
+        $this->rubricMapper          = $rubricMapper;
+        $this->workTypeMapper        = $workTypeMapper;
+        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
     }
 
 
@@ -311,12 +313,7 @@ class Controller extends Assessment\Controller
 
         if ($rq->post['responseId']) {
             // Load an existing response to update
-
-            /* TODO: Implement with Mr Sannang's data sources
-             */
-
-            $response = $this->getSubmissionFileMapper()->findById($rq->post['responseId']);
-
+            $response = $this->getDueWorkResponseMapper()->findById($rq->post['responseId']);
         } else {
             // Create a new response
             $response = new DueWorkSubmission();
@@ -540,21 +537,21 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @return SubmissionBox\Submission\FileMapper
+     * @return DueWorkResponseMapper
      */
-    protected function getSubmissionFileMapper()
+    protected function getDueWorkResponseMapper()
     {
-        return $this->submissionFileMapper;
+        return $this->dueWorkResponseMapper;
     }
 
 
     /**
-     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     * @param DueWorkResponseMapper $dueWorkResponseMapper
      * @return static
      */
-    protected function setSubmissionFileMapper($submissionFileMapper)
+    protected function setDueWorkResponseMapper($dueWorkResponseMapper)
     {
-        $this->submissionFileMapper = $submissionFileMapper;
+        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         return $this;
     }
 
