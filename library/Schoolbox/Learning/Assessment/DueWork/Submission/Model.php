@@ -79,6 +79,16 @@ class Model extends AbstractResponse
     }
 
     /**
+     * Is this a draft? (In other words, has it not yet been submitted?)
+     *
+     * @return bool
+     */
+    public function isDraft()
+    {
+        return !($this->getSubmittedAt() instanceof \Alaress_Date_Format && !($this->getSubmittedAt() instanceof \Alaress_Date_NullDate));
+    }
+
+    /**
      * This response is submitted (no longer a draft)
      *
      * @return bool

@@ -96,7 +96,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getUpdatedAt());
+                ->setUpdatedAt($studentSubmission->getUpdatedAt())
+                ->setSubmittedAt($studentSubmission->getSubmittedAt());
 
             foreach ($studentSubmission->getFiles() as $file) {
                 // Translate the file subobject
@@ -139,7 +140,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = (new StudentSubmission())
                 ->setOwner($domainObject->getSubmittedBy())
-                ->setCreatedAt($domainObject->getCreatedAt());
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setSubmittedAt($domainObject->getSubmittedAt());
 
             // Files
             foreach ($domainObject->getAllFiles() as $file) {
