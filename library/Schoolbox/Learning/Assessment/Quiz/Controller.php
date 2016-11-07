@@ -18,6 +18,11 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 
 /**
  * Class Controller
@@ -36,6 +41,21 @@ class Controller extends Assessment\Controller
      */
     private $participantMapper;
 
+    /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
+
+    /**
+     * @var QuizSectionMapper
+     */
+    private $quizSectionMapper;
+
+    /**
+     * @var QuizAttemptMapper
+     */
+    private $quizAttemptMapper;
+
 
     /**
      * Controller constructor.
@@ -47,6 +67,9 @@ class Controller extends Assessment\Controller
      * @param Transactor             $transactor
      * @param BreadcrumbFactory      $bakery
      * @param Participant\DataSource $participantMapper
+     * @param QuizMapper             $quizMapper
+     * @param QuizSectionMapper      $quizSectionMapper
+     * @param QuizAttemptMapper      $quizAttemptMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -55,10 +78,16 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
-        Participant\DataSource $participantMapper
+        Participant\DataSource $participantMapper,
+        QuizMapper $quizMapper,
+        QuizSectionMapper $quizSectionMapper,
+        QuizAttemptMapper $quizAttemptMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
         $this->participantMapper = $participantMapper;
+        $this->quizMapper = $quizMapper;
+        $this->quizSectionMapper = $quizSectionMapper;
+        $this->quizAttemptMapper = $quizAttemptMapper;
     }
 
 
@@ -106,27 +135,62 @@ class Controller extends Assessment\Controller
     /**
      * Redirect method
      *
-     * Sends you to a status or summary screen depending on who is
-     * currently logged in and what they are viewing
+     * Sends you to a page depending on the user's role and progress in a Quiz
      *
-     * For quizzes, this is slightly more complicated than for other types.
-     * If you are a participant of this quiz, but you have not made any attempts,
-     * redirect straight to the intro page.
+     * if(user is a participant of this quiz)
+     *     if(user has no attempts || latest attempt is finished)
+     *         Display Quiz Intro
+     *     else(user's latest attempt is unfinished)
+     *         Display latest attempt, first section
+     * else(user is not participant)
+     *    if(user is teacher)
+     *        Display Summary page
+     *    else(user not teacher)
+     *        Display permission denied
      *
      * @api GET /learning/assessment/:assessmentId
      * @param IAssessable $assessment
      */
     public function getAssessment(IAssessable $assessment)
     {
+        // Is user a participant ?
         try {
-            $participation = $this->getParticipantMapper()->findForAssessmentAndUser($assessment, $this->getUser());
+            $participant = $this->getParticipantMapper()->findForAssessmentAndUser($assessment, $this->getUser());
 
-            if ($participation->getAllResponses()->count() == 0) {
+            // Has user not yet attempted the quiz
+            if ($participant->getAllResponses()->count() == 0) {
                 // this is the special case: redirect to intro
                 $this->getResponse()->redirect->afterPost(
                     $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
                 );
                 return;
+            } else {
+                // Get latest attempt's finish date.
+                $latestResponse = $participant->findMostRecentResponse();
+                $latestAttempt = $this->quizAttemptMapper->findById($latestResponse->getId());
+                $finishDate = $latestAttempt->getFinish();
+
+                // Is the attempt in progress ?
+                if(is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate){
+                    $quiz = $this->getQuizForAssessmentId($assessment->getId());
+                    $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
+                    /** @var QuizSection $firstSection */
+                    $firstSection = null;
+                    foreach($sections as $section){
+                        if(is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()){
+                            $firstSection = $section;
+                        }
+                    }
+
+                    $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
+                    return;
+                // Not in progress
+                } else {
+                    $this->getResponse()->redirect->afterPost(
+                        $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
+                    );
+                    return;
+                }
             }
 
         } catch (\OutOfBoundsException $e ) {
@@ -195,6 +259,23 @@ class Controller extends Assessment\Controller
     protected function getParticipantMapper()
     {
         return $this->participantMapper;
+    }
+
+    /**
+     * Converts an assessment_id to a Quiz
+     *
+     * @param int $assessmentId
+     * @return Quiz
+     */
+    protected function getQuizForAssessmentId($assessmentId)
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId)->first();
+
+        if (Quiz::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+        return $quiz;
     }
 
 }
