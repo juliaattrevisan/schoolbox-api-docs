@@ -37,6 +37,7 @@ foreach ($docs as $doc) {
     try{
         $submission = FileMapper::getInstance()->findById($doc->getFile()->getId());
 
+        // TODO fix this to work with multiple files
         $documentId = $gateway->submit($submission);
 
         if (!empty($documentId)) {
