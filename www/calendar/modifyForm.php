@@ -25,16 +25,17 @@ $eventMapper     = new EventMapper();
  *
  * @param int $userId
  * @param Event $event
+ * @param string $action
  *
  * @return Schoolbox\User
  */
-$validateOwner = function ($userId, $event) use ($userMapper) {
+$validateOwner = function ($userId, $event, $action) use ($userMapper) {
     try {
         /* Check logged in user has permission to modify this event
          */
         $eventAccess = new Access();
 
-        if ($eventAccess->checkAccess($_SESSION['user'], $event) === false) {
+        if ($action != 'Add' && $eventAccess->checkAccess($_SESSION['user'], $event) === false) {
             error(34);
         } else {
             $user = $userMapper->findById($userId);
@@ -71,7 +72,7 @@ switch ($_REQUEST['action']) {
             try {
                 $event = $eventMapper->findById($_POST['id']);
                 // Validate event's existing owner too
-                $validateOwner($event->getOwner()->getId(), $event);
+                $validateOwner($event->getOwner()->getId(), $event, $_REQUEST['action']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 error(160);
                 exit;
@@ -79,7 +80,7 @@ switch ($_REQUEST['action']) {
         } else {
             $event = new Event();
         }
-        $owner = $validateOwner($_POST['userId'], $event);
+        $owner = $validateOwner($_POST['userId'], $event, $_REQUEST['action']);
         /* Events aren't visible until this date
          * TODO: Fix validator in Alaress Date Format
          */
@@ -216,7 +217,7 @@ switch ($_REQUEST['action']) {
         try {
             $event = $eventMapper->findById($_REQUEST['id']);
             // Validate owner of this event can actually delete this event
-            $validateOwner($event->getOwner()->getId(), $event);
+            $validateOwner($event->getOwner()->getId(), $event, $_REQUEST['action']);
         } catch (\Exception $e) {
             error(160);
             exit;
