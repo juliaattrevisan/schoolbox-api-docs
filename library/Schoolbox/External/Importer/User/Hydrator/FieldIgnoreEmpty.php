@@ -27,6 +27,9 @@ class FieldIgnoreEmpty extends Field
     public function hydrate($row, UserModel $user)
     {
         if (isset($row[$this->fieldname]) && strlen($row[$this->fieldname]) > 0) {
+            if ($this->trim) {
+                $row[$this->fieldname] = trim($row[$this->fieldname]);
+            }
             return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
         }
         return $user;
