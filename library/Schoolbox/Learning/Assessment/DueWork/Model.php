@@ -111,6 +111,7 @@ class Model extends AbstractAssessment
 
     /**
      * Work out if we are going to accept responses
+     * TODO an 'is' method should safely return a boolean; this logic should be in an 'assertAcceptSubmission()' method
      *
      * It's not accepting submissions if:
      *      - If it's not open
