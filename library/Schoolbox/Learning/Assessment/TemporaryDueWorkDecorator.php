@@ -15,89 +15,258 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
+use \Schoolbox\File\Mimetype;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use \Schoolbox\Learning\Assessment\DueWork\WorkType as WorkType;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
 class TemporaryDueWorkDecorator
 {
 
     /**
      * TemporaryDueWorkDecorator constructor.
+     */
+    public function __construct()
+    {
+        $this->hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
+        $this->celia = \Schoolbox\UserMapper::getInstance()->findById(3);
+    }
+
+    /**
+     * Interior Decorate
+     *
      * @param DueWork $assessment
      */
-    public function __construct(DueWork $assessment)
+    public function decorate(DueWork $assessment)
     {
+        $this->generateResponse1($assessment);
+        $this->generateResponse2($assessment);
+        $this->generateFloaters($assessment);
+    }
+
+    /**
+     * First chunk of test data
+     *
+     * @param DueWork $assessment
+     */
+    private function generateResponse1(DueWork $assessment)
+    {
+        $plagscan1 = new Plagscan();
+        $plagscan1
+            ->setId(1234)
+            ->setStatus(1)
+            ->setScore('93%')
+            ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+        $mime1 = new Mimetype();
+        $mime1->setDescription('JPEG Image');
+        $mime1->setMime('image/jpeg');
+        $mime1->setIconFile('image_jpeg.png');
+        $mime1->setInline(1);
+        $mime1->setEnable(1);
+        $mime1->setMaxFileSize(0);
+
+        $storage1 = new \Schoolbox\Resource\Storage\Model();
+        $storage1
+            ->setHash('s89789d9hw3thsug8923u5')
+            ->setSize('12345678')
+            ->setMimeType($mime1);
+
+        $submissionFile1 = new SubmissionFile();
+        $submissionFile1
+            ->setId(11)
+            ->setStorage($storage1)
+            ->setCrocodocId('vjfh-6677=eirj-01928333')
+            ->setFilename('mark this Sir.xlsx')
+            ->setPlagscan($plagscan1);
+
+        /* File 2
+         */
+        $plagscan2 = new Plagscan();
+        $plagscan2
+            ->setId(1234)
+            ->setStatus(1)
+            ->setScore('14%')
+            ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+        $mime2 = new Mimetype();
+        $mime2->setDescription('Microsoft Word Document');
+        $mime2->setMime('application/msword');
+        $mime2->setIconFile('msword_doc.png');
+        $mime2->setInline(1);
+        $mime2->setEnable(1);
+        $mime2->setMaxFileSize(0);
+
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+
+        $submissionFile2 = new SubmissionFile();
+        $submissionFile2
+            ->setId(12)
+            ->setStorage($storage2)
+            ->setCrocodocId('vjfh-6677=eirj-01928333')
+            ->setFilename('online-submission.html')
+            ->setPlagscan($plagscan2);
+
         $response1 = new Submission();
         $response1
             ->setId(1)
             ->setAssessable($assessment)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setAllFiles((new Collection())
+                ->add($submissionFile1)
+                ->add($submissionFile2)
+            )
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        /* Feedback for this Response
+         */
+        $mime3 = new Mimetype();
+        $mime3->setDescription('Microsoft Word Document');
+        $mime3->setMime('application/msword');
+        $mime3->setIconFile('msword_doc.png');
+        $mime3->setInline(1);
+        $mime3->setEnable(1);
+        $mime3->setMaxFileSize(0);
+
+        $storage3 = new \Schoolbox\Resource\Storage\Model();
+        $storage3
+            ->setHash('aaaabbbcccccddd')
+            ->setSize('1024')
+            ->setMimetype($mime3);
+
+        $feedbackFile1 = new FeedbackFile();
+        $feedbackFile1
+            ->setId(12)
+            ->setStorage($storage3)
+            ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
+            ->setFilename('This is the correct response.txt');
 
         $feedback1 = new Feedback();
         $feedback1
             ->setId(11)
+            ->setReviewer($this->celia)
             ->setAssessable($assessment)
+            ->setNormalisedMark(-3)
+            ->setComment('This is a flawed piece of work.')
+            ->setAllFiles((new Collection())
+                ->add($feedbackFile1)
+            )
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback1);
+
+        $assessment->getResponses()->add($response1);
+        $assessment->getFeedbacks()->add($feedback1);
+    }
+
+    /**
+     * Second chunk of test data
+     *
+     * @param DueWork $assessment
+     */
+    private function generateResponse2(DueWork $assessment)
+    {
+        $plagscan2 = new Plagscan();
+        $plagscan2
+            ->setId(1234)
+            ->setStatus(1)
+            ->setScore('45%')
+            ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+        $mime2 = new Mimetype();
+        $mime2->setDescription('Microsoft Word Document');
+        $mime2->setMime('application/msword');
+        $mime2->setIconFile('msword_doc.png');
+        $mime2->setInline(1);
+        $mime2->setEnable(1);
+        $mime2->setMaxFileSize(0);
+
+        $storage2 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('d3f0f82be30a7da942fa00792d221a7eddff43bd');
+
+        $submissionFile2 = new SubmissionFile();
+        $submissionFile2
+            ->setId(12)
+            ->setStorage($storage2)
+            ->setCrocodocId('slkjl2j3589uslk23jl4')
+            ->setFilename('online-submission.html')
+            ->setPlagscan($plagscan2);
 
         $response2 = new Submission();
         $response2
             ->setId(2)
             ->setAssessable($assessment)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setAllFiles((new Collection())->add($submissionFile2))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback2 = new Feedback();
         $feedback2
             ->setId(22)
             ->setAssessable($assessment)
+            ->setReviewer($this->celia)
+            ->setAssessable($assessment)
+            ->setNormalisedMark(56)
+            ->setComment('Hadoken.')
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-03 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-03 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response2->getAllFeedback()->add($feedback2);
 
-        $response3 = new Submission();
-        $response3
-            ->setId(3)
-            ->setAssessable($assessment)
-            ->setSubmittedAt(new \Alaress_Date_Format('2016-10-31 04:34:34', \Alaress_Date_Format::DATABASE_FORMAT));
+        $assessment->getResponses()->add($response2);
+        $assessment->getFeedbacks()->add($feedback2);
+    }
 
-        $feedback3 = new Feedback();
-        $feedback3
-            ->setId(33)
-            ->setAssessable($assessment)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $response3->getAllFeedback()->add($feedback3);
-
+    /**
+     * Third hunk of test data
+     *
+     * @param DueWork $assessment
+     */
+    private function generateFloaters(DueWork $assessment)
+    {
         /* Floaters
          */
         $floating1 = new Feedback();
         $floating1
             ->setId(111)
             ->setAssessable($assessment)
+            ->setReviewer($this->celia)
+            ->setNormalisedMark(86)
+            ->setComment('This is a floating feedback.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating2 = new Feedback();
         $floating2
             ->setId(222)
             ->setAssessable($assessment)
+            ->setReviewer($this->celia)
+            ->setComment('A Feedback upon which it doth float.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating3 = new Feedback();
         $floating3
             ->setId(333)
             ->setAssessable($assessment)
+            ->setReviewer($this->celia)
+            ->setComment('Antigravity Feedbackery.')
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-            ->add($response2)
-            ->add($response3)
-        )->setFeedbacks((new Collection())
-            ->add($floating1)
-            ->add($floating2)
-            ->add($floating3)
-        );
+        $assessment
+            ->getFeedbacks()
+                ->add($floating1)
+                ->add($floating2)
+                ->add($floating3);
     }
 }
