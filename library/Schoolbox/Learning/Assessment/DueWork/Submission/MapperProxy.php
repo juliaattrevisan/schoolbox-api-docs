@@ -106,6 +106,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     ->setCrocodocId($file->getUuid())
                     ->setFilename($file->getFilename());
 
+                // Hydrate Plagscan too
+                $modelPlagscan = $responseFile->getPlagscan();
+                if ($modelPlagscan instanceof \Plagscan_Document) {
+                    // Assuming plagscan ID => id is the correct mapping
+                    // It will do for now ¯\_(ツ)_/¯
+                    $responsePlagscan = (new Plagscan())
+                        ->setId($modelPlagscan->getPlagscanId())
+                        ->setStatus($modelPlagscan->getStatus())
+                        ->setScore($modelPlagscan->getScore())
+                        ->setHtml($modelPlagscan->getHtml());
+
+                    $responseFile->setPlagscan($responsePlagscan);
+                }
+
                 $response->getAllFiles()->add($responseFile);
             }
             $dueWorkResponses->add($response);
@@ -133,13 +147,25 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
 
-                $dataModel->getFiles()->add(
-                    (new StudentSubmissionFile())
-                        ->setStorage($file->getStorage())
-                        ->setEditableInline($file->getEditableInline())
-                        ->setUuid($file->getCrocodocId())
-                        ->setFilename($file->getFilename())
-                );
+                $dataModelFile = (new StudentSubmissionFile())
+                    ->setStorage($file->getStorage())
+                    ->setEditableInline($file->getEditableInline())
+                    ->setUuid($file->getCrocodocId())
+                    ->setFilename($file->getFilename());
+
+                // Dehydrate Plagscan too, and save it
+                $plagscan = $file->getPlagscan();
+                if ($plagscan instanceof Plagscan) {
+                    $dataModelPlagscan = (new \Plagscan_Document())
+                        ->setPlagscanId($plagscan->getId())
+                        ->setStatus($plagscan->getStatus())
+                        ->setScore($plagscan->getScore())
+                        ->setHtml($plagscan->getHtml());
+
+                    $dataModelFile->setPlagscan($dataModelPlagscan);
+                }
+
+                $dataModel->getFiles()->add($dataModelFile);
             }
 
             $dataModels->add($dataModel);
