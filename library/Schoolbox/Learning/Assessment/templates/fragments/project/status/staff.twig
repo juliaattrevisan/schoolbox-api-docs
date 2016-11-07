@@ -30,7 +30,7 @@
         <h1>{{ assessment.title }}</h1>
     </div>
     <nav>
-        <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify"></a>
+        <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify"></a>
     </nav>
 </div>
 
@@ -67,8 +67,8 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isRouteAuthorized('learningAssessment.postUpdateAssessment', {assessmentId: assessable.id}) %}
-                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
+                                    {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
                                     {% endif %}
 
                                     {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
