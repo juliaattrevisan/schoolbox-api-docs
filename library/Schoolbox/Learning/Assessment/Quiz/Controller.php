@@ -19,6 +19,15 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Controller
+ *
+ * TODO
+ * This class and Schoolbox\Learning\Quiz\Controller (note the absence of 'Assessment' in the middle)
+ * need to be merged into a single class...
+ *
+ * @package Schoolbox\Learning\Assessment\Quiz
+ */
 class Controller extends Assessment\Controller
 {
 
@@ -91,6 +100,40 @@ class Controller extends Assessment\Controller
     {
         // TODO redirect to quiz student review... I think... maybe intro??
         throw new NotFound();
+    }
+
+
+    /**
+     * Redirect method
+     *
+     * Sends you to a status or summary screen depending on who is
+     * currently logged in and what they are viewing
+     *
+     * For quizzes, this is slightly more complicated than for other types.
+     * If you are a participant of this quiz, but you have not made any attempts,
+     * redirect straight to the intro page.
+     *
+     * @api GET /learning/assessment/:assessmentId
+     * @param IAssessable $assessment
+     */
+    public function getAssessment(IAssessable $assessment)
+    {
+        try {
+            $participation = $this->getParticipantMapper()->findForAssessmentAndUser($assessment, $this->getUser());
+
+            if ($participation->getAllResponses()->count() == 0) {
+                // this is the special case: redirect to intro
+                $this->getResponse()->redirect->afterPost(
+                    $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
+                );
+                return;
+            }
+
+        } catch (\OutOfBoundsException $e ) {
+            // not a participant; fall through to default behaviour
+        }
+
+        parent::getAssessment($assessment);
     }
 
 
