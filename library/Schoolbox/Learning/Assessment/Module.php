@@ -350,7 +350,8 @@ class Module extends BaseModule
         // $pc =& $injector->params[Assessment\Project\Controller::class];
 
         // quiz specific
-        // $qc =& $injector->params[Assessment\Quiz\Controller::class];
+        $qc =& $injector->params[Assessment\Quiz\Controller::class];
+        $qc['participantMapper'] = $injector->lazyGet('participantDataSource');
 
         // task specific
         // $tc =& $injector->params[Assessment\Task\Controller::class];

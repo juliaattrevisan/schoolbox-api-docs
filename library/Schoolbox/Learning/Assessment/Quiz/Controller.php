@@ -9,12 +9,49 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
+
+    /**
+     * @var Participant\DataSource
+     */
+    private $participantMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param UserMapper             $userMapper
+     * @param ErrorMapper            $errorMapper
+     * @param DataModel\MapperProxy  $assessmentMapper
+     * @param Access                 $access
+     * @param Transactor             $transactor
+     * @param BreadcrumbFactory      $bakery
+     * @param Participant\DataSource $participantMapper
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        ErrorMapper $errorMapper,
+        DataModel\MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor,
+        BreadcrumbFactory $bakery,
+        Participant\DataSource $participantMapper
+    ) {
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        $this->participantMapper = $participantMapper;
+    }
+
 
     /**
      * This gives you a summary of progress made within an Assessment
@@ -106,6 +143,15 @@ class Controller extends Assessment\Controller
     protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
     {
         return $defaultReturnUrl;
+    }
+
+
+    /**
+     * @return Participant\DataSource
+     */
+    protected function getParticipantMapper()
+    {
+        return $this->participantMapper;
     }
 
 }
