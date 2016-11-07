@@ -36,10 +36,10 @@ class Access
             return true;
         }
 
-        /* If event is on a personal level, check user is the owner
+        /* If event is on a personal level, check user is the owner or the author
          */
         if ($event->isPersonalLevel()) {
-            if ($user->getId() == $event->getOwner()->getId()) {
+            if ($user->getId() == $event->getOwner()->getId() || $user->getId() == $event->getAuthor()->getId()) {
                 return true;
             }
         }
