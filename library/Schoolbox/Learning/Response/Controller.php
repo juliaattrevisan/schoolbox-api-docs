@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
@@ -60,7 +61,8 @@ class Controller extends Base
         $data = [
             'assessment' => $assessment,
             'student' => $student,
-            'timeline' => (new Timeline($assessment))->getTimeline()
+            'carousel' => (new StudentCarousel($this->getRouter(), $student, $assessment, null))->produce(),
+            'timeline' => (new Timeline($assessment))->getTimeline(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
@@ -92,31 +94,6 @@ class Controller extends Base
             }
         }
 
-        /* TODO: Get a list of possible participants and whether they've submitted stuff
-         */
-        $allPeople = [];
-
-        foreach ($response->getAssessable()->getAllParticipants() as $currentParticipant) {
-            $latestSubmission = $currentParticipant->findMostRecentResponse();
-
-            $person = [
-                'text' => $currentParticipant->getUser()->getFullname(),
-                'value' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $currentParticipant->getUser()->getId()]),
-                'html' => "
-                    <div class=\"row\">
-                        <div class=\"avatar card small-10\">
-                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
-                            <p>{$currentParticipant->getUser()->getFullName()}</p>
-                            <span class=\"label status unsubmitted\">Not Submitted</span>
-                        </div>
-                    </div>
-                ",
-                'unsubmitted' => $latestSubmission ? false : true,
-            ];
-
-            $allPeople[] = $person;
-        }
-
         /* ResponseFile Factory might throw exceptions if you're viewing
          * crocodocable files that somehow die
          */
@@ -128,9 +105,7 @@ class Controller extends Base
                 'selectedFileId' => $this->getRequest()->query['fileId'],
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
-
-                'currentPerson' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $response->getSubmittedOnBehalfOf()->getId()]),
-                'allPeople' => $allPeople,
+                'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));

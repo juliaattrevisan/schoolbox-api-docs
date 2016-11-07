@@ -105,8 +105,12 @@ class Module extends BaseModule
                 $student = $this->getUserMapper()->createModel();
             }
 
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+
+            $this->loadParticipantsIntoAssessment($assessment);
+
             return [
-                'assessment' => $this->getAssessmentMapperProxy()->findById($params['assessmentId']),
+                'assessment' => $assessment,
                 'student'    => $student,
             ];
         });
