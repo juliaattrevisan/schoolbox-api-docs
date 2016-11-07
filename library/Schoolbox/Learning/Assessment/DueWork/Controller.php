@@ -206,11 +206,10 @@ class Controller extends Assessment\Controller
 
             foreach ($latestResponse->getAllFiles() as $file) {
                 /* Load in the wizzywig instead of a file attachment,
-                 * if the submission uses the wizzywig editor and the
-                 * submission is still a draft
+                 * if the submission uses the wizzywig editor
                  */
                 if ($file->getEditableInline()) {
-                    $editorContents = $file->getStorage()->read();
+                    $editorContents .= $file->getStorage()->read();
                 } else {
                     // add it to the danger zone
                     $zone->attachFiles([$file->getHash()]);
