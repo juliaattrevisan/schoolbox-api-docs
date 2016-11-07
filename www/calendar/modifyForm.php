@@ -59,7 +59,7 @@ switch ($_REQUEST['action']) {
 
         } else {
             $event = new Event();
-            $owner = $_SESSION['user'];
+            $owner = $userMapper->findById($_POST['userId']);
         }
 
         /* Events aren't visible until this date
