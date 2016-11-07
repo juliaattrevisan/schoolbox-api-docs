@@ -108,7 +108,7 @@ class Model extends AbstractResponse
      */
 
     /**
-     * @return Collection|IStorage[]
+     * @return Collection|File\Model[]
      */
     public function getAllFiles()
     {
@@ -116,7 +116,7 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @param Collection|IStorage[] $allFiles
+     * @param Collection|File\Model[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)

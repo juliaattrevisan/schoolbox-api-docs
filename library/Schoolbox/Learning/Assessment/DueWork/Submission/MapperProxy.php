@@ -12,9 +12,10 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use Schoolbox\Mapper;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 
 /**
@@ -98,7 +99,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($studentSubmission->getUpdatedAt());
 
             foreach ($studentSubmission->getFiles() as $file) {
-                $response->getAllFiles()->add($file->getStorage());
+                // Translate the file subobject
+                $responseFile = (new DueWorkSubmissionFile())
+                    ->setStorage($file->getStorage())
+                    ->setEditableInline($file->getEditableInline())
+                    ->setCrocodocId($file->getUuid())
+                    ->setFilename($file->getFilename());
+
+                $response->getAllFiles()->add($responseFile);
             }
             $dueWorkResponses->add($response);
         }
@@ -121,10 +129,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Files
             foreach ($domainObject->getAllFiles() as $file) {
-                // TODO this can't be all that needs to be set?
+
+                // The post-save of a file will have to handle saving of plagscan
+                // (due to the new Plagscan object not holding a file ID)
+
                 $dataModel->getFiles()->add(
                     (new StudentSubmissionFile())
-                        ->setStorage($file)
+                        ->setStorage($file->getStorage())
+                        ->setEditableInline($file->getEditableInline())
+                        ->setUuid($file->getCrocodocId())
+                        ->setFilename($file->getFilename())
                 );
             }
 
