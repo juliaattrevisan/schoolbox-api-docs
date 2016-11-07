@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -55,6 +56,7 @@ class Module extends RestfulModule
                 '/quiz/{assessmentId}/{userId}/attempts'                    => 'getQuizAttemptsByUser',
                 '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
                 '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
+                '/quiz/{assessmentId}/attempts/export'                      => 'getExportAttempts',
             ],
             'POST' => []
         ];
