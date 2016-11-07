@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -327,10 +328,14 @@ class Module extends BaseModule
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
-        $dc['rubricMapper']    = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
-        $dc['resultSetMapper'] = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
-        $dc['workTypeMapper']  = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
-        $dc['submissionFileMapper'] = $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class);
+        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
+        $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
+        $dc['workTypeMapper']           = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
+        // TODO get this out of DI
+        $dc['dueWorkResponseMapper']    = $injector->lazyNew(
+            DueWorkResponseMapper::class,
+            ['mapper' => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class)]
+        );
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
