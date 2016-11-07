@@ -15,7 +15,6 @@ use Alaress\Web\Controller as Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
-use Component_Homepage_CourseBuilderController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
@@ -223,7 +222,7 @@ class Controller extends Base\Base
     protected function getCourseBuilderInstance(Folder\Model $unit)
     {
         // confirm that there's a Course Builder component
-        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Component_Homepage_CourseBuilderController::class);
+        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Schoolbox\Learning\Assessment\Builder\Component\Homepage\Controller::class);
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
@@ -240,7 +239,7 @@ class Controller extends Base\Base
      * @param string $controller
      * @return Component_Instance
      */
-    protected function injectNewComponent(Folder\Model $unit, $controller = Component_Homepage_CourseBuilderController::class)
+    protected function injectNewComponent(Folder\Model $unit, $controller = \Schoolbox\Learning\Assessment\Builder\Component\Homepage\Controller::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
         $instanceMapper = $this->getComponentInstanceMapper();

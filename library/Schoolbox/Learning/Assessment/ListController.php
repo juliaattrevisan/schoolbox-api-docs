@@ -249,12 +249,6 @@ class ListController extends Web\Controller\Base
             $assessmentFactory = new Factory($user, $postData);
             $assessment = $assessmentFactory->produce($assessment);
 
-            /* Manually do a check
-             */
-            if (!$assessment->isValidDates()) {
-                throw new DomainException('double-check the date fields you provided');
-            }
-
             $transactionSummary = $this->getTransactor()->transact($assessment);
         }
         catch (InvalidArgumentException $e) {
