@@ -330,7 +330,7 @@ class Module extends BaseModule
         $dc['rubricMapper']    = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
         $dc['resultSetMapper'] = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
         $dc['workTypeMapper']  = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
-        $ac['submissionFileMapper'] = $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class);
+        $dc['submissionFileMapper'] = $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
