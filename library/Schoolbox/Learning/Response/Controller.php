@@ -97,15 +97,12 @@ class Controller extends Base
          * crocodocable files that somehow die
          */
         try {
-            $factory = new ResponseFileFactory($response, $file, $this->getUser());
-            $subfragment = $factory->produce();
-
             $data = [
                 'assessment' => $assessment,
                 'response' => $response,
                 'selectedFileId' => $this->getRequest()->query['fileId'],
                 'file' => $file,
-                'subfragment' => $subfragment,
+                'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
