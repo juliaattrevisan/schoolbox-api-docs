@@ -32,7 +32,7 @@
                                     <img src="/portrait.php?userId=485&size=square64" alt="View Profile" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
-                                <p class="meta">{{ currentFile.storage.size }}</p>
+                                <p class="meta">{{ currentFile.humanReadableSize }}</p>
                             </div>
                             {% if currentFile.plagscan %}
                                 <article class="grade">

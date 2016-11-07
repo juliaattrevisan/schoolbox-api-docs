@@ -71,6 +71,16 @@ class Model implements IStorage
         return '';
     }
 
+    /**
+     * Get a human-readable version of the filesize
+     *
+     * @return string
+     */
+    public function getHumanReadableSize()
+    {
+        return \Alaress_Byte_Format::bytesToString($this->getSize());
+    }
+
     /* Getters/Setters
      */
 
