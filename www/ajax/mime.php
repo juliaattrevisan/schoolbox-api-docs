@@ -55,7 +55,6 @@ try {
 
 } catch(Schoolbox\Mapper\Exception $e) {
     // do nothing
-    new \Alaress_Probe($e);
 }
 
 foreach(array_reverse($filenames) as $filename) {
