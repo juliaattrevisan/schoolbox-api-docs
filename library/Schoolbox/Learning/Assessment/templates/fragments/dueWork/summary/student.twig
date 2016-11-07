@@ -19,6 +19,7 @@
 {% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
 {% endif %}
 
+{% if assessment.responses|length %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
@@ -55,6 +56,7 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns">
