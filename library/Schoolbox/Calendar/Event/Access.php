@@ -12,9 +12,9 @@
 namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Access
 {
@@ -30,8 +30,6 @@ class Access
      */
     public function checkAccess(User $user, Event $event, $groups, $campuses)
     {
-        $userMapper = new UserMapper();
-
         /* Check superuser
          */
         if ($user->isSuperuser()) {
@@ -72,6 +70,8 @@ class Access
         /* If the event is on a group level, check if the user is a group manager
          */
         if ($event->isGroupLevel()) {
+            $userAccessMapper = UserAccessMapper::getInstance();
+
             /* Loop through the groups selected for this event
              */
             foreach ($groups as $group) {
@@ -82,15 +82,9 @@ class Access
                     $groupId = $group;
                 }
 
-                $groupManagers = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $groupId);
-
-                /* Loop through the managers for this group and check for $user
-                 */
-                foreach ($groupManagers as $groupManager) {
-
-                    if ($groupManager->getId() === $user->getId()) {
-                        return true;
-                    }
+                $access = $userAccessMapper->getAccess($user, $groupId);
+                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                    return true;
                 }
             }
         }
