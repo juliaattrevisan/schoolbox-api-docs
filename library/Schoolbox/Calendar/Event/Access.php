@@ -70,8 +70,8 @@ class Access
         /* If the event is on a group level, check if the user is a group manager
          */
         if ($event->isGroupLevel()) {
-            $userAccessMapper = UserAccessMapper::getInstance();
 
+            $userAccessMapper = UserAccessMapper::getInstance();
             /* Loop through the groups selected for this event
              */
             foreach ($groups as $group) {
@@ -81,8 +81,13 @@ class Access
                 } else {
                     $groupId = $group;
                 }
+                
+                try {
+                    $access = $userAccessMapper->getAccess($user, $groupId);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    return false;
+                }
 
-                $access = $userAccessMapper->getAccess($user, $groupId);
                 if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
                     return true;
                 }
