@@ -69,13 +69,8 @@ class Model extends AbstractResponse
      */
     public function getOnlineSubmissionContent()
     {
-        /* Known versions of the Online Submission file which stores
-         * the wizzywig contents
-         */
-        $knownFilenames = ['online-submission.html', 'Online Submission.html'];
-
         foreach ($this->getAllFiles() as $currentFile) {
-            if (in_array($currentFile->getBasename(), $knownFilenames)) {
+            if ($currentFile->isOnlineSubmission()) {
                 return $currentFile->getStorage()->read();
             }
         }
