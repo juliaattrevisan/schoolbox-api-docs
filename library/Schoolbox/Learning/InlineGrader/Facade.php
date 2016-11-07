@@ -46,11 +46,6 @@ class Facade
     private $user = null;
 
     /**
-     * @var Loader
-     */
-    private $loader;
-
-    /**
      * Facade constructor.
      *
      * @param Submission $submission
@@ -66,15 +61,6 @@ class Facade
         /* Kinda need this, maybe?
          */
         $this->setTerm(TermMapper::getInstance()->findForDate($this->getSubmission()->getSubmittedAt()));
-
-        /* You always need this otherwise Inline Grader won't work
-         */
-        $this->setLoader(new Loader(
-            new Authenticator(),
-            $this->getFile()->getCrocodocId(),
-            $this->getUser(),
-            $this->getTerm()->getArchived())
-        );
     }
 
     /**
@@ -92,7 +78,16 @@ class Facade
             $this->upload();
         }
 
-        return $this->getLoader()->annotate();
+        /* Sequential dependency - crocodoc requires a crocodoc id to
+         * exist, otherwise it can't start, preventing us from initting
+         * Loader() in constructor
+         */
+        return (new Loader(
+            new Authenticator(),
+            $this->getFile()->getCrocodocId(),
+            $this->getUser(),
+            $this->getTerm()->getArchived())
+        )->annotate();
     }
 
     /**
@@ -115,7 +110,16 @@ class Facade
     {
         $filename = "return_{$this->getFile()->getFilename()}.pdf";
 
-        return $this->getLoader()->getDownloadUrl($filename);
+        /* Sequential dependency - crocodoc requires a crocodoc id to
+         * exist, otherwise it can't start, preventing us from initting
+         * Loader() in constructor
+         */
+        return (new Loader(
+            new Authenticator(),
+            $this->getFile()->getCrocodocId(),
+            $this->getUser(),
+            $this->getTerm()->getArchived())
+        )->getDownloadUrl($filename);
     }
 
     /* Getters/Setters
@@ -190,24 +194,6 @@ class Facade
     private function setUser($user)
     {
         $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return Loader
-     */
-    private function getLoader()
-    {
-        return $this->loader;
-    }
-
-    /**
-     * @param Loader $loader
-     * @return $this
-     */
-    private function setLoader($loader)
-    {
-        $this->loader = $loader;
         return $this;
     }
 }

@@ -132,6 +132,12 @@ class Loader
 
         $result = json_decode($this->getCurl()->getResult());
 
+        /* DomainException is usually thrown when crocodoc
+         * tries to access an invalid crocodocId usually
+         * because you haven't uploaded the file yet
+         *
+         * But it could apply to any curl issue, really
+         */
         if ($this->getCurl()->getErrors()) {
             throw new \DomainException(implode(', ', $this->getCurl()->getErrors()));
         }
