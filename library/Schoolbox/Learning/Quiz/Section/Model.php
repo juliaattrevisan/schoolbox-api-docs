@@ -7,8 +7,10 @@
 
 namespace Schoolbox\Learning\Quiz\Section;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -49,6 +51,19 @@ class Model implements ISoftDeletable
      * @var int
      */
     private $pool;
+
+    /**
+     * @var QuizQuestion[]|GenericCollection<QuizQuestion>
+     */
+    private $questions;
+
+    /**
+     * Model constructor.
+     */
+    public function __construct()
+    {
+        $this->questions = new GenericCollection(QuizQuestion::class);
+    }
 
     /* Getters / Setters
      */
@@ -158,6 +173,28 @@ class Model implements ISoftDeletable
     public function setPool($pool)
     {
         $this->pool = $pool;
+        return $this;
+    }
+
+    /**
+     * @return QuizQuestion[]|GenericCollection<QuizQuestion>
+     */
+    public function getQuestions()
+    {
+        return $this->questions;
+    }
+
+    /**
+     * @param GenericCollection $questions
+     * @return static
+     */
+    public function setQuestions(GenericCollection $questions)
+    {
+        if(QuizQuestion::class != $questions->getElementClass()){
+            $msg = "Collection must be of type '".QuizQuestion::class."'. Found: ".$questions->getElementClass();
+            throw new \DomainException($msg);
+        }
+        $this->questions = $questions;
         return $this;
     }
 }
