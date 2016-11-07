@@ -61,10 +61,10 @@ class Plagscan_Gateway
 
 
     /**
-     * @param Submission\File $submission
+     * @param Submission\SingleFile\Model $submission
      * @return string
      */
-    public function submit(Submission\File $submission)
+    public function submit(Submission\SingleFile\Model $submission)
     {
         $documentName = $submission->getBasename();
 
