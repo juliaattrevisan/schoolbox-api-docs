@@ -87,7 +87,7 @@ class TemporaryDataDecorator
             ->setId(12)
             ->setStorage($storage2)
             ->setCrocodocId('vjfh-6677=eirj-01928333')
-            ->setFilename('online-submission.html')
+            ->setFilename('online-submission')
             ->setPlagscan($plagscan2);
 
         $response = new Submission();
@@ -158,7 +158,7 @@ class TemporaryDataDecorator
             ->setId(5233)
             ->setStorage($storage1)
             ->setCrocodocId('slkjl2j3589uslk23jl4')
-            ->setFilename('online-submission.html')
+            ->setFilename('online-submission')
             ->setPlagscan($plagscan1);
 
         /* Second file
@@ -175,7 +175,7 @@ class TemporaryDataDecorator
             ->setId(13345)
             ->setStorage($storage2)
             ->setCrocodocId('dfue45636')
-            ->setFilename('some-unplaggable-file.pdf')
+            ->setFilename('some-unplaggable-file')
             ->setPlagscan($plagscan2);
 
         /* Third file
@@ -192,7 +192,7 @@ class TemporaryDataDecorator
             ->setId(13345)
             ->setStorage($storage3)
             ->setCrocodocId('36dg36')
-            ->setFilename('thingy.jpg')
+            ->setFilename('thingy')
             ->setPlagscan($plagscan3);
 
         /* Fourth file
@@ -209,7 +209,7 @@ class TemporaryDataDecorator
             ->setId(64267)
             ->setStorage($storage4)
             ->setCrocodocId('3d33lkjl2590')
-            ->setFilename('chemistry.pptx')
+            ->setFilename('chemistry')
             ->setPlagscan($plagscan4);
 
         /* Accumulate

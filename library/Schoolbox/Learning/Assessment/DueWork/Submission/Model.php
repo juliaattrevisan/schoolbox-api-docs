@@ -75,7 +75,7 @@ class Model extends AbstractResponse
         $knownFilenames = ['online-submission.html', 'Online Submission.html'];
 
         foreach ($this->getAllFiles() as $currentFile) {
-            if (in_array($currentFile->getFilename(), $knownFilenames)) {
+            if (in_array($currentFile->getBasename(), $knownFilenames)) {
                 return $currentFile->getStorage()->read();
             }
         }
