@@ -32,11 +32,14 @@
                                     <img src="/portrait.php?userId=485&size=square64" alt="View Profile" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
-
-                                {% if currentFile.plagscan %}
-                                <p class="meta">{{ currentFile.plagscan.score|purify }}</p>
-                                {% endif %}
+                                <p class="meta">{{ currentFile.storage.size }}</p>
                             </div>
+                            {% if currentFile.plagscan %}
+                                <article class="grade">
+                                    <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
+                                    <p class="meta">Plagiarism Check</p>
+                                </article>
+                            {% endif %}
                         </li>
                         {% endfor %}
                     </ul>
