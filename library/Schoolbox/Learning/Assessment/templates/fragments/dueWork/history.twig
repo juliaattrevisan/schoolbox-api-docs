@@ -1,36 +1,88 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
-        {% for currentResponse in assessment.responses %}
 
-            <h3 class="subheader">{{ currentResponse.submittedAt.short }}</h3>
-            <section>
-                <ul class="information-list">
-                    <li>
-                        {% if currentResponse.allFiles %}
-                            <ul class="information-list">
-                                {% for currentFile in currentResponse.allFiles %}
-                                    <li>
-                                        <div class="card small-12">
-                                            <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-                                                <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime" />
-                                                <p>{{ currentFile.filename }}</p>
-                                            </a>
-                                            <p class="meta">{{ currentFile.humanReadableSize }}</p>
-                                        </div>
+        <section>
+             <ul class="information-list social-stream">
+                {% for currentResponse in assessment.responses %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/search/user/3" title="View Profile">
+                                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
+                                <p>{{ student.fullname }}</p>
+                                <p class="meta">{{ currentResponse.submittedAt.short }}</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <article>
+                        {# TODO: put in the Wizzywig content here #}
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla risus imperdiet lacus lacinia, non vestibulum mauris fermentum. Aenean ac cursus nulla, eu mattis lorem. Ut id nisi velit. In eu congue odio. Morbi leo diam, viverra ut massa ut, lobortis tincidunt nulla. Suspendisse non neque non est tincidunt lacinia at at erat. In in varius erat. Nam vulputate est est, eu mattis eros interdum vitae. Integer leo leo, gravida bibendum dui eget, placerat sagittis libero. Nullam ac semper tortor. Mauris augue nunc, porttitor in nulla nec, consectetur ultrices ex. Vestibulum sit amet nisi scelerisque odio convallis elementum. Proin vitae varius nulla.
+                    </article>
+
+                    {% if currentResponse.allFiles %}
+                    <ul class="information-list">
+                        {% for currentFile in currentResponse.allFiles %}
+                        <li>
+                            <div class="card small-12 compact">
+                                <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
+                                    <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                                    <p>{{ currentFile.filename }}</p>
+                                    <p class="meta">
                                         {% if currentFile.plagscan %}
-                                            <article class="grade">
-                                                <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
-                                                <p class="meta">Plagiarism Check</p>
-                                            </article>
+                                        <span class="gradient-1">{{ currentFile.plagscan.score|purify }}</span>
+                                        <span class="meta">plagiarised</span>
                                         {% endif %}
-                                    </li>
+                                    </p>
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if currentResponse.allFeedback|length %}
+                    <ul class="information-list reply">
+                        {% for currentFeedback in currentResponse.allFeedback %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="/search/user/230" title="View Profile">
+                                        <img src="/portrait.php?userId=19&amp;size=square64" alt="" class="hide-for-small-only">
+                                        <p>Alaress Admin</p>
+                                        <p class="meta">Posted 43 seconds ago</p>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {% if currentFeedback.comment|length %}
+                            <article>
+                                {{ currentFeedback.comment|purify }}
+                            </article>
+                            {% endif %}
+
+                            {% if currentFeedback.allFiles %}
+                            <ul class="information-list">
+                                {% for currentFile in currentFeedback.allFiles %}
+                                <li>
+                                    <div class="card small-12 compact">
+                                        <a href="/send.php?id=39" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
+                                            <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                                            <p>{{ currentFile.filename }}</p>
+                                        </a>
+                                    </div>
+                                </li>
                                 {% endfor %}
                             </ul>
-                        {% endif %}
-                    </li>
-                </ul>
-            </section>
-        {% endfor %}
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
     </div>
 </div>
