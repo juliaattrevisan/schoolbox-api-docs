@@ -11,11 +11,11 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 card">
-                            <a href="/storage/fetch.php?hash={{ file.storage.hash }}" data-plugin="preview" title="">
+                            <a href="/storage/fetch.php?hash={{ file.hash }}" data-plugin="preview" title="">
                                 <img src="/ajax/mime/{{ file.mime }}" alt="Preview" class="mime" />
-                                <p>{{ file.storage.filename }}</p>
+                                <p>{{ file.filename }}</p>
                             </a>
-                            <p class="meta">{{ file.storage.humanReadableSize }}</p>
+                            <p class="meta">{{ file.size | bytes }}</p>
 
                             {% include '@learning/dueWork/plagscan.twig' with {currentFile: file} %}
                         </div>
