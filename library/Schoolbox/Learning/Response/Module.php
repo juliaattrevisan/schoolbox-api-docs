@@ -65,7 +65,7 @@ class Module extends BaseModule
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{responseId}/annotated'                => 'getCrocodocDownload',
+                '/responses/{responseId}/annotated{/fileId}'       => 'getCrocodocDownload',
             ],
             'POST' => []
         ];
@@ -124,6 +124,29 @@ class Module extends BaseModule
 
             return [
                 'response' => $response,
+            ];
+        });
+
+        /* TODO: Arbitrarily assume 326 for now
+         * TODO: Generate a populated response for now
+         */
+        $this->addRoutePreload($matcher, '(?:getCrocodocDownload)', function ($params) {
+            $response = $this->generateResponse1();
+
+            /* Factory to figure out which fragment is required
+             */
+            foreach ($response->getAllFiles() as $currentFile) {
+                if ($currentFile->getId() == $params['fileId']) {
+                    return [
+                        'response' => $response,
+                        'file' => $currentFile
+                    ];
+                }
+            }
+
+            return [
+                'response' => $response,
+                'file' => $response->getAllFiles()->first()
             ];
         });
 

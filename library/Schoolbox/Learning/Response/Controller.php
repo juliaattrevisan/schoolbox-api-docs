@@ -123,26 +123,12 @@ class Controller extends Base
      * Download a particular annotated crocodoc as a pdf
      *
      * @param SubmissionFile $file
+     * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getCrocodocDownload(SubmissionFile $file)
+    public function getCrocodocDownload(Submission $response, SubmissionFile $file)
     {
-        /* TODO: Generate a populated response for now
-         */
-        $response = $this->generateResponse1();
-
-        /* Factory to figure out which fragment is required
-         */
-        $file = $response->getAllFiles()->first();
-
-        foreach ($response->getAllFiles() as $currentFile) {
-            if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
-                $file = $currentFile;
-                break;
-            }
-        }
-
         if (strlen($file->getCrocodocId())) {
             try {
                 $location = (new InlineGraderFacade($response, $file, $this->getUser()))->getDownloadUrl();
