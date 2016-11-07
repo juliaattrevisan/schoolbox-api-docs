@@ -1,56 +1,3 @@
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
-<script type="text/javascript">
-    $(function() {
-        var navNext = $('a[rel="next"]');
-        var navPrev = $('a[rel="prev"]');
-        var markInput = $('[name^="mark"]').not('[type=hidden]').eq(0);
-
-        var tgt = $('select[name=student-select]'),
-                ize,
-                skipUnsubmitted = $('#skipUnsubmitted'),
-                students = {{ allPeople|json_encode|raw }},
-                selectizeOptions = {
-                    preload: true,
-                    closeAfterSelect: false,
-                    options: students,
-                    render: {
-                        option: function (item) {
-                            item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
-                            return $('<div/>').html(item.html).html();
-                        },
-                        item: function (item) {
-                            return $('<div/>').html(item.html).html();
-                        }
-                    }
-                };
-
-        ize = tgt.selectize(selectizeOptions);
-
-        // hack, option not available
-        $('.selectize-input input').prop('disabled', true).hide();
-
-        // manually set the value, because selectize
-        ize[0].selectize.setValue("{{ currentPerson }}", true);
-
-        // add the listener AFTER we've set the value
-        ize.on('change', function (e) {
-            window.location.href = e.target.value;
-        });
-
-        function refreshNav(nav, source) {
-            if (source.length) {
-                nav.attr('href', source.data('value'))
-                    .attr('title', source.children('img').attr('alt'))
-                    .removeAttr('disabled');
-            } else {
-                nav.removeAttr('href')
-                    .removeAttr('title')
-                    .attr('disabled', 'disabled');
-            }
-        }
-    });
-</script>
-
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
@@ -59,30 +6,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 medium-8 columns">
-        <div class="avatar-switch">
-            <nav>
-                <a rel="prev" href="" title=""></a>
-            </nav>
-            <div class="student">
-                <select name="student-select"></select>
-            </div>
-            <nav>
-                <a rel="next" href="" title=""></a>
-            </nav>
-        </div>
-    </div>
-    <div class="small-12 medium-4 columns">
-        <form action="/submission/inlineGrading/configForm.php" method="post">
-            <input type="hidden" name='boxId' value="{BOX_ID}" />
-            <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-            <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-            <label for="skipUnsubmitted" class="checkbox-label">Skip not submitted</label>
-        </form>
-    </div>
-</div>
+{% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
 {% include '@learningResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
 

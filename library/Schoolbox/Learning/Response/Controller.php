@@ -97,7 +97,7 @@ class Controller extends Base
         $allPeople = [];
 
         foreach ($response->getAssessable()->getAllParticipants() as $currentParticipant) {
-            $submissionExists = $currentParticipant->findMostRecentResponse();
+            $latestSubmission = $currentParticipant->findMostRecentResponse();
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
@@ -111,7 +111,7 @@ class Controller extends Base
                         </div>
                     </div>
                 ",
-                'unsubmitted' => $submissionExists ? false : true,
+                'unsubmitted' => $latestSubmission ? false : true,
             ];
 
             $allPeople[] = $person;
@@ -129,7 +129,7 @@ class Controller extends Base
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
 
-                'currentPerson' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $response->getSubmittedBy()->getId()]),
+                'currentPerson' => $this->getRouter()->generate('learningResponse.getResponseList', [ 'assessmentId' => $response->getAssessable()->getId(), 'studentId' => $response->getSubmittedOnBehalfOf()->getId()]),
                 'allPeople' => $allPeople,
             ];
 
