@@ -24,6 +24,9 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
 
 class Controller extends Assessment\Controller
 {
@@ -116,6 +119,53 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
+
+        /* TODO: Don't use temporary data
+         * Ram in some temporary responses so that I
+         * can make the Submission History section
+         */
+        $hodes = (new UserMapper())->findById(230);
+        $plagscan1 = new DueWorkSubmissionFilePlagscan();
+        $plagscan1
+            ->setId(1234)
+            ->setStatus(1)
+            ->setScore('93% plagiariased')
+            ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+        $storage1 = new \Schoolbox\Resource\Storage\Model();
+        $storage1->setHash('s89789d9hw3thsug8923u5');
+
+        $submissionFile1 = new DueWorkSubmissionFile();
+        $submissionFile1
+            ->setId(11)
+            ->setStorage($storage1)
+            ->setCrocodocId('vjfh-6677=eirj-01928333')
+            ->setFilename('mark this Sir.xlsx')
+            ->setPlagscan($plagscan1);
+
+        $storage2 = new \Schoolbox\Resource\Storage\Model();
+        $storage2->setHash('lk5j34kl5jousdio');
+
+        $submissionFile2 = new DueWorkSubmissionFile();
+        $submissionFile2
+            ->setId(12)
+            ->setStorage($storage1)
+            ->setCrocodocId('vjfh-6677=eirj-01928333')
+            ->setFilename('and this too.docx');
+
+        $response = new DueWorkSubmission();
+        $response
+            ->setAssessable($assessment)
+            ->setSubmittedBy($hodes)
+            ->setSubmittedOnBehalfOf($hodes)
+            ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->getAllFiles()->add($submissionFile1)->add($submissionFile2);
+
+        $assessment->getResponses()->add($response);
+        $assessment->getResponses()->add($response);
+        $assessment->getResponses()->add($response);
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),

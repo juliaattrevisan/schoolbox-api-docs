@@ -13,6 +13,41 @@
 {% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
 {% endif %}
 
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Submission History</h2>
+        {% for currentResponse in assessment.responses %}
+
+        <h3 class="subheader">{{ currentResponse.submittedAt.short }}</h3>
+        <section>
+            <ul class="information-list">
+                <li>
+                    {% if currentResponse.allFiles %}
+                    <ul class="information-list">
+                        {% for currentFile in currentResponse.allFiles %}
+                        <li>
+                            <div class="card small-12">
+                                <a href='#' title="{{ currentFile.filename }}">
+                                    <img src="/portrait.php?userId=485&size=square64" alt="View Profile" />
+                                    <p>{{ currentFile.filename }}</p>
+                                </a>
+
+                                {% if currentFile.plagscan %}
+                                <p class="meta">{{ currentFile.plagscan.score|purify }}</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+            </ul>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+
 <div class="row">
     <div class="small-12 columns">
     {% if submissionsBlocked %}
