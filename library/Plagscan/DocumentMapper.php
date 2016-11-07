@@ -78,7 +78,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 
 		$this->hasSoftDeleteDateField('deleted');
 
-//        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
+        $this->joins('file_id', Submission\SingleFile\Mapper::class, 'id', null, null);
 
 	}
 

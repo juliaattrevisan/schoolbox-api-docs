@@ -30,7 +30,7 @@ class Plagscan_Document implements ISoftDeletable {
 	protected $id;
 
 	/**
-	 * @var Submission\File
+	 * @var Submission\SingleFile\Model
 	 */
 	protected $file;
 
@@ -176,7 +176,7 @@ class Plagscan_Document implements ISoftDeletable {
 	}
 
 	/**
-	 * @param  Submission\File $file
+	 * @param  Submission\SingleFile\Model $file
 	 *
 	 * @return static
 	 */
@@ -186,7 +186,7 @@ class Plagscan_Document implements ISoftDeletable {
 	}
 
 	/**
-	 * @return Submission\File
+	 * @return Submission\SingleFile\Model
 	 */
 	public function getFile() {
 		return $this->file;
