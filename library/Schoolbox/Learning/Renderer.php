@@ -7,7 +7,9 @@
 
 namespace Schoolbox\Learning;
 
+use Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
@@ -52,7 +54,10 @@ class Renderer extends \Twig_Extension
 
             new \Twig_SimpleTest('quiz', function ($assessable) { return $assessable instanceof Quiz; }),
             new \Twig_SimpleTest('dueWork', function ($assessable) { return $assessable instanceof DueWork; }),
-            new \Twig_SimpleTest('task', function ($assessable) { return $assessable instanceof Task; })
+            new \Twig_SimpleTest('task', function ($assessable) { return $assessable instanceof Task; }),
+
+            new \Twig_SimpleTest('response', function ($interaction) { return $interaction instanceof IResponse; }),
+            new \Twig_SimpleTest('feedback', function ($interaction) { return $interaction instanceof IFeedback; })
         ];
     }
 
