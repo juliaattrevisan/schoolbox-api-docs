@@ -13,9 +13,11 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
 
+        $size = $_GET['size'] ?: 'maxsize';
+
         $image = new Alaress\Image\Storage(
             $resource,
-            $_GET['size'],
+            $size,
             new \Alaress\Image\Transformation\Storage()
         );
 
