@@ -19,3 +19,4 @@ ALTER TABLE `task_completion`
 
 /* drop harvested table */
 DROP TABLE `task_instance`;
+

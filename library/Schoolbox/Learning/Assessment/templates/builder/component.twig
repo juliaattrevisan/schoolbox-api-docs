@@ -17,17 +17,8 @@
 {% if canWrite %}
     <div class="component-action">
         <section>
-            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'project'}) }}" title="Create a new Project">
-                Add Project
-            </a>
-            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'task'}) }}" title="Create a new Task">
-                Add Task
-            </a>
-            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'dueWork'}) }}" title="Create a new Due Work">
-                Add Due Work
-            </a>
-            <a class="button" href="{{ routeLookup('learningAssessment.getSelectAssessmentInUnitSpecification', {unitSpecId: unit.id, assessmentTypeTitle: 'quiz'}) }}" title="Create a new Quiz">
-                Add Quiz
+            <a class="button" href="routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id})" title="Create a new activity">
+                Create Activity
             </a>
         </section>
     </div>

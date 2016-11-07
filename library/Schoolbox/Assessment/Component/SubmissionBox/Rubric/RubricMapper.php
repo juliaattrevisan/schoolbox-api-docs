@@ -84,7 +84,7 @@ class RubricMapper
         $parentFolderId = null;
 
         if ($context instanceof UnitSpecification) {
-            $parentFolderId = $context->getCourse()->getFolder()->getId();
+            $parentFolderId = $context->getFolder()->getParent()->getId();
         }
 
         return $this->createForFolder($folderId, $parentFolderId, $levelNames);
@@ -313,7 +313,9 @@ class RubricMapper
         $in = [ 'folderId' ];
 
         // if the box has a task, include parent-folder criteria
-        if ($box->getTask()->getId() || $forceTaskMode) {
+        /*TODO: Fix criteria when submission box part of unitspec
+         *
+         * if ($box->getTask()->getId() || $forceTaskMode) {
 
             $key      = 'parentFolderId';
             $parentId = $box->getCategory()->getParent()->getId();
@@ -325,7 +327,7 @@ class RubricMapper
 
             $args[$key] = $parentId;
             $in[] = $key;
-        }
+        }*/
 
         $in = implode(', :', $in);
 

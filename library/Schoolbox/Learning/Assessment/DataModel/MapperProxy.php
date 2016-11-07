@@ -76,7 +76,9 @@ class MapperProxy
     public function findById($id)
     {
         try {
-            return $this->translateToDomainModel($this->baseMapper->findById($id));
+            $originalModel = $this->baseMapper->findById($id);
+            $this->baseMapper->augmentListWithDueWorkRubrics([$originalModel]);
+            return $this->translateToDomainModel($originalModel);
         } catch (MapperException\Deleted $e) {
             $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
             throw $e;

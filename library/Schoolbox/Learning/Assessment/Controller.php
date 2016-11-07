@@ -112,7 +112,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $type = AssessmentType::objectToString($assessment);
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
 
-        $template = "@learningAssessment/fragments/$type/update.twig";
+        $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
