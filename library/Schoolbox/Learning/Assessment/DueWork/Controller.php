@@ -191,36 +191,34 @@ class Controller extends Assessment\Controller
          */
 
         /** @var Submission\File\Model $submission */
-        $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
-            'owner' => $student->getId(),
-            'box_id' => 72
-        ], [
-            'order' => [
-                'submitted' => 'desc'
-            ]
-        ]);
-
-        /* Assume the most recent record is the latest submission
-         */
-        if ($allResponses->count()) {
-            $latestResponse = $allResponses->first();
-
-            /* Load in the wizzywig instead of a file attachment,
-             * if the submission uses the wizzywig editor and the
-             * submission is still a draft
-             */
-            if (in_array($latestResponse->getStorage()->getFilename(), $onlineSubmissionFilenames)) {
-                if ($latestResponse->getDraft()) {
-                    $editorContents = $latestResponse->getStorage()->read();
-                }
-            }
-        }
+        $allResponses = $participant->getAllResponses();
 
         /* Attach files if any exist
          */
         $zoneFactory = new Assessment\Attachzone\Factory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
+        /* Assume the most recent record is the latest submission
+         */
+        if ($allResponses->count()) {
+            /** @var Submission\Model $latestResponse */
+            $latestResponse = $allResponses->first();
+
+            foreach ($latestResponse->getAllFiles() as $file) {
+                /* Load in the wizzywig instead of a file attachment,
+                 * if the submission uses the wizzywig editor and the
+                 * submission is still a draft
+                 */
+                if ($file->getEditableInline()) {
+                    $editorContents = $file->getStorage()->read();
+                } else {
+                    // add it to the danger zone
+                    $zone->attachFiles([$file->getHash()]);
+                }
+            }
+        }
+
+        // TODO: what is this I don't even
         if (!$this->getUser()->isSuperuser()) {
             $folderIds = [];
 
