@@ -22,6 +22,9 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFi
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
+use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
+use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
+
 class Controller extends Base
 {
     /**
@@ -94,7 +97,7 @@ class Controller extends Base
          * crocodocable files that somehow die
          */
         try {
-            $factory = new \Schoolbox\Learning\InlineGrader\Factory\ResponseFile($response, $file, $this->getUser());
+            $factory = new ResponseFileFactory($response, $file, $this->getUser());
             $subfragment = $factory->produce();
 
             $data = [
@@ -145,7 +148,7 @@ class Controller extends Base
 
         if (strlen($file->getCrocodocId())) {
             try {
-                $facade = new \Schoolbox\Learning\InlineGrader\Facade($response, $file, $this->getUser());
+                $facade = new InlineGraderFacade($response, $file, $this->getUser());
                 $location = $facade->getDownloadUrl();
 
                 $this->getResponse()->redirect->to($location);
