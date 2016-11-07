@@ -1,7 +1,7 @@
 {% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 
-{% set createRoute = isRouteAuthorized('learningAssessment.getSelectAssessmentInFolder')
-    ? routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: folder.id, assessmentTypeTitle: 'task'})
+{% set createRoute = isRouteAuthorized('learningAssessment.getCreateAssessmentForm')
+    ? routeLookup('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType})
     : ''
 %}
 
@@ -67,7 +67,7 @@
     {% if createRoute %}
         <div class="component-action">
             <section>
-                <a href="{{ createRoute }}" class="button">Create Task</a>
+                <a href="{{ createRoute }}?type=task" class="button">Create Task</a>
             </section>
         </div>
     {% endif %}

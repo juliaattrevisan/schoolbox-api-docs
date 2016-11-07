@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -85,9 +86,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         return [
             'component_id' => $this->getInstance()->getId(),
             'compact'      => $this->getConfig('compactMode'),
-            'folder'       => $this->getSource(),
+            'context'      => $this->getSource(),
+            'contextType'  => AssessmentContextType::TYPE_FOLDER.'s',
             'assessables'  => $this->assessments,
-            'termCode'     => $this->getTermMapper()->findForToday()->getCode()
+            'termCode'     => $this->getTermMapper()->findForToday()->getCode(),
         ];
     }
 
