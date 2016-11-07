@@ -54,7 +54,7 @@ class Access
                 /** @var UserAccess $currentAccess */
                 // Loop through the campuses selected for the event
                 foreach ($campuses as $campus) {
-                    if (is_object($event)) {
+                    if (is_object($campus)) {
                         $campusId = $campus->getCampusId();
                     } else {
                         $campusId = $campus;
