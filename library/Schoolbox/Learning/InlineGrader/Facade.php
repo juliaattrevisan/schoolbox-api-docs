@@ -83,7 +83,7 @@ class Facade
             $this->getFile()->getCrocodocId(),
             $this->getUser(),
             $this->getTerm()->getArchived())
-        )->render();
+        )->annotate();
     }
 
     /**

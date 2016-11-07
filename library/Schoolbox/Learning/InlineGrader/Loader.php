@@ -93,7 +93,7 @@ class Loader
     /**
      * Setups up session with crocodoc and returns the URL to access the crocodoc document for that iframe
      */
-    public function render()
+    public function annotate()
     {
         $access = UserAccess::ACCESS_DENY;
         if ($this->getUser()->isSuperuser()) {
