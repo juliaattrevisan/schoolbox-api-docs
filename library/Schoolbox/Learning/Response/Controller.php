@@ -116,6 +116,44 @@ class Controller extends Base
     }
 
     /**
+     * Download a particular annotated crocodoc as a pdf
+     *
+     * @param SubmissionFile $file
+     */
+    public function getCrocodocDownload(SubmissionFile $file)
+    {
+        /* TODO: Generate a populated response for now
+         */
+        $response = $this->generateResponse1();
+
+        /* Factory to figure out which fragment is required
+         */
+        $file = $response->getAllFiles()->first();
+
+        foreach ($response->getAllFiles() as $currentFile) {
+            if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
+                $file = $currentFile;
+                break;
+            }
+        }
+
+        if (strlen($file->getCrocodocId())) {
+            try {
+                $facade = new \Schoolbox\Learning\InlineGrader\Facade($response, $file, $this->getUser());
+                $location = $facade->getDownloadUrl();
+
+                $this->getResponse()->redirect->to($location);
+            }
+            catch (\RangeException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+            }
+            catch (\DomainException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+            }
+        }
+    }
+
+    /**
      * Dump out a plagscan report
      *
      * @param Plagscan $plagscan

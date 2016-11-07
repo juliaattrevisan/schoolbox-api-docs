@@ -48,11 +48,11 @@ class Facade
     /**
      * Facade constructor.
      *
-     * @param SubmissionFile $file
      * @param Submission $submission
+     * @param SubmissionFile $file
      * @param User $user
      */
-    public function __construct(SubmissionFile $file, Submission $submission, User $user)
+    public function __construct(Submission $submission, SubmissionFile $file, User $user)
     {
         $this->setFile($file);
         $this->setSubmission($submission);
@@ -74,13 +74,16 @@ class Facade
         /* If this was previously uploaded in the past, resume scribbling
          * Otherwise upload it and start a new scribble
          */
-        $file = $this->getFile();
-
-        if (!strlen($file->getCrocodocId())) {
+        if (!strlen($this->getFile()->getCrocodocId())) {
             $this->upload();
         }
 
-        return (new Loader(new Authenticator(), $file->getCrocodocId(), $this->getUser(), $this->getTerm()->getArchived()))->render();
+        return (new Loader(
+            new Authenticator(),
+            $this->getFile()->getCrocodocId(),
+            $this->getUser(),
+            $this->getTerm()->getArchived())
+        )->render();
     }
 
     /**
@@ -96,31 +99,20 @@ class Facade
         }
     }
 
-//    }
-//
-//    /**
-//     * Redirects to a PDF download link for this object.
-//     *
-//     * @throws Exception
-//     */
-//    public function download()
-//    {
-//        /* If this was previously uploaded in the past, resume scribbling
-//         * Otherwise upload it and start a new scribble
-//         */
-//        $submission = $this->getSubmission();
-//        if (!strlen($submission->getUuid())) {
-//            $this->upload();
-//        }
-//
-//        try {
-//            $loader = new Loader($submission->getUuid(), $this->getUser(), $this->getTerm()->getArchived());
-//            header('Location: '.$loader->getDownloadUrl('return_'.$submission->getFilename().'.pdf'));
-//            exit;
-//        } catch (Exception $e) {
-//            echo "Error encountered: ".$e->getMessage();
-//        }
-//    }
+    /**
+     * Redirects to a PDF download link for this object.
+     */
+    public function getDownloadUrl()
+    {
+        $filename = "return_{$this->getFile()->getFilename()}.pdf";
+
+        return (new Loader(
+            new Authenticator(),
+            $this->getFile()->getCrocodocId(),
+            $this->getUser(),
+            $this->getTerm()->getArchived())
+        )->getDownloadUrl($filename);
+    }
 
     /* Getters/Setters
      */

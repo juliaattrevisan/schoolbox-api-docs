@@ -139,7 +139,7 @@ class ResponseFile
 
             /* Figger out a crocodoc url
              */
-            $url = (new Facade($this->getFile(), $this->getSubmission(), $this->getUser()))->start();
+            $url = (new Facade($this->getSubmission(), $this->getFile(), $this->getUser()))->start();
 
             /* Dock this doc into the crocodoc dock
              */

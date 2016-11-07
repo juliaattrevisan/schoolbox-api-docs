@@ -51,6 +51,10 @@ class Module extends BaseModule
                 /* View a Response File's plagscan report
                  */
                 '/responses/plagscan/{plagscanId}'                 => 'getPlagscanReport',
+
+                /* Download an annotated crocodoc
+                 */
+                '/responses/{responseId}/annotated'                => 'getCrocodocDownload',
             ],
             'POST' => []
         ];
@@ -69,16 +73,9 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getResponseList)';
+        $ruleRegexp = '(?:getResponseList|getResponse|getCrocodocDownload)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            ));
-
-        $ruleRegexp = '(?:getResponse)';
-        $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)

@@ -67,6 +67,13 @@ class Loader
     private $crocodocViewUrl = 'https://crocodoc.com/view';
 
     /**
+     * Crocodoc location for downloading an annotated file
+     * 
+     * @var string
+     */
+    private $crocodocDownloadUrl = 'https://crocodoc.com/api/v2/download/document';
+
+    /**
      * Constructor
      *
      * @param Authenticator
@@ -149,10 +156,14 @@ class Loader
             'uuid'      => $this->getUuid(),
             'annotated' => 'true',
         ];
+
         if ($filename) {
             $parts['filename'] = $filename;
         }
-        return "https://crocodoc.com/api/v2/download/document?".http_build_query($parts);
+
+        $queryString = http_build_query($parts);
+
+        return "{$this->getCrocodocDownloadUrl()}?{$queryString}";
     }
 
     /* Getters/Setters
@@ -295,6 +306,24 @@ class Loader
     private function setCrocodocViewUrl($crocodocViewUrl)
     {
         $this->crocodocViewUrl = $crocodocViewUrl;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCrocodocDownloadUrl()
+    {
+        return $this->crocodocDownloadUrl;
+    }
+
+    /**
+     * @param string $crocodocDownloadUrl
+     * @return $this
+     */
+    private function setCrocodocDownloadUrl($crocodocDownloadUrl)
+    {
+        $this->crocodocDownloadUrl = $crocodocDownloadUrl;
         return $this;
     }
 }
