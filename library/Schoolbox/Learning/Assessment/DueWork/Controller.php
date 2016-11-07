@@ -185,8 +185,6 @@ class Controller extends Assessment\Controller
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
-         *
-         * TODO: Replace SubmissionFileMapper() usage
          */
 
         /** @var Submission\File\Model $submission */
