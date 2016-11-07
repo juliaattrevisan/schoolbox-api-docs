@@ -12,6 +12,7 @@
 namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\User;
+use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -23,12 +24,12 @@ class Access
      *
      * @param User $user
      * @param Event $event
-     * @param $groups
-     * @param $campuses
+     * @param array|Collection $groups
+     * @param array|Collection $campuses
      *
      * @return bool
      */
-    public function checkAccess(User $user, Event $event, $groups, $campuses)
+    public function checkAccess(User $user, Event $event, $groups = [], $campuses = [])
     {
         /* Check superuser
          */
@@ -81,7 +82,7 @@ class Access
                 } else {
                     $groupId = $group;
                 }
-                
+
                 try {
                     $access = $userAccessMapper->getAccess($user, $groupId);
                 } catch (\Schoolbox\Mapper\Exception $e) {
