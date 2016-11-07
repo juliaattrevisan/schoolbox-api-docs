@@ -12,6 +12,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
@@ -102,6 +103,7 @@ class Controller extends Base
             $data = [
                 'assessment' => $assessment,
                 'response' => $response,
+                'attachzone' => (new Zone('feedbackFiles'))->getTwigContext(),
                 'selectedFileId' => $this->getRequest()->query['fileId'],
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),

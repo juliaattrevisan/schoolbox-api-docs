@@ -49,11 +49,11 @@
     </div>
 </div>
 <div class="row">
-    <div class="small-12 medium-7 columns">
+    <div class="small-12 columns">
         [grading options and dropdowns etc]
         <textarea cols="100" rows="5">Comments and stuff</textarea>
     </div>
-    <div class="small-12 medium-5 columns">
-        [upload files]
+    <div class="small-12 columns">
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     </div>
 </div>
