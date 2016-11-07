@@ -75,6 +75,8 @@ class Controller extends Base
      * I can't call it getResponse() lol wups
      *
      * @param IResponse $response
+     * @throws \RangeException Cannot authenticate at crocodoc
+     * @throws \DomainException Some kind of curl error between us and crocodoc
      */
     public function getParticularResponse($response)
     {
@@ -108,15 +110,9 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
         }
         catch (\RangeException $e) {
-
-            /* Cannot authenticate at crocodoc
-             */
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
         catch (\DomainException $e) {
-
-            /* Some kind of curl error between us and crocodoc
-             */
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
     }
@@ -125,6 +121,8 @@ class Controller extends Base
      * Download a particular annotated crocodoc as a pdf
      *
      * @param SubmissionFile $file
+     * @throws \RangeException Cannot authenticate at crocodoc
+     * @throws \DomainException Some kind of curl error between us and crocodoc
      */
     public function getCrocodocDownload(SubmissionFile $file)
     {
@@ -145,21 +143,14 @@ class Controller extends Base
 
         if (strlen($file->getCrocodocId())) {
             try {
-                $facade = new InlineGraderFacade($response, $file, $this->getUser());
-                $location = $facade->getDownloadUrl();
+                $location = (new InlineGraderFacade($response, $file, $this->getUser()))->getDownloadUrl();
 
                 $this->getResponse()->redirect->to($location);
             }
             catch (\RangeException $e) {
-
-                /* Cannot authenticate at crocodoc
-                 */
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
             }
             catch (\DomainException $e) {
-
-                /* Some kind of curl error between us and crocodoc
-                 */
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
             }
         }
