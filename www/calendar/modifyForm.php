@@ -19,49 +19,12 @@ $calendarHandler = new Calendar();
 $page            = new SitePage();
 $userMapper      = new UserMapper();
 $eventMapper     = new EventMapper();
-
-/**
- * Gets owner out of this event, or errors out if they don't have permission.
- *
- * @param int $userId
- * @param Event $event
- * @param string $action
- *
- * @return Schoolbox\User
- */
-$validateOwner = function ($userId, $event, $action) use ($userMapper) {
-    try {
-        /* Check logged in user has permission to modify this event
-         */
-        $eventAccess = new Access();
-
-        if ($action != 'Add' && $eventAccess->checkAccess($_SESSION['user'], $event) === false) {
-            error(34);
-        } else {
-            $user = $userMapper->findById($userId);
-            return $user;
-        }
-    } catch (\Schoolbox\Mapper\Exception $e) {
-        //If the event owner has been soft deleted, pass ownership to the current superuser
-        if($_SESSION['user']->isSuperuser()) {
-            return $_SESSION['user'];
-        }
-        else {
-            error(19);
-            exit;
-        }
-    }
-};
-
-/* Superuser/Staff/Parent adding event for someone else or
- * someone creating their own event
- */
+$eventAccess     = new Access();
 
 switch ($_REQUEST['action']) {
     case 'Add':
     case 'Update':
-        /* Default$eventMapper
-         */
+
         $publishDate = null;
         $until       = null;
 
@@ -69,18 +32,36 @@ switch ($_REQUEST['action']) {
          * Otherwise spawn a new one
          */
         if (is_numeric($_POST['id'])) {
+
+            /* Check event exists
+             */
             try {
                 $event = $eventMapper->findById($_POST['id']);
-                // Validate event's existing owner too
-                $validateOwner($event->getOwner()->getId(), $event, $_REQUEST['action']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 error(160);
                 exit;
             }
+
+            /* Check user has permission to modify this event
+             */
+            if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+                error(34);
+            }
+
+            /* Check owner still exists
+             * If not - pass ownership to the editor
+             */
+            try {
+                $owner = $userMapper->findById($event->getOwner()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $owner = $_SESSION['user'];
+            }
+
         } else {
             $event = new Event();
+            $owner = $_SESSION['user'];
         }
-        $owner = $validateOwner($_POST['userId'], $event, $_REQUEST['action']);
+
         /* Events aren't visible until this date
          * TODO: Fix validator in Alaress Date Format
          */
@@ -213,15 +194,25 @@ switch ($_REQUEST['action']) {
         break;
 
     case 'Delete':
+
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
+
+        /**
+         * Check event exists
+         */
         try {
             $event = $eventMapper->findById($_REQUEST['id']);
-            // Validate owner of this event can actually delete this event
-            $validateOwner($event->getOwner()->getId(), $event, $_REQUEST['action']);
         } catch (\Exception $e) {
             error(160);
-            exit;
         }
+
+        /**
+         * Check user has permission to delete this event
+         */
+        if ($eventAccess->checkAccess($_SESSION['user'], $event) == false) {
+            error(34);
+        }
+
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() != null) {
