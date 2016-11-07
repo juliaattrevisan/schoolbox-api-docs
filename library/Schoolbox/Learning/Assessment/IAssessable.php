@@ -27,10 +27,23 @@ interface IAssessable extends ISoftDeletable
      * * a folder
      * * a unit specification
      * * a unit implementation
+     * * a project
      *
      * @return AssessmentContext
      */
     public function getContext();
+
+    /**
+     * Return the ultimate context within which this assessment belongs.
+     *
+     * Currently, they may belong to:
+     * * a folder
+     * * a unit specification
+     * * a unit implementation
+     *
+     * @return AssessmentContext
+     */
+    public function getBaseContext();
 
     /**
      * Set the context within which this assessment belongs.
