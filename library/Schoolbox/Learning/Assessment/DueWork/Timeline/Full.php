@@ -12,25 +12,25 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork;
+namespace Schoolbox\Learning\Assessment\DueWork\Timeline;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 
-class Timeline
+class Full
 {
 
     /**
      * @var DueWork
      */
-    private $assessment;
+    protected $assessment;
 
     /**
      * @var Collection
      */
-    private $recombined;
+    protected $recombined;
 
     /**
      * Save yourself some time by returning the cached
@@ -38,7 +38,7 @@ class Timeline
      *
      * @var bool
      */
-    private $hasRecombined = false;
+    protected $hasRecombined = false;
 
     /**
      * Timeline constructor.
@@ -74,7 +74,7 @@ class Timeline
      *
      * 1 + 1 = 1
      */
-    private function recombine()
+    protected function recombine()
     {
         $processedFeedback = [];
 
@@ -155,18 +155,18 @@ class Timeline
      */
 
     /**
-     * @return Model
+     * @return DueWork
      */
-    private function getAssessment()
+    protected function getAssessment()
     {
         return $this->assessment;
     }
 
     /**
-     * @param Model $assessment
+     * @param DueWork $assessment
      * @return $this
      */
-    private function setAssessment($assessment)
+    protected function setAssessment($assessment)
     {
         $this->assessment = $assessment;
         return $this;
@@ -175,7 +175,7 @@ class Timeline
     /**
      * @return Collection
      */
-    private function getRecombined()
+    protected function getRecombined()
     {
         return $this->recombined;
     }
@@ -184,7 +184,7 @@ class Timeline
      * @param Collection $recombined
      * @return $this
      */
-    private function setRecombined($recombined)
+    protected function setRecombined($recombined)
     {
         $this->recombined = $recombined;
         return $this;
@@ -193,7 +193,7 @@ class Timeline
     /**
      * @return boolean
      */
-    private function getHasRecombined()
+    protected function getHasRecombined()
     {
         return $this->hasRecombined;
     }
@@ -202,7 +202,7 @@ class Timeline
      * @param boolean $hasRecombined
      * @return $this
      */
-    private function setHasRecombined($hasRecombined)
+    protected function setHasRecombined($hasRecombined)
     {
         $this->hasRecombined = $hasRecombined;
         return $this;

@@ -18,6 +18,12 @@
                 {% for currentInteraction in timeline %}
                     {% if currentInteraction is response %}
                         {% include '@learningResponse/inlineGrading/interaction/response.twig' %}
+
+                        {# I have the feeling people will want Feedbacks displayed here too
+                         #
+                         # This seems like a very convenient place to start editing any
+                         # Unpublished Feedbacks, per student
+                         #}
                     {% endif %}
                 {% endfor %}
             </ul>

@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DueWork\Timeline;
+use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
