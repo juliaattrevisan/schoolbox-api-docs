@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -201,6 +202,7 @@ class Controller extends Assessment\Controller
             /** @var Submission\Model $latestResponse */
             $latestResponse = $allResponses->first();
 
+            // Display the files that are a part of latest submission
             foreach ($latestResponse->getAllFiles() as $file) {
                 /* Load in the wizzywig instead of a file attachment,
                  * if the submission uses the wizzywig editor
@@ -211,6 +213,13 @@ class Controller extends Assessment\Controller
                     // add it to the danger zone
                     $zone->attachFiles([$file->getHash()]);
                 }
+            }
+
+            // Is the latest response a draft? Update it if so, otherwise create a new one.
+            // (The files in the latest submission were added regardless, so a student can
+            //  create a new draft from their most recent live submission.)
+            if (!$latestResponse->isDraft()) {
+                $latestResponse = null;
             }
         }
 
