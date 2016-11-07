@@ -56,7 +56,35 @@ abstract class AbstractMapperProxy
         return $this->transformModels($mapperModels);
     }
 
+    /**
+     * Saves this object or collection of objects.
+     *
+     * @param object|Collection $model A model object, or collection thereof
+     * @return array
+     */
+    public function save($model)
+    {
+        return $this->getMapper()->save(
+            $this->transformDomainObjects(
+                $this->getMapper()->getModelAsCollection($model)
+            )
+        );
+    }
 
+    /**
+     * Deletes this object or collection of objects.
+     *
+     * @param object|Collection $model A model object, or collection thereof
+     * @return bool
+     */
+    public function delete($model)
+    {
+        return $this->getMapper()->delete(
+            $this->transformDomainObjects(
+                $this->getMapper()->getModelAsCollection($model)
+            )
+        );
+    }
 
     /**
      * Determines if the specified column list requires translation before being
