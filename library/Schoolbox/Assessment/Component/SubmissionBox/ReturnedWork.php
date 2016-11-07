@@ -25,6 +25,7 @@ class ReturnedWork implements ISoftDeletable, IFile
 
     use StorableTrait;
 
+    use Traits\Model\CreatedAtDate;
     use Traits\Model\DeletedAtDate;
 
     /**
@@ -339,14 +340,4 @@ class ReturnedWork implements ISoftDeletable, IFile
         $this->isConfirmationOfSubmission = $isConfirmationOfSubmission;
         return $this;
     }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->getReturned();
-    }
-
-
 }

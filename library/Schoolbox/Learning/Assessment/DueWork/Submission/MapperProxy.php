@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
@@ -106,12 +107,30 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|StudentSubmission[] $domainObjects
+     * @param Collection|DueWorkSubmission[] $domainObjects
      * @return GenericCollection|StudentSubmission[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
         $dataModels = new GenericCollection(StudentSubmission::class);
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = (new StudentSubmission())
+                ->setOwner($domainObject->getSubmittedBy())
+                ->setCreatedAt($domainObject->getCreatedAt());
+
+            // Files
+            foreach ($domainObject->getAllFiles() as $file) {
+                // TODO this can't be all that needs to be set?
+                $dataModel->getFiles()->add(
+                    (new StudentSubmissionFile())
+                        ->setStorage($file)
+                );
+            }
+
+            $dataModels->add($dataModel);
+        }
+
         return $dataModels;
     }
 }
