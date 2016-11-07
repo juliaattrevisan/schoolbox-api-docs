@@ -128,6 +128,17 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     protected function transformDomainObjects(Collection $domainObjects)
     {
         $dataModels = new GenericCollection(Completion::class);
+
+        foreach ($domainObjects as $domainObject) {
+            // TODO add task ID - map from assessment ID somehow
+            // TODO add completion status once markbook is merged
+            $dataModel = (new Completion())
+                ->setStudent($domainObject->getReviewee())
+                ->setMarkingUser($domainObject->getReviewer())
+                ->setCompletionDate($domainObject->getCreatedAt());
+            $dataModels->add($dataModel);
+        }
+
         return $dataModels;
     }
 }
