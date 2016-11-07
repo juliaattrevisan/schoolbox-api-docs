@@ -139,6 +139,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         return $quizResponses;
     }
+
+    /**
+     * @param Collection|QuizFeedback[] $domainObjects
+     * @return GenericCollection|QuizAttempt[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(QuizAttempt::class);
+        return $dataModels;
+    }
 }
 
 

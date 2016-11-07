@@ -104,6 +104,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         return $dueWorkResponses;
     }
+
+    /**
+     * @param Collection|StudentSubmission[] $domainObjects
+     * @return GenericCollection|StudentSubmission[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(StudentSubmission::class);
+        return $dataModels;
+    }
 }
 
 

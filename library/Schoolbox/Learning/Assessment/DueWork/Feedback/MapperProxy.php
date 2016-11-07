@@ -80,7 +80,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|SubmissionReturn[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|DueWorkFeedback[]
      */
     protected function transformModels(Collection $mapperModels)
     {
@@ -110,6 +110,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $dueWorkFeedbacks;
+    }
+
+    /**
+     * @param Collection|DueWorkFeedback[] $domainObjects
+     * @return GenericCollection|SubmissionReturn[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(SubmissionReturn::class);
+        return $dataModels;
     }
 }
 
