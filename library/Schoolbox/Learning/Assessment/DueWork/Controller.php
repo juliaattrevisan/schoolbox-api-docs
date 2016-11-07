@@ -179,9 +179,8 @@ class Controller extends Assessment\Controller
 
         /* Otherwise continue
          */
-        $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
-        $latestResponse            = null;
-        $editorContents            = '';
+        $latestResponse = null;
+        $editorContents = '';
 
         /* Find all the records spawned by $participant
          *
