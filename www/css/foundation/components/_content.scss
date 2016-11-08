@@ -363,6 +363,12 @@ $container-bg: white !default;
 	}
 }
 
+.island {
+	.empty-state {
+		margin-bottom: 0;
+	}
+}
+
 .trace {
 	pre {
 		display: inline;

@@ -1,4 +1,20 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+
+{% if assessables is empty %}
+
+<div class="empty-state">
+    <i class="{{ icon }}"></i>
+    <p>No {{ typeLabel | lower }}, yet!</p>
+    {% if user.role.isStudent %}
+        <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View your grades</a>
+    {% endif %}
+    {% if createRoute %}
+        <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
+    {% endif %}
+</div>
+
+{% else %}
+
 <section>
     {% set createRoute -%}
         {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
@@ -46,3 +62,4 @@
     })
 </script>
 
+{% endif %}
