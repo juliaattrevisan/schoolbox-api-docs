@@ -202,7 +202,7 @@ class Controller extends Assessment\Controller
          */
         if ($allResponses->count()) {
             /** @var Submission\Model $latestResponse */
-            $latestResponse = $allResponses->first();
+            $latestResponse = $participant->findMostRecentResponse();
 
             // Display the files that are a part of latest submission
             foreach ($latestResponse->getAllFiles() as $file) {
