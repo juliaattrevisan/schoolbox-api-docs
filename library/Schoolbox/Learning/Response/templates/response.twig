@@ -53,10 +53,10 @@
 <div class="row">
     <div class="small-12 columns">
 
-        {% if assessment.markType.id == 1 %}
+        {% if assessment.markType.id == constant('TYPE_PERCENT', assessment.markType) %}
             {# Percentage #}
             <input type="text" name="percentage" placeholder="%" />
-        {% elseif assessment.markType.id == 2 %}
+        {% elseif assessment.markType.id == constant('TYPE_LETTER', assessment.markType) %}
             {# Letter Grade#}
             {% if assessment.gradeGroup.gradeLevels|length %}
                 <select name="gradeGroup">
@@ -67,10 +67,10 @@
                     {# Augment with dueWork/errorMapper records #}
                 </select>
             {% endif %}
-        {% elseif assessment.markType.id == 3 %}
+        {% elseif assessment.markType.id == constant('TYPE_TOTAL', assessment.markType) %}
             {# Total Mark#}
-            <input type="text" name="percentage" placeholder="/ {{ assessment.maxMark }}" />
-        {% elseif assessment.markType.id == 6 %}
+            <input type="text" name="mark" placeholder="/ {{ assessment.maxMark }}" />
+        {% elseif assessment.markType.id == constant('TYPE_NONE', assessment.markType) %}
             {# None #}
         {% endif %}
 
