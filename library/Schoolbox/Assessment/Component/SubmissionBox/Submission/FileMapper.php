@@ -56,6 +56,7 @@ class FileMapper extends Mapper
             ]
         );
 
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
     }
 
@@ -112,6 +113,30 @@ class FileMapper extends Mapper
             }
         }
         return $resultSet;
+    }
+
+    /**
+     * Post-save callback.
+     *
+     * Persists all files that have been attached to this submission.
+     *
+     * @param File $object
+     * @param File $previous
+     */
+    public function persistFiles(File $object, File $previous = null)
+    {
+        $joinMapper = $this->getJoinMapper('file');
+
+        // Delete files that were attached but aren't now
+        $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
+        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
+        $joinMapper->delete($removedFiles);
+
+        // Save files that are now attached
+        foreach ($object->getFiles() as $file) {
+            $file->setSubmission($object);
+        }
+        $joinMapper->save($object->getFiles());
     }
 
     /**

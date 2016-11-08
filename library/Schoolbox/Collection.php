@@ -550,6 +550,27 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Diffs by a column.
+     *
+     * A shortcut for `$this->diff($otherCollection, $callbackWhichComparesField)`.
+     *
+     * @param Collection $otherCollection
+     * @param string     $field
+     *
+     * @return Collection
+     */
+    public function diffBy(Collection $otherCollection, $field)
+    {
+        $getMethod = $this->getGetMethodName($field);
+        return $this->diff(
+            $otherCollection,
+            function ($a, $b) use ($getMethod) {
+                return $a->$getMethod() == $b->$getMethod;
+            }
+        );
+    }
+
+    /**
      * Returns a new collection containing items that are in $this, but not in
      * $otherCollection.
      *
