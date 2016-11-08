@@ -23,18 +23,7 @@
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
 
-                                {% if currentFile.plagscan %}
-                                    <p class="meta">
-                                        {% if currentFile.plagscan.isComplete %}
-                                            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
-                                            <span class="meta" title="Plagiarism check completed.">plagiarised</span>
-                                        {% elseif currentFile.plagscan.isProcessing %}
-                                            <span class="meta" title="Plagiarism check is currently processing - check back again soon.">Plagiarism check processing</span>
-                                        {% elseif currentFile.plagscan.isPending %}
-                                            <span class="meta" title="Plagiarism check is pending.">Plagiarism check pending</span>
-                                        {% endif %}
-                                    </p>
-                                {% endif %}
+                                {% include '@learning/dueWork/plagscan.twig' %}
                             </a>
                         </div>
                     </div>
