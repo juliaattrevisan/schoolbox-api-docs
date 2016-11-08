@@ -118,6 +118,7 @@ class Participant
     }
 
     /**
+     * @deprecated use isMarked()
      * This Participant received a Feedback for the $assessable
      *
      * @return bool
@@ -128,6 +129,27 @@ class Participant
     }
 
     /**
+     * Has this participant received ANY feedback for this assessment?
+     *
+     * @return bool
+     */
+    public function isMarked()
+    {
+        return $this->allFeedbacks->count() > 0;
+    }
+
+    /**
+     * Has this participant made ANY kind of response to this assessment?
+     *
+     * @return bool
+     */
+    public function isResponded()
+    {
+        return $this->allResponses->count() > 0;
+    }
+
+    /**
+     * @deprecated misnomer, use hasPublishedFeedback()
      * This Participant received a Published Feedback for the $assessable
      *
      * @return bool
@@ -137,6 +159,13 @@ class Participant
         return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasPublishedFeedback()
+    {
+        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
+    }
 
     /**
      * @return IResponse|null
