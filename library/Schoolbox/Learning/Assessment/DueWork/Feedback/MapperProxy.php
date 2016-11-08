@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
@@ -132,6 +133,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         foreach ($domainObjects as $domainObject) {
             $dataModel = (new SubmissionReturn())
+                ->setId($domainObject->getId())
+                ->setSubmissionBox(
+                    (new SubmissionBox())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setOwner($domainObject->getReviewee())
                 ->setMarker($domainObject->getReviewer())
                 ->setComment($domainObject->getComment())
