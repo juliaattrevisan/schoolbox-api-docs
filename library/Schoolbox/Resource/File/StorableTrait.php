@@ -185,7 +185,7 @@ trait StorableTrait
      */
     public function read()
     {
-        return $this->storage->readStream();
+        return $this->storage->read();
     }
 
     /**
