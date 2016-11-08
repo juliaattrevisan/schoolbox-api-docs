@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 $event = false;
 

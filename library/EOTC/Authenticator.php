@@ -34,8 +34,13 @@ class Authenticator {
 	 * Constructor
 	 *
 	 */
-	public function __construct() {
-		$this->setPermissionMapper(new EventPermissionMapper());
+	public function __construct(SitePage $page) {
+        //Return 404 if EOTC is not enabled
+	    if(!(int)\Config::get('eotc_enabled')){
+            $page->pageNotFound();
+        }
+
+        $this->setPermissionMapper(new EventPermissionMapper());
 
 		$this->setup();
 	}
@@ -46,6 +51,11 @@ class Authenticator {
 	protected function setup() {
 
 	}
+
+	public function isEOTCEnabled()
+    {
+        return \Config::get('eotc_enabled');
+    }
 
 	/**
 	 * Determine whether the specified user can spawn an ETOC event

@@ -10,6 +10,8 @@
  * @version     SVN: $Id$
  */
 
+new \EOTC\Authenticator($this);
+
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 

@@ -10,7 +10,7 @@
 
 /* If you are a Creator, continue
  */
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 

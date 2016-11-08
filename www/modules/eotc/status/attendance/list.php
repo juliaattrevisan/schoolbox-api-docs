@@ -24,7 +24,7 @@ $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators and Subscribed Users can view this page
  */
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);

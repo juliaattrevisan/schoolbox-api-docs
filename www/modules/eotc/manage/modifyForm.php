@@ -15,7 +15,7 @@ require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$userMapper = \Schoolbox\UserMapper::getInstance();

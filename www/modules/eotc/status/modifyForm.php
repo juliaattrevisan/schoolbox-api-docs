@@ -29,7 +29,7 @@ $sessionUser = $_SESSION['user'];
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 /* Only EOTC Administrators can view this page and a special case for
  * events where creators can self-promote this status into the next.
