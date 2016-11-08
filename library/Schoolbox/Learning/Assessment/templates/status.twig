@@ -1,1 +1,130 @@
-<h1>TODO status.twig</h1>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+<script src="/javascript/shared/jquery.toast-timeout.js" type="text/javascript"></script>
+
+<h1 class="subheader label">THIS TEMPLATE IS ASSESSMENT-TYPE AGNOSTIC</h1>
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Status of {{ assessment.title }}</h1>
+        <ul class="meta">
+            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
+            <li class="icon-calendar">Due {{ assessment.dueAt.relative }} on {{ assessment.dueAt.localShort }}</li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        {% if assessment.allParticipants | length %}
+        <section id="assessment-status">
+            <ul class="information-list">
+            {% for participant in assessment.allParticipants %}
+
+                {% set routeArgs = { assessmentId: assessment.id, studentId: participant.user.id } %}
+
+                {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+                {% set pActionResponses = '' %}
+                {% set pActionCount     = '' %}
+                {% set pStatusText      = '' %}
+                {% set pStatusClass     = '' %}
+                {% set pTooltip         = '' %}
+
+                {% block config %}
+                <li>
+                    {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+                    <div class="small-12 column">
+                        <div class="row actions-small-{{ pActionCount }}">
+                            <div class="list-item">
+
+
+                                {# TODO snap this card out so it can be used in the inlineGrader carousel #}
+                                <div class="small-12 card">
+                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
+                                    <h3>{{ participant.user.fullName }}</h3>
+                                    <p class="meta">
+                                        <span title="{{ pTooltip }}" class="progress-tick tiny {{ pStatusClass }}"></span>
+                                        <span>{{ pStatusText }}</span>
+                                    </p>
+                                </div>
+
+
+                            </div>
+                            {% if pActionCount %}
+                                <nav>
+                                    {%- spaceless %}
+                                        {% if pActionResponses %}
+                                            <a class="icon-history" href="{{ pActionResponses }}"></a>
+                                        {% endif %}
+                                        {% if pActionSummary %}
+                                            <a class="icon-next" href="{{ pActionSummary }}"></a>
+                                        {% endif %}
+                                    {% endspaceless -%}
+                                </nav>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="small-12 column">
+                        {% block grading %}{% endblock %}
+                    </div>
+                </li>
+                {% endblock %}
+
+            {% endfor %}
+            </ul>
+        </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="{{ icon.renderClass(assessment) }}"></i>
+                <p>This assessment has no students participating.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<div class="toast" data-alert data-save-draft></div>
+
+<script type="text/javascript">
+    $(function () {
+
+        var formSaveLabel = $('[data-save-draft]');
+
+        $('[data-combobox]').combobox({{ errors | json_encode | raw }});
+
+        $('#assessment-status')
+            .on('change keydown paste keypress', 'textarea', function () {
+                var $form = $(this).closest('form');
+                $form.find('[data-interaction-draft]').slideDown();
+            })
+            .on('blur', ':input', function () {
+                var $form = $(this).closest('form');
+
+                var data = {
+                    type: $form.attr('method'),
+                    data: $form.serializeArray()
+                };
+
+                formSaveLabel.toastActivate({
+                    text: 'Autosaving'
+                });
+
+                $.ajax($form.attr('action'), data)
+                 .done(function () { toast.apply($form, arguments); })
+                 .fail(function () { toast.apply($form, arguments); })
+                 .always(function () { toast.apply($form, arguments); });
+            });
+
+        function toast(arguments) {
+            console.log(arguments);
+
+            formSaveLabel.toastTimeout({
+                text: 'Draft Saved',
+                css: 'success'
+            });
+
+            this.find('[data-interaction-draft]').slideDown();
+        }
+    });
+</script>

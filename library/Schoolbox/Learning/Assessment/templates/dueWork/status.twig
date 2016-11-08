@@ -1,0 +1,60 @@
+{#  usage: per-participation, configure the following vars for the parent template to use
+     - pActionResponses: a route to see the list of responses for this participation
+     - pStatusText:      the description to output under the user's name
+     - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     - pTooltip:         a tooltip explaining the status marker
+
+    available varaibles:
+     - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
+     - assessment:  the assessment we're looking at
+     - participant: the current participant of the iteration
+
+#}
+{% extends '@learningAssessment/status.twig' %}
+
+{% block config %}
+
+    {# TODO uncomment once this route is merged to core #}
+    {#{% set pActionResponses = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}#}
+
+    {% set latestFeedback    = participant.findMostRecentFeedback %}
+    {% set latestResponse    = participant.findMostRecentResponse %}
+    {% set multipleResponses = participant.allResponses | length > 1 %}
+
+    {% set isPublished  = latestFeedback.published %}
+    {% set canPublish   = latestFeedback and not isPublished %}
+
+    {% if assessment.acceptsNone %}
+        {% set pStatusClass = '' %}
+        {% set pTooltip     = '' %}
+    {% else %}
+        {% set pStatusClass = participant.markingRequired ? 'pending' : (latestResponse or latestFeedback ? 'complete' : '') %}
+        {% set pTooltip     = participant.markingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'No submission') %}
+
+        {% set pStatusText %}
+            {%- spaceless %}
+                {% if not latestResponse %}
+                    Not submitted
+                {% else %}
+                    {% if multipleResponses %}
+                        Resubmitted
+                    {% else %}
+                        Submitted
+                    {% endif %}
+                    {% if latestResponse.submittedAt < assessment.dueAt %}
+                        on time
+                    {% else %}
+                        late
+                    {% endif %}
+                {% endif %}
+            {% endspaceless -%}
+        {% endset %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
+
+{% block grading %}
+    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+{% endblock %}
