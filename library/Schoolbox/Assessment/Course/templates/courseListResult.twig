@@ -51,7 +51,7 @@
         {% if hasTot %}
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.id }}">
         <li>
-            <a href="{{ routeLookup('courseImport.getImportForm', { courseId: course.id }) }}" class="icon-download">Import into classes</a>
+            <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: course.id }) }}" class="icon-download">Import into classes</a>
         </li>
         <li>
             {% if course.folder.hasHomepage %}
