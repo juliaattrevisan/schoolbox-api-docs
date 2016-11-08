@@ -19,6 +19,24 @@
 
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-calendar"></i>
+        <p>No upcoming events!</p>
+
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage">Add an event</a> or <a href="/calendar/import/{ID}">import events</a> to this page.
+        </p>
+        <!-- END empty_modify -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN event_list -->
+
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -68,4 +86,6 @@
         <a class="button icon-copy" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</a>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
+
+    <!-- END event_list -->
 </div>

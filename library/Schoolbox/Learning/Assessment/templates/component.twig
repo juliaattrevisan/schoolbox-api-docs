@@ -6,10 +6,14 @@
     <i class="{{ icon }}"></i>
     <p>No {{ typeLabel | lower }}, yet!</p>
     {% if user.role.isStudent %}
-        <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View your grades</a>
+        <p>
+            <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View your grades</a>
+        </p>
     {% endif %}
     {% if createRoute %}
-        <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
+        <p>
+            <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
+        </p>
     {% endif %}
 </div>
 
