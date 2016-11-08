@@ -25,7 +25,7 @@
                             <div class="list-item">
                                 <div class="card small-12 compact">
                                     <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?fileId={{ currentFile.id }}" title="{{ currentFile.filename }}">
-                                        <img src="/images/mime/60x60/{{ currentFile.storage.mimeType.iconFile }}" alt="View Profile" class="mime"/>
+                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                         <p>{{ currentFile.filename }}</p>
 
                                         {% include '@learning/dueWork/plagscan.twig' %}

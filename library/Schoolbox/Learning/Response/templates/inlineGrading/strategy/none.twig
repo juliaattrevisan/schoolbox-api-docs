@@ -12,7 +12,7 @@
                     <div class="list-item">
                         <div class="small-12 card">
                             <a href="/storage/fetch.php?hash={{ file.storage.hash }}" data-plugin="preview" title="">
-                                <img src="/images/mime/60x60/{{ file.storage.mimetype.iconFile }}" class="mime" alt="" />
+                                <img src="/ajax/mime/{{ file.mime }}" alt="Preview" class="mime" />
                                 <p>{{ file.storage.filename }}</p>
                             </a>
                             <p class="meta">{{ file.storage.humanReadableSize }}</p>
