@@ -51,7 +51,7 @@ if (is_numeric($_GET['eventID'])) {
      */
     $eventAccess = new Access();
 
-    if ($eventAccess->checkAccess($selectedUser, $event) === false) {
+    if ($eventAccess->checkAccess($selectedUser, $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
         error(34);
     }
 

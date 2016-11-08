@@ -19,48 +19,12 @@ $calendarHandler = new Calendar();
 $page            = new SitePage();
 $userMapper      = new UserMapper();
 $eventMapper     = new EventMapper();
-
-/**
- * Gets owner out of this event, or errors out if they don't have permission.
- *
- * @param int $userId
- * @param Event $event
- *
- * @return Schoolbox\User
- */
-$validateOwner = function ($userId, $event) use ($userMapper) {
-    try {
-        /* Check logged in user has permission to modify this event
-         */
-        $eventAccess = new Access();
-
-        if ($eventAccess->checkAccess($_SESSION['user'], $event) === false) {
-            error(34);
-        } else {
-            $user = $userMapper->findById($userId);
-            return $user;
-        }
-    } catch (\Schoolbox\Mapper\Exception $e) {
-        //If the event owner has been soft deleted, pass ownership to the current superuser
-        if($_SESSION['user']->isSuperuser()) {
-            return $_SESSION['user'];
-        }
-        else {
-            error(19);
-            exit;
-        }
-    }
-};
-
-/* Superuser/Staff/Parent adding event for someone else or
- * someone creating their own event
- */
+$eventAccess     = new Access();
 
 switch ($_REQUEST['action']) {
     case 'Add':
     case 'Update':
-        /* Default$eventMapper
-         */
+
         $publishDate = null;
         $until       = null;
 
@@ -68,18 +32,36 @@ switch ($_REQUEST['action']) {
          * Otherwise spawn a new one
          */
         if (is_numeric($_POST['id'])) {
+
+            /* Check event exists
+             */
             try {
                 $event = $eventMapper->findById($_POST['id']);
-                // Validate event's existing owner too
-                $validateOwner($event->getOwner()->getId(), $event);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 error(160);
                 exit;
             }
+
+            /* Check user has permission to modify this event
+             */
+            if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
+                error(34);
+            }
+
+            /* Check owner still exists
+             * If not - pass ownership to the editor
+             */
+            try {
+                $owner = $userMapper->findById($event->getOwner()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $owner = $_SESSION['user'];
+            }
+
         } else {
             $event = new Event();
+            $owner = $userMapper->findById($_POST['userId']);
         }
-        $owner = $validateOwner($_POST['userId'], $event);
+
         /* Events aren't visible until this date
          * TODO: Fix validator in Alaress Date Format
          */
@@ -119,6 +101,7 @@ switch ($_REQUEST['action']) {
 //                error(2);
 //            }
 //        }
+
         /* NO RETREAT
          * NO SURRENDER
          */
@@ -128,7 +111,8 @@ switch ($_REQUEST['action']) {
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
         }
-        /* Spawned further up
+
+        /* spawned further up
          */
         $event->setOwner($owner);
         $event->setAccess($_POST['level']);
@@ -140,12 +124,14 @@ switch ($_REQUEST['action']) {
         $event->setDetail($_POST['detail']);
         $event->setPublishDateTime($pubDateObject);
         $event->setAllDay($_POST['allday']);
+
         /* Collections of ids
          */
         $event->setRoleCollection(
             new \Schoolbox\Collection(isset($_POST['groupCheck']) ? $_POST['groupCheck'] : array())
         );
         $event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
          */
@@ -153,26 +139,27 @@ switch ($_REQUEST['action']) {
             $event->setAttendance($_POST['attendance']);
             $event->setAttendanceDirty(true);
         }
-        // Force events to have at least one campus value selected (if a group event)
+
         if ($event->isCampusLevel()) {
+            /* Check at least one campus has been selected
+             */
             if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
                 error(158);
                 exit;
             }
-        }
-
-        // Error out if user don't have write access to requested groups
-        if ($event->isGroupLevel()) {
+        } else if ($event->isGroupLevel()) {
+            /* Check at least one group has been selected
+             */
             if (!is_array($_POST['group']) || !count($_POST['group'])) {
                 error(2);
                 exit;
             }
-            foreach ($_POST['group'] as $group) {
-                if ($groupHandler->getPermission($group, $owner->getId()) < WRITE_ACCESS) {
-                    error(34);
-                    exit;
-                }
-            }
+        }
+
+        /* Check user has permission to write the event with the new settings
+         */
+        if ($eventAccess->checkAccess($_SESSION['user'], $event, $_POST['group'], $_POST['campus']) == false) {
+            error(34);
         }
 
         /* Set up individual relations for each event in the series
@@ -212,15 +199,25 @@ switch ($_REQUEST['action']) {
         break;
 
     case 'Delete':
+
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
+
+        /**
+         * Check event exists
+         */
         try {
             $event = $eventMapper->findById($_REQUEST['id']);
-            // Validate owner of this event can actually delete this event
-            $validateOwner($event->getOwner()->getId(), $event);
         } catch (\Exception $e) {
             error(160);
-            exit;
         }
+
+        /**
+         * Check user has permission to delete this event
+         */
+        if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
+            error(34);
+        }
+
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() != null) {

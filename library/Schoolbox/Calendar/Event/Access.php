@@ -12,34 +12,35 @@
 namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Access
 {
     /**
-     * Checks if a given user has permission to modify a given event
+     * Checks if a given user has permission to write an event
      *
      * @param User $user
      * @param Event $event
+     * @param array|Collection $groups
+     * @param array|Collection $campuses
      *
      * @return bool
      */
-    public function checkAccess(User $user, Event $event)
+    public function checkAccess(User $user, Event $event, $groups = [], $campuses = [])
     {
-        $userMapper = new UserMapper();
-
         /* Check superuser
          */
         if ($user->isSuperuser()) {
             return true;
         }
 
-        /* If event is on a personal level, check user is the owner
+        /* If event is on a personal level, check user is the owner or the author
          */
         if ($event->isPersonalLevel()) {
-            if ($user->getId() == $event->getOwner()->getId()) {
+            if ($user->getId() == $event->getOwner()->getId() || $user->getId() == $event->getAuthor()->getId()) {
                 return true;
             }
         }
@@ -53,8 +54,14 @@ class Access
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
                 // Loop through the campuses selected for the event
-                foreach ($event->getCampusCollection() as $currentCampus) {
-                    if ($currentCampus->getCampusId() == $currentAccess->getServiceIdentifier()) {
+                foreach ($campuses as $campus) {
+                    if (is_object($campus)) {
+                        $campusId = $campus->getCampusId();
+                    } else {
+                        $campusId = $campus;
+                    }
+
+                    if ($campusId == $currentAccess->getServiceIdentifier()) {
                         return true;
                     }
                 }
@@ -65,17 +72,25 @@ class Access
          */
         if ($event->isGroupLevel()) {
 
+            $userAccessMapper = UserAccessMapper::getInstance();
             /* Loop through the groups selected for this event
              */
-            foreach ($event->getCategoryCollection() as $category) {
+            foreach ($groups as $group) {
 
-                /* Loop through the managers for this group and check for $user
-                 */
-                $groupManagers = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $category->getCategoryId());
-                foreach ($groupManagers as $groupManager) {
-                    if ($groupManager->getId() === $user->getId()) {
-                        return true;
-                    }
+                if (is_object($group)) {
+                    $groupId = $group->getCategoryId();
+                } else {
+                    $groupId = $group;
+                }
+
+                try {
+                    $access = $userAccessMapper->getAccess($user, $groupId);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    return false;
+                }
+
+                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                    return true;
                 }
             }
         }

@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Event\Access;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
@@ -21,20 +22,8 @@ $page = new SitePage();
 $groupHandler = new Group();
 
 $user = $_SESSION['user'];
-
-/* Superuser/Staff/Parent adding event for someone else or
- * someone creating their own event
- */
-if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($user->getId() == $_POST['userId'])) {
-	$ownerId = $_POST['userId'];
-	$owner   = UserMapper::getInstance()->createModel()->setId($ownerId);
-}
-/* You're not supposed to be able to create events under other circumstances
- */
-else {
-	error(19);
-	exit;
-}
+$ownerId = $_POST['userId'];
+$owner   = UserMapper::getInstance()->createModel()->setId($ownerId);
 
 $event = new Event();
 
@@ -64,6 +53,13 @@ if ($_POST['allDay']) {
         ->setStartDateTime($startDate)
         ->setEndDateTime($endDate)
         ->setAllDay(false);
+}
+
+/* Check user has permission to create this event
+ */
+$eventAccess = new Access();
+if ($eventAccess->checkAccess($user, $event) == false) {
+    error(35);
 }
 
 $affectedIds = EventMapper::getInstance()->save($event);
