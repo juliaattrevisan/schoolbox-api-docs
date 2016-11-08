@@ -1,3 +1,6 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 <script type="text/javascript">
@@ -11,7 +14,6 @@
 </script>
 
 {# Crumbz: Class > Markbook #}
-{% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs([class.title, '/homepage/'~class.id], ['Markbook', '#']) }}
 
 <div class="actions-small-1 row">
@@ -85,13 +87,20 @@
                         Class Average
                     </th>
                     {% for assessment in markbook.assessments %}
-                        <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
-                            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
-                                {{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}
+                        {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
+                        <td class="{% if assessmentMean %}{{ urgency.marks(assessmentMean) }}-bg{% endif %}">
+                            <a class="{% if assessmentMean %}{{ urgency.marks(assessmentMean) }}{% endif %}"
+                               href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                                {{ assessmentMean | default('–') }}
                             </a>
                         </td>
                     {% endfor %}
-                    <td>{{ markbook.markbookStatistics.weightedMean | default('–') }}</td>
+                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
+                    <td class="{% if weightedMean %}{{ urgency.marks(weightedMean) }}-bg{% endif %}">
+                        <span class="{% if weightedMean %}{{ urgency.marks(weightedMean) }}{% endif %}">
+                            {{ weightedMean | default('–') }}
+                        </span>
+                    </td>
                 </tr>
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
@@ -186,7 +195,9 @@
                                            data-interaction="update_progress"></a>
                                     {% endif %}
                                 {% else %}
-                                    <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                    {% set normalisedMark = mostRecentFeedback.normalisedMark %}
+                                    <a class="{% if normalisedMark %}{{ urgency.marks(normalisedMark) }}{% endif %}"
+                                       href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.mostRecentFeedback.comment }}">
                                         {{ mostRecentFeedback.humanReadableMark | default('–') }}
                                     </a>
@@ -196,12 +207,12 @@
                             {% endif %}
                         </td>
                     {% endfor %}
-                    <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
+                    <td class="{% if studentMean %}{{ urgency.marks(studentMean) }}-bg{% endif %}">
                         {# TODO use actual selected term code #}
-                        {# TODO use gradients #}
-                        <a class="gradient-{STUDENT_AVG_GRADIENT}"
+                        <a class="{% if studentMean %}{{ urgency.marks(studentMean) }}{% endif %}"
                            href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
-                            {{ markbook.studentStatistics[student.id].weightedMean | default('–') }}
+                            {{ studentMean | default('–') }}
                         </a>
                     </td>
                 </tr>
