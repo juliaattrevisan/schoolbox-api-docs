@@ -65,6 +65,11 @@
                 <thead>
                 <tr class="rotate-headers">
                     <th>&nbsp;</th>
+                    <th>
+                        <div>
+                            <span>Student Average</span>
+                        </div>
+                    </th>
                     {% for assessment in markbook.assessments %}
                     <th>
                         <div>
@@ -75,16 +80,17 @@
                         </div>
                     </th>
                     {% endfor %}
-                    <th>
-                        <div>
-                            <span>Student Average</span>
-                        </div>
-                    </th>
                 </tr>
                 <tr>
                     <th>
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                         Class Average
+                    </th>
+                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
+                    <th>
+                        <span class="{{ urgency.marks(weightedMean) }}">
+                            {{ weightedMean | default('–') }}
+                        </span>
                     </th>
                     {% for assessment in markbook.assessments %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
@@ -95,12 +101,6 @@
                             </a>
                         </td>
                     {% endfor %}
-                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
-                    <td>
-                        <span class="{{ urgency.marks(weightedMean) }}">
-                            {{ weightedMean | default('–') }}
-                        </span>
-                    </td>
                 </tr>
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
@@ -171,6 +171,16 @@
                             </a>
                         </div>
                     </th>
+
+                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
+                    <th>
+                        {# TODO use actual selected term code #}
+                        <a class="{{ urgency.marks(studentMean) }}"
+                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
+                            {{ studentMean | default('–') }}
+                        </a>
+                    </th>
+
                     {% for assessment in markbook.assessments %}
                         <td class="column-{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
@@ -207,14 +217,6 @@
                             {% endif %}
                         </td>
                     {% endfor %}
-                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
-                    <td>
-                        {# TODO use actual selected term code #}
-                        <a class="{{ urgency.marks(studentMean) }}"
-                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
-                            {{ studentMean | default('–') }}
-                        </a>
-                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>
