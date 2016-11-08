@@ -88,7 +88,7 @@
                     </th>
                     {% for assessment in markbook.assessments %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
-                        <td class="{% if assessmentMean %}{{ urgency.marks(assessmentMean) }}-bg{% endif %}">
+                        <td>
                             <a class="{% if assessmentMean %}{{ urgency.marks(assessmentMean) }}{% endif %}"
                                href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
                                 {{ assessmentMean | default('–') }}
@@ -96,7 +96,7 @@
                         </td>
                     {% endfor %}
                     {% set weightedMean = markbook.markbookStatistics.weightedMean %}
-                    <td class="{% if weightedMean %}{{ urgency.marks(weightedMean) }}-bg{% endif %}">
+                    <td>
                         <span class="{% if weightedMean %}{{ urgency.marks(weightedMean) }}{% endif %}">
                             {{ weightedMean | default('–') }}
                         </span>
@@ -208,7 +208,7 @@
                         </td>
                     {% endfor %}
                     {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
-                    <td class="{% if studentMean %}{{ urgency.marks(studentMean) }}-bg{% endif %}">
+                    <td>
                         {# TODO use actual selected term code #}
                         <a class="{% if studentMean %}{{ urgency.marks(studentMean) }}{% endif %}"
                            href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
