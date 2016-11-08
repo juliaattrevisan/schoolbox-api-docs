@@ -90,7 +90,7 @@ class Model extends AbstractResponse
      */
     public function isDraft()
     {
-        return !($this->getSubmittedAt() instanceof \Alaress_Date_Format && !($this->getSubmittedAt() instanceof \Alaress_Date_NullDate));
+        return !$this->isSubmitted();
     }
 
     /**
