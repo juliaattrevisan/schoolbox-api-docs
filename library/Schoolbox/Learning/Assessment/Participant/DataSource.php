@@ -243,11 +243,16 @@ class DataSource
             // Add feedback
             foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
                 if ($feedback->getReviewee()->getId() == $user->getId()) {
+                    $feedback->setAssessable($assessment);
+                    $participant->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
                     // Feedbacks may have a stub response.
                     // If so, use it to find the actual response, and associate them together.
                     $stubResponse = $feedback->getResponse();
+
                     if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
                         $stubResponseId = $stubResponse->getId();
+
                         foreach ($participant->getAllResponses() as $response) {
                             // For now assume that the types of response and feedback match
                             if ($stubResponseId == $response->getId()) {
