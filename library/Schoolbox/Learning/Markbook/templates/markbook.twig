@@ -89,7 +89,7 @@
                     {% for assessment in markbook.assessments %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
                         <td>
-                            <a class="{% if assessmentMean %}{{ urgency.marks(assessmentMean) }}{% endif %}"
+                            <a class="{{ urgency.marks(assessmentMean) }}"
                                href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
                                 {{ assessmentMean | default('–') }}
                             </a>
@@ -97,7 +97,7 @@
                     {% endfor %}
                     {% set weightedMean = markbook.markbookStatistics.weightedMean %}
                     <td>
-                        <span class="{% if weightedMean %}{{ urgency.marks(weightedMean) }}{% endif %}">
+                        <span class="{{ urgency.marks(weightedMean) }}">
                             {{ weightedMean | default('–') }}
                         </span>
                     </td>
@@ -196,7 +196,7 @@
                                     {% endif %}
                                 {% else %}
                                     {% set normalisedMark = mostRecentFeedback.normalisedMark %}
-                                    <a class="{% if normalisedMark %}{{ urgency.marks(normalisedMark) }}{% endif %}"
+                                    <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.mostRecentFeedback.comment }}">
                                         {{ mostRecentFeedback.humanReadableMark | default('–') }}
@@ -210,7 +210,7 @@
                     {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
                     <td>
                         {# TODO use actual selected term code #}
-                        <a class="{% if studentMean %}{{ urgency.marks(studentMean) }}{% endif %}"
+                        <a class="{{ urgency.marks(studentMean) }}"
                            href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
                             {{ studentMean | default('–') }}
                         </a>

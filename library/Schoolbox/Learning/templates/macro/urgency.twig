@@ -48,6 +48,8 @@
  #}
 {% macro marks(normalisedMark) %}
 {% spaceless %}
-    gradient-{{ (normalisedMark/10)|round(0, 'floor') }}
+    {% if normalisedMark|length %}
+        gradient-{{ (normalisedMark/10)|round(0, 'floor') }}
+    {% endif %}
 {% endspaceless %}
 {% endmacro %}
