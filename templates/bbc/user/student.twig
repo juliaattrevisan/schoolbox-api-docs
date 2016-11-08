@@ -1,0 +1,8 @@
+{% extends '@core/user/student.twig' %}
+
+{% if showButtons %}
+    {% block buttons_miscellaneous %}
+        <!-- Start on School Grades page initially -->
+        <li class="no-pad"><a href="http://tass.bbc.qld.edu.au/kiosk/index.cfm?do=kiosk.students.main.student.details&stud_code={{ user.getExternalId() }}" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>TASS Profile</a></li>
+    {% endblock buttons_miscellaneous %}
+{% endif %}
