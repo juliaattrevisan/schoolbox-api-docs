@@ -25,9 +25,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
 
 class Controller extends Assessment\Controller
 {
