@@ -10,6 +10,7 @@ namespace Schoolbox\Mapper;
 use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 
 /**
@@ -50,7 +51,10 @@ abstract class AbstractMapperProxy
         try {
             $object = $this->transformModel($this->getMapper()->findById($id));
         } catch (Mapper\Exception\Deleted $e) {
-            $e->setDeletedObject($this->transformModel($e->getDeletedObject()));
+            $object = $this->transformModel($e->getDeletedObject());
+            if ($object instanceof ISoftDeletable) {
+                $e->setDeletedObject($object);
+            }
             throw $e;
         }
         return $object;
