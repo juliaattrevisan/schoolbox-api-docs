@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Completion;
 
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion;
@@ -87,6 +88,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         foreach($mapperModels as $completion){
             $taskCompletion = (new TaskCompletion())
+                // TODO add completion status once markbook is merged
                 ->setId($completion->getId())
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
@@ -122,9 +124,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = new GenericCollection(Completion::class);
 
         foreach ($domainObjects as $domainObject) {
-            // TODO add task ID - map from assessment ID somehow
             // TODO add completion status once markbook is merged
             $dataModel = (new Completion())
+                ->setId($domainObject->getId())
+                ->setTask(
+                    (new Task())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setStudent($domainObject->getSubmittedOnBehalfOf())
                 ->setMarkingUser($domainObject->getSubmittedBy())
                 ->setCompletionDate($domainObject->getCreatedAt());
