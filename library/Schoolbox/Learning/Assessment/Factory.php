@@ -278,6 +278,12 @@ class Factory
                 throw new \InvalidArgumentException('set a close date');
             }
         }
+        else {
+            $publishAt = new \Alaress_Date_NullDate();
+            $openAt = new \Alaress_Date_NullDate();
+            $dueAt = new \Alaress_Date_NullDate();
+            $closeAt = new \Alaress_Date_NullDate();
+        }
 
         /* Start manufacturing
          */
