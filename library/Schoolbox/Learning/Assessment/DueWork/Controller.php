@@ -345,13 +345,10 @@ class Controller extends Assessment\Controller
          * (ie. not a draft) ram the current datetime in
          */
         if ($isFinal) {
-
-            /* TODO: this will die because it's not using an actual mapper/model
-             */
             $response->setSubmittedAt(Alaress_Date_Format::now());
         }
 
-        /* TODO: Do the actual saving
+        /* Do the actual saving
          */
         $this->getDueWorkResponseMapper()->save($response);
 
