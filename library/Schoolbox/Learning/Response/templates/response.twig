@@ -52,7 +52,28 @@
 </div>
 <div class="row">
     <div class="small-12 columns">
-        [grading options and dropdowns etc]
+
+        {% if assessment.markType.id == 1 %}
+            {# Percentage #}
+            <input type="text" name="percentage" placeholder="%" />
+        {% elseif assessment.markType.id == 2 %}
+            {# Letter Grade#}
+            {% if assessment.gradeGroup.gradeLevels|length %}
+                <select name="gradeGroup">
+                    {% for current in assessment.gradeGroup.gradeLevels %}
+                        <option value="{{ current.id }}">{{ current.caption }}</option>
+                    {% endfor %}
+
+                    {# Augment with dueWork/errorMapper records #}
+                </select>
+            {% endif %}
+        {% elseif assessment.markType.id == 3 %}
+            {# Total Mark#}
+            <input type="text" name="percentage" placeholder="/ {{ assessment.maxMark }}" />
+        {% elseif assessment.markType.id == 6 %}
+            {# None #}
+        {% endif %}
+
         <textarea cols="100" rows="5">Comments and stuff</textarea>
     </div>
     <div class="small-12 columns">
