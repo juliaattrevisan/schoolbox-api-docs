@@ -16,7 +16,7 @@
 
         var tgt = $('select[name=student-select]'),
                 ize,
-                skipUnsubmitted = $('#skipUnsubmitted'),
+                showSubmittedOnly = $('#showSubmittedOnly'),
                 students = {{ carousel.allPeople|json_encode|raw }},
                 selectizeOptions = {
                     preload: true,
@@ -24,7 +24,7 @@
                     options: students,
                     render: {
                         option: function (item) {
-                            item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
+                            item.disabled = showSubmittedOnly.is(':checked') && !item.submitted;
                             return $('<div/>').html(item.html).html();
                         },
                         item: function (item) {
@@ -58,7 +58,7 @@
             }
         }
 
-        skipUnsubmitted.change(function (event) {
+        showSubmittedOnly.change(function (event) {
             var ize = tgt[0].selectize,
                     skip = $(this).is(':checked') ? 1 : 0,
                     form = $(this).closest('form');
@@ -68,10 +68,15 @@
 
             ize.refreshOptions(false);
 
-//            // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
-//            var boxId = form.find('input[name=boxId]').val();
-//
-//            $.post(form.attr('action'), { boxId: boxId, skipUnsubmitted: skip });
+            $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: assessment.id }) }}', {
+                headers: {
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                type: 'POST',
+                data: {
+                    showSubmittedOnly: skip
+                }
+            });
 
             var val = ize.getOption(ize.getValue());
 
@@ -108,11 +113,11 @@
         </div>
     </div>
     <div class="small-12 medium-4 columns">
-        <form action="/submission/inlineGrading/configForm.php" method="post">
+        <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: assessment.id }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {% if assessment.submittedOnly %}checked="checked"{% endif %} value='1' />
-            <label for="skipUnsubmitted" class="checkbox-label">Skip not submitted</label>
+            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if assessment.submittedOnly %}checked="checked"{% endif %} value='1' />
+            <label for="showSubmittedOnly" class="checkbox-label">Only show submitted</label>
         </form>
     </div>
 </div>

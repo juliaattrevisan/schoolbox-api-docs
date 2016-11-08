@@ -111,7 +111,7 @@ class StudentCarousel
                         </div>
                     </div>
                 ",
-                'unsubmitted' => $latestSubmission ? false : true,
+                'submitted' => $latestSubmission ? true : false,
             ];
 
             $allPeople[] = $person;

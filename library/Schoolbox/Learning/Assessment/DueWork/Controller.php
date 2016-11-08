@@ -41,7 +41,6 @@ class Controller extends Assessment\Controller
     /** @var SubmissionBox\Submission\FileMapper */
     private $submissionFileMapper;
 
-
     /**
      * @param UserMapper                          $userMapper
      * @param Error\Mapper                        $errorMapper
@@ -433,6 +432,50 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+
+    /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string      $defaultReturnUrl
+     * @return string
+     */
+    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    {
+        // if your context is a project, redirect back to its status screen
+        if ($assessment->getContext() instanceof Assessment\Project) {
+            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+        }
+
+        return $defaultReturnUrl;
+    }
+
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+        /* TODO: Make this more generalised
+         * TODO: Save this setting lol
+         * For now the only utility here is to update Skip Unsubmitted setting
+         */
+
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+        if ((int)$this->getRequest()->post['showSubmittedOnly']) {
+            $assessment->showOnlySubmittedStudents();
+        }
+        else {
+            $assessment->showAllSubmissibleStudents();
+        }
+
+        return;
+    }
+
+    /* Getters/Setters
+     */
 
     /**
      * @return Rubric\ResultMapper

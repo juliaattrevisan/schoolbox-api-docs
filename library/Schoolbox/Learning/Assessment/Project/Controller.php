@@ -227,5 +227,15 @@ class Controller extends Assessment\Controller
         return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
     }
 
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+    }
+
 
 }

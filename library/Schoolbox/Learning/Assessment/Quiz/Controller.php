@@ -264,4 +264,13 @@ class Controller extends Assessment\Controller
         return $quiz;
     }
 
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+    }
 }

@@ -85,6 +85,7 @@ class Module extends BaseModule
 
         $this->register('GET',  "$assRoute",        'getAssessment',            $loggedIn, $preloadAssessment);
         $this->register('POST', "$assRoute",        'postUpdateAssessment',     $isStaff,  $preloadAssessment);
+        $this->register('PATCH', "$assRoute",       'patchUpdateAssessment',    $isStaff,  $preloadAssessment);
         $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $isStaff,  $preloadAssessment);
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $isStaff,  $preloadAssessment);
         $this->register('GET',  "$assRoute/status", 'getStatus',                $isStaff,  $preloadAssessment);
