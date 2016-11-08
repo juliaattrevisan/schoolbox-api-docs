@@ -117,19 +117,42 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Progress report</h2>
-        <section class="content">
-            <ul class="inline-list no-margin" id="progress-icon">
-                <li>
-                    <a href="#" class="progress-tick no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick pending no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick complete no-text"></a>
-                </li>
+        <section class="content" id="progress-icon">
+            <ul class="inline-list no-margin">
+                <li><a href="#" class="progress-tick"></a></li>
+                <li><a href="#" class="progress-tick pending"></a></li>
+                <li><a href="#" class="progress-tick complete"></a></li>
+            </ul>
+            <div class="content"></div>
+            <ul class="inline-list no-margin">
+                <li><a href="#" class="progress-tick small"></a></li>
+                <li><a href="#" class="progress-tick pending small"></a></li>
+                <li><a href="#" class="progress-tick complete small"></a></li>
+            </ul>
+            <div class="content"></div>
+            <ul class="inline-list no-margin">
+                <li><a href="#" class="progress-tick tiny"></a></li>
+                <li><a href="#" class="progress-tick pending tiny"></a></li>
+                <li><a href="#" class="progress-tick complete tiny"></a></li>
             </ul>
         </section>
+        <script type="text/javascript">
+            $(function () {
+                $('#progress-icon').on('click', 'a', function (e) {
+                    e.preventDefault();
+
+                    var $a = $(this);
+
+                    if ($a.hasClass('pending')) {
+                        $a.removeClass('pending').addClass('complete');
+                    } else if ($a.hasClass('complete')) {
+                        $a.removeClass('complete');
+                    } else {
+                        $a.addClass('pending');
+                    }
+                });
+            });
+        </script>
     </div>
 </div>
 
