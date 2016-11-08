@@ -4,9 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DataModel;
-
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -19,14 +17,12 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
-
 /**
  * Proxy mapper for IAssessable objects.
  *
@@ -40,31 +36,23 @@ class MapperProxy
      * @var Mapper
      */
     protected $baseMapper;
-
     /**
      * The translator between domain and data objects.
      *
      * @var Translator
      */
     protected $translator;
-
-    /** @var Participant\DataSource */
-    private $participantDataSource;
-
     /**
      * Constructor
      *
-     * @param Mapper $baseMapper
+     * @param Mapper     $baseMapper
      * @param Translator $translator
-     * @param Participant\DataSource $participantDataSource
      */
-    public function __construct(Mapper $baseMapper, Translator $translator, Participant\DataSource $participantDataSource)
+    public function __construct(Mapper $baseMapper, Translator $translator)
     {
         $this->baseMapper = $baseMapper;
         $this->translator = $translator;
-        $this->participantDataSource = $participantDataSource;
     }
-
     /**
      * Finds an assessable by ID
      *
@@ -76,15 +64,12 @@ class MapperProxy
     public function findById($id)
     {
         try {
-            $originalModel = $this->baseMapper->findById($id);
-            $this->baseMapper->augmentListWithDueWorkRubrics([$originalModel]);
-            return $this->translateToDomainModel($originalModel);
+            return $this->translateToDomainModel($this->baseMapper->findById($id));
         } catch (MapperException\Deleted $e) {
             $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
             throw $e;
         }
     }
-
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -100,7 +85,6 @@ class MapperProxy
         $model = $this->baseMapper->findById($assessmentId);
         return $this->findById($model->getSpecificationAssessment()->getId());
     }
-
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -112,9 +96,8 @@ class MapperProxy
     {
         // Get all assessables which have this assessment as a spec
         return $this->baseMapper->findByColumn('spec.id', $assessmentId, $options)
-                                ->map([$this, 'translateToDomainModel']);
+            ->map([$this, 'translateToDomainModel']);
     }
-
     /**
      * Find all assessables for this context
      *
@@ -138,7 +121,6 @@ class MapperProxy
         }
         return new Collection();
     }
-
     /**
      * Finds all assessables for a unit specification
      *
@@ -148,9 +130,8 @@ class MapperProxy
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options), isset($options['hydrateParticipants']));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
     }
-
     /**
      * Finds all assessables for a unit implementation
      *
@@ -160,11 +141,14 @@ class MapperProxy
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options), isset($options['hydrateParticipants']));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
     }
-
     /**
-     * Finds all assessables for a folder
+     * Finds all assessables for a folder.
+     *
+     * This only finds assessables that are directly within a folder context:
+     * see `findAllInCourseImplementationForFolderId` for finding assessables
+     * that have been imported into a folder through a course import.
      *
      * @param int   $folderId
      * @param array $options
@@ -172,9 +156,20 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options), isset($options['hydrateParticipants']));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
     }
-
+    /**
+     * Finds all assessables that have been imported into a folder through a
+     * course import.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllInCourseImplementationForFolderId($folderId, $options = [])
+    {
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
+    }
     /**
      * Finds all assessables that are part of the given project
      *
@@ -184,9 +179,8 @@ class MapperProxy
      */
     public function findAllForProjectId($projectId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options), isset($options['hydrateParticipants']));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
     }
-
     /**
      * Saves an assessable
      *
@@ -197,7 +191,6 @@ class MapperProxy
     {
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable, $sequence);
-
         // Folder context translation:
         // Look up the data model's assessment object ID, and translate to a project ID
         $context = $dataModel->getAssessmentContext();
@@ -205,9 +198,7 @@ class MapperProxy
             $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
             $context->setId($project->getId());
         }
-
         $this->baseMapper->save($dataModel);
-
         // Set fields on the domain model object
         $assessable
             ->setId($dataModel->getId())
@@ -217,36 +208,29 @@ class MapperProxy
 //            ->setUpdatedAt($dataModel->getUpdatedAt())
 //            ->setDeletedAt($dataModel->getDeletedAt())
         ;
-
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
-
         } elseif ($subObject instanceof DueWork) {
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
             $subObject->setRubricResultSet(0);
             DueWorkMapper::getInstance()->save($subObject);
-
             // Save the Rubric
             /** @var DueWorkModel $dueWork */
             $dueWork = $assessable;
-
             if($dueWork->getRubric()){
                 $dueWork->getRubric()->setSubmissionBox($subObject);
                 DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
             }
-
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($dataModel->getContextFolder());
             QuizMapper::getInstance()->save($subObject);
-
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
-
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
                 $i = 0;
@@ -260,7 +244,6 @@ class MapperProxy
             }
         }
     }
-
     /**
      * Deletes an assessable
      *
@@ -270,11 +253,9 @@ class MapperProxy
     {
         // Delete assessment
         $this->baseMapper->delete($this->translateToDataModel($assessable, 0));
-
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
     }
-
     /**
      * Translates the data model to a domain object.
      *
@@ -287,7 +268,6 @@ class MapperProxy
         // TODO try to remove this, and update translator to return Model objects directly
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
-
         // Retrieve sub-projects
         $assessable = $this->translator->translateToDomainModel($subModel);
         if ($assessable instanceof ProjectObject) {
@@ -295,17 +275,15 @@ class MapperProxy
         }
         return $assessable;
     }
-
     /**
      * Translates a collection of data models to a domain object.
      *
      * Any broken data models just get skipped.
      *
      * @param Collection|Model[] $collection
-     * @param bool               $hydrateParticipants
      * @return Collection|IAssessable[]
      */
-    public function translateToDomainModelCollection(Collection $collection, $hydrateParticipants = false)
+    public function translateToDomainModelCollection(Collection $collection)
     {
         $newCollection = new Collection();
         foreach ($collection as $model) {
@@ -318,18 +296,8 @@ class MapperProxy
                 }
             }
         }
-
-        if ($hydrateParticipants) {
-            // TODO this shouldn't need to be done like this
-            $newCollection->map(function (IAssessable $a) {
-                // manuel hydration -_-
-                return $a->setAllParticipants($this->participantDataSource->findForAssessment($a));
-            });
-        }
-
         return $newCollection;
     }
-
     /**
      * Translates the domain object to a data model.
      *
@@ -340,7 +308,6 @@ class MapperProxy
     public function translateToDataModel(IAssessable $assessable, $sequence)
     {
         $dataModel = $this->translator->translateToDataModel($assessable, $sequence);
-
         // Turn the data model inside out
         // TODO try to remove this, and update translator to accept Model objects directly
         $model = $dataModel->getAssessmentModel();

@@ -72,6 +72,13 @@ class Decorator implements DecoratorInterface
 
         /* TODO: Replace old classes and stuff?
          */
+        $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
+        $gradingGroup->setId($this->getGradingScheme());
+
+        $assessment->setGradeGroup($gradingGroup);
+
+        /* TODO: Replace old classes and stuff?
+         */
         $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
         $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
@@ -81,12 +88,6 @@ class Decorator implements DecoratorInterface
 
         $assessment->setMarkScheme($markScheme);
 
-        /* TODO: Replace old classes and stuff?
-         */
-        $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
-        $gradingGroup->setId($this->getGradingScheme());
-
-        $assessment->setGradeGroup($gradingGroup);
         $assessment->setUseRubric($this->getUsesRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
 

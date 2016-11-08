@@ -4,9 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DataModel;
-
 use PDOStatement;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -23,7 +21,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-
 /**
  * Class Mapper
  *
@@ -51,7 +48,6 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
         // Type joins (what type of assessment is this?)
         // * task
         // * due work
@@ -91,7 +87,6 @@ class Mapper extends BaseMapper
                 'other_key' => 'assessment_id'
             ]
         );
-
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
         // * unit specification (via assessment_course_unit_specification)
@@ -141,7 +136,6 @@ class Mapper extends BaseMapper
             null,
             'contextProject'
         );
-
         // the specification of this assessment
         // (if this assessment is within a unit implementation)
         // An implementation may only have one specification,
@@ -157,11 +151,9 @@ class Mapper extends BaseMapper
             null,
             'specificationAssessment'
         );
-
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
     }
-
     /**
      * When deleting an Assessment that is a Quiz, we need to delete all sub-objects of the Quiz
      * @param Model $assessment
@@ -174,7 +166,6 @@ class Mapper extends BaseMapper
             $quizMapper->delete($quiz);
         }
     }
-
     /**
      * When restoring an Assessment that is a Quiz, we need to restore all sub-objects of the Quiz
      * @param Model $assessment
@@ -187,7 +178,6 @@ class Mapper extends BaseMapper
             $quizMapper->restoreSoftDeleted($quiz);
         }
     }
-
     /**
      * Selecting from the assessment table also returns whatever assessable
      * object is joined onto it.
@@ -229,7 +219,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
         ";
     }
-
     /**
      * Retrieves a list of assessments, along with their joined objects.
      *
@@ -246,25 +235,22 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-
             // Task?
             if ($row['t.id']) {
                 $model->setTask($this->hydrateJoin($row, 'task', 't'));
             } else {
                 $model->setTask(null);
             }
-
             // Due work?
             if ($row['d.id']) {
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
-                         ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
+                        ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
                 );
                 $dueWorkIds[] = $row['d.id'];
             } else {
                 $model->setDueWork(null);
             }
-
             // Quiz?
             if ($row['q.assess_id']) {
                 $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
@@ -272,69 +258,58 @@ class Mapper extends BaseMapper
             } else {
                 $model->setQuiz(null);
             }
-
             // Project?
             if ($row['p.id']) {
                 $model->setProject($this->hydrateJoin($row, 'project', 'p'));
             } else {
                 $model->setProject(null);
             }
-
             // Specification
             if ($row['spec.id']) {
                 $model->setSpecificationAssessment($this->hydrateJoin($row, 'assessment_specification_implementation', 'spec'));
             } else {
                 $model->setSpecificationAssessment(null);
             }
-
             // Context (whatever it might be)
             $context = null;
             if ($row['f.id']) {
                 // Folder
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
-
             } elseif ($row['us.id']) {
                 // Unit spec
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
                     ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
-
             } elseif ($row['ui.id']) {
                 // Unit impl
                 $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui')
                     ->setCourse(
                         $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
-                             ->setFolder(
-                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
-                             )
+                            ->setFolder(
+                                $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
+                            )
                     );
-
             } elseif ($row['pa.id']) {
                 // Project
                 $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
-
                 // Load context for this project itself
                 $contextProjectIds[] = $row['pa.assessment_id'];
-
             }
             $model->setAssessmentContext($context);
-
             $modelList->add($model);
         }
-
         // Load related 1-M models
-
         // Due work files
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
-
+        // Due work grade levels
+        $modelList = $this->augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds);
+        // Due work rubric grids
+        $modelList = $this->augmentListWithDueWorkRubrics($modelList, $dueWorkIds);
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
-
         // Folder codes for all contexts
         $modelList = $this->augmentListWithFolderCodes($modelList);
-
         return $modelList;
     }
-
     /**
      * Augments the list from hydrateSelect() with due work files.
      *
@@ -345,7 +320,6 @@ class Mapper extends BaseMapper
     protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
     {
         if (!empty($dueWorkIds)) {
-
             // Retrieve and sort list of duework files
             $files      = [];
             $filesQuery = "
@@ -365,7 +339,6 @@ class Mapper extends BaseMapper
                 }
                 $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
             }
-
             // Augment list with due work files
             foreach ($modelList as $model) {
                 try {
@@ -381,30 +354,59 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
-
     /**
-     * Augments the list from hydrateSelect() with the rubric grid (if it has one).
+     * Augments the list from hydrateSelect() with the grade levels for their selected grade scheme.
      *
      * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
      * @return Collection|Model[]
      */
-    public function augmentListWithDueWorkRubrics($modelList)
+    protected function augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds)
     {
-        foreach ($modelList as $model) {
-            try {
-                $submodel = $model->getSubObject();
-            } catch (\UnexpectedValueException $e) {
-                // Broken assessment - not much I can do besides ignore
-                continue;
-            }
-            if ($submodel instanceof SubmissionBox) {
-                $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
-                $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
+        if (!empty($dueWorkIds)) {
+            $gradeGroups = SubmissionBox\GradeLevel\Group\Mapper::getInstance()->findAllWithGradeLevels()->indexBy('id');
+            // Augment list
+            foreach ($modelList as $model) {
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
+                if ($submodel instanceof SubmissionBox) {
+                    if ($submodel->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
+                        $submodel->setGradeGroup($gradeGroups[$submodel->getGradeGroup()->getId()]);
+                    }
+                }
             }
         }
         return $modelList;
     }
-
+    /**
+     * Augments the list from hydrateSelect() with the rubric grid (if it has one).
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithDueWorkRubrics($modelList, $dueWorkIds)
+    {
+        if (!empty($dueWorkIds)) {
+            foreach ($modelList as $model) {
+                try {
+                    $submodel = $model->getSubObject();
+                } catch (\UnexpectedValueException $e) {
+                    // Broken assessment - not much I can do besides ignore
+                    continue;
+                }
+                if ($submodel instanceof SubmissionBox) {
+                    $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+                    $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
+                }
+            }
+        }
+        return $modelList;
+    }
     /**
      * Augments the list from hydrateSelect() with context projects.
      *
@@ -429,7 +431,6 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
-
     /**
      * Augments the list from hydrateSelect() with their context's folder codes.
      *
@@ -443,24 +444,19 @@ class Mapper extends BaseMapper
     protected function augmentListWithFolderCodes($modelList)
     {
         $folderIds = [];
-
         // Pass 1: load folder IDs for all non-projects
         // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-
             if (!$context instanceof ProjectModel) {
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
-
         // Load folders in a single query
         $folders = $this->getJoinMapper('assessment_folder')->findByColumn('id', $folderIds)->indexBy('id');
-
         // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-
             if (!$context instanceof ProjectModel) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
@@ -469,7 +465,6 @@ class Mapper extends BaseMapper
                 }
             }
         }
-
         return $modelList;
     }
 }
