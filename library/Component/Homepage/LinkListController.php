@@ -67,74 +67,96 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             )
         );
 
+        /** @var Schoolbox\Resource\Link[] $allLinks */
+        $allLinks = $this->getLinkMapper()->findAllInCategory(
+            $this->getSource(),
+            array(
+                'size' => $this->getConfig('size'),
+                'sort' => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+            )
+        );
+
         /* Need title injected here
          */
         $this->parseConfig();
 
-        //link output
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-        $this->setBlock('source_folder_exists', 'link', 'link_block');
-        $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
-        $this->setBlock('link', 'modify_link', 'modify_link_block');
+        //setup block for submission button
+        $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
-        if(!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
-        } else {
-            $this->setVar('source_folder_deleted_block', '');
+        if (count($allLinks) != 0) {
 
-            /** @var Schoolbox\Resource\Link[] $allLinks */
-            $allLinks = $this->getLinkMapper()->findAllInCategory(
-                $this->getSource(),
-                array(
-                    'size' => $this->getConfig('size'),
-                    'sort' => $this->getConfig('sort'),
-                    'sortdir' => $this->getConfig('sortdir'),
-                )
-            );
+            $this->setBlock($templateHandle, 'links', 'links_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-            $this->setVar('link_block', '');
-
-            $j = 0;
-
-            foreach ($allLinks as $currentLink) {
-                if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    continue;
-                }
-                $this->setVar(
-                    array(
-                        'LINK_ID' => $currentLink->getId(),
-                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
-                        'LINK_URL' => $currentLink->getHref(),
-                        'LINK_TARGET' => $currentLink->getLinkTarget(),
-                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
-                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
-                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
-                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
-                    )
-                );
-
-                // Controls
-                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar('modify_link_block', '');
-                } else {
-                    $this->parse('modify_link_block', 'modify_link');
-                }
-
-                $this->parse("link_block", "link", true);
-            }
-
-            //setup block for submission button
-            $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
-
+            $this->setVar('links_block', '');
+            $this->parse('empty_state_block', 'empty_state');
+            $this->setVar('SOURCE_ID', $this->getSource()->getId());
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("submit_link_block", "");
+                $this->setVar("empty_modify_block", "");
             } else {
-                $this->parse("submit_link_block", "submit_link");
+                $this->parse("empty_modify_block", "empty_modify");
             }
-            $this->parse('source_folder_exists_block','source_folder_exists');
+
+        } else {
+
+            //link output
+            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('source_folder_exists', 'link', 'link_block');
+            $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
+            $this->setBlock('link', 'modify_link', 'modify_link_block');
+
+            $this->setVar('empty_state_block', '');
+
+            if (!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            } else {
+                $this->setVar('source_folder_deleted_block', '');
+
+                $this->setVar('link_block', '');
+
+                $j = 0;
+
+                foreach ($allLinks as $currentLink) {
+                    if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                        continue;
+                    }
+                    $this->setVar(
+                        array(
+                            'LINK_ID' => $currentLink->getId(),
+                            'LINK_NAME' => Scrub::text($currentLink->getDescription()),
+                            'LINK_URL' => $currentLink->getHref(),
+                            'LINK_TARGET' => $currentLink->getLinkTarget(),
+                            'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
+                            'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                            'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
+                            'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
+                            'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                        )
+                    );
+
+                    // Controls
+                    if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                        $this->setVar('modify_link_block', '');
+                    } else {
+                        $this->parse('modify_link_block', 'modify_link');
+                    }
+
+                    $this->parse("link_block", "link", true);
+                }
+
+
+
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                    $this->setVar("submit_link_block", "");
+                } else {
+                    $this->parse("submit_link_block", "submit_link");
+                }
+                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            }
         }
 
         return true;

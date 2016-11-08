@@ -20,27 +20,35 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        $this->setBlock($templateHandle, "poll_question", "poll_question_block");
-        $this->setBlock('poll_question', "poll_vote", "poll_vote_block");
-        $this->setBlock('poll_question', "show_results", "show_results_block");
-        $this->setBlock("poll_vote", "poll_options", "poll_options_block");
-
-        $this->setBlock($templateHandle, "response_count", "response_count_block");
-        $this->setBlock($templateHandle, 'new_poll', 'new_poll_block');
-
-        $this->setBlock('poll_question', "poll_chart", "poll_chart_block");
-//        $this->setBlock('poll_chart', "poll_responses", "poll_responses_block");
-//        $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
-        $this->setVar('poll_responses_block', '');
-
-        $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
+        /* Need the title injected here
+                 */
+        $this->parseConfig();
 
         $pollHandler = new Poll();
 
-        $this->setVar('poll_question_block', '');
-        $this->setVar('show_results_block', '');
-
         if ($this->getConfig('poll') && is_numeric($this->getConfig('poll'))) {
+
+            $this->setBlock($templateHandle, "poll_question", "poll_question_block");
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('poll_question', "poll_vote", "poll_vote_block");
+            $this->setBlock('poll_question', "show_results", "show_results_block");
+            $this->setBlock("poll_vote", "poll_options", "poll_options_block");
+
+            $this->setBlock($templateHandle, "response_count", "response_count_block");
+            $this->setBlock($templateHandle, 'new_poll', 'new_poll_block');
+
+            $this->setBlock('poll_question', "poll_chart", "poll_chart_block");
+            // $this->setBlock('poll_chart', "poll_responses", "poll_responses_block");
+            // $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
+            $this->setVar('poll_responses_block', '');
+
+            $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
+
+            $this->setVar('poll_question_block', '');
+            $this->setVar('show_results_block', '');
+
+            $this->setVar('empty_state_block', '');
+
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
             $created = new Alaress_Date_Format;
@@ -56,12 +64,12 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                 $this->setVar(
                     array(
-                        'POLL_ID'           => $poll['pollID'],
-                        'POLL_QUESTION'     => Scrub::text($poll['question']),
-                        'POLL_AUTHOR_ID'    => $author->getId(),
+                        'POLL_ID' => $poll['pollID'],
+                        'POLL_QUESTION' => Scrub::text($poll['question']),
+                        'POLL_AUTHOR_ID' => $author->getId(),
                         'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square64",
-                        'POLL_AUTHOR_NAME'  => $author->getFullName(),
-                        'POLL_CREATED'      => $created->getRelativeTime(),
+                        'POLL_AUTHOR_NAME' => $author->getFullName(),
+                        'POLL_CREATED' => $created->getRelativeTime(),
                     )
                 );
 
@@ -72,9 +80,9 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                     $this->setVar(
                         array(
-                            'POLL_HEIGHT'     => count($pollData) * 30 + 70,
+                            'POLL_HEIGHT' => count($pollData) * 30 + 70,
                             'poll_vote_block' => '',
-                            'response_count'  => count($pollData)
+                            'response_count' => count($pollData)
                         )
                     );
 
@@ -84,7 +92,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         foreach ($pollData as $data) {
                             $pollJson[] = [
                                 'name' => $data['option'],
-                                'data'  => [intval($data['result'])],
+                                'data' => [intval($data['result'])],
                             ];
                             $i++;
                         }
@@ -102,8 +110,8 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                             $this->setVar(
                                 array(
                                     'POLL_OPTION_INDEX' => $i,
-                                    'POLL_OPTION'       => Scrub::text($data['option']),
-                                    'POLL_ON_OFF'       => $i % 2 ? 'polloff' : '',
+                                    'POLL_OPTION' => Scrub::text($data['option']),
+                                    'POLL_ON_OFF' => $i % 2 ? 'polloff' : '',
                                 )
                             );
 
@@ -128,12 +136,11 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 }
 
                 $this->parse('poll_question_block', 'poll_question');
-            }
-            else {
+            } else {
                 $this->setVar(array(
-                    'POLL_ID'		=> '',
-                    'POLL_TITLE'	=> 'Poll',
-                    'POLL_QUESTION'	=> '',
+                    'POLL_ID' => '',
+                    'POLL_TITLE' => 'Poll',
+                    'POLL_QUESTION' => '',
                 ));
 
                 $this->setVar('poll_chart_block', '');
@@ -149,30 +156,24 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             }
 
             $current = $poll;
-        } else {
-            $this->setVar(
-                array(
-                    'POLL_ID'       => '',
-                    'POLL_TITLE'    => 'Poll',
-                    'POLL_QUESTION' => '',
-                )
-            );
 
-            $this->setVar("poll_chart_block", '');
-            $this->setVar("poll_vote_block", "");
-            $this->setVar('show_results_block', '');
-            $this->setVar('modify_poll_block', '');
+        }
+        else
+        {
+            $this->setBlock($templateHandle, 'poll', 'poll_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('poll_block', '');
+            $this->parse('empty_state_block', 'empty_state');
+
+            $this->setBlock('empty_state_block', 'empty_modify');
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('new_poll_block', '');
+                $this->setVar('empty_modify', '');
             } else {
-                $this->parse('new_poll_block', 'new_poll');
+                $this->parse('empty_modify_block', 'empty_modify');
             }
         }
-
-        /* Need the title injected here
-         */
-        $this->parseConfig();
 
         return true;
     }
