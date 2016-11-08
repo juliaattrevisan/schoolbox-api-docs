@@ -11,8 +11,11 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -21,14 +24,17 @@ use SitePage;
 
 abstract class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var IAssessable[] */
-    protected $assessments = [];
+    /** @var IAssessable[]|Collection */
+    protected $assessments;
 
     /** @var AssessmentMapperProxy $assessmentMapper */
     private $assessmentMapper;
 
     /** @var TermMapper $termMapper */
     private $termMapper;
+
+    /** @var  Participant\DataSource */
+    private $participantMapper;
 
     /**
      * Constructor
@@ -46,6 +52,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
         $this->setAssessmentMapper($assMap);
         $this->setTermMapper(TermMapper::getInstance());
+        $this->participantMapper = $this->getSitePage()->getDi()->get('participantDataSource');
     }
 
     /**
@@ -59,6 +66,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             return false;
         }
 
+        // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
+        // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllForContext($this->getSource())
@@ -71,8 +80,18 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->limit($this->getConfig('size'));
 
         } catch (\DomainException $e) {
-            // if something goes wrong, this componenet will not be displayed
+            // if something goes wrong, this component will not be displayed
             return false;
+        }
+
+        // Load current user's participant in each Assessment
+        foreach($this->assessments as $assessment){
+            try{
+                $participant = $this->participantMapper->findForAssessmentAndUser($assessment, $this->getUser());
+                $assessment->getAllParticipants()->add($participant);
+            } catch (\OutOfBoundsException $e) {
+                // noop
+            }
         }
 
         return true;
@@ -84,6 +103,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     private function getTwigContext()
     {
         return [
+            'user'         => $this->getUser(),
             'component_id' => $this->getInstance()->getId(),
             'compact'      => $this->getConfig('compactMode'),
             'context'      => $this->getSource(),
@@ -108,7 +128,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             $this->getTwigTemplate(),
-            array_merge(['user' => $this->getUser()], $this->getTwigContext()),
+            $this->getTwigContext(),
             true
         );
     }

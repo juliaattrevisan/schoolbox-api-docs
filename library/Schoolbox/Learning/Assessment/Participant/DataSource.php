@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use \Schoolbox\User as User;
 use Schoolbox\UserMapper;
 
 /**
@@ -203,17 +204,61 @@ class DataSource
 
     /**
      * @param IAssessable $assessment
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @throws \OutOfBoundsException
      * @return Participant
      */
-    public function findForAssessmentAndUser(Iassessable $assessment, \Schoolbox\User $user)
+    public function findForAssessmentAndUser(IAssessable $assessment, User $user)
     {
-        foreach ($this->findForAssessment($assessment) as $participant) {
-            if ($participant->getUser()->getId() == $user->getId()) {
-                return $participant;
+        // Assume for now User is a Participant. We will perform a fall-back check later if required
+        $participant = new Participant($user, $assessment);
+
+        // Find all Responses
+        foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
+            if($response->getSubmittedOnBehalfOf() == $user){
+                $response->setAssessable($assessment);
+                $participant->getAllResponses()->setOffset($response->getId(), $response);
             }
         }
+
+        // Find all Feedback, and optionally link to Response
+        foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
+            if($feedback->getReviewee() == $user){
+                $feedback->setAssessable($assessment);
+                $participant->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
+
+                // Feedbacks may have a stub response.
+                // If so, use it to find the actual response, and associate them together.
+                $stubResponse = $feedback->getResponse();
+
+                if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                    $stubResponseId = $stubResponse->getId();
+                    $response = $participant->getAllResponses()->getOffset($stubResponseId);
+                    if($response instanceof IResponse){
+                        $feedback->setResponse($response);
+                        $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
+                    }
+                }
+            }
+        }
+
+        // If Responses or Feedback, return
+        if($participant->getAllResponses()->count() || $participant->getAllFeedbacks()->count()){
+            return $participant;
+        }
+
+        // No Responses or Feedback, check if a member of the class
+        $externalUserArray = $this->externalDb->getStudents($assessment->getBaseContext()->getFolder()->getCodeString());
+
+
+        if(is_array($externalUserArray)) {
+            foreach ($externalUserArray as $externalUser) {
+                if ($user->getExternalId() == $externalUser['synergy_id']) {
+                    return $participant;
+                }
+            }
+        }
+
         throw new \OutOfBoundsException("{$user->getFullName()} is not a participant of {$assessment->getTitle()}");
     }
 

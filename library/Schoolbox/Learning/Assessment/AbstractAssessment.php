@@ -742,5 +742,14 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->context;
     }
+
+    /** Retrieves the parent context of this project
+     *
+     * @return AssessmentContext
+     */
+    public function getBaseContext()
+    {
+        return $this->getContext()->getBaseContext();
+    }
 }
 

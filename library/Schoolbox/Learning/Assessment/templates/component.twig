@@ -1,4 +1,3 @@
-{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
 <section>
     {% set createRoute -%}
         {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
@@ -10,44 +9,10 @@
     <ul class="action-list">
         {% for assessable in assessables %}
 
+            {% block listItem %}
+                {% include '@learningAssessment/componentListItem.twig' with {extraNavItemCount: 0} %}
+            {% endblock %}
 
-            {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-            {% if assessable is quiz %}
-                {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
-            {% else %}
-                {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
-            {% endif %}
-            {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
-
-            {% set actionCount = (modifyRoute ? 1 : 0) + (deleteRoute ? 1 : 0) %}
-
-            <li class="actions-small-{{ actionCount }}" data-assessment="{{ assessable.id }}">
-                <div class="list-item">
-                    <div class="card small-12">
-                        {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
-                            <h3 data-assessment-title>{{ assessable.title }}</h3>
-                            {% if viewRoute %}</a>{% endif %}
-                        <p class="meta">
-                            <span class="{{ urgency.datetime(assessment, user) }}">
-                                Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                {% if actionCount %}
-                    <nav>{% spaceless %}
-                            {% if modifyRoute %}
-                                <a class="icon-modify" href="{{ modifyRoute }}" title="Modify"></a>
-                            {% endif %}
-                            {% if deleteRoute %}
-                                <a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" title="Delete"></a>
-                            {% endif %}
-                        {% endspaceless %}</nav>
-                {% endif %}
-                {% if not compact %}
-                    <article>{{ assessable.description | purify }}</article>
-                {% endif %}
-            </li>
         {% endfor %}
     </ul>
     <div class="component-action">
