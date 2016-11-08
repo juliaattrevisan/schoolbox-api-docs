@@ -25,8 +25,6 @@ use Schoolbox\Video\QueueMapper;
  * Storage Mapper. Maps storage table to Schoolbox storage objects
  *
  * @package Schoolbox\Resource\Storage
- *
- * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends Schoolbox\Mapper implements Receiver
 {
@@ -165,6 +163,25 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         ";
     }
 
+    /**
+     * Ensures that path is always calculated on all hydrated objects.
+     *
+     * This used to be in `$this->hydrateSelect` - however, that method doesn't
+     * get called if this object is hydrated through a join from another mapper.
+     *
+     * @param array         $row
+     * @param string        $alias
+     * @param callable|null $callback
+     *
+     * @return Model
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        /** @var Model $storage */
+        $storage = parent::hydrate($row, $alias, $callback);
+        $storage->setPath($this->getManager()->calcPath($storage));
+        return $storage;
+    }
 
     /**
      * @param PDOStatement $statement
@@ -176,7 +193,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $storage = $this->hydrate($r);
-            $storage->setPath($this->mgr->calcPath($storage));
             $storage->setMimetype($this->hydrateJoin($r, 'allowedFileExtension'));
 
             $c->add($storage);
