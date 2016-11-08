@@ -19,7 +19,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
      *
      * @var bool
      */
-    protected $quantitative;
+    protected $quantitative = false;
 
     /**
      * Bounds checks a normalised mark
