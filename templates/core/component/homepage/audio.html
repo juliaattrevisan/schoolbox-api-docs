@@ -8,6 +8,24 @@
 
 	{CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-audio"></i>
+        <p>No audio files available!</p>
+
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/cms/file/new/{SOURCE_ID}">Post audio file</a>
+        </p>
+        <!-- END empty_modify -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN audio -->
+
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -139,4 +157,6 @@
             </section>
         </div>
     </div>
+
+    <!-- END audio -->
 </div>
