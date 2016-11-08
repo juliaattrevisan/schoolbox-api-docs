@@ -10,6 +10,7 @@
 
 namespace EOTC;
 use \Schoolbox\User;
+use Schoolbox\Config\ConfigMapper;
 
 class Authenticator {
 
@@ -35,8 +36,10 @@ class Authenticator {
 	 *
 	 */
 	public function __construct(SitePage $page) {
+
         //Return 404 if EOTC is not enabled
-	    if(!(int)\Config::get('eotc_enabled')){
+        $configMapper = ConfigMapper::getInstance();
+        if(0 == $configMapper->get('eotc_enabled')){
             $page->pageNotFound();
         }
 
@@ -51,11 +54,6 @@ class Authenticator {
 	protected function setup() {
 
 	}
-
-	public function isEOTCEnabled()
-    {
-        return \Config::get('eotc_enabled');
-    }
 
 	/**
 	 * Determine whether the specified user can spawn an ETOC event

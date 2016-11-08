@@ -26,8 +26,11 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
      */
     protected function checkModuleEnabled()
     {
-        // Placeholder for EOTC being merged into core package.
-        // @see SA-580 and Calendar_Api_Config_Connector_Booking::checkModuleEnabled()
+        //Ensure EOTC module is enabled
+        $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
+        if(0 == $configMapper->get('eotc_enabled')){
+            throw new DomainException('EOTC Module is disabled');
+        }
         return true;
     }
 
