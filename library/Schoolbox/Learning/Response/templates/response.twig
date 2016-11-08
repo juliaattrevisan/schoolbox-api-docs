@@ -64,7 +64,12 @@
                         <option value="{{ current.id }}">{{ current.caption }}</option>
                     {% endfor %}
 
-                    {# Augment with dueWork/errorMapper records #}
+                    {% if submissionStates|length %}
+                        <option value="" disabled></option>
+                        {% for current in submissionStates %}
+                            <option value="{{ current.id }}">{{ current.displayAs }}</option>
+                        {% endfor %}
+                    {% endif %}
                 </select>
             {% endif %}
         {% elseif assessment.markType.id == constant('TYPE_TOTAL', assessment.markType) %}
