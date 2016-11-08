@@ -95,13 +95,13 @@ class Model extends AbstractResponse
     }
 
     /**
-     * This response has been submitted late
+     * This response has been submitted on time
      *
      * @return mixed
      */
-    public function isSubmittedLate()
+    public function isSubmittedOnTime()
     {
-        return ($this->getSubmittedAt()->gt($this->getAssessable()->getDueAt()));
+        return ($this->getSubmittedAt()->lt($this->getAssessable()->getDueAt()));
     }
 
     /* Getters/Setters

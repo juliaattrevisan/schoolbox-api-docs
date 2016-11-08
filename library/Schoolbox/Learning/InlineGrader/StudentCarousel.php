@@ -79,12 +79,23 @@ class StudentCarousel
         $allPeople = [];
 
         foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
-            $latestFeedback = ($currentParticipant->findMostRecentPublishedFeedback() == null);
-            $latestSubmission = ($currentParticipant->findMostRecentResponse() == null);
+            $latestSubmission = $currentParticipant->findMostRecentResponse();
 
-            $hasUnmarked = (!$latestSubmission || ($latestSubmission && !$latestFeedback));
-
-
+            /** @var Submission $latestSubmission */
+            if ($latestSubmission) {
+                if ($latestSubmission->isSubmittedOnTime()) {
+                    $css = 'submitted';
+                    $label = 'Submitted on time';
+                }
+                else {
+                    $css   = 'submitted-late';
+                    $label = 'Submitted late';
+                }
+            }
+            else {
+                $css = 'unsubmitted';
+                $label = 'Not submitted';
+            }
 
             /* Viewing a ResponseList for a particular student
              */
@@ -101,11 +112,11 @@ class StudentCarousel
                         <div class=\"avatar card small-10\">
                             <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
                             <p>{$currentParticipant->getUser()->getFullName()}</p>
-                            <span class=\"label status unsubmitted\">Not Submitted</span>
+                            <span class=\"label status {$css}\">{$label}</span>
                         </div>
                     </div>
                 ",
-                'submitted' => $hasUnmarked,
+                'submitted' => $currentParticipant->isMarkingRequired(),
             ];
 
             $allPeople[] = $person;
