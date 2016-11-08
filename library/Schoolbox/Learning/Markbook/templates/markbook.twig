@@ -94,12 +94,12 @@
                     </th>
                     {% for assessment in markbook.assessments %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
-                        <td>
+                        <th>
                             <a class="{{ urgency.marks(assessmentMean) }}"
                                href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
                                 {{ assessmentMean | default('–') }}
                             </a>
-                        </td>
+                        </th>
                     {% endfor %}
                 </tr>
 
@@ -108,55 +108,55 @@
                 <tr class="sub-row" data-sub-table-row>
                     <th>Weight</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ assessment.weight }}</td>
+                        <th>{{ assessment.weight }}</th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>% Total Weight</th>
                     {% for assessment in markbook.assessments %}
-                        <td>
+                        <th>
                             {% if markbook.markbookStatistics.totalWeight > 0 %}
                                 {{ (assessment.weight / markbook.markbookStatistics.totalWeight * 100) | round(2) }}
                             {% else %}
                                 –
                             {% endif %}
-                        </td>
+                        </th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Mean</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</td>
+                        <th>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Standard Deviation</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</td>
+                        <th>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Minimum</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</td>
+                        <th>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Maximum</th>
                     {% for assessment in markbook.assessments %}
-                        <td>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</td>
+                        <th>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</th>
                     {% endfor %}
-                    <td>&nbsp;</td>
+                    <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
