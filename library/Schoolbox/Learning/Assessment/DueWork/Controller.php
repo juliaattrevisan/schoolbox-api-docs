@@ -319,12 +319,12 @@ class Controller extends Assessment\Controller
             // Create a new response
             $response = new DueWorkSubmission();
             $response
-                ->setAssessable($assessment)
                 ->setSubmittedBy($creator)
                 ->setSubmittedOnBehalfOf($participant->getUser())
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
         }
+        $response->setAssessable($assessment);
 
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
