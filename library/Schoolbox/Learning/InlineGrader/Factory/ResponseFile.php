@@ -155,7 +155,7 @@ class ResponseFile
             /* Download File prompt
              */
             return [
-                'strategy' => 'none.twig'
+                'strategy' => 'download.twig'
             ];
         }
     }
