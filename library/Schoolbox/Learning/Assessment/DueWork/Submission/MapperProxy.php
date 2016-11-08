@@ -146,7 +146,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     (new SubmissionBox())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
-                ->setOwner($domainObject->getSubmittedBy())
+                ->setOwner($domainObject->getSubmittedOnBehalfOf())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt());
 
