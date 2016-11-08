@@ -1,0 +1,28 @@
+{# TODO create feedback routes #}
+{% set fbUrl %}/learning/assessments/{{ participant.assessable.id }}/{{ participant.user.id }}/feedback{% endset %}
+{% set actionStyle = participant.allFeedbacks | length and not participant.findMostRecentFeedback.published ? '' : 'display:none;' %}
+
+<form method="post" action="{{ fbUrl }}" class="row">
+    <div class="small-12 medium-3 column">
+        {% block grading %}{% endblock %}
+    </div>
+    <div class="small-12 medium-9 column">
+        <label>Comment
+            <textarea name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
+        </label>
+    </div>
+    <div class="row">
+        <div class="small-12 column">
+            <div class="component-action">
+                <section>
+                    <div style="{{ actionStyle }}" data-interaction-draft>
+                        {%- spaceless %}
+                            <a class="button">Discard Draft</a>
+                            <a class="button">Publish</a>
+                        {% endspaceless -%}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</form>
