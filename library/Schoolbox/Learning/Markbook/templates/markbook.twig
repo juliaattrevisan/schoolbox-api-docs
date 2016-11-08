@@ -24,15 +24,14 @@
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li class="separator">Create New Assessment</li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'dueWork'}) }}'
-               class='icon-due-work'>Due Work</a></li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'quiz'}) }}'
-               class='icon-quiz'>Quiz</a></li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'task'}) }}'
-               class='icon-task'>Task</a></li>
-        <li><a href='{{ routeLookup('learningAssessment.getSelectAssessmentInFolder', {folderId: class.id, assessmentTypeTitle: 'project'}) }}'
-               class='icon-project'>Project</a></li>
+        {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders' }) %}
+        {% if baseRoute %}
+            <li class="separator">Create New Assessment</li>
+            <li><a href="{{ baseRoute }}?type=dueWork" class='icon-due-work'>Due Work</a></li>
+            <li><a href="{{ baseRoute }}?type=quiz" class='icon-quiz'>Quiz</a></li>
+            <li><a href="{{ baseRoute }}?type=task" class='icon-task'>Task</a></li>
+            <li><a href="{{ baseRoute }}?type=project" class='icon-project'>Project</a></li>
+        {% endif %}
         <li class="separator">Report</li>
         <li><a href='#' class='icon-download'>TODO: Download Spreadsheet</a>
     </ul>
