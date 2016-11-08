@@ -120,7 +120,9 @@ set iconClassnames = {
                                         </label>
                                     </span>
                                     {% if level == 1 %}
-                                        <span class="icon-add"></span>
+                                        <span>
+                                            <span class="icon-add icon-8"></span>
+                                        </span>
                                     {% endif %}
                                 {% endfor %}
                             </li>
@@ -134,9 +136,7 @@ set iconClassnames = {
                         </p>
                         <ul class="permission-list" id="adv-selection" data-roles data-digest-settings data-settings>
                             <li data-role="{{ role.id }}">
-
-                                        {% include '@messages/options.twig' with { mode: 'def' } %}
-
+                                {% include '@messages/options.twig' with { mode: 'def' } %}
                             </li>
                         </ul>
                     </div>

@@ -1027,6 +1027,11 @@ nav {
 		padding: 0;
 	}
 
+	span:not([data-perm-container])>[class*="icon-"]:before {
+		padding-right: 10px;
+		padding-left: 10px;
+	}
+
 	a{
 		// Button splash & .actions-small-# a[class*="icon-"] specificity causes this
 		overflow: inherit !important;
