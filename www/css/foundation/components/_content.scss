@@ -895,26 +895,6 @@ nav {
 			}
 		}
 	}
-	.reply{
-		background-color: rgba(0,0,0,0.02);
-		border-top: 1px solid $body-bg;
-		clear: both;
-		.reply{
-			background-color: transparent;
-			@media #{$medium-up} {
-				margin-left: rem-calc((4.3 * $base-font-size));
-			}
-
-			@media #{$small-up} {
-				margin-left: rem-calc((2 * $base-font-size));
-			}
-		}
-
-		li,
-		.component-form{
-			clear: both;
-		}
-	}
 	form {
 		margin: 0;
 	}
@@ -1249,8 +1229,8 @@ p{
 
 }
 
-// Social Stream
-.social-stream{
+// Threaded / Social Stream
+.threaded {
 	@include information-list;
 	.body{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
@@ -1258,16 +1238,59 @@ p{
 			margin: $paragraph-margin-bottom 0;
 		}
 	}
+
+	.reply{
+		background-color: rgba(0,0,0,0.02);
+		border-top: 1px solid $body-bg;
+		clear: both;
+		padding-left: 2rem;
+
+		@media #{$small-only} {
+			padding-left: 2.5rem;
+		}
+
+		.reply{
+			background-color: transparent;
+			padding-left: 1rem;
+			margin-left: 1rem;
+		}
+	}
+
 	@media #{$small-only} {
 		.body{
 			margin: rem-calc(($base-font-size - 8)) 0;
 		}
-		.reply{
-			margin-left: 1rem;
+	}
+}
+
+.social-stream {
+	@extend .threaded;
+
+	.reply {
+		padding-left: 1rem;
+
+		@media #{$small-only} {
+			padding-left: 0.5rem;
+		}
+
+		li,
+		.component-form{
+			clear: both;
+		}
+
+		.reply {
+			@media #{$medium-up} {
+				margin-left: rem-calc((4.3 * $base-font-size));
+			}
+
+			@media #{$small-up} {
+				margin-left: rem-calc((2 * $base-font-size));
+			}
 		}
 	}
 }
 
+// Tables
 .table-actions{
 	[class^="icon-"]:before,
 	[class*=" icon-"]:before{

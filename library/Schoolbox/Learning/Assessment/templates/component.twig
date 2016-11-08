@@ -28,7 +28,7 @@
                             <h3 data-assessment-title>{{ assessable.title }}</h3>
                             {% if viewRoute %}</a>{% endif %}
                         <p class="meta">
-                            <span class="{{ urgency.gradientClass(assessment, user) }}">
+                            <span class="{{ urgency.datetime(assessment, user) }}">
                                 Due {{ assessable.dueAt.relativeTime }} on {{ assessable.dueAt.dateOnly }}
                             </span>
                         </p>

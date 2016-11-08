@@ -1,6 +1,12 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script type="text/javascript">
+    $(function() {
+        $('[data-plugin="preview"]').preview();
+    });
+</script>
+
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
@@ -11,6 +17,10 @@
 
 {% if assessment.useRubric %}
 {% include '@learningAssessment/fragments/dueWork/summary/rubrics.twig' %}
+{% endif %}
+
+{% if assessment.responses|length %}
+{% include '@learningAssessment/fragments/dueWork/history.twig' %}
 {% endif %}
 
 <div class="row">

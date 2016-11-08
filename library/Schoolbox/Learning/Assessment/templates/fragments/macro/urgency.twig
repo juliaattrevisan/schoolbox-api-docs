@@ -5,7 +5,7 @@
  # (have a lot of time to create responses) to red (you are
  # running out of time to create responses)
  #}
-{% macro gradientClass(assessable, user) %}
+{% macro datetime(assessable, user) %}
 {% spaceless %}
 
 {% if assessable.isParticipant(user) %}
@@ -15,5 +15,38 @@
     {% endif %}
 {% endif %}
 
+{% endspaceless %}
+{% endmacro %}
+
+
+{##
+ # Decide Urgency of a Plagscan percentage
+ #
+ # $value represents how much of the document was plagiarised
+ # so a high percentage means a lot was copied from somewhere
+ #
+ # Status of -1 should be hidden entirely, and the default
+ # thresholds are 60, 20 and 0 (represented in red, orange,
+ # and green respectively)
+ #}
+{% macro plagscan(value) %}
+{% spaceless %}
+    {% set numericValue = value|replace({'%': ''}) %}
+    {% if numericValue > 60 %}
+        plagscan-critical
+    {% elseif numericValue > 20 %}
+        plagscan-warning
+    {% elseif numericValue > 0 %}
+        plagscan-ok
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{##
+ # Decide urgency of normalised marks
+ #}
+{% macro marks(normalisedMark) %}
+{% spaceless %}
+    gradient-{{ (normalisedMark/10)|round(0, 'floor') }}
 {% endspaceless %}
 {% endmacro %}

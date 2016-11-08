@@ -1,0 +1,39 @@
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+<script type="text/javascript">
+    $(function() {
+        $('#view-history').on('click', function(event) {
+            event.preventDefault();
+
+            $(this).remove();
+
+            $('#history')
+                .find('[data-history-row]:hidden')
+                .css({opacity:0})
+                .show()
+                .animate({opacity:1}, 2000);
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Submission History</h2>
+
+        <section>
+             <ul id='history' class="information-list threaded">
+                 {% for currentInteraction in timeline %}
+                     {% if currentInteraction is response %}
+                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
+                     {% elseif currentInteraction is feedback %}
+                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' %}
+                     {% endif %}
+                 {% endfor %}
+            </ul>
+        </section>
+
+        {% if timeline|length > 1 %}
+        <a id="view-history" class="button full-width icon-down-arrow">View {{ timeline|length -1 }} older interactions</a>
+        {% endif %}
+    </div>
+</div>
