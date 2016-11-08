@@ -115,7 +115,7 @@ set iconClassnames = {
                                                value="{{ level }}" type="checkbox"
                                                {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                                         />
-                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="checkbox-toggle">
+                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="input-toggle">
                                             <span class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></span>
                                         </label>
                                     </span>
