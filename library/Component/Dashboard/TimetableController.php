@@ -252,7 +252,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             array(
                                                 'ATTENDANCE_CLASS_CODE'        => $class,
                                                 'ATTENDANCE_SUBJECT_CODE'      => $subject,
-                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getUsingFormat('m/d/Y'),
+                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getUsingFormat('d/m/Y'),
                                                 'ATTENDANCE_ATTENDANCE_DAY'    => $this->dayNumber[$campus_id],
                                                 'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                                 'ATTENDANCE_TIMETABLE_CODE'    => $timetableCode,
