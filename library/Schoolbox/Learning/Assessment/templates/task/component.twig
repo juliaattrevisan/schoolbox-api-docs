@@ -1,37 +1,12 @@
-{% include '@learningAssessment/component.twig' with {
-assessmentType: 'Task',
-typeLabel: 'Task'
-} %}
+{% extends '@learningAssessment/component.twig' %}
+
+{% set assessmentType = 'task' %}
+{% set typeLabel = 'Task' %}
 
 
-{% block extraNavItems %}
 
-    {% if assessable.isParticipant(user) %}
-        {% set extraNavItemCount = 1 %}
-        {% set participant = assessable.getParticipant(user) %}
-        {% set mostRecentResponse = participant.findMostRecentFeedback %}
-        {% set mostRecentFeedback = participant.findMostRecentFeedback %}
-        {% set progressText = assessable.getHumanReadableMark(user, false) %}
-
-        {% if mostRecentResponse is null and mostRecentFeedback is null %}
-            {#No Response or Feedback#}
-            {% set progressClass = '' %}
-            {% set url = assessable.url %}
-
-        {% elseif mostRecentFeedback is not null %}
-            {#Teacher Assessed#}
-            {% set progressText = progressText ~ ', Click To Undo' %}
-            {% set progressClass = 'pending' %}
-            {% set url = '/task/start/' ~ assessable.id ~ '/undo' %}
-
-        {% else %}
-            {#Student Assessed#}
-            {% set progressClass = 'complete' %}
-            {% set url = '/task/start/' ~ assessable.id %}
-
-        {% endif %}
-
-        <a href="{{ url }}" class="progress-tick {{ progressClass }} no-text" data-interaction="update_progress" title="{{ progressText }}"></a>
-
-    {% endif %}
+{% block listItem %}
+    {% include '@learningAssessment/task/componentListItem.twig' %}
 {% endblock %}
+
+
