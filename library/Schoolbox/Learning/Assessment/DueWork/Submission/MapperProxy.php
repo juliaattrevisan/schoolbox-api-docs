@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -138,8 +139,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = new GenericCollection(StudentSubmission::class);
 
         foreach ($domainObjects as $domainObject) {
-            // TODO add box ID
+            // TODO consider whether the submission box should be looked up in save()
             $dataModel = (new StudentSubmission())
+                ->setId($domainObject->getId())
+                ->setSubmissionBox(
+                    (new SubmissionBox())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setOwner($domainObject->getSubmittedBy())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt());

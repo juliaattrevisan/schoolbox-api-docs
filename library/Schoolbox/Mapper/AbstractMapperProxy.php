@@ -155,6 +155,18 @@ abstract class AbstractMapperProxy
     protected abstract function getSelectString();
 
     /**
+     * Retrieves a single mapping from an external to an internal ID.
+     *
+     * @param $externalValue
+     * @return int
+     */
+    protected function getInternalValue($externalValue)
+    {
+        $values = $this->getInternalValues([$externalValue]);
+        return isset($values[0]) ? $values[0] : null;
+    }
+
+    /**
      * @param $externalValues
      * @return array
      */
