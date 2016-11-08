@@ -94,6 +94,16 @@ class Model extends AbstractResponse
         return $this->getSubmittedAt() !== null;
     }
 
+    /**
+     * This response has been submitted late
+     *
+     * @return mixed
+     */
+    public function isSubmittedLate()
+    {
+        return ($this->getSubmittedAt()->gt($this->getAssessable()->getDueAt()));
+    }
+
     /* Getters/Setters
      */
 

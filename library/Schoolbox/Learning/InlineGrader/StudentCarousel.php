@@ -84,6 +84,8 @@ class StudentCarousel
 
             $hasUnmarked = (!$latestSubmission || ($latestSubmission && !$latestFeedback));
 
+
+
             /* Viewing a ResponseList for a particular student
              */
             $urlValue = $this->getRouter()->generate('learningResponse.getResponseList', [
