@@ -261,16 +261,11 @@ class Participant
     /**
      * @param GenericCollection|IResponse[] $allResponses
      * @return static
+     * @throws \DomainException if the new Collection has incorrect member-item type
      */
     public function setAllResponses(GenericCollection $allResponses)
     {
-        $proposedElementType = $allResponses->getElementClass();
-        $allowedElementType = $this->getAllowedResponseType();
-
-        if($proposedElementType != $allowedElementType){
-            throw new \UnexpectedValueException("Expected: $allowedElementType, Actual: $proposedElementType");
-        }
-
+        $this->allResponses->assertSameItemClass($allResponses);
         $this->allResponses = $allResponses;
         return $this;
     }
@@ -286,16 +281,11 @@ class Participant
     /**
      * @param GenericCollection|IFeedback[] $allFeedbacks
      * @return static
+     * @throws \DomainException if the new Collection has incorrect member-item type
      */
     public function setAllFeedbacks(GenericCollection $allFeedbacks)
     {
-        $proposedElementType = $allFeedbacks->getElementClass();
-        $allowedElementType = $this->getAllowedFeedbackType();
-
-        if($proposedElementType != $allowedElementType){
-            throw new \UnexpectedValueException("Expected: $allowedElementType, Actual: $proposedElementType");
-        }
-
+        $this->allFeedbacks->assertSameItemClass($allFeedbacks);
         $this->allFeedbacks = $allFeedbacks;
         return $this;
     }

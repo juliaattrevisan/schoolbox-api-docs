@@ -15,6 +15,7 @@ use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Model as QuizQuestionT
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
+use \DomainException;
 
 class Model implements ISoftDeletable
 {
@@ -186,13 +187,11 @@ class Model implements ISoftDeletable
     /**
      * @param GenericCollection $answers
      * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setAnswers(GenericCollection $answers)
     {
-        if(QuizAnswer::class != $answers->getElementClass()){
-            $msg = "Collection must be of type '".QuizAnswer::class ."'. Found: ".$answers->getElementClass();
-            throw new \DomainException($msg);
-        }
+        $this->answers->assertSameItemClass($answers);
         $this->answers = $answers;
         return $this;
     }

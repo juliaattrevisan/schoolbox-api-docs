@@ -26,6 +26,7 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use \DomainException;
 
 class Model implements ISoftDeletable, IAssessableDataModel
 {
@@ -617,13 +618,11 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * @param GenericCollection $sections
      * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setSections(GenericCollection $sections)
     {
-        if(QuizSection::class != $sections->getElementClass()){
-            $msg = "Collection must be of type '".QuizSection::class."'. Found: ".$sections->getElementClass();
-            throw new \DomainException($msg);
-        }
+        $this->sections->assertSameItemClass($sections);
         $this->sections = $sections;
         return $this;
     }
@@ -639,13 +638,11 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * @param GenericCollection $attempts
      * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setAttempts(GenericCollection $attempts)
     {
-        if(QuizAttempt::class != $attempts->getElementClass()){
-            $msg = "Collection must be of type '".QuizAttempt::class."'. Found: ".$attempts->getElementClass();
-            throw new \DomainException($msg);
-        }
+        $this->attempts->assertSameItemClass($attempts);
         $this->attempts = $attempts;
         return $this;
     }

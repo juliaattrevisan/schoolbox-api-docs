@@ -13,6 +13,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use \DomainException;
 
 /**
  * Represents a set of Questions in a Quiz
@@ -187,13 +188,11 @@ class Model implements ISoftDeletable
     /**
      * @param GenericCollection $questions
      * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setQuestions(GenericCollection $questions)
     {
-        if(QuizQuestion::class != $questions->getElementClass()){
-            $msg = "Collection must be of type '".QuizQuestion::class."'. Found: ".$questions->getElementClass();
-            throw new \DomainException($msg);
-        }
+        $this->questions->assertSameItemClass($questions);
         $this->questions = $questions;
         return $this;
     }
