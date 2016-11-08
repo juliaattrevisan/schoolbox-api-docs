@@ -149,7 +149,7 @@ abstract class Component_ControllerAbstract
             ->setConfig($instance->getConfigArray())
             ->setFolderMapper(FolderMapper::getInstance())
             ->setErrorMapper(ErrorMapper::getInstance())
-            ->configMapper = ConfigMapper::getInstance();
+            ->setConfigMapper(ConfigMapper::getInstance());
     }
 
     /**
