@@ -63,10 +63,13 @@ trait CompletionStatusTrait
 
     /**
      * Set this task as self-assessed.
+     *
+     * @return static
      */
     public function markAsSelfAssessed()
     {
         $this->completionStatus = $this->availableCompletionStatuses['selfAssessed'];
+        return $this;
     }
 
     /**
@@ -81,10 +84,13 @@ trait CompletionStatusTrait
 
     /**
      * Set this task as not yet attempted
+     *
+     * @return static
      */
     public function markAsNotAttempted()
     {
         $this->completionStatus = $this->availableCompletionStatuses['notAttempted'];
+        return $this;
     }
 
 
