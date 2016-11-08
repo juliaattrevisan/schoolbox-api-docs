@@ -250,9 +250,12 @@ class DataSource
         // No Responses or Feedback, check if a member of the class
         $externalUserArray = $this->externalDb->getStudents($assessment->getBaseContext()->getFolder()->getCodeString());
 
-        foreach($externalUserArray as $externalUser){
-            if($user->getExternalId() == $externalUser['synergy_id']){
-                return $participant;
+
+        if(is_array($externalUserArray)) {
+            foreach ($externalUserArray as $externalUser) {
+                if ($user->getExternalId() == $externalUser['synergy_id']) {
+                    return $participant;
+                }
             }
         }
 
