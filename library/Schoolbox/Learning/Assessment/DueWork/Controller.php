@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
 use DomainException;
+use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkRespo
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -91,8 +93,11 @@ class Controller extends Assessment\Controller
         /* TODO: Quickmark screen
          */
         $twigData = [
+            'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'type'        => Assessment\AssessmentType::objectToString($assessment),
+            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
-            'assessment' => $assessment,
+            'assessment'  => $assessment,
         ];
 
         $this->getResponse()->content->set(
@@ -101,6 +106,17 @@ class Controller extends Assessment\Controller
                 $twigData
             )
         );
+    }
+
+
+    /**
+     * @param IMarkScheme $scheme
+     * @return string
+     */
+    private function deriveSchemeName(IMarkScheme $scheme)
+    {
+        $c = get_class($scheme);
+        return substr($c, strrpos($c, '\\')+1);
     }
 
 
