@@ -9,6 +9,20 @@
         $.fn.alaressEditor({
             targetElements: $('[name=description]')
         });
+
+        $('#open').hide();
+        $('#close').hide();
+
+        $('#acceptOnline').change(function () {
+            if (this.value < 1) {
+                $('#open').hide();
+                $('#close').hide();
+            }
+            else {
+                $('#open').show();
+                $('#close').show();
+            }
+        });
     });
 </script>
 
