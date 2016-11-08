@@ -17,7 +17,7 @@
 {% if canWrite %}
     <div class="component-action">
         <section>
-            <a class="button" href="routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id})" title="Create a new activity">
+            <a class="button" href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}" title="Create a new activity">
                 Create Activity
             </a>
         </section>
