@@ -78,15 +78,22 @@ abstract class AbstractMapperProxy
      * Saves this object or collection of objects.
      *
      * @param object|Collection $model A model object, or collection thereof
-     * @return array
+     * @return bool Always true
+     * @throws \PDOException if something went wrong in the save process
      */
     public function save($model)
     {
-        return $this->getMapper()->save(
-            $this->transformDomainObjects(
-                $this->getMapper()->getModelAsCollection($model)
-            )
-        );
+        foreach ($this->getMapper()->getModelAsCollection($model) as $domainObject) {
+            $dataModel = $this->transformDomainObject($domainObject);
+            $this->getMapper()->save($dataModel);
+
+            // The save action will have set an auto-incrementing ID if $dataModel didn't already exist.
+            // Populate the ID of the domain object based on that value.
+            if (method_exists($dataModel, 'getId') && method_exists($domainObject, 'setId')) {
+                $domainObject->setId($dataModel->getId());
+            }
+        }
+        return true;
     }
 
     /**
@@ -216,6 +223,17 @@ abstract class AbstractMapperProxy
      * @return GenericCollection
      */
     protected abstract function transformDomainObjects(Collection $mapperModels);
+
+    /**
+     * Converts a single domain model object into a data model.
+     *
+     * @param object $mapperModel
+     * @return object
+     */
+    protected function transformDomainObject($mapperModel)
+    {
+        return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
+    }
 
     /* Getters / Setters
      */
