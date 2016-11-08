@@ -332,13 +332,15 @@ class Controller extends Assessment\Controller
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
-        foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
-            $response->getAllFiles()->add(
-                (new DueWorkSubmissionFile())
-                    ->setStorage($attachment)
-                    ->setFilename($attachment->getFilename())
-                    ->setEditableInline(false)
-            );
+        if (!empty($rq->post['attachment'])) {
+            foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
+                $response->getAllFiles()->add(
+                    (new DueWorkSubmissionFile())
+                        ->setStorage($attachment)
+                        ->setFilename($attachment->getFilename())
+                        ->setEditableInline(false)
+                );
+            }
         }
 
         /* If we're saving the final version of the submission
