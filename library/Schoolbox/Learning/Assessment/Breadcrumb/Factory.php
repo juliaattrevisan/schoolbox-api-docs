@@ -58,8 +58,12 @@ class Factory
         $context = $assessment->getContext();
 
         if ($context instanceof Project) {
-            $path = $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()]);
-        } else {
+            $path = $this->router->generate('learningAssessment.getAssessment', ['assessmentId' => $context->getId()]);
+        }
+        elseif ($context instanceof UnitSpecification) {
+             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
+        }
+        else {
             $path = "/homepage/{$context->getId()}";
         }
         $trail->add([$context->getTitle(), $path]);
@@ -68,7 +72,7 @@ class Factory
          */
         if ($assessment instanceof Project) {
             $params = ['assessmentId' => $assessment->getId()];
-            $route = $this->router->generate('learningAssessment.getSummary', $params);
+            $route = $this->router->generate('learningAssessment.getAssessment', $params);
             $trail->add([$assessment->getTitle(), $route]);
         }
 

@@ -119,6 +119,7 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment),
+            'baseContext'      => $assessment->getBaseContext(),
             'counts'           => $counts,
             'assessableCounts' => $assessableCounts,
             'assessment'       => $assessment,

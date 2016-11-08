@@ -58,7 +58,7 @@
                                 <div class="list-item">
                                     <div class="compact card wrap-down small-12">
                                         <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
-                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id}) }}">
+                                        <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
                                             </h3>
@@ -146,8 +146,14 @@
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="small-12 column">
-        <a href="{{ returnUrl }}" class="button submit full-width">Return</a>
+        {% if baseContext is unitSpecification %}
+        <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit full-width">Return to course</a>
+        {% else %}
+        <a href="/homepage/{{ baseContext.id }}" class="button submit full-width">Return to homepage</a>
+        {% endif %}
     </div>
 </div>
+
