@@ -14,6 +14,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
+use \Schoolbox\Config\ConfigMapper;
 
 abstract class Component_ControllerAbstract
 {
@@ -128,6 +129,11 @@ abstract class Component_ControllerAbstract
     private $errorMapper;
 
     /**
+     * @var ConfigMapper
+     */
+    private $configMapper;
+
+    /**
      * Constructor
      *
      * @param Component_Instance                   $instance
@@ -142,7 +148,8 @@ abstract class Component_ControllerAbstract
             ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
             ->setFolderMapper(FolderMapper::getInstance())
-            ->setErrorMapper(ErrorMapper::getInstance());
+            ->setErrorMapper(ErrorMapper::getInstance())
+            ->setConfigMapper(ConfigMapper::getInstance());
     }
 
     /**
@@ -630,6 +637,7 @@ abstract class Component_ControllerAbstract
      *                                controls if this is true.)
      *
      * @return bool Was the template renderable?
+     * @throws Exception
      */
     protected function renderTwigTemplate(
         $templateHandle,
@@ -664,7 +672,15 @@ abstract class Component_ControllerAbstract
         try {
             $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
         } catch (\Exception $e) {
-            return false;
+
+            // Are we in debug mode?
+            if($this->configMapper->get('debug_mode')){
+                // Ka-boom!
+                throw $e;
+            } else {
+                // Silently discard erroneous component and continue with rest of page
+                return false;
+            }
         }
 
         // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
@@ -1236,5 +1252,22 @@ abstract class Component_ControllerAbstract
         return $this;
     }
 
+    /**
+     * @return ConfigMapper
+     */
+    public function getConfigMapper()
+    {
+        return $this->configMapper;
+    }
+
+    /**
+     * @param ConfigMapper $configMapper
+     * @return static
+     */
+    public function setConfigMapper(ConfigMapper $configMapper)
+    {
+        $this->configMapper = $configMapper;
+        return $this;
+    }
 
 }
