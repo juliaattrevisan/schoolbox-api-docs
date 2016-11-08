@@ -13,7 +13,10 @@
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Learning\Course\Implementation;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Learning\Course\ImplementationMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -25,9 +28,9 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
     /**
      * A list of units within this course.
      *
-     * @var Collection|UnitInstance[]
+     * @var Implementation
      */
-    protected $unit_list = [];
+    protected $courseImplementation;
 
     /** @var int[] */
     protected $accessList = [];
@@ -72,23 +75,35 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
-        $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
+
+        /** @var ImplementationMapperProxy $implementationProxy */
+        $implementationProxy = $this->getSitePage()->getDi()->get('courseImplementationDataSource');
+        /** @var AssessmentMapperProxy $assessmentProxy */
+        $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
+
+
+        $implementationId = $this->getConfig('importedCourse');
+
+        $this->courseImplementation = $implementationProxy->findById($implementationId);
+
         $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         // Build student list
-        if (count($this->unit_list)) {
-
-            // collate access for each unit
-            foreach ($this->unit_list as $instance)  {
-                $unitId = $instance->getUnitCategory()->getId();
-                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [ $unitId ]);
-            }
+        if (count($this->courseImplementation->getUnits())) {
 
             // Try to get original course folder from each unit in course.
-            foreach ($this->unit_list as $unit) {
+            foreach ($this->courseImplementation->getUnits() as $unit) {
+
+                $unitId = $unit->getSpecification()->getFolder()->getId();
+                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
+
+                $assessables = $assessmentProxy->findAllForUnitImplementationId($unit->getId());
+                $unit->setAssessables($assessables);
+            }
+            foreach($this->courseImplementation->getUnits() as $unit) {
                 try {
                     $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
-                        Folder\Mapper::getInstance()->findCheaplyById($unit->getUnitCategory()->getId())->getParent()->getId()
+                        Folder\Mapper::getInstance()->findCheaplyById($unit->getSpecification()->getFolder()->getId())->getParent()->getId()
                     );
                     // I have a course folder, so:
                     break;
@@ -96,6 +111,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                     // I don't have a course folder, so:
                     continue;
                 }
+
+
             }
 
             $userCollection = \Schoolbox\Permission\Access\UserAccessMapper::getInstance()->findStudentsInCategory($this->getContext());
@@ -109,27 +126,14 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 );
             }
 
-            // Get task instance IDs out of unit list.
-            // Then, retrieve for: current user if a student, or all students if a
-            // teacher.
-            $task_list       = array_reduce(
-                array_map(
-                    function ($v) {
-                        /** @var Collection $v */
-                        return $v->getColumnValues('id');
-                    },
-                    $this->unit_list->getColumnValues('tasks')
-                ),
-                'array_merge',
-                array()
-            );
-            $this_student_id = null;
+
+          /*  $this_student_id = null;
             if ($this->readOnly) {
                 $this_student_id = $this->getUser()->getId();
             }
             $this->completion_list = Task\CompletionMapper::getInstance()->findLatestForList(
                 $task_list, $this_student_id
-            );
+            );*/
         } else {
             if ($this->readOnly) {
                 return false;
@@ -214,7 +218,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
-        if (count($this->unit_list)) {
+        if (count($this->courseImplementation->getUnits())) {
             $this->renderTemplateForUnitList();
         } else {
             $this->renderTemplateForCourseSelector();
@@ -234,9 +238,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
     {
         // unit list will be a collection of Unit models
         $this->setVar('unit_block', '');
-        $i = 0;
-        foreach ($this->unit_list as $unit) {
-            $this->setVar('UNIT_BACKGROUND', ($i++ % 2 === 1 ? 'dark' : ''));
+        foreach ($this->courseImplementation->getUnits() as $unit) {
             $this->renderUnitInUnitList($unit);
         }
         $this->parse('course_unit_list_block', 'course_unit_list');
@@ -266,14 +268,14 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             },
             $this->student_list
         );
-        foreach ($this->completion_list as $item) {
+        /*foreach ($this->completion_list as $item) {
             // Only add students who are in the list of students for this homepage.
             $student_id = $item->getStudent()->getId();
             if (in_array($student_id, $studentIdList)) {
                 $task_instance_id                             = $item->getTask()->getId();
                 $grouped_list[$task_instance_id][$student_id] = $item;
             }
-        }
+        }*/
 
         // Is this a student? If so, figure out if they've completed all units
         // and change message accordingly.
@@ -281,7 +283,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $completion_date_list = array();
         if ($this->readOnly) {
             $is_completed = true;
-            foreach ($unit->getTasks() as $task) {
+            foreach ($unit->getAssessables() as $task) {
                 $completion = $grouped_list[$task->getId()][$_SESSION['id']];
                 if (!($completion instanceof Task\Completion)
                     || $completion->getCompletionStatus() != Task\Completion::COMPLETION_STATUS_COMPLETE
@@ -301,7 +303,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_ID'                     => Scrub::text($unit->getId()),
                 'RETURN_URL_NAME'             => Redirect::RETURN_URL,
                 'RETURN_URL'                  => Redirect::encode($_GET["page"]),
-                'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getUnitCategory()->getId()),
+                'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getFolder()->getId()),
                 'UNIT_NAME'                   => Scrub::text($unit->getTitle()),
                 'UNIT_OPEN_DATE'              => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
                 'UNIT_DUE_DATE'               => Scrub::text($unit->getDueDate()->getDatabaseDate()),
@@ -389,7 +391,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             $this->parse('unit_no_expand_block', 'unit_no_expand');
         }
         if ($display_task_list || $is_completed) {
-            foreach ($unit->getTasks() as $task) {
+            foreach ($unit->getAssessables() as $task) {
                 $this->renderTaskInUnit($task, $unit, $grouped_list[$task->getId()]);
             }
         }
@@ -407,7 +409,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      */
     protected function canLinkToUnit(UnitInstance $unit)
     {
-        $folderId = $unit->getUnitCategory()->getId();
+        $folderId = $unit->getFolder()->getId();
 
         // no perms, quick and easy failure
         if ($this->accessList[$folderId] < \Schoolbox\Permission\Access\UserAccess::ACCESS_READ) {
@@ -428,11 +430,11 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
     /**
      * Displays this task in the list of tasks for a unit.
      *
-     * @param Task\Instance $task The task that is being rendered
+     * @param \Schoolbox\Learning\Assessment\IAssessable $task The task that is being rendered
      * @param UnitInstance $unit The unit that the task is rendered into
      * @param Task\Completion[] $completion_list The list of completions, keyed by student
      */
-    public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list)
+    public function renderTaskInUnit(\Schoolbox\Learning\Assessment\IAssessable $task, UnitInstance $unit, $completion_list)
     {
 
         // Students only:
@@ -484,17 +486,17 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             array(
                 'UNIT_TASK_ID'                    => Scrub::text($task->getId()),
                 'UNIT_TASK_NAME'                  => Scrub::text($task->getTitle()),
-                'UNIT_TASK_LINK'                  => Scrub::text($task->getLink()),
-                'UNIT_TASK_CLASS'                 => Scrub::text($task->getIconClass()),
-                'UNIT_TASK_PREVIEW'               => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
-                'UNIT_TASK_TYPE_LABEL'            => Scrub::text($task->getLabel()),
-                'UNIT_TASK_SELF_ASSESS'           => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                'UNIT_TASK_LINK'                  => '/learning/assessment/'.$task->getId(),
+                'UNIT_TASK_CLASS'                 => Scrub::text($task->getTypeName()),
+                'UNIT_TASK_PREVIEW'               => $task instanceof Schoolbox\Learning\Assessment\Task\Model ? 'data-plugin="preview"' : '',
+                'UNIT_TASK_TYPE_LABEL'            => Scrub::text($task->getTypeName()),
+                //'UNIT_TASK_SELF_ASSESS'           => ($task->getRequiresConfirmation() ? '' : 'checked'),
                 'UNIT_TASK_COMPLETION_COUNT'      => $complete_count,
                 'UNIT_TASK_GRADIENT'              => $gradient,
                 'UNIT_TASK_COMPLETION_TITLE'      => $unit_task_title,
                 'UNIT_TASK_COMPLETE_CLASS'        => $unit_task_class,
                 'UNIT_TASK_SET_STATUS'            => '',
-                'UNIT_TASK_MODIFY_URL'            => $task->getType() == Task::TYPE_TASK
+                'UNIT_TASK_MODIFY_URL'            => $task instanceof Schoolbox\Learning\Assessment\Task\Model
                     ? '#'
                     : '/task/instance/modify/' . $task->getId(),
                 'UNIT_TASK_REVEAL_ATTR'           => '',
@@ -526,15 +528,15 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 }
                 $this->parse('unit_task_start_block', 'unit_task_start');
             }
-            if ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
+            if ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model ) {
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 // Am I a student that has previous attempts? Show that block if I do.
                 if ($complete_count > 0) {
                     $this->parse('unit_task_quiz_attempts_block', 'unit_task_quiz_attempts');
                 }
-            } elseif ($task->getType() == Task::TYPE_DUE_WORK) {
-                if (!$task->getSubmissionBox()->getPublishDate()->isNull()
-                    && $task->getSubmissionBox()->getPublishDate()->isFuture()
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+                if (!$task->getPublishDate()->isNull()
+                    && $task->getPublishDate()->isFuture()
                 ) {
                     // this box is to be published in the future: do not render it.
                     return;
@@ -543,15 +545,15 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         } else {
             // Only show modify form if this is a simple task.
             // (No assessment or due work)
-            if ($task->getType() == Task::TYPE_TASK) {
+            if ($task instanceof Schoolbox\Learning\Assessment\Task\Model) {
                 $this->setVar(
                     'UNIT_TASK_REVEAL_ATTR',
                     'data-reveal-id="modifyTask-' . Scrub::text($task->getId()) . '"'
                 );
 
                 $zone = $this->newZone('az-task-' . $task->getId());
-                if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
-                    $zone->attachFiles(array(substr($task->getLink(), -40)));
+                if (strpos($task->getUrl(), '/storage/fetch.php') === 0) {
+                    $zone->attachFiles(array(substr($task->getUrl(), -40)));
                     $this->setVar(
                         array(
                             'UNIT_TASK_ATTACH_DISPLAY' => 'display: block;',
@@ -572,16 +574,16 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 $zone->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
 
                 $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
-            } elseif ($task->getType() == Task::TYPE_DUE_WORK) {
-                $this->setVar('UNIT_DUEWORK_ID', Scrub::text($task->getSubmissionBox()->getId()));
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+                $this->setVar('UNIT_DUEWORK_ID', Scrub::text($task->getId()));
                 $this->parse('unit_task_duework_results_block', 'unit_task_duework_results');
-            } elseif ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
-                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model ) {
+                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
 
             // in all cases EXCEPT duework:nonsubmittable, render the completion count
-            if ($task->getType() != Task::TYPE_DUE_WORK || $task->getSubmissionBox()->getAcceptOnline()) {
+            if (!$task instanceof Schoolbox\Learning\Assessment\DueWork\Model || $task->getAcceptOnline()) {
                 $this->parse('unit_task_count_block', 'unit_task_count');
             }
 
@@ -594,10 +596,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         // Set due dates for tasks
         $dueDate = null;
-        if ($task->getType() == Task::TYPE_DUE_WORK) {
-            $dueDate = $task->getSubmissionBox()->getDueDate();
-        } elseif ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
-            $dueDate = $task->getAssessment()->getFinish();
+        if ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+            $dueDate = $task->getDueAt();
+        } elseif ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model) {
+            $dueDate = $task->getDueAt();
         }
         if ($dueDate instanceof Alaress_Date_Format && !$dueDate->isNull()) {
             $this->setVar(

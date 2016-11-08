@@ -188,7 +188,7 @@ class ImplementationMapperProxy
         foreach ($allSpecs as $spec) {
             $ids[] = $spec->getId();
         }
-        $allUnits = $this->unitMapper->findAllByCourseId($ids, ['order' => ['f.name' => 'asc']])
+        $allUnits = $this->unitMapper->findAllByCourseId($ids, ['order' => ['open_date' => 'desc']])
             ->groupByCallback(function ($v) {
                 /** @var UnitModel $v */
                 return $v->getCourse()->getId();
