@@ -395,25 +395,23 @@ class Mapper extends BaseMapper
      * Augments the list from hydrateSelect() with the rubric grid (if it has one).
      *
      * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
      * @return Collection|Model[]
      */
-    protected function augmentListWithDueWorkRubrics($modelList, $dueWorkIds)
+    public function augmentListWithDueWorkRubrics($modelList)
     {
-        if (!empty($dueWorkIds)) {
-            foreach ($modelList as $model) {
-                try {
-                    $submodel = $model->getSubObject();
-                } catch (\UnexpectedValueException $e) {
-                    // Broken assessment - not much I can do besides ignore
-                    continue;
-                }
-                if ($submodel instanceof SubmissionBox) {
-                    $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
-                    $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
-                }
+        foreach ($modelList as $model) {
+            try {
+                $submodel = $model->getSubObject();
+            } catch (\UnexpectedValueException $e) {
+                // Broken assessment - not much I can do besides ignore
+                continue;
+            }
+            if ($submodel instanceof SubmissionBox) {
+                $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+                $submodel->setRubric($rubricMapper->findBySubmissionBox($submodel));
             }
         }
+
         return $modelList;
     }
     /**

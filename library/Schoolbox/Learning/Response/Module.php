@@ -121,7 +121,7 @@ class Module extends BaseModule
          */
         $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById(326);
-
+            new \Alaress_Probe($assessment);
             $this->loadParticipantsIntoAssessment($assessment);
 
             $response = $this->generateResponse1()->setAssessable($assessment);
