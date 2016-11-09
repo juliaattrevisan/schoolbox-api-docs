@@ -94,18 +94,18 @@ class ResponseFile
              */
             try {
                 $audio = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
-
-                return [
-                    'strategy' => 'audio.twig',
-                    'data' => [
-                        'audio' => $audio,
-                    ]
-                ];
             }
             catch (MapperException $e) {
+                $audio = null;
             }
 
-            return [];
+            return [
+                'strategy' => 'audio.twig',
+                'data' => [
+                    'hash' => $this->getFile()->getHash(),
+                    'audio' => $audio,
+                ]
+            ];
         }
         elseif ($mimetype->isVideo()) {
 
@@ -114,18 +114,18 @@ class ResponseFile
              */
             try {
                 $video = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
-
-                return [
-                    'strategy' => 'video.twig',
-                    'data' => [
-                        'video' => $video,
-                    ]
-                ];
             }
             catch (MapperException $e) {
+                $video = null;
             }
 
-            return [];
+            return [
+                'strategy' => 'video.twig',
+                'data' => [
+                    'hash' => $this->getFile()->getHash(),
+                    'video' => $video,
+                ]
+            ];
         }
         elseif ($this->getFile()->isOnlineSubmission()) {
 
