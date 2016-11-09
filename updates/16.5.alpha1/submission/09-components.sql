@@ -30,3 +30,7 @@ UPDATE component_definition
 SET class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Builder\\Controller'
 WHERE class = 'Component_Homepage_CourseBuilderController';
 
+UPDATE component_definition
+SET class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Outline\\Controller'
+WHERE class = 'Component_Homepage_CourseOutlineController';
+
