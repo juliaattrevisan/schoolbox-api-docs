@@ -29,12 +29,14 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('realname', self::TYPE_STRING, null, 'filename');
-        $this->uses('uuid', self::TYPE_STRING);
-        $this->uses('editable_inline', self::TYPE_BOOLEAN);
-
         $this->joins('student_submission_id', FileMapper::class, 'id', null, null, 'submission', 'submission');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('realname', self::TYPE_STRING, null, 'filename');
+        $this->uses('editable_inline', self::TYPE_BOOLEAN);
+        $this->uses('uuid', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**

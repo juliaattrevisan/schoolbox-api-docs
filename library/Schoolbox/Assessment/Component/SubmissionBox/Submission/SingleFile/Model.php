@@ -9,6 +9,10 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
@@ -19,6 +23,9 @@ use Schoolbox\User;
 class Model implements IFile
 {
     use StorableTrait;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * @var string
