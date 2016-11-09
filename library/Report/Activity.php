@@ -170,11 +170,11 @@ OR ml.name        LIKE :keyword
 
         $joins = "
             LEFT JOIN `user` u    ON u.id = cl.user
-            LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
+            LEFT JOIN folder c  ON cl.objectID = c.id  AND cl.object = 'folder'
             LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
-            LEFT JOIN category cfile ON f.category = cfile.id
+            LEFT JOIN folder cfile ON f.category = cfile.id
             LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
-            LEFT JOIN category clink ON l.category = clink.id
+            LEFT JOIN folder clink ON l.category = clink.id
             LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
             LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
             LEFT JOIN textBox t   ON cl.objectID = t.textBoxId AND cl.object = 'content'
