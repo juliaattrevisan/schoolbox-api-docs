@@ -253,6 +253,9 @@ OR ml.name        LIKE :keyword
                     case 'modify':
                         $actionString .= 'Modified ';
                         break;
+                    case 'move':
+                        $actionString .= 'Move ';
+                        break;
                     case 'create' :
                         $actionString .= 'Added ';
                         break;
