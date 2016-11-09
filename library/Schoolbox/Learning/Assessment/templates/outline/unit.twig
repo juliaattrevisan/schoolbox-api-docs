@@ -26,12 +26,12 @@
         </nav>
         <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
 
-            {% if unit.isAfterDueDate %}
+            {% if unit.isAfterDueDate == false %}
             <li class="separator">Create</li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=project" class="icon-project">Project</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=dueWork" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=quiz" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=task" class="icon-task">Task</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=project&returnUrl={{ returnUrl }}" class="icon-project">Project</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=dueWork&returnUrl={{ returnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=quiz&returnUrl={{ returnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id}) }}?type=task&returnUrl={{ returnUrl }}" class="icon-task">Task</a></li>
             {% endif %}
             <li class="separator">Manage</li>
             <li><a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit">Delete</a></li>

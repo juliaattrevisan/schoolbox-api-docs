@@ -39,13 +39,13 @@
         {% if readOnly == false  %}
         <ul data-dropdown-content class="f-dropdown" id="options-task{{ task.id }}">
             {% if task is quiz %}
-            <li><a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress">View Results</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}" class="icon-progress">View Results</a></li>
             <li><a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz">Previous Attempts</a></li>
             {% endif %}
             {% if task is dueWork %}
-            <li><a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}" class="icon-progress">View Results</a></li>
             {% endif %}
-            <li><a href="{UNIT_TASK_MODIFY_URL}?{RETURN_URL_NAME}={RETURN_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl }}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
             <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>
         </ul>
         {% endif %}
