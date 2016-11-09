@@ -1,49 +1,21 @@
 <li class="actions-small-1" {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
-    <div class="list-item">
-        <div class="card small-12">
-            <a href="/search/user/{{ student.id }}" title="View Profile">
-                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
-                <p>{{ student.fullname }}</p>
-                <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
-            </a>
-        </div>
-    </div>
+    {% include '@learning/dueWork/interaction/response/creator.twig' %}
 
     <article>
         {{ currentInteraction.onlineSubmissionContent|purify }}
     </article>
 
     {% if currentInteraction.allFiles %}
-        <ul class="information-list">
-            {% for currentFile in currentInteraction.allFiles %}
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card small-12 compact">
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                                <p>{{ currentFile.filename }}</p>
-
-                                {% if currentFile.plagscan %}
-                                    <p class="meta">
-                                        {% if currentFile.plagscan.isComplete %}
-                                            <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}</span>
-                                            <span class="meta" title="Plagiarism check completed.">plagiarised</span>
-                                        {% elseif currentFile.plagscan.isProcessing %}
-                                            <span class="meta" title="Plagiarism check is currently processing - check back again soon.">Plagiarism check processing</span>
-                                        {% elseif currentFile.plagscan.isPending %}
-                                            <span class="meta" title="Plagiarism check is pending.">Plagiarism check pending</span>
-                                        {% endif %}
-                                    </p>
-                                {% endif %}
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="" class="icon-next" title="View in Inline Grader"></a>
-                    </nav>
-                </li>
-            {% endfor %}
-        </ul>
+    <ul class="information-list">
+        {% for currentFile in currentInteraction.allFiles %}
+        <li class="actions-small-1">
+            {% include '@learning/dueWork/interaction/response/files.twig' %}
+            <nav>
+                <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: currentInteraction.id}) }}?fileId={{ currentFile.id }}" class="icon-next" title="View in Inline Grader"></a>
+            </nav>
+        </li>
+        {% endfor %}
+    </ul>
     {% endif %}
 
     {% if currentInteraction.allFeedback|length %}

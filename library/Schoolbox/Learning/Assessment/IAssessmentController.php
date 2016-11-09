@@ -70,6 +70,15 @@ interface IAssessmentController
     public function postUpdateAssessment(IAssessable $assessment);
 
     /**
+     * @api   PATCH /learning/assessments/:assessmentId
+     * @level 165
+     *
+     * @param IAssessable $assessment
+     * @return mixed
+     */
+    public function patchUpdateAssessment(IAssessable $assessment);
+
+    /**
      * @api   GET /learning/assessments/:assessmentId/modify
      * @level 165
      *

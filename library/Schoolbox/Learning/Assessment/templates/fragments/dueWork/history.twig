@@ -1,4 +1,4 @@
-{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="text/javascript">
     $(function() {
@@ -19,6 +19,12 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
+
+        {% for currentInteraction in timeline %}
+            {% if currentInteraction is response %}
+            {% elseif currentInteraction is feedback %}
+            {% endif %}
+        {% endfor %}
 
         <section>
              <ul id='history' class="information-list threaded">

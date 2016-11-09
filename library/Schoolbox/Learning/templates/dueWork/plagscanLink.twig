@@ -1,0 +1,3 @@
+{% if currentFile.plagscan.isComplete %}
+<a href="{{ routeLookup('learningResponse.getPlagscanReport', {plagscanId: currentFile.plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
+{% endif %}

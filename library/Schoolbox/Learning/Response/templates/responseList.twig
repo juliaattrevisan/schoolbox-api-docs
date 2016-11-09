@@ -1,0 +1,34 @@
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Grading for {{ student.fullname }}</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="" class="icon-add" title="Add Feedback for {{ student.fullname }} in {{ assessment.title }}"></a>
+    </nav>
+</div>
+
+{% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Submission History</h2>
+
+        <section>
+            <ul id='history' class="information-list threaded">
+                {% for currentInteraction in timeline %}
+                    {% if currentInteraction is response %}
+                        {% include '@learningResponse/inlineGrading/interaction/response.twig' with {response: currentInteraction} %}
+
+                        {# I have the feeling people will want Feedbacks displayed here too
+                         #
+                         # This seems like a very convenient place to start editing any
+                         # Unpublished Feedbacks, per student
+                         #}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

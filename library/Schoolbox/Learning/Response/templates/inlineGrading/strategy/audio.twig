@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Audio</h2>
+        <section>
+            {% if data.audio.isComplete %}
+                <script type="text/javascript">
+                    $(function() {
+                        $("#audio").mediaelementplayer().data('mediaelementplayer');
+                    });
+                </script>
+                <div>
+                    <audio id="audio" controls preload="none" width="100%">
+                        <source src="/cms/sendVideo.php?type=submission&id={{ data.audio.hash }}" type='audio/mp3'>
+                    </audio>
+                </div>
+            {% else %}
+                <div class="content">
+                    <div class="row">
+                        <div class="card small-12">
+                            <img src="{INJECTABLE_AUDIO_STATUS_SRC}" alt="Audio Processing" />
+                            <p>{INJECTABLE_AUDIO_STATUS_MSG}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+

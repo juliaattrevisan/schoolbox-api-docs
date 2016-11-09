@@ -125,7 +125,7 @@ class Factory
         $this->setWorkType(trim($post['workType']));
         $this->setMarkType(trim($post['markType']));
         $this->setGradingScheme(trim($post['gradingScheme']));
-        $this->setUsesRubric(trim($post['useRubric']));
+        $this->setUseRubric(trim($post['useRubric']));
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
 
@@ -219,7 +219,7 @@ class Factory
                 $this->getWorkType(),
                 $this->getMarkType(),
                 $this->getGradingScheme(),
-                $this->getUsesRubric(),
+                $this->getUseRubric(),
                 $this->getMarkPerCapability(),
                 $this->getMaxMark(),
                 $this->getRubricData(),

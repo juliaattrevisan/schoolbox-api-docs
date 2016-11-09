@@ -788,6 +788,7 @@ nav {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	clear:both;
 
 	&.expandable {
 		@include list-interaction('expander', 'pointer');

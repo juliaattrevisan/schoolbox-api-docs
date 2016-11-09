@@ -12,6 +12,8 @@ use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
+use Schoolbox\Learning\Response\Module as ResponseModule;
+
 
 class Learning implements ModuleConfigInterface
 {
@@ -34,6 +36,9 @@ class Learning implements ModuleConfigInterface
 
         $feedbackModule = new FeedbackModule($di);
         $feedbackModule->init("/$namespace");
+
+        $responseModule = new ResponseModule($di);
+        $responseModule->init("/$namespace");
 
         $quizModule = new QuizModule($di);
         $quizModule->init("/$namespace");

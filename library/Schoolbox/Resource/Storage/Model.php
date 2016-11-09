@@ -184,7 +184,6 @@ class Model extends File implements IStorage
         return $this->size;
     }
 
-
     /**
      * @param int $size
      * @return self

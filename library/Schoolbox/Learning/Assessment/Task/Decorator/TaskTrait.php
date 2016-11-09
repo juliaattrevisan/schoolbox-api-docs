@@ -19,11 +19,6 @@ trait TaskTrait
     protected $hasSelfAssessed = false;
 
     /**
-     * @var int
-     */
-    protected $maxMark;
-
-    /**
      * @var string
      */
     protected $url;

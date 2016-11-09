@@ -1,4 +1,4 @@
-{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/urgency.twig' as urgency %}
 
 {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
 {% if assessable is quiz %}

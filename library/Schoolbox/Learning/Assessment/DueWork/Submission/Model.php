@@ -69,13 +69,8 @@ class Model extends AbstractResponse
      */
     public function getOnlineSubmissionContent()
     {
-        /* Known versions of the Online Submission file which stores
-         * the wizzywig contents
-         */
-        $knownFilenames = ['online-submission.html', 'Online Submission.html'];
-
         foreach ($this->getAllFiles() as $currentFile) {
-            if (in_array($currentFile->getBasename(), $knownFilenames)) {
+            if ($currentFile->isOnlineSubmission()) {
                 return $currentFile->getStorage()->read();
             }
         }
@@ -97,6 +92,16 @@ class Model extends AbstractResponse
         }
 
         return $this->getSubmittedAt() !== null;
+    }
+
+    /**
+     * This response has been submitted on time
+     *
+     * @return mixed
+     */
+    public function isSubmittedOnTime()
+    {
+        return ($this->getSubmittedAt()->lt($this->getAssessable()->getDueAt()));
     }
 
     /* Getters/Setters

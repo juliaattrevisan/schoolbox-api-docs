@@ -2,6 +2,10 @@
 /**
  * DueWorkTrait
  *
+ * Trait for DueWork-specific vars to use when populating an actual
+ * DueWork instance. Note that decorators store these as contents
+ * from a POST array (typically) and therefore contain only scalars
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -54,6 +58,13 @@ trait DueWorkTrait
      * @var array|string[]
      */
     protected $attachedFiles;
+
+    /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     *
+     * @var $int
+     */
+    private $maxMark;
 
     /**
      * @return int
@@ -130,7 +141,7 @@ trait DueWorkTrait
     /**
      * @return boolean
      */
-    protected function getUsesRubric()
+    protected function getUseRubric()
     {
         return $this->useRubric;
     }
@@ -139,7 +150,7 @@ trait DueWorkTrait
      * @param boolean $usesRubric
      * @return $this
      */
-    protected function setUsesRubric($usesRubric)
+    protected function setUseRubric($usesRubric)
     {
         $this->useRubric = $usesRubric;
         return $this;

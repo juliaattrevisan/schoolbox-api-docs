@@ -1,0 +1,10 @@
+<div class="list-item">
+    <div class="card small-12 compact">
+        <a href="/storage/fetch.php?hash={{ currentFile.storage.hash }}" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
+            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+            <p>{{ currentFile.filename }}</p>
+
+            {% include '@learning/dueWork/plagscan.twig' %}
+        </a>
+    </div>
+</div>

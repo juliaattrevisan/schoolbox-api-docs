@@ -133,6 +133,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function postUpdateAssessment(IAssessable $assessment)
     {
 
+        /* Modify particular fields
+         */
+        if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
+            $this->patchUpdateAssessment($assessment);
+            return;
+        }
+
+        /* Regular update
+         */
         try {
             $assessmentInfo = $this->persistAssessment(
                 $this->getUser(),
@@ -160,7 +169,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // we're done here
         $this->redirect($returnUrl);
     }
-
 
     /**
      * Delete the given assessment.

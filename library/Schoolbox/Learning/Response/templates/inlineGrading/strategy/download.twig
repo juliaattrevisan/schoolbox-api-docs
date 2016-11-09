@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Download File</h2>
+        <section>
+            <div class="content">
+                <p class="no-margin">
+                    Sorry, we are unable to preview this file. Download it below:
+                </p>
+            </div>
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 card">
+                            <a href="/storage/fetch.php?hash={{ file.hash }}" data-plugin="preview" title="">
+                                <img src="/ajax/mime/{{ file.mime }}" alt="Preview" class="mime" />
+                                <p>{{ file.filename }}</p>
+                            </a>
+                            <p class="meta">{{ file.size | bytes }}</p>
+
+                            {% include '@learning/dueWork/plagscan.twig' with {currentFile: file} %}
+                        </div>
+                    </div>
+                    <nav>
+                        {% include '@learning/dueWork/plagscanLink.twig' with {currentFile: file} %}
+                        <a href="/storage/fetch.php?hash={{ file.hash }}" class="icon-download" title="Download"></a>
+                    </nav>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

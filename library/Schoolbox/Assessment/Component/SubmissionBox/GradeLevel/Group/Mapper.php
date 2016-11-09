@@ -6,13 +6,12 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
-
+use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
-
 class Mapper extends BaseMapper
 {
     /**
@@ -21,7 +20,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('submission_grade_group');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model');
+        $this->hasModel(Model::class);
         $this->hasMap(
             array(
                 'column'     => 'id',
@@ -40,46 +39,61 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'levels',
             array(
-                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Mapper',
+                'mapper'    => GradeMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'submission_grade_group_id',
                 'multiple'  => true,
             )
         );
     }
-
     /**
-     * Loads all groups, along with their constituent grade levels.
-     *
-     * @return Collection|Model[]
+     * @return string
      */
-    public function findAllWithGradeLevels()
+    protected function getSelectString()
     {
-        $query = "
+        return "
             SELECT
-                {$this->getColumnString('g')},
+                {$this->getColumnString()},
                 {$this->getJoinColumnString('levels', 'l')}
-            FROM `{$this->getTable()}` `g`
-            LEFT JOIN {$this->getJoinSql('levels', 'g', 'l')}
-            ORDER BY `g`.`id` ASC, `l`.`lower_bound` ASC
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('levels', '', 'l')}
         ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute();
-
-        // may as well just make an assoc array
-        $groups = array();
+    }
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    public function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var Model[] $groups */
+        $groups = [];
         foreach ($statement as $row) {
-            /** @var Model $item */
-            $item = $this->hydrate($row, 'g');
-            $id   = $item->getId();
-            if (!array_key_exists($id, $groups)) {
-                $groups[$id] = $item;
+            // Build a grade group if required
+            $id = $row['id'];
+            if (!isset($groups[$id])) {
+                $groups[$id] = $this->hydrate($row);
             }
+            // Build levels
             $level = $this->hydrateJoin($row, 'levels', 'l');
             if ($level instanceof GradeModel && $level->getId()) {
                 $groups[$id]->addGradeLevel($level);
             }
         }
+        // Sort each group's level by lower bound
+        foreach ($groups as $group) {
+            $group->getGradeLevels()->sortBy('lowerBound', 'asc');
+        }
         return new Collection(array_values($groups));
+    }
+    /**
+     * Loads all groups, along with their constituent grade levels.
+     *
+     * @deprecated all queries on this mapper now hydrate all grade levels, so just use `findAll()`.
+     *
+     * @return Collection|Model[]
+     */
+    public function findAllWithGradeLevels()
+    {
+        return $this->findAll();
     }
 }

@@ -25,6 +25,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Timeline\Full as FullTimeline;
 
 class Controller extends Assessment\Controller
 {
@@ -40,7 +41,6 @@ class Controller extends Assessment\Controller
 
     /** @var SubmissionBox\Submission\FileMapper */
     private $submissionFileMapper;
-
 
     /**
      * @param UserMapper                          $userMapper
@@ -129,7 +129,7 @@ class Controller extends Assessment\Controller
             'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $assessment,
-            'timeline'    => (new Timeline($assessment))->getTimeline()
+            'timeline'    => (new FullTimeline($assessment))->getTimeline()
         ];
 
         try {
@@ -366,12 +366,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment)
     {
-        // configure the object
-        $assessment
-            ->setUseRubric(false)
-//            ->setAcceptsMultiple()
-        ;
-
         // create an empty Rubric with appropriate Indicators
         $rubric = $this->getRubricMapper()->createForContext($assessment->getContext());
         $rubric->setSubmissionBox(new SubmissionBox()); // TODO fix this with...something
@@ -433,6 +427,50 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+
+    /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string      $defaultReturnUrl
+     * @return string
+     */
+    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    {
+        // if your context is a project, redirect back to its status screen
+        if ($assessment->getContext() instanceof Assessment\Project) {
+            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+        }
+
+        return $defaultReturnUrl;
+    }
+
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+        /* TODO: Make this more generalised
+         * TODO: Save this setting lol
+         * For now the only utility here is to update Skip Unsubmitted setting
+         */
+
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+        if ((int)$this->getRequest()->post['showSubmittedOnly']) {
+            $assessment->showOnlySubmittedStudents();
+        }
+        else {
+            $assessment->showAllSubmissibleStudents();
+        }
+
+        return;
+    }
+
+    /* Getters/Setters
+     */
 
     /**
      * @return Rubric\ResultMapper
