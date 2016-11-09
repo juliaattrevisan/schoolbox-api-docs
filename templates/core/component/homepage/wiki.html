@@ -3,51 +3,72 @@
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island">
-            <section>
-                <!-- BEGIN source_folder_deleted -->
-                {SOURCE_FOLDER_UNAVAILABLE}
-                <!-- END source_folder_deleted -->
+    <!-- BEGIN empty_state -->
 
-                <!-- BEGIN source_folder_exists -->
-                <ul class="action-list">
-                    <!-- BEGIN wiki_row -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="{WIKI_COMPACT} card small-12">
-                                <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}' title="View Wiki">
-                                    <img class="mime" src="/images/mime/document.svg">
-                                    <h3>{WIKI_HEADING}</h3>
-                                </a>
-                                <p class="meta {COMPONENT_COMPACTMODE_HIDE}">
-                                    Last edited by
-                                    <a href="/search/user/{WIKI_AUTHOR_ID}" title="View Profile">{WIKI_AUTHOR}</a>
-                                    {WIKI_MODIFIED}
-                                </p>
-                            </div>
-                        </div>
-                        <nav>
-                            <!-- BEGIN modify_wiki -->
-                            <a class="icon-modify" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
-                            <!-- END modify_wiki -->
-                        </nav>
-                        <!-- BEGIN compact_hide -->
-                        <article>{WIKI_BODY}</article>
-                        <!-- END compact_hide -->
-                    </li>
-                    <!-- END wiki_row -->
-                </ul>
+        <div class="empty-state">
+            <i class="icon-collab-docs"></i>
+            <p>No documents available!</p>
 
-                <!-- BEGIN submit_wiki -->
-                <div class="component-action">
-                    <section>
-                        <a href="/wiki/modify/new/{WIKI_CATEGORY_ID}/{COMPONENT_INSTANCE_ID}" class="button">Create Document</a>
-                    </section>
-                </div>
-                <!-- END submit_wiki -->
-                <!-- END source_folder_exists -->
-            </section>
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/wiki/modify/new/{WIKI_CATEGORY_ID}/{COMPONENT_INSTANCE_ID}">Create document</a>
+            </p>
+            <!-- END empty_modify -->
+
         </div>
-    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN wiki -->
+
+        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+            <div class="small-12 island">
+                <section>
+                    <!-- BEGIN source_folder_deleted -->
+                    {SOURCE_FOLDER_UNAVAILABLE}
+                    <!-- END source_folder_deleted -->
+
+                    <!-- BEGIN source_folder_exists -->
+                    <ul class="action-list">
+                        <!-- BEGIN wiki_row -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="{WIKI_COMPACT} card small-12">
+                                    <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}' title="View Wiki">
+                                        <img class="mime" src="/images/mime/document.svg">
+                                        <h3>{WIKI_HEADING}</h3>
+                                    </a>
+                                    <p class="meta {COMPONENT_COMPACTMODE_HIDE}">
+                                        Last edited by
+                                        <a href="/search/user/{WIKI_AUTHOR_ID}" title="View Profile">{WIKI_AUTHOR}</a>
+                                        {WIKI_MODIFIED}
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                <!-- BEGIN modify_wiki -->
+                                <a class="icon-modify" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
+                                <!-- END modify_wiki -->
+                            </nav>
+                            <!-- BEGIN compact_hide -->
+                            <article>{WIKI_BODY}</article>
+                            <!-- END compact_hide -->
+                        </li>
+                        <!-- END wiki_row -->
+                    </ul>
+
+                    <!-- BEGIN submit_wiki -->
+                    <div class="component-action">
+                        <section>
+                            <a href="/wiki/modify/new/{WIKI_CATEGORY_ID}/{COMPONENT_INSTANCE_ID}" class="button">Create Document</a>
+                        </section>
+                    </div>
+                    <!-- END submit_wiki -->
+                    <!-- END source_folder_exists -->
+                </section>
+            </div>
+        </div>
+
+    <!-- END wiki -->
+
 </div>
