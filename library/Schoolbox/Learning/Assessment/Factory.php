@@ -256,6 +256,12 @@ class Factory
              * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
              */
 
+            try {
+                $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException('set a publish date');
+            }
+
             if($assessment instanceof Task) {
                 $openAt = new \Alaress_Date_NullDate();
             } else {
@@ -265,13 +271,6 @@ class Factory
                     throw new \InvalidArgumentException('set a open date');
                 }
             }
-
-            try {
-                $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a publish date');
-            }
-
 
             try {
                 $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
@@ -295,6 +294,7 @@ class Factory
             $dueAt = new \Alaress_Date_NullDate();
             $closeAt = new \Alaress_Date_NullDate();
         }
+
 
         /* Start manufacturing
          */
