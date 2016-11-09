@@ -156,8 +156,8 @@ class ListController extends Web\Controller\Base
                 $this->redirect($controller->determineRedirect($assessment, $defaultReturnUrl));
             }
 
-        } catch (Web\Controller\Exception $e) {
-            $this->sendError($e);
+        } catch (DomainException $e) {
+            $this->sendError($e->getMessage(), [], 400, $e->getCode());
             return;
         }
     }
