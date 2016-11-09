@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Alaress_Date_Format;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
 
@@ -51,4 +52,13 @@ class Model extends AbstractFeedback
         $this->allFiles = $allFiles;
         return $this;
     }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getCreatedAt();
+    }
+
 }
