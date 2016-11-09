@@ -1,4 +1,4 @@
-{# Renders a term selector. #}
+{# Render a term selector #}
 <nav>
     <a data-interaction="previous-term" class="icon-previous"></a>
 </nav>
@@ -18,13 +18,30 @@
     <a data-interaction="next" class="icon-next"></a>
 </nav>
 
-<select data-unit-selector>
-    <option disabled selected>All assessments</option>
-    {% for course in courses %}
-        <optgroup label="Course: {{ course.specification.folder.title }}">
-            {% for unit in course.units %}
-                <option>{{ unit.specification.folder.title }}</option>
-            {% endfor %}
-        </optgroup>
-    {% endfor %}
-</select>
+{# Render unit selector too #}
+{% if courses|length %}
+    <select data-unit-selector>
+        <option disabled selected>All assessments</option>
+        {% for course in courses %}
+            <optgroup label="Course: {{ course.specification.folder.title }}">
+                {% for unit in course.units %}
+                    <option>{{ unit.specification.folder.title }}</option>
+                {% endfor %}
+            </optgroup>
+        {% endfor %}
+    </select>
+{% endif %}
+
+{# JS that makes it all run #}
+<script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Term selector
+        $.fn.contextSelector({
+            href: 'learning/markbook/{{ class.id|e('js') }}/term',
+            selector: {
+                semester: 'select[data-term-selector]'
+            }
+        });
+    });
+</script>
