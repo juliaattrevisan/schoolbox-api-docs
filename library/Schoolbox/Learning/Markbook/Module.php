@@ -30,41 +30,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function registerRoutes()
     {
-        $routes = [
-            'GET' => [
-                '/{classId}' => 'getMarkbook',
-            ],
-            'POST' => []
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this->addRoutePermission($authorizer, 'getMarkbook', new Rule\IsLoggedIn());
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload(
-            $matcher,
+        $this->register(
+            'GET',
+            '/{classId}',
             'getMarkbook',
+            // TODO update this
+            new Rule\IsLoggedIn(),
             function ($params) {
                 try {
                     $class = $this->getFolderMapper()->findById($params['classId']);
