@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -34,6 +35,8 @@ class Controller extends Base
     /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
      *
+     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
+     *
      * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165
      *
@@ -42,24 +45,73 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         // obtain a reference to the most recent floating feedback
+        // TODO it would be nice to do this via SQL rather than in here, but them's the breaks
+        $feedbacks = $this->getFeedbackDataSource()
+            ->findForAssessment($participant->getAssessable())
+            ->filter(
+                function (IFeedback $feedback) use ($participant)
+                {
+                    if ($feedback->getResponse()) {
+                        // floating feedback only
+                        return false;
+                    }
 
-        // if none, create new draft
+                    // filter to current user only
+                    return $participant->getUser()->getId() == $feedback->getReviewee()->getId();
+                }
+            )
+            ->sortBy('updatedAt', 'desc')
+        ;
 
-        // elseif published, create new draft
+        if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
+            // if none, or published: create new draft
+            $feedback = $this->getFeedbackDataSource()->createModel($participant->getAssessable());
 
-        // endif
+            $feedback
+                ->setReviewee($participant->getUser())
+                ->setCreatedAt(Alaress_Date_Format::now())
+            ;
+
+            // on CREATE, return 201 Created
+            $responseCode = 201;
+
+        } else {
+            // most recent is draft, use that
+            $feedback = $feedbacks->first();
+
+            // on UPDATE, return 204 No Content
+            $responseCode = 204;
+        }
 
         // mutate model found, and save
+        $postMark    = $this->getRequest()->post['mark'];
+        $postComment = $this->getRequest()->post['comment'];
 
+        $feedback
+            ->setReviewer($this->getUser())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+            ->setComment($postComment)
+            ->setHumanReadableMark($postMark)
+            ->setNormalisedMark($participant->getAssessable()->getMarkScheme()->getNormalisedMark($postMark))
+        ;
 
-        // if CREATE, return 201 Created
-        // if UPDATE, return 204 No Content
-        $this->getResponse()->status->set(201);
-
+        $this->getFeedbackDataSource()->save($feedback);
 
         $template = '';
         $data = [];
 
+        $this->respond($template, $data, $responseCode);
+    }
+
+
+    /**
+     * @param string $template
+     * @param array  $data
+     * @param int    $responseCode
+     */
+    protected function respond($template, $data, $responseCode = 200)
+    {
+        $this->getResponse()->status->set($responseCode);
         $this->getResponse()->content->set($this->buildContent($template, $data));
     }
 
