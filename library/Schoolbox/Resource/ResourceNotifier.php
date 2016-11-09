@@ -247,11 +247,25 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
+     * @param array                    $diff
      * @return void
      */
-    public function notifySystemUpdated($resource, $effector)
+    public function notifySystemUpdated($resource, $effector, $diff)
     {
-        $this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
+        /* We don't need this
+         */
+        unset($diff['modifiedAt']);
+
+        /* Check if this change included a folder move
+         */
+        if (isset($diff['folder'])) {
+            $this->notifySystem(LogMapper::ACTION_MOVE, $resource, $effector);
+            unset($diff['folder']);
+        }
+
+        if (!empty($diff)) {
+            $this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
+        }
     }
 
 

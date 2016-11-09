@@ -20,6 +20,7 @@ class LogMapper extends Mapper {
 	const ACTION_CREATE = 'create';
 	const ACTION_READ   = 'access';
 	const ACTION_UPDATE = 'modify';
+	const ACTION_MOVE   = 'move';
 	const ACTION_DELETE = 'delete';
 
 	const KIND_FILE     = 'file';
