@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 
 class Controller extends Base
 {
@@ -140,6 +141,11 @@ class Controller extends Base
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
+    }
+
+    public function getMarkbookForTerm(Folder $class, Term $term)
+    {
+        //
     }
 
     /* Getters/Setters

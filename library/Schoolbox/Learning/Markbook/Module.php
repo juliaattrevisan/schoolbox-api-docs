@@ -34,29 +34,30 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $this->register(
-            'GET',
-            '/{classId}',
-            'getMarkbook',
-            // Assuming these are the correct permissions
-            new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_WRITE,
-                function ($params) {
-                    return $params['class']->getId();
-                },
-                Access::getInstance()
-            ),
+        // Assuming these are the correct permissions
+        $access = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
             function ($params) {
-                try {
-                    $class = $this->getFolderMapper()->findById($params['classId']);
-                } catch (MapperException $e) {
-                    $class = $this->getFolderMapper()->createModel();
-                }
-                return [
-                    'class' => $class,
-                ];
-            }
+                return $params['class']->getId();
+            },
+            Access::getInstance()
         );
+
+        $preload = function ($params) {
+            $extraParams = [];
+            try {
+                $extraParams['class'] = $this->getFolderMapper()->findById($params['classId']);
+            } catch (MapperException $e) {
+                $extraParams['class'] = $this->getFolderMapper()->createModel();
+            }
+            if ($params['termCode']) {
+                $extraParams['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+            }
+            return $extraParams;
+        };
+
+        $this->register('GET', '/{classId}', 'getMarkbook', $access, $preload);
+        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $access, $preload);
     }
 
     /**
