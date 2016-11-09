@@ -1,0 +1,22 @@
+{# usage: [
+        participant: a fully hydrated participant object
+        markScheme:  a correctly-configured markscheme object
+        maxLength:   how big can this input be?
+        inputTitle:  the tooltip to display on this input
+        placeholder: the placeholder text
+    ]
+#}
+<label>Grade
+    <input
+            placeholder="{{ placeholder }}"
+            data-validation-limit="{{ markScheme.totalMark }}"
+            class="no-margin"
+            id="mark-{{ participant.user.id }}" name="mark"
+            type="text"
+            maxlength="{{ maxLength }}"
+            value="{{ participant.mark.unpublished.humanReadable }}"
+            title="{{ inputTitle }}"
+            data-mark-input
+            data-combobox
+    />
+</label>

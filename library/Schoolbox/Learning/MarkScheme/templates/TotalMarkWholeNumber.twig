@@ -1,18 +1,12 @@
 {% extends '@learningMarkScheme/commentable.twig' %}
 
 {% block grading %}
-<label>Grade
-    <input
-            placeholder='    / {{ markScheme.totalMark }}'
-            data-validation-limit="{{ markScheme.totalMark }}"
-            class="no-margin"
-            id="mark-{{ participant.user.id }}" name="mark"
-            type="text"
-            maxlength="16"
-            value="{{ participant.mark.unpublished.humanReadable }}"
-            title="Maximum Mark: {{ markScheme.totalMark }}"
-            data-mark-input
-            data-combobox
-    />
-</label>
+
+    {% set inclusion = {
+        maxLength: 16,
+        inputTitle: 'Maximum Mark: ' ~ markScheme.totalMark,
+        placeholder: 'Mark out of ' ~ markScheme.totalMark
+    } %}
+
+    {% include '@learningMarkScheme/text-input.twig' with inclusion %}
 {% endblock %}
