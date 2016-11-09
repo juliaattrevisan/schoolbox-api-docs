@@ -1,6 +1,22 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-folder"></i>
+        <p>No folders available!</p>
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/resource/folder/create/{FOLDER_CAT_ID}">Add folder</a>
+        </p>
+        <!-- END empty_modify -->
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN folder -->
+
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -39,4 +55,6 @@
             </section>
         </div>
     </div>
+
+    <!-- END folder -->
 </div>
