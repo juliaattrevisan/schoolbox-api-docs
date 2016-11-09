@@ -25,10 +25,12 @@
             {% endfor %}
         </ul>
     </div>
+
 {% else %}
-    <div class="content">
-        <p>
-            You have no upcoming matches scheduled.
-        </p>
+
+    <div class="empty-state">
+        <i class="icon-sport"></i>
+        <p>You have no upcoming matches scheduled.</p>
     </div>
+
 {% endif %}
