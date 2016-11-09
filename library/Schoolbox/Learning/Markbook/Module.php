@@ -9,6 +9,8 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -36,8 +38,14 @@ class Module extends BaseModule
             'GET',
             '/{classId}',
             'getMarkbook',
-            // TODO update this
-            new Rule\IsLoggedIn(),
+            // Assuming these are the correct permissions
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                function ($params) {
+                    return $params['class']->getId();
+                },
+                Access::getInstance()
+            ),
             function ($params) {
                 try {
                     $class = $this->getFolderMapper()->findById($params['classId']);
