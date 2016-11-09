@@ -262,7 +262,8 @@ class Factory
                 throw new \InvalidArgumentException('set a publish date');
             }
 
-            if($assessment instanceof Task) {
+            // Projects and tasks have only publish and due date
+            if($assessment instanceof Task || $assessment instanceof Project) {
                 $openAt = new \Alaress_Date_NullDate();
             } else {
                 try {
@@ -278,7 +279,7 @@ class Factory
                 throw new \InvalidArgumentException('set a due date');
             }
 
-            if($assessment instanceof Task) {
+            if($assessment instanceof Task || $assessment instanceof Project) {
                 $closeAt = new \Alaress_Date_NullDate();
             } else {
                 try {
