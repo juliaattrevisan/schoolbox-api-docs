@@ -25,6 +25,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
+use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -168,7 +169,7 @@ class Controller extends Base
     {
         if (strlen($file->getCrocodocId())) {
             try {
-                $location = (new InlineGraderFacade($response, $file, $this->getUser()))->getDownloadUrl();
+                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()))->getDownloadUrl();
 
                 $this->getResponse()->redirect->to($location);
             }
