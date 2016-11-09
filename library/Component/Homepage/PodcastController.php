@@ -25,7 +25,17 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         $this->setVar('default_podcast_block', '');
         $this->setVar('podcast_list_block', '');
 
-        if ($this->getConfig('url')) {
+        if (!$this->getConfig('url')) {
+
+            $this->setBlock($templateHandle, 'podcast', 'podcast_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+            $this->setVar('podcast_block', '');
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
             $xml = new Xml($this->getConfig('url'));
 
             // Podcasts from xml feed
@@ -87,9 +97,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - channel not found at URL');
                 $this->setVar('podcast_list_block', '');
             }
-        } else {
-            $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
-            $this->setVar('podcast_list_block', '');
         }
 
         /* Need the podcast title injected here
