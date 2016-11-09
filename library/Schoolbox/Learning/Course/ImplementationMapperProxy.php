@@ -110,6 +110,7 @@ class ImplementationMapperProxy
     {
         return $this->loadUnitsForCollection(
             $this->mapper->findByColumn('folder_id', $folderId, $options)
+                         ->map([$this->translator, 'translateToDomainModel'])
         );
     }
 
