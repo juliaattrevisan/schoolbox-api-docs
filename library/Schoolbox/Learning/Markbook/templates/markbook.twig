@@ -42,7 +42,7 @@
 <div class="row">
     <div class="small-12 island">
         <div class="context-switch">
-            {% include 'sub/termSelector.twig' with {terms: terms, currentTerm: currentTerm} %}
+            {% include '@learningMarkbook/fragments/termSelector.twig' with {terms: terms, currentTerm: currentTerm} %}
             {# select a unit as well #}
             <select data-unit-selector>
                 <option disabled selected>All assessments</option>
