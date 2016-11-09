@@ -1,0 +1,48 @@
+{% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
+
+<ul class="information-list">
+    {% for unit in units %}
+        {% set expanded = readOnly == false or unit.isOpen %}
+        {% set expanded_icon = expanded ? 'icon-down-arrow' : 'icon-up-arrow' %}
+        {% set expanded_state = expanded ? 'collapsed' : 'expanded' %}
+
+        <li class="actions-small-1 interact {{ expanded_state }}" data-unit data-unit_id="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
+        <div class="list-item">
+            <div class="card small-12">
+                <h3>
+                    {% if expanded %}
+                    <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
+                    <a href="/homepage/{{ unit.specification.folder.id }}">{{ unit.title }}</a>
+                    {% else %}
+                        {{ unit.title }}
+                    {% endif %}
+                </h3>
+                <span class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</span>
+            </div>
+        </div>
+        {% if readOnly == false %}
+        <nav>
+            <a href="#" class="icon-more" data-dropdown="unit-options{{ unit.id }}" aria-expanded="false" title="Actions"></a>
+        </nav>
+        <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+
+            {% if unit.isAfterDueDate %}
+            <li class="separator">Create</li>
+            <li><a href="/submission/createSubmission/new/{ID}/unit:{{ unit.id }}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+            <li><a href="/assess/create/{ID}/unit:{{ unit.id }}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+            <li><a href="/task/createInstance/{{ unit.id }}?{RETURN_URL_NAME}={RETURN_URL}" class="icon-task" data-reveal-id="createTask-{{ unit.id }}">Task</a></li>
+            {% endif %}
+            <li class="separator">Manage</li>
+            <li><a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit">Delete</a></li>
+        </ul>
+        {% endif %}
+
+        <form action="/course/unit/delete" method="post" data-form_type="delete_unit" class="hide">
+            <input type="hidden" name="id"        value="{{ unit.id }}" />
+            <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
+        </form>
+
+            {% include '@learningAssessment/outline/task.twig' %}
+    </li>
+    {% endfor %}
+</ul>

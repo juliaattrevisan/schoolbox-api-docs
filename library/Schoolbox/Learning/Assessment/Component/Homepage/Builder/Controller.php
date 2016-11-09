@@ -91,8 +91,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
         }
 
-        // Render this mess out
-
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/builder/component.twig',

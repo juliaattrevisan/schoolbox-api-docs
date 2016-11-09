@@ -1,0 +1,59 @@
+            <script type="text/javascript" src="/javascript/shared/course/jquery.course-outline.js"></script>
+            <script type="text/javascript">
+                (function($) {
+                    $(function() {
+                        var component = $('#component{{ componentInstance.id }}'),
+                                socialstreamSession = { categoryId: '{{ course.folder.id }}' };
+
+                        component.setupCourseOutline({
+                            course_homepage: '{{ course.folder.id }}',
+                            import_base_url: '{{ routeLookup('courseImport.getImportForm', { courseSpecId: course.id, classCode: folder.id }) }}',
+                            readonly:        {{ readOnly ? 'true':'false' }},
+                            previewSelector: '[data-plugin=preview]'
+                        });
+
+                        /* Alternate expando style
+                         */
+                        component.on('click', 'a[data-interaction="toggle-expanded"]', function(event){
+                            event.preventDefault();
+
+                            $(this).closest('li').find('[data-task-list]').removeClass('hide');
+                            $(this).toggleClass('icon-down-arrow icon-up-arrow');
+                            $(this).closest('li').toggleClass('expanded');
+                        });
+
+
+
+                    });
+                })(jQuery);
+            </script>
+
+            <section>
+                {% if units|length %}
+                    <p class="component-titlebar meta">
+                        <a class="icon-course" href="/homepage/{{ course.folder.id }}" title="Visit course page">{{ course.title }}</a>
+                    </p>
+                    {% include '@learningAssessment/outline/unit.twig' %}
+                {% else %}
+                    <div class="content">
+                        <p>To get started with courses you need to first import an existing course to display</p>
+
+                        <a href="#" class="button icon-course" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import New Course</a>
+                        <a href="/course/management/{{ context.id }}" class="button icon-export">Manage Courses</a>
+                    </div>
+                {% endif %}
+
+            </section>
+            <div class="content">
+                <a href="/course/import/modify/{{ componentInstance.id }}" class="button icon-modify">Modify</a>
+            </div>
+
+        <!-- Form for reodering tasks -->
+        <div class="hide">
+            <form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
+                <input type="hidden" name="action"    value="reorder"/>
+                <input type="hidden" name="category"  value="{ID}"/>
+                <input type="hidden" name="unit_id" value=""/>
+            </form>
+        </div>
+

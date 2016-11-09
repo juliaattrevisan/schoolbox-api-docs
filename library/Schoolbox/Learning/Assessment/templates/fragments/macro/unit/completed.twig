@@ -1,0 +1,27 @@
+{##
+ # Get string for the completed status of a unit
+ #
+ #}
+{% macro unitCompletion(unit) %}
+    {% spaceless %}
+        {% if unit.isBeforeOpenDate %}
+            This unit will open {{ unit.getRelativeOpenDate.getRelativeTime }}
+        {% elseif unit.isOpen %}
+            This unit will close {{ unit.getRelativeDueDate.getRelativeTime }}
+        {% else %}
+            This unit closed {{ unit.getRelativeDueDate.getRelativeTime }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+
+{% macro unitUrgency(unit) %}
+    {% spaceless %}
+        {% if unit.isBeforeOpenDate %}
+            gradient
+        {% elseif unit.isOpen %}
+            gradient-10
+        {% else %}
+            gradient-0
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}

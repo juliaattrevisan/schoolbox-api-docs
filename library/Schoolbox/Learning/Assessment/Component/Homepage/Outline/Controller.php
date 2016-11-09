@@ -1,0 +1,594 @@
+<?php
+/**
+ * Course component for a class.
+ * Before a course is selected, it contains a selector for the course - after
+ * this, it contains a list of units and tasks within the course.
+ *
+ * This is the Course Outline component.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
+
+
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Learning\Course\Implementation;
+use Schoolbox\Learning\Course\ImplementationMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Learning\Assessment\Redirect;
+use Component_Homepage_ControllerAbstract;
+use Schoolbox\User;
+
+class Controller extends Component_Homepage_ControllerAbstract
+{
+
+    /**
+     * A list of units within this course.
+     *
+     * @var Implementation
+     */
+    protected $courseImplementation;
+
+    /** @var int[] */
+    protected $accessList = [];
+
+    /** @var Folder\Model */
+    protected $originalCourse;
+
+    /**
+     * @var Collection|User
+     */
+    protected $userCollection;
+
+    /**
+     * A list of students who have completed the tasks within the course.
+     *
+     * @var Collection|Task\Completion[]
+     */
+    protected $completion_list;
+
+    /**
+     * A list of students for this category.
+     *
+     * @var array
+     */
+    protected $student_list = array();
+
+    /**
+     * @var bool
+     */
+    protected $readOnly;
+
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
+        // Get the list of units for this course, as well as who has actually
+        // completed each unit.
+
+        /** @var ImplementationMapperProxy $implementationProxy */
+        $implementationProxy = $this->getSitePage()->getDi()->get('courseImplementationDataSource');
+        /** @var AssessmentMapperProxy $assessmentProxy */
+        $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
+
+
+        $implementationId = $this->getConfig('importedCourse');
+
+        $this->courseImplementation = $implementationProxy->findById($implementationId);
+
+        $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
+
+        // Build student list
+        if (count($this->courseImplementation->getUnits())) {
+
+            // Try to get original course folder from each unit in course.
+            foreach ($this->courseImplementation->getUnits() as $unit) {
+
+                $unitId = $unit->getSpecification()->getFolder()->getId();
+                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
+
+                $assessables = $assessmentProxy->findAllForUnitImplementationId($unit->getId());
+                $unit->setAssessables($assessables);
+            }
+            foreach($this->courseImplementation->getUnits() as $unit) {
+                try {
+                    $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
+                        Folder\Mapper::getInstance()->findCheaplyById($unit->getSpecification()->getFolder()->getId())->getParent()->getId()
+                    );
+                    // I have a course folder, so:
+                    break;
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // I don't have a course folder, so:
+                    continue;
+                }
+
+
+            }
+
+            $this->userCollection = \Schoolbox\Permission\Access\UserAccessMapper::getInstance()->findStudentsInCategory($this->getContext());
+
+
+            $this_student_id = null;
+            if ($this->readOnly) {
+              $this_student_id = $this->getUser()->getId();
+            }
+            /*$this->completion_list = Task\CompletionMapper::getInstance()->findLatestForList(
+              $task_list, $this_student_id
+            );*/
+        } else {
+            if ($this->readOnly) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function renderTemplate($templateHandle)
+    {
+
+        //$this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? trim($this->getConfig('componentname')) : $this->getComponentName());
+
+
+        $data = [
+            'readOnly'  => $this->readOnly,
+            'context'   => $this->getContext(),
+            'course'    => $this->originalCourse,
+            'units'     => $this->courseImplementation->getUnits(),
+            'studentCount' => count($this->userCollection),
+            'componentInstance' => $this->getInstance(),
+            ];
+
+
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learningAssessment/outline/component.twig',
+            $data,
+            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+        );
+
+
+
+        // If courseHomepage is set, a course has been selected.
+        // This means that the units and tasks that were imported are displayed.
+        // If it isn't, then a selector is displayed (if user has write access)
+        if (count($this->courseImplementation->getUnits())) {
+            $this->renderTemplateForUnitList();
+        } else {
+            $this->renderTemplateForCourseSelector();
+        }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
+
+        return true;
+    }
+
+    /**
+     * Renders the unit list template for this component.
+     */
+    protected function renderTemplateForUnitList()
+    {
+        // unit list will be a collection of Unit models
+        $this->setVar('unit_block', '');
+        foreach ($this->courseImplementation->getUnits() as $unit) {
+            $this->renderUnitInUnitList($unit);
+        }
+        $this->parse('course_unit_list_block', 'course_unit_list');
+    }
+
+    /**
+     * Renders the course selector template for this component.
+     */
+    protected function renderTemplateForCourseSelector()
+    {
+        $this->parse('course_selector_block', 'course_selector');
+    }
+
+    /**
+     * Displays this unit in the list of units
+     *
+     * @param UnitInstance $unit The unit that the task is rendered into
+     */
+    public function renderUnitInUnitList(UnitInstance $unit)
+    {
+
+        // Group the task list by task, then student.
+        $grouped_list  = array();
+        $studentIdList = array_map(
+            function ($student) {
+                return $student['uid'];
+            },
+            $this->student_list
+        );
+        /*foreach ($this->completion_list as $item) {
+            // Only add students who are in the list of students for this homepage.
+            $student_id = $item->getStudent()->getId();
+            if (in_array($student_id, $studentIdList)) {
+                $task_instance_id                             = $item->getTask()->getId();
+                $grouped_list[$task_instance_id][$student_id] = $item;
+            }
+        }*/
+
+        // Is this a student? If so, figure out if they've completed all units
+        // and change message accordingly.
+        $is_completed         = false;
+        $completion_date_list = array();
+        if ($this->readOnly) {
+            $is_completed = true;
+            foreach ($unit->getAssessables() as $task) {
+                $completion = $grouped_list[$task->getId()][$_SESSION['id']];
+                if (!($completion instanceof Task\Completion)
+                    || $completion->getCompletionStatus() != Task\Completion::COMPLETION_STATUS_COMPLETE
+                ) {
+                    $is_completed = false;
+                    break;
+                } else {
+                    $completion_date_list[] = $completion->getCompletionDate()->getDateTimeObject();
+                }
+            }
+        }
+        $is_completed = ($is_completed && !empty($completion_date_list));
+        $is_expanded  = !$is_completed && $unit->isOpen();
+
+        $this->setVar(
+            array(
+                'UNIT_ID'                     => Scrub::text($unit->getId()),
+                'RETURN_URL_NAME'             => Redirect::RETURN_URL,
+                'RETURN_URL'                  => Redirect::encode($_GET["page"]),
+                'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getFolder()->getId()),
+                'UNIT_NAME'                   => Scrub::text($unit->getTitle()),
+                'UNIT_OPEN_DATE'              => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                'UNIT_DUE_DATE'               => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                'UNIT_STUDENT_COUNT'          => count($this->student_list),
+                'UNIT_TASK_COMPLETE_CLASS'    => '',
+                'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
+                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded ? 'icon-up-arrow' : 'icon-down-arrow'),
+                'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
+                'unit_task_block'             => '',
+                'unit_task_allow_move_block'  => '',
+                'unit_completion_block'       => '',
+                'unit_expand_block'           => '',
+                'unit_no_expand_block'        => '',
+                'unit_actions_block'          => '',
+                'unit_delete_block'           => '',
+                'unit_report_actions_block'   => '',
+                'unit_add_task_actions_block' => '',
+                'course_modify_block'         => '',
+            )
+        );
+
+        if (!$this->readOnly) {
+            $this->parse('course_modify_block', 'course_modify');
+            $this->parse('unit_delete_block', 'unit_delete');
+            $this->parse('unit_task_allow_move_block', 'unit_task_allow_move');
+            $this->parse('unit_report_actions_block', 'unit_report_actions');
+            if (!$unit->isAfterDueDate()) {
+                $this->parse('unit_add_task_actions_block', 'unit_add_task_actions');
+            }
+            $this->parse('unit_actions_block', 'unit_actions');
+        }
+
+        // Output due date and urgency
+        // If due date isn't reached, don't display at all, instead only
+        // show how long until this unit opens.
+        $completion_status = null;
+        $rel_time          = null;
+
+        // How many days until this item is due?
+        $now  = new DateTime('now');
+        $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
+        $days = $diff->days;
+        if ($diff->invert) {
+            $days = 0;
+        }
+        $urgency = min(10, max(0, $days));
+
+        if ($is_completed) {
+            $completion_status = 'Completed';
+            $rel_time          = new Alaress_Date_Format(max($completion_date_list));
+            $urgency           = 10;
+        } else {
+            // Otherwise, show a standard open/due message.
+            if ($unit->isBeforeOpenDate()) {
+                $completion_status = 'This unit will open';
+                $rel_time          = $unit->getRelativeOpenDate();
+                $urgency           = null;
+            } elseif ($unit->isOpen()) {
+                $completion_status = 'This unit will close';
+                $rel_time          = $unit->getRelativeDueDate();
+            } else {
+                $completion_status = 'This unit closed';
+                $rel_time          = $unit->getRelativeDueDate();
+                $urgency           = 0;
+            }
+        }
+        $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
+        $this->setVar('UNIT_RELATIVE_DATE', Scrub::text($rel_time->getRelativeTime()));
+        $this->setVar('UNIT_UPCOMING_URGENCY', Scrub::text($urgency));
+        $this->parse('unit_completion_block', 'unit_completion');
+
+        // Output list of tasks within units, only if the task is open
+        $display_task_list = ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
+
+        if ($display_task_list) {
+
+            if ($this->canLinkToUnit($unit)) {
+                $this->parse('unit_link_block', 'unit_link');
+            } else {
+                $this->setVar('unit_link_block', $this->getVar('UNIT_NAME'));
+            }
+
+            $this->parse('unit_expand_block', 'unit_expand');
+        } else {
+            $this->parse('unit_no_expand_block', 'unit_no_expand');
+        }
+        if ($display_task_list || $is_completed) {
+            foreach ($unit->getAssessables() as $task) {
+                $this->renderTaskInUnit($task, $unit, $grouped_list[$task->getId()]);
+            }
+        }
+
+        $this->newZone('az-new-task-unit-' . $unit->getId(), 'ATTACH_ZONE');
+
+        $this->parse('unit_block', 'unit', true);
+    }
+
+
+    /**
+     * @param UnitInstance $unit
+     * @throws \Schoolbox\Mapper\Exception
+     * @return bool
+     */
+    protected function canLinkToUnit(UnitInstance $unit)
+    {
+        $folderId = $unit->getFolder()->getId();
+
+        // no perms, quick and easy failure
+        if ($this->accessList[$folderId] < \Schoolbox\Permission\Access\UserAccess::ACCESS_READ) {
+            return false;
+        }
+
+        try {
+            // check the folder still exists
+            Folder\Mapper::getInstance()->findCheaplyById($folderId);
+            return true;
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Displays this task in the list of tasks for a unit.
+     *
+     * @param \Schoolbox\Learning\Assessment\IAssessable $task The task that is being rendered
+     * @param UnitInstance $unit The unit that the task is rendered into
+     * @param Task\Completion[] $completion_list The list of completions, keyed by student
+     */
+    public function renderTaskInUnit(\Schoolbox\Learning\Assessment\IAssessable $task, UnitInstance $unit, $completion_list)
+    {
+
+        // Students only:
+        // Output whether this item is complete.
+        $unit_task_class  = '';
+        $unit_task_title  = '';
+        $undoable         = false;
+        $completable      = false;
+        if ($this->readOnly) {
+            $unit_task_class = 'progress-tick incomplete';
+            $unit_task_title = 'Incomplete, click to mark completed';
+            $completion_item = $completion_list[$_SESSION['id']];
+            if ($completion_item instanceof Task\Completion) {
+                switch ($completion_item->getCompletionStatus()) {
+                    case Task\Completion::COMPLETION_STATUS_COMPLETE:
+                        $unit_task_class  = 'progress-tick complete';
+                        $unit_task_title  = 'Teacher Approved';
+                        break;
+                    case Task\Completion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                        $unit_task_class  = 'progress-tick pending';
+                        $unit_task_title  = 'Self Assessed, click to undo';
+                        $undoable         = true;
+                        break;
+                    case Task\Completion::COMPLETION_STATUS_INCOMPLETE:
+                    default:
+                        $completable = true;
+                        break;
+                }
+            } else {
+                $completable = true;
+            }
+        }
+        $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
+
+        $complete_count = count($completion_list);
+
+        /* Prevent division by zero issue when there are no students
+		 * in student_list
+		 */
+        $num = count($this->student_list);
+
+        if ($num) {
+            $gradient = round($complete_count / $num * 10);
+        } else {
+            $gradient = 100;
+        }
+
+        $this->setVar(
+            array(
+                'UNIT_TASK_ID'                    => Scrub::text($task->getId()),
+                'UNIT_TASK_NAME'                  => Scrub::text($task->getTitle()),
+                'UNIT_TASK_LINK'                  => '/learning/assessment/'.$task->getId(),
+                'UNIT_TASK_CLASS'                 => Scrub::text($task->getTypeName()),
+                'UNIT_TASK_PREVIEW'               => $task instanceof Schoolbox\Learning\Assessment\Task\Model ? 'data-plugin="preview"' : '',
+                'UNIT_TASK_TYPE_LABEL'            => Scrub::text($task->getTypeName()),
+                //'UNIT_TASK_SELF_ASSESS'           => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                'UNIT_TASK_COMPLETION_COUNT'      => $complete_count,
+                'UNIT_TASK_GRADIENT'              => $gradient,
+                'UNIT_TASK_COMPLETION_TITLE'      => $unit_task_title,
+                'UNIT_TASK_COMPLETE_CLASS'        => $unit_task_class,
+                'UNIT_TASK_SET_STATUS'            => '',
+                'UNIT_TASK_MODIFY_URL'            => $task instanceof Schoolbox\Learning\Assessment\Task\Model
+                    ? '#'
+                    : '/task/instance/modify/' . $task->getId(),
+                'UNIT_TASK_REVEAL_ATTR'           => '',
+                'unit_task_count_block'           => '',
+                'unit_task_due_date_block'        => '',
+                'unit_task_start_block'           => '',
+                'unit_task_actions_block'         => '',
+                'unit_task_delete_block'          => '',
+                'unit_task_modify_block'          => '',
+                'unit_task_delete_form_block'     => '',
+                'unit_task_modify_form_block'     => '',
+                'unit_task_quiz_results_block'    => '',
+                'unit_task_quiz_attempts_block'   => '',
+                'unit_task_duework_results_block' => '',
+                'unit_task_actions_more_block'    => '',
+            )
+        );
+
+        // Teacher sees the number of students that have completed
+        // this task, nobody else does.
+        if ($this->readOnly) {
+            if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
+                // Have I, the student, completed this yet?
+                // Let me undo if so, otherwise let me complete it.
+                if ($undoable) {
+                    $this->setVar('UNIT_TASK_SET_STATUS', '/undo');
+                } elseif ($completable) {
+                    $this->setVar('UNIT_TASK_SET_STATUS', '/complete');
+                }
+                $this->parse('unit_task_start_block', 'unit_task_start');
+            }
+            if ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model ) {
+                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
+                // Am I a student that has previous attempts? Show that block if I do.
+                if ($complete_count > 0) {
+                    $this->parse('unit_task_quiz_attempts_block', 'unit_task_quiz_attempts');
+                }
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+                if (!$task->getPublishDate()->isNull()
+                    && $task->getPublishDate()->isFuture()
+                ) {
+                    // this box is to be published in the future: do not render it.
+                    return;
+                }
+            }
+        } else {
+            // Only show modify form if this is a simple task.
+            // (No assessment or due work)
+            if ($task instanceof Schoolbox\Learning\Assessment\Task\Model) {
+                $this->setVar(
+                    'UNIT_TASK_REVEAL_ATTR',
+                    'data-reveal-id="modifyTask-' . Scrub::text($task->getId()) . '"'
+                );
+
+                $zone = $this->newZone('az-task-' . $task->getId());
+                if (strpos($task->getUrl(), '/storage/fetch.php') === 0) {
+                    $zone->attachFiles(array(substr($task->getUrl(), -40)));
+                    $this->setVar(
+                        array(
+                            'UNIT_TASK_ATTACH_DISPLAY' => 'display: block;',
+                            'UNIT_TASK_URL_DISPLAY'    => 'display: none;'
+                        )
+                    );
+
+                } else {
+                    $this->setVar(
+                        array(
+                            'UNIT_TASK_ATTACH_DISPLAY' => 'display: none;',
+                            'UNIT_TASK_URL_DISPLAY'    => 'display: block;'
+                        )
+                    );
+
+                }
+
+                $zone->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
+
+                $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+                $this->setVar('UNIT_DUEWORK_ID', Scrub::text($task->getId()));
+                $this->parse('unit_task_duework_results_block', 'unit_task_duework_results');
+            } elseif ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model ) {
+                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getId()));
+                $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
+            }
+
+            // in all cases EXCEPT duework:nonsubmittable, render the completion count
+            if (!$task instanceof Schoolbox\Learning\Assessment\DueWork\Model || $task->getAcceptOnline()) {
+                $this->parse('unit_task_count_block', 'unit_task_count');
+            }
+
+            $this->parse('unit_task_actions_more_block', 'unit_task_actions_more');
+            $this->parse('unit_task_delete_block', 'unit_task_delete');
+            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
+            $this->parse('unit_task_modify_block', 'unit_task_modify');
+            $this->parse('unit_task_actions_block', 'unit_task_actions');
+        }
+
+        // Set due dates for tasks
+        $dueDate = null;
+        if ($task instanceof Schoolbox\Learning\Assessment\DueWork\Model) {
+            $dueDate = $task->getDueAt();
+        } elseif ($task instanceof Schoolbox\Learning\Assessment\Quiz\Model) {
+            $dueDate = $task->getDueAt();
+        }
+        if ($dueDate instanceof Alaress_Date_Format && !$dueDate->isNull()) {
+            $this->setVar(
+                array(
+                    'UNIT_TASK_DUE_DATE'          => Scrub::text($dueDate->getDateOnly()),
+                    'UNIT_TASK_RELATIVE_DUE_DATE' => Scrub::text($dueDate->getRelativeTime())
+                )
+            );
+            $this->parse('unit_task_due_date_block', 'unit_task_due_date');
+        }
+        $this->parse('unit_task_block', 'unit_task', true);
+    }
+
+
+    /**
+     * @param string $id
+     * @param string $target
+     *
+     * @return \Schoolbox\Resource\Attachment\Zone
+     */
+    protected function newZone($id, $target = '')
+    {
+        $zone = new \Schoolbox\Resource\Attachment\Zone($id);
+        $zone->setMulti(false)
+            ->setReadOnly(false)
+            ->setMimeFilter(null)
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Attach file or folder')
+            ->setModalTitle('Select File or Folder')
+            ->setThumbnailSize(32);
+
+        if ($target) {
+            $zone->renderIntoSitePage($this->getSitePage(), $target);
+        }
+
+        return $zone;
+    }
+}

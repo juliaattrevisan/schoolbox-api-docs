@@ -1,0 +1,63 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<ul class="action-list sortable-card ui-sortable task-list {% if expanded %}hide{% endif %}" data-task-list>
+    {% for task in unit.assessables %}
+        {% set preview = task is task ? 'data-plugin="preview"' : '' %}
+    <li class="actions-small-1 interact" data-unit-task data-unit_task_id="{{ task.id }}">
+        <div class="list-item">
+            {% if readOnly == false %}
+            <div class="grip compact"></div>
+            {% endif %}
+            <div class="small-11 compact card wrap-down">
+                <a class="icon-16 {{ icon.renderClass(task) }}" title="{{ task.typeName }}" {{ preview }} href="/task/start/{{ task.id }}"></a>
+                <p>
+                    <a title="{{ task.typeName }}" {{ preview }} href="/task/start/{{ task.id }}">{{ task.title }}</a>
+                </p>
+
+                <!--
+                Student: see buttons for starting/ending task
+                Teacher: sees completion stats
+                -->
+                {% if readOnly == false %}
+                <p class="meta">
+                    <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{{ studentCount }} students completed</span>
+                </p>
+                {% else %}
+                <p class="meta spaced">
+                    <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        <nav>
+            {% if readOnly == false %}
+            <a href="#" class="icon-more" data-dropdown="options-task{{ task.id }}" aria-expanded="false" title="Actions"></a>
+            {% else %}
+            <a href="/task/start/{{ task.id }}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS} no-text" data-interaction="update_progress" title="{UNIT_TASK_COMPLETION_TITLE}"></a>
+            {% endif %}
+        </nav>
+        {% if readOnly == false  %}
+        <ul data-dropdown-content class="f-dropdown" id="options-task{{ task.id }}">
+            {% if task is quiz %}
+            <li><a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress">View Results</a></li>
+            <li><a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz">Previous Attempts</a></li>
+            {% endif %}
+            {% if task is dueWork %}
+            <li><a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a></li>
+            {% endif %}
+            <li><a href="{UNIT_TASK_MODIFY_URL}?{RETURN_URL_NAME}={RETURN_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+            <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>
+        </ul>
+        {% endif %}
+
+        <!-- BEGIN unit_task_delete_form -->
+        <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task" class="hide">
+            <input type="hidden" name="action"    value="delete" />
+            <input type="hidden" name="id"        value="{{ task.id }}" />
+            <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
+            <input type="hidden" name="unit_id"   value="{{ unit.id }}"/>
+        </form>
+        <!-- END unit_task_delete_form -->
+    </li>
+    {% endfor %}
+</ul>
