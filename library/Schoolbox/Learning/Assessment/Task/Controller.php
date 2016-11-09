@@ -81,6 +81,7 @@ class Controller extends Assessment\Controller
     protected function getAssessmentTwigData(IAssessable $assessment)
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
+        $data['acceptingResponses'] = false;
         $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
 
         return $data;

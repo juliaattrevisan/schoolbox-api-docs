@@ -40,7 +40,11 @@
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: currentUser} %}
 
         <div class="row">
+            {% if assessment.baseContext is unitSpecification %}
+            <div class="small-12 island">
+            {% else %}
             <div class="small-12 medium-6 island">
+            {% endif %}
                 <h2 class="subheader">Activities</h2>
 
                 {% if assessment.assessables | length %}
@@ -54,7 +58,7 @@
                                 <div class="list-item">
                                     <div class="compact card wrap-down small-12">
                                         <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
-                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id}) }}">
+                                        <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
                                             </h3>
@@ -82,9 +86,6 @@
                     </ul>
                     <div class="component-action">
                         <section>
-                            {% for returnUrl in allReturnUrls %}
-                                <a href="{{ returnUrl.url }}" title="Create a new {{ returnUrl.label }}" class="button icon-{{ returnUrl.icon }}">New {{ returnUrl.label }}</a>
-                            {% endfor %}
                             <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id }) }}{{ returnUrlSuffix }}" class="button" title="Create a new activity">Create Activity</a>
                         </section>
                     </div>
@@ -145,3 +146,14 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="small-12 column">
+        {% if baseContext is unitSpecification %}
+        <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit full-width">Return to course</a>
+        {% else %}
+        <a href="/homepage/{{ baseContext.id }}" class="button submit full-width">Return to homepage</a>
+        {% endif %}
+    </div>
+</div>
+

@@ -16,6 +16,10 @@
     <input type="text" name="title" value="{{ assessment.title }}" required />
 </label>
 
+<label>
+    Description
+    <textarea name="description">{{ assessment.description }}</textarea>
+</label>
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}

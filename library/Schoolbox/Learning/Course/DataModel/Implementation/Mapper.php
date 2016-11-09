@@ -38,6 +38,18 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Finds the unit spec for this folder.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Model
+     */
+    public function findByFolderId($folderId, $options = [])
+    {
+        return $this->findByColumn('folder_id', $folderId, $options);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getSelectString()

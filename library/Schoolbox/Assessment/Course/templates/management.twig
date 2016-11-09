@@ -1,4 +1,4 @@
-<script type="text/javascript">
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
     $(function() {
 
         /* Attach Course Selector Modal listeners
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
             </nav>
         </div>
 
@@ -91,38 +91,23 @@
         <section>
             <ul class="action-list" id="courseList">
                 {% for currentCourse in allCourses %}
-                {% set courseComponentId = allCourseComponentIds[currentCourse.id].componentId %}
-                {% set courseComponentRemoved = allCourseComponentIds[currentCourse.id].restorable %}
-                {% set courseParents = lineage[currentCourse.id] %}
-
                 <li class="actions-small-2">
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>
-                            {% if courseComponentRemoved %}
-                                <del class="icon-archive" title="The associated Course Outline component has been removed">
-                            {%- endif -%}
-                                {{ currentCourse.name }}
-                            {%- if courseComponentRemoved -%}
-                                </del>
-                            {% endif %}
-                            </h3>
-                            <p class="meta">
-                                {{ courseParents[0].name }}
-                                {% for courseParent in courseParents | slice(1) %}
-                                    &gt; {{ courseParent.name }}
-                                {% endfor %}
-                            </p>
-
+                            <a href="/homepage/{{ currentCourse.specification.folder.id }}">
+                                <h3>
+                                    <span class="icon-course"></span>{{ currentCourse.specification.folder.name }}
+                                </h3>
+                            </a>
                         </div>
                     </div>
                     <nav>
                         {% if courseComponentRemoved %}
                             <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% else %}
-                            <a href="{{ routeLookup('courseImport.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
+                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import"></a>
                         {% endif %}
-                        <a href="" class="icon-delete" title="Permanently Delete Import" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>
+                        <a href="" class="icon-delete" title="Permanently Delete Import" data-delete="{{ currentCourse.id }}" data-coursename="{{ currentCourse.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
@@ -135,7 +120,7 @@
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
-                <a href="{{ routeLookup('courseImport.getImportForm', { courseId: 0, classCode: folder.id }) }}">import one</a>.
+                <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: 0, classCode: folder.id }) }}">import one</a>.
             </p>
         </div>
 

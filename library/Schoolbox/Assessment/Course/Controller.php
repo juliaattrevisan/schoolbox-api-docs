@@ -36,7 +36,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
@@ -122,6 +122,16 @@ class Controller extends Base\Base
      */
     protected $unitSpecificationTranslator;
 
+    /**
+     * @var CourseImplementationMapper
+     */
+    protected $courseImplementationMapper;
+
+    /**
+     * @var CourseImplementationMapperProxy
+     */
+    protected $courseImplementationMapperProxy;
+
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
 
@@ -155,20 +165,23 @@ class Controller extends Base\Base
     /**
      * Set dependencies
      *
-     * @param CourseSpecificationMapperProxy $courseSpecificationDataSource
-     * @param UnitSpecificationMapperProxy   $unitSpecificationDataSource
-     * @param AssessmentMapperProxy          $assessmentDataSource
+     * @param CourseSpecificationMapperProxy  $courseSpecificationDataSource
+     * @param UnitSpecificationMapperProxy    $unitSpecificationDataSource
+     * @param AssessmentMapperProxy           $assessmentDataSource
+     * @param CourseImplementationMapper $courseImplementationMapper
      */
     public function __construct(
         CourseSpecificationMapperProxy $courseSpecificationDataSource,
         UnitSpecificationMapperProxy $unitSpecificationDataSource,
-        AssessmentMapperProxy $assessmentDataSource
+        AssessmentMapperProxy $assessmentDataSource,
+        CourseImplementationMapper $courseImplementationMapper
     ) {
         // Deprecated course/unit specification mappers - all gone!
 
         // Proxy for course/unit specification mappers
         $this->setUnitSpecificationMapperProxy($unitSpecificationDataSource);
         $this->setCourseSpecificationMapperProxy($courseSpecificationDataSource);
+        $this->setCourseImplementationMapper($courseImplementationMapper);
 
         // Proxy for assessment mapper
         $this->setAssessmentMapperProxy($assessmentDataSource);
@@ -1140,40 +1153,15 @@ class Controller extends Base\Base
     {
         /* TODO: Exception falls directly on to carpet
          */
-        $folder = $this->getFolderMapper()->findById($folderId);
+        $folder = $this->getFolderMapper()->findCheaplyById($folderId);
 
         /* Find all the Courses associated with this Folder, via imported Units
          */
-        $allCourses = new Collection();
-
-        $allFolders = $this->getUnitInstanceMapper()->findAllCoursesUsedInFolders([$folderId]);
-
-        if ($allFolders->count()) {
-            $allCourses = $allFolders->getOffset($folderId);
-        }
-
-        $lineages = [];
-
-        foreach ($allCourses as $i => $course) {
-            try {
-                // if one of the ancestors is deleted, this will explode
-                $lineages[$course->getId()] = $this->getLineage($course);
-            } catch (MapperException $e) {
-                // this course exists in a deleted ancestor, so strictly speaking it no longer exists either...
-                unset($allCourses[$i]);
-            }
-        }
-
-        /* Find all the Units in this Folder; also includes
-         * Units which have had their Course Outlines removed
-         */
-        $allCourseComponentIds = $this->getUnitInstanceMapper()->findComponentsForCourses($folderId);
+        $allCourses = $this->getCourseImplementationMapper()->findByFolderId($folderId);
 
         $this->tpl('management', [
             'folder' => $folder,
             'allCourses' => $allCourses,
-            'allCourseComponentIds' => $allCourseComponentIds,
-            'lineage' => $lineages
         ]);
     }
 
@@ -1673,6 +1661,24 @@ class Controller extends Base\Base
     }
 
     /**
+     * @return CourseImplementationMapper
+     */
+    public function getCourseImplementationMapper()
+    {
+        return $this->courseImplementationMapper;
+    }
+
+    /**
+     * @param CourseImplementationMapper $courseImplementationMapper
+     */
+    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
+    {
+        $this->courseImplementationMapper = $courseImplementationMapper;
+    }
+
+
+
+    /**
      * @return AssessmentMapperProxy
      */
     public function getAssessmentMapperProxy()
@@ -1697,43 +1703,6 @@ class Controller extends Base\Base
     {
         return $this->getFolderMapper()->getAncestry();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /** @var AbstractTreeBuilder */
     protected $treeBuilder;

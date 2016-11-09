@@ -35,6 +35,7 @@ class Controller extends Assessment\Controller
         $data = [
             'types'            => new Assessment\AssessmentType(),
             'selectedSummator' => $selectedSummator,
+            'acceptingResponses'=> false,
             'allSummators'     => $summatorMapping,
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),
@@ -119,11 +120,13 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment),
+            'baseContext'      => $assessment->getBaseContext(),
             'counts'           => $counts,
             'assessableCounts' => $assessableCounts,
             'assessment'       => $assessment,
             'currentUser'      => $this->getUser(),
             'returnUrlSuffix'  => $returnUrlSuffix,
+            'returnUrl'        => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(

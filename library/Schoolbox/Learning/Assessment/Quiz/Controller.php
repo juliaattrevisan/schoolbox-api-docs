@@ -235,8 +235,8 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment)
     {
-        // no additional data required: everything we need is already on the Quiz object
-        return [];
+        $data['acceptingResponses']= true;
+        return $data;
     }
 
     /**

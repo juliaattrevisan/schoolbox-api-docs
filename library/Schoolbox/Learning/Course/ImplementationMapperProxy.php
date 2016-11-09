@@ -84,6 +84,20 @@ class ImplementationMapperProxy
     }
 
     /**
+     * Proxy for `Mapper->findByFolderId()`.
+     *
+     * @param int $folderId
+     * @param array $options
+     * @return Implementation
+     * @throws Exception if object wasn't found
+     * @throws Exception\Deleted if object was deleted
+     */
+    public function findByFolderId($folderId, $options = [])
+    {
+        return $this->mapper->findByFolderId($folderId, $options)->map([$this->translator, 'translateToDomainModel']);
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Implementation $implementation

@@ -1,0 +1,18 @@
+{%  macro dateField(dateProperty, dateValue) %}
+<div class="row" id="{{ dateProperty }}">
+    <div class="column small-12 medium-6">
+        <label>
+            {{ dateProperty|capitalize }} Date
+            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.localShort }}" data-datepicker />
+        </label>
+    </div>
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                {{ dateProperty|capitalize }} Time
+                <input name="{{ dateProperty }}Time" type="text" value="{{ dateValue.timeOnly }}" data-timepicker />
+            </label>
+        </div>
+    </div>
+</div>
+{% endmacro %}

@@ -381,6 +381,7 @@ class Controller extends Assessment\Controller
 
         // setup some data...
         $data = [
+            'acceptingResponses'=> true,
             'attachzone'      => $zoneFactory->buildForAssessmentType($assessment)->getTwigContext(),
             'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
