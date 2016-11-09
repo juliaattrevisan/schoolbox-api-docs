@@ -37,9 +37,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_NullDate())
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_NullDate())
             ->setCreatedAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new Alaress_Date_Format('2016-10-15 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDeletedAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -52,9 +52,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(32, $assessmentModel->getId());
         $this->assertEquals(3, $assessmentModel->getSequence());
         $this->assertEquals('2016-10-14 12:00:00', $assessmentModel->getPublishDate()->getDatabase());
-        $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getOpenDate()->getDatabase());
+        $this->assertEquals('2016-10-14 12:00:00', $assessmentModel->getOpenDate()->getDatabase());
         $this->assertEquals('2016-10-18 12:00:00', $assessmentModel->getDueDate()->getDatabase());
-        $this->assertEquals('2016-10-23 13:00:00', $assessmentModel->getCloseDate()->getDatabase());
+        $this->assertEquals('2016-10-18 12:00:00', $assessmentModel->getCloseDate()->getDatabase());
         $this->assertEquals('2016-10-14 12:00:00', $assessmentModel->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-10-15 12:00:00', $assessmentModel->getUpdatedAt()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getDeletedAt()->getDatabase());
@@ -79,9 +79,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setDescription('Blargh')
                     ->setWeight(51)
                     ->setPublishDate(new Alaress_Date_Format('2016-10-10 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                    ->setOpenDate(new Alaress_Date_Format('2016-10-11 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setOpenDate(new \Alaress_Date_NullDate())
                     ->setDueDate(new Alaress_Date_Format('2016-10-12 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                    ->setCloseDate(new Alaress_Date_Format('2016-10-13 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setCloseDate(new \Alaress_Date_NullDate())
                     ->setCreatedAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setUpdatedAt(new Alaress_Date_Format('2016-10-15 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setDeletedAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -96,9 +96,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Tasks are always weightless, regardless of what the assessment says
         $this->assertEquals(0, $assessment->getWeight());
         $this->assertEquals('2016-10-10 12:00:00', $assessment->getPublishAt()->getDatabase());
-        $this->assertEquals('2016-10-11 12:00:00', $assessment->getOpenAt()->getDatabase());
+        $this->assertEquals('2016-10-10 12:00:00', $assessment->getOpenAt()->getDatabase());
         $this->assertEquals('2016-10-12 12:00:00', $assessment->getDueAt()->getDatabase());
-        $this->assertEquals('2016-10-13 12:00:00', $assessment->getCloseAt()->getDatabase());
+        $this->assertEquals('2016-10-12 12:00:00', $assessment->getCloseAt()->getDatabase());
         $this->assertEquals('2016-10-14 12:00:00', $assessment->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-10-15 12:00:00', $assessment->getUpdatedAt()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $assessment->getDeletedAt()->getDatabase());

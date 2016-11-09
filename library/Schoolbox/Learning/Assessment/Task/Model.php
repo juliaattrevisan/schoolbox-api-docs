@@ -189,4 +189,40 @@ class Model extends AbstractAssessment
         $this->attachedFile = $attachedFile;
         return $this;
     }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getOpenAt()
+    {
+        return $this->getPublishAt();
+    }
+
+    /**
+     * @param \Alaress_Date_Format $openAt
+     * @return static
+     */
+    public function setOpenAt($openAt)
+    {
+        //noop
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCloseAt()
+    {
+        return $this->getDueAt();
+    }
+
+    /**
+     * @param \Alaress_Date_Format $closeAt
+     * @return static
+     */
+    public function setCloseAt($closeAt)
+    {
+        // noop
+        return $this;
+    }
 }
