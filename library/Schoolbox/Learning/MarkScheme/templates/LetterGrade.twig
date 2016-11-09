@@ -2,17 +2,13 @@
 
 {% block grading %}
     <label>Grade
-        <select>
-            {% if participant.mark.unpublished.humanReadable %}
-                <option disabled="disabled">(Select grade)</option>
-                <option selected="selected" value="{{ latestFeedback.normalisedMark }}">{{ latestFeedback.humanReadableMark }}</option>
-            {% else %}
-                <option disabled="disabled" selected="selected">(Select grade)</option>
-            {% endif %}
-            <option>A+</option>
-            <option>A</option>
-            <option>B+</option>
-            <option>B</option>
+        <select name="mark">
+        {% for level in markScheme.gradeGroup.gradeLevels %}
+            {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
+            {% set selected = isGt and not found ? 'selected="selected"' : '' %}
+            {% if isGt %}{% set found = true %}{% endif %}
+            <option {{ selected }} value="{{ level.rawGrade }}">{{ level.caption }}</option>
+        {% endfor %}
         </select>
     </label>
 {% endblock %}
