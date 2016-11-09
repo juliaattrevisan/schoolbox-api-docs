@@ -9,10 +9,10 @@
             <div class="grip compact"></div>
             {% endif %}
             <div class="small-11 compact card wrap-down">
-                <a class="icon-16 {{ icon.renderClass(task) }}" title="{{ task.typeName }}" {{ preview }} href="/task/start/{{ task.id }}"></a>
-                <p>
-                    <a title="{{ task.typeName }}" {{ preview }} href="/task/start/{{ task.id }}">{{ task.title }}</a>
-                </p>
+                <a class="" title="{{ task.typeName }}"  href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}">
+                <span class="{{ icon.renderClass(task) }}"></span>
+                <p>{{ task.title }}</p>
+                </a>
 
                 <!--
                 Student: see buttons for starting/ending task
@@ -24,7 +24,7 @@
                 </p>
                 {% else %}
                 <p class="meta spaced">
-                    <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
+                    <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {{ task.dueDate.short }}</span>
                 </p>
                 {% endif %}
             </div>
