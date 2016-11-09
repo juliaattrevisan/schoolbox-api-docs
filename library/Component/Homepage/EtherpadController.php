@@ -57,80 +57,101 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');        
-        $this->setBlock('source_folder_exists', 'etherpad_pad', 'etherpad_pad_block');
-        $this->setBlock('source_folder_exists', 'etherpad_has_create', 'etherpad_has_create_block');
-        $this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
-
-        $this->setVar(
-            array(
-                'etherpad_pad_block'        => '',
-                'etherpad_has_create_block' => '',
-                'etherpad_has_modify_block' => '',
+        $options = array(
+            'order' => array(
+                $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
             )
         );
+        /* Find all the pads associated with this list of groups
+        * Apply all the component powers
+        */
 
+        $padMapper = new \Etherpad\PadMapper();
+        $allPads = $padMapper->findByColumn('homepage_id', $this->getSource()->getId(), $options);
 
-        if(!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
+        if (count($allPads) == 0) {
+
+            $this->setBlock($templateHandle, 'etherpad', 'etherpad_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+            $this->setVar('etherpad_block', '');
+            $this->setVar('SOURCE_ID', $this->getSource()->getId());
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("empty_modify_block", "");
+            } else {
+                $this->parse("empty_modify_block", "empty_modify");
+            }
+
+            $this->parse('empty_state_block', 'empty_state');
+
         } else {
-            $this->setVar('source_folder_deleted_block', '');
 
-            /* Find all the pads associated with this list of groups
-             * Apply all the component powers
-             */
-            $padMapper = new \Etherpad\PadMapper();
+            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('source_folder_exists', 'etherpad_pad', 'etherpad_pad_block');
+            $this->setBlock('source_folder_exists', 'etherpad_has_create', 'etherpad_has_create_block');
+            $this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
 
-            $options = array(
-                'order' => array(
-                    $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
+            $this->setVar(
+                array(
+                    'etherpad_pad_block'        => '',
+                    'etherpad_has_create_block' => '',
+                    'etherpad_has_modify_block' => '',
                 )
             );
 
-            /* Optional limits
-             */
-            if ($this->getConfig('size')) {
-                $options['limit'] = $this->getConfig('size');
-            }
+            $this->setVar("empty_state_block", "");
 
-            $allPads = $padMapper->findByColumn('homepage_id', $this->getSource()->getId(), $options);
+            if (!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            } else {
+                $this->setVar('source_folder_deleted_block', '');
 
-            /* Only provide Modify Document button to those with write access
-             */
-            foreach ($allPads as $currentPad) {
-                $this->setVar(
-                    array(
-                        'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
-                        'ETHERPAD_PAD_ID' => $currentPad->getId(),
-                        'ETHERPAD_NAME' => $currentPad->getDisplayName(),
-                        'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
-                    )
-                );
-
-                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                    $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+                /* Optional limits
+                 */
+                if ($this->getConfig('size')) {
+                    $options['limit'] = $this->getConfig('size');
                 }
 
-                $this->parse('etherpad_pad_block', 'etherpad_pad', true);
-
-                /* Clear children after parsing out the parent
+                /* Only provide Modify Document button to those with write access
                  */
-                $this->setVar(
-                    array(
-                        'etherpad_has_modify_block' => ''
-                    )
-                );
-            }
+                foreach ($allPads as $currentPad) {
+                    $this->setVar(
+                        array(
+                            'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
+                            'ETHERPAD_PAD_ID' => $currentPad->getId(),
+                            'ETHERPAD_NAME' => $currentPad->getDisplayName(),
+                            'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+                        )
+                    );
 
-            /* Only provide Create Document button to those with write access
-             */
-            if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                $this->setVar('SOURCE_ID', $this->getSource()->getId());
-                $this->parse('etherpad_has_create_block', 'etherpad_has_create');
-            }
+                    if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                        $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+                    }
 
-            $this->parse('source_folder_exists_block','source_folder_exists');
+                    $this->parse('etherpad_pad_block', 'etherpad_pad', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar(
+                        array(
+                            'etherpad_has_modify_block' => ''
+                        )
+                    );
+                }
+
+                /* Only provide Create Document button to those with write access
+                 */
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                    $this->setVar('SOURCE_ID', $this->getSource()->getId());
+                    $this->parse('etherpad_has_create_block', 'etherpad_has_create');
+                }
+
+                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            }
         }
 
         return true;
