@@ -18,6 +18,10 @@ use \Schoolbox\Learning\InlineGrader\Document;
 
 class Facade
 {
+    /**
+     * @var Authenticator
+     */
+    private $authenticator;
 
     /**
      * The file hash to upload
@@ -48,12 +52,14 @@ class Facade
     /**
      * Facade constructor.
      *
+     * @param Authenticator $authenticator
      * @param Submission $submission
      * @param SubmissionFile $file
      * @param User $user
      */
-    public function __construct(Submission $submission, SubmissionFile $file, User $user)
+    public function __construct(Authenticator $authenticator, Submission $submission, SubmissionFile $file, User $user)
     {
+        $this->setAuthenticator($authenticator);
         $this->setFile($file);
         $this->setSubmission($submission);
         $this->setUser($user);
@@ -83,7 +89,7 @@ class Facade
          * Loader() in constructor
          */
         return (new Loader(
-            new Authenticator(),
+            $this->getAuthenticator(),
             $this->getFile()->getCrocodocId(),
             $this->getUser(),
             $this->getTerm()->getArchived())
@@ -115,7 +121,7 @@ class Facade
          * Loader() in constructor
          */
         return (new Loader(
-            new Authenticator(),
+            $this->getAuthenticator(),
             $this->getFile()->getCrocodocId(),
             $this->getUser(),
             $this->getTerm()->getArchived())
@@ -126,9 +132,27 @@ class Facade
      */
 
     /**
+     * @return Authenticator
+     */
+    private function getAuthenticator()
+    {
+        return $this->authenticator;
+    }
+
+    /**
+     * @param Authenticator $authenticator
+     * @return $this
+     */
+    private function setAuthenticator($authenticator)
+    {
+        $this->authenticator = $authenticator;
+        return $this;
+    }
+
+    /**
      * @return SubmissionFile
      */
-    public function getFile()
+    private function getFile()
     {
         return $this->file;
     }
@@ -137,7 +161,7 @@ class Facade
      * @param SubmissionFile $file
      * @return $this
      */
-    public function setFile($file)
+    private function setFile($file)
     {
         $this->file = $file;
         return $this;

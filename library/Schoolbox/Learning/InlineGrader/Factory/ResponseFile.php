@@ -138,33 +138,31 @@ class ResponseFile
         elseif ($this->isCrocodocable()) {
 
             /* Figger out a crocodoc url
+             * \RangeException Use Download File prompt if crocodoc api key is nonexistent on our end
+             * \DomainException Use Download File prompt if crocodoc cannot be authenticated on the crocodoc end
              */
             try {
-                $url = (new Facade($this->getSubmission(), $this->getFile(), $this->getUser()))->start();
-
-                /* Dock this doc into the crocodoc dock
-                 */
-                return [
-                    'data' => [
-                        'url' => $url
-                    ],
-                    'strategy' => 'crocodoc.twig'
-                ];
+                $authenticator = new Authenticator();
             }
             catch (\RangeException $e) {
-
-                /* Use Download File prompt if crocodoc api key is nonexistent
-                 * on our end
-                 */
                 return [
                     'strategy' => 'download.twig'
                 ];
             }
-            catch (\DomainException $e) {
 
-                /* Use Download File prompt if crocodoc cannot be authenticated
-                 * on the crocodoc end
-                 */
+            /* Dock this doc into the crocodoc dock
+             */
+            try {
+                $url = (new Facade($authenticator, $this->getSubmission(), $this->getFile(), $this->getUser()))->start();
+
+                return [
+                    'strategy' => 'crocodoc.twig',
+                    'data' => [
+                        'url' => $url
+                    ]
+                ];
+            }
+            catch (\DomainException $e) {
                 return [
                     'strategy' => 'download.twig'
                 ];
