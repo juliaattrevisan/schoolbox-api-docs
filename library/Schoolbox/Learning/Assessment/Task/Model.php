@@ -204,7 +204,7 @@ class Model extends AbstractAssessment
      */
     public function setOpenAt($openAt)
     {
-        $this->setPublishAt($openAt);
+        //noop
         return $this;
     }
 
@@ -222,7 +222,7 @@ class Model extends AbstractAssessment
      */
     public function setCloseAt($closeAt)
     {
-        $this->setDueAt($closeAt);
+        // noop
         return $this;
     }
 }
