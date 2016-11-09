@@ -305,6 +305,13 @@ foreach ($alreadyInFolderList as $current) {
     $tempFolderIds[] = $current->getCategoryId();
 }
 
+/* If user is a superuser but isn't involved in the homepage used to get here-
+ * force the homepage into the checkbox list
+ */
+if (isset($_GET['homepageId']) && $_SESSION['user']->isSuperuser() && !in_array($_GET['homepageId'], $tempFolderIds)) {
+    $tempFolderIds[] = $_GET['homepageId'];
+}
+
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $allFolders   = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
 
