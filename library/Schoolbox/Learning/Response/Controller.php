@@ -90,12 +90,16 @@ class Controller extends Base
     {
         /* Factory to figure out which fragment is required
          */
-        $file = $response->getAllFiles()->first();
+        $file = null;
 
-        foreach ($response->getAllFiles() as $currentFile) {
-            if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
-                $file = $currentFile;
-                break;
+        if ($response->getAllFiles()->count()) {
+            $file = $response->getAllFiles()->first();
+
+            foreach ($response->getAllFiles() as $currentFile) {
+                if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
+                    $file = $currentFile;
+                    break;
+                }
             }
         }
 
