@@ -1,31 +1,40 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Video</h2>
-        <section>
-            {% if data.video.isComplete %}
+
+        {% if data.video.isComplete %}
+            <section>
                 <script type="text/javascript">
                     $(function() {
                         $("#video").mediaelementplayer().data('mediaelementplayer');
                     });
                 </script>
-                <video id="video"
-                       controls
-                       preload="none"
-                       poster="/cms/videoThumb.php?type=submission&id={{ data.video.hash }}&size=poster"
-                       height="400"
-                       width="100%">
+                <video id="video" controls preload="none" width="100%"
+                       height="400" poster="/cms/videoThumb.php?type=submission&id={{ data.video.hash }}&size=poster">
                     <source src="/cms/sendVideo.php?type=submission&id={{ data.video.hash }}" type='video/mp4'>
                 </video>
-            {% else %}
-                <div class="content">
-                    <div class="row">
-                        <div class="card small-12">
-                            <img src="{INJECTABLE_AUDIO_STATUS_SRC}" alt="Video Processing" />
-                            <p>{INJECTABLE_AUDIO_STATUS_MSG}</p>
+            </section>
+        {% elseif data.video.isPending or data.video.isProcessing %}
+            <div class="empty-state">
+                <div class="loader"></div>
+                <p>We are currently processing this video.</p>
+                <p>It will be ready to play later.</p>
+            </div>
+        {% else %}
+            <section>
+                <ul class="action-list">
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <p>Sorry, we are unable to process this video. Please download the video to watch.</p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            {% endif %}
-        </section>
+                        <nav>
+                            <a href="/storage/fetch.php?hash={{ data.hash }}" class="icon-download" title="Download"></a>
+                        </nav>
+                    </li>
+                </ul>
+            </section>
+        {% endif %}
     </div>
 </div>
