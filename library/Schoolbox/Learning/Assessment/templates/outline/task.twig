@@ -4,10 +4,10 @@
     {% for task in unit.assessables %}
         {% set preview = task is task ? 'data-plugin="preview"' : '' %}
     <li class="actions-small-1 interact" data-unit-task data-unit_task_id="{{ task.id }}">
-        <div class="list-item">
-            {% if readOnly == false %}
+        {% if readOnly == false %}
             <div class="grip compact"></div>
-            {% endif %}
+        {% endif %}
+        <div class="list-item">
             <div class="small-11 compact card wrap-down">
                 <a class="" title="{{ task.typeName }}"  href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}">
                 <span class="{{ icon.renderClass(task) }}"></span>
