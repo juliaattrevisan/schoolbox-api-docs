@@ -235,7 +235,7 @@ class Controller extends Base\Base
     protected function getCourseBuilderInstance(Folder\Model $unit)
     {
         // confirm that there's a Course Builder component
-        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Schoolbox\Learning\Assessment\Builder\Component\Homepage\Controller::class);
+        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller::class);
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
@@ -252,7 +252,7 @@ class Controller extends Base\Base
      * @param string $controller
      * @return Component_Instance
      */
-    protected function injectNewComponent(Folder\Model $unit, $controller = \Schoolbox\Learning\Assessment\Builder\Component\Homepage\Controller::class)
+    protected function injectNewComponent(Folder\Model $unit, $controller = \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
         $instanceMapper = $this->getComponentInstanceMapper();
@@ -1185,7 +1185,7 @@ class Controller extends Base\Base
          */
         $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
             'class',
-            'Component_Homepage_CourseOutlineController'
+            'Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller'
         );
 
         $componentDefinitionId = $componentDefinition->first()->getId();

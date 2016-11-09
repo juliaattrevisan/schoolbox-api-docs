@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Component_Homepage_CourseOutlineController;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error;
