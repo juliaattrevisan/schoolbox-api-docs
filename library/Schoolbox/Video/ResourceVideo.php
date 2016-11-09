@@ -166,19 +166,44 @@ class ResourceVideo
     }
 
     /**
-    * Is this video processing completed?
-    *
-    * @return bool
-    */
+     * Is this video currently completed?
+     *
+     * @return bool
+     */
     public function isComplete()
     {
-        if ($this->getStatus() == QueueMapper::STATUS_COMPLETED) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getStatus() == QueueMapper::STATUS_COMPLETED;
     }
 
+    /**
+     * Is this video currently pending?
+     *
+     * @return bool
+     */
+    public function isPending()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_PENDING;
+    }
+
+    /**
+     * Is this video currently processing?
+     *
+     * @return bool
+     */
+    public function isProcessing()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_PROCESSING;
+    }
+
+    /**
+     * Is this video currently failed?
+     *
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->getStatus() == QueueMapper::STATUS_FAILED;
+    }
 
     /**
      * @param File\IFile $file
