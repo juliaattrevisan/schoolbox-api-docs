@@ -7,10 +7,29 @@
 namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 
 class Controller extends Base
 {
+
+    /**
+     * @var IFeedbackDataSource
+     */
+    protected $feedbackDataSource;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param IFeedbackDataSource $feedbackDataSource
+     */
+    public function __construct(IFeedbackDataSource $feedbackDataSource)
+    {
+        $this->feedbackDataSource = $feedbackDataSource;
+    }
+
 
     /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
@@ -64,6 +83,15 @@ class Controller extends Base
             // full synchronous page
             return $this->buildHtmlOutput($template, $data);
         }
+    }
+
+
+    /**
+     * @return IFeedbackDataSource
+     */
+    protected function getFeedbackDataSource()
+    {
+        return $this->feedbackDataSource;
     }
 
 }

@@ -63,7 +63,9 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->params[Controller::class] = [];
+        $injector->params[Controller::class] = [
+            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource')
+        ];
     }
 
 
