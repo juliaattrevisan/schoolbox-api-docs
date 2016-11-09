@@ -8,8 +8,10 @@
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -124,11 +126,20 @@ class Controller extends Base
         }
 
         // Generate data: assessments and their Participants
+        /** @var Collection|IAssessable[] $assessments */
         $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
 
         // Also get anything in a unit spec for that folder
         $assessments->merge(
             $this->getAssessmentMapperProxy()->findAllInCourseImplementationForFolderId($class->getId())
+        );
+
+        // Filter by term
+        // TODO perform this filtering on a query level
+        $assessments = $assessments->filter(
+            function (IAssessable $assessment) use ($term) {
+                return $term->contains($assessment->getCloseAt());
+            }
         );
 
         // Load participants
