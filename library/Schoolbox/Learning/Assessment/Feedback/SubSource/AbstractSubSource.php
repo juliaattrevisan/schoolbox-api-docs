@@ -68,4 +68,21 @@ abstract class AbstractSubSource implements IFeedbackDataSource
             $this->mapperProxy->delete($response);
         }
     }
+
+
+    /**
+     * Creates a new model appropriate to the target assessment
+     *
+     * @param IAssessable $target
+     * @return IFeedback
+     */
+    public function createModel(IAssessable $target)
+    {
+        if ($this->recognizes($target)) {
+            return $this->mapperProxy->createModel();
+        }
+        return null;
+    }
+
+
 }

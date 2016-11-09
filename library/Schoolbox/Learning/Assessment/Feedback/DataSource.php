@@ -88,4 +88,27 @@ class DataSource implements IFeedbackDataSource
             }
         }
     }
+
+
+    /**
+     * Creates a new model appropriate to the target assessment
+     *
+     * @param IAssessable $target
+     * @return IFeedback
+     */
+    public function createModel(IAssessable $target)
+    {
+        /** @var IFeedback $feedback */
+        $feedback = null;
+
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($target)) {
+                $feedback = $subSource->createModel($target);
+                $feedback->setAssessable($target);
+            }
+        }
+
+        return $feedback;
+    }
+
 }

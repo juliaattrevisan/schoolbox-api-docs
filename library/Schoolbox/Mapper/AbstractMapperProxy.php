@@ -87,6 +87,15 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * @return object
+     * @throws Exception
+     */
+    public function createModel()
+    {
+        return $this->transformModels(new Collection([ $this->getMapper()->createModel() ]))->first();
+    }
+
+    /**
      * Determines if the specified column list requires translation before being
      * submitted to the Mapper
      *
