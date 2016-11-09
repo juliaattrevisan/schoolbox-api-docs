@@ -84,7 +84,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         //setup block for submission button
         $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
-        if (count($allLinks) != 0) {
+        if (count($allLinks) == 0) {
 
             $this->setBlock($templateHandle, 'links', 'links_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
