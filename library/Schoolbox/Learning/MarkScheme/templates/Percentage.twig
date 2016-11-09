@@ -1,0 +1,12 @@
+{% extends '@learningMarkScheme/commentable.twig' %}
+
+{% block grading %}
+
+    {% set inclusion = {
+        maxLength: 5,
+        inputTitle: 'Percentage',
+        placeholder: 'Percentage mark'
+    } %}
+
+    {% include '@learningMarkScheme/text-input.twig' with inclusion %}
+{% endblock %}
