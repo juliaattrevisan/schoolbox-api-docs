@@ -276,6 +276,6 @@ CREATE TABLE `project_assessment` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-ALTER TABLE assess`
+ALTER TABLE `assess`
   CHANGE COLUMN `start` `start` DATETIME NULL ,
   CHANGE COLUMN `finish` `finish` DATETIME NULL ;
