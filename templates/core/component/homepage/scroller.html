@@ -3,6 +3,24 @@
 
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-image-slideshow"></i>
+        <p>No images available!</p>
+
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}">Post an image</a>
+        </p>
+        <!-- END empty_modify -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN scroller -->
+
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section class="imageslider-container">
@@ -120,4 +138,6 @@
             </section>
         </div>
     </div>
+
+    <!-- END scroller -->
 </div>

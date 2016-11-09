@@ -1,6 +1,24 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-image-slideshow"></i>
+        <p>No images available!</p>
+
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/cms/file/new/{ID}">Post Image</a>
+        </p>
+        <!-- END empty_modify -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN image -->
+
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
             <section>
@@ -20,4 +38,6 @@
             </section>
         </div>
     </div>
+
+    <!-- END image -->
 </div>
