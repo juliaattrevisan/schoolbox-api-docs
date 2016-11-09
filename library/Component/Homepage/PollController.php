@@ -162,17 +162,17 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
         {
             $this->setBlock($templateHandle, 'poll', 'poll_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('poll_block', '');
-            $this->parse('empty_state_block', 'empty_state');
-
-            $this->setBlock('empty_state_block', 'empty_modify');
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar('empty_modify', '');
             } else {
                 $this->parse('empty_modify_block', 'empty_modify');
             }
+
+            $this->parse('empty_state_block', 'empty_state');
         }
 
         return true;

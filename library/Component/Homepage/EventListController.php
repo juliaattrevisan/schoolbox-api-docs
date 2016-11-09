@@ -62,12 +62,10 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         if ($eventRenderer->getAllEvents()->count() == 0) {
 
             $this->setBlock($templateHandle, 'event_list', 'event_list_block');
-            $this->setBlock($templateHandle, 'empty_modify', 'empty_modify_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('event_list_block', '');
-
-            $this->parse('empty_state_block', 'empty_state');
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar('empty_modify_block', '');
@@ -75,6 +73,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 $this->parse('empty_modify_block', 'empty_modify');
             }
 
+            $this->parse('empty_state_block', 'empty_state');
 
         } else {
 

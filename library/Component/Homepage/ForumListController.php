@@ -66,11 +66,10 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
             $this->setBlock($templateHandle, 'posts', 'posts_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('posts_block', '');
             $this->setVar('COMPONENT_CONFIG_SRC_ID', $this->getSource()->getId());
-
-            $this->parse('empty_state_block', 'empty_state');
             $this->setVar('SOURCE_ID', $this->getSource()->getId());
 
             if ($is_post_allowed || $this->getContentPermission() >= UserAccess::ACCESS_FULL) {
@@ -78,6 +77,8 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             } else {
                 $this->setVar("empty_modify_block", "");
             }
+
+            $this->parse('empty_state_block', 'empty_state');
 
         } else {
 

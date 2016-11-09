@@ -87,9 +87,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
             $this->setBlock($templateHandle, 'audio', 'audio_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('audio_block', '');
-            $this->parse('empty_state_block', 'empty_state');
             $this->setVar('SOURCE_ID', $this->getSource()->getId());
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -97,6 +97,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             } else {
                 $this->parse("empty_modify_block", "empty_modify");
             }
+
+            $this->parse('empty_state_block', 'empty_state');
 
         } else {
 

@@ -19,6 +19,29 @@
     </script>
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-textbox"></i>
+        <p>No content available!</p>
+
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}">Edit content</a>
+        </p>
+        <!-- END empty_modify -->
+        <!-- BEGIN empty_create -->
+        <p>
+            <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}">Create content</a>
+        </p>
+        <!-- END empty_create -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN textbox -->
+
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -85,6 +108,9 @@
             </section>
         </div>
     </div>
+
+    <!-- END textbox -->
+
 </div>
 
 

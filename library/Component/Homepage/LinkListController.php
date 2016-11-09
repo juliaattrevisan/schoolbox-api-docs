@@ -88,9 +88,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
             $this->setBlock($templateHandle, 'links', 'links_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('links_block', '');
-            $this->parse('empty_state_block', 'empty_state');
             $this->setVar('SOURCE_ID', $this->getSource()->getId());
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -98,6 +98,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             } else {
                 $this->parse("empty_modify_block", "empty_modify");
             }
+
+            $this->parse('empty_state_block', 'empty_state');
 
         } else {
 

@@ -62,94 +62,120 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             return false;
         }
 
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-        $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
-        $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
-        $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
-        $this->setBlock('text_locked', 'create_text', 'create_text_block');
-
-
-
-        if(!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
-        } else {
-            $this->setVar('source_folder_deleted_block', '');
-
-            /*
-             * Remember where the textBox came from - if you modify a streamed
-             * textBox which comes from another homepage, you were able to
-             * inadvertently steal ownership of it
-             */
-            $heading = Scrub::text($this->getTextbox()->getHeading());
-            $this->setComponentName($heading);
-
-            $this->setVar(array(
-                'TEXTBOX_HEADING'     => $heading,
-                'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
-                'TEXTBOX_ID'          => $this->getTextbox()->getId(),
-                'ID'                  => $this->getContext()->getId(),
-                'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
-                'text_editable_block' => '',
-                'modify_text_block'   => '',
-                'create_text_block'   => '',
-                'text_locked_block'   => '',
-            ));
-
-            /* To edit someone else's textbox, you need write access to both homepages.
-             * To just edit one homepage's textbox, you need write access to that homepage.
-             */
-            $editing = false;
-            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
-                if ($this->getSitePage()->arg[1] == 'textBoxModify') {
-                    $editing = true;
-                    $this->setVar(
-                        array(
-                            'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
-                        )
-                    );
-                } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
-                    $editing = true;
-                    $this->setVar(
-                        array(
-                            'TEXTBOX_HEADING' => '',
-                            'TEXTBOX_BODY' => '',
-                            'TEXTBOX_ID' => '',
-                            'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
-                        )
-                    );
-                }
-                $this->parse('text_editable_block', 'text_editable');
-            } else {
-                // modify links
-                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                    if ($this->getTextbox()->getId()) {
-                        $this->parse('modify_text_block', 'modify_text');
-                    } else {
-                        $this->parse('create_text_block', 'create_text');
-                    }
-                }
-
-                // formatted text
-                $this->parse('text_locked_block', 'text_locked');
-            }
-            $this->parse('source_folder_exists_block', 'source_folder_exists');
-        }
-
-        /* Need title injected here
-         */
-        if ($editing) {
-            $this->getConfig()['collapse']['value'] = false;
-        }
         $this->parseConfig();
 
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
-            /* Remove headers */
-            $this->setVar('CONFIGURATION', '');
-            $this->setBlock($templateHandle, 'header', 'header_block');
-            $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
+        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty(Scrub::text($this->getTextbox()->getBody()))) {
+
+            $this->setBlock($templateHandle, 'textbox', 'textbox_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_create', 'empty_create_block');
+
+            $this->setVar('textbox_block', '');
+
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                if ($this->getTextbox()->getId()) {
+                    $this->setVar('empty_create_block', '');
+                    $this->parse('empty_modify_block', 'empty_modify');
+                } else {
+                    $this->setVar('empty_modify_block', '');
+                    $this->parse('empty_create_block', 'empty_create');
+                }
+            }
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
+            $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
+            $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
+            $this->setBlock('text_locked', 'create_text', 'create_text_block');
+
+            $this->setVar('empty_state_block', '');
+
+            if (!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            } else {
+                $this->setVar('source_folder_deleted_block', '');
+
+                /*
+                 * Remember where the textBox came from - if you modify a streamed
+                 * textBox which comes from another homepage, you were able to
+                 * inadvertently steal ownership of it
+                 */
+                $heading = Scrub::text($this->getTextbox()->getHeading());
+                $this->setComponentName($heading);
+
+                $this->setVar(array(
+                    'TEXTBOX_HEADING' => $heading,
+                    'TEXTBOX_BODY' => Scrub::html($this->getTextbox()->getBody()),
+                    'TEXTBOX_ID' => $this->getTextbox()->getId(),
+                    'ID' => $this->getContext()->getId(),
+                    'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
+                    'text_editable_block' => '',
+                    'modify_text_block' => '',
+                    'create_text_block' => '',
+                    'text_locked_block' => '',
+                ));
+
+                /* To edit someone else's textbox, you need write access to both homepages.
+                 * To just edit one homepage's textbox, you need write access to that homepage.
+                 */
+                $editing = false;
+                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
+                    if ($this->getSitePage()->arg[1] == 'textBoxModify') {
+                        $editing = true;
+                        $this->setVar(
+                            array(
+                                'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
+                            )
+                        );
+                    } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
+                        $editing = true;
+                        $this->setVar(
+                            array(
+                                'TEXTBOX_HEADING' => '',
+                                'TEXTBOX_BODY' => '',
+                                'TEXTBOX_ID' => '',
+                                'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
+                            )
+                        );
+                    }
+                    $this->parse('text_editable_block', 'text_editable');
+                } else {
+                    // modify links
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                        if ($this->getTextbox()->getId()) {
+                            $this->parse('modify_text_block', 'modify_text');
+                        } else {
+                            $this->parse('create_text_block', 'create_text');
+                        }
+                    }
+
+                    // formatted text
+                    $this->parse('text_locked_block', 'text_locked');
+                }
+                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            }
+
+            /* Need title injected here
+             */
+            if ($editing) {
+                $this->getConfig()['collapse']['value'] = false;
+            }
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
+                /* Remove headers */
+                $this->setVar('CONFIGURATION', '');
+                $this->setBlock($templateHandle, 'header', 'header_block');
+                $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+                $this->setVar('header_block', '');
+                $this->setVar('dashboard_header_block', '');
+            }
         }
 
 
