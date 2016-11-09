@@ -1,6 +1,6 @@
 CREATE TABLE `ups_custom_hydrator` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `class` VARCHAR(256) NOT NULL,
+    `class` VARCHAR(255) NOT NULL,
     `role_type` ENUM('student','parent','staff') NOT NULL, -- omitting 'guest', this enum mirrors groups.group_type
     `enabled` BOOL NOT NULL DEFAULT 1,
     `sequence` INT UNSIGNED NOT NULL,
