@@ -110,17 +110,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param IMarkScheme $scheme
-     * @return string
-     */
-    private function deriveSchemeName(IMarkScheme $scheme)
-    {
-        $c = get_class($scheme);
-        return substr($c, strrpos($c, '\\')+1);
-    }
-
-
-    /**
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
