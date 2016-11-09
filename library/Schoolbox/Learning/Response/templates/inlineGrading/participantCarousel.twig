@@ -116,7 +116,7 @@
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
             <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if assessment.submittedOnly %}checked="checked"{% endif %} value='1' />
-            <label for="showSubmittedOnly" class="checkbox-label">Cycle Unmarked Work <span class='hint has-tip tip-top' title="When using the selector, only cycle through students who have unmarked work." data-tooltip="">?</span></label>
+            <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
         </form>
     </div>
 </div>
