@@ -7,6 +7,22 @@
 
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-image"></i>
+        <p>No images available!</p>
+        <!-- BEGIN empty_modify -->
+        <p>
+            <a href="/cms/file/new/{FILE_CAT_ID}">Post a file</a>
+        </p>
+        <!-- END empty_modify -->
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN file -->
+
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -113,4 +129,6 @@
             </section>
         </div>
     </div>
+
+    <!-- END file -->
 </div>
