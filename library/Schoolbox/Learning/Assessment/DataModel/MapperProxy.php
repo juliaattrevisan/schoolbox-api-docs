@@ -5,6 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
+
 /**
  * Proxy mapper for IAssessable objects.
  *
@@ -65,7 +67,6 @@ class MapperProxy
     {
         try {
             $originalModel = $this->baseMapper->findById($id);
-            $this->baseMapper->augmentListWithDueWorkRubrics([$originalModel]);
             return $this->translateToDomainModel($originalModel);
         } catch (MapperException\Deleted $e) {
             $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
