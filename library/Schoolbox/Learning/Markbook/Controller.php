@@ -85,6 +85,26 @@ class Controller extends Base
      */
     public function getMarkbook(Folder $class)
     {
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'learningMarkbook.getMarkbookForTerm',
+                [
+                    'classId'  => $class->getId(),
+                    'termCode' => $this->getTermMapper()->findForToday()->getCode(),
+                ]
+            )
+        );
+    }
+
+    /**
+     * Displays a list of marks for students in the specified class for the given term
+     *
+     * @api   GET /learning/markbook/:classId/term/:termCode
+     * @param Folder $class
+     * @param Term   $term
+     */
+    public function getMarkbookForTerm(Folder $class, Term $term)
+    {
         // Replaces /submission/listSubmission/{termSlug}/{folderId}
         //       eg /submission/listSubmission/{termSlug}/{folderId}
         // Replaces /submission/viewSubmission/{dueWorkId}
@@ -136,16 +156,11 @@ class Controller extends Base
                     'class'       => $class,
                     'markbook'    => $markbook,
                     'terms'       => $terms,
-                    'currentTerm' => TermMapper::getInstance()->findForToday(),
+                    'currentTerm' => $term,
                     'courses'     => $courses,
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );
-    }
-
-    public function getMarkbookForTerm(Folder $class, Term $term)
-    {
-        //
     }
 
     /* Getters/Setters
