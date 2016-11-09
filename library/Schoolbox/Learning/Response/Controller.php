@@ -27,6 +27,11 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\ListFactory as GradeLevelListFactory;
+
 class Controller extends Base
 {
     /**
@@ -107,6 +112,10 @@ class Controller extends Base
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+
+                /* Rubrics data
+                 */
+                'rubricContext' => $this->generateMarkableRubricContext($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
@@ -117,6 +126,30 @@ class Controller extends Base
         catch (\DomainException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
+    }
+
+    /**
+     * Get a markable grid for Rubrics marking
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return array
+     */
+    private function generateMarkableRubricContext(IAssessable $assessment, User $student)
+    {
+        /** @var DueWork $assessment */
+        $markTypeSlug = $assessment->getMarkType()->getSlug();
+
+        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
+
+        $context = [
+            'rubric' => $assessment->getRubric()->toContext(),
+            'markType' => [
+                'mode' => $markTypeSlug
+            ]
+        ];
+
+        return $context;
     }
 
     /**
