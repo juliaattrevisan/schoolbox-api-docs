@@ -151,16 +151,33 @@ class Controller extends Base
         // Also show the courses/units that are on this homepage
         $courses = $this->getCourseImplementationDataSource()->findAllByFolderId($class->getId());
 
+        // And the previous and next term
+        $previousTerm = null;
+        $nextTerm     = null;
+        foreach ($terms as $i => $termInList) {
+            if ($termInList->getId() == $term->getId()) {
+                if (isset($terms[$i + 1])) {
+                    $previousTerm = $terms[$i + 1];
+                }
+                if (isset($terms[$i - 1])) {
+                    $nextTerm = $terms[$i - 1];
+                }
+                break;
+            }
+        }
+
         // And output
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningMarkbook/markbook.twig',
                 [
-                    'class'       => $class,
-                    'markbook'    => $markbook,
-                    'terms'       => $terms,
-                    'currentTerm' => $term,
-                    'courses'     => $courses,
+                    'class'        => $class,
+                    'markbook'     => $markbook,
+                    'terms'        => $terms,
+                    'currentTerm'  => $term,
+                    'previousTerm' => $previousTerm,
+                    'nextTerm'     => $nextTerm,
+                    'courses'      => $courses,
                 ]
             )->setTitle('Markbook for '.$class->getTitle())
         );

@@ -43,7 +43,15 @@
     <div class="small-12 island">
         <div class="context-switch">
             {% include '@learningMarkbook/fragments/markbookSelector.twig'
-                with {terms: terms, currentTerm: currentTerm, courses: courses} %}
+                with {
+                    class: class,
+                    terms: terms,
+                    currentTerm: currentTerm,
+                    previousTerm: previousTerm,
+                    nextTerm: nextTerm,
+                    courses: courses
+                }
+            %}
         </div>
     </div>
 </div>

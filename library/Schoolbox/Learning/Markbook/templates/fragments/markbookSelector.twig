@@ -1,6 +1,12 @@
 {# Render a term selector #}
+{# Figure out next and last term #}
 <nav>
-    <a data-interaction="previous-term" class="icon-previous"></a>
+    {% if previousTerm %}
+        <a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: previousTerm.code}) }}"
+           data-interaction="previous-term" class="icon-previous"></a>
+    {% else %}
+        <a href="#" data-interaction="previous-term" class="icon-previous" disabled></a>
+    {% endif %}
 </nav>
 <div class="semester">
     <select data-term-selector>
@@ -15,7 +21,12 @@
     </select>
 </div>
 <nav>
-    <a data-interaction="next" class="icon-next"></a>
+    {% if nextTerm %}
+        <a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: nextTerm.code}) }}"
+           data-interaction="next-term" class="icon-next"></a>
+    {% else %}
+        <a href="#" data-interaction="next-term" class="icon-next" disabled></a>
+    {% endif %}
 </nav>
 
 {# Render unit selector too #}
@@ -40,7 +51,9 @@
         $.fn.contextSelector({
             href: 'learning/markbook/{{ class.id|e('js') }}/term',
             selector: {
-                semester: 'select[data-term-selector]'
+                semester: 'select[data-term-selector]',
+                nextSemester: '[data-interaction="next-term"]',
+                previousSemester: '[data-interaction="previous-term"]'
             }
         });
     });
