@@ -2,15 +2,15 @@
 
 <ul class="information-list">
     {% for unit in courseImplementation.units %}
-        {% set expanded = readOnly == false or unit.isOpen %}
-        {% set expanded_icon = expanded ? 'icon-down-arrow' : 'icon-up-arrow' %}
-        {% set expanded_state = expanded ? 'collapsed' : 'expanded' %}
+        {% set expanded = unit.isOpen == true %}
+        {% set expanded_icon = expanded ? 'icon-up-arrow' :'icon-down-arrow'  %}
+        {% set expanded_state = expanded ? 'expanded' :'collapsed' %}
 
         <li class="actions-small-1 interact {{ expanded_state }}" data-unit data-unit_id="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
         <div class="list-item">
             <div class="card small-12">
                 <h3>
-                    {% if expanded %}
+                    {% if unit.isBeforeOpenDate==false or readOnly == false %}
                     <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
                     <a href="/homepage/{{ unit.specification.folder.id }}">{{ unit.title }}</a>
                     {% else %}

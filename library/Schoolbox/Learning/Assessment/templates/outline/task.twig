@@ -1,6 +1,6 @@
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-<ul class="action-list sortable-card ui-sortable task-list {% if expanded %}hide{% endif %}" data-task-list>
+<ul class="action-list sortable-card ui-sortable task-list {% if expanded==false %}hide{% endif %}" data-task-list>
     {% for task in unit.assessables %}
         {% set preview = task is task ? 'data-plugin="preview"' : '' %}
     <li class="actions-small-1 interact" data-unit-task data-unit_task_id="{{ task.id }}">
