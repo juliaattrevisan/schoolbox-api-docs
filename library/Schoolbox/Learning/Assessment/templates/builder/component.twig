@@ -1,13 +1,11 @@
 {% if breadcrumbs | length %}
-    <div class="content">
-        <ul class="breadcrumb">
-            <li>
-                {% for node in breadcrumbs %}
-                    <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
-                {% endfor %}
-            </li>
-        </ul>
-    </div>
+<ul class="breadcrumb">
+    <li>
+        {% for node in breadcrumbs %}
+            <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
+        {% endfor %}
+    </li>
+</ul>
 {% endif %}
 
 {% if canRead %}
