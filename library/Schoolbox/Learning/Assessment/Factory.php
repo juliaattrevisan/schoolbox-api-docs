@@ -247,7 +247,8 @@ class Factory
         /* Check required data
          */
         if (!strlen(trim($this->getTitle()))) {
-            throw new \InvalidArgumentException('set an assessment title');
+            $typeName = $assessment->getTypeName();
+            throw new \InvalidArgumentException("Insufficient information. You need to set a title for this $typeName");
         }
 
         if(!$assessment->getContext()->getBaseContext() instanceof UnitSpecification) {
