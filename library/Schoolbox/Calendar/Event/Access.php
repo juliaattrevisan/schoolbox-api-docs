@@ -96,13 +96,20 @@ class Access
 
                 try {
                     $access = $userAccessMapper->getAccess($user, $groupId);
+                    /* TODO: write access should only be able to edit if they
+                     * are author or owner. The logic to show the modify button
+                     * will need to change first
+                     */
+                    if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                        return true;
+                    }
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    return false;
+                    /* User didn't have access for this group but might
+                     * for another one in this loop
+                     */
                 }
 
-                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-                    return true;
-                }
+
             }
         }
 
