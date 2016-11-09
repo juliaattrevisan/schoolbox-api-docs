@@ -80,6 +80,7 @@ class Module extends BaseModule
                 'assessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
                 'participantDataSource'          => $injector->lazyGet('participantDataSource'),
                 'courseImplementationDataSource' => $injector->lazyGet('courseImplementationDataSource'),
+                'termMapper'                     => $this->getMapperFactory()->getLazy(TermMapper::class),
             ])
         );
     }

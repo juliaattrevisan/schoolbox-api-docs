@@ -45,6 +45,11 @@ class Controller extends Base
     protected $courseImplementationDataSource;
 
     /**
+     * @var TermMapper
+     */
+    protected $termMapper;
+
+    /**
      * Constructor
      *
      * @param ErrorMapper                    $errorMapper
@@ -52,19 +57,22 @@ class Controller extends Base
      * @param Participant\DataSource         $participantDataSource
      * @param GradeGroupMapper               $gradeGroupMapper
      * @param CourseImplementationDataSource $courseImplementationDataSource
+     * @param TermMapper                     $termMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Participant\DataSource $participantDataSource,
         GradeGroupMapper $gradeGroupMapper,
-        CourseImplementationDataSource $courseImplementationDataSource
+        CourseImplementationDataSource $courseImplementationDataSource,
+        TermMapper $termMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setParticipantDataSource($participantDataSource);
         $this->setGradeGroupMapper($gradeGroupMapper);
         $this->setCourseImplementationDataSource($courseImplementationDataSource);
+        $this->setTermMapper($termMapper);
     }
 
     /**
@@ -114,8 +122,7 @@ class Controller extends Base
         );
 
         // And what is required for a context selector
-        // TODO inject term mapper
-        $terms = TermMapper::getInstance()->findAll(['order' => ['start' => 'desc']]);
+        $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
 
         // Also show the courses/units that are on this homepage
         $courses = $this->getCourseImplementationDataSource()->findAllByFolderId($class->getId());
@@ -225,6 +232,24 @@ class Controller extends Base
     public function setCourseImplementationDataSource(CourseImplementationDataSource $courseImplementationDataSource)
     {
         $this->courseImplementationDataSource = $courseImplementationDataSource;
+        return $this;
+    }
+
+    /**
+     * @return TermMapper
+     */
+    public function getTermMapper()
+    {
+        return $this->termMapper;
+    }
+
+    /**
+     * @param TermMapper $termMapper
+     * @return static
+     */
+    public function setTermMapper(TermMapper $termMapper)
+    {
+        $this->termMapper = $termMapper;
         return $this;
     }
 }
