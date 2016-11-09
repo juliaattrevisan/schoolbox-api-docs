@@ -23,7 +23,6 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
 
         /* If no url is specified it might time out -_-
          * So just hide all this instead
@@ -42,6 +41,11 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 
             $url = $this->getConfig('url');
             if (preg_match($pattern, $url, $matches)) {
+
+                $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
+                $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+                $this->setVar('empty_state_block', '');
+
                 $this->setVar(
                     array(
                         'WIDGET_ID' => $matches[2],
@@ -56,11 +60,24 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
                 $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
 
                 $this->parse('has_wolfram_block', 'has_wolfram');
+
             } else {
-                $this->setVar('has_wolfram_block', '');
+                $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
+                $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+                $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+                $this->setVar('wolfram_block', '');
+
+                $this->parse('empty_state_block', 'empty_state');
             }
         } else {
-            $this->setVar('has_wolfram_block', '');
+            $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+            $this->setVar('wolfram_block', '');
+
+            $this->parse('empty_state_block', 'empty_state');
         }
 
         return true; // everything went according to plan
