@@ -83,16 +83,28 @@ class StudentCarousel
 
             /** @var Submission $latestSubmission */
             if ($latestSubmission) {
-                if ($latestSubmission->isSubmittedOnTime()) {
-                    $css = 'submitted';
-                    $label = 'Submitted on time';
+                if ($latestSubmission->isSubmitted()) {
+                    if ($latestSubmission->isSubmittedOnTime()) {
+                        $css = 'submitted';
+                        $label = 'Submitted on time';
+                    }
+                    else {
+                        $css   = 'submitted-late';
+                        $label = 'Submitted late';
+                    }
                 }
                 else {
-                    $css   = 'submitted-late';
-                    $label = 'Submitted late';
+
+                    /* Draft Submission exists
+                     */
+                    $css = 'unsubmitted';
+                    $label = 'Not submitted';
                 }
             }
             else {
+
+                /* No submission exists
+                 */
                 $css = 'unsubmitted';
                 $label = 'Not submitted';
             }
