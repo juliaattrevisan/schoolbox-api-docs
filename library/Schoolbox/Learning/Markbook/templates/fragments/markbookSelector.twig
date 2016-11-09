@@ -1,4 +1,4 @@
-{# Renders a term selector. It's up to you what to do with it #}
+{# Renders a term selector. #}
 <nav>
     <a data-interaction="previous-term" class="icon-previous"></a>
 </nav>
@@ -17,3 +17,14 @@
 <nav>
     <a data-interaction="next" class="icon-next"></a>
 </nav>
+
+<select data-unit-selector>
+    <option disabled selected>All assessments</option>
+    {% for course in courses %}
+        <optgroup label="Course: {{ course.specification.folder.title }}">
+            {% for unit in course.units %}
+                <option>{{ unit.specification.folder.title }}</option>
+            {% endfor %}
+        </optgroup>
+    {% endfor %}
+</select>

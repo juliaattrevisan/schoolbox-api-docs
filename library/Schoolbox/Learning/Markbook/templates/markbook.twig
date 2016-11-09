@@ -42,18 +42,8 @@
 <div class="row">
     <div class="small-12 island">
         <div class="context-switch">
-            {% include '@learningMarkbook/fragments/termSelector.twig' with {terms: terms, currentTerm: currentTerm} %}
-            {# select a unit as well #}
-            <select data-unit-selector>
-                <option disabled selected>All assessments</option>
-                {% for course in courses %}
-                    <optgroup label="Course: {{ course.specification.folder.title }}">
-                        {% for unit in course.units %}
-                            <option>{{ unit.specification.folder.title }}</option>
-                        {% endfor %}
-                    </optgroup>
-                {% endfor %}
-            </select>
+            {% include '@learningMarkbook/fragments/markbookSelector.twig'
+                with {terms: terms, currentTerm: currentTerm, courses: courses} %}
         </div>
     </div>
 </div>
