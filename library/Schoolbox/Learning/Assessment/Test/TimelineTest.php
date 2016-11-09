@@ -14,7 +14,7 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Timeline;
+use Schoolbox\Learning\Assessment\DueWork\Timeline\Full as Timeline;
 use \Schoolbox\User;
 
 class TimelineTest extends \PHPUnit_Framework_TestCase
