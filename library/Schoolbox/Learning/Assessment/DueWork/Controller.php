@@ -25,6 +25,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Timeline\Full as FullTimeline;
 
 class Controller extends Assessment\Controller
 {
@@ -128,7 +129,7 @@ class Controller extends Assessment\Controller
             'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $assessment,
-            'timeline'    => (new Timeline($assessment))->getTimeline()
+            'timeline'    => (new FullTimeline($assessment))->getTimeline()
         ];
 
         try {
@@ -365,12 +366,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment)
     {
-        // configure the object
-        $assessment
-            ->setUseRubric(false)
-//            ->setAcceptsMultiple()
-        ;
-
         // create an empty Rubric with appropriate Indicators
         $rubric = $this->getRubricMapper()->createForContext($assessment->getContext());
         $rubric->setSubmissionBox(new SubmissionBox()); // TODO fix this with...something

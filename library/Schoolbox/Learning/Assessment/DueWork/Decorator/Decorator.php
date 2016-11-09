@@ -32,19 +32,19 @@ class Decorator implements DecoratorInterface
      * @param $workType
      * @param $markType
      * @param $gradingScheme
-     * @param $usesRubric
+     * @param $useRubric
      * @param $markPerCapability
      * @param $maxMark
      * @param $rubricData
      * @param $attachedFiles
      */
-    public function __construct($acceptOnline, $workType, $markType, $gradingScheme, $usesRubric, $markPerCapability, $maxMark, $rubricData, $attachedFiles)
+    public function __construct($acceptOnline, $workType, $markType, $gradingScheme, $useRubric, $markPerCapability, $maxMark, $rubricData, $attachedFiles)
     {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setWorkType(intval($workType));
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
-        $this->setUsesRubric(trim($usesRubric));
+        $this->setUseRubric(trim($useRubric));
         $this->setMarkPerCapability(trim($markPerCapability));
         $this->setMaxMark(trim($maxMark));
         $this->setRubricData($rubricData);
@@ -88,14 +88,14 @@ class Decorator implements DecoratorInterface
 
         $assessment->setMarkScheme($markScheme);
 
-        $assessment->setUseRubric($this->getUsesRubric());
+        $assessment->setUseRubric($this->getUseRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
 
         /** @var DueWorkRubric $rubric */
         $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), false);
         $assessment->setRubric($rubric);
 
-        if($this->getUsesRubric()){
+        if($this->getUseRubric()){
             $markMax = $rubric->getTotal();
             $assessment->setMaxMark($markMax);
         }
