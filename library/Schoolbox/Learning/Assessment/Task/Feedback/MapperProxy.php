@@ -10,10 +10,10 @@ namespace Schoolbox\Learning\Assessment\Task\Feedback;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponse;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponseDomainObject;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
 
 
@@ -54,6 +54,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
+     * Overridden to only retrieve task completions that are status: complete
+     * (not requires confirmation)
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findByColumnList(array $columnList, $options = array())
+    {
+        $columnList['completion_status'] = DataObject::COMPLETION_STATUS_COMPLETE;
+        return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
      * @return string
      */
     protected function getExternalColumnName()
@@ -80,20 +94,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|Completion[] $mapperModels
-     * @return GenericCollection|TaskFeedback[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $taskFeedbacks = new GenericCollection(TaskFeedback::class);
+        $taskFeedbacks = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $completion){
-            $taskFeedback = (new TaskFeedback())
+            $taskFeedback = (new DomainObject())
                 ->setId($completion->getId())
                 // The completion serves as both a response and a feedback.
                 // Add a corresponding stub response.
                 ->setResponse(
-                    (new TaskResponse())
+                    (new TaskResponseDomainObject())
                         ->setId($completion->getId())
                 )
                 ->setReviewee($completion->getStudent())
@@ -123,16 +137,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|TaskFeedback[] $domainObjects
-     * @return GenericCollection|Completion[]
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(Completion::class);
+        $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
             // TODO add completion status once markbook is merged
-            $dataModel = (new Completion())
+            $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setTask(
                     (new Task())
@@ -147,11 +161,3 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $dataModels;
     }
 }
-
-
-
-
-
-
-
-

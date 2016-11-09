@@ -10,14 +10,12 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Mapper;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -82,15 +80,15 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|SubmissionReturn[] $mapperModels
-     * @return GenericCollection|DueWorkFeedback[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $dueWorkFeedbacks = new GenericCollection(DueWorkFeedback::class);
+        $dueWorkFeedbacks = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $submissionReturn){
-            $feedback = (new DueWorkFeedback())
+            $feedback = (new DomainObject())
                 ->setId($submissionReturn->getId())
                 // TODO implement optional association due work feedback association with a response
 //                ->setResponse(
@@ -124,15 +122,15 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|DueWorkFeedback[] $domainObjects
-     * @return GenericCollection|SubmissionReturn[]
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(SubmissionReturn::class);
+        $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
-            $dataModel = (new SubmissionReturn())
+            $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setSubmissionBox(
                     (new SubmissionBox())
@@ -164,11 +162,3 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $dataModels;
     }
 }
-
-
-
-
-
-
-
-
