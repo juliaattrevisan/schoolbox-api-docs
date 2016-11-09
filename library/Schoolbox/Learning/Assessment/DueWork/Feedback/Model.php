@@ -53,6 +53,20 @@ class Model extends AbstractFeedback
         return $this;
     }
 
+
+    /**
+     * @param Alaress_Date_Format $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt = null)
+    {
+        if (empty($this->getCreatedAt())) {
+            $this->setCreatedAt($updatedAt);
+        }
+        return $this;
+    }
+
+
     /**
      * @return Alaress_Date_Format
      */
