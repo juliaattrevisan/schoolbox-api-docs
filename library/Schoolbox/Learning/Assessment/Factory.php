@@ -251,21 +251,27 @@ class Factory
             throw new \InvalidArgumentException("Insufficient information. You need to set a title for this $typeName");
         }
 
-        if(!$assessment->getContext()->getBaseContext() instanceof UnitSpecification) {
+        if(!$assessment->getBaseContext() instanceof UnitSpecification) {
             /* Check dates are provided
              * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
              */
+
+            if($assessment instanceof Task) {
+                $openAt = new \Alaress_Date_NullDate();
+            } else {
+                try {
+                    $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
+                } catch (\InvalidArgumentException $e) {
+                    throw new \InvalidArgumentException('set a open date');
+                }
+            }
+
             try {
                 $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
             } catch (\InvalidArgumentException $e) {
                 throw new \InvalidArgumentException('set a publish date');
             }
 
-            try {
-                $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a open date');
-            }
 
             try {
                 $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
@@ -273,10 +279,14 @@ class Factory
                 throw new \InvalidArgumentException('set a due date');
             }
 
-            try {
-                $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a close date');
+            if($assessment instanceof Task) {
+                $closeAt = new \Alaress_Date_NullDate();
+            } else {
+                try {
+                    $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
+                } catch (\InvalidArgumentException $e) {
+                    throw new \InvalidArgumentException('set a close date');
+                }
             }
         }
         else {
