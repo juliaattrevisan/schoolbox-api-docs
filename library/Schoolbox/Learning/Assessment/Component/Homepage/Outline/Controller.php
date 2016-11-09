@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Learning\Course\Implementation;
 use Schoolbox\Learning\Course\ImplementationMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -79,6 +80,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
+        $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
@@ -88,15 +90,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         /** @var AssessmentMapperProxy $assessmentProxy */
         $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-
         $implementationId = $this->getConfig('importedCourse');
 
-        $this->courseImplementation = $implementationProxy->findById($implementationId);
+        try{
+            $this->courseImplementation = $implementationProxy->findById($implementationId);
 
-        $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-
-        // Build student list
-        if (count($this->courseImplementation->getUnits())) {
 
             // Try to get original course folder from each unit in course.
             foreach ($this->courseImplementation->getUnits() as $unit) {
@@ -107,7 +105,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $assessables = $assessmentProxy->findAllForUnitImplementationId($unit->getId());
                 $unit->setAssessables($assessables);
             }
-            foreach($this->courseImplementation->getUnits() as $unit) {
+            foreach ($this->courseImplementation->getUnits() as $unit) {
                 try {
                     $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
                         Folder\Mapper::getInstance()->findCheaplyById($unit->getSpecification()->getFolder()->getId())->getParent()->getId()
@@ -127,16 +125,18 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             $this_student_id = null;
             if ($this->readOnly) {
-              $this_student_id = $this->getUser()->getId();
+                $this_student_id = $this->getUser()->getId();
             }
             /*$this->completion_list = Task\CompletionMapper::getInstance()->findLatestForList(
               $task_list, $this_student_id
             );*/
-        } else {
+
+        } catch (MapperException $e) {
             if ($this->readOnly) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -153,7 +153,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'readOnly'  => $this->readOnly,
             'context'   => $this->getContext(),
             'course'    => $this->originalCourse,
-            'units'     => $this->courseImplementation->getUnits(),
+            'courseImplementation'     => $this->courseImplementation,
             'studentCount' => count($this->userCollection),
             'componentInstance' => $this->getInstance(),
             ];

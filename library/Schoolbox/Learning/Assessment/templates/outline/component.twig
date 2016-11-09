@@ -29,11 +29,14 @@
             </script>
 
             <section>
-                {% if units|length %}
+                {% if courseImplementation.units|length %}
                     <p class="component-titlebar meta">
                         <a class="icon-course" href="/homepage/{{ course.folder.id }}" title="Visit course page">{{ course.title }}</a>
                     </p>
                     {% include '@learningAssessment/outline/unit.twig' %}
+                    <div class="content">
+                        <a href="/course/import/modify/{{ componentInstance.id }}" class="button icon-modify">Modify</a>
+                    </div>
                 {% else %}
                     <div class="content">
                         <p>To get started with courses you need to first import an existing course to display</p>
@@ -42,11 +45,7 @@
                         <a href="/course/management/{{ context.id }}" class="button icon-export">Manage Courses</a>
                     </div>
                 {% endif %}
-
             </section>
-            <div class="content">
-                <a href="/course/import/modify/{{ componentInstance.id }}" class="button icon-modify">Modify</a>
-            </div>
 
         <!-- Form for reodering tasks -->
         <div class="hide">
