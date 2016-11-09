@@ -26,6 +26,7 @@ use Schoolbox\MobileApp;
 use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 use ZendService\Apple\Apns;
+use Schoolbox\Config\ConfigMapper;
 
 class Controller extends BaseController
 {
@@ -173,7 +174,6 @@ class Controller extends BaseController
      */
     public function configure($roletype = null)
     {
-
         $roletypes = ['all', 'student', 'staff', 'parent'];
 
         $filters = [
@@ -192,12 +192,28 @@ class Controller extends BaseController
                    ->indexBy('id')
                    ->getAll();
 
+        //Filtering out disabled modules
+        //What about resource_booking and leave (which is boarder_leave_enabled in settings)?
+        $checkEnabled = Array('eotc');
+
+        $configMapper = ConfigMapper::getInstance();
+
+        foreach($ns as $i=>$k){
+            if(in_array($k->getSlug(), $checkEnabled)){
+                if(0 == $configMapper->get($k->getSlug().'_enabled')){
+                    unset($ns[$i]);
+                }
+            }
+        }
+
         $sources = SourceMapper::getInstance()
                                ->findAll()
                                ->indexBy('id')
                                ->getAll();
 
         $config = $this->getConfig()->find($rolec->getColumnValues('id'));
+
+        //Filtering out $config display further in Twig. Is there a more elegant solution?
 
         $this->getResponse()->content->set([
             'title'    => 'Global Message Configuration',
@@ -212,8 +228,6 @@ class Controller extends BaseController
             ]
         ]);
     }
-
-
 
     /**
      * @api   GET /adminv2/messages/configure/custom
