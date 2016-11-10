@@ -29,6 +29,7 @@ class RubricContext
     {
         /** @var DueWork $assessment */
         $markTypeSlug = $assessment->getMarkType()->getSlug();
+        $markTypeSlug = 'letter';
 
         RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
 
@@ -38,6 +39,16 @@ class RubricContext
                 'mode' => $markTypeSlug
             ]
         ];
+
+        /* Ram in some levels
+         */
+        $levels = [];
+
+        foreach ($assessment->getGradeGroup()->getGradeLevels() as $level) {
+            $levels[$level->getLowerBound()] = $level->getCaption();
+        }
+
+        $context['markType']['conf'] = $levels;
 
         return $context;
     }
@@ -60,9 +71,6 @@ class RubricContext
         /** @var DueWork $assessment */
         $context = [
             'rubric' => $assessment->getRubric()->toContext($currentUser),
-            'markType' => [
-                'mode' => $markTypeSlug
-            ]
         ];
 
 //        // Hide total mark from students and parents
