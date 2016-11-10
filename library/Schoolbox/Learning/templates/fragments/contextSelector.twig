@@ -58,7 +58,7 @@
         <select id="context-selector-enrolled-subjects">
             <option disabled="" selected="" label="Select a subject">Select a subject</option>
             {% for folder in folders %}
-                <option data-href="{{ routeLookup('learning.getGradesForSubject', {studentId: student.id, termCode: term.code, subjectId: folder.id }) }}" {% if folder.id == subject.id %}selected{% endif %} value="{{ folder.id }}">{{ folder.name }} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %}, {% endif %}{% endfor %})</option>
+                <option data-href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: term.code, subjectId: folder.id }) }}" {% if folder.id == subject.id %}selected{% endif %} value="{{ folder.id }}">{{ folder.name }} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %}, {% endif %}{% endfor %})</option>
             {% endfor %}
         </select>
     </div>
