@@ -1,0 +1,74 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+
+{% set attempt = participant.findMostRecentResponse %}
+{% set review  = attempt.findMostRecentFeedback %}
+
+{% set actionStyle = review.published or not attempt.submitted ? 'display:none;' : '' %}
+
+<div class="row">
+{% if participant.allResponses | length %}
+
+    <div class="small-12 large-4 column">
+    {% set urgencyClass = review ? urgency.marks(review.normalisedMark) : '' %}
+
+    {% if attempt %}
+        {% if attempt.submitted %}
+            {% if review %}
+                <p class="grade {{ urgencyClass }}">
+                    <span>{{ review.humanReadableMark }}</span>
+                </p>
+            {% else %}
+                {#<a href="#" class="button expand">Review</a>#}
+                <h4>Awaiting Review</h4>
+            {% endif %}
+        {% else %}
+            <h4>In Progress</h4>
+        {% endif %}
+    {% else %}
+        &ndash;
+    {% endif %}
+    </div>
+    <div class="small-12 large-8 column">
+        {% set dt = 'small-6 large-3' %}
+        {% set dd = 'small-6 large-9' %}
+
+        <dl class="inline-dl">
+
+            {% if attempt.submitted %}
+            <dt class="{{ dt }}">Finish</dt>
+            <dd class="{{ dd }}">
+                {% if attempt.submittedAt.null %}&ndash;{% else %}{{ attempt.submittedAt.local }}{% endif %}
+            </dd>
+
+            <dt class="{{ dt }}">Time Taken</dt>
+            <dd class="{{ dd }}">
+                {% if attempt.submittedAt.null %}In Progress...{% else %}{{ attempt.submittedAt.diffInSeconds(attempt.createdAt) | hms }}{% endif %}
+            </dd>
+            {% endif %}
+
+            {% if multipleResponses %}
+            <dt class="{{ dt }}">Previous Attempts</dt>
+            <dd class="{{ dd }}">
+                {{ participant.allResponses | length - 1 }}
+            </dd>
+            {% endif %}
+
+        </dl>
+    </div>
+{% endif %}
+    <div class="row">
+        <div class="small-12 column">
+            <div class="component-action">
+                <section>
+                    <div style="{{ actionStyle }}" data-interaction-draft>
+                        {%- spaceless %}
+                            <a class="button" href="#" data-interaction-delete="{{ attempt.id }}">Delete Attempt</a>
+                            <a class="button" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
+                        {% endspaceless -%}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
