@@ -158,22 +158,28 @@ class Markbook
             // Render all stats as percentages for now?
             $markScheme = new Percentage();
 
+            // Just get marks for all students, and let the summators do the rest.
+            $normMarks = [];
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
+            }
+
             $statistics = [
                 'mean'              => null,
                 'sd'                => null,
-                'min'               => $markScheme->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
-                'minNormalized'     => $minSummator->summateSingleAssessable($assessment, true),
-                'max'               => $markScheme->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
-                'maxNormalized'     => $maxSummator->summateSingleAssessable($assessment, true),
-                'count'             => $countSummator->summateSingleAssessable($assessment, true),
+                'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
+                'minNormalized'     => $minSummator->summateList($normMarks),
+                'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
+                'maxNormalized'     => $maxSummator->summateList($normMarks),
+                'count'             => $countSummator->summateList($normMarks),
             ];
 
             // mean and SD are only meaningful for quantitative marks
             if ($assessment->getMarkScheme()->isQuantitative()) {
-                $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true));
-                $statistics['meanNormalized']   = $meanSummator->summateSingleAssessable($assessment, true);
-                $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true));
-                $statistics['sdNormalized']     = $stdevSummator->summateSingleAssessable($assessment, true);
+                $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+                $statistics['meanNormalized']   = $meanSummator->summateList($normMarks);
+                $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
+                $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
             }
 
             $this->assessmentStatistics[$assessment->getId()] = $statistics;
