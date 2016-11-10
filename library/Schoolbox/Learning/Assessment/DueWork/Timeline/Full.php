@@ -91,6 +91,24 @@ class Full
                  * in the timeline
                  */
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+
+                    /* Students should also be able to view crocodoc annotations
+                     * but we don't store them separately. They actually share
+                     * the same uuid, you just download them with different
+                     * querystring params to utilise editable/noneditable modes
+                     *
+                     * Therefore augment each $currentFeedback's file list with
+                     * all the crocodocable ones from $currentResponse. Note that
+                     * this won't apply to floating feedbacks as these won't be
+                     * directly related to a particular response, and crocodoc
+                     * annotations won't exist
+                     */
+                    foreach ($currentResponse->getAllFiles() as $currentFile) {
+                        if (strlen($currentFile->getCrocodocId())) {
+                            $currentFeedback->getAllFiles()->add($currentFile);
+                        }
+                    }
+
                     $processedFeedback[] = $currentFeedback->getId();
                 }
             }

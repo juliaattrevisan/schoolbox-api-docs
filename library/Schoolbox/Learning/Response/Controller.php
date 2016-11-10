@@ -16,7 +16,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 
-use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
@@ -62,7 +61,7 @@ class Controller extends Base
          * Ram in some temporary responses so that I
          * can make the Submission History section
          */
-        (new TemporaryDataDecorator())->decorate($assessment);
+        (new TemporaryResponse())->produceResponse($assessment);
 
         $data = [
             'assessment' => $assessment,
