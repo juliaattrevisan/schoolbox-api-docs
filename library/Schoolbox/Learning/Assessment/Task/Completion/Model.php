@@ -25,7 +25,7 @@ class Model extends AbstractResponse
      */
     public function getSubmittedAt()
     {
-        return $this->getUpdatedAt();
+        return $this->getCreatedAt();
     }
 
     /* Tasks always return Null marks for Feedbacks
@@ -70,4 +70,16 @@ class Model extends AbstractResponse
 
         return null;
     }
+
+
+    /**
+     * This response is submitted (no longer a draft)
+     *
+     * @return bool
+     */
+    public function isSubmitted()
+    {
+        return true;
+    }
+
 }
