@@ -6,7 +6,7 @@ ALTER TABLE `storage` ENGINE=INNODB;
 ALTER TABLE `student_submission`
     ADD `created_at` DATETIME NOT NULL AFTER `uuid`,
     ADD `updated_at` DATETIME NOT NULL AFTER `created_at`,
-    CHANGE COLUMN `submitted` `submitted_at` DATETIME NOT NULL AFTER `updated_at`,
+    CHANGE COLUMN `submitted` `submitted_at` DATETIME NULL DEFAULT NULL AFTER `updated_at`,
     ADD `deleted_at` DATETIME NULL DEFAULT NULL AFTER `submitted_at`
 ;
 
