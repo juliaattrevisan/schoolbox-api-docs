@@ -118,6 +118,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
+                // TODO figure out if this is the right field
+                ->setPublishedAt($attempt->getReviewed())
             ;
 
             // TODO populate individual answers
@@ -139,12 +141,26 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         return $quizResponses;
     }
+
+    /**
+     * @param Collection|QuizFeedback[] $domainObjects
+     * @return GenericCollection|QuizAttempt[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(QuizAttempt::class);
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = (new QuizAttempt())
+                ->setId($domainObject->getId())
+                ->setUser($domainObject->getReviewee())
+                ->setStart($domainObject->getCreatedAt())
+                ->setFinish($domainObject->getUpdatedAt())
+                ->setDeleted($domainObject->getDeletedAt())
+                ->setReviewed($domainObject->getPublishedAt());
+            $dataModels->add($dataModel);
+        }
+
+        return $dataModels;
+    }
 }
-
-
-
-
-
-
-
-

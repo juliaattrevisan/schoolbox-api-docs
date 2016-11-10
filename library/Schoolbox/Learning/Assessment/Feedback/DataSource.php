@@ -62,4 +62,53 @@ class DataSource implements IFeedbackDataSource
         }
         return $assessments;
     }
+
+    /**
+     * @param IFeedback $feedback
+     */
+    public function save(IFeedback $feedback)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($feedback->getAssessable())) {
+                $subSource->save($feedback);
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param IFeedback $feedback
+     */
+    public function delete(IFeedback $feedback)
+    {
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($feedback->getAssessable())) {
+                $subSource->delete($feedback);
+                return;
+            }
+        }
+    }
+
+
+    /**
+     * Creates a new model appropriate to the target assessment
+     *
+     * @param IAssessable $target
+     * @return IFeedback
+     */
+    public function createModel(IAssessable $target)
+    {
+        /** @var IFeedback $feedback */
+        $feedback = null;
+
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($target)) {
+                $feedback = $subSource->createModel($target);
+                $feedback->setAssessable($target);
+            }
+        }
+
+        return $feedback;
+    }
+
 }

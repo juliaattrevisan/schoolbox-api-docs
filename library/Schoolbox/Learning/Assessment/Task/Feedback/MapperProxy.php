@@ -94,7 +94,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|Completion[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|TaskFeedback[]
      */
     protected function transformModels(Collection $mapperModels)
     {
@@ -119,6 +119,27 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $taskFeedbacks;
+    }
+
+    /**
+     * @param Collection|TaskFeedback[] $domainObjects
+     * @return GenericCollection|Completion[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(Completion::class);
+
+        foreach ($domainObjects as $domainObject) {
+            // TODO add task ID - map from assessment ID somehow
+            // TODO add completion status once markbook is merged
+            $dataModel = (new Completion())
+                ->setStudent($domainObject->getReviewee())
+                ->setMarkingUser($domainObject->getReviewer())
+                ->setCompletionDate($domainObject->getCreatedAt());
+            $dataModels->add($dataModel);
+        }
+
+        return $dataModels;
     }
 }
 

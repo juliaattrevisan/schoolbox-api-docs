@@ -127,6 +127,29 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         return $quizResponses;
     }
+
+    /**
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(DataObject::class);
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = (new DataObject())
+                ->setId($domainObject->getId())
+                ->setUser($domainObject->getSubmittedOnBehalfOf())
+                ->setStart($domainObject->getCreatedAt())
+                ->setFinish($domainObject->getUpdatedAt())
+                ->setDeleted($domainObject->getDeletedAt());
+                // TODO reviewed field probably needs to be set somehow
+//                ->setReviewed($domainObject->getPublishedAt());
+            $dataModels->add($dataModel);
+        }
+
+        return $dataModels;
+    }
 }
 
 

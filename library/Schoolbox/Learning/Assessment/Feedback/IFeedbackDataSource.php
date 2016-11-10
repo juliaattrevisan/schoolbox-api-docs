@@ -31,4 +31,27 @@ interface IFeedbackDataSource
      * @return Collection|IFeedback[]
      */
     public function findForAssessment(IAssessable $assessment);
+
+    /**
+     * Saves a feedback.
+     *
+     * @param IFeedback $feedback
+     */
+    public function save(IFeedback $feedback);
+
+    /**
+     * Soft-deletes a feedback.
+     *
+     * @param IFeedback $feedback
+     */
+    public function delete(IFeedback $feedback);
+
+
+    /**
+     * Creates a new model appropriate to the target assessment
+     *
+     * @param IAssessable $target
+     * @return IFeedback
+     */
+    public function createModel(IAssessable $target);
 }

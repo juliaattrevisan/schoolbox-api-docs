@@ -80,7 +80,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|SubmissionReturn[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|DueWorkFeedback[]
      */
     protected function transformModels(Collection $mapperModels)
     {
@@ -110,6 +110,36 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $dueWorkFeedbacks;
+    }
+
+    /**
+     * @param Collection|DueWorkFeedback[] $domainObjects
+     * @return GenericCollection|SubmissionReturn[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(SubmissionReturn::class);
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = (new SubmissionReturn())
+                ->setOwner($domainObject->getReviewee())
+                ->setMarker($domainObject->getReviewer())
+                ->setComment($domainObject->getComment())
+                ->setNormalizedMark($domainObject->getNormalisedMark())
+                ->setMark($domainObject->getHumanReadableMark())
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setDeletedAt($domainObject->getDeletedAt());
+
+            // Attach file (only first)
+            foreach ($domainObject->getAllFiles() as $file) {
+                $dataModel->setStorage($file);
+                break;
+            }
+
+            $dataModels->add($dataModel);
+        }
+
+        return $dataModels;
     }
 }
 

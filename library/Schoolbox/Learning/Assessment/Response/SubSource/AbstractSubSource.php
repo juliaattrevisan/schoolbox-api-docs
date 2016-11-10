@@ -48,4 +48,24 @@ abstract class AbstractSubSource implements IResponseDataSource
         }
         return new Collection();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function save(IResponse $response)
+    {
+        if ($this->recognizes($response->getAssessable())) {
+            $this->mapperProxy->save($response);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(IResponse $response)
+    {
+        if ($this->recognizes($response->getAssessable())) {
+            $this->mapperProxy->delete($response);
+        }
+    }
 }

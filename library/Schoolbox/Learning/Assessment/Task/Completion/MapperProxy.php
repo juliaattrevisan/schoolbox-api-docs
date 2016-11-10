@@ -96,7 +96,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Transforms the Mapper-generated models into the required type.
      *
      * @param Collection|Completion[] $mapperModels
-     * @return GenericCollection
+     * @return GenericCollection|TaskCompletion[]
      */
     protected function transformModels(Collection $mapperModels)
     {
@@ -105,7 +105,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
             $taskCompletion = (new TaskCompletion())
                 ->setId($completion->getId())
-                ->setSubmittedBy($completion->getStudent())
+                ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
@@ -114,6 +114,27 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $taskCompletions;
+    }
+
+    /**
+     * @param Collection|TaskCompletion[] $domainObjects
+     * @return GenericCollection|Completion[]
+     */
+    protected function transformDomainObjects(Collection $domainObjects)
+    {
+        $dataModels = new GenericCollection(Completion::class);
+
+        foreach ($domainObjects as $domainObject) {
+            // TODO add task ID - map from assessment ID somehow
+            // TODO add completion status once markbook is merged
+            $dataModel = (new Completion())
+                ->setStudent($domainObject->getSubmittedOnBehalfOf())
+                ->setMarkingUser($domainObject->getSubmittedBy())
+                ->setCompletionDate($domainObject->getCreatedAt());
+            $dataModels->add($dataModel);
+        }
+
+        return $dataModels;
     }
 }
 
