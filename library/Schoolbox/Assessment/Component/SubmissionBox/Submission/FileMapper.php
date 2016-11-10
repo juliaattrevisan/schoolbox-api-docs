@@ -184,15 +184,15 @@ class FileMapper extends Mapper
             SELECT
                 {$this->getColumnString('ss')},
                 {$boxJoin->getColumnString('sb')},
-                {$categoryJoin->getColumnString('c')},
-            FROM {$this->getTable()} ss
+                {$categoryJoin->getColumnString('c')}
+            FROM {$this->getTable()} `ss`
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
             AND sb.deleted IS FALSE
             AND ss.owner = :user_id
-            AND ss.draft IS FALSE
-            ORDER BY ss.submitted DESC
+            AND ss.submitted_at IS NOT NULL
+            ORDER BY ss.submitted_at DESC
             LIMIT :limit
         ";
 

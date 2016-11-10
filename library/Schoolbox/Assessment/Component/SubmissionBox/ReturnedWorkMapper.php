@@ -64,7 +64,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function getActivities($user_id, $limit, array $categories, array $visibilities = [ SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT ])
     {
-        // TODO - very unlikely this will work after DB schema migration to split tables
+        // TODO - SA-1308 This method has been commented out so the page can work without a fatal error.
+        // Need to update the query below, and build the new object graph, then use it accordingly in
+        // all callers to this method.
+        return new Schoolbox\Collection();
 
         //
         // User mapper: I want to know if the user (requesting user, not user
@@ -143,7 +146,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             'sb.category = :category',
             'sr.owner = :student',
             'sb.deleted IS FALSE',
-            'sb.task_id IS NULL',
         );
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
@@ -170,7 +172,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				sb.id AS box_id,
 				sr.mark,
 				sr.norm_mark,
-				sr.returned,
+				sr.published_at,
 				sr.comment,
 				sb.weight,
 				sb.mark_type,
@@ -178,7 +180,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
-			ORDER BY sr.returned DESC
+			ORDER BY sr.published_at DESC
 		";
         $statement = $this->database->prepare($query);
         $statement->execute($params);
