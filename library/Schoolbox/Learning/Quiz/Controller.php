@@ -82,6 +82,16 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->to("/assess/intro/$assessId");
     }
 
+    /**
+     * @api   GET /learning/quiz/{assessmentId}/{userId}/attempts
+     * @param int $assessmentId
+     * @param int $userId
+     */
+    public function getQuizAttemptsByUser($assessmentId, $userId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/attempts/$assessId/$userId");
+    }
 
     /**
      * Converts an assessment_id to an assess_id

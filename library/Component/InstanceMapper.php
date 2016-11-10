@@ -572,7 +572,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
      * @param string       $controller
      * @return Component_Instance
      */
-    public function injectNewComponent(Folder\Model $folder, array $config = [], $controller = Component_Homepage_CourseOutlineController::class)
+    public function injectNewComponent(Folder\Model $folder, array $config = [], $controller =  \Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller::class)
     {
         $definitionMapper = \Component_DefinitionMapper::getInstance(); // $this->getComponentDefinitionMapper();
         $configDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();

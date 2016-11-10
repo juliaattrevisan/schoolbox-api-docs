@@ -1,5 +1,29 @@
-{% if _writable %}
-    {% include '@learningAssessment/builder/task/writable.twig' %}
-{% else %}
-    {% include '@learningAssessment/builder/task/readonly.twig' %}
-{% endif %}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<li class="actions-small-1" data-task_id="{{ task.id }}">
+    <div class="grip compact"></div>
+    <div class="list-item">
+        <div class="card small-12 compact wrap-down">
+            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}">
+                <span class="{{ icon.renderClass(task) }}"></span>
+                <p>{{ task.title }}</p>
+            </a>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ task.id }}"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
+        <li><a href="/task/export/{{ task.id }}?returnUrl={{ returnUrl }}" data-reveal-id="export-modal-{{ task.id }}" data-reveal-ajax="true" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: task.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
+        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
+    </ul>
+    <div data-reveal class="reveal-modal" id="export-modal-{{ task.id }}"></div>
+    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
+        <input type="hidden" name="action"    value="delete" />
+        <input type="hidden" name="id"        value="{{ task.id }}" />
+        <input type="hidden" name="category"  value="{{ unit.id }}"/>
+        <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
+        <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
+    </form>
+</li>

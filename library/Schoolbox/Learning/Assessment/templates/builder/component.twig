@@ -1,25 +1,19 @@
 {% if breadcrumbs | length %}
-    <div class="content">
-        <ul class="breadcrumb">
-            <li>
-                {% for node in breadcrumbs %}
-                    <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
-                {% endfor %}
-            </li>
-        </ul>
-    </div>
+<ul class="breadcrumb">
+    <li>
+        {% for node in breadcrumbs %}
+            <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
+        {% endfor %}
+    </li>
+</ul>
 {% endif %}
 
-{% if canRead %}
-    {% include '@learningAssessment/builder/unit.twig' with { unit: unit, '_writable': canWrite } %}
-{% endif %}
+{% include '@learningAssessment/builder/unit.twig' with { unit: unit } %}
 
-{% if canWrite %}
-    <div class="component-action">
-        <section>
-            <a class="button" href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}" title="Create a new activity">
-                Create Activity
-            </a>
-        </section>
-    </div>
-{% endif %}
+<div class="component-action">
+    <section>
+        <a class="button" href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}" title="Create a new activity">
+            Create Activity
+        </a>
+    </section>
+</div>
