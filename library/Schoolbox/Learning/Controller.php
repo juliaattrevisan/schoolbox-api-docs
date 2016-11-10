@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Assessable\DataSource as AssessableDataSource;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Count;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
@@ -71,6 +72,11 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
+     * @var AssessableDataSource
+     */
+    protected $assessableDataSource;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper            $errorMapper
@@ -80,6 +86,7 @@ class Controller extends Base
      * @param FolderMapper           $folderMapper
      * @param GradeGroup             $gradeGroup
      * @param ShowcaseMapper         $showcaseMapper
+     * @param AssessableDataSource   $assessableDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -88,7 +95,8 @@ class Controller extends Base
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $gradeGroup,
-        ShowcaseMapper $showcaseMapper
+        ShowcaseMapper $showcaseMapper,
+        AssessableDataSource $assessableDataSource
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -97,6 +105,7 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setGradeGroup($gradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
+        $this->setAssessableDataSource($assessableDataSource);
     }
 
     /**
@@ -310,31 +319,36 @@ class Controller extends Base
             $term = $this->getTermMapper()->findForToday();
         }
 
-        // Grab all the folders that the student submitted to in the term
-
-        $folders = $this->getFolderMapper()->findFoldersWithSubmissions($student, $term);
-
         // Storage for each folders markbook
 
         $markbooks = [];
+        $markbooksFolders = [];
 
-        /** @var Folder $folder */
-        foreach ($folders as $folder) {
+        // Keep a collection of all folders for use in the dropdown
 
-            // Get all the assessments for the folder
+        $folders = new Collection;
 
-            $assessments = $this->getAssessmentMapperProxy()->findAllForContext($folder)->sortBy('dueAt', 'asc');
+        $assessments = $this->getAssessableDataSource()->findForUser($student, $term);
 
-            // Grab all the participants
+        /** @var IAssessable $assessment */
+        foreach ($assessments as $assessment) {
+            $folder = $assessment->getContext()->getFolder();
 
-            /** @var IAssessable $assessment */
-            foreach ($assessments as $assessment) {
-                $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+            if ($folder instanceof Folder) {
+                if (!isset($foldersFound[$folder->getId()])) {
+
+                    if (!isset($markbooksFolders[$folder->getId()])) {
+                        $markbooksFolders[$folder->getId()] = new Collection();
+                        $folders->add($folder);
+                    }
+
+                    $markbooksFolders[$folder->getId()]->add($assessment);
+                }
             }
+        }
 
-            // Let markbook calculate the statistics
-
-            $markbooks[$folder->getId()] = (new Markbook($assessments))->getStudentStatistics()[$student->getId()];
+        foreach ($markbooksFolders as $folderId => $assessments) {
+            $markbooks[$folderId] = (new Markbook($assessments))->getStudentStatistics()[$student->getId()];
         }
 
         // Squish this mess out
@@ -541,6 +555,24 @@ class Controller extends Base
         $this->participantDataSource = $participantDataSource;
         return $this;
     }
+
+    /**
+     * @return AssessableDataSource
+     */
+    protected function getAssessableDataSource()
+    {
+        return $this->assessableDataSource;
+    }
+
+    /**
+     * @param AssessableDataSource $assessableDataSource
+     * @return static
+     */
+    protected function setAssessableDataSource(AssessableDataSource $assessableDataSource)
+    {
+        $this->assessableDataSource = $assessableDataSource;
+        return $this;
+    }    
 
     /**
      * @return TermMapper

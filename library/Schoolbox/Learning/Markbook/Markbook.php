@@ -152,6 +152,7 @@ class Markbook
         $maxSummator      = new Maximum();
         $weightedSummator = new WeightedAverage();
         $countSummator    = new Count();
+
         foreach ($this->getAssessments() as $assessment) {
 
             // Summator for assessment statistics:
@@ -205,6 +206,7 @@ class Markbook
         $overallMarkScheme = new LetterGrade(
             GradeGroupMapper::getInstance()->findById($defaultGradeGroup)
         );
+
         foreach ($this->getStudents() as $student) {
             $this->studentStatistics[$student->getId()]['mean'] =
                 $overallMarkScheme->getHumanReadableMark(

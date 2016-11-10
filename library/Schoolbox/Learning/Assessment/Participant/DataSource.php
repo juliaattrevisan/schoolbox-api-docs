@@ -19,6 +19,11 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 /**
  * The single source of truth for assessment participants.
@@ -60,6 +65,19 @@ class DataSource
      */
     protected $feedbackDataSource;
 
+    /** @var AssessmentMapperProxy */
+    protected $assessmentMapperProxy;
+
+    /**
+     * @var TermMapper
+     */
+    protected $termMapper;
+
+    /**
+     * @var folderMapper
+     */
+    protected $folderMapper;
+
     /**
      * Constructor
      *
@@ -68,19 +86,28 @@ class DataSource
      * @param UserMapper              $userMapper
      * @param ResponseDataSource      $responseDataSource
      * @param FeedbackDataSource      $feedbackDataSource
+     * @param TermMapper              $termMapper;
+     * @param FolderMapper            $folderMapper;
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
         External_ClassInterface $externalDb,
         UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         ResponseDataSource $responseDataSource,
-        FeedbackDataSource $feedbackDataSource
+        FeedbackDataSource $feedbackDataSource,
+        TermMapper $termMapper,
+        FolderMapper $folderMapper,
+        AssessmentMapperProxy $assessmentMapperProxy
     ) {
-        $this->externalDb         = $externalDb;
-        $this->userAccessMapper   = $userAccessMapper;
-        $this->userMapper         = $userMapper;
-        $this->responseDataSource = $responseDataSource;
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->externalDb               = $externalDb;
+        $this->userAccessMapper         = $userAccessMapper;
+        $this->userMapper               = $userMapper;
+        $this->responseDataSource       = $responseDataSource;
+        $this->feedbackDataSource       = $feedbackDataSource;
+        $this->termMapper               = $termMapper;
+        $this->folderMapper             = $folderMapper;
+        $this->assessmentMapperProxy    = $assessmentMapperProxy;
     }
 
     /**
@@ -98,6 +125,7 @@ class DataSource
      * @param IAssessable $assessment
      * @return Collection|Participant[]
      */
+
     public function findForAssessment(IAssessable $assessment)
     {
         // This will use:
@@ -205,61 +233,53 @@ class DataSource
     /**
      * @param IAssessable $assessment
      * @param User $user
-     * @throws \OutOfBoundsException
+     * @param bool $returnResponses
+     * @param bool $returnFeedbacks
      * @return Participant
      */
-    public function findForAssessmentAndUser(IAssessable $assessment, User $user)
+    public function findForAssessmentAndUser(IAssessable $assessment, User $user, $returnResponses = true, $returnFeedbacks = true)
     {
-        // Assume for now User is a Participant. We will perform a fall-back check later if required
         $participant = new Participant($user, $assessment);
 
-        // Find all Responses
-        foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-            if($response->getSubmittedOnBehalfOf() == $user){
-                $response->setAssessable($assessment);
-                $participant->getAllResponses()->setOffset($response->getId(), $response);
+        // Need to add them into the assessment
+        $assessment->setAllParticipants(
+            new Collection([$participant])
+        );
+
+        if ($returnResponses) {
+            // Add responses
+            foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
+                if ($response->getSubmittedOnBehalfOf()->getId() == $user->getId()) {
+                    $participant->getAllResponses()->add($response);
+                }
             }
         }
 
-        // Find all Feedback, and optionally link to Response
-        foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-            if($feedback->getReviewee() == $user){
-                $feedback->setAssessable($assessment);
-                $participant->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
-
-                // Feedbacks may have a stub response.
-                // If so, use it to find the actual response, and associate them together.
-                $stubResponse = $feedback->getResponse();
-
-                if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
-                    $stubResponseId = $stubResponse->getId();
-                    $response = $participant->getAllResponses()->getOffset($stubResponseId);
-                    if($response instanceof IResponse){
-                        $feedback->setResponse($response);
-                        $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
+        if ($returnFeedbacks) {
+            // Add feedback
+            foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
+                if ($feedback->getReviewee()->getId() == $user->getId()) {
+                    // Feedbacks may have a stub response.
+                    // If so, use it to find the actual response, and associate them together.
+                    $stubResponse = $feedback->getResponse();
+                    if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                        $stubResponseId = $stubResponse->getId();
+                        foreach ($participant->getAllResponses() as $response) {
+                            // For now assume that the types of response and feedback match
+                            if ($stubResponseId == $response->getId()) {
+                                $response->getAllFeedback()->add($feedback);
+                                $feedback->setResponse($response);
+                                break;
+                            }
+                        }
                     }
+
+                    $participant->getAllFeedbacks()->add($feedback);
                 }
             }
         }
 
-        // If Responses or Feedback, return
-        if($participant->getAllResponses()->count() || $participant->getAllFeedbacks()->count()){
-            return $participant;
-        }
-
-        // No Responses or Feedback, check if a member of the class
-        $externalUserArray = $this->externalDb->getStudents($assessment->getBaseContext()->getFolder()->getCodeString());
-
-
-        if(is_array($externalUserArray)) {
-            foreach ($externalUserArray as $externalUser) {
-                if ($user->getExternalId() == $externalUser['synergy_id']) {
-                    return $participant;
-                }
-            }
-        }
-
-        throw new \OutOfBoundsException("{$user->getFullName()} is not a participant of {$assessment->getTitle()}");
+        return $participant;
     }
 
     /**
