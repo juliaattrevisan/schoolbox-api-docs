@@ -4,6 +4,7 @@ ALTER TABLE `student_submission`
   DROP COLUMN `realname`,
   DROP COLUMN `marked`,
   DROP COLUMN `late`,
+  DROP COLUMN `draft`,
   DROP COLUMN `uuid`
 ;
 
