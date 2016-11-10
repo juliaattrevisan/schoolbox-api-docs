@@ -63,3 +63,31 @@
 {% block grading %}
     {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
 {% endblock %}
+
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(function () {
+
+            var assessmentList = $('#assessment-status');
+
+            assessmentList.on('click', '[data-interaction-delete]', function (e) {
+                e.preventDefault();
+
+                var $a = $(this);
+
+                $(this).confirmDialog({
+                    text: 'Whatever you do, don\'t.',
+                    confirmEvent: function () {
+                        $.post(
+                                '/assess/deleteAttempt',
+                                { attemptIds: [ $a.attr('data-interaction-delete') ]}
+                        ).always(function () {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
