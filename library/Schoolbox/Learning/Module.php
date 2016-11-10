@@ -40,8 +40,8 @@ class Module extends BaseModule
                 '/classes'                                => 'getClasses',
                 '/markbook/{classId}'                     => 'getMarkbook',
                 '/due/{userId}'                           => 'getDue',
-                '/grades/{studentId}{/termCode}'             => 'getGrades',
-                '/grades/{studentId}/{termCode}/{subjectId}' => 'getGradesForSubject',
+                '/grades/{userId}{/termCode}'             => 'getGrades',
+                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
             'POST' => []
         ];
@@ -131,7 +131,7 @@ class Module extends BaseModule
             '(?:getGrades|getGradesForSubject)',
             function ($params) {
                 try {
-                    $args['student'] = $this->getUserMapper()->findById($params['studentId']);
+                    $args['student'] = $this->getUserMapper()->findById($params['userId']);
                 } catch (MapperException $e) {
                     $args['student'] = null;
                 }
@@ -142,7 +142,7 @@ class Module extends BaseModule
                 }
                 if (array_key_exists('subjectId', $params)) {
                     try {
-                        $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
+                        $args['subject'] = $this->getFolderMapper()->findById($params['userId']);
                         $args['subject']->loadTeachers();
                     } catch (MapperException $e) {
                         $args['subject'] = $this->getFolderMapper()->createModel();

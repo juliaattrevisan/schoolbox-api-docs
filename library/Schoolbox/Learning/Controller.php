@@ -119,7 +119,7 @@ class Controller extends Base
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'studentId' => $this->getUser()->getId()
+                'userId' => $this->getUser()->getId()
             ]));
         }
 
@@ -257,7 +257,7 @@ class Controller extends Base
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'studentId' => $this->getUser()->getId()
+                'userId' => $this->getUser()->getId()
             ]));
         }
 
@@ -284,7 +284,7 @@ class Controller extends Base
     /**
      * Displays a list assessables that a student needs to complete
      *
-     * @api   GET /due/{studentId}
+     * @api   GET /due/{userId}
      * @level 165
      * @param User $viewee
      */
