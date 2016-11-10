@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 
@@ -39,9 +39,9 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
-     * @var GradeGroupMapper
+     * @var GradeGroup
      */
-    protected $gradeGroupMapper;
+    protected $defaultGradeGroup;
 
     /**
      * @var CourseImplementationDataSource
@@ -59,7 +59,7 @@ class Controller extends Base
      * @param ErrorMapper                    $errorMapper
      * @param AssessmentMapperProxy          $assessmentMapperProxy
      * @param Participant\DataSource         $participantDataSource
-     * @param GradeGroupMapper               $gradeGroupMapper
+     * @param GradeGroup                     $defaultGradeGroup
      * @param CourseImplementationDataSource $courseImplementationDataSource
      * @param TermMapper                     $termMapper
      */
@@ -67,14 +67,14 @@ class Controller extends Base
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Participant\DataSource $participantDataSource,
-        GradeGroupMapper $gradeGroupMapper,
+        GradeGroup $defaultGradeGroup,
         CourseImplementationDataSource $courseImplementationDataSource,
         TermMapper $termMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setParticipantDataSource($participantDataSource);
-        $this->setGradeGroupMapper($gradeGroupMapper);
+        $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setCourseImplementationDataSource($courseImplementationDataSource);
         $this->setTermMapper($termMapper);
     }
@@ -148,10 +148,7 @@ class Controller extends Base
         }
 
         // Build a markbook
-        $markbook = new Markbook(
-            $assessments,
-            $this->getGradeGroupMapper()->findById($this->getConfigLoader()->get('default_grade_group'))
-        );
+        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup());
 
         // And what is required for a context selector
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
@@ -249,20 +246,20 @@ class Controller extends Base
     }
 
     /**
-     * @return GradeGroupMapper
+     * @return GradeGroup
      */
-    public function getGradeGroupMapper()
+    public function getDefaultGradeGroup()
     {
-        return $this->gradeGroupMapper;
+        return $this->defaultGradeGroup;
     }
 
     /**
-     * @param GradeGroupMapper $gradeGroupMapper
+     * @param GradeGroup $defaultGradeGroup
      * @return static
      */
-    public function setGradeGroupMapper(GradeGroupMapper $gradeGroupMapper)
+    public function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
     {
-        $this->gradeGroupMapper = $gradeGroupMapper;
+        $this->defaultGradeGroup = $defaultGradeGroup;
         return $this;
     }
 

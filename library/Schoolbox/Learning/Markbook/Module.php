@@ -77,7 +77,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper'                    => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'gradeGroupMapper'               => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
+                'defaultGradeGroup'              => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
                 'participantDataSource'          => $injector->lazyGet('participantDataSource'),
                 'courseImplementationDataSource' => $injector->lazyGet('courseImplementationDataSource'),
