@@ -4,9 +4,10 @@ ALTER TABLE `storage` ENGINE=INNODB;
 
 -- Add missing CRUD timestamps
 ALTER TABLE `student_submission`
-    CHANGE COLUMN `submitted` `submitted` DATETIME NOT NULL AFTER `uuid`,
-    ADD `updated_at` DATETIME NOT NULL,
-    ADD `deleted_at` DATETIME NULL DEFAULT NULL
+    ADD `created_at` DATETIME NOT NULL AFTER `uuid`,
+    ADD `updated_at` DATETIME NOT NULL AFTER `created_at`,
+    CHANGE COLUMN `submitted` `submitted_at` DATETIME NOT NULL AFTER `updated_at`,
+    ADD `deleted_at` DATETIME NULL DEFAULT NULL AFTER `submitted_at`
 ;
 
 -- Submission file table
@@ -40,6 +41,7 @@ CREATE TABLE `student_submission_file` (
 -- Heuristic for whether a file is editable inline:
 -- * name is "Online Assessment" or "online-assessment"
 -- * type is "text/html"
+-- Deleted if the parent Assessment is deleted
 INSERT INTO `student_submission_file` (
     `student_submission_id`,
     `hash`,
@@ -47,7 +49,8 @@ INSERT INTO `student_submission_file` (
     `editable_inline`,
     `uuid`,
     `created_at`,
-    `updated_at`
+    `updated_at`,
+    `deleted_at`
 )
 SELECT
     `ss`.`id`,
@@ -55,9 +58,12 @@ SELECT
     `ss`.`realname`,
     (IF(`aft`.`mime` = 'text/html' AND `ss`.`realname` IN ('Online Submission', 'online-submission'), TRUE, FALSE)),
     `ss`.`uuid`,
-    `ss`.`submitted`,
-    `ss`.`submitted`
+    `ss`.`submitted_at`,
+    `ss`.`submitted_at`,
+    `a`.`deleted_at`
 FROM `student_submission` `ss`
 INNER JOIN `storage` `st` ON `ss`.`hash` = `st`.`hash`
 LEFT JOIN `allowedFileExtension` `afe` ON `st`.`ext` = `afe`.`extension`
-LEFT JOIN `allowedFileTypes` `aft` ON `afe`.`fileTypeID` =`aft`.`fileTypeID`;
+LEFT JOIN `allowedFileTypes` `aft` ON `afe`.`fileTypeID` =`aft`.`fileTypeID`
+JOIN `submission_box` `sb` ON `ss`.`box_id` = `sb`.`id`
+JOIN `assessment` `a` ON `sb`.`assessment_id` = `a`.`id`;
