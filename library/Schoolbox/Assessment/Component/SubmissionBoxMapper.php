@@ -461,7 +461,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			r.norm_mark,
 			r.comment,
 			b.mark_visibility,
-			b.created, s.submitted, r.returned
+			b.created, s.submitted_at, r.published_at
 			FROM submission_box b
 			LEFT JOIN folder c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
@@ -469,7 +469,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN lu_submission_type f ON b.type = f.id
 			WHERE $wherePart
 			GROUP BY b.id
-			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
+			ORDER BY categoryName, b.created DESC, s.submitted_at DESC, r.published_at DESC
 		";
 
         $statement = $this->database->prepare($query);
