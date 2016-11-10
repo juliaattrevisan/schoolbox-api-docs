@@ -122,76 +122,13 @@
         {% endif %}
     </div>
 </div>
-<div class="toast" data-alert data-save-draft></div>
 
 <script type="text/javascript">
     $(function () {
-
-        var formSaveLabel  = $('[data-save-draft]');
         var assessmentList = $('#assessment-status');
         var filters        = $('#filters');
         var emptyFilter    = $('#empty-filter');
-
-        $('[data-combobox]').combobox({{ errors | json_encode | raw }});
-
-        assessmentList
-            .on('change keydown paste keypress', 'textarea', function () {
-                var $form = $(this).closest('form');
-                $form.find('[data-interaction-draft]').slideDown();
-            })
-            .on('focus', ':input', function () {
-                // stash the current state, so we can compare on blur and prevent unnecessary firing
-                $(this).data('preval', $(this).val());
-            })
-            .on('blur', ':input', function () {
-
-                // do a preval comparison to find out if we can skip AJAX
-                if ($(this).val() == $(this).data('preval')) {
-                    return;
-                }
-
-                var $form = $(this).closest('form');
-
-                var data = {
-                    type: $form.attr('method'),
-                    dataType: 'json',
-                    data: $form.serializeArray()
-                };
-
-                formSaveLabel.toastActivate({
-                    text: 'Autosaving'
-                });
-
-                $.ajax($form.attr('action'), data)
-                 .done(function () {
-                     toast.apply($form, arguments);
-
-                     var $li = $form.closest('[data-status]');
-
-                     $li.attr('data-status', '{{ statusComplete }}');
-
-                     $li.find('.progress-tick')
-                        .removeClass('{{ statusIncomplete }} {{ statusPending }}')
-                        .addClass('{{ statusComplete }}');
-
-                     $('#filters').find('[data-status="complete"]').prop('checked', true);
-
-                     console.log(this);
-                 })
-                 .fail(function () { toast.apply($form, arguments); })
-                 .always(function () { toast.apply($form, arguments); });
-            });
-
-        function toast(arguments) {
-//            console.log(arguments);
-
-            formSaveLabel.toastTimeout({
-                text: 'Draft Saved',
-                css: 'success'
-            });
-
-            this.find('[data-interaction-draft]').slideDown();
-        }
+        var filterShowAll  = $('#filter-show-all');
 
         filters.on('change', 'input', function () {
             var $in = $(this);
@@ -214,9 +151,11 @@
             }
         });
 
-        $('#filter-show-all').on('click', function (e) {
+        filterShowAll.on('click', function (e) {
             e.preventDefault();
             filters.find('[type=checkbox]').prop('checked', true).trigger('change');
         });
     });
 </script>
+{% block scripts %}
+{% endblock %}
