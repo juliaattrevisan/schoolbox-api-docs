@@ -203,11 +203,11 @@
                                            data-interaction="update_progress"></a>
                                     {% endif %}
                                 {% else %}
-                                    {% set normalisedMark = mostRecentFeedback.normalisedMark %}
+                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.mostRecentFeedback.comment }}">
-                                        {{ normalisedMark | default('–') }}
+                                        {{ assessment.getHumanReadableMark(student, true) | default('–') }}
                                     </a>
                                 {% endif %}
                             {% else %}
