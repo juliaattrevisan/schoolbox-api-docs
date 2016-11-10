@@ -63,6 +63,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Get the current folder and hydrate its parent
         $folder = $this->getSource();
 
+        if($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+            return false;
+        }
+
         // Get the units details
         try {
             $unit = $this->getUnitSpecificationMapperProxy()->findByFolderId($this->getSource()->getId());
@@ -71,22 +75,18 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'unit'   => $unit,
                 'tasks'  => $this->getAssessmentMapperProxy()->findAllForContext($unit),
                 'usages' => $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
+                'returnUrl'  => $_GET["page"],
             ];
-        }
-        catch(MapperException $e) {
+        } catch (MapperException $e) {
 
         }
 
-        $data = array_merge($data, [
-            'canRead'     => $this->getContentPermission() >= UserAccess::ACCESS_READ,
-            'canWrite'    => $this->getContentPermission() >= UserAccess::ACCESS_WRITE,
-            'returnUrl'   => $_GET["page"],
-            'breadcrumbs' => [],
-        ]);
+        $data['componentInstance'] = $this->getInstance();
+
 
         // Retrieve all of the parents for use as breadcrumbs
         if ($this->getContext() instanceof FolderModel) {
-            foreach (FolderMapper::getInstance()->findParents($folder,null,true) as $parent) {
+            foreach (FolderMapper::getInstance()->findParents($folder, null, true) as $parent) {
                 $data['breadcrumbs'][] = $parent;
             }
         }
