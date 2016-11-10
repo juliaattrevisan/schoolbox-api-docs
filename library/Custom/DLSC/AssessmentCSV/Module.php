@@ -28,8 +28,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        //exit($basePath);
-        $this->addGetRoute($router, 'getIndex', $basePath, '/index');
+        $this->addGetRoute($router, 'generate', $basePath, '/generate');
+        $this->addGetRoute($router, 'download', $basePath, '/download');
     }
 
     /**
@@ -47,17 +47,9 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF)
         );
 
-        $this->addRoutePermission($authorizer, 'getIndex', $permissionIndex);
+        $this->addRoutePermission($authorizer, 'generate', $permissionIndex);
+        $this->addRoutePermission($authorizer, 'download', $permissionIndex);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-
-    }
-
 
     /**
      * {@inheritdoc}
