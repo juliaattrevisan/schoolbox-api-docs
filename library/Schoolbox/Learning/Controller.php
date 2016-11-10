@@ -48,7 +48,7 @@ class Controller extends Base
     /**
      * @var GradeGroup
      */
-    protected $gradeGroup;
+    protected $defaultGradeGroup;
 
     /**
      * @var FolderMapper
@@ -68,25 +68,25 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper            $errorMapper
-     * @param TermMapper             $termMapper
-     * @param FolderMapper           $folderMapper
-     * @param GradeGroup             $gradeGroup
-     * @param ShowcaseMapper         $showcaseMapper
-     * @param AssessableDataSource   $assessableDataSource
+     * @param ErrorMapper          $errorMapper
+     * @param TermMapper           $termMapper
+     * @param FolderMapper         $folderMapper
+     * @param GradeGroup           $defaultGradeGroup
+     * @param ShowcaseMapper       $showcaseMapper
+     * @param AssessableDataSource $assessableDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
         FolderMapper $folderMapper,
         TermMapper $termMapper,
-        GradeGroup $gradeGroup,
+        GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
         AssessableDataSource $assessableDataSource
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setTermMapper($termMapper);
         $this->setFolderMapper($folderMapper);
-        $this->setGradeGroup($gradeGroup);
+        $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setAssessableDataSource($assessableDataSource);
     }
@@ -283,7 +283,7 @@ class Controller extends Base
         }
 
         foreach ($markbooksFolders as $folderId => $assessments) {
-            $markbooks[$folderId] = (new Markbook($assessments))->getStudentStatistics()[$student->getId()];
+            $markbooks[$folderId] = (new Markbook($assessments, $this->getDefaultGradeGroup()))->getStudentStatistics()[$student->getId()];
         }
 
         // Squish this mess out
@@ -319,7 +319,7 @@ class Controller extends Base
 
         // Let markbook calculate the statistics
 
-        $markbook = new Markbook($assessments);
+        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
@@ -506,18 +506,18 @@ class Controller extends Base
     /**
      * @return GradeGroup
      */
-    protected function getGradeGroup()
+    protected function getDefaultGradeGroup()
     {
-        return $this->gradeGroup;
+        return $this->defaultGradeGroup;
     }
 
     /**
-     * @param GradeGroup $gradeGroup
+     * @param GradeGroup $defaultGradeGroup
      * @return static
      */
-    protected function setGradeGroup(GradeGroup $gradeGroup)
+    protected function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
     {
-        $this->gradeGroup = $gradeGroup;
+        $this->defaultGradeGroup = $defaultGradeGroup;
         return $this;
     }
 

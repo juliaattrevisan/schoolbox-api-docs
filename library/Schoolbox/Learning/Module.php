@@ -178,7 +178,8 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'errorMapper'       => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'defaultGradeGroup' => $this->getInjector()->get('defaultGradeGroup'),
             ])
         );
     }
