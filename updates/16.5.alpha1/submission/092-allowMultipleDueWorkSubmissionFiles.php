@@ -1,6 +1,6 @@
 <?php
 /**
- * After adding new columns in preceding SQL file, this script populates those fields
+ * After adding new columns to 'student_submission' in preceding SQL file, this script populates those fields
  *
  * `created_at`      FROM `submitted_at`
  * `updated_at`      FROM `submitted_at`
