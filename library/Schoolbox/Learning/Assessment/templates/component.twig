@@ -2,10 +2,10 @@
 <section>
     {% set createRoute -%}
         {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
-        {%- if assessmentType -%}
-            ?type={{ assessmentType }}
-        {%- endif -%}
     {%- endset %}
+    {% if createRoute and assessmentType  %}
+        {% set createRouteType = createRouteType ~ 'type=' ~ assessmentType -%}
+    {% endif %}
 
     <ul class="action-list">
         {% for assessable in assessables %}
@@ -16,17 +16,13 @@
 
         {% endfor %}
     </ul>
+    {% if createRoute %}
     <div class="component-action">
         <section>
-            {# TODO: Replace hrefs with routeLookup #}
-            {% if user.role.isStudent %}
-                <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View Grades</a>
-            {% endif %}
-            {% if createRoute %}
-                <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
-            {% endif %}
+                <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>
         </section>
     </div>
+    {% endif %}
 </section>
 <script type="text/javascript">
     $(function () {
