@@ -11,7 +11,6 @@ use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
@@ -28,6 +27,11 @@ class Model implements IFile
     use DeletedAtDate;
 
     /**
+     * @var File
+     */
+    protected $submission;
+
+    /**
      * @var string
      */
     protected $uuid;
@@ -42,10 +46,7 @@ class Model implements IFile
      */
     protected $plagscan;
 
-    /**
-     * @var File
-     */
-    protected $submission;
+
 
     /**
      * Owner is inferred from the submission's owner.
@@ -55,14 +56,6 @@ class Model implements IFile
     public function getOwner()
     {
         return $this->getSubmission()->getOwner();
-    }
-
-    /**
-     * Creation date is inferred from submission's creation date.
-     */
-    public function getCreatedAt()
-    {
-        return $this->getSubmission()->getCreatedAt();
     }
 
     /**
