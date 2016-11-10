@@ -462,6 +462,13 @@ class Bootstrap implements BootstrapInterface {
                         )
                     );
 
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'hms',
+                            array('Alaress_Date_Format', 'timestampToHms')
+                        )
+                    );
+
                     // Bytes to string filter
                     $twig->addFilter(
                         new Twig_SimpleFilter(
