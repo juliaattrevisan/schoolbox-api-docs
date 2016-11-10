@@ -1,6 +1,10 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
+{% set statusIncomplete = 'incomplete' %}
+{% set statusPending    = 'pending'    %}
+{% set statusComplete   = 'complete'   %}
+
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 <script src="/javascript/shared/jquery.toast-timeout.js" type="text/javascript"></script>
 
@@ -11,10 +15,37 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Status of {{ assessment.title }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 large-4 columns">
         <ul class="meta">
             <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
             <li class="icon-calendar">Due {{ assessment.dueAt.relative }} on {{ assessment.dueAt.localShort }}</li>
         </ul>
+    </div>
+    <div class="small-12 large-8 columns text-right">
+        <ul class="filters" id="filters">
+            <li>
+                <input type="checkbox" id="filter-incom" checked="checked" data-status="{{ statusIncomplete }}" />
+                <label for="filter-incom">
+                    <span class="progress-tick tiny"></span> Not Attempted
+                </label>
+            </li>
+            <li>
+                <input type="checkbox" id="filter-act" checked="checked" data-status="{{ statusPending }}" />
+                <label for="filter-act">
+                    <span class="progress-tick tiny pending"></span> Action Required
+                </label>
+            </li>
+            <li>
+                <input type="checkbox" id="filter-comp" checked="checked" data-status="{{ statusComplete }}" />
+                <label for="filter-comp">
+                    <span class="progress-tick tiny complete"></span> Complete
+                </label>
+            </li>
+        </ul>
+
     </div>
 </div>
 <div class="row">
@@ -34,7 +65,7 @@
                 {% set pTooltip         = '' %}
 
                 {% block config %}
-                <li>
+                <li data-status="{{ pStatusClass }}">
                     {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
                     <div class="small-12 column">
                         <div class="row actions-small-{{ pActionCount }}">
@@ -76,6 +107,13 @@
             {% endfor %}
             </ul>
         </section>
+        <div class="empty-state" style="display:none;" id="empty-filter">
+            <i class="icon-staff-students"></i>
+            <p>
+                No students match the current filters.
+                Add another filter or <a id="filter-show-all">show everything</a>.
+            </p>
+        </div>
         {% else %}
             <div class="empty-state">
                 <i class="{{ icon.renderClass(assessment) }}"></i>
@@ -89,16 +127,29 @@
 <script type="text/javascript">
     $(function () {
 
-        var formSaveLabel = $('[data-save-draft]');
+        var formSaveLabel  = $('[data-save-draft]');
+        var assessmentList = $('#assessment-status');
+        var filters        = $('#filters');
+        var emptyFilter    = $('#empty-filter');
 
         $('[data-combobox]').combobox({{ errors | json_encode | raw }});
 
-        $('#assessment-status')
+        assessmentList
             .on('change keydown paste keypress', 'textarea', function () {
                 var $form = $(this).closest('form');
                 $form.find('[data-interaction-draft]').slideDown();
             })
+            .on('focus', ':input', function () {
+                // stash the current state, so we can compare on blur and prevent unnecessary firing
+                $(this).data('preval', $(this).val());
+            })
             .on('blur', ':input', function () {
+
+                // do a preval comparison to find out if we can skip AJAX
+                if ($(this).val() == $(this).data('preval')) {
+                    return;
+                }
+
                 var $form = $(this).closest('form');
 
                 var data = {
@@ -112,13 +163,27 @@
                 });
 
                 $.ajax($form.attr('action'), data)
-                 .done(function () { toast.apply($form, arguments); })
+                 .done(function () {
+                     toast.apply($form, arguments);
+
+                     var $li = $form.closest('[data-status]');
+
+                     $li.attr('data-status', '{{ statusComplete }}');
+
+                     $li.find('.progress-tick')
+                        .removeClass('{{ statusIncomplete }} {{ statusPending }}')
+                        .addClass('{{ statusComplete }}');
+
+                     $('#filters').find('[data-status="complete"]').prop('checked', true);
+
+                     console.log(this);
+                 })
                  .fail(function () { toast.apply($form, arguments); })
                  .always(function () { toast.apply($form, arguments); });
             });
 
         function toast(arguments) {
-            console.log(arguments);
+//            console.log(arguments);
 
             formSaveLabel.toastTimeout({
                 text: 'Draft Saved',
@@ -127,5 +192,31 @@
 
             this.find('[data-interaction-draft]').slideDown();
         }
+
+        filters.on('change', 'input', function () {
+            var $in = $(this);
+            var s   = $in.data('status');
+            var $li = assessmentList.find('[data-status="'+s+'"]');
+
+            if ($in.is(':checked')) {
+                $li.slideDown();
+                if ($li.length) {
+                    emptyFilter.slideUp();
+                }
+            } else {
+                $li.slideUp(function () {
+                    if (assessmentList.find('li[data-status]:visible').length == 0) {
+                        emptyFilter.slideDown();
+                    } else {
+                        emptyFilter.slideUp();
+                    }
+                })
+            }
+        });
+
+        $('#filter-show-all').on('click', function (e) {
+            e.preventDefault();
+            filters.find('[type=checkbox]').prop('checked', true).trigger('change');
+        });
     });
 </script>

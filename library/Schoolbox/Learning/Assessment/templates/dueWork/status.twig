@@ -8,6 +8,9 @@
      - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
      - assessment:  the assessment we're looking at
      - participant: the current participant of the iteration
+     - statusIncomplete: a string representing the 'incomplete' state
+     - statusPending: a string representing the 'pending' state
+     - statusComplete: a string representing the 'complete' state
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -28,7 +31,7 @@
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = participant.markingRequired ? 'pending' : (latestResponse or latestFeedback ? 'complete' : '') %}
+        {% set pStatusClass = participant.markingRequired ? statusPending : (latestResponse or latestFeedback ? statusComplete : statusIncomplete) %}
         {% set pTooltip     = participant.markingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'No submission') %}
 
         {% set pStatusText %}
