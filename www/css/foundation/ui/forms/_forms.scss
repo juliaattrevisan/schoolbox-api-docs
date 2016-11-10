@@ -352,7 +352,7 @@ input[type=radio]{
 }
 
 // Toggle Checkbox (VAPORWAVE)
-@mixin vaporwave($label-class: false, $toggle-size: ($input-height), $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
+@mixin vaporwave($label-class: false, $toggle-height: $input-height, $toggle-width: $input-height, $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
 
 	$label-selector: "label";
 
@@ -364,9 +364,9 @@ input[type=radio]{
 	+ #{$label-selector} {
 		font-weight: $font-weight-normal;
 		margin: 0;
-		line-height: $toggle-size;
-		height: $toggle-size;
-		width: $toggle-size;
+		line-height: $toggle-height;
+		height: $toggle-height;
+		width: $toggle-width;
 		text-align: center;
 		@include single-transition(background-color, 0.15s, linear);
 		span:before{
@@ -434,6 +434,23 @@ input[type=radio]:not(.plain)    {
 input[type=checkbox]:not(.plain) {
 	@include fancy-check('checkbox-label');
 	@include vaporwave('input-toggle');
+}
+
+ul.filters {
+    &:before {
+        display: inline-block;
+        content: "Showing:";
+        margin-right: 8px;
+    }
+    input[type=checkbox] {
+        @include vaporwave($toggle-width: auto);
+    }
+    li {
+        display: inline-block;
+    }
+    label {
+        padding: 0 12px 0 8px;
+    }
 }
 
 // Win7/IE11 fix for size of checkboxes
