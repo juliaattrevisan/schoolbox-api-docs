@@ -2,7 +2,7 @@
 
 {% block grading %}
     <label>Grade
-        <select name="mark">
+        <select name="mark" tabindex="{{ tabIndex.mark }}">
         {% for level in markScheme.gradeGroup.gradeLevels %}
             {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
             {% set selected = isGt and not found ? 'selected="selected"' : '' %}

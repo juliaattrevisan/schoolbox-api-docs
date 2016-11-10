@@ -2,13 +2,18 @@
 {% set fbUrl %}/learning/assessments/{{ participant.assessable.id }}/{{ participant.user.id }}/feedback{% endset %}
 {% set actionStyle = participant.allFeedbacks | length and not participant.findMostRecentFeedback.published ? '' : 'display:none;' %}
 
+{% set tabIndex = {
+    mark: (loop.index0 * 2) + 1,
+    comment: (loop.index0 * 2) + 2
+} %}
+
 <form method="post" action="{{ fbUrl }}" class="row">
     <div class="small-12 medium-3 column">
         {% block grading %}{% endblock %}
     </div>
     <div class="small-12 medium-9 column">
         <label>Comment
-            <textarea name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
+            <textarea tabindex="{{ tabIndex.comment }}" name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
         </label>
     </div>
     <div class="row">
