@@ -83,8 +83,6 @@ if (!empty($_POST)) {
         error(117);
     }
 
-    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
     /* Render create page
      */
@@ -100,8 +98,6 @@ if (!empty($_POST)) {
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
-        'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
-        'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
         'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
         'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),

@@ -40,8 +40,19 @@ catch (\Exception $e) {
     error(117);
 }
 
-$assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-$assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+if($assess['start']) {
+    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+}
+else {
+    $assessStartDate = new Alaress_Date_NullDate();
+}
+if($assess['finish']) {
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+}
+else {
+    $assessFinishDate = new Alaress_Date_NullDate();
+
+}
 
 $returnUrl = $_GET[Redirect::RETURN_URL]
     ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}"

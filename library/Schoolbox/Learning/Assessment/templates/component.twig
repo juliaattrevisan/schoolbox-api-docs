@@ -4,7 +4,7 @@
         {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
     {%- endset %}
     {% if createRoute and assessmentType  %}
-        {% set createRouteType = createRouteType ~ 'type=' ~ assessmentType -%}
+        {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
     {% endif %}
 
     <ul class="action-list">
