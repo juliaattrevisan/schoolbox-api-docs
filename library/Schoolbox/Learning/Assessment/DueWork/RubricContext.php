@@ -41,4 +41,35 @@ class RubricContext
 
         return $context;
     }
+
+    /**
+     * Get a readonly grid and the student's current rubric values
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param User $currentUser
+     * @return array
+     */
+    public function generate(IAssessable $assessment, User $student, User $currentUser)
+    {
+        /** @var DueWork $assessment */
+        $markTypeSlug = $assessment->getMarkType()->getSlug();
+
+        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
+
+        /** @var DueWork $assessment */
+        $context = [
+            'rubric' => $assessment->getRubric()->toContext($currentUser),
+            'markType' => [
+                'mode' => $markTypeSlug
+            ]
+        ];
+
+//        // Hide total mark from students and parents
+//        if (!($groupHandler->isSuperuser() || $groupHandler->isStaff())) {
+//            unset($context['rubric']['total']);
+//        }
+
+        return $context;
+    }
 }

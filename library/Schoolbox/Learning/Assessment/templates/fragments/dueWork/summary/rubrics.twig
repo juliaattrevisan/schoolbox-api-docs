@@ -1,8 +1,9 @@
+{% if assessment.useRubric %}
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <h2 class="subheader">Marking Guide</h2>
-        <section class="content">
-            put rubrics grid here
-        </section>
+
+        {% include '@rubric/grid.twig' with {rubric: rubricContext.rubric} only %}
     </div>
 </div>
+{% endif %}

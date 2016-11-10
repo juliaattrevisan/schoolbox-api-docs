@@ -130,7 +130,11 @@ class Controller extends Assessment\Controller
             'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $assessment,
-            'timeline'    => (new FullTimeline($assessment))->getTimeline()
+            'timeline'    => (new FullTimeline($assessment))->getTimeline(),
+
+            /* Rubrics data
+             */
+            'rubricContext' => (new RubricContext())->generate($assessment, $student, $this->getUser()),
         ];
 
         try {
