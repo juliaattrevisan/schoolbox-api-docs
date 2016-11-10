@@ -31,8 +31,14 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             return false;
         }
 
+        // TODO. SA-1309 - Disabled due to reliaance on old schema.
+        // Need to update to use new Mappers + Models + object graph
+        echo '<h3>Component_Dashboard_RecentSubmissionsController is disabled. See SA-1309</h3>';
+        return false;
+
         // returns appropriately sorted and formatted data for this module
         $this->submissions = $this->getSubmissionHandler()->getTotalSubmissionsByOwner($_SESSION['id']);
+
 
         return true;
     }
