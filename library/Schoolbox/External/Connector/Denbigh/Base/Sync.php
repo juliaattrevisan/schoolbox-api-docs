@@ -84,6 +84,7 @@ class Sync implements SyncInterface
                 s.denbighID      AS student_id,
                 s.academicYear   AS student_year_level,
                 ''               AS student_campus,
+                s.house          AS student_house,
                 ''               AS student_gender,
                 s.firstname      AS student_preferred,
                 s.surname        AS student_surname
