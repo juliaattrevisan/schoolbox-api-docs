@@ -63,6 +63,13 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
             {
                 $this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
 
+
+                // TODO SA-1310
+                // This Component is broken after the migration of SA-1212.
+                // Need to replace Handlers calls with calls to Mappers, and use new Model object graph.
+                echo '<h3>Component_Dashboard_ActivityController is disabled. See SA-1310</h3>';
+                return false;
+
                 $sub = $this->activity->submissionDetails($catInfo['id']);
 
                 /* What's New for Online Assessments
