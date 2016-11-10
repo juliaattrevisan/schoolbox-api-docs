@@ -174,6 +174,16 @@ class TemporaryResponse
             ->setStorage($storage)
             ->setFilename($storage3->getFilename());
 
+        /* Annotated Crocodoc
+         * Note that we have to steal info from the SubmissionFile instance
+         */
+        $annotatedCrocodoc = new FeedbackFile();
+        $annotatedCrocodoc
+            ->setId(1331)
+            ->setStorage($storage4)
+            ->setCrocodocId('75ac23be-4210-43cf-93e1-77c172afab78')
+            ->setFilename($storage4->getFilename());
+
         $feedback = new Feedback();
         $feedback
             ->setId(110000001)
@@ -183,11 +193,11 @@ class TemporaryResponse
             ->setComment('This is a flawed piece of work.')
             ->setAllFiles((new Collection())
                 ->add($feedbackFile)
+                ->add($annotatedCrocodoc)
             )
             ->setCreatedAt(new \Alaress_Date_Format('2016-11-01 03:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-11-01 04:14:12', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 11:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
-
 
         /* Accumulate
          */
