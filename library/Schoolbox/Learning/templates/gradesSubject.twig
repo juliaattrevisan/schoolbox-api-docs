@@ -1,4 +1,4 @@
-{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
@@ -61,9 +61,9 @@
         </div>
         <div class="small-12 large-6 island">
             <h2 class="subheader">Current Grade Average</h2>
-            <section class="content {{ urgency.gradientNormalised(markbook.studentStatistics[student.id].meanNormalised) }}-bg">
+            <section class="content {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg">
                 <div class="grade">
-                <span class="{{ urgency.gradientNormalised(markbooks[student.id].meanNormalised) }}">
+                <span class="{{ urgency.marks(markbooks[student.id].meanNormalised) }}">
                     {{ markbook.studentStatistics[student.id].mean }}
                 </span>
                 </div>
@@ -190,13 +190,13 @@
                                     <div class="small-12 large-4 columns grade">
                                         {% set feedback = assessment.participant(student).findMostRecentFeedback %}
                                         {% if feedback %}
-                                            <div class="{{ urgency.gradientNormalised(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
+                                            <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
                                             <p class="comment">{{ feedback.comment }}</p>
                                         {% endif %}
                                     </div>
 
                                     <div class="small-12 large-3 columns">
-                                        Due <span class="{{ urgency.gradientClass(assessment, student) }}">{{ assessment.dueAt.relativeTime }}</span>
+                                        Due <span class="{{ urgency.datetime(assessment, student) }}">{{ assessment.dueAt.relativeTime }}</span>
                                         on {{ assessment.dueAt.dateOnly }}
                                     </div>
                                 </div>
@@ -223,6 +223,7 @@
                             <div class="toast" data-alert="" data-publish-to-eportfolio-label="publish-boxId-{{ assessment.id }}">Showcase Updated</div>
                         </li>
                     {% endfor %}
+                </ul>
             </section>
         </div>
     </div>

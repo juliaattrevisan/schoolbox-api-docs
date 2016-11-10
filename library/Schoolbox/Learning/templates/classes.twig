@@ -31,7 +31,7 @@
                         <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                     </nav>
                     <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                        <li><a href="/submission/allWork/{{ currentUser.id }}/{{ currentSemester.code }}/{{ class.id }}" class="icon-approve">Grades</a></li>
+                        <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: currentSemester.id, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
                     </ul>
                     {% endif %}
                 </div>

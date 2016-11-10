@@ -119,7 +119,7 @@ class Controller extends Base
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'studentId' => $this->getUser()->getId()
+                'userId' => $this->getUser()->getId()
             ]));
         }
 
@@ -257,7 +257,7 @@ class Controller extends Base
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'studentId' => $this->getUser()->getId()
+                'userId' => $this->getUser()->getId()
             ]));
         }
 
@@ -284,7 +284,7 @@ class Controller extends Base
     /**
      * Displays a list assessables that a student needs to complete
      *
-     * @api   GET /due/{studentId}
+     * @api   GET /due/{userId}
      * @level 165
      * @param User $viewee
      */
@@ -313,14 +313,7 @@ class Controller extends Base
      */
     public function getGrades(User $student, Term $term)
     {
-        // If no term is specified, default to the current
-
-        if ($term == null) {
-            $term = $this->getTermMapper()->findForToday();
-        }
-
         // Storage for each folders markbook
-
         $markbooks = [];
         $markbooksFolders = [];
 
@@ -373,12 +366,6 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        // If no term is specified, default to the current
-
-        if ($term == null) {
-            $term = $this->getTermMapper()->findForToday();
-        }
-
         $assessments = $this->getAssessmentMapperProxy()->findAllForContext($subject)->sortBy('dueAt', 'asc');
 
         // Grab all the participants

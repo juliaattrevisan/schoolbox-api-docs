@@ -1,4 +1,4 @@
-{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/urgency.twig' as urgency %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -51,9 +51,9 @@
                                 </p>
                             </div>
                             <div class="small-4 columns no-pad">
-                                <div class="grade {{ urgency.gradientNormalised(markbooks[folder.id].meanNormalised) }}-bg content">
+                                <div class="grade {{ urgency.marks(markbooks[folder.id].meanNormalised) }}-bg content">
                                     <a href="/learning/feedback/student/{{ student.id }}/{{ term.code }}/{{ folder.id }}">
-                                        <span class="{{ urgency.gradientNormalised(markbooks[folder.id].meanNormalised) }}">
+                                        <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
                                             {{ markbooks[folder.id].mean }}
                                         </span>
                                     </a>
