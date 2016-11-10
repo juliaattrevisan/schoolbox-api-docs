@@ -172,6 +172,7 @@ class Markbook
                 'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
                 'maxNormalized'     => $maxSummator->summateList($normMarks),
                 'count'             => $countSummator->summateList($normMarks),
+                'weight'            => $assessment->getWeight(),
             ];
 
             // mean and SD are only meaningful for quantitative marks
@@ -184,6 +185,13 @@ class Markbook
 
             $this->assessmentStatistics[$assessment->getId()] = $statistics;
             $totalWeight += $assessment->getWeight();
+        }
+
+        // Weight percent statistic
+        if ($totalWeight > 0) {
+            foreach ($this->assessmentStatistics as $assessmentId => $statistics) {
+                $this->assessmentStatistics[$assessmentId]['weightPercent'] = $statistics['weight'] / $totalWeight * 100;
+            }
         }
 
         // Summate student's statistics as an average, weighted by each assessment's weight.

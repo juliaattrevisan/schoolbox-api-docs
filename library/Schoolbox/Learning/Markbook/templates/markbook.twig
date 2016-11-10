@@ -103,59 +103,18 @@
 
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>Weight</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>{{ assessment.weight }}</th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>% Total Weight</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>
-                            {% if markbook.markbookStatistics.totalWeight > 0 %}
-                                {{ (assessment.weight / markbook.markbookStatistics.totalWeight * 100) | round(2) }}
-                            {% else %}
-                                –
-                            {% endif %}
-                        </th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>Mean</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>Standard Deviation</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>Minimum</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
 
-                <tr class="sub-row" data-sub-table-row>
-                    <th>Maximum</th>
-                    <th>&nbsp;</th>
-                    {% for assessment in markbook.assessments %}
-                        <th>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</th>
-                    {% endfor %}
-                </tr>
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
+
                 </thead>
                 <tbody>
                 {# Need all students that ever participated in any assessments #}
