@@ -26,7 +26,7 @@
 
                 {# We pass the responseId as well, so that people can download annotated crocodocs
                  #}
-                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentInteraction: currentFeedback, responseId: currentInteraction.id} %}
+                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentFeedback, responseId: currentInteraction.id} only %}
             {% endfor %}
         </ul>
     {% endif %}
