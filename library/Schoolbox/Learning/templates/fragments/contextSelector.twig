@@ -45,7 +45,7 @@
         <select id="context-selector-semester">
             <option disabled {% if term is empty %}selected{% endif %} label="Select a term">Select a term</option>
             {% for termCurrent in terms %}
-                <option data-href="{{ routeLookup('learning.getGrades', {studentId: student.id, termCode: termCurrent.code }) }}" value="{{ termCurrent.code }}" {% if term.code == termCurrent.code %}selected{% endif %}>
+                <option data-href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: termCurrent.code }) }}" value="{{ termCurrent.code }}" {% if term.code == termCurrent.code %}selected{% endif %}>
                     {{ termCurrent.title }} ({{ termCurrent.start.dateOnly }} - {{ termCurrent.displayFinish.dateOnly }})
                 </option>
             {% endfor %}
