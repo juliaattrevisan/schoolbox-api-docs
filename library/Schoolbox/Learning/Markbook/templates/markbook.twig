@@ -68,7 +68,7 @@
                             <span>Student Average</span>
                         </div>
                     </th>
-                    {% for assessment in markbook.assessments %}
+                    {% for assessment in markbook.assessmentsWithProjectContents  %}
                     <th>
                         <div>
                                 <span>
@@ -90,7 +90,7 @@
                             {{ weightedMean | default('–') }}
                         </span>
                     </th>
-                    {% for assessment in markbook.assessments %}
+                    {% for assessment in markbook.assessmentsWithProjectContents %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
                         <th>
                             <a class="{{ urgency.marks(assessmentMean) }}"
@@ -138,7 +138,7 @@
                         </a>
                     </th>
 
-                    {% for assessment in markbook.assessments %}
+                    {% for assessment in markbook.assessmentsWithProjectContents  %}
                         <td class="column-{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
                                 {% set mostRecentFeedback = assessment.getParticipant(student).findMostRecentPublishedFeedback %}

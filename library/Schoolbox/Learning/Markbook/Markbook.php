@@ -145,8 +145,10 @@ class Markbook
      */
     protected function collateStatistics()
     {
+        // Collate assessments and weight
         foreach ($this->getAssessments() as $assessment) {
             $this->collateAssessmentStatistics($assessment);
+            $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
         }
 
         // Collate weight percent for each assessment
@@ -225,8 +227,41 @@ class Markbook
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
 
-        $this->assessmentStatistics[$assessment->getId()] = $statistics;
+        // Collate project statistics too
+        if ($assessment instanceof Project) {
+            $statistics['projectTotalWeight'] = 0;
+            foreach ($assessment->getAssessables() as $projectAssessment) {
+                $this->collateAssessmentStatistics($projectAssessment);
+                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
+            }
 
-        $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
+            // Pass 2: weight percent
+            if ($statistics['projectTotalWeight'] > 0) {
+                foreach ($assessment->getAssessables() as $projectAssessment) {
+                    $this->assessmentStatistics[$projectAssessment->getId()]['projectWeightPercent']
+                        = $this->assessmentStatistics[$projectAssessment->getId()]['weight'] / $statistics['projectTotalWeight'] * 100;
+                }
+            }
+        }
+
+        $this->assessmentStatistics[$assessment->getId()] = $statistics;
+    }
+
+    /**
+     * Retrieves a generator which iterates all assessments, and drills down into project
+     * sub-assessments.
+     *
+     * @return \Generator
+     */
+    public function getAssessmentsWithProjectContents()
+    {
+        foreach ($this->getAssessments() as $assessment) {
+            yield $assessment;
+            if ($assessment instanceof Project) {
+                foreach ($assessment->getAssessables() as $projectAssessment) {
+                    yield $projectAssessment;
+                }
+            }
+        }
     }
 }

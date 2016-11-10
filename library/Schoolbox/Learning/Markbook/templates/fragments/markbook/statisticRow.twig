@@ -1,7 +1,7 @@
 <tr class="sub-row" data-sub-table-row>
     <th>{{ label }}</th>
     <th>&nbsp;</th>
-    {% for assessment in markbook.assessments %}
+    {% for assessment in markbook.assessmentsWithProjectContents  %}
     <th>
         {% if markbook.assessmentStatistics[assessment.id][key] %}
             {% if round %}
