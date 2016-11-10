@@ -192,6 +192,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('duework.work_type', 'dt')},
+                {$this->getJoinColumnString('duework.mark_type', 'mt')},
                 {$this->getJoinColumnString('duework.grade_group', 'gg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
@@ -208,6 +209,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
             LEFT JOIN {$this->getJoinSql('duework.work_type', 'd', 'dt')}
+            LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
             LEFT JOIN {$this->getJoinSql('duework.grade_group', 'd', 'gg')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
@@ -249,6 +251,11 @@ class Mapper extends BaseMapper
                     $this->hydrateJoin($row, 'duework', 'd')
                         ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
                 );
+                $model->setDueWork(
+                    $this->hydrateJoin($row, 'duework', 'd')
+                        ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
+                );
+
                 // apply grade group
                 $model->getDueWork()->setGradeGroup(
                     $this->hydrateJoin($row, 'duework.grade_group', 'gg')
