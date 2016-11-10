@@ -23,7 +23,10 @@
     {% if currentInteraction.allFeedback|length %}
         <ul class="information-list reply">
             {% for currentFeedback in currentInteraction.allFeedback %}
-                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentInteraction: currentFeedback} %}
+
+                {# We pass the responseId as well, so that people can download annotated crocodocs
+                 #}
+                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentInteraction: currentFeedback, responseId: currentInteraction.id} %}
             {% endfor %}
         </ul>
     {% endif %}

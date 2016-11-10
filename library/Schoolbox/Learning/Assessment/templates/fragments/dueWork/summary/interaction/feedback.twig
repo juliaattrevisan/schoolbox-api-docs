@@ -1,3 +1,4 @@
+{% if currentInteraction.isPublished %}
 <li {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
     <div class="list-item">
         <div class="card small-12 medium-8">
@@ -23,15 +24,31 @@
     {% if currentInteraction.allFiles %}
         <ul class="information-list">
             {% for currentFile in currentInteraction.allFiles %}
+
+                {# Only show published feedback and therefore also
+                 # only list files that are involved with a Published Feedback
+                 #}
                 <li>
                     <div class="card small-12 compact">
-                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
-                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                            <p>{{ currentFile.filename }}</p>
-                        </a>
+
+                        {# Crocodoc annotations have their own special url.
+                         # responseId comes from the twig that includes this fragment
+                         #}
+                        {% if currentFile.crocodocId|length %}
+                            <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {responseId: responseId, feedbackId: currentInteraction.id, fileId: currentFile.id}) }}" rel="external" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <p>{{ currentFile.filename }}</p>
+                            </a>
+                        {% else %}
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <p>{{ currentFile.filename }}</p>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
 </li>
+{% endif %}

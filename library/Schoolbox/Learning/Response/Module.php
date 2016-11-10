@@ -46,19 +46,19 @@ class Module extends BaseModule
                 /* Get a list of Responses for a particular Student and Assessment
                  * Presented as a more succinct Submission History
                  */
-                '/assessments/{assessmentId}/{studentId}/responses' => 'getResponseList',
-
-                /* View a Response in the Inline Grader
-                 */
-                '/responses/{responseId}'                          => 'getParticularResponse',
-
-                /* View a Response File's plagscan report
-                 */
-                '/responses/plagscan/{plagscanId}'                 => 'getPlagscanReport',
+                '/assessments/{assessmentId}/{studentId}/responses'       => 'getResponseList',
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{responseId}/annotated{/fileId}'       => 'getCrocodocDownload',
+                '/responses/{responseId}/{feedbackId}/annotated{/fileId}' => 'getCrocodocDownload',
+
+                /* View a Response in the Inline Grader
+                 */
+                '/responses/{responseId}'                                 => 'getParticularResponse',
+
+                /* View a Response File's plagscan report
+                 */
+                '/responses/plagscan/{plagscanId}'                        => 'getPlagscanReport',
             ],
             'POST' => []
         ];
@@ -77,12 +77,21 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getResponseList|getParticularResponse|getCrocodocDownload)';
+        $ruleRegexp = '(?:getResponseList|getParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)
+            ));
+
+        $ruleRegexp = '(?:getCrocodocDownload)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRole(Role::STUDENT)
             ));
     }
 
@@ -131,12 +140,25 @@ class Module extends BaseModule
             $this->loadParticipantsIntoAssessment($assessment);
             $response = (new TemporaryResponse())->produceResponse($assessment);
 
+            $feedback = null;
+
+            /* Need this $feedback to determine whether the requested
+             * crocodoc annotation is part of a published feedback
+             */
+            foreach ($response->getAllFeedback() as $currentFeedback) {
+                if ($currentFeedback->getId() == $params['feedbackId']) {
+                    $feedback = $currentFeedback;
+                    break;
+                }
+            }
+
             /* Factory to figure out which fragment is required
              */
             foreach ($response->getAllFiles() as $currentFile) {
                 if ($currentFile->getId() == $params['fileId']) {
                     return [
                         'response' => $response,
+                        'feedback' => $feedback,
                         'file' => $currentFile
                     ];
                 }
@@ -144,6 +166,7 @@ class Module extends BaseModule
 
             return [
                 'response' => $response,
+                'feedback' => $feedback,
                 'file' => $response->getAllFiles()->first()
             ];
         });

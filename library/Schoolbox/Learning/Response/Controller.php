@@ -159,24 +159,48 @@ class Controller extends Base
     /**
      * Download a particular annotated crocodoc as a pdf
      *
-     * @param SubmissionFile $file
      * @param Submission $response
+     * @param SubmissionFile $file
+     * @param Feedback $feedback
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getCrocodocDownload(Submission $response, SubmissionFile $file)
+    public function getCrocodocDownload(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
-        if (strlen($file->getCrocodocId())) {
-            try {
-                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()))->getDownloadUrl();
+        /* If you are a student and the feedback is published
+         * and the requested file has a crocodocked url,
+         * attempt to download it
+         *
+         * Otherwise 404
+         */
+        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
+            if (strlen($file->getCrocodocId())) {
+                try {
+                    $location = (
+                    new InlineGraderFacade(
+                        new InlineGraderAuthenticator(),
+                        $response,
+                        $file,
+                        $this->getUser()
+                    )
+                    )->getDownloadUrl();
 
-                $this->getResponse()->redirect->to($location);
-            }
-            catch (\RangeException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-            }
-            catch (\DomainException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+                    $this->getResponse()->redirect->to($location);
+                } catch (\RangeException $e) {
+                    throw $this->getErrorMapper()->generateException(
+                        ErrorMapper::ERROR_PROCESSING,
+                        null,
+                        $e->getMessage()
+                    );
+                } catch (\DomainException $e) {
+                    throw $this->getErrorMapper()->generateException(
+                        ErrorMapper::ERROR_PROCESSING,
+                        null,
+                        $e->getMessage()
+                    );
+                }
+            } else {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
         else {
