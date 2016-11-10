@@ -142,12 +142,13 @@ class Module extends BaseModule
                 }
                 if (array_key_exists('subjectId', $params)) {
                     try {
-                        $args['subject'] = $this->getFolderMapper()->findById($params['userId']);
-                        $args['subject']->loadTeachers();
+                        var_dump($params['subjectId']);
+                        $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
                         $args['subject'] = $this->getFolderMapper()->createModel();
                     }
                 }
+
                 return $args;
             }
         );
