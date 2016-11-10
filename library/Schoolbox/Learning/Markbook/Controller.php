@@ -130,7 +130,7 @@ class Controller extends Base
         // TODO perform this filtering on a query level
         $assessments = $assessments->filter(
             function (IAssessable $assessment) use ($term) {
-                return $term->contains($assessment->getCloseAt());
+                return $term->contains($assessment->getDueAt());
             }
         );
 
