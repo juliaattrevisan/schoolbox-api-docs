@@ -13,6 +13,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -136,6 +137,13 @@ class Controller extends Base
 
         // Load participants
         foreach ($assessments as $assessment) {
+            // Project activities too. ¯\_(ツ)_/¯
+            // TODO load participants for activities more intelligently than this
+            if ($assessment instanceof Project) {
+                foreach ($assessment->getAssessables() as $projectActivity) {
+                    $projectActivity->setAllParticipants($this->getParticipantDataSource()->findForAssessment($projectActivity));
+                }
+            }
             $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
         }
 
