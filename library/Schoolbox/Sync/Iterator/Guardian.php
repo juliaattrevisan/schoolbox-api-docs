@@ -129,6 +129,14 @@ class Guardian extends IteratorIterator
             $campus = new User\Common\Campus();
             $campus->setCode($row['student_campus']);
             $student->getCampus()->add($campus);
+
+            /* House
+             */
+            $student
+                ->getHouse()
+                ->setCode($row['student_house'])
+            ;
+
             $guardian->addStudent($student);
         }
         return $guardian;
