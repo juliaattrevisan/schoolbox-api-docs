@@ -392,7 +392,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if ($assessment->getContext() instanceof Project) {
             return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
         }
-
         return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
     }
 
