@@ -101,13 +101,13 @@ class TemporaryResponse
             ->setPlagscanId(43964701)
             ->setStatus(2);
 
-        $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('a351bf467f221eead2d0a184db35d13cc86a43e3');
+        $storage4 = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash('4b50da92d887f9e05804f7425125b5064f5cb385');
 
         $submissionFile4 = new SubmissionFile();
         $submissionFile4
             ->setId(6426700000001)
             ->setStorage($storage4)
-            ->setCrocodocId('9bd30ca7-3b0b-471d-a887-707773533c60')
+            ->setCrocodocId('75ac23be-4210-43cf-93e1-77c172afab78')
             ->setFilename($storage4->getFilename())
             ->setPlagscan($plagscan4);
 
