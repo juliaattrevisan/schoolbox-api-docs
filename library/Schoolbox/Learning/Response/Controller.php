@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
@@ -119,7 +120,7 @@ class Controller extends Base
 
                 /* Rubrics data
                  */
-                'rubricContext' => $this->generateMarkableRubricContext($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
+                'rubricContext' => (new RubricContext())->generateMarkable($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
@@ -130,30 +131,6 @@ class Controller extends Base
         catch (\DomainException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
-    }
-
-    /**
-     * Get a markable grid for Rubrics marking
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return array
-     */
-    private function generateMarkableRubricContext(IAssessable $assessment, User $student)
-    {
-        /** @var DueWork $assessment */
-        $markTypeSlug = $assessment->getMarkType()->getSlug();
-
-        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
-
-        $context = [
-            'rubric' => $assessment->getRubric()->toContext(),
-            'markType' => [
-                'mode' => $markTypeSlug
-            ]
-        ];
-
-        return $context;
     }
 
     /**

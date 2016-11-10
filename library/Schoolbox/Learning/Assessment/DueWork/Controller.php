@@ -149,7 +149,6 @@ class Controller extends Assessment\Controller
         );
     }
 
-
     /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
