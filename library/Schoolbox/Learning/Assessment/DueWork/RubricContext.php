@@ -29,7 +29,6 @@ class RubricContext
     {
         /** @var DueWork $assessment */
         $markTypeSlug = $assessment->getMarkType()->getSlug();
-        $markTypeSlug = 'letter';
 
         RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
 
@@ -63,9 +62,6 @@ class RubricContext
      */
     public function generate(IAssessable $assessment, User $student, User $currentUser)
     {
-        /** @var DueWork $assessment */
-        $markTypeSlug = $assessment->getMarkType()->getSlug();
-
         RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
 
         /** @var DueWork $assessment */
