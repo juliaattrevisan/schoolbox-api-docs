@@ -82,6 +82,7 @@ class Sync implements SyncInterface
                 s.synergy_id         AS student_id,
                 s.year               AS student_year_level,
                 c.ext_timetable_code AS student_campus,
+                h.house              AS student_house,
                 ''                   AS student_gender,
                 s.firstname          AS student_preferred,
                 s.lastname           AS student_surname
@@ -91,6 +92,7 @@ class Sync implements SyncInterface
             LEFT  JOIN `user` `s`         ON ur.relation_id = s.id
             LEFT  JOIN userCampus uc      ON s.id = uc.uid
             LEFT  JOIN luCampus c         ON uc.campus = c.id
+            LEFT  JOIN house h            ON s.house = h.id
             WHERE p.enabled IS TRUE
             AND   s.enabled IS TRUE
             AND   pg.group_type = 'parent'
