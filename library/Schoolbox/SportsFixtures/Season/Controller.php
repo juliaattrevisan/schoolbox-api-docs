@@ -55,7 +55,7 @@ class Controller extends AbstractController
     /**
      * List of Seasons
      *
-     * @api GET /sportsfixtures/seasons?query
+     * @api GET /fixtures/seasons?query
      * @level 165
      *
      * @param object $context
@@ -134,7 +134,7 @@ class Controller extends AbstractController
     /**
      * View a single season
      *
-     * @api GET /sportsfixures/seasons/{season.id}
+     * @api GET /fixtures/seasons/{season.id}
      * @level 165
      *
      * @param Model $entity
@@ -149,8 +149,8 @@ class Controller extends AbstractController
     /**
      * Display form for create/update season
      *
-     * @api GET /sportsfixtures/seasons/new
-     * @api GET /sportsfixtures/seasons/{season.id}/edit
+     * @api GET /fixtures/seasons/new
+     * @api GET /fixtures/seasons/{season.id}/edit
      * @level 165
      *
      * @param Model $entity
@@ -174,8 +174,8 @@ class Controller extends AbstractController
     /**
      * Persist method for entity
      *
-     * @api POST /sportsfixtures/seasons/
-     * @api POST /sportsfixtures/seasons/{season.id}
+     * @api POST /fixtures/seasons/
+     * @api POST /fixtures/seasons/{season.id}
      * @level 165
      *
      * @param Model $entity

@@ -34,7 +34,7 @@ class Controller extends AbstractController
     /**
      * List of Venues
      *
-     * @api GET /sportsfixtures/venues
+     * @api GET /fixtures/venues
      * @level 165
      *
      * @param object $context
@@ -87,7 +87,7 @@ class Controller extends AbstractController
     /**
      * View a single venue
      *
-     * @api GET /sportsfixures/venues/{venue.id}
+     * @api GET /fixtures/venues/{venue.id}
      * @level 165
      *
      * @param Model $entity
@@ -102,8 +102,8 @@ class Controller extends AbstractController
     /**
      * Display form for create/update venue
      *
-     * @api GET /sportsfixtures/venues/new
-     * @api GET /sportsfixtures/venues/{venue.id}/edit
+     * @api GET /fixtures/venues/new
+     * @api GET /fixtures/venues/{venue.id}/edit
      * @level 165
      *
      * @param Model $entity
@@ -137,8 +137,8 @@ class Controller extends AbstractController
     /**
      * Persist method for entity
      *
-     * @api POST /sportsfixtures/venues/
-     * @api POST /sportsfixtures/venues/{venue.id}
+     * @api POST /fixtures/venues/
+     * @api POST /fixtures/venues/{venue.id}
      * @level 165
      *
      * @param Model $entity

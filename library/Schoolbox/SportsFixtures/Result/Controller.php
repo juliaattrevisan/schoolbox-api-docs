@@ -221,7 +221,7 @@ class Controller extends AbstractController
      * The same as getEntity() except that it only shows
      * the Results for the specified Team
      *
-     * @api /sportsfixtures/matches/:matchId/results/:teamId
+     * @api /fixtures/matches/:matchId/results/:teamId
      * @param Match $context
      * @param Team $team
      */
