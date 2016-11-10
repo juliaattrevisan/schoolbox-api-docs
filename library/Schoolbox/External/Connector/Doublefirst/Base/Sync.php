@@ -101,6 +101,7 @@ class Sync implements SyncInterface
                         ce.WorkEmailAddress         AS student_contact_work_email,
                         pc.PupilID                  AS student_id,
                         ''                          AS student_campus,
+                        p.HouseID                   AS student_house,
                         ''                          AS student_gender,
                         p.ForeName                  AS student_preferred,
                         p.Surname                   AS student_surname,
