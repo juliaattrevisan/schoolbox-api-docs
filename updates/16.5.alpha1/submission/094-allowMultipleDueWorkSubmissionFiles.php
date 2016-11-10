@@ -42,7 +42,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             `sr`.`id`              AS 'sr.id',
             `sr`.`created_at`      AS 'sr.created_at',
             `sb`.`mark_visibility` AS 'sb.mark_visibility'
-        FROM `student_submission` `sr`
+        FROM `submission_return` `sr`
         JOIN `submission_box` `sb` ON `sr`.`box_id` =  `sb`.`id`
     ");
 

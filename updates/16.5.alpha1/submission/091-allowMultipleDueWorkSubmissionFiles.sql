@@ -67,3 +67,8 @@ LEFT JOIN `allowedFileExtension` `afe` ON `st`.`ext` = `afe`.`extension`
 LEFT JOIN `allowedFileTypes` `aft` ON `afe`.`fileTypeID` =`aft`.`fileTypeID`
 JOIN `submission_box` `sb` ON `ss`.`box_id` = `sb`.`id`
 JOIN `assessment` `a` ON `sb`.`assessment_id` = `a`.`id`;
+
+-- Rename column in preparation of migration
+-- Plagscan will now need to link to the new 'student_submission_file' table
+ALTER TABLE `plagscan_document`
+    CHANGE COLUMN `file_id` `student_submission_file_id` INT (11) UNSIGNED NOT NULL;
