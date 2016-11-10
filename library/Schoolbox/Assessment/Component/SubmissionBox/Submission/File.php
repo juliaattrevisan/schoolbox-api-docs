@@ -38,20 +38,11 @@ class File implements IStorage
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var bool */
-    protected $draft;
+    /** @var User */
+    protected $owner;
 
     /** @var SubmissionBox */
     protected $submissionBox;
-
-    /** @var bool */
-    protected $marked;
-
-    /** @var bool */
-    protected $late;
-
-    /** @var User */
-    protected $owner;
 
     /**
      * The list of files within this submission.
@@ -59,6 +50,11 @@ class File implements IStorage
      * @var Collection|SingleFile\Model[]
      */
     protected $files;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    private $submittedAt;
 
     /**
      * Constructor
@@ -73,146 +69,30 @@ class File implements IStorage
      */
     public function isDraft()
     {
-        return $this->draft;
+        return $this->submittedAt instanceof \Alaress_Date_NullDate;
     }
 
 
     /**
-     * @deprecated only exists for mapper compatibility
-     * @return boolean
-     */
-    public function getDraft()
-    {
-        return $this->isDraft();
-    }
-
-
-    /**
-     * @param boolean $draft
-     * @return static
-     */
-    public function setDraft($draft)
-    {
-        $this->draft = $draft;
-        return $this;
-    }
-
-
-    /**
-     * @return User
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-
-    /**
-     * @param User $owner
-     * @return static
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-        return $this;
-    }
-
-
-    /**
-     * @return SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submissionBox;
-    }
-
-
-    /**
-     * @param SubmissionBox $submissionBox
-     * @return static
-     */
-    public function setSubmissionBox($submissionBox)
-    {
-        $this->submissionBox = $submissionBox;
-        return $this;
-    }
-
-
-    /**
-     * @return boolean
+     * Will be late if not-submitted and current time is after due date, or was submitted after due date
+     *
+     * @return bool
      */
     public function isLate()
     {
-        return $this->late;
+        $now = \Alaress_Date_Format::now();
+        $dueDate = $this->submissionBox->getDueDate();
+        $isSubmitted = ! $this->isDraft();
+
+        // Submitted after due date ?
+        if($isSubmitted && $this->submittedAt->gt($dueDate)){
+            return true;
+        }
+
+        // Or not submitted and now past due date
+        return $now->gt($dueDate);
     }
 
-    /**
-     * @deprecated for mapper use only
-     * @return bool
-     */
-    public function getLate()
-    {
-        return $this->isLate();
-    }
-
-
-    /**
-     * @param boolean $late
-     * @return static
-     */
-    public function setLate($late)
-    {
-        $this->late = $late;
-        return $this;
-    }
-
-
-    /**
-     * @return boolean
-     */
-    public function isMarked()
-    {
-        return $this->marked;
-    }
-
-
-    /**
-     * @deprecated for mapper use only
-     * @return bool
-     */
-    public function getMarked()
-    {
-        return $this->isMarked();
-    }
-
-
-    /**
-     * @param boolean $marked
-     * @return static
-     */
-    public function setMarked($marked)
-    {
-        $this->marked = $marked;
-        return $this;
-    }
-
-    /**
-     * @return Collection|SingleFile\Model[]
-     */
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    /**
-     * @param Collection|SingleFile\Model[] $files
-     * @return static
-     */
-    public function setFiles(Collection $files)
-    {
-        $this->files = $files;
-        return $this;
-    }
 
     /**
      * Does this user have permission to view this submission?
@@ -290,6 +170,87 @@ class File implements IStorage
             'submission_box_id' => $this->getSubmissionBox()->getId(),
         ]) > 0;
     }
+
+    /* Getters / Setters
+     */
+
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+
+    /**
+     * @param User $owner
+     * @return static
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submissionBox;
+    }
+
+
+    /**
+     * @param SubmissionBox $submissionBox
+     * @return static
+     */
+    public function setSubmissionBox($submissionBox)
+    {
+        $this->submissionBox = $submissionBox;
+        return $this;
+    }
+
+    /**
+     * @return Collection|SingleFile\Model[]
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * @param Collection|SingleFile\Model[] $files
+     * @return static
+     */
+    public function setFiles(Collection $files)
+    {
+        $this->files = $files;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getSubmittedAt()
+    {
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $submittedAt
+     * @return static
+     */
+    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    {
+        $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
 
     // Deliberately broken implementation of IStorage.
     // Added only so that uses of this object which assume it's still an IStorage can be rewritten.

@@ -41,14 +41,11 @@ class FileMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('owner', UserMapper::class);
-        $this->uses('marked', self::TYPE_BOOLEAN);
-        $this->uses('late', self::TYPE_BOOLEAN);
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
-        $this->uses('draft', self::TYPE_BOOLEAN);
-        $this->uses('submitted', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
 
         $this->hasJoin(
             'file',
@@ -128,7 +125,7 @@ class FileMapper extends Mapper
      */
     public function createDefaultReturn(File $object, $previous = null)
     {
-        if (!($object->getDraft())) {
+        if (!($object->isDraft())) {
             $boxId = $object->getSubmissionBox()->getId();
             /** @var ReturnedWorkMapper $returnMapper */
             $returnMapper = $this->getJoinMapper('box_id.return');
