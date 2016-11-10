@@ -8,7 +8,7 @@ ALTER TABLE `submission_return`
   ADD `student_submission_id` INT(5) NULL DEFAULT NULL AFTER `owner`,
   CHANGE COLUMN `returned` `created_at` DATETIME NOT NULL AFTER `is_confirmation_of_submission`,
   ADD `published_at` DATETIME NULL DEFAULT NULL AFTER `created_at`,
-  ADD `updated_at` DATETIME NOT NULL AFTER `published_at`
+  ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `published_at`
 ;
 
 -- ReturnedFile file table
