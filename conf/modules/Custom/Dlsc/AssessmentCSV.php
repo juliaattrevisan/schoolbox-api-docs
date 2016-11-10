@@ -24,8 +24,9 @@ class AssessmentCSV implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
+        $di = $kernel->getDependencyInjector();
+
         if ($di->get('config')->get('site_location') == 'dlsc') {
-            $di = $kernel->getDependencyInjector();
             $module = new Module($di);
             $module->init('/modules/custom/dlsc/assessmentcsv');
         }
