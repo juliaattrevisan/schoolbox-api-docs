@@ -1,13 +1,13 @@
 <?php
 /**
- * Module definition for De La Selle's custom assessment csv export.
+ * Module definition for De La Selle's custom assessment csv export
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\DLSC\AssessmentCSV;
+namespace Custom\Dlsc\AssessmentCSV;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
@@ -21,14 +21,14 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends BaseModule
 {
-    protected $basename = 'customDLSCAssessmentCSV';
+    protected $basename = 'customDlscAssessmentCSV';
 
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'generate', $basePath, '/generate');
+        $this->addGetRoute($router, 'generateNightly', $basePath, '/generate');
         $this->addGetRoute($router, 'download', $basePath, '/download');
     }
 
@@ -47,7 +47,7 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF)
         );
 
-        $this->addRoutePermission($authorizer, 'generate', $permissionIndex);
+        $this->addRoutePermission($authorizer, 'generateNightly', $permissionIndex);
         $this->addRoutePermission($authorizer, 'download', $permissionIndex);
     }
 

@@ -1,13 +1,13 @@
 <?php
 /**
- * Controller for De La Salle's assessment CSV export.
+ * Controller for De La Salle's assessment CSV export
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\DLSC\AssessmentCSV;
+namespace Custom\Dlsc\AssessmentCSV;
 
 use Alaress\Web\Controller\Base;
 use Alaress\Csv\Writer AS CsvWriter;
@@ -15,9 +15,12 @@ use Alaress\Csv\Writer AS CsvWriter;
 class Controller extends Base
 {
     /**
+     * Generate a csv of assessment result data
      *
+     * @param resource $file
+     * @return resource
      */
-    public function generate()
+    protected function generate($file)
     {
         $query = "
             SELECT          sr.owner,
@@ -71,26 +74,44 @@ class Controller extends Base
             }
         }
 
-        $file = fopen('testfile.csv', 'w');
-
         $writer = new CsvWriter($file, $data);
         $writer->write();
 
-        return true;
+        return $file;
     }
 
 
     /**
+     * The method that will be called nightly via a cron job
+     *
+     * @api GET /modules/custom/dlsc/assessmentcsv/generate
+     * @level 160
+     *
+     */
+    public function generateNightly()
+    {
+        $file = fopen('testfile.csv', 'w');
+        $this->generate($file);
+    }
+
+
+    /**
+     * Download a fresh csv
+     *
+     * @api GET /modules/custom/dlsc/assessmentcsv/download
+     * @level 160
      *
      */
     public function download()
     {
+
         /* Generate an updated csv
          */
-        $this->generate();
+        $filename = 'testfile_temp.csv';
+        $file = fopen($filename, 'w');
+        $this->generate($file);
 
         $now = date('Y-m-d-H-i-s');
-        $filename = "testfile.csv";
         $newFilename = "results-{$now}.csv";
 
         /* Force download
@@ -105,10 +126,14 @@ class Controller extends Base
             header('Content-Length: ' . filesize($filename));
 
             readfile($filename);
-            exit;
         }
 
-        exit('no file found');
+        /* Close the file pointer and delete the temp file
+         */
+        fclose($file);
+        unlink($filename);
+
+        exit();
     }
 
 }

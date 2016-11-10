@@ -1,5 +1,6 @@
 <?php
 /**
+ * Configuration for De La Salle's assessment csv export
  *
  * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -7,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Config\Modules\Custom\DLSC;
+namespace Config\Modules\Custom\Dlsc;
 
 use Alaress\Application\Kernel;
-use Custom\DLSC\AssessmentCSV\Module;
+use Custom\Dlsc\AssessmentCSV\Module;
 use Config\Modules\ModuleConfigInterface;
 
 class AssessmentCSV implements ModuleConfigInterface
@@ -26,9 +27,9 @@ class AssessmentCSV implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        if ($di->get('config')->get('site_location') == 'dlsc') {
+        //if ($di->get('config')->get('site_location') == 'dlsc') {
             $module = new Module($di);
             $module->init('/modules/custom/dlsc/assessmentcsv');
-        }
+        //}
     }
 }
