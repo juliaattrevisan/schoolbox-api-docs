@@ -17,7 +17,7 @@ use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class AbstractResponse implements IResponse
+abstract class AbstractResponse implements IResponse
 {
     use Id;
     use CreatedAtDate;
