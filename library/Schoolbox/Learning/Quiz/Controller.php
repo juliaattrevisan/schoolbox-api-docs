@@ -115,6 +115,22 @@ class Controller extends AbstractController
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
      *
+     * GETs the page where a Teacher can add Section and Questions to the Quiz
+     *
+     * @api   GET /learning/quiz/review/{assessmentId}/horizontal
+     * @level 165
+     * @param int $assessmentId
+     * @todo Rebuild with twig
+     */
+    public function getQuizReviewHorizontal($assessmentId)
+    {
+        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $this->getResponse()->redirect->to("/assess/reviewHorizontal/$assessId");
+    }
+
+    /**
+     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+     *
      * Enables a Student to begin a Quiz
      *
      * @api   GET /learning/quiz/intro/{assessmentId}

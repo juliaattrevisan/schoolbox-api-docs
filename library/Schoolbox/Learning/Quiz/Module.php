@@ -52,6 +52,7 @@ class Module extends RestfulModule
 
         $routes = [
             'GET' => [
+                '/quiz/review/{assessmentId}/horizontal'                    => 'getQuizReviewHorizontal',
                 '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection',
                 '/quiz/{assessmentId}/{userId}/attempts'                    => 'getQuizAttemptsByUser',
                 '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
