@@ -207,7 +207,7 @@
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.mostRecentFeedback.comment }}">
-                                        {{ mostRecentFeedback.humanReadableMark | default('–') }}
+                                        {{ normalisedMark | default('–') }}
                                     </a>
                                 {% endif %}
                             {% else %}
