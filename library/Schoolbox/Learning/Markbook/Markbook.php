@@ -153,9 +153,9 @@ class Markbook
 
         // Collate weight percent for each assessment
         if ($this->markbookStatistics['totalWeight'] > 0) {
-            foreach ($this->assessmentStatistics as $assessmentId => $statistics) {
-                $this->assessmentStatistics[$assessmentId]['weightPercent'] =
-                    $statistics['weight'] / $this->markbookStatistics['totalWeight'] * 100;
+            foreach ($this->getAssessments() as $assessment) {
+                $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
+                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->markbookStatistics['totalWeight'] * 100;
             }
         }
 
@@ -216,8 +216,13 @@ class Markbook
             'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
             'maxNormalized'     => $maxSummator->summateList($normMarks),
             'count'             => $countSummator->summateList($normMarks),
-            'weight'            => $assessment->getWeight(),
         ];
+        if ($assessment->getContext() instanceof Project) {
+            $statistics['weightInProject'] = $assessment->getWeight();
+        } else {
+            $statistics['weight'] = $assessment->getWeight();
+
+        }
 
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
@@ -239,7 +244,7 @@ class Markbook
             if ($statistics['projectTotalWeight'] > 0) {
                 foreach ($assessment->getAssessables() as $projectAssessment) {
                     $this->assessmentStatistics[$projectAssessment->getId()]['projectWeightPercent']
-                        = $this->assessmentStatistics[$projectAssessment->getId()]['weight'] / $statistics['projectTotalWeight'] * 100;
+                        = $this->assessmentStatistics[$projectAssessment->getId()]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
                 }
             }
         }
