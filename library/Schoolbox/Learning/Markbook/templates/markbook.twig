@@ -105,14 +105,15 @@
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Weight</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>{{ assessment.weight }}</th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>% Total Weight</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>
                             {% if markbook.markbookStatistics.totalWeight > 0 %}
@@ -122,39 +123,38 @@
                             {% endif %}
                         </th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Mean</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>{{ markbook.assessmentStatistics[assessment.id].mean | default('–') }}</th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Standard Deviation</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>{{ markbook.assessmentStatistics[assessment.id].sd | default('–') }}</th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Minimum</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>{{ markbook.assessmentStatistics[assessment.id].min | default('–') }}</th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
 
                 <tr class="sub-row" data-sub-table-row>
                     <th>Maximum</th>
+                    <th>&nbsp;</th>
                     {% for assessment in markbook.assessments %}
                         <th>{{ markbook.assessmentStatistics[assessment.id].max | default('–') }}</th>
                     {% endfor %}
-                    <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
