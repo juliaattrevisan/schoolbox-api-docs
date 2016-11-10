@@ -19,11 +19,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 /**
  * The single source of truth for assessment participants.
@@ -65,19 +60,6 @@ class DataSource
      */
     protected $feedbackDataSource;
 
-    /** @var AssessmentMapperProxy */
-    protected $assessmentMapperProxy;
-
-    /**
-     * @var TermMapper
-     */
-    protected $termMapper;
-
-    /**
-     * @var folderMapper
-     */
-    protected $folderMapper;
-
     /**
      * Constructor
      *
@@ -86,28 +68,19 @@ class DataSource
      * @param UserMapper              $userMapper
      * @param ResponseDataSource      $responseDataSource
      * @param FeedbackDataSource      $feedbackDataSource
-     * @param TermMapper              $termMapper;
-     * @param FolderMapper            $folderMapper;
-     * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
         External_ClassInterface $externalDb,
         UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         ResponseDataSource $responseDataSource,
-        FeedbackDataSource $feedbackDataSource,
-        TermMapper $termMapper,
-        FolderMapper $folderMapper,
-        AssessmentMapperProxy $assessmentMapperProxy
+        FeedbackDataSource $feedbackDataSource
     ) {
         $this->externalDb               = $externalDb;
         $this->userAccessMapper         = $userAccessMapper;
         $this->userMapper               = $userMapper;
         $this->responseDataSource       = $responseDataSource;
         $this->feedbackDataSource       = $feedbackDataSource;
-        $this->termMapper               = $termMapper;
-        $this->folderMapper             = $folderMapper;
-        $this->assessmentMapperProxy    = $assessmentMapperProxy;
     }
 
     /**
