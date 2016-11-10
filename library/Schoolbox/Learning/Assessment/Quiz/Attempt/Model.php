@@ -36,16 +36,26 @@ class Model extends AbstractResponse
      */
     private $firstSectionId;
 
+    /** @var \Alaress_Date_Format */
+    protected $submittedAt;
+
 
     /**
-     * Attempts are submitted at the updatedAt value
-     * in case the Attempt is modified by the Student
-     *
      * @return \Alaress_Date_Format
      */
     public function getSubmittedAt()
     {
-        return $this->getUpdatedAt();
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    {
+        $this->submittedAt = $submittedAt;
+        return $this;
     }
 
     /**
