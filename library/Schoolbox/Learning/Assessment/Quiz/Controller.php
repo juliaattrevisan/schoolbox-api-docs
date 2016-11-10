@@ -181,6 +181,20 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string      $defaultReturnUrl
+     * @return string
+     */
+    protected function determineRedirect(IAssessable $assessment, $defaultReturnUrl = '')
+    {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        return '/assess/section/create/'. $quiz->getId();
+    }
+
+
+    /**
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
