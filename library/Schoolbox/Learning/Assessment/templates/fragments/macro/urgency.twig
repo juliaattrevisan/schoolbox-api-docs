@@ -1,0 +1,24 @@
+{##
+ # Get css classname representing gradient
+ #
+ # This represents a colour shift in the due date from green
+ # (have a lot of time to create responses) to red (you are
+ # running out of time to create responses)
+ #}
+{% macro gradientClass(assessable, user) %}
+    {% spaceless %}
+        {% if assessable.isParticipant(user) %}
+            {% if assessable.participant(user).allResponses|length == 0 %}
+                {% set urgency = (assessable.dueAt.unixTimestamp - date().format('U')) / 86400 %}
+                gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
+            {% endif %}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+
+{% macro gradientNormalised(value) %}
+    {% spaceless %}
+        {% set urgency = value / 10 %}
+        gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
+    {% endspaceless %}
+{% endmacro %}

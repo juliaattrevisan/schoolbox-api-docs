@@ -15,6 +15,7 @@ namespace Schoolbox\Resource\Folder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
@@ -397,6 +398,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByParent($id)
     {
+
+
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
@@ -1413,6 +1416,82 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         $folderMapper->save($movedFolder->setParent($parentFolder));
+    }
+
+    /**
+     * Return a list of folders that the student has submitted work to in a given term
+     * @param User $student
+     * @param Term $term
+     * @return Collection|Model[]
+     */
+    public function findFoldersWithSubmissions(User $student, Term $term)
+    {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+
+        $query = "
+            SELECT
+                {$this->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')},
+                {$homepageConfig_mapper->getColumnString('hp')},
+                {$group_mapper->getColumnString('ug')}
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
+            WHERE c.deleted_at IS NULL AND c.id IN 
+            ( 
+              SELECT DISTINCT 
+                CASE 
+                  WHEN `d`.`category` IS NOT NULL THEN `d`.`category`
+                  ELSE `t`.`category_id` 
+                END AS `folder_id`
+              FROM `assessment` AS `a`
+              LEFT JOIN `task` AS `t` ON `a`.`id` = `t`.`assessment_id`
+              LEFT JOIN `submission_box` AS `d` ON `a`.`id` = `d`.`assessment_id`
+              LEFT JOIN `task_completion` AS `tc` ON `t`.`id` = `tc`.`task_id`
+              LEFT JOIN `submission_return` AS `sr` ON `sr`.`box_id` = `d`.id
+              WHERE 
+                (`tc`.`student_id` = :studentId OR `sr`.`owner` = :studentId) AND 
+                (`a`.`due_date` BETWEEN :startDate AND :endDate)
+            )
+            ORDER BY c.name
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            ':studentId' => $student->getId(),
+            ':startDate' => $term->getStart(),
+            ':endDate' => $term->getActualFinish()
+        ]);
+
+        $collection = new Collection();
+        $category = null;
+
+        foreach ($statement as $row) {
+            $category = $this->hydrate($row, 'c');
+
+            /** @var HomepageConfig $homepageConfig */
+            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+            $category->setHomepage($homepageConfig);
+
+            /** @var \Schoolbox\Resource\Group $group */
+            $group = $group_mapper->hydrate($row, 'ug');
+            $category->setGroup($group);
+
+            /** @var \Schoolbox\Resource\Folder\Code\Model $code */
+            $code = $code_mapper->hydrate($row, 'cc');
+            if ($code->getFolder()->getId()) {
+                $category->addCode($code);
+            }
+            $collection->add($category);
+
+            $category->loadTeachers();
+        }
+
+        return $collection;
     }
 
     /**

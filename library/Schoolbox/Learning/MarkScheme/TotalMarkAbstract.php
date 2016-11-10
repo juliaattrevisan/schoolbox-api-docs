@@ -23,6 +23,13 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     private $totalMark;
 
     /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = true;
+
+    /**
      * @param int|float $totalMark
      */
     public function __construct($totalMark)

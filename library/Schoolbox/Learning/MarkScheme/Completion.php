@@ -20,6 +20,13 @@ class Completion extends AbstractMarkScheme
     const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher-Assessed';
 
     /**
+     * This type is not comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = false;
+
+    /**
      * Returns a string representation of a normalised Mark
      *
      * @param mixed          $normalisedMark Ignored.

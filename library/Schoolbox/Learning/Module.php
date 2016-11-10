@@ -40,8 +40,8 @@ class Module extends BaseModule
                 '/classes'                                => 'getClasses',
                 '/markbook/{classId}'                     => 'getMarkbook',
                 '/due/{userId}'                           => 'getDue',
-                '/grades/{userId}/{termCode}'             => 'getGrades',
-                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
+                '/grades/{studentId}{/termCode}'             => 'getGrades',
+                '/grades/{studentId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
             'POST' => []
         ];
@@ -111,7 +111,6 @@ class Module extends BaseModule
             }
         );
 
-
         $this->addRoutePreload(
             $matcher,
             '(?:getMarkbook)',
@@ -127,17 +126,14 @@ class Module extends BaseModule
             }
         );
 
-
-
-
         $this->addRoutePreload(
             $matcher,
             '(?:getGrades|getGradesForSubject)',
             function ($params) {
                 try {
-                    $args['user'] = $this->getUserMapper()->findById($params['userId']);
+                    $args['student'] = $this->getUserMapper()->findById($params['studentId']);
                 } catch (MapperException $e) {
-                    $args['user'] = $this->getUserMapper()->createModel();
+                    $args['student'] = null;
                 }
                 try {
                     $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
@@ -147,6 +143,7 @@ class Module extends BaseModule
                 if (array_key_exists('subjectId', $params)) {
                     try {
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
+                        $args['subject']->loadTeachers();
                     } catch (MapperException $e) {
                         $args['subject'] = $this->getFolderMapper()->createModel();
                     }
@@ -173,7 +170,9 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                'participantDataSource' => $injector->lazyGet('participantDataSource'),
             ])
         );
     }

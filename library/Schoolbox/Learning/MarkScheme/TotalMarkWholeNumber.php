@@ -28,6 +28,13 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     const TOTAL_MARK_MIN = 1;
 
     /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = true;
+
+    /**
      * @param float $totalMark
      * @throws InvalidArgumentException if $totalMark has a fractional component
      * @throws RangeException if $totalMark is less than permitted minimum

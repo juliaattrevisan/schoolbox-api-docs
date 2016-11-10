@@ -41,6 +41,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 
+use Schoolbox\Learning\Assessment\Assessable\DataSource as AssessableDataSource;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
@@ -638,6 +639,13 @@ class Bootstrap implements BootstrapInterface {
             'participantDataSource' => $di->lazyGet('participantDataSource'),
         ];
         $di->set('assessmentDataSource', $di->lazyNew(AssessmentMapperProxy::class));
+
+        // Register assessable data source
+        $di->params[AssessableDataSource::class] = [
+            'responseDataSource' => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+        ];
+        $di->set('assessableDataSource', $di->lazyNew(ParticipantDataSource::class));
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [

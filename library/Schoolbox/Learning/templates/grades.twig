@@ -1,1 +1,100 @@
-<h1>TODO - grades.twig</h1>
+{% import '@learningAssessment/fragments/macro/urgency.twig' as urgency %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Grades for {{ term.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-5 island">
+        <section>
+            <ul class="action-list">
+                <li>
+                    <div class="small-12 card">
+                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="{{ student.fullName }}"/>
+                            <p>{{ student.fullName }}</p>
+                            <p class="meta">Year {{ student.year }} Student</p>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div class="small-12 medium-7 columns">
+        <div class="content">
+            {% include '@learning/fragments/contextSelector.twig' with {folders: folders, terms: terms} %}
+        </div>
+    </div>
+</div>
+
+{# Display subjects the student is involved in for the selected term #}
+
+{% for folder in folders %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="list-item">
+                            <div class="small-8 card">
+                                <a href="{{ routeLookup('learning.getGradesForSubject', {studentId: student.id, termCode: term.code, subjectId: folder.id}) }}" title="View Grades">
+                                    <span class="icon-home icon-32" title="{{ folder.name }}"></span>
+                                    <p>{{ folder.name }}</p>
+                                </a>
+                                <p class="meta">
+                                    {% for code in folder.codes %}
+                                        {{ code.code }}{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+                            <div class="small-4 columns no-pad">
+                                <div class="grade {{ urgency.gradientNormalised(markbooks[folder.id].meanNormalised) }}-bg content">
+                                    <a href="/learning/feedback/student/{{ student.id }}/{{ term.code }}/{{ folder.id }}">
+                                        <span class="{{ urgency.gradientNormalised(markbooks[folder.id].meanNormalised) }}">
+                                            {{ markbooks[folder.id].mean }}
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% for teacher in folder.teachers %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 card">
+                                    <a href="/search/user/{{ teacher.id }}" title="">
+                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                             alt="{{ teacher.fullName }}"/>
+                                        <p>{{ teacher.fullName }}</p>
+                                    </a>
+                                    <p class="meta">Teacher</p>
+                                </div>
+
+                            </div>
+                            <nav>
+                                <a href="/mail/createMail.php?replyto={{ teacher.email }}" class="icon-email" title="Mail"></a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+
+{% endfor %}
+
+{% if folders | length == 0 %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>You are not enrolled in any classes this term.  If you believe this is incorrect please contact your administrator.</p>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

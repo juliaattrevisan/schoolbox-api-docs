@@ -36,6 +36,12 @@ class TotalMarkFractional extends TotalMarkAbstract
 
     const TOTAL_MARK_MIN = 0.0;
 
+    /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = true;
 
     /**
      * TotalMarkFractional constructor.

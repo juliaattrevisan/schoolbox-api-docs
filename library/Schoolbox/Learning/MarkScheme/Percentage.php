@@ -16,6 +16,13 @@ class Percentage extends AbstractMarkScheme
     const TITLE = 'Percentage';
 
     /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = true;
+
+    /**
      * Returns a string representation of a normalised Mark
      *
      * @param float          $normalisedMark

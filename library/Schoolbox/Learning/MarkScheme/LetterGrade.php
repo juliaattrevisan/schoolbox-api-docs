@@ -21,6 +21,13 @@ class LetterGrade extends AbstractMarkScheme
     private $gradeGroup;
 
     /**
+     * This type is not comparable numerically.
+     *
+     * @var bool
+     */
+    protected $quantitative = false;
+
+    /**
      * @param GradeGroup $gradeGroup
      */
     public function __construct(GradeGroup $gradeGroup)

@@ -14,6 +14,14 @@ abstract class AbstractMarkScheme implements IMarkScheme
     const TITLE = 'Abstract Mark Scheme';
 
     /**
+     * Does this mark scheme produce human-readable results that are comparable
+     * as numbers?
+     *
+     * @var bool
+     */
+    protected $quantitative;
+
+    /**
      * Bounds checks a normalised mark
      *
      * @param float $normalisedMark
@@ -40,5 +48,21 @@ abstract class AbstractMarkScheme implements IMarkScheme
     public static function getTitle()
     {
         return static::TITLE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuantitative()
+    {
+        return $this->quantitative;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQualitative()
+    {
+        return !$this->quantitative;
     }
 }
