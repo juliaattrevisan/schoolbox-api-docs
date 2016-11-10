@@ -17,15 +17,16 @@
 
 {% block config %}
 
-    {# TODO uncomment once this route is merged to core #}
-    {#{% set pActionResponses = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}#}
-
     {% set latestFeedback    = participant.findMostRecentFeedback %}
     {% set latestResponse    = participant.findMostRecentResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
+
+    {% if latestResponse %}
+        {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}
+    {% endif %}
 
     {% if assessment.acceptsNone %}
         {% set pStatusClass = '' %}
