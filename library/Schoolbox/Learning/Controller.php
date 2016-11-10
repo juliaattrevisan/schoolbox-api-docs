@@ -11,6 +11,7 @@ use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -61,6 +62,16 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
+     * @var AssessmentMapperProxy
+     */
+    protected $assessmentMapperProxy;
+
+    /**
+     * @var Participant\DataSource
+     */
+    protected $participantDataSource;
+
+    /**
      * @var AssessableDataSource
      */
     protected $assessableDataSource;
@@ -68,15 +79,19 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper          $errorMapper
-     * @param TermMapper           $termMapper
-     * @param FolderMapper         $folderMapper
-     * @param GradeGroup           $defaultGradeGroup
-     * @param ShowcaseMapper       $showcaseMapper
-     * @param AssessableDataSource $assessableDataSource
+     * @param ErrorMapper            $errorMapper
+     * @param AssessmentMapperProxy  $assessmentMapperProxy
+     * @param Participant\DataSource $participantDataSource
+     * @param TermMapper             $termMapper
+     * @param FolderMapper           $folderMapper
+     * @param GradeGroup             $defaultGradeGroup
+     * @param ShowcaseMapper         $showcaseMapper
+     * @param AssessableDataSource   $assessableDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
+        AssessmentMapperProxy $assessmentMapperProxy,
+        Participant\DataSource $participantDataSource,
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
@@ -84,6 +99,8 @@ class Controller extends Base
         AssessableDataSource $assessableDataSource
     ) {
         $this->setErrorMapper($errorMapper);
+        $this->setAssessmentMapperProxy($assessmentMapperProxy);
+        $this->setParticipantDataSource($participantDataSource);
         $this->setTermMapper($termMapper);
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
@@ -446,6 +463,42 @@ class Controller extends Base
     protected function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return AssessmentMapperProxy
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->assessmentMapperProxy;
+    }
+
+    /**
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @return static
+     */
+    protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
+    {
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return Participant\DataSource
+     */
+    protected function getParticipantDataSource()
+    {
+        return $this->participantDataSource;
+    }
+
+    /**
+     * @param Participant\DataSource $participantDataSource
+     * @return static
+     */
+    protected function setParticipantDataSource(Participant\DataSource $participantDataSource)
+    {
+        $this->participantDataSource = $participantDataSource;
         return $this;
     }
 
