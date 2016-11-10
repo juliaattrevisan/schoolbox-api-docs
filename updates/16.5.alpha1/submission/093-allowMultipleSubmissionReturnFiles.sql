@@ -29,3 +29,28 @@ CREATE TABLE `submission_return_file` (
     ON UPDATE RESTRICT
 )
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+
+-- Populate data
+-- Unlike StudentSubmissions, textArea comments are saved in the 'comment' field, not as a text/html hash
+-- Deleted if the SubmissionReturn they belong to is deleted (ie not checking the Assessment or DueWork tables)
+INSERT INTO `submission_return_file` (
+  `submission_return_id`,
+  `hash`,
+  `realname`,
+  `uuid`,
+  `created_at`,
+  `updated_at`,
+  `deleted_at`
+)
+  SELECT
+    `sr`.`id`,
+    `sr`.`hash`,
+    (IF(`sr`.`filename` IS NOT NULL, `sr`.`filename`, `ssf`.`realname`)),
+    `sr`.`uuid`,
+    `sr`.`created_at`,
+    `sr`.`created_at`,
+    `sr`.`deleted_at`
+  FROM `submission_return` `sr`
+    LEFT JOIN `student_submission_file` `ssf` ON  `sr`.`uuid` = `ssf`.`uuid`
+  WHERE `sr`.`hash` IS NOT NULL OR `sr`.`uuid` IS NOT NULL;
