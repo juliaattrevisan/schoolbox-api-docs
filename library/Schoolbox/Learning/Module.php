@@ -138,11 +138,14 @@ class Module extends BaseModule
                 try {
                     $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
                 } catch (MapperException $e) {
-                    $args['term'] = $this->getTermMapper()->createModel();
+
+                    /* If no term is specified, default to the current
+                     * or if you tried a nonexistent term
+                     */
+                    $args['term'] = $this->getTermMapper()->findForToday();
                 }
                 if (array_key_exists('subjectId', $params)) {
                     try {
-                        var_dump($params['subjectId']);
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
                         $args['subject'] = $this->getFolderMapper()->createModel();

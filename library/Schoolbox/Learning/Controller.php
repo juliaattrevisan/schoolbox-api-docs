@@ -313,14 +313,7 @@ class Controller extends Base
      */
     public function getGrades(User $student, Term $term)
     {
-        // If no term is specified, default to the current
-
-        if ($term == null) {
-            $term = $this->getTermMapper()->findForToday();
-        }
-
         // Storage for each folders markbook
-
         $markbooks = [];
         $markbooksFolders = [];
 
