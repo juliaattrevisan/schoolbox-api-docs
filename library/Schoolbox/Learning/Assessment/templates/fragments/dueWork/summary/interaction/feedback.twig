@@ -35,7 +35,7 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {responseId: responseId, feedbackId: currentFeedback.id, fileId: currentFile.id}) }}" rel="external" data-plugin="preview">
+                            <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" rel="external" data-plugin="preview">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>

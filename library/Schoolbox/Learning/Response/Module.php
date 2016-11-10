@@ -46,19 +46,19 @@ class Module extends BaseModule
                 /* Get a list of Responses for a particular Student and Assessment
                  * Presented as a more succinct Submission History
                  */
-                '/assessments/{assessmentId}/{studentId}/responses'       => 'getResponseList',
+                '/assessments/{assessmentId}/{studentId}/responses'           => 'getResponseList',
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{responseId}/{feedbackId}/annotated{/fileId}' => 'getCrocodocDownload',
+                '/responses/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocDownload',
 
                 /* View a Response in the Inline Grader
                  */
-                '/responses/{responseId}'                                 => 'getParticularResponse',
+                '/responses/{responseId}'                                     => 'getParticularResponse',
 
                 /* View a Response File's plagscan report
                  */
-                '/responses/plagscan/{plagscanId}'                        => 'getPlagscanReport',
+                '/responses/plagscan/{plagscanId}'                            => 'getPlagscanReport',
             ],
             'POST' => []
         ];
@@ -155,7 +155,7 @@ class Module extends BaseModule
             /* Factory to figure out which fragment is required
              */
             foreach ($response->getAllFiles() as $currentFile) {
-                if ($currentFile->getId() == $params['fileId']) {
+                if ($currentFile->getCrocodocId() == $params['crocodocId']) {
                     return [
                         'response' => $response,
                         'feedback' => $feedback,
@@ -167,7 +167,7 @@ class Module extends BaseModule
             return [
                 'response' => $response,
                 'feedback' => $feedback,
-                'file' => $response->getAllFiles()->first()
+                'file' => null
             ];
         });
 
