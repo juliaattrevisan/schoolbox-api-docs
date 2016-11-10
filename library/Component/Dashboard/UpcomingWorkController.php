@@ -78,6 +78,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
         $submissionHandler = new Submission();
 
+        // TODO SA-1307 - this next line breaks because it relies on Handlers which rely on the old schema
+        // Need to rewrite to use the new Mappers + Models
+        return false;
+
         $upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($this->userID);
 
         $now = time();
