@@ -210,7 +210,7 @@ class Controller extends Assessment\Controller
                  * if the submission uses the wizzywig editor
                  */
                 if ($file->getEditableInline()) {
-                    $editorContents .= $file->getStorage()->read();
+                    $editorContents .= $file->read();
                 } else {
                     // add it to the danger zone
                     $zone->attachFiles([$file->getHash()]);
