@@ -148,7 +148,7 @@ class Module extends BaseModule
                     try {
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
-                        $args['subject'] = $this->getFolderMapper()->createModel();
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }
 

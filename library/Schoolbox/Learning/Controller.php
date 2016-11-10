@@ -366,12 +366,6 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        // If no term is specified, default to the current
-
-        if ($term == null) {
-            $term = $this->getTermMapper()->findForToday();
-        }
-
         $assessments = $this->getAssessmentMapperProxy()->findAllForContext($subject)->sortBy('dueAt', 'asc');
 
         // Grab all the participants
