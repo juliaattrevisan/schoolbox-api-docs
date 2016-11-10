@@ -62,6 +62,7 @@ class RubricContext
      */
     public function generate(IAssessable $assessment, User $student, User $currentUser)
     {
+        /** @var DueWork $assessment */
         RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
 
         /** @var DueWork $assessment */
@@ -69,10 +70,10 @@ class RubricContext
             'rubric' => $assessment->getRubric()->toContext($currentUser),
         ];
 
-//        // Hide total mark from students and parents
-//        if (!($groupHandler->isSuperuser() || $groupHandler->isStaff())) {
-//            unset($context['rubric']['total']);
-//        }
+        // Hide total mark from students and parents
+        if (!($currentUser->isSuperuser() || $currentUser->getRole()->isStaff())) {
+            unset($context['rubric']['total']);
+        }
 
         return $context;
     }
