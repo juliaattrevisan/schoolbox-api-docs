@@ -13,7 +13,7 @@
 <div class="row">
     <div class="small-12 columns island">
         {% if assessmentsToMark|length %}
-            <h2 class="subheader">Stuff you need to mark</h2>
+            <h2 class="subheader">Requires Assessment</h2>
         {% endif %}
         {% for assessment in assessmentsToMark %}
             {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
@@ -74,7 +74,7 @@
         {% endfor %}
 
         {% if assessmentsToChase|length %}
-            <h2 class="subheader">Stuff you need to chase</h2>
+            <h2 class="subheader">Not Submitted</h2>
         {% endif %}
         {% for assessment in assessmentsToChase %}
             {%- set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  -%}
