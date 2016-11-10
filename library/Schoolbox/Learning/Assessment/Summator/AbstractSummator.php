@@ -19,6 +19,19 @@ use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
 {
+    /**
+     * @inheritDoc
+     */
+    public function summateList($values)
+    {
+        $this->reset();
+        foreach ($values as $value) {
+            if (!is_null($value)) {
+                $this->aggregate($value, 1);
+            }
+        }
+        return $this->finalise();
+    }
 
     /**
      * @inheritDoc
