@@ -565,7 +565,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return $this->diff(
             $otherCollection,
             function ($a, $b) use ($getMethod) {
-                return $a->$getMethod() == $b->$getMethod;
+                return $a->$getMethod() == $b->$getMethod();
             }
         );
     }
