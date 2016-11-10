@@ -28,7 +28,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'generateNightly', $basePath, '/generate');
+        $this->addGetRoute($router, 'generateNightly', $basePath, '/generateNightly');
         $this->addGetRoute($router, 'download', $basePath, '/download');
     }
 
