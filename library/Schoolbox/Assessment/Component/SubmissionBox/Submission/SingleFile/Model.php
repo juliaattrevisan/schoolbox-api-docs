@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -19,7 +20,7 @@ use Schoolbox\User;
 /**
  * A single file within a student's submission to a due work.
  */
-class Model implements IFile
+class Model implements IFile, ISoftDeletable
 {
     use StorableTrait;
     use CreatedAtDate;

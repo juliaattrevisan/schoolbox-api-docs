@@ -101,7 +101,7 @@ class ActivityFactory {
 			->setOwner($return->getOwner())
 			->setCategory($return->getSubmissionBox()->getCategory())
 			->setReturnedWork($return)
-			->setDate($return->getReturned());
+			->setDate($return->getCreatedAt());
 		return $activity;
 	}
 }

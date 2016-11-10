@@ -154,8 +154,8 @@ class FileMapper extends Mapper
                     ->setOwner($object->getOwner())
                     // No real marker
                     ->setMarker($box->getOwner())
-                    ->setMark($defaultState->getDisplayAs())
-                    ->setReturned($object->getCreatedAt())
+                    ->setHumanReadableMark($defaultState->getDisplayAs())
+                    ->setCreatedAt($object->getCreatedAt())
                     ->setNormalizedMark($defaultState->getNormaliseAs())
                 ;
                 $returnMapper->save($defaultReturn);

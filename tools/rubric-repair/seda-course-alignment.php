@@ -453,7 +453,7 @@ $kernel->run
                     // add to seen list so we don't parse them again
                     $userSeen[$studentId] = true;
 
-                    $hrMark = $return->getMark();
+                    $hrMark = $return->getHumanReadableMark();
 
                     // EXTREMELY SPECIFIC CASE: student returns with an submission state of 'RESUBMIT' need to be left alone
                     if ($hrMark == 'RESUBMIT') {

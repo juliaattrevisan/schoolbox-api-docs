@@ -384,7 +384,7 @@ if (count($submission_history)) {
                 $history['HISTORY_ICON'] = 'tick';
             }
 
-            $mark = $activity_item->getReturnedWork()->getMark();
+            $mark = $activity_item->getReturnedWork()->getHumanReadableMark();
             $norm_mark = $activity_item->getReturnedWork()->getNormalizedMark();
 
             if ($box->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
@@ -569,8 +569,8 @@ if (count($submission_history)) {
                 $recentComment = $activity_item->getReturnedWork()->getComment();
             }
 
-            if (!isset($recentMark) && $activity_item->getReturnedWork()->getMark()) {
-                $recentMark = $activity_item->getReturnedWork()->getMark();
+            if (!isset($recentMark) && $activity_item->getReturnedWork()->getHumanReadableMark()) {
+                $recentMark = $activity_item->getReturnedWork()->getHumanReadableMark();
             }
 
         }
@@ -706,7 +706,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
                             'RETURNED_WORK_FILE_ID' => $returnedFile->getId(),
                             'RETURNED_WORK_FILE_SIZE' => Alaress_Byte_Format::bytesToString($storage->getSize()),
                             'RETURNED_WORK_FILE_NAME' => Scrub::Text($storage->getFilename()),
-                            'RETURNED_WORK_FILE_DATE' => $returnedFile->getReturned()->getRelativeTime(),
+                            'RETURNED_WORK_FILE_DATE' => $returnedFile->getCreatedAt()->getRelativeTime(),
                             'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
                         )
                     );

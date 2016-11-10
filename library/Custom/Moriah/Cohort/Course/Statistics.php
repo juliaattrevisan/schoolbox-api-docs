@@ -274,7 +274,7 @@ class Statistics
             // Don't use this mark if it's not more recent than an existing mark
             // for this student.
             if (array_key_exists($userId, $marks)) {
-                $thisReturnDate = $return->getReturned();
+                $thisReturnDate = $return->getCreatedAt();
                 $lastReturnDate = $marks[$userId]['date'];
                 if ($thisReturnDate->compare($lastReturnDate) < 0) {
                     continue;
@@ -283,10 +283,10 @@ class Statistics
 
             $marks[$userId] = array(
                 'mark'         => $return->getNormalizedMark(),
-                'display_mark' => $return->getMark(),
+                'display_mark' => $return->getHumanReadableMark(),
                 'comment'      => $return->getComment(),
                 'attempts'     => 0,
-                'date'         => $return->getReturned(),
+                'date'         => $return->getCreatedAt(),
             );
         }
 

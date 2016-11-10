@@ -95,7 +95,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getCreatedAt());
+                ->setUpdatedAt($studentSubmission->getUpdatedAt());
 
             foreach ($studentSubmission->getFiles() as $file) {
                 $response->getAllFiles()->add($file->getStorage());

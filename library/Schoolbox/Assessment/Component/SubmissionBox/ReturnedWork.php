@@ -10,23 +10,24 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\File\Mimetype;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits;
-use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
-use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\UserMapper;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 
-class ReturnedWork implements ISoftDeletable, IFile
+class ReturnedWork implements ISoftDeletable
 {
 
-    use StorableTrait;
-
-    use Traits\Model\CreatedAtDate;
-    use Traits\Model\DeletedAtDate;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * @var SubmissionBox
@@ -44,6 +45,13 @@ class ReturnedWork implements ISoftDeletable, IFile
     protected $owner;
 
     /**
+     * This Return is optionally linked to a Submission
+     *
+     * @var SubmissionBox\Submission\File|null;
+     */
+    protected $submission;
+
+    /**
      * @var string
      */
     protected $comment;
@@ -51,7 +59,7 @@ class ReturnedWork implements ISoftDeletable, IFile
     /**
      * @var string
      */
-    protected $mark;
+    protected $humanReadableMark;
 
     /**
      * @var float
@@ -71,19 +79,12 @@ class ReturnedWork implements ISoftDeletable, IFile
     /**
      * @var \Alaress_Date_Format
      */
-    protected $submitted;
+    protected $publishedAt;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var ReturnedWork\SingleFile\Model[]|Collection
      */
-    protected $returned;
-
-    /**
-     * Optional crocodoc uuid
-     *
-     * @var null
-     */
-    protected $uuid = null;
+    private $files;
 
 
     /**
@@ -93,22 +94,21 @@ class ReturnedWork implements ISoftDeletable, IFile
     {
         $this->setSubmissionBox(new SubmissionBox());
         $this->setOwner(new User());
-        // This is meant to ensure that getStorage() always returns an IStorage,
-        // not to specify that it must be a particular IStorage implementation.
-        $this->setStorage(new StorageModel());
+        $this->files = new Collection();
     }
 
     /**
      * Calculates a gradient (from 0 to 10) from the normalized mark for this
      * return.
      *
-     * @return int
+     * @return int|void
      */
     public function getGradientFromNormalizedMark()
     {
         if (!empty($this->getNormalizedMark())) {
             return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
         }
+        return null;
     }
 
     /**
@@ -146,6 +146,14 @@ class ReturnedWork implements ISoftDeletable, IFile
      */
 
     /**
+     * @return \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submission_box;
+    }
+
+    /**
      * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
      *
      * @return $this
@@ -157,32 +165,12 @@ class ReturnedWork implements ISoftDeletable, IFile
     }
 
     /**
-     * @return \Schoolbox\Assessment\Component\SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submission_box;
-    }
-
-    /**
-     * The person who the mark is for
-     * @param  \Schoolbox\User $owner
-     *
-     * @return $this
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-        return $this;
-    }
-
-    /**
-     * The person who the mark is for
+     * The person who marked the work
      * @return \Schoolbox\User
      */
-    public function getOwner()
+    public function getMarker()
     {
-        return $this->owner;
+        return $this->marker;
     }
 
     /**
@@ -198,32 +186,40 @@ class ReturnedWork implements ISoftDeletable, IFile
     }
 
     /**
-     * The person who marked the work
+     * The person who the mark is for
      * @return \Schoolbox\User
      */
-    public function getMarker()
+    public function getOwner()
     {
-        return $this->marker;
+        return $this->owner;
     }
 
-
     /**
-     * @param  \Alaress_Date_Format $submitted
+     * The person who the mark is for
+     * @param  \Schoolbox\User $owner
      *
      * @return $this
      */
-    public function setSubmitted($submitted)
+    public function setOwner($owner)
     {
-        $this->submitted = $submitted;
+        $this->owner = $owner;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return null|Submission\File
      */
-    public function getSubmitted()
+    public function getSubmission()
     {
-        return $this->submitted;
+        return $this->submission;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
     }
 
     /**
@@ -237,12 +233,13 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this;
     }
 
+
     /**
      * @return string
      */
-    public function getComment()
+    public function getHumanReadableMark()
     {
-        return $this->comment;
+        return $this->humanReadableMark;
     }
 
     /**
@@ -250,18 +247,18 @@ class ReturnedWork implements ISoftDeletable, IFile
      *
      * @return $this
      */
-    public function setMark($mark)
+    public function setHumanReadableMark($mark)
     {
-        $this->mark = $mark;
+        $this->humanReadableMark = $mark;
         return $this;
     }
 
     /**
-     * @return string
+     * @return float
      */
-    public function getMark()
+    public function getNormalizedMark()
     {
-        return $this->mark;
+        return $this->normalized_mark;
     }
 
     /**
@@ -275,52 +272,6 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getNormalizedMark()
-    {
-        return $this->normalized_mark;
-    }
-
-    /**
-     * @param  \Alaress_Date_Format $returned
-     *
-     * @return $this
-     */
-    public function setReturned($returned)
-    {
-        $this->returned = $returned;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getReturned()
-    {
-        return $this->returned;
-    }
-
-    /**
-     * Set uuid
-     *
-     * @param null $uuid
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-    }
-
-    /**
-     * Get uuid
-     *
-     * @return null
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
 
     /**
      * @return boolean
@@ -340,4 +291,43 @@ class ReturnedWork implements ISoftDeletable, IFile
         $this->isConfirmationOfSubmission = $isConfirmationOfSubmission;
         return $this;
     }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
+    }
+
+    /**
+     * @param  \Alaress_Date_Format $publishedAt
+     *
+     * @return static
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+    /**
+     * @return ReturnedWork\SingleFile\Model[]|Collection
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * @param ReturnedWork\SingleFile\Model[]|Collection $files
+     * @return $this
+     */
+    public function setFiles(Collection $files)
+    {
+        $this->files = $files;
+        return $this;
+    }
+
 }

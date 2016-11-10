@@ -187,7 +187,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         if ($return && $box->isMarkShownToRole($currentUser->getRole())) {
                             $this->getPage()->setVar(
                                 array(
-                                    'SHOWCASED_WORK_RETURNED_MARK' => $return->getMark(),
+                                    'SHOWCASED_WORK_RETURNED_MARK' => $return->getHumanReadableMark(),
                                     'SHOWCASED_WORK_RETURNED_GRADIENT' => $return->getGradientFromNormalizedMark(),
                                 )
                             );
