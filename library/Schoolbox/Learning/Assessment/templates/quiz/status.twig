@@ -1,0 +1,65 @@
+{#  usage: per-participation, configure the following vars for the parent template to use
+     - pActionResponses: a route to see the list of responses for this participation
+     - pStatusText:      the description to output under the user's name
+     - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     - pTooltip:         a tooltip explaining the status marker
+
+    available varaibles:
+     - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
+     - assessment:  the assessment we're looking at
+     - participant: the current participant of the iteration
+     - statusIncomplete: a string representing the 'incomplete' state
+     - statusPending: a string representing the 'pending' state
+     - statusComplete: a string representing the 'complete' state
+
+#}
+{% extends '@learningAssessment/status.twig' %}
+
+{% block config %}
+
+    {#{% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}#}
+    {% set latestResponse    = participant.findMostRecentResponse %}
+    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set multipleResponses = participant.allResponses | length > 1 %}
+
+    {% set isPublished  = latestFeedback.published %}
+    {% set canPublish   = latestFeedback and not isPublished %}
+
+    {% if not latestResponse %}
+        {% set pActionSummary    = '' %}
+    {% endif %}
+
+    {% if assessment.acceptsNone %}
+        {% set pStatusClass = '' %}
+        {% set pTooltip     = '' %}
+    {% else %}
+        {% set pStatusClass = participant.markingRequired ? statusPending : (latestResponse or latestFeedback ? statusComplete : statusIncomplete) %}
+        {% set pTooltip     = participant.markingRequired ? 'Review required' : (latestResponse or latestFeedback ? 'Reviewed' : 'Not attempted') %}
+
+        {% set pStatusText %}
+            {%- spaceless %}
+                {% if not latestResponse %}
+                    Not attempted
+                {% else %}
+                    {% if multipleResponses %}
+                        Reattempted
+                    {% else %}
+                        Attempted
+                    {% endif %}
+                    {% if latestResponse.submittedAt < assessment.dueAt %}
+                        on time
+                    {% else %}
+                        late
+                    {% endif %}
+                {% endif %}
+            {% endspaceless -%}
+        {% endset %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
+
+
+{% block grading %}
+    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+{% endblock %}

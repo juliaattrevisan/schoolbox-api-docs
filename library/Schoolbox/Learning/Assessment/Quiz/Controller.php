@@ -105,13 +105,14 @@ class Controller extends Assessment\Controller
         /* TODO: Quickmark screen
          */
         $twigData = [
+            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
             'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/quiz/status/staff.twig",
+                "@learningAssessment/quiz/status.twig",
                 $twigData
             )
         );
