@@ -12,20 +12,20 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Timeline;
+namespace Schoolbox\Learning\Assessment\Timeline;
 
 use \Schoolbox\Collection;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Participant;
 
 class Full
 {
 
     /**
-     * @var DueWork
+     * @var Participant
      */
-    protected $assessment;
+    protected $participant;
 
     /**
      * @var Collection
@@ -43,11 +43,11 @@ class Full
     /**
      * Timeline constructor.
      *
-     * @param DueWork $assessment
+     * @param Participant $participant
      */
-    public function __construct(DueWork $assessment)
+    public function __construct(Participant $participant)
     {
-        $this->setAssessment($assessment);
+        $this->setParticipant($participant);
         $this->setRecombined(new Collection());
     }
 
@@ -78,8 +78,7 @@ class Full
     {
         $processedFeedback = [];
 
-        /** @var Submission $currentResponse */
-        foreach ($this->getAssessment()->getResponses() as $currentResponse) {
+        foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
             /* Only show Submitted submissions (ignore drafts)
              */
@@ -98,7 +97,7 @@ class Full
 
         /* Only grab unique Floating Feedbacks
          */
-        foreach ($this->getAssessment()->getFeedbacks() as $currentFeedback) {
+        foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
             if (!in_array($currentFeedback->getId(), $processedFeedback)) {
 
                 /* Only show Published feedbacks
@@ -125,19 +124,19 @@ class Full
 
             /* Get the first date to compare against
              */
-            if ($a instanceof Submission) {
+            if ($a instanceof IResponse) {
                 $date1 = $a->getSubmittedAt();
             }
-            elseif ($a instanceof Feedback) {
+            elseif ($a instanceof IFeedback) {
                 $date1 = $a->getPublishedAt();
             }
 
             /* Get the second date to compare against
              */
-            if ($b instanceof Submission) {
+            if ($b instanceof IResponse) {
                 $date2 = $b->getSubmittedAt();
             }
-            elseif ($b instanceof Feedback) {
+            elseif ($b instanceof IFeedback) {
                 $date2 = $b->getPublishedAt();
             }
 
@@ -155,20 +154,20 @@ class Full
      */
 
     /**
-     * @return DueWork
+     * @return Participant
      */
-    protected function getAssessment()
+    protected function getParticipant()
     {
-        return $this->assessment;
+        return $this->participant;
     }
 
     /**
-     * @param DueWork $assessment
+     * @param Participant $assessment
      * @return $this
      */
-    protected function setAssessment($assessment)
+    protected function setParticipant($assessment)
     {
-        $this->assessment = $assessment;
+        $this->participant = $assessment;
         return $this;
     }
 
