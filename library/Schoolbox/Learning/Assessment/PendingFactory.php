@@ -934,12 +934,12 @@ class PendingFactory
                 sb.mark_visibility AS 'sb.mark_visibility',
                 ss.id              AS 'ss.id',
                 ss.owner           AS 'ss.owner',
-                ss.submitted       AS 'ss.submitted',
-                ss.marked          AS 'ss.marked'
+                ss.submitted_at    AS 'ss.submitted_at',
+                ss.updated_at      AS 'ss.updated_at'
             FROM submission_box sb
             JOIN student_submission ss ON ss.box_id = sb.id
             WHERE sb.deleted = 0
-            AND ss.draft = 0
+            AND ss.submitted_at IS NOT NULL
             AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
         ";
         $statement = $this->database->prepare($query);
@@ -970,12 +970,13 @@ class PendingFactory
                 sr.id                            AS 'sr.id',
                 sr.marker                        AS 'sr.marker',
                 sr.owner                         AS 'sr.owner',
-                sr.returned                      AS 'sr.returned',
+                sr.updated_at                    AS 'sr.updated_at',
+                sr.published_at                  AS 'sr.published_at',
                 sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
             FROM submission_box sb
-            JOIN submission_return sr ON sr.box_id = sb.id 
+            JOIN submission_return sr ON sr.box_id = sb.id
             WHERE sb.deleted = 0
-            AND sr.deleted_at IS NULL
+            AND sr.published_at IS NOT NULL
             AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
         ";
 
@@ -1123,7 +1124,7 @@ class PendingFactory
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
-            $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted']));
+            $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted_at']));
 
             $dueWork->getResponses()->add($response);
             $participants = $dueWork->getAllParticipants();
@@ -1148,8 +1149,8 @@ class PendingFactory
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
             $feedback->setId($row['sr.id']);
-            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.returned']));
-            $feedback->setPublishedAt($this->getFastDateFromString($row['sr.returned']));
+            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.updated_at']));
+            $feedback->setPublishedAt($this->getFastDateFromString($row['sr.published_at']));
             $feedback->setAssessable($dueWork);
 
             $dueWork->getFeedbacks()->add($feedback);
