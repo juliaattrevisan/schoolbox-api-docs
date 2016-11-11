@@ -14,7 +14,7 @@
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                             <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                            <li><a href="{{ routeLookup('learning.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
+                            <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
                             <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
                             <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                         </ul>
