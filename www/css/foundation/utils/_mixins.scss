@@ -263,7 +263,7 @@
 		.#{$prefix}-#{$i} {
 			color: $derived;
 		}
-		.#{$prefix}-bg-#{$i} {
+		.#{$prefix}-#{$i}-bg {
 			background-color: $derived;
 			color: calc-text-color($derived, $light, $dark);
 

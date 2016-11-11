@@ -85,18 +85,13 @@
                         Class Average
                     </th>
                     {% set weightedMean = markbook.markbookStatistics.weightedMean %}
-                    <th>
-                        <span class="{{ urgency.marks(weightedMean) }}">
+                    <th class="{{ urgency.marks(markbook.markbookStatistics.normalisedMean) }}-bg">
                             {{ weightedMean | default('–') }}
-                        </span>
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
-                        <th>
-                            <a class="{{ urgency.marks(assessmentMean) }}"
-                               href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                        <th class="{{ urgency.marks(assessmentMean) }}-bg">
                                 {{ assessmentMean | default('–') }}
-                            </a>
                         </th>
                     {% endfor %}
                 </tr>
@@ -134,10 +129,11 @@
                     </th>
 
                     {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
-                    <th>
+                    {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
+                    <th class="{{ urgency.marks(meanNormalised) }}-bg">
                         {# TODO use actual selected term code #}
-                        <a class="{{ urgency.marks(studentMean) }}"
-                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
+                        <a class="{{ urgency.marks(meanNormalised) }}-bg"
+                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}" title="View students grades">
                             {{ studentMean | default('–') }}
                         </a>
                     </th>
