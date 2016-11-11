@@ -102,8 +102,6 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        /* TODO: Quickmark screen
-         */
         $twigData = [
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),

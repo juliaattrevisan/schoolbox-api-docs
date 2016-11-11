@@ -90,8 +90,6 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        /* TODO: Quickmark screen
-         */
         $twigData = [
             'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
