@@ -26,6 +26,8 @@ use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
 use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\Access;
 
 class Module extends BaseModule
 {
@@ -108,14 +110,30 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        // Add permissions to each route
-
-        $permissionIndex = new Rule\All(
+        /* Must be superuser or have write (or higher) access to the homepage
+         */
+        $isSuperUser = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\IsSuperuser()
         );
 
-        $this->addRoutePermission($authorizer, 'getIndex', $permissionIndex);
+        $hasHomepageWrite = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                function ($params) {
+                    return $params['folderId'];
+                },
+                Access::getInstance()
+            )
+        );
+
+        $permissionIndex = new Rule\Any(
+            $isSuperUser,
+            $hasHomepageWrite
+        );
+
+        $this->addRoutePermission($authorizer, '.*', $permissionIndex);
     }
 
     /**
