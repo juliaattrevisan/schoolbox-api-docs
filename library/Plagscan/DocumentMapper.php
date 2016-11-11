@@ -78,7 +78,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 
 		$this->hasSoftDeleteDateField('deleted');
 
-//        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
+        $this->joins('file_id', Submission\SingleFile\Mapper::class, 'id', null, null);
 
 	}
 
@@ -89,7 +89,11 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	 *
 	 * @return array
 	 */
-	public function save ($dirtyDocument) {
+	public function save($dirtyDocument)
+	{
+        // It no longer makes sense to not update an existing document,
+        // because submission files shouldn't be updated after the submission gets published.
+        // TODO port to an async process
 		$existing_id = null;
 		try {
 			// Don't do anything if $existing_document exists already
@@ -98,7 +102,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		}
 		catch (Schoolbox\Mapper\Exception $e) {}
 		if (!isset($existing_id)) {
-			$this->clearPreviousVersions($dirtyDocument);
+//			$this->clearPreviousVersions($dirtyDocument);
 			$documentId = $this->gateway->submit($dirtyDocument->getFile());
 
 			if (!empty($documentId)) {
@@ -113,38 +117,40 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		return parent::save($dirtyDocument);
 	}
 
-    /**
-     * Deletes all plagscan documents for previous versions of this file, from
-     * the database and the gateway.
-     *
-     * @param Plagscan_Document $dirtyDocument
-     */
-    public function clearPreviousVersions($dirtyDocument) {
-        $file = $this->submissionMapper->findById($dirtyDocument->getFile()->getId());
-
-        // Previous submissions of this file for this box and student.
-        $fileList = $this->submissionMapper->findByColumnList(
-            array(
-                'box_id' => $file->getSubmissionBox()->getId(),
-                'owner'  => $file->getOwner()->getId(),
-            )
-        );
-
-        // Previous Plagscan documents - delete them all, from here and from
-        // Plagscan.
-        /** @var Plagscan_Document[] $documentList */
-        $documentList = $this->findByColumn('file_id', $fileList->getColumnValues('id'));
-        foreach ($documentList as $document) {
-            // Set the document as deleted.
-            if ($this->gateway->delete($document->getPlagscanId())) {
-                $this->delete($document);
-            }
-        }
-    }
+//    /**
+//     * Deletes all plagscan documents for previous versions of this file, from
+//     * the database and the gateway.
+//     *
+//     * @param Plagscan_Document $dirtyDocument
+//     */
+//    public function clearPreviousVersions($dirtyDocument) {
+//        $file = $this->submissionMapper->findById($dirtyDocument->getFile()->getId());
+//
+//        // Previous submissions of this file for this box and student.
+//        $fileList = $this->submissionMapper->findByColumnList(
+//            array(
+//                'box_id' => $file->getSubmissionBox()->getId(),
+//                'owner'  => $file->getOwner()->getId(),
+//            )
+//        );
+//
+//        // Previous Plagscan documents - delete them all, from here and from
+//        // Plagscan.
+//        /** @var Plagscan_Document[] $documentList */
+//        $documentList = $this->findByColumn('file_id', $fileList->getColumnValues('id'));
+//        foreach ($documentList as $document) {
+//            // Set the document as deleted.
+//            if ($this->gateway->delete($document->getPlagscanId())) {
+//                $this->delete($document);
+//            }
+//        }
+//    }
 
     /**
      * Populates a Plagscan document out of a submission. Doesn't actually save
      * it, though.
+     *
+     * TODO make this work with multiple files
      *
      * @param  Submission\File $submission
      * @return Plagscan_Document

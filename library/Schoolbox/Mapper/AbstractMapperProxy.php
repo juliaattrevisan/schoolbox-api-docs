@@ -10,6 +10,7 @@ namespace Schoolbox\Mapper;
 use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 
 /**
@@ -39,6 +40,27 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * Proxy for $this->mapper->findById().
+     *
+     * @param int $id
+     * @return object
+     * @throws Mapper\Exception\Deleted if it was deleted
+     */
+    public function findById($id)
+    {
+        try {
+            $object = $this->transformModel($this->getMapper()->findById($id));
+        } catch (Mapper\Exception\Deleted $e) {
+            $object = $this->transformModel($e->getDeletedObject());
+            if ($object instanceof ISoftDeletable) {
+                $e->setDeletedObject($object);
+            }
+            throw $e;
+        }
+        return $object;
+    }
+
+    /**
      * Gets a typed Collection of objects that match the specified column values
      *
      * @param array $columnList
@@ -60,15 +82,22 @@ abstract class AbstractMapperProxy
      * Saves this object or collection of objects.
      *
      * @param object|Collection $model A model object, or collection thereof
-     * @return array
+     * @return bool Always true
+     * @throws \PDOException if something went wrong in the save process
      */
     public function save($model)
     {
-        return $this->getMapper()->save(
-            $this->transformDomainObjects(
-                $this->getMapper()->getModelAsCollection($model)
-            )
-        );
+        foreach ($this->getMapper()->getModelAsCollection($model) as $domainObject) {
+            $dataModel = $this->transformDomainObject($domainObject);
+            $this->getMapper()->save($dataModel);
+
+            // The save action will have set an auto-incrementing ID if $dataModel didn't already exist.
+            // Populate the ID of the domain object based on that value.
+            if (method_exists($dataModel, 'getId') && method_exists($domainObject, 'setId')) {
+                $domainObject->setId($dataModel->getId());
+            }
+        }
+        return true;
     }
 
     /**
@@ -137,6 +166,18 @@ abstract class AbstractMapperProxy
     protected abstract function getSelectString();
 
     /**
+     * Retrieves a single mapping from an external to an internal ID.
+     *
+     * @param $externalValue
+     * @return int
+     */
+    protected function getInternalValue($externalValue)
+    {
+        $values = $this->getInternalValues([$externalValue]);
+        return isset($values[0]) ? $values[0] : null;
+    }
+
+    /**
      * @param $externalValues
      * @return array
      */
@@ -169,12 +210,34 @@ abstract class AbstractMapperProxy
     protected abstract function transformModels(Collection $mapperModels);
 
     /**
+     * Converts a single data model object into a domain model.
+     *
+     * @param object $model
+     * @return object
+     */
+    protected function transformModel($model)
+    {
+        return $this->transformModels(new Collection([$model]))->first();
+    }
+
+    /**
      * Transforms domain model objects into data model objects.
      *
      * @param Collection $mapperModels
      * @return GenericCollection
      */
     protected abstract function transformDomainObjects(Collection $mapperModels);
+
+    /**
+     * Converts a single domain model object into a data model.
+     *
+     * @param object $mapperModel
+     * @return object
+     */
+    protected function transformDomainObject($mapperModel)
+    {
+        return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
+    }
 
     /* Getters / Setters
      */

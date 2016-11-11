@@ -38,6 +38,13 @@ class Model implements IStorage
     protected $plagscan;
 
     /**
+     * Is this editable inline?
+     *
+     * @var bool
+     */
+    protected $editableInline;
+
+    /**
      * File constructor.
      */
     public function __construct()
@@ -127,6 +134,24 @@ class Model implements IStorage
     public function setPlagscan($plagscan)
     {
         $this->plagscan = $plagscan;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getEditableInline()
+    {
+        return $this->editableInline;
+    }
+
+    /**
+     * @param boolean $editableInline
+     * @return static
+     */
+    public function setEditableInline($editableInline)
+    {
+        $this->editableInline = $editableInline;
         return $this;
     }
 }

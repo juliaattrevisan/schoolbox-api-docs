@@ -7,14 +7,16 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use Schoolbox\Mapper;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 
 /**
@@ -80,25 +82,47 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|StudentSubmission[] $mapperModels
-     * @return GenericCollection|DueWorkSubmission[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $dueWorkResponses = new GenericCollection(DueWorkSubmission::class);
+        $dueWorkResponses = new GenericCollection(DomainObject::class);
 
         foreach ($mapperModels as $studentSubmission) {
-            $response = (new DueWorkSubmission())
+            $response = (new DomainObject())
                 ->setId($studentSubmission->getId())
                 ->setSubmittedBy($studentSubmission->getOwner())
                 // TODO add submitted on behalf of as a separate column
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getUpdatedAt());
+                ->setUpdatedAt($studentSubmission->getUpdatedAt())
+                ->setSubmittedAt($studentSubmission->getSubmittedAt());
 
             foreach ($studentSubmission->getFiles() as $file) {
-                $response->getAllFiles()->add($file->getStorage());
+                // Translate the file subobject
+                $responseFile = (new DueWorkSubmissionFile())
+                    ->setStorage($file->getStorage())
+                    ->setEditableInline($file->getEditableInline())
+                    ->setCrocodocId($file->getUuid())
+                    ->setFilename($file->getFilename());
+
+                // Hydrate Plagscan too
+                $modelPlagscan = $responseFile->getPlagscan();
+                if ($modelPlagscan instanceof \Plagscan_Document) {
+                    // Assuming plagscan ID => id is the correct mapping
+                    // It will do for now ¯\_(ツ)_/¯
+                    $responsePlagscan = (new Plagscan())
+                        ->setId($modelPlagscan->getPlagscanId())
+                        ->setStatus($modelPlagscan->getStatus())
+                        ->setScore($modelPlagscan->getScore())
+                        ->setHtml($modelPlagscan->getHtml());
+
+                    $responseFile->setPlagscan($responsePlagscan);
+                }
+
+                $response->getAllFiles()->add($responseFile);
             }
             $dueWorkResponses->add($response);
         }
@@ -107,25 +131,50 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|DueWorkSubmission[] $domainObjects
-     * @return GenericCollection|StudentSubmission[]
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(StudentSubmission::class);
+        $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
-            $dataModel = (new StudentSubmission())
-                ->setOwner($domainObject->getSubmittedBy())
-                ->setCreatedAt($domainObject->getCreatedAt());
+            // TODO consider whether the submission box should be looked up in save()
+            $dataModel = (new DataObject())
+                ->setId($domainObject->getId())
+                ->setSubmissionBox(
+                    (new SubmissionBox())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
+                ->setOwner($domainObject->getSubmittedOnBehalfOf())
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setSubmittedAt($domainObject->getSubmittedAt());
 
             // Files
             foreach ($domainObject->getAllFiles() as $file) {
-                // TODO this can't be all that needs to be set?
-                $dataModel->getFiles()->add(
-                    (new StudentSubmissionFile())
-                        ->setStorage($file)
-                );
+
+                // The post-save of a file will have to handle saving of plagscan
+                // (due to the new Plagscan object not holding a file ID)
+
+                $dataModelFile = (new StudentSubmissionFile())
+                    ->setStorage($file->getStorage())
+                    ->setEditableInline($file->getEditableInline())
+                    ->setUuid($file->getCrocodocId())
+                    ->setFilename($file->getFilename());
+
+                // Dehydrate Plagscan too, and save it
+                $plagscan = $file->getPlagscan();
+                if ($plagscan instanceof Plagscan) {
+                    $dataModelPlagscan = (new \Plagscan_Document())
+                        ->setPlagscanId($plagscan->getId())
+                        ->setStatus($plagscan->getStatus())
+                        ->setScore($plagscan->getScore())
+                        ->setHtml($plagscan->getHtml());
+
+                    $dataModelFile->setPlagscan($dataModelPlagscan);
+                }
+
+                $dataModel->getFiles()->add($dataModelFile);
             }
 
             $dataModels->add($dataModel);
@@ -134,11 +183,3 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $dataModels;
     }
 }
-
-
-
-
-
-
-
-

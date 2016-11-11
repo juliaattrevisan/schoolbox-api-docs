@@ -7,11 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Completion;
 
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as DomainObject;
 use Schoolbox\Mapper;
 
 
@@ -52,6 +53,23 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
+     * Overridden to only retrieve task completions that are status: complete
+     * or requires confirmation.
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findByColumnList(array $columnList, $options = array())
+    {
+        $columnList['completion_status'] = [
+            DataObject::COMPLETION_STATUS_REQUIRES_CONFIRMATION,
+            DataObject::COMPLETION_STATUS_COMPLETE,
+        ];
+        return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
      * @return string
      */
     protected function getExternalColumnName()
@@ -78,15 +96,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|Completion[] $mapperModels
-     * @return GenericCollection|TaskCompletion[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $taskCompletions = new GenericCollection(TaskCompletion::class);
+        $taskCompletions = new GenericCollection(DomainObject::class);
 
         foreach($mapperModels as $completion){
-            $taskCompletion = (new TaskCompletion())
+            $taskCompletion = (new DomainObject())
+                // TODO add completion status once markbook is merged
                 ->setId($completion->getId())
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
@@ -114,17 +133,21 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|TaskCompletion[] $domainObjects
-     * @return GenericCollection|Completion[]
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(Completion::class);
+        $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
-            // TODO add task ID - map from assessment ID somehow
             // TODO add completion status once markbook is merged
-            $dataModel = (new Completion())
+            $dataModel = (new DataObject())
+                ->setId($domainObject->getId())
+                ->setTask(
+                    (new Task())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setStudent($domainObject->getSubmittedOnBehalfOf())
                 ->setMarkingUser($domainObject->getSubmittedBy())
                 ->setCompletionDate($domainObject->getCreatedAt());
@@ -134,11 +157,3 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $dataModels;
     }
 }
-
-
-
-
-
-
-
-

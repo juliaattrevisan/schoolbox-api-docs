@@ -18,14 +18,17 @@ use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Response\TemporaryResponse;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\DueWork\Timeline\Full as FullTimeline;
 
 class Controller extends Assessment\Controller
@@ -40,20 +43,20 @@ class Controller extends Assessment\Controller
     /** @var WorkTypeMapper */
     private $workTypeMapper;
 
-    /** @var SubmissionBox\Submission\FileMapper */
-    private $submissionFileMapper;
+    /** @var DueWorkResponseMapper */
+    private $dueWorkResponseMapper;
 
     /**
-     * @param UserMapper                          $userMapper
-     * @param Error\Mapper                        $errorMapper
-     * @param MapperProxy                         $assessmentMapper
-     * @param Access                              $access
-     * @param Transactor                          $transactor
-     * @param Assessment\Breadcrumb\Factory       $bakery
-     * @param Rubric\RubricMapper                 $rubricMapper
-     * @param Rubric\ResultMapper                 $resultSetMapper
-     * @param WorkTypeMapper                      $workTypeMapper
-     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param MapperProxy                   $assessmentMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     * @param Rubric\RubricMapper           $rubricMapper
+     * @param Rubric\ResultMapper           $resultSetMapper
+     * @param WorkTypeMapper                $workTypeMapper
+     * @param DueWorkResponseMapper         $dueWorkResponseMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -65,13 +68,13 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         WorkTypeMapper $workTypeMapper,
-        SubmissionBox\Submission\FileMapper $submissionFileMapper
+        DueWorkResponseMapper $dueWorkResponseMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
-        $this->resultSetMapper      = $resultSetMapper;
-        $this->rubricMapper         = $rubricMapper;
-        $this->workTypeMapper       = $workTypeMapper;
-        $this->submissionFileMapper = $submissionFileMapper;
+        $this->resultSetMapper       = $resultSetMapper;
+        $this->rubricMapper          = $rubricMapper;
+        $this->workTypeMapper        = $workTypeMapper;
+        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
     }
 
 
@@ -179,48 +182,50 @@ class Controller extends Assessment\Controller
 
         /* Otherwise continue
          */
-        $onlineSubmissionFilenames = ['Online Submission', 'online-submission'];
-        $latestResponse            = null;
-        $editorContents            = '';
+        $latestResponse = null;
+        $editorContents = '';
 
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
-         *
-         * TODO: Replace SubmissionFileMapper() usage
          */
 
         /** @var Submission\File\Model $submission */
-        $allResponses = $this->getSubmissionFileMapper()->findByColumnList([
-            'owner' => $student->getId(),
-            'box_id' => 72
-        ], [
-            'order' => [
-                'submitted' => 'desc'
-            ]
-        ]);
-
-        /* Assume the most recent record is the latest submission
-         */
-        if ($allResponses->count()) {
-            $latestResponse = $allResponses->first();
-
-            /* Load in the wizzywig instead of a file attachment,
-             * if the submission uses the wizzywig editor and the
-             * submission is still a draft
-             */
-            if (in_array($latestResponse->getStorage()->getFilename(), $onlineSubmissionFilenames)) {
-                if ($latestResponse->getDraft()) {
-                    $editorContents = $latestResponse->getStorage()->read();
-                }
-            }
-        }
+        $allResponses = $participant->getAllResponses();
 
         /* Attach files if any exist
          */
         $zoneFactory = new Assessment\Attachzone\Factory();
         $zone = $zoneFactory->buildForAssessmentType($assessment);
 
+        /* Assume the most recent record is the latest submission
+         */
+        if ($allResponses->count()) {
+            /** @var Submission\Model $latestResponse */
+            $latestResponse = $participant->findMostRecentResponse();
+
+            // Display the files that are a part of latest submission
+            foreach ($latestResponse->getAllFiles() as $file) {
+                /* Load in the wizzywig instead of a file attachment,
+                 * if the submission uses the wizzywig editor
+                 */
+                if ($file->getEditableInline()) {
+                    $editorContents .= $file->read();
+                } else {
+                    // add it to the danger zone
+                    $zone->attachFiles([$file->getHash()]);
+                }
+            }
+
+            // Is the latest response a draft? Update it if so, otherwise create a new one.
+            // (The files in the latest submission were added regardless, so a student can
+            //  create a new draft from their most recent live submission.)
+            if (!$latestResponse->isDraft()) {
+                $latestResponse = null;
+            }
+        }
+
+        // TODO: what is this I don't even
         if (!$this->getUser()->isSuperuser()) {
             $folderIds = [];
 
@@ -282,7 +287,8 @@ class Controller extends Assessment\Controller
             if ($rq->isXhr()) {
                 $result['success'] = false;
                 $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-                $result['id']      = 72;
+                // Probably don't need id
+//                $result['id']      = 72;
 
                 $rs->status->setCode(403);
                 $rs->content->set($this->buildJsonOutput($result));
@@ -308,43 +314,52 @@ class Controller extends Assessment\Controller
 
         if ($rq->post['responseId']) {
             // Load an existing response to update
-
-            /* TODO: Implement with Mr Sannang's data sources
-             */
-
-            $response = $this->getSubmissionFileMapper()->findById($rq->post['responseId']);
-
+            $response = $this->getDueWorkResponseMapper()->findById($rq->post['responseId']);
         } else {
             // Create a new response
             $response = new DueWorkSubmission();
             $response
-                ->setAssessable($assessment)
                 ->setSubmittedBy($creator)
                 ->setSubmittedOnBehalfOf($participant->getUser())
-                ->attachOnlineSubmissionContent($body)
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
+        }
+        $response->setAssessable($assessment);
+
+        // Replace files with what was actually submitted
+        $response->setAllFiles(new Collection());
+        $response->attachOnlineSubmissionContent($body);
+
+        // Make one of those factories that builds storages from hashes
+        $factory = new CollectorFactory();
+        if (!empty($rq->post['attachment'])) {
+            foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
+                $response->getAllFiles()->add(
+                    (new DueWorkSubmissionFile())
+                        ->setStorage($attachment)
+                        ->setFilename($attachment->getFilename())
+                        ->setEditableInline(false)
+                );
+            }
         }
 
         /* If we're saving the final version of the submission
          * (ie. not a draft) ram the current datetime in
          */
         if ($isFinal) {
-
-            /* TODO: this will die because it's not using an actual mapper/model
-             */
             $response->setSubmittedAt(Alaress_Date_Format::now());
         }
 
-        /* TODO: Do the actual saving
+        /* Do the actual saving
          */
+        $this->getDueWorkResponseMapper()->save($response);
 
         /* Saving drafts from the wizzywig
          */
         if ($rq->isXhr()) {
             $result['success'] = true;
             $result['message'] = 'OK';
-            $result['id']      = 72;
+            $result['id']      = $response->getId();
 
             $rs->status->setCode(200);
             $rs->content->set($this->buildJsonOutput($result));
@@ -537,21 +552,21 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @return SubmissionBox\Submission\FileMapper
+     * @return DueWorkResponseMapper
      */
-    protected function getSubmissionFileMapper()
+    protected function getDueWorkResponseMapper()
     {
-        return $this->submissionFileMapper;
+        return $this->dueWorkResponseMapper;
     }
 
 
     /**
-     * @param SubmissionBox\Submission\FileMapper $submissionFileMapper
+     * @param DueWorkResponseMapper $dueWorkResponseMapper
      * @return static
      */
-    protected function setSubmissionFileMapper($submissionFileMapper)
+    protected function setDueWorkResponseMapper($dueWorkResponseMapper)
     {
-        $this->submissionFileMapper = $submissionFileMapper;
+        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         return $this;
     }
 

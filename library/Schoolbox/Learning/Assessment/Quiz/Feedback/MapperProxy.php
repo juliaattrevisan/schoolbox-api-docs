@@ -8,12 +8,13 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
 
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponseDomainObject;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
@@ -93,23 +94,23 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the Mapper-generated models into the required type.
      *
-     * @param Collection|QuizAttempt[] $mapperModels
-     * @return GenericCollection|QuizFeedback[]
+     * @param Collection|DataObject[] $mapperModels
+     * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        /** @var QuizFeedback[] $quizResponses */
-        $quizResponses = new GenericCollection(QuizFeedback::class);
+        /** @var DomainObject[] $quizResponses */
+        $quizResponses = new GenericCollection(DomainObject::class);
 
         $ids = [];
         foreach ($mapperModels as $attempt) {
             $ids[] = $attempt->getId();
-            $response = (new QuizFeedback())
+            $response = (new DomainObject())
                 ->setId($attempt->getId())
                 // The completion serves as both a response and a feedback.
                 // Add a corresponding stub response.
                 ->setResponse(
-                    (new QuizResponse())
+                    (new QuizResponseDomainObject())
                         ->setId($attempt->getId())
                 )
                 ->setReviewee($attempt->getUser())
@@ -144,16 +145,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * @param Collection|QuizFeedback[] $domainObjects
-     * @return GenericCollection|QuizAttempt[]
+     * @param Collection|DomainObject[] $domainObjects
+     * @return GenericCollection|DataObject[]
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $dataModels = new GenericCollection(QuizAttempt::class);
+        $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
-            $dataModel = (new QuizAttempt())
+            $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
+                ->setAssessment(
+                    (new Quiz())
+                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+                )
                 ->setUser($domainObject->getReviewee())
                 ->setStart($domainObject->getCreatedAt())
                 ->setFinish($domainObject->getUpdatedAt())

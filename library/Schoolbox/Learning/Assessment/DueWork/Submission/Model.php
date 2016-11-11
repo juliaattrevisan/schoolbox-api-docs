@@ -56,7 +56,12 @@ class Model extends AbstractResponse
     {
         $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $body, false);
 
-        $this->getAllFiles()->add($storage);
+        $this->getAllFiles()->add(
+            (new File\Model())
+                ->setStorage($storage)
+                ->setFilename('Online Submission')
+                ->setEditableInline(true)
+        );
 
         return $this;
     }
@@ -76,6 +81,16 @@ class Model extends AbstractResponse
         }
 
         return '';
+    }
+
+    /**
+     * Is this a draft? (In other words, has it not yet been submitted?)
+     *
+     * @return bool
+     */
+    public function isDraft()
+    {
+        return !$this->isSubmitted();
     }
 
     /**
@@ -108,7 +123,7 @@ class Model extends AbstractResponse
      */
 
     /**
-     * @return Collection|IStorage[]
+     * @return Collection|File\Model[]
      */
     public function getAllFiles()
     {
@@ -116,7 +131,7 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @param Collection|IStorage[] $allFiles
+     * @param Collection|File\Model[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)

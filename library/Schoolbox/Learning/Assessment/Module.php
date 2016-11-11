@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -327,10 +328,14 @@ class Module extends BaseModule
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
-        $dc['rubricMapper']    = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
-        $dc['resultSetMapper'] = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
-        $dc['workTypeMapper']  = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
-        $ac['submissionFileMapper'] = $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class);
+        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\RubricMapper::class);
+        $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(SubmissionBox\Rubric\ResultMapper::class);
+        $dc['workTypeMapper']           = $this->getMapperFactory()->getLazy(SubmissionBox\WorkTypeMapper::class);
+        // TODO get this out of DI
+        $dc['dueWorkResponseMapper']    = $injector->lazyNew(
+            DueWorkResponseMapper::class,
+            ['mapper' => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class)]
+        );
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
@@ -338,9 +343,9 @@ class Module extends BaseModule
         // quiz specific
         $qc =& $injector->params[Assessment\Quiz\Controller::class];
         $qc['participantMapper'] = $injector->lazyGet('participantDataSource');
-        $dc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
-        $dc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
-        $dc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
+        $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
+        $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
+        $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
 
         // task specific
         // $tc =& $injector->params[Assessment\Task\Controller::class];
