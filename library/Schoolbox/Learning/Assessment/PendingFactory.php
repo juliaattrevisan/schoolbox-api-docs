@@ -934,12 +934,12 @@ class PendingFactory
                 sb.mark_visibility AS 'sb.mark_visibility',
                 ss.id              AS 'ss.id',
                 ss.owner           AS 'ss.owner',
-                ss.submitted       AS 'ss.submitted',
-                ss.marked          AS 'ss.marked'
+                ss.submitted_at    AS 'ss.submitted_at',
+                ss.updated_at      AS 'ss.updated_at'
             FROM submission_box sb
             JOIN student_submission ss ON ss.box_id = sb.id
             WHERE sb.deleted = 0
-            AND ss.draft = 0
+            AND ss.submitted_at IS NOT NULL
             AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
         ";
         $statement = $this->database->prepare($query);
@@ -959,34 +959,34 @@ class PendingFactory
      */
     private function getDueWorkFeedbacks()
     {
-        // Bug out early if no DueWork
-        if (!count($this->dueWorkAssessmentIds)) {
+//        // Bug out early if no DueWork
+//        if (!count($this->dueWorkAssessmentIds)) {
             return [];
-        }
-        $query = "
-            SELECT
-                sb.assessment_id                 AS 'sb.assessment_id',
-                sb.mark_visibility               AS 'sb.mark_visibility',
-                sr.id                            AS 'sr.id',
-                sr.marker                        AS 'sr.marker',
-                sr.owner                         AS 'sr.owner',
-                sr.returned                      AS 'sr.returned',
-                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
-            FROM submission_box sb
-            JOIN submission_return sr ON sr.box_id = sb.id 
-            WHERE sb.deleted = 0
-            AND sr.deleted_at IS NULL
-            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
-        // Find Students who received DueWork Feedback but are't in the current studentList
-        $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
-
-        return $dueWorkFeedbacks;
+//        }
+//        $query = "
+//            SELECT
+//                sb.assessment_id                 AS 'sb.assessment_id',
+//                sb.mark_visibility               AS 'sb.mark_visibility',
+//                sr.id                            AS 'sr.id',
+//                sr.marker                        AS 'sr.marker',
+//                sr.owner                         AS 'sr.owner',
+//                sr.returned                      AS 'sr.returned',
+//                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+//            FROM submission_box sb
+//            JOIN submission_return sr ON sr.box_id = sb.id
+//            WHERE sb.deleted = 0
+//            AND sr.deleted_at IS NULL
+//            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
+//        ";
+//
+//        $statement = $this->database->prepare($query);
+//        $statement->execute();
+//        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
+//
+//        // Find Students who received DueWork Feedback but are't in the current studentList
+//        $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
+//
+//        return $dueWorkFeedbacks;
     }
 
 
@@ -1123,7 +1123,7 @@ class PendingFactory
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
-            $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted']));
+            $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted_at']));
 
             $dueWork->getResponses()->add($response);
             $participants = $dueWork->getAllParticipants();
