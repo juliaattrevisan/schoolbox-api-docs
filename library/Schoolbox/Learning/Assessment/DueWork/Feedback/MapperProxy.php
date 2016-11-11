@@ -97,11 +97,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setReviewee($submissionReturn->getOwner())
                 ->setComment($submissionReturn->getComment())
                 ->setNormalisedMark($submissionReturn->getNormalizedMark())
-                ->setHumanReadableMark($submissionReturn->getMark())
+                ->setHumanReadableMark($submissionReturn->getHumanReadableMark())
                 ->setReviewer($submissionReturn->getMarker())
                 ->setCreatedAt($submissionReturn->getCreatedAt())
-                ->setUpdatedAt($submissionReturn->getCreatedAt())
-                ->setPublishedAt($submissionReturn->getCreatedAt())
+                ->setUpdatedAt($submissionReturn->getUpdatedAt())
+                ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
             if($hash = $submissionReturn->getHash()){
                 $feedback->getAllFiles()->add(StorageMapper::getInstance()->findByHash($hash));

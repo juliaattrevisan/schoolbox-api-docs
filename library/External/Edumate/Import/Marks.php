@@ -42,7 +42,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			if (!$exists) {
 				$submissionReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
 
-				$submissionReturn->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+				$submissionReturn->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			else {
 				/* Reuse an existing Submission Return
@@ -108,12 +108,12 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			/* Assign marks and comments
 			 */
 			$submissionReturn->setComment('');
-			$submissionReturn->setMark($edumateMark->getMark() . ' / ' . $submissionBox->getMaxMark());
+			$submissionReturn->setHumanReadableMark($edumateMark->getMark() . ' / ' . $submissionBox->getMaxMark());
 			$submissionReturn->setNormalizedMark(100 * (float)$edumateMark->getMark()/(float)$submissionBox->getMaxMark());
 //			$submissionReturn->setFilename(null);
 //			$submissionReturn->setFilesize(null);
 //			$submissionReturn->setMimetype(null);
-			$submissionReturn->setSubmitted(null);
+			$submissionReturn->setCreatedAt(null);
 
 			/* Save it
 			 */

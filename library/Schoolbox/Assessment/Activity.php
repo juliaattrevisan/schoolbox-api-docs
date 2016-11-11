@@ -276,7 +276,7 @@ class Activity {
 	}
 
 	public function getReturnedMark() {
-		return $this->isReturn() ? $this->getReturnedWork()->getMark() : null;
+		return $this->isReturn() ? $this->getReturnedWork()->getHumanReadableMark() : null;
 	}
 
 	public function getReturnedNormalizedMark() {

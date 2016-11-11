@@ -169,7 +169,7 @@ class Module extends BaseModule
                 ->setSubmittedOnBehalfOf($student)
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getCreatedAt());
+                ->setUpdatedAt($studentSubmission->getUpdatedAt());
 
             if($hash = $studentSubmission->getHash()){
                 $response->getAllFiles()->add($this->getStorageMapper()->findByHash($hash));
@@ -198,11 +198,11 @@ class Module extends BaseModule
                 ->setId($submissionReturn->getId())
                 ->setComment($submissionReturn->getComment())
                 ->setNormalisedMark($submissionReturn->getNormalizedMark())
-                ->setHumanReadableMark($submissionReturn->getMark())
+                ->setHumanReadableMark($submissionReturn->getHumanReadableMark())
                 ->setReviewer($submissionReturn->getMarker())
                 ->setCreatedAt($submissionReturn->getCreatedAt())
-                ->setUpdatedAt($submissionReturn->getCreatedAt())
-                ->setPublishedAt($submissionReturn->getCreatedAt())
+                ->setUpdatedAt($submissionReturn->getUpdatedAt())
+                ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
 
             if($hash = $submissionReturn->getHash()){

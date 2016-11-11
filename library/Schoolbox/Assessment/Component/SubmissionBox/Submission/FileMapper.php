@@ -40,13 +40,12 @@ class FileMapper extends Mapper
         $this->hasModel(File::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('marked', self::TYPE_BOOLEAN);
-        $this->uses('late', self::TYPE_BOOLEAN);
-        $this->uses('submitted', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
-        $this->uses('draft', self::TYPE_BOOLEAN);
-
-        $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
         $this->joins('owner', UserMapper::class);
+        $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('submitted_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasJoin(
             'file',
@@ -126,7 +125,7 @@ class FileMapper extends Mapper
      */
     public function createDefaultReturn(File $object, $previous = null)
     {
-        if (!($object->getDraft())) {
+        if (!($object->isDraft())) {
             $boxId = $object->getSubmissionBox()->getId();
             /** @var ReturnedWorkMapper $returnMapper */
             $returnMapper = $this->getJoinMapper('box_id.return');
@@ -155,8 +154,8 @@ class FileMapper extends Mapper
                     ->setOwner($object->getOwner())
                     // No real marker
                     ->setMarker($box->getOwner())
-                    ->setMark($defaultState->getDisplayAs())
-                    ->setReturned($object->getCreatedAt())
+                    ->setHumanReadableMark($defaultState->getDisplayAs())
+                    ->setCreatedAt($object->getCreatedAt())
                     ->setNormalizedMark($defaultState->getNormaliseAs())
                 ;
                 $returnMapper->save($defaultReturn);
@@ -185,15 +184,15 @@ class FileMapper extends Mapper
             SELECT
                 {$this->getColumnString('ss')},
                 {$boxJoin->getColumnString('sb')},
-                {$categoryJoin->getColumnString('c')},
-            FROM {$this->getTable()} ss
+                {$categoryJoin->getColumnString('c')}
+            FROM {$this->getTable()} `ss`
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
             AND sb.deleted IS FALSE
             AND ss.owner = :user_id
-            AND ss.draft IS FALSE
-            ORDER BY ss.submitted DESC
+            AND ss.submitted_at IS NOT NULL
+            ORDER BY ss.submitted_at DESC
             LIMIT :limit
         ";
 

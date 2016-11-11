@@ -9,6 +9,10 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
@@ -16,9 +20,17 @@ use Schoolbox\User;
 /**
  * A single file within a student's submission to a due work.
  */
-class Model implements IFile
+class Model implements IFile, ISoftDeletable
 {
     use StorableTrait;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
+    /**
+     * @var File
+     */
+    protected $submission;
 
     /**
      * @var string
@@ -35,10 +47,7 @@ class Model implements IFile
      */
     protected $plagscan;
 
-    /**
-     * @var File
-     */
-    protected $submission;
+
 
     /**
      * Owner is inferred from the submission's owner.
@@ -48,14 +57,6 @@ class Model implements IFile
     public function getOwner()
     {
         return $this->getSubmission()->getOwner();
-    }
-
-    /**
-     * Creation date is inferred from submission's creation date.
-     */
-    public function getCreatedAt()
-    {
-        return $this->getSubmission()->getCreatedAt();
     }
 
     /**

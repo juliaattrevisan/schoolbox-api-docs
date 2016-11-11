@@ -278,7 +278,7 @@ class Factory
              * record unintentionally
              */
             // Is this outside of the update window? if so, create a new one.
-            $return_time = $returnedWork->getReturned();
+            $return_time = $returnedWork->getCreatedAt();
             $window_ago = new Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 
             /* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
@@ -286,7 +286,7 @@ class Factory
             if ($this->getSubmissionBox()->getMarkVisibility() == SubmissionBox::MARK_VISIBILITY_PRIVATE
                 || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()
             ) {
-                $returnedWork->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+                $returnedWork->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
             } /* Spawn a new returned work record, so pump in a returned date
 			 * and all the ownership stuff
 			 */
@@ -313,8 +313,8 @@ class Factory
         $returnedWork = $this->getReturnedWorkMapper()->createModel();
         $returnedWork->setOwner($this->getUser());
         $returnedWork->setSubmissionBox($this->getSubmissionBox());
-        $returnedWork->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-        $returnedWork->setUuid($this->getUuid());
+        $returnedWork->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+        $returnedWork->getFiles()->first()->setUuid($this->getUuid());
 
         return $returnedWork;
     }
@@ -333,7 +333,7 @@ class Factory
         if (isset($errors[$this->getMark()])) {
             /* A string mark was submitted (Absent, Not Submitted, etc)
              */
-            $returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
+            $returnedWork->setHumanReadableMark($errors[$this->getMark()]->getDisplayAs());
             $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
         } elseif ($this->getSubmissionBox()->isRubric()) {
             /* If it's a rubric, it normalises in a special way
@@ -342,24 +342,24 @@ class Factory
             if ($this->getRubric() && !$this->getMark()) {
 
                 $normalisedMark = $this->getRubric()->getPercentage() * 100;
-                $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
+                $returnedWork->setHumanReadableMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
                 $returnedWork->setNormalizedMark($normalisedMark);
             }
             else {
                 $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
-                $returnedWork->setMark($normalisedMarkArray['mark']);
+                $returnedWork->setHumanReadableMark($normalisedMarkArray['mark']);
                 $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
             }
         } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
             /* Empty mark (not zero) - treat as null
              */
-            $returnedWork->setMark(null);
+            $returnedWork->setHumanReadableMark(null);
             $returnedWork->setNormalizedMark(null);
         } else {
             /* Just do it in the normal way
              */
             $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
-            $returnedWork->setMark($normalisedMarkArray['mark']);
+            $returnedWork->setHumanReadableMark($normalisedMarkArray['mark']);
             $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
         }
 
@@ -367,7 +367,7 @@ class Factory
          */
         $returnedWork->setComment($this->getComment());
         $returnedWork->setMarker($_SESSION['user']);
-        $returnedWork->setUuid($this->getUuid());
+        $returnedWork->getFiles()->first()->setUuid($this->getUuid());
 
         return $returnedWork;
     }

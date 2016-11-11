@@ -27,124 +27,24 @@ use Schoolbox\Assessment\Course\Task;
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
 {
-
     protected function mapping()
     {
         $this->hasTable('submission_return');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWork');
-        $this->hasMap(
-            array(
-                'column' => 'id',
-                'property' => 'id',
-                'type' => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'box_id',
-                'property' => 'submissionBox',
-                'type' => self::TYPE_MODEL,
-                'join' => 'submission_box',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'owner',
-                'property' => 'owner',
-                'type' => self::TYPE_MODEL,
-                'join' => 'owner',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'marker',
-                'property' => 'marker',
-                'type' => self::TYPE_MODEL,
-                'join' => 'marker',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'comment',
-                'property' => 'comment',
-                'type' => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'mark',
-                'property' => 'mark',
-                'type' => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'norm_mark',
-                'property' => 'normalizedMark',
-                'type' => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'filename',
-                'property' => 'filename',
-                'type' => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'submitted',
-                'property' => 'submitted',
-                'type' => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'returned',
-                'property' => 'returned',
-                'type' => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'uuid',
-                'property' => 'uuid',
-                'type' => self::TYPE_STRING,
-            )
-        );
+        $this->hasModel(ReturnedWork::class);
 
-        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
-
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->hasJoin(
-            'submission_box',
-            array(
-                'mapper' => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
-                'this_key' => 'box_id',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'owner',
-            array(
-                'mapper' => '\\Schoolbox\\UserMapper',
-                'this_key' => 'owner',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'marker',
-            array(
-                'mapper' => '\\Schoolbox\\UserMapper',
-                'this_key' => 'marker',
-                'other_key' => 'id',
-            )
-        );
-
-        $this->joins('hash', Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('id', Schoolbox\Mapper::TYPE_INTEGER, Schoolbox\Mapper::COLUMN_IDENTIFIER);
+        $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
+        $this->joins('owner', Schoolbox\UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('marker', Schoolbox\UserMapper::class, 'id', null, null, 'marker', 'marker');
+        $this->joins('student_submission_id', SubmissionBox\Submission\FileMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->uses('comment', Schoolbox\Mapper::TYPE_STRING);
+        $this->uses('mark', Schoolbox\Mapper::TYPE_STRING, null, 'humanReadableMark');
+        $this->uses('norm_mark', Schoolbox\Mapper::TYPE_STRING, null, 'normalizedMark');
+        $this->uses('is_confirmation_of_submission', Schoolbox\Mapper::TYPE_BOOLEAN);
+        $this->uses('created_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('published_at', Schoolbox\Mapper::TYPE_DATETIME);
+        $this->uses('updated_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
@@ -164,6 +64,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function getActivities($user_id, $limit, array $categories, array $visibilities = [ SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT ])
     {
+        // TODO - SA-1308 This method has been commented out so the page can work without a fatal error.
+        // Need to update the query below, and build the new object graph, then use it accordingly in
+        // all callers to this method.
+        return new Schoolbox\Collection();
 
         //
         // User mapper: I want to know if the user (requesting user, not user
@@ -242,7 +146,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             'sb.category = :category',
             'sr.owner = :student',
             'sb.deleted IS FALSE',
-            'sb.task_id IS NULL',
         );
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
@@ -269,7 +172,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				sb.id AS box_id,
 				sr.mark,
 				sr.norm_mark,
-				sr.returned,
+				sr.published_at,
 				sr.comment,
 				sb.weight,
 				sb.mark_type,
@@ -277,7 +180,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
-			ORDER BY sr.returned DESC
+			ORDER BY sr.published_at DESC
 		";
         $statement = $this->database->prepare($query);
         $statement->execute($params);
@@ -440,7 +343,4 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
     }
-
-
-
 }

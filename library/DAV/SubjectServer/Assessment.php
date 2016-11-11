@@ -122,9 +122,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
     {
         $storage = Storage\Mapper::getInstance()->acceptStream($name, $data, false);
 
-        $late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
         $submit_date    = new DateTime('now');
-        $is_late        = ($late_timestamp < $submit_date->getTimestamp());
 
         $submission = new Submission\File();
         $submission
@@ -132,7 +130,6 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
             ->setOwner($this->getUser())
             ->setFilename($storage->getFilename())
             ->setCreatedAt($submit_date)
-            ->setLate($is_late)
             ->setStorage($storage);
 
         //
