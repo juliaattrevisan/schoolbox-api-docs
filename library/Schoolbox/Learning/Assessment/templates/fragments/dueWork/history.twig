@@ -26,7 +26,7 @@
                      {% if currentInteraction is response %}
                          {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
                      {% elseif currentInteraction is feedback %}
-                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' %}
+                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction} %}
                      {% endif %}
                  {% endfor %}
             </ul>

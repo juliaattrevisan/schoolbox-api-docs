@@ -11,7 +11,9 @@
         <li class="actions-small-1">
             {% include '@learning/dueWork/interaction/response/files.twig' %}
             <nav>
+                {% if isRouteAuthorized('learningResponse.getParticularResponse', {responseId: response.id}) %}
                 <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: currentInteraction.id}) }}?fileId={{ currentFile.id }}" class="icon-next" title="View in Inline Grader"></a>
+                {% endif %}
             </nav>
         </li>
         {% endfor %}
@@ -21,7 +23,10 @@
     {% if currentInteraction.allFeedback|length %}
         <ul class="information-list reply">
             {% for currentFeedback in currentInteraction.allFeedback %}
-                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentInteraction: currentFeedback} %}
+
+                {# We pass the responseId as well, so that people can download annotated crocodocs
+                 #}
+                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentFeedback, responseId: currentInteraction.id} only %}
             {% endfor %}
         </ul>
     {% endif %}

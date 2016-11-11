@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
@@ -16,7 +17,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 
-use \Schoolbox\Learning\Assessment\DueWork\TemporaryDataDecorator;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
@@ -62,7 +62,7 @@ class Controller extends Base
          * Ram in some temporary responses so that I
          * can make the Submission History section
          */
-        (new TemporaryDataDecorator())->decorate($assessment);
+        (new TemporaryResponse())->produceResponse($assessment);
 
         $data = [
             'assessment' => $assessment,
@@ -120,7 +120,7 @@ class Controller extends Base
 
                 /* Rubrics data
                  */
-                'rubricContext' => $this->generateMarkableRubricContext($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
+                'rubricContext' => (new RubricContext())->generateMarkable($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
@@ -134,50 +134,50 @@ class Controller extends Base
     }
 
     /**
-     * Get a markable grid for Rubrics marking
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return array
-     */
-    private function generateMarkableRubricContext(IAssessable $assessment, User $student)
-    {
-        /** @var DueWork $assessment */
-        $markTypeSlug = $assessment->getMarkType()->getSlug();
-
-        RubricMapper::getInstance()->applyStudentMark($assessment->getRubric(), $student);
-
-        $context = [
-            'rubric' => $assessment->getRubric()->toContext(),
-            'markType' => [
-                'mode' => $markTypeSlug
-            ]
-        ];
-
-        return $context;
-    }
-
-    /**
      * Download a particular annotated crocodoc as a pdf
      *
-     * @param SubmissionFile $file
      * @param Submission $response
+     * @param SubmissionFile $file
+     * @param Feedback $feedback
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getCrocodocDownload(Submission $response, SubmissionFile $file)
+    public function getCrocodocDownload(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
-        if (strlen($file->getCrocodocId())) {
-            try {
-                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()))->getDownloadUrl();
+        /* If you are a student and the feedback is published
+         * and the requested file has a crocodocked url,
+         * attempt to download it
+         *
+         * Otherwise 404
+         */
+        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
+            if (strlen($file->getCrocodocId())) {
+                try {
+                    $location = (
+                    new InlineGraderFacade(
+                        new InlineGraderAuthenticator(),
+                        $response,
+                        $file,
+                        $this->getUser()
+                    )
+                    )->getDownloadUrl();
 
-                $this->getResponse()->redirect->to($location);
-            }
-            catch (\RangeException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-            }
-            catch (\DomainException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+                    $this->getResponse()->redirect->to($location);
+                } catch (\RangeException $e) {
+                    throw $this->getErrorMapper()->generateException(
+                        ErrorMapper::ERROR_PROCESSING,
+                        null,
+                        $e->getMessage()
+                    );
+                } catch (\DomainException $e) {
+                    throw $this->getErrorMapper()->generateException(
+                        ErrorMapper::ERROR_PROCESSING,
+                        null,
+                        $e->getMessage()
+                    );
+                }
+            } else {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
         else {

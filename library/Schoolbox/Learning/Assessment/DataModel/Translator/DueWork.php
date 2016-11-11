@@ -154,6 +154,10 @@ class DueWork implements IAssessmentTypeTranslator
             $assessable->setMarkType(
                 (new DueWorkModel\MarkType())
                     ->setId($model->getMarkType()->getId())
+                    ->setName($model->getMarkType()->getName())
+                    ->setSlug($model->getMarkType()->getSlug())
+                    ->setComment($model->getMarkType()->getComment())
+                    ->setEnabled($model->getMarkType()->getEnabled())
             );
 
             // Attach a (possibly empty) Rubric

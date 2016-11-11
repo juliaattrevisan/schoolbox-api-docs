@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Response\TemporaryResponse;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
@@ -122,14 +123,18 @@ class Controller extends Assessment\Controller
          * Ram in some temporary responses so that I
          * can make the Submission History section
          */
-        (new TemporaryDataDecorator())->decorate($assessment);
+        (new TemporaryResponse())->produceResponse($assessment);
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
             'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $assessment,
-            'timeline'    => (new FullTimeline($assessment))->getTimeline()
+            'timeline'    => (new FullTimeline($assessment))->getTimeline(),
+
+            /* Rubrics data
+             */
+            'rubricContext' => (new RubricContext())->generate($assessment, $student, $this->getUser()),
         ];
 
         try {
@@ -147,7 +152,6 @@ class Controller extends Assessment\Controller
             )
         );
     }
-
 
     /**
      * Displays a form enabling a student to create Submission for a Due Work

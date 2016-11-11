@@ -1,37 +1,54 @@
+{% if currentFeedback.isPublished %}
 <li {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
     <div class="list-item">
         <div class="card small-12 medium-8">
-            <a href="/search/user/{{ currentInteraction.reviewer.id}}" title="View Profile">
-                <img src="/portrait.php?userId={{ currentInteraction.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
-                <p>{{ currentInteraction.reviewer.fullname }}</p>
-                <p class="meta">Published {{ currentInteraction.publishedAt.short }}</p>
+            <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">
+                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
+                <p>{{ currentFeedback.reviewer.fullname }}</p>
+                <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
             </a>
         </div>
         <div class="small-12 medium-4 columns text-right">
             <div class="grade content">
-                <span class="{{ urgency.marks(currentInteraction.normalisedMark) }}">{{ currentInteraction.humanReadableMark }}</span>
+                <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
             </div>
         </div>
     </div>
 
-    {% if currentInteraction.comment|length %}
+    {% if currentFeedback.comment|length %}
         <article>
-            {{ currentInteraction.comment|purify }}
+            {{ currentFeedback.comment|purify }}
         </article>
     {% endif %}
 
-    {% if currentInteraction.allFiles %}
+    {% if currentFeedback.allFiles %}
         <ul class="information-list">
-            {% for currentFile in currentInteraction.allFiles %}
+            {% for currentFile in currentFeedback.allFiles %}
+
+                {# Only show published feedback and therefore also
+                 # only list files that are involved with a Published Feedback
+                 #}
                 <li>
                     <div class="card small-12 compact">
-                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
-                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                            <p>{{ currentFile.filename }}</p>
-                        </a>
+
+                        {# Crocodoc annotations have their own special url.
+                         # responseId comes from the twig that includes this fragment
+                         #}
+                        {% if currentFile.crocodocId|length %}
+                            <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" rel="external" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <p>{{ currentFile.filename }}</p>
+                            </a>
+                        {% else %}
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <p>{{ currentFile.filename }}</p>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
 </li>
+{% endif %}
