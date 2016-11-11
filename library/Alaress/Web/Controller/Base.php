@@ -262,18 +262,32 @@ abstract class Base {
         return $output->setTemplate($template)->setData($data);
     }
 
+
     /**
      * Factory method for loading a chromed HTML output object.
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
+     * @param string  $title
+     * @param string  $tab
      * @return Output\ThemedHtml
+     * @throws ServiceNotFound
      */
-    protected function buildHtmlOutput($template, $data)
+    protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
     {
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
-        return $output->setTemplate($template)->setData($data);
+        $tpl = $output->setTemplate($template)->setData($data);
+
+        if ($title) {
+            $tpl->setTitle($title);
+        }
+
+        if ($tab) {
+            $tpl->setTab($tab);
+        }
+
+        return $tpl;
     }
 
     /**
