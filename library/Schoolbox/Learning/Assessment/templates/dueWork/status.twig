@@ -113,7 +113,7 @@
 
                 $.ajax($form.attr('action'), data)
                     .done(function () {
-                        toast.apply($form, arguments);
+                        toast.apply($form);
 
                         var $li = $form.closest('[data-status]');
 
@@ -124,19 +124,16 @@
                             .addClass('{{ statusComplete }}');
 
                         filters.find('[data-status="complete"]').prop('checked', true);
-
-                        console.log(this);
                     })
-                    .fail(function () { toast.apply($form, arguments); })
-                    .always(function () { toast.apply($form, arguments); });
+                    .fail(function (xhr) { toast.call($form, xhr.responseText, false); });
+//                    .always(function () { toast.apply($form, arguments); });
             });
 
-        function toast(arguments) {
-//            console.log(arguments);
+        function toast(text, success) {
 
             formSaveLabel.toastTimeout({
-                text: 'Draft Saved',
-                css: 'success'
+                text: text || 'Draft Saved',
+                css: (success == false) ? 'alert' : 'success'
             });
 
             this.find('[data-interaction-draft]').slideDown();
