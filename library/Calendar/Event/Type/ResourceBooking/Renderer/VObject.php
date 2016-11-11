@@ -41,6 +41,7 @@ class VObject extends Base
             // Generate a UID based on $this->getEvent()->getEventId()
             $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
             $vEvent->add('CATEGORIES', $this->getEvent()->getCategory());
+            $vEvent->add('LOCATION', $this->getEvent()->getLocation());
 
             $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
             $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());

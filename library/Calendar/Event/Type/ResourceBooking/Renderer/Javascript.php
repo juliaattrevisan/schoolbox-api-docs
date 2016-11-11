@@ -146,7 +146,7 @@ class Javascript extends Base
                     'eventId' => $this->getEvent()->getEventId(),
                     'time' => $this->getEvent()->getTime(),
                     'detail' => Scrub::html($detail),
-                    'location' =>  $this->getEvent()->getCategory(),
+                    'location' =>  $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType' => 'type' . $this->getEvent()->getType(),
                     'type' => $this->getEvent()->getEventType(),
