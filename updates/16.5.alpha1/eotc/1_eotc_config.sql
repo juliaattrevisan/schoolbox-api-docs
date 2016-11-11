@@ -1,5 +1,7 @@
 /* Add config setting if not already there
 */
+
+drop procedure if exists check_config;
 delimiter //
 create procedure check_config()
   begin

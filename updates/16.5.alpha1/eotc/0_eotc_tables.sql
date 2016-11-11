@@ -6,6 +6,7 @@
 
 /* Create tables for all clients but 'stk'
 */
+drop procedure if exists check_website;
 delimiter //
 create procedure check_website()
   begin
@@ -40,6 +41,11 @@ create procedure check_website()
         `value` text CHARACTER SET utf8,
         PRIMARY KEY (`id`)
       ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+      INSERT INTO `eotc_config` (`name`, `value`) VALUES ('first_reminder', '10');
+      INSERT INTO `eotc_config` (`name`, `value`) VALUES ('daily_reminder', '3');
+      INSERT INTO `eotc_config` (`name`, `value`) VALUES ('urgent_threshold', '3');
+      INSERT INTO `eotc_config` (`name`) VALUES ('policy');
 
 
       DROP TABLE IF EXISTS `eotc_event`;
@@ -176,6 +182,13 @@ create procedure check_website()
         PRIMARY KEY (`id`)
       ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
+      INSERT INTO `eotc_status` (`name`) VALUES ('Initial Application');
+      INSERT INTO `eotc_status` (`name`) VALUES ('Approved In Principle');
+      INSERT INTO `eotc_status` (`name`) VALUES ('Details Completed');
+      INSERT INTO `eotc_status` (`name`) VALUES ('Ready For Final Approval');
+      INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
+      INSERT INTO `eotc_status` (`name`) VALUES ('Cancelled');
+
     end if;
 
   end;
@@ -183,3 +196,11 @@ create procedure check_website()
 delimiter ;
 call check_website();
 drop procedure check_website;
+
+
+
+
+
+
+
+
