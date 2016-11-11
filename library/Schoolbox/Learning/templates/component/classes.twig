@@ -19,12 +19,14 @@
                             <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                         </ul>
                     {% endif %}
-                    {%  if currentUser.getRole.isStudent == true %}
+
+                    {% set gradesRoute = routeLookupIfAuthorized('learning.getGradesForSubject', { userId: currentUser.id, termCode: currentSemester.code, subjectId: class.id }) %}
+                    {% if currentUser.getRole.isStudent == true and gradesRoute %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                            <li><a href="/submission/allWork/{{ currentUser.id }}/{{ currentSemester.code }}/{{ class.id }}" class="icon-approve">Grades</a></li>
+                            <li><a href="{{ gradesRoute }}" class="icon-approve">Grades</a></li>
                         </ul>
                     {% endif %}
                 </div>
