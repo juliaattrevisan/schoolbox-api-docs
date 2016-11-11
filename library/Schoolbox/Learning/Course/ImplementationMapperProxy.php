@@ -88,13 +88,26 @@ class ImplementationMapperProxy
      *
      * @param int $folderId
      * @param array $options
-     * @return Implementation
-     * @throws Exception if object wasn't found
-     * @throws Exception\Deleted if object was deleted
+     * @return Collection|Implementation[]
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->mapper->findByFolderId($folderId, $options)->map([$this->translator, 'translateToDomainModel']);
+        return $this->findAllByFolderId($folderId, $options);
+    }
+
+    /**
+     * Find all course implementations for this folder.
+     *
+     * @param int $folderId
+     * @param array $options
+     * @return Collection|Implementation[]
+     */
+    public function findAllByFolderId($folderId, $options = [])
+    {
+        return $this->loadUnitsForCollection(
+            $this->mapper->findByColumn('folder_id', $folderId, $options)
+                         ->map([$this->translator, 'translateToDomainModel'])
+        );
     }
 
     /**

@@ -1,0 +1,188 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Controls for Averages and Dynamic updates for input fields
+         */
+        $.fn.marksheetAverages();
+        $('[data-mark-sheet]').marksheetInputs();
+    });
+</script>
+
+{# Crumbz: Class > Markbook #}
+{{ bread.crumbs([class.title, '/homepage/'~class.id], ['Markbook', '#']) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Markbook</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders' }) %}
+        {% if baseRoute %}
+            <li class="separator">Create New Assessment</li>
+            <li><a href="{{ baseRoute }}?type=dueWork" class='icon-due-work'>Due Work</a></li>
+            <li><a href="{{ baseRoute }}?type=quiz" class='icon-quiz'>Quiz</a></li>
+            <li><a href="{{ baseRoute }}?type=task" class='icon-task'>Task</a></li>
+            <li><a href="{{ baseRoute }}?type=project" class='icon-project'>Project</a></li>
+        {% endif %}
+        <li class="separator">Report</li>
+        <li><a href='#' class='icon-download'>TODO: Download Spreadsheet</a>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="context-switch">
+            {% include '@learningMarkbook/fragments/markbookSelector.twig'
+                with {
+                    class: class,
+                    terms: terms,
+                    currentTerm: currentTerm,
+                    previousTerm: previousTerm,
+                    nextTerm: nextTerm,
+                    courses: courses
+                }
+            %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="scrollable">
+            <table data-mark-sheet>
+                <thead>
+                <tr class="rotate-headers">
+                    <th>&nbsp;</th>
+                    <th>
+                        <div>
+                            <span>Student Average</span>
+                        </div>
+                    </th>
+                    {% for assessment in markbook.assessmentsWithProjectContents  %}
+                    <th>
+                        <div>
+                                <span>
+                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br />
+                                    <span class="meta">{{ assessment.typeName }}</span>
+                                </span>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>
+                        <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
+                        Class Average
+                    </th>
+                    {% set weightedMean = markbook.markbookStatistics.weightedMean %}
+                    <th>
+                        <span class="{{ urgency.marks(weightedMean) }}">
+                            {{ weightedMean | default('–') }}
+                        </span>
+                    </th>
+                    {% for assessment in markbook.assessmentsWithProjectContents %}
+                        {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
+                        <th>
+                            <a class="{{ urgency.marks(assessmentMean) }}"
+                               href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                                {{ assessmentMean | default('–') }}
+                            </a>
+                        </th>
+                    {% endfor %}
+                </tr>
+
+                {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in Project', key: 'weightInProject'} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in Project', key: 'projectWeightPercent', round: 2} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
+
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
+
+                </thead>
+                <tbody>
+                {# Need all students that ever participated in any assessments #}
+                {% for student in markbook.students %}
+                <tr data-id="{{ student.id }}">
+                    <th class="no-pad">
+                        <div class="card small-12">
+                            <a href="/search/user/{{ student.id }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile" />
+                                <p>{{ student.formatName }}</p>
+                            </a>
+                        </div>
+                    </th>
+
+                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
+                    <th>
+                        {# TODO use actual selected term code #}
+                        <a class="{{ urgency.marks(studentMean) }}"
+                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}">
+                            {{ studentMean | default('–') }}
+                        </a>
+                    </th>
+
+                    {% for assessment in markbook.assessmentsWithProjectContents  %}
+                        <td class="column-{{ assessment.id }}">
+                            {% if assessment.isParticipant(student) %}
+                                {% set mostRecentFeedback = assessment.getParticipant(student).findMostRecentPublishedFeedback %}
+                                {% if assessment is task %}
+                                    {# An icon that shows if the student has attempted the task or not #}
+                                    {# TODO abstract this out #}
+                                    {% if mostRecentFeedback.isMarkedAsCompleted %}
+                                        <a href="#"
+                                           class="no-text progress-tick complete"
+                                           title="Completed – click to mark as not attempted"
+                                           data-interaction="update_progress"></a>
+                                    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
+                                        <a href="#"
+                                           class="no-text progress-tick pending"
+                                           title="Self-assessed – click to mark as complete"
+                                           data-interaction="update_progress"></a>
+                                    {% else %}
+                                        <a href="#"
+                                           class="no-text progress-tick"
+                                           title="Not attempted – click to mark as complete"
+                                           data-interaction="update_progress"></a>
+                                    {% endif %}
+                                {% else %}
+                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
+                                    <a class="{{ urgency.marks(normalisedMark) }}"
+                                       href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                       title="{{ participant.mostRecentFeedback.comment }}">
+                                        {{ assessment.getHumanReadableMark(student, true) | default('–') }}
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                –
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

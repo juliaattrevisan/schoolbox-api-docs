@@ -49,7 +49,7 @@ class Controller extends Base
     /**
      * @var GradeGroup
      */
-    protected $gradeGroup;
+    protected $defaultGradeGroup;
 
     /**
      * @var FolderMapper
@@ -84,7 +84,7 @@ class Controller extends Base
      * @param Participant\DataSource $participantDataSource
      * @param TermMapper             $termMapper
      * @param FolderMapper           $folderMapper
-     * @param GradeGroup             $gradeGroup
+     * @param GradeGroup             $defaultGradeGroup
      * @param ShowcaseMapper         $showcaseMapper
      * @param AssessableDataSource   $assessableDataSource
      */
@@ -94,7 +94,7 @@ class Controller extends Base
         Participant\DataSource $participantDataSource,
         FolderMapper $folderMapper,
         TermMapper $termMapper,
-        GradeGroup $gradeGroup,
+        GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
         AssessableDataSource $assessableDataSource
     ) {
@@ -103,7 +103,7 @@ class Controller extends Base
         $this->setParticipantDataSource($participantDataSource);
         $this->setTermMapper($termMapper);
         $this->setFolderMapper($folderMapper);
-        $this->setGradeGroup($gradeGroup);
+        $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setAssessableDataSource($assessableDataSource);
     }
@@ -241,47 +241,6 @@ class Controller extends Base
     }
 
     /**
-     * Displays a list of marks for students in the specified class
-     *
-     * @api   GET /learning/markbook/:classId
-     * @level 165
-     * @param Folder $class
-     */
-    public function getMarkbook(Folder $class)
-    {
-        // Replaces /submission/listSubmission/{termSlug}/{folderId}
-        //       eg /submission/listSubmission/{termSlug}/{folderId}
-        // Replaces /submission/viewSubmission/{dueWorkId}
-        //       eg /submission/viewSubmission/56
-
-        // Is current user not SuperUser or Staff ?
-        if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'userId' => $this->getUser()->getId()
-            ]));
-        }
-
-
-        // Does this class exist ?
-        if (!$class->getId()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
-
-        // Generate data: assessments and their Participants
-        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
-        foreach ($assessments as $assessment) {
-            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
-        }
-        // The markbook will handle statistics
-        $markbook = new Markbook($assessments);
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/markbook.twig', [
-            'class'    => $class,
-            'markbook' => $markbook,
-        ]));
-    }
-
-    /**
      * Displays a list assessables that a student needs to complete
      *
      * @api   GET /due/{userId}
@@ -341,7 +300,7 @@ class Controller extends Base
         }
 
         foreach ($markbooksFolders as $folderId => $assessments) {
-            $markbooks[$folderId] = (new Markbook($assessments))->getStudentStatistics()[$student->getId()];
+            $markbooks[$folderId] = (new Markbook($assessments, $this->getDefaultGradeGroup()))->getStudentStatistics()[$student->getId()];
         }
 
         // Squish this mess out
@@ -377,7 +336,7 @@ class Controller extends Base
 
         // Let markbook calculate the statistics
 
-        $markbook = new Markbook($assessments);
+        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
@@ -600,18 +559,18 @@ class Controller extends Base
     /**
      * @return GradeGroup
      */
-    protected function getGradeGroup()
+    protected function getDefaultGradeGroup()
     {
-        return $this->gradeGroup;
+        return $this->defaultGradeGroup;
     }
 
     /**
-     * @param GradeGroup $gradeGroup
+     * @param GradeGroup $defaultGradeGroup
      * @return static
      */
-    protected function setGradeGroup(GradeGroup $gradeGroup)
+    protected function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
     {
-        $this->gradeGroup = $gradeGroup;
+        $this->defaultGradeGroup = $defaultGradeGroup;
         return $this;
     }
 

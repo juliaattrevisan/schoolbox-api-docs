@@ -173,6 +173,7 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
     }
+
     /**
      * Finds all assessables that are part of the given project
      *

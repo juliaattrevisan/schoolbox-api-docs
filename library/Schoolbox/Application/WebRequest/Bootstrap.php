@@ -32,6 +32,7 @@ use Database;
 use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Application\WebRequest;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -715,6 +716,19 @@ class Bootstrap implements BootstrapInterface {
                                 )
                             )
                         );
+                }
+            )
+        );
+
+        // Register default grade group
+        $di->set(
+            'defaultGradeGroup',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    // A default group surely must be set up?
+                    return $mapperFactory->get(GradeGroupMapper::class)->findById(
+                        $di->get('config')->get('default_grade_group')
+                    );
                 }
             )
         );

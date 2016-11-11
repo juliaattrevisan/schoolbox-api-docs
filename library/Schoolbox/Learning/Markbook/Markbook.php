@@ -7,9 +7,10 @@
 
 namespace Schoolbox\Learning\Markbook;
 
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Count;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
@@ -17,8 +18,7 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\User;
 
 /**
@@ -34,11 +34,16 @@ class Markbook
     protected $assessments;
 
     /**
+     * The grade group to use when summarising a student's overall grade for these assessments.
+     *
+     * @var GradeGroup
+     */
+    protected $gradeGroup;
+
+    /**
      * Statistics for the whole markbook.
      *
-     * Currently only contains a weighted mean.
-     *
-     * @var array
+     * @var array Currently, only contains weightedMean
      */
     protected $markbookStatistics = [];
 
@@ -46,11 +51,7 @@ class Markbook
      * Statistics for each assessment.
      *
      * key:   assessment ID
-     * value: an array of statistics:
-     *        * mean
-     *        * sd
-     *        * min
-     *        * max
+     * value: an array of statistics (currently: mean, sd, min, max, count)
      *
      * @var array
      */
@@ -60,11 +61,7 @@ class Markbook
      * Statistics for each student.
      *
      * key:   student ID
-     * value: an array of statistics:
-     *        * mean
-     *        * sd
-     *        * min
-     *        * max
+     * value: an array of statistics (currently: weightedMean)
      *
      * @var array
      */
@@ -76,10 +73,12 @@ class Markbook
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
      * @param Collection|IAssessable[] $assessments
+     * @param GradeGroup               $gradeGroup
      */
-    public function __construct(Collection $assessments)
+    public function __construct(Collection $assessments, GradeGroup $gradeGroup)
     {
         $this->assessments = $assessments;
+        $this->gradeGroup  = $gradeGroup;
         $this->collateStatistics();
     }
 
@@ -142,131 +141,132 @@ class Markbook
     }
 
     /**
-     * Collates statistics for each assessment into an array.
+     * Collates statistics for each assessment, student and the overall markbook.
      */
     protected function collateStatistics()
     {
-        $meanSummator     = new Average();
-        $stdevSummator    = new StandardDeviation();
-        $minSummator      = new Minimum();
-        $maxSummator      = new Maximum();
-        $weightedSummator = new WeightedAverage();
-        $countSummator    = new Count();
-
+        // Collate assessments and weight
         foreach ($this->getAssessments() as $assessment) {
-
-            // Summator for assessment statistics:
-            // a relative of ISummator which takes an assessment instead of a user
-            // The summator will get all normalized marks out, then convert the outputs to mean/min/max/sd
-            // Render as whatever type of mark scheme this is?
-
-            $markScheme = $assessment->getMarkScheme();
-
-            // Special case for quiz total mark:
-            // fall back to a different summator
-            // TODO figure out a better way to do this
-            if ($markScheme instanceof TotalMarkFractional) {
-                if ($markScheme->getTotalMark() > 0) {
-                    $markScheme = new TotalMarkWholeNumber($markScheme->getTotalMark());
-                } else {
-                    continue;
-                }
-            }
-
-            $statistics = [
-                'mean'              => null,
-                'sd'                => null,
-                'min'               => $markScheme->getHumanReadableMark($minSummator->summateSingleAssessable($assessment, true)),
-                'minNormalized'     => $minSummator->summateSingleAssessable($assessment, true),
-                'max'               => $markScheme->getHumanReadableMark($maxSummator->summateSingleAssessable($assessment, true)),
-                'maxNormalized'     => $maxSummator->summateSingleAssessable($assessment, true),
-                'count'             => $countSummator->summateSingleAssessable($assessment, true),
-            ];
-
-            // mean and SD are only meaningful for quantitative marks
-            if ($markScheme->isQuantitative()) {
-                $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateSingleAssessable($assessment, true));
-                $statistics['meanNormalized']   = $meanSummator->summateSingleAssessable($assessment, true);
-                $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateSingleAssessable($assessment, true));
-                $statistics['sdNormalized']     = $stdevSummator->summateSingleAssessable($assessment, true);
-            }
-
-            $this->assessmentStatistics[$assessment->getId()] = $statistics;
+            $this->collateAssessmentStatistics($assessment);
+            $this->markbookStatistics['totalWeight'] += $assessment->getWeight();
         }
 
-        // Summator for a student's statistics:
-        // weighted average.
-        // The average is all we care about for student stats
-        // Render as a grade scheme
-//        $this->studentStatistics = array_map([$this, 'calculateStatistics'], $studentMarks);
+        // Collate weight percent for each assessment
+        if ($this->markbookStatistics['totalWeight'] > 0) {
+            foreach ($this->getAssessments() as $assessment) {
+                $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
+                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->markbookStatistics['totalWeight'] * 100;
+            }
+        }
 
-        // Inject whatever the default grade group is
-        // TODO inject all of this
-        $defaultGradeGroup = \Config::get('default_grade_group');
-        $overallMarkScheme = new LetterGrade(
-            GradeGroupMapper::getInstance()->findById($defaultGradeGroup)
-        );
-
+        // Summate student's statistics as an average, weighted by each assessment's weight.
+        // Render as whatever the default grade group is
+        $overallMarkScheme = new LetterGrade($this->gradeGroup);
+        $weightedSummator  = new WeightedAverage();
         foreach ($this->getStudents() as $student) {
-            $this->studentStatistics[$student->getId()]['mean'] =
+            $this->studentStatistics[$student->getId()]['weightedMean'] =
                 $overallMarkScheme->getHumanReadableMark(
-                    $weightedSummator->summate($this->getAssessments(), $student, true)
+                    $weightedSummator->summateAllAssessablesForUser($this->getAssessments(), $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                     $weightedSummator->summate($this->getAssessments(), $student, true);
         }
 
-//        var_dump(
-//            $this->assessmentStatistics,
-//            $this->studentStatistics
-//        );
-
-        // Summator for overall statistics:
-        // relative of weighted average, which takes no user.
-        // Again, average is all we care about
-        $this->markbookStatistics['mean'] = $overallMarkScheme->getHumanReadableMark(
+        // Summate overall statistics:
+        // First, average each assessable for all participants
+        // Then, summate the result as an average, weighted by each assessment's weight.
+        // Render as whatever the default grade group is
+        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark(
             $weightedSummator->summateAllAssessables(
                 $this->getAssessments(),
                 true,
-                $meanSummator
+                new Average()
             )
         );
     }
 
     /**
-     * Calculates generic statistics for a list of values.
+     * Collates statistics for a single assessment.
      *
-     * @param array $values
-     * @return array
+     * @param IAssessable $assessment
      */
-    protected function calculateStatistics($values)
+    protected function collateAssessmentStatistics(IAssessable $assessment)
     {
-        // Possible extra stats (for box plots):
-        // median, Q1, Q3, lower and upper fence
-        $statistics = [
-            'mean'  => null,
-            'sd'    => null,
-            'min'   => null,
-            'max'   => null,
-            'count' => count($values),
-        ];
-        if ($statistics['count'] > 0) {
-            // These need to be converted back into human-readable versions
-            $statistics['mean'] = array_sum($values) / $statistics['count'];
-            $statistics['min']  = min($values);
-            $statistics['max']  = max($values);
+        $meanSummator  = new Average();
+        $stdevSummator = new StandardDeviation();
+        $minSummator   = new Minimum();
+        $maxSummator   = new Maximum();
+        $countSummator = new Count();
 
-            if ($statistics['count'] > 1) {
-                // Standard deviation only makes sense for a sample size of at least 2
-                $variance = 0;
-                foreach ($values as $mark) {
-                    $variance += pow($mark - $statistics['mean'], 2);
+        // Summate assessment statistics for all users for each assessment
+        // Render all stats as percentages for now?
+        $markScheme = new Percentage();
+
+        // Just get marks for all students, and let the summators do the rest.
+        $normMarks = [];
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
+        }
+
+        $statistics = [
+            'mean'              => null,
+            'sd'                => null,
+            'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
+            'minNormalized'     => $minSummator->summateList($normMarks),
+            'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
+            'maxNormalized'     => $maxSummator->summateList($normMarks),
+            'count'             => $countSummator->summateList($normMarks),
+        ];
+        if ($assessment->getContext() instanceof Project) {
+            $statistics['weightInProject'] = $assessment->getWeight();
+        } else {
+            $statistics['weight'] = $assessment->getWeight();
+
+        }
+
+        // mean and SD are only meaningful for quantitative marks
+        if ($assessment->getMarkScheme()->isQuantitative()) {
+            $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+            $statistics['meanNormalized']   = $meanSummator->summateList($normMarks);
+            $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
+            $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
+        }
+
+        // Collate project statistics too
+        if ($assessment instanceof Project) {
+            $statistics['projectTotalWeight'] = 0;
+            foreach ($assessment->getAssessables() as $projectAssessment) {
+                $this->collateAssessmentStatistics($projectAssessment);
+                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
+            }
+
+            // Pass 2: weight percent
+            if ($statistics['projectTotalWeight'] > 0) {
+                foreach ($assessment->getAssessables() as $projectAssessment) {
+                    $this->assessmentStatistics[$projectAssessment->getId()]['projectWeightPercent']
+                        = $this->assessmentStatistics[$projectAssessment->getId()]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
                 }
-                // Old markbook used population standard deviation, rather than sample
-                // To use sample SD: subtract 1 from denominator
-                $statistics['sd'] = sqrt($variance / $statistics['count']);
             }
         }
-        return $statistics;
+
+        $this->assessmentStatistics[$assessment->getId()] = $statistics;
+    }
+
+    /**
+     * Retrieves a generator which iterates all assessments, and drills down into project
+     * sub-assessments.
+     *
+     * @return \Generator
+     */
+    public function getAssessmentsWithProjectContents()
+    {
+        foreach ($this->getAssessments() as $assessment) {
+            yield $assessment;
+            if ($assessment instanceof Project) {
+                foreach ($assessment->getAssessables() as $projectAssessment) {
+                    yield $projectAssessment;
+                }
+            }
+        }
     }
 }

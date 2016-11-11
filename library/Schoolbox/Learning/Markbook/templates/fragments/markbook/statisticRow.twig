@@ -1,0 +1,17 @@
+<tr class="sub-row" data-sub-table-row>
+    <th>{{ label }}</th>
+    <th>&nbsp;</th>
+    {% for assessment in markbook.assessmentsWithProjectContents  %}
+    <th>
+        {% if markbook.assessmentStatistics[assessment.id][key] %}
+            {% if round %}
+                {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
+            {% else %}
+                {{ markbook.assessmentStatistics[assessment.id][key] }}
+            {% endif %}
+        {% else %}
+            –
+        {% endif %}
+    </th>
+    {% endfor %}
+</tr>

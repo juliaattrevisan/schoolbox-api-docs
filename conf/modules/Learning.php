@@ -9,6 +9,7 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
+use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
@@ -42,5 +43,8 @@ class Learning implements ModuleConfigInterface
 
         $quizModule = new QuizModule($di);
         $quizModule->init("/$namespace");
+
+        $markbookModule = new MarkbookModule($di);
+        $markbookModule ->init("/$namespace/markbook");
     }
 }

@@ -38,7 +38,6 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
                 '/classes'                                => 'getClasses',
-                '/markbook/{classId}'                     => 'getMarkbook',
                 '/due/{userId}'                           => 'getDue',
                 '/grades/{userId}{/termCode}'             => 'getGrades',
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
@@ -180,6 +179,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                 'participantDataSource' => $injector->lazyGet('participantDataSource'),
             ])

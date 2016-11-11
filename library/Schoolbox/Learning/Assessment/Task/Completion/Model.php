@@ -11,9 +11,11 @@
 namespace Schoolbox\Learning\Assessment\Task\Completion;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
 
 class Model extends AbstractResponse
 {
+    use CompletionStatusTrait;
 
     /**
      * Completions are submitted at the updatedAt value

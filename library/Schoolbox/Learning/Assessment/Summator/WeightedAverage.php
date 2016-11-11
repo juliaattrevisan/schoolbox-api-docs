@@ -23,11 +23,10 @@ use \Schoolbox\User;
 
 class WeightedAverage extends AbstractSummator
 {
-
     /**
-     * @var float
+     * @var array
      */
-    protected $weightedAverage;
+    protected $runningValues = [];
 
     /**
      * Calculate the total weighting of all IAssessables
@@ -50,14 +49,13 @@ class WeightedAverage extends AbstractSummator
     /**
      * @inheritDoc
      */
-    protected function aggregate($val, $assessableWeight, $totalWeight)
+    protected function aggregate($val, $assessableWeight)
     {
-        if (!is_null($val) && $totalWeight > 0) {
-            $this->weightedAverage += ($val * ($assessableWeight / $totalWeight));
-
-            /* A useful place to diagnose problems
-             */
-            //echo " $val*{$assessableWeight}/{$totalWeight} ";
+        if (!is_null($val) && $assessableWeight > 0) {
+            $this->runningValues[] = [
+                'val'    => $val,
+                'weight' => $assessableWeight,
+            ];
         }
     }
 
@@ -66,7 +64,7 @@ class WeightedAverage extends AbstractSummator
      */
     protected function reset()
     {
-        $this->weightedAverage = null;
+        $this->runningValues = [];
     }
 
     /**
@@ -74,11 +72,15 @@ class WeightedAverage extends AbstractSummator
      */
     protected function finalise()
     {
-        if (is_null($this->weightedAverage)) {
+        if (empty($this->runningValues)) {
             return null;
         }
-
-        return (float)$this->weightedAverage;
+        $totalWeight     = array_sum(array_column($this->runningValues, 'weight'));
+        $weightedAverage = 0;
+        foreach ($this->runningValues as $runningValue) {
+            $weightedAverage += ($runningValue['val'] * ($runningValue['weight'] / $totalWeight));
+        }
+        return (float)$weightedAverage;
     }
 
     /**

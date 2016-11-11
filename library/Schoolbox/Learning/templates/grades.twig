@@ -40,7 +40,7 @@
                     <li>
                         <div class="list-item">
                             <div class="small-8 card">
-                                <a href="{{ routeLookup('learning.getGradesForSubject', {studentId: student.id, termCode: term.code, subjectId: folder.id}) }}" title="View Grades">
+                                <a href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: term.code, subjectId: folder.id}) }}" title="View Grades">
                                     <span class="icon-home icon-32" title="{{ folder.name }}"></span>
                                     <p>{{ folder.name }}</p>
                                 </a>

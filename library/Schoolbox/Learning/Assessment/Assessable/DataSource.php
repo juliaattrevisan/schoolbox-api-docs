@@ -108,7 +108,7 @@ class DataSource
 
                 // Only interested in assessments due in the specified term
 
-                if ($assessment->getDueAt()->between($term->getStart(), $term->getActualFinish())) {
+                if ($term->contains($assessment->getDueAt())) {
 
                     // Grab requested participant with their feedback
 

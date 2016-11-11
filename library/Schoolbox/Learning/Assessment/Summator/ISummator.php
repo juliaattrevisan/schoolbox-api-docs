@@ -16,6 +16,16 @@ use \Schoolbox\User;
 interface ISummator
 {
     /**
+     * Summation of a generic list of values.
+     *
+     * Assumes that weight of all values is equal.
+     *
+     * @param mixed $values The list of values to summate. Needs to be iterable.
+     * @return float|null
+     */
+    public function summateList($values);
+
+    /**
      * Execute summation strategy upon a Collection of
      * IAssessable instances
      *

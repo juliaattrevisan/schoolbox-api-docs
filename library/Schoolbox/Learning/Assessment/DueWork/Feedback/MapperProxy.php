@@ -126,8 +126,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setMarker($domainObject->getReviewer())
                 ->setComment($domainObject->getComment())
                 ->setNormalizedMark($domainObject->getNormalisedMark())
-                ->setMark($domainObject->getHumanReadableMark())
+                ->setHumanReadableMark($domainObject->getHumanReadableMark())
                 ->setCreatedAt($domainObject->getCreatedAt())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
 
             // Attach file (only first)
