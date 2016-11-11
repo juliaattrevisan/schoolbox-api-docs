@@ -959,34 +959,35 @@ class PendingFactory
      */
     private function getDueWorkFeedbacks()
     {
-//        // Bug out early if no DueWork
-//        if (!count($this->dueWorkAssessmentIds)) {
+        // Bug out early if no DueWork
+        if (!count($this->dueWorkAssessmentIds)) {
             return [];
-//        }
-//        $query = "
-//            SELECT
-//                sb.assessment_id                 AS 'sb.assessment_id',
-//                sb.mark_visibility               AS 'sb.mark_visibility',
-//                sr.id                            AS 'sr.id',
-//                sr.marker                        AS 'sr.marker',
-//                sr.owner                         AS 'sr.owner',
-//                sr.returned                      AS 'sr.returned',
-//                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
-//            FROM submission_box sb
-//            JOIN submission_return sr ON sr.box_id = sb.id
-//            WHERE sb.deleted = 0
-//            AND sr.deleted_at IS NULL
-//            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
-//        ";
-//
-//        $statement = $this->database->prepare($query);
-//        $statement->execute();
-//        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
-//
-//        // Find Students who received DueWork Feedback but are't in the current studentList
-//        $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
-//
-//        return $dueWorkFeedbacks;
+        }
+        $query = "
+            SELECT
+                sb.assessment_id                 AS 'sb.assessment_id',
+                sb.mark_visibility               AS 'sb.mark_visibility',
+                sr.id                            AS 'sr.id',
+                sr.marker                        AS 'sr.marker',
+                sr.owner                         AS 'sr.owner',
+                sr.updated_at                    AS 'sr.updated_at',
+                sr.published_at                  AS 'sr.published_at',
+                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+            FROM submission_box sb
+            JOIN submission_return sr ON sr.box_id = sb.id
+            WHERE sb.deleted = 0
+            AND sr.published_at IS NOT NULL
+            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Find Students who received DueWork Feedback but are't in the current studentList
+        $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
+
+        return $dueWorkFeedbacks;
     }
 
 
@@ -1148,8 +1149,8 @@ class PendingFactory
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
             $feedback->setId($row['sr.id']);
-            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.returned']));
-            $feedback->setPublishedAt($this->getFastDateFromString($row['sr.returned']));
+            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.updated_at']));
+            $feedback->setPublishedAt($this->getFastDateFromString($row['sr.published_at']));
             $feedback->setAssessable($dueWork);
 
             $dueWork->getFeedbacks()->add($feedback);
