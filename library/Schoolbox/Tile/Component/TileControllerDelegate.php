@@ -14,7 +14,6 @@
 namespace Schoolbox\Tile\Component;
 
 use Component_ControllerAbstract;
-use Group as GroupHandler;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -23,12 +22,6 @@ use Twig_Environment;
 
 class TileControllerDelegate
 {
-    /**
-     * Deprecated group handler, used for fetching user's permissions
-     *
-     * @var GroupHandler
-     */
-    protected $groupHandler;
 
     /**
      * @var Layout\Model

@@ -306,7 +306,7 @@ $masonry-drop-background: $input-focus-bg-color;
   color: $icon-color-calendar;
 }
 .icon-masonry-Component_Dashboard_ChildSubjectController:before {
-  @extend .icon-progress;
+  @extend .icon-staff-students;
   color: $icon-color-child-subject;
 }
 .icon-masonry-Component_Dashboard_GreetingController:before {
@@ -342,7 +342,7 @@ $masonry-drop-background: $input-focus-bg-color;
   color: $icon-color-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_SubjectController:before {
-  @extend .icon-progress;
+  @extend .icon-class-list;
   color: $icon-color-subject-list;
 }
 .icon-masonry-Component_Dashboard_TextboxController:before {
@@ -389,4 +389,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-task;
   color: $icon-color-task;
 }
-
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController:before {
+  @extend .icon-teacher;
+  color: $icon-color-class-teachers;
+}

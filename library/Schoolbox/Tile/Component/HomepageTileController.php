@@ -11,7 +11,6 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Group as GroupHandler;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -19,12 +18,6 @@ use SitePage;
 
 class HomepageTileController extends Component_Homepage_ControllerAbstract implements TileControllerInterface
 {
-    /**
-     * Deprecated group handler, used for fetching user's permissions
-     *
-     * @var GroupHandler
-     */
-    protected $groupHandler;
 
     /**
      * @var Layout\Model
@@ -49,7 +42,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->groupHandler = new GroupHandler();
         $this->delegate = new TileControllerDelegate();
     }
 
