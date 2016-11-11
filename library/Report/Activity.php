@@ -246,24 +246,33 @@ OR ml.name        LIKE :keyword
             ));
 
             foreach ($this->dataSet as $log) {
+               /*if ($log['action'] == 'move') {
+                    var_dump($log);
+                    exit;
+                }*/
 
                 $actionString = "";
 
                 switch($log['action']) {
                     case 'modify':
                         $actionString .= 'Modified ';
+                        $locationPrefix = 'in';
                         break;
                     case 'move':
                         $actionString .= 'Moved ';
+                        $locationPrefix = 'to';
                         break;
                     case 'create' :
                         $actionString .= 'Added ';
+                        $locationPrefix = 'in';
                         break;
                     case 'delete' :
                         $actionString .= 'Deleted ';
+                        $locationPrefix = 'in';
                         break;
                     case 'access' :
                         $actionString .= 'Accessed ';
+                        $locationPrefix = 'in';
                         break;
                 }
 
@@ -272,10 +281,10 @@ OR ml.name        LIKE :keyword
                         $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . Scrub::text($log['c_name']) . '</a>';
                         break;
                     case 'file':
-                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> in <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
+                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
                         break;
                     case 'link':
-                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
+                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
                         $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . Scrub::text($log['mf_description']) . '</a>';
