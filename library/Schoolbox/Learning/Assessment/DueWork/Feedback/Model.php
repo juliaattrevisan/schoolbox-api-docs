@@ -19,7 +19,7 @@ class Model extends AbstractFeedback
     /**
      * All the Files that are part of the Feedback made by Teacher
      *
-     * @var Collection
+     * @var Collection|File\Model[]
      */
     protected $allFiles;
 
@@ -35,7 +35,7 @@ class Model extends AbstractFeedback
      */
 
     /**
-     * @return Collection
+     * @return Collection|File\Model[]
      */
     public function getAllFiles()
     {
@@ -43,7 +43,7 @@ class Model extends AbstractFeedback
     }
 
     /**
-     * @param Collection $allFiles
+     * @param Collection|File\Model[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)

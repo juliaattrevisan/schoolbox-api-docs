@@ -10,8 +10,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as SubmissionReturn;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Mapper;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -103,9 +105,18 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($submissionReturn->getUpdatedAt())
                 ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
-            if($hash = $submissionReturn->getHash()){
-                $feedback->getAllFiles()->add(StorageMapper::getInstance()->findByHash($hash));
+
+            // Add all files in return
+            foreach ($submissionReturn->getFiles() as $file) {
+                $feedback->getAllFiles()->add(
+                    (new DueWorkFeedbackFile())
+                        ->setId($file->getId())
+                        ->setStorage($file->getStorage())
+                        ->setCrocodocId($file->getUuid())
+                        ->setFilename($file->getStorage()->getBasename())
+                );
             }
+
             $dueWorkFeedbacks->add($feedback);
         }
 
@@ -132,10 +143,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
 
-            // Attach file (only first)
+            // Add all files
             foreach ($domainObject->getAllFiles() as $file) {
-                $dataModel->setStorage($file);
-                break;
+                $dataModel->getFiles()->add(
+                    (new SubmissionReturnFile())
+                        ->setId($file->getId())
+                        ->setStorage($file->getStorage())
+                        ->setUuid($file->getCrocodocId())
+                );
             }
 
             $dataModels->add($dataModel);
