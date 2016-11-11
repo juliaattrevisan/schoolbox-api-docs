@@ -8,6 +8,8 @@ namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use DueWork_ErrorMapper;
+use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -91,9 +93,38 @@ class Controller extends Base
             ->setReviewer($this->getUser())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setComment($postComment)
-            ->setHumanReadableMark($postMark)
-            ->setNormalisedMark($participant->getAssessable()->getMarkScheme()->getNormalisedMark($postMark))
         ;
+
+        if ($postMark) {
+            try {
+
+                $scheme = $participant->getAssessable()->getMarkScheme();
+
+                // verify normalisation, then sanitise the output
+                $norm = $scheme->getNormalisedMark($postMark);
+                $sane = $scheme->getHumanReadableMark($norm);
+
+                $feedback
+                    ->setNormalisedMark($norm)
+                    ->setHumanReadableMark($sane)
+                ;
+            } catch (InvalidArgumentException $e) {
+                // check for error code
+                try {
+                    $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
+
+                    $feedback
+                        ->setNormalisedMark($code->getNormaliseAs())
+                        ->setHumanReadableMark($postMark)
+                    ;
+
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // invalid input
+                    $this->sendError('Invalid mark given');
+                    return;
+                }
+            }
+        }
 
         $this->getFeedbackDataSource()->save($feedback);
 
