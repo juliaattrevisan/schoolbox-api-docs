@@ -224,7 +224,7 @@ class FileMapper extends Mapper
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id
-            AND ss.draft IS FALSE
+            AND ss.published_at IS NOT NULL
             ORDER BY ss.submitted DESC
         ";
 
@@ -360,7 +360,7 @@ class FileMapper extends Mapper
             FROM {$this->getTable()} ss
             WHERE ss.owner = :user_id
             AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-            AND ss.draft IS FALSE
+            AND ss.submitted_at IS NOT NULL
             GROUP BY ss.box_id 
         ";
         $statement = $this->database->prepare($query);
