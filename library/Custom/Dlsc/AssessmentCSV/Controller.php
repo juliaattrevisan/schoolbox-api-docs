@@ -84,7 +84,7 @@ class Controller extends Base
     /**
      * The method that will be called nightly via a cron job
      *
-     * @api GET /modules/custom/dlsc/assessmentcsv/generate
+     * @api GET /modules/custom/dlsc/assessmentcsv/generateNightly
      * @level 160
      *
      */
