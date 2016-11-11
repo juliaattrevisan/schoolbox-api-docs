@@ -86,16 +86,22 @@ class Controller extends Base
         }
 
         // mutate model found, and save
-        $postMark    = $this->getRequest()->post['mark'];
-        $postComment = $this->getRequest()->post['comment'];
+        $postMark    = trim($this->getRequest()->post['mark']);
+        $postComment = trim($this->getRequest()->post['comment']);
+        $postPublish = $this->getRequest()->post['publish'];
 
         $feedback
             ->setReviewer($this->getUser())
             ->setUpdatedAt(Alaress_Date_Format::now())
-            ->setComment($postComment)
         ;
 
+        if ($postComment) {
+            // comment defined and non-empty
+            $feedback->setComment($postComment);
+        }
+
         if ($postMark) {
+            // mark defined and non-empty
             try {
 
                 $scheme = $participant->getAssessable()->getMarkScheme();
@@ -123,6 +129,13 @@ class Controller extends Base
                     $this->sendError('Invalid mark given');
                     return;
                 }
+            }
+        }
+
+        if ($postPublish == true) {
+            // recieved signal to publish this
+            if (!$feedback->isPublished()) {
+                $feedback->setPublishedAt(Alaress_Date_Format::now());
             }
         }
 
