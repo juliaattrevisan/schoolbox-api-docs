@@ -541,7 +541,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
             FROM submission_box sb
             LEFT JOIN lu_submission_type ft ON ft.id = sb.type
             LEFT JOIN folder c ON c.`id` = sb.`category`
-            LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.draft IS FALSE
+            LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.submitted_at IS NOT NULL
             LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year

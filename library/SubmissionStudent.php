@@ -98,7 +98,7 @@ class SubmissionStudent extends DeprecatedModel
         $query = "SELECT sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, sr.returned, sr.mark
                   FROM submission_box sb
                   LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = $user_id
-                  LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = $user_id AND ss.draft IS FALSE
+                  LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = $user_id AND ss.submitted_at IS NOT NULL
                   WHERE sb.id = $submission_box_id
                   AND sb.deleted = 0
                   AND sb.task_id IS NULL";

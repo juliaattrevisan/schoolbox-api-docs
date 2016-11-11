@@ -224,8 +224,8 @@ class FileMapper extends Mapper
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id
-            AND ss.draft IS FALSE
-            ORDER BY ss.submitted DESC
+            AND ss.submitted_at IS NOT NULL
+            ORDER BY ss.submitted_at DESC
         ";
 
         $params = array(
@@ -356,11 +356,11 @@ class FileMapper extends Mapper
             return array();
         }
         $query = "
-            SELECT ss.box_id, COUNT(DISTINCT submitted) as submission_count
+            SELECT ss.box_id, COUNT(DISTINCT submitted_at) as submission_count
             FROM {$this->getTable()} ss
             WHERE ss.owner = :user_id
             AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-            AND ss.draft IS FALSE
+            AND ss.submitted_at IS NOT NULL
             GROUP BY ss.box_id 
         ";
         $statement = $this->database->prepare($query);
