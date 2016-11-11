@@ -106,7 +106,6 @@ set iconClassnames = {
                             <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
                             If you only select a single option, users will be locked to that option.
                         </p>
-
                         <ul class="permission-list" id="adv-possibilities" data-roles data-digest-settings>
                             <li data-role>
                                 {% for level, perm in perms %}
@@ -116,12 +115,14 @@ set iconClassnames = {
                                                value="{{ level }}" type="checkbox"
                                                {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                                         />
-                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="no-margin">
-                                            <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></a>
+                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="input-toggle">
+                                            <span class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></span>
                                         </label>
                                     </span>
                                     {% if level == 1 %}
-                                    <span class="icon-add"></span>
+                                        <span>
+                                            <span class="icon-add icon-8"></span>
+                                        </span>
                                     {% endif %}
                                 {% endfor %}
                             </li>
