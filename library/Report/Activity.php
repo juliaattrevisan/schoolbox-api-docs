@@ -170,11 +170,12 @@ OR ml.name        LIKE :keyword
 
         $joins = "
             LEFT JOIN `user` u    ON u.id = cl.user
-            LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
+            LEFT JOIN folder c  ON cl.objectID = c.id  AND cl.object = 'folder'
+            LEFT JOIN folder cfolder ON c.parent = cfolder.id 
             LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
-            LEFT JOIN category cfile ON f.category = cfile.id
+            LEFT JOIN folder cfile ON f.category = cfile.id
             LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
-            LEFT JOIN category clink ON l.category = clink.id
+            LEFT JOIN folder clink ON l.category = clink.id
             LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
             LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
             LEFT JOIN textBox t   ON cl.objectID = t.textBoxId AND cl.object = 'content'
@@ -195,6 +196,7 @@ OR ml.name        LIKE :keyword
             cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
             u.username, u.title, u.firstname, u.lastname,
             c.id AS c_id, c.name AS c_name,
+            cfolder.id AS cf_id, cfolder.name AS cf_name,
             f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description, cfile.name AS f_catname,
             l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,  clink.name AS l_catname,
             mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
@@ -247,11 +249,18 @@ OR ml.name        LIKE :keyword
 
             foreach ($this->dataSet as $log) {
 
-                $actionString = "";
+                $actionString = '';
+                $locationPrefix = 'in';
+                $moveSuffix = '';
 
                 switch($log['action']) {
                     case 'modify':
                         $actionString .= 'Modified ';
+                        break;
+                    case 'move':
+                        $actionString .= 'Moved ';
+                        $locationPrefix = 'to';
+                        $moveSuffix = ' to <a href=/homepage/'. $log['cf_id'] . '>' . $log['cf_name'] . '</a>';
                         break;
                     case 'create' :
                         $actionString .= 'Added ';
@@ -266,13 +275,13 @@ OR ml.name        LIKE :keyword
 
                 switch($log['object']) {
                     case 'folder':
-                        $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . Scrub::text($log['c_name']) . '</a>';
+                        $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . Scrub::text($log['c_name']) . $moveSuffix . ' </a>';
                         break;
                     case 'file':
-                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> in <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
+                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
                         break;
                     case 'link':
-                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
+                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
                         $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . Scrub::text($log['mf_description']) . '</a>';

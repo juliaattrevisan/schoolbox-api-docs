@@ -189,6 +189,9 @@ class Controller extends Base
                 case 'modify':
                     $action = 'Modified '.$log['ip'];
                     break;
+                case 'move':
+                    $action = 'Moved '.$log['ip'];
+                    break;
                 case 'access':
                     $action = 'Accessed '.$log['ip'];
                     break;
