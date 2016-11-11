@@ -103,7 +103,7 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/dueWork/status.twig",
-                $twigData
+                $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
     }
@@ -149,7 +149,7 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/fragments/dueWork/summary/student.twig",
-                $twigData
+                $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
     }

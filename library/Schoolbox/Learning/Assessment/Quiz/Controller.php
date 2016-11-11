@@ -113,7 +113,7 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/quiz/status.twig",
-                $twigData
+                $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
     }
