@@ -87,22 +87,4 @@ class Model implements IStorage
         $this->crocodocId = $crocodocId;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    /**
-     * @param string $filename
-     * @return self
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
-    }
 }

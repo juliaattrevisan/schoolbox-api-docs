@@ -113,7 +113,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                         ->setId($file->getId())
                         ->setStorage($file->getStorage())
                         ->setCrocodocId($file->getUuid())
-                        ->setFilename($file->getStorage()->getBasename())
                 );
             }
 
