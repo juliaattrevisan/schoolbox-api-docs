@@ -28,7 +28,7 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders' }) %}
         {% if baseRoute %}
-            <li class="separator">Create New Assessment</li>
+            <li class="separator">Create New Activity</li>
             <li><a href="{{ baseRoute }}?type=dueWork" class='icon-due-work'>Due Work</a></li>
             <li><a href="{{ baseRoute }}?type=quiz" class='icon-quiz'>Quiz</a></li>
             <li><a href="{{ baseRoute }}?type=task" class='icon-task'>Task</a></li>
@@ -125,10 +125,10 @@
                 {% for student in markbook.students %}
                 <tr data-id="{{ student.id }}">
                     <th class="no-pad">
-                        <div class="card small-12">
+                        <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
-                                <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile" />
-                                <p>{{ student.formatName }}</p>
+                                <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
+                                <h3>{{ student.lastname }}, {{ student.firstname }}</h3>
                             </a>
                         </div>
                     </th>
