@@ -139,6 +139,22 @@
             this.find('[data-interaction-draft]').slideDown();
         }
 
+        assessmentList.on('click', '[data-draft="publish"]', function (e) {
+            e.preventDefault();
+
+            var $form = $(this).closest('form');
+
+            $.ajax($form.attr('action'), {
+                dataType: 'json',
+                data:  { publish: 1 },
+                type: 'post'
+            }).done(function () {
+                $form.find('data-interaction-draft').slideUp();
+            }).fail(function (xhr) {
+                toast.call($form, xhr.responseText, false);
+            });
+        })
+
     });
 </script>
 {% endblock %}
