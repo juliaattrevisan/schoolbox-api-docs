@@ -63,14 +63,9 @@ class Import
             // Make sure the user has access to the folder before we return it
             if ($this->getAccess()->getFolderAccess($_SESSION["user"], [$currentFolder->getId()]) >= UserAccess::ACCESS_WRITE) {
 
-                $name = $currentFolder->getName();
-                if ($currentFolder->getCodeString()) {
-                    $name .= " ({$currentFolder->getCodeString()})";
-                }
-
                 $data[] = [
                     'id' => $currentFolder->getId(),
-                    'name' => $name,
+                    'name' => $currentFolder->getTitle(),
                 ];
             }
         }
@@ -120,7 +115,7 @@ class Import
 
                 $data['sources'] = [
                     'id'   => $courseSpec->getFolder()->getId(),
-                    'name' => $courseSpec->getFolder()->getName()
+                    'name' => $courseSpec->getFolder()->getTitle()
                 ];
 
                 /* Bolt on the Unit/Task data

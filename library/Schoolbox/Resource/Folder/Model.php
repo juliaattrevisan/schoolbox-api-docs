@@ -298,7 +298,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         return [
             'value' => $this->getId(),
-            'label' => $this->getName()
+            'label' => $this->getTitle()
         ];
     }
 
