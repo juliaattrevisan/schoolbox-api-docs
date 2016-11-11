@@ -6,6 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_ErrorMapper
+ * @method DueWork_Error findOneByColumn($columnName, $columnValue, $order = [])
+ */
 class DueWork_ErrorMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
