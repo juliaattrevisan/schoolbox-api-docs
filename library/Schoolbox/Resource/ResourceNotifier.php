@@ -258,11 +258,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         /* Check if this change included a folder move
          */
-        if (isset($diff['folder'])) {
+        if (isset($diff['folder']) || isset($diff['parent'])) {
             $this->notifySystem(LogMapper::ACTION_MOVE, $resource, $effector);
             unset($diff['folder']);
+            unset($diff['parent']);
         }
 
+        /* If this change was more than just a move - log as normal
+         */
         if (!empty($diff)) {
             $this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
         }
