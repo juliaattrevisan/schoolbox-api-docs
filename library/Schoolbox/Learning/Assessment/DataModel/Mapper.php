@@ -250,9 +250,6 @@ class Mapper extends BaseMapper
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
                         ->setWorkType($this->hydrateJoin($row, 'duework.work_type', 'dt'))
-                );
-                $model->setDueWork(
-                    $this->hydrateJoin($row, 'duework', 'd')
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                 );
 
