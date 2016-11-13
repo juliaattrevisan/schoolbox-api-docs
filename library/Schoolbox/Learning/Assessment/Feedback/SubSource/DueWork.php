@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Feedback\SubSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\User;
 
 /**
  * Sub-source for due work responses.
@@ -32,5 +33,13 @@ class DueWork extends AbstractSubSource
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof DueWorkObject;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findForStudent(User $student)
+    {
+        return $this->mapperProxy->findByColumnList(['owner' => $student->getId()]);
     }
 }
