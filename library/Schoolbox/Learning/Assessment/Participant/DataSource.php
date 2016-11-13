@@ -332,14 +332,15 @@ class DataSource
         $assessments = new Collection();
 
         // Find all classes by class code (students only)
+        $folderIds = [];
+        // TODO inject this
+        $folderMapper = FolderMapper::getInstance();
         if ($student->getRole()->isStudent()) {
-            $folderMapper = FolderMapper::getInstance();
-            $subjectCodes = [];
+            // TODO inject this
             $externalUser = new \External_User();
             foreach ($externalUser->getSubjectList($student) as $subject) {
-                // How are campus codes handled in subject retrieval?
                 try {
-                    $folder = $folderMapper->findByCode($subject['code'], $subject['campusCode']);
+                    $folderIds[] = $folderMapper->findByCode($subject['code'], $subject['campusCode'])->getId();
                 } catch (MapperException $e) {
                     // This folder does not exist. That's okay.
                     continue;
@@ -348,20 +349,22 @@ class DataSource
         }
 
         // Find all of this user's group memberships
-        $folderIds = $this->userAccessMapper->findByColumnList([
-            'uid'     => $student->getId(),
-            'type'    => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-        ])->getColumnValues('serviceIdentifier');
+        return array_merge(
+            $folderIds,
+                $this->userAccessMapper->findByColumnList([
+                'uid'     => $student->getId(),
+                'type'    => UserAccess::ACCESS_READ,
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+            ])->getColumnValues('serviceIdentifier')
+        );
 
-        // DI this
+        // Find every assessment the student has created a response to
+
+        // Find every assessment the student has had a feedback created for
+
+        // TODO inject this
         $assessmentDataSource = new AssessmentDataSource();
 
         return $assessmentDataSource->findAllForFolderId($folderIds);
-
-        // Groups
-        // Classes
-
-        // Find all assessments in those folders
     }
 }
