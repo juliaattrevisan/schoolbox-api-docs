@@ -17,7 +17,7 @@ try {
         /* @var $resource Schoolbox\Resource\Storage\Model */
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
 
-        if ($_GET['save']) {
+        if (!$resource->getMimeType()->getInline() || $_GET['save']) {
             $attach = "attachment;";
         } else {
             $attach = "";
@@ -33,7 +33,8 @@ try {
         $basename = $resource->getBasename();
 
         header("Pragma: ");
-        header("Cache-control: ");
+        header("Cache-control: private");
+        header("Content-Ranges: none");
         header("Content-Disposition: $attach filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
         fpassthru($resource->readStream());
