@@ -748,25 +748,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Does not find codes that have been deleted
      *
      * @param  string $code
+     * @param  string $campusCode If provided, use this campus code in the query.
      * @throws MapperException if statement returned no category
      * @return Model
      */
-    public function findByCode($code)
+    public function findByCode($code, $campusCode = '')
     {
         // Retrieve all codes for category, not just $code
         $query = "
             {$this->getSelectString()}
             {$this->getFromString()}
             WHERE folder.deleted_at IS NULL
-            AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
+        $params = [];
+        if (strlen($campusCode) === 0) {
+            $query .= ' AND (cc.code = :code OR cc.code LIKE :codeLike)';
+            $params['code']     = $code;
+            $params['codeLike'] = '%/' . $this->database->quoteForLike($code);
+        } else {
+            $query .= ' AND cc.code = :code';
+            $params['code'] = $code.'/'.$campusCode;
+        }
         $statement = $this->database->prepare($query);
-        $statement->execute(
-            array(
-                'code'     => $code,
-                'codeLike' => '%/' . $this->database->quoteForLike($code),
-            )
-        );
+        $statement->execute($params);
         $model = $this->hydrateSelect($statement)->first();
 
         if (!$model instanceof Model) {
