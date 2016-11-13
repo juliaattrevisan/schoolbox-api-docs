@@ -766,8 +766,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $params['code']     = $code;
             $params['codeLike'] = '%/' . $this->database->quoteForLike($code);
         } else {
-            $query .= ' AND cc.code = :code';
-            $params['code'] = $code.'/'.$campusCode;
+            $query .= ' AND (cc.code = :code OR cc.code = :fullCode)';
+            $params['code']     = $code;
+            $params['fullCode'] = $campusCode . '/' . $code;
         }
         $statement = $this->database->prepare($query);
         $statement->execute($params);
