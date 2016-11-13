@@ -63,8 +63,10 @@
                 }).get();
 
                 $.post('/assess/reviewAttempt', {selectedIds: selectedIds})
-                    .always(function(status) {
-                        location.reload();
+                    .always(function(response) {
+                        if('reload' == response.action){
+                            location.reload();
+                        }
                     });
             }
         });
