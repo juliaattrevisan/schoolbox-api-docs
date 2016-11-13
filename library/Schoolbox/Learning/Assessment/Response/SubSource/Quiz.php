@@ -10,13 +10,17 @@ namespace Schoolbox\Learning\Assessment\Response\SubSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
-use Schoolbox\User;
 
 /**
  * Sub-source for quiz responses.
  */
 class Quiz extends AbstractSubSource
 {
+    /**
+     * @inheritdoc
+     */
+    protected $studentField = 'user_id';
+
     /**
      * Constructor
      *
@@ -33,13 +37,5 @@ class Quiz extends AbstractSubSource
     public function recognizes(IAssessable $assessment)
     {
         return $assessment instanceof QuizObject;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findForStudent(User $student)
-    {
-        return $this->mapperProxy->findByColumnList(['user_id' => $student->getId()]);
     }
 }

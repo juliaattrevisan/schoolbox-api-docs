@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Mapper\AbstractMapperProxy;
+use Schoolbox\User;
 
 /**
  * Base class for feedback sub-sources.
@@ -22,6 +23,13 @@ abstract class AbstractSubSource implements IFeedbackDataSource
      * @var AbstractMapperProxy
      */
     protected $mapperProxy;
+
+    /**
+     * The field of the mapper proxy's table which contains the student ID.
+     *
+     * @var string
+     */
+    protected $studentField;
 
     /**
      * Constructor
@@ -47,6 +55,14 @@ abstract class AbstractSubSource implements IFeedbackDataSource
                                      });
         }
         return new Collection();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findForStudent(User $student)
+    {
+        return $this->mapperProxy->findByColumnList([$this->studentField => $student->getId()]);
     }
 
     /**
