@@ -23,7 +23,7 @@ create procedure check_msg()
     set @source31 := (SELECT id FROM `msg_source` WHERE  namespace = @namespace and description = 'someone updates or comments on your EOTC');
     set @source4 := (SELECT id FROM `msg_source` WHERE  namespace = @namespace and description = 'an EOTC is upcoming and requires your approval');
 
-    if is null then
+    if @source1 is null then
       INSERT INTO `msg_source`
       (`namespace`, `key`, `role_type`, `description`)
       VALUES
