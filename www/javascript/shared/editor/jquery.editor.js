@@ -391,12 +391,20 @@
             });
 
             CKEDITOR.instances[identifier].on('key', function(event) {
+
                 /* Disable Nanospell if keycode 229 is pressed (sign of IME use)
                  * (Nanospell breaks IME use)
                  */
                 if (event.data.keyCode === 229) {
+
                     CKEDITOR.instances[identifier].stopNanospell();
+
+                    /* If nanospell has been disabled - we can remove this from running on every keypress
+                     * NOTE: if any further code is added to this listener this will need to change
+                     */
+                    event.removeListener();
                 }
+
             });
         }
 	}
