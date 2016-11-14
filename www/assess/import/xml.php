@@ -45,7 +45,7 @@ if ($is_task) {
     $assessment->setTask($task);
     QuizMapper::getInstance()->save($assessment);
 
-    $task->setAssessment($assessment);
+    $task->setQuiz($assessment);
     TaskMapper::getInstance()->save($task);
 } elseif (!empty($_POST['unit_id'])) {
     $task_instance = new Task\Instance();
