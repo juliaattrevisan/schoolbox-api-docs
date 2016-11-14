@@ -37,8 +37,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        // TODO attach Plagscan document
+        $this->joins('id', \Plagscan_DocumentMapper::class, 'student_submission_file_id', null, self::COLUMN_JOIN_MULTI, 'plagscan', 'plagscan');
     }
 
     /**
@@ -51,12 +50,14 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('submission', 's')},
                 {$this->getJoinColumnString('storage', 'f')},
-                {$this->getJoinColumnString('storage.allowedFileExtension', 'm')}
+                {$this->getJoinColumnString('storage.allowedFileExtension', 'm')},
+                {$this->getJoinMapper('plagscan')->getColumnString('ps')}
 
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('submission', '', 's')}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
+            LEFT JOIN {$this->getJoinSql('plagscan', '', 'ps')}
         ";
     }
 
@@ -72,17 +73,23 @@ class Mapper extends BaseMapper
         $resultSet = $this->createCollection();
 
         foreach ($statement as $row) {
-            $result = $this->hydrate($row);
+            /** @var \Schoolbox\File\Mimetype $mimetype */
+            $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
 
             /** @var \Schoolbox\Resource\Storage\Model $storage */
             $storage = $this->hydrateJoin($row, 'storage', 'f');
-            $storage->setMimetype($this->hydrateJoin($row, 'storage.allowedFileExtension', 'm'));
+            $storage->setMimetype($mimetype);
 
-            $resultSet->add(
-                $result
-                    ->setStorage($storage)
-                    ->setSubmission($this->hydrateJoin($row, 'submission', 's'))
-            );
+            /** @var \Plagscan_Document $plagscan */
+            $plagscan = $this->hydrateJoin($row, 'plagscan', 'ps');
+
+            $submissionFile = $this->hydrate($row);
+            $submissionFile
+                ->setStorage($storage)
+                ->setPlagscan($plagscan)
+                ->setSubmission($this->hydrateJoin($row, 'submission', 's'));
+
+            $resultSet->add($submissionFile);
         }
         return $resultSet;
     }
