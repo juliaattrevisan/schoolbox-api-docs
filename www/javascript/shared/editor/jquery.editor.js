@@ -389,6 +389,15 @@
                     });
                 }
             });
+
+            CKEDITOR.instances[identifier].on('key', function(event) {
+                /* Disable Nanospell if keycode 229 is pressed (sign of IME use)
+                 * (Nanospell breaks IME use)
+                 */
+                if (event.data.keyCode === 229) {
+                    CKEDITOR.instances[identifier].stopNanospell();
+                }
+            });
         }
 	}
 })(jQuery);
