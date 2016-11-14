@@ -183,6 +183,15 @@
                         <!-- END export_group -->
                     </select>
                 </label>
+                <input type="radio" name="export" value="event_type" id="export-type" />
+                <label for="export-type">Events by type:
+                    <select name="event_type">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_type -->
+                        <option label="{EXPORT_TYPE_NAME}" value="{EXPORT_TYPE_ID}">{EXPORT_TYPE_NAME}</option>
+                        <!-- END export_type -->
+                    </select>
+                </label>
             </fieldset>
         </section>
         <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
