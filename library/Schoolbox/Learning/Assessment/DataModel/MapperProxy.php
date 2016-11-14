@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
+use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -51,15 +52,25 @@ class MapperProxy
     protected $translator;
 
     /**
+     * @var External_UserInterface
+     */
+    protected $externalUser;
+
+    /**
      * Constructor
      *
-     * @param Mapper     $baseMapper
-     * @param Translator $translator
+     * @param Mapper                 $baseMapper
+     * @param Translator             $translator
+     * @param External_UserInterface $externalUser
      */
-    public function __construct(Mapper $baseMapper, Translator $translator)
-    {
-        $this->baseMapper = $baseMapper;
-        $this->translator = $translator;
+    public function __construct(
+        Mapper $baseMapper,
+        Translator $translator,
+        External_UserInterface $externalUser
+    ) {
+        $this->baseMapper   = $baseMapper;
+        $this->translator   = $translator;
+        $this->externalUser = $externalUser;
     }
 
     /**
@@ -213,17 +224,24 @@ class MapperProxy
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
         // Find folders (from class)
+        $classFolderIds = $folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student))
+                                       ->getColumnValues('id');
 
         // Find folders (from group)
         // TODO probably best to inject this rather than delve
         $userAccessMapper = $this->baseMapper->getJoinMapper('task.owner.userAccess');
-        $userAccessMapper->findByColumnList([
+        $groupFolderIds   = $userAccessMapper->findByColumnList([
             'uid'     => $student->getId(),
             'type'    => UserAccess::ACCESS_READ,
             'service' => UserAccess::SERVICE_HOMEPAGE,
         ])->getColumnValues('serviceIdentifier');
 
-        // Find existing participations (from feedback or response)
+        // Find existing participations (from response)
+
+        // Find existing participations (from feedback)
+
+        // And find all the assessables
+        return $this->findAllForFolderId(array_merge($classFolderIds, $groupFolderIds));
     }
 
     /**
