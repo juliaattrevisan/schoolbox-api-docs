@@ -126,7 +126,8 @@ class Controller extends Assessment\Controller
          * Ram in some temporary responses so that I
          * can make the Submission History section
          */
-        (new TemporaryResponse())->produceResponse($assessment);
+//        (new TemporaryResponse())->produceResponse($assessment);
+
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
