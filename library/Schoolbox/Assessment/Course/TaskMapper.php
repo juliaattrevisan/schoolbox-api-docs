@@ -45,9 +45,6 @@ class TaskMapper extends Schoolbox\Mapper
             'this_key'  => 'id',
             'other_key' => 'task_id',
         ));
-
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteRelatedObjects'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteRelatedObjects'));
     }
 
     /**
