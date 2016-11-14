@@ -7,11 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Completion;
 
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\Task as TaskDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as DomainObject;
 use Schoolbox\Mapper;
 
@@ -107,6 +108,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $taskCompletion = (new DomainObject())
                 // TODO add completion status once markbook is merged
                 ->setId($completion->getId())
+                ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($completion->getMarkingUser())
                 ->setSubmittedOnBehalfOf($completion->getStudent())
                 ->setCreatedAt($completion->getCompletionDate())
@@ -145,7 +147,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setTask(
-                    (new Task())
+                    (new TaskDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setStudent($domainObject->getSubmittedOnBehalfOf())
