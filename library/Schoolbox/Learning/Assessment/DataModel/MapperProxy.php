@@ -262,23 +262,10 @@ class MapperProxy
         // Also need assessments which this student may not participating in
         // via folder or class, but through a previous response or feedback.
         $assessmentIds    = $assessments->getColumnValues('id');
-        $extraAssessments = [];
-
-        // Find existing participations (from response)
-        foreach ($this->responseDataSource->findForStudent($student) as $response) {
-            $assessmentId = $response->getAssessable()->getId();
-            if (!in_array($assessmentId, $assessmentIds)) {
-                $extraAssessments[$assessmentId] = $assessmentId;
-            }
-        }
-
-        // Find existing participations (from feedback)
-        foreach ($this->feedbackDataSource->findForStudent($student) as $feedback) {
-            $assessmentId = $feedback->getAssessable()->getId();
-            if (!in_array($assessmentId, $assessmentIds)) {
-                $extraAssessments[$assessmentId] = $assessmentId;
-            }
-        }
+        $extraAssessments = array_diff(
+            $this->baseMapper->findUniqueAssessmentIdsForStudent($student),
+            $assessmentIds
+        );
 
         if (!empty($extraAssessments)) {
             $assessments = $assessments->merge(
