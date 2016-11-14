@@ -30,13 +30,19 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
 	}
 }
 
-/* Multiple soft-delete
+/* Update attempts
  */
+$data = [
+    'action'  => 'reload',
+    'updated' => [],
+];
 foreach ($allAttempts as $currentAttempt) {
-	$responseHandler->deleteResponsesForAttempt($currentAttempt['attempt_id']);
 
-	$attemptHandler->update(array(
+    $data['updated'][$currentAttempt['attempt_id']] = $attemptHandler->update(array(
 		'attempt_id' => $currentAttempt['attempt_id'],
 		'reviewed_at' => 'NOW()'
 	));
 }
+header('Content-Type: application/json');
+die(json_encode($data));
+
