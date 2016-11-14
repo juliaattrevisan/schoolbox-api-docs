@@ -37,7 +37,7 @@ use Schoolbox\UserMapper;
  * Class SubmissionNotifier
  * @package Schoolbox\Assessment\Component\SubmissionBox
  */
-class FileNotifier extends AbstractModuleNotifier
+class SubmissionNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_SUBMITTED   = 'submitted';
