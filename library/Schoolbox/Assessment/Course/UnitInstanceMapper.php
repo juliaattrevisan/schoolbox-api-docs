@@ -649,7 +649,7 @@ class UnitInstanceMapper extends BaseMapper {
     public function saveTaskIntoUnitInstance(UnitInstance $unit, Task $task, User $owner) {
         // Protection for if the assessment or box aren't objects at all.
         // TODO: make the hydrator at least hydrate null objects?
-        if (!($task->getAssessment() instanceof Quiz)) {
+        if (!($task->getQuiz() instanceof Quiz)) {
             $task->setAssessment(new Quiz());
         }
         if (!($task->getSubmissionBox() instanceof SubmissionBox)) {

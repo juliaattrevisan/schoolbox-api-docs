@@ -92,7 +92,7 @@ class Cloner
      */
     public function cloneAssessment()
     {
-        $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
+        $assess_id = $this->task_instance->getTask()->getQuiz()->getId();
         if ($assess_id) {
 
             $mapper   = QuizMapper::getInstance();

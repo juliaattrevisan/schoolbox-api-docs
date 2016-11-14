@@ -184,7 +184,7 @@ class InstanceMapper extends BaseMapper {
             if ($task instanceof Task && $task->getId()) {
                 $cloner = new Cloner($object);
                 try {
-                    if (($assess_id = $task->getAssessment()->getId())) {
+                    if (($assess_id = $task->getQuiz()->getId())) {
                         $assessment = $cloner->cloneAssessment();
                         $this->updateAll($object, 'assess_id', $assessment->getId());
                     }
