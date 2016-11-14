@@ -9,11 +9,14 @@
 
 namespace Schoolbox\Learning\Quiz\Attempt;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use \Alaress_Date_Format;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
+use \DomainException;
 
 class Model implements ISoftDeletable
 {
@@ -51,6 +54,19 @@ class Model implements ISoftDeletable
      * @var Alaress_Date_Format
      */
     protected $deleted;
+
+    /**
+     * @var QuizAnswer[]|GenericCollection<QuizAnswer>
+     */
+    private $answers;
+
+    /**
+     * Model constructor.
+     */
+    public function __construct()
+    {
+        $this->answers = new GenericCollection(QuizAnswer::class);
+    }
 
     /**
      * Is this deleted?
@@ -177,5 +193,25 @@ class Model implements ISoftDeletable
     public function getDeleted()
     {
         return $this->deleted;
+    }
+
+    /**
+     * @return QuizAnswer[]|GenericCollection<QuizQuestion>
+     */
+    public function getAnswers()
+    {
+        return $this->answers;
+    }
+
+    /**
+     * @param GenericCollection $answers
+     * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
+     */
+    public function setAnswers(GenericCollection $answers)
+    {
+        $this->answers->assertSameItemClass($answers);
+        $this->answers = $answers;
+        return $this;
     }
 }

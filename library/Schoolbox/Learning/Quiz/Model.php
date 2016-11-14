@@ -15,6 +15,7 @@ use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -23,6 +24,9 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use \DomainException;
 
 class Model implements ISoftDeletable, IAssessableDataModel
 {
@@ -140,9 +144,23 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     protected $mark_visibility = 0;
 
+    /**
+     * Indexed by section.id
+     * @var QuizSection[]|GenericCollection<QuizSection>
+     */
+    private $sections;
+
+    /**
+     * Indexed by attempt.id
+     * @var QuizAttempt[]|GenericCollection<QuizAttempt>
+     */
+    private $attempts;
+
     public function __construct()
     {
         $this->setCurriculumNodes(new Collection());
+        $this->sections = new GenericCollection(QuizSection::class);
+        $this->attempts = new GenericCollection(QuizAttempt::class);
     }
 
     /**
@@ -586,6 +604,46 @@ class Model implements ISoftDeletable, IAssessableDataModel
             : \Alaress_Date_Format::now()->endOfDay();
         $this->setStart($start_date);
         $this->setFinish($finish_date);
+        return $this;
+    }
+
+    /**
+     * @return QuizSection[]|GenericCollection<QuizSection>
+     */
+    public function getSections()
+    {
+        return $this->sections;
+    }
+
+    /**
+     * @param GenericCollection $sections
+     * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
+     */
+    public function setSections(GenericCollection $sections)
+    {
+        $this->sections->assertSameItemClass($sections);
+        $this->sections = $sections;
+        return $this;
+    }
+
+    /**
+     * @return QuizAttempt[]|GenericCollection<QuizAttempts>
+     */
+    public function getAttempts()
+    {
+        return $this->attempts;
+    }
+
+    /**
+     * @param GenericCollection $attempts
+     * @return static
+     * @throws DomainException if new Generic Collection is of incorrect type
+     */
+    public function setAttempts(GenericCollection $attempts)
+    {
+        $this->attempts->assertSameItemClass($attempts);
+        $this->attempts = $attempts;
         return $this;
     }
 }

@@ -7,6 +7,8 @@
 
 namespace Schoolbox;
 
+use \DomainException;
+
 /**
  * Member items must be of declared type.
  * Type is declared on construction or insertion of first element.
@@ -140,5 +142,21 @@ class GenericCollection extends Collection
         $this->checkType($value);
         parent::offsetSet($index, $value);
         return $this;
+    }
+
+    /**
+     * Convenience method available to setters to ensure the proposed new Collection
+     * has the same member-item type as the existing Collection
+     *
+     * @param GenericCollection $newCollection
+     * @throws DomainException if the new Collection has a different item-type to this Collection
+     */
+    public function assertSameItemClass(GenericCollection $newCollection)
+    {
+        $thisItemClass = $this->getElementClass();
+        $otherItemClass = $newCollection->getElementClass();
+        if($thisItemClass != $otherItemClass){
+            throw new \DomainException("Collection must be of type '$thisItemClass'. Found: '$otherItemClass'");
+        }
     }
 }
