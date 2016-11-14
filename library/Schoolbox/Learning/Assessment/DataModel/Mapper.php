@@ -459,7 +459,7 @@ class Mapper extends BaseMapper
         // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (!$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof ProjectModel) {
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
