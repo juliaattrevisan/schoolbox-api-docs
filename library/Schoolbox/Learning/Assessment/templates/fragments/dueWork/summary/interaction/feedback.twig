@@ -1,5 +1,5 @@
 {% if currentFeedback.isPublished %}
-<li {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
+<li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
     <div class="list-item">
         <div class="card small-12 medium-8">
             <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">

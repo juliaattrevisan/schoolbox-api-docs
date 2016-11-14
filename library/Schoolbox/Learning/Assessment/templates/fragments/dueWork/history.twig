@@ -21,10 +21,15 @@
         <h2 class="subheader">Submission History</h2>
 
         <section>
+            {% set firstSubmissionIndex = 0 %}
+            {% set isOlderInteraction = false %}
+
              <ul id='history' class="information-list threaded">
                  {% for currentInteraction in timeline %}
                      {% if currentInteraction is response %}
                          {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
+                         {% set firstSubmissionIndex = loop.index %}
+                         {% set isOlderInteraction = true %}
                      {% elseif currentInteraction is feedback %}
                          {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction} %}
                      {% endif %}
@@ -33,7 +38,11 @@
         </section>
 
         {% if timeline|length > 1 %}
-        <a id="view-history" class="button full-width icon-down-arrow">View {{ timeline|length -1 }} older interactions</a>
+            {% set olderInteractions = timeline|length - firstSubmissionIndex %}
+
+            {% if olderInteractions %}
+            <a id="view-history" class="button full-width icon-down-arrow">View {{ olderInteractions }} older interaction{% if olderInteractions > 1 %}s{% endif %}</a>
+            {% endif %}
         {% endif %}
     </div>
 </div>

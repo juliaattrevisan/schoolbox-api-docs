@@ -1,4 +1,4 @@
-<li class="actions-small-1" {% if loop.index > 1 %}style="display:none"{% endif %} data-history-row>
+<li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
     {% include '@learning/dueWork/interaction/response/creator.twig' %}
 
     <article>
