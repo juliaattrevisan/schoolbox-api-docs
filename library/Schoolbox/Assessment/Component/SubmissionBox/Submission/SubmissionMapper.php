@@ -19,11 +19,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as SubmissionFileMapper;
 
 /**
  * A mapper for a student's submission to a due work.
- *
- * The name FileMapper is a misnomer, as student submissions may now contain multiple files.
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
  * @method Submission findById($id)
@@ -50,13 +49,15 @@ class SubmissionMapper extends BaseMapper
         $this->hasJoin(
             'file',
             [
-                'mapper'    => SingleFile\Mapper::class,
+                'mapper'    => SubmissionFileMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'student_submission_id',
             ]
         );
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteFiles' ]);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFiles'));
     }
 
     /**
@@ -138,6 +139,32 @@ class SubmissionMapper extends BaseMapper
             $file->setSubmission($object);
         }
         $joinMapper->save($addedFiles);
+    }
+
+
+    /**
+     * Soft deletes all Files for the specified Submission
+     *
+     * @param Submission $submission
+     */
+    public function softDeleteSubmissionFiles(Submission $submission)
+    {
+        $submissionFileMapper = SubmissionFileMapper::getInstance();
+        $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
+        $submissionFileMapper->delete($files);
+    }
+
+
+    /**
+     * Restores all soft-deleted Files for the specified Submission
+     *
+     * @param Submission $submission
+     */
+    public function restoreSubmissionFiles(Submission $submission)
+    {
+        $submissionFileMapper = SubmissionFileMapper::getInstance();
+        $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
+        $submissionFileMapper->restoreSoftDeleted($files);
     }
 
     /**
