@@ -19,10 +19,11 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use External_Markbook;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 /**
  * Class SubmissionBoxMapper
@@ -103,6 +104,63 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+
+
+        // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
+    }
+
+
+    /**
+     * Soft deletes all Student Submissions for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function softDeleteSubmissions(SubmissionBox $dueWork)
+    {
+        $submissionMapper = SubmissionMapper::getInstance();
+        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $submissionMapper->delete($submissions);
+    }
+
+    /**
+     * Soft deletes all Teacher Returns for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function softDeleteReturns(SubmissionBox $dueWork)
+    {
+        $returnMapper = ReturnedWorkMapper::getInstance();
+        $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $returnMapper->delete($returns);
+    }
+
+
+    /**
+     * Restores all deleted Student Submissions for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function restoreSubmissions(SubmissionBox $dueWork)
+    {
+        $submissionMapper = SubmissionMapper::getInstance();
+        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $submissionMapper->restoreSoftDeleted($submissions);
+    }
+
+    /**
+     * Restores all deleted Teacher Returns for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function restoreReturns(SubmissionBox $dueWork)
+    {
+        $returnMapper = ReturnedWorkMapper::getInstance();
+        $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $returnMapper->restoreSoftDeleted($returns);
     }
 
     /**
