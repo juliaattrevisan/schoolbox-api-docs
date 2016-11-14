@@ -36,16 +36,65 @@
 
     <!-- BEGIN empty_state -->
 
-    <div class="empty-state">
-        <i class="icon-video"></i>
-        <p>No video files available!</p>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list" data-dz-container></ul>
+            </section>
+        </div>
+    </div>
 
-        <!-- BEGIN empty_modify -->
-        <p>
-            <a href="/cms/file/new/{FILE_CAT_ID}">Post a video</a>
-        </p>
-        <!-- END empty_modify -->
+    <div data-dz-wrap class="dropzone-wrap">
+        <div data-dz-container="">
+        </div>
+        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="video"></form>
+        <div class="hide" data-dz-template>
+            <li>
+                <div class="card small-12">
+                    <div class="icon-audio icon-32"></div>
+                    <h3 data-dz-name></h3>
+                    <p class="meta" data-dz-status>Uploading...</p>
+                    <div class="progress dz-progress">
+                        <span class="meter dz-upload" style="width:0;"></span>
+                    </div>
+                </div>
+            </li>
+        </div>
 
+        <div class="empty-state">
+            <i class="icon-video"></i>
+            <p>No video files available!</p>
+
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/cms/file/new/{FILE_CAT_ID}">Post a video</a> or drag one onto this component
+            </p>
+            <script type="text/javascript">
+                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                    wrapClass: 'dragging',
+                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                    tplWrap: '<li class="dz-preview" />',
+                    dictDefaultMessage: 'You can drag videos into this space.',
+                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                    showIfEmpty: false,
+                    addedfile: function (file) {
+                        $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+                    },
+                    sending: function (file, xhr, formData) {
+                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                        formData.append('category', $(file.previewElement).data('node'));
+                        formData.append('comment', '');
+                        formData.append('hidden', 0);
+                    },
+                    complete: function (file) {
+                        $(file.previewElement).find('img').remove();
+                    }
+                });
+            </script>
+            <!-- END empty_modify -->
+        </div>
     </div>
 
     <!-- END empty_state -->

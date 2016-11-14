@@ -66,6 +66,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->outputList = new \Schoolbox\Collection(array());
         }
 
+        // Set up component name
+        $this->setVar(array(
+            'FILE_CAT_ID' => $this->getSource()->getId(),
+        ));
+
         if ($this->outputList->count() == 0) {
 
             $this->setBlock($templateHandle, 'video', 'video_block');
@@ -128,11 +133,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
                     return false;
                 }
-
-                // Set up component name
-                $this->setVar(array(
-                    'FILE_CAT_ID' => $this->getSource()->getId(),
-                ));
 
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
