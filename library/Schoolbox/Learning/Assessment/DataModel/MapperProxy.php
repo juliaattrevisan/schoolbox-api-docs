@@ -8,6 +8,8 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -57,20 +59,36 @@ class MapperProxy
     protected $externalUser;
 
     /**
+     * @var ResponseDataSource
+     */
+    protected $responseDataSource;
+
+    /**
+     * @var FeedbackDataSource
+     */
+    protected $feedbackDataSource;
+
+    /**
      * Constructor
      *
      * @param Mapper                 $baseMapper
      * @param Translator             $translator
      * @param External_UserInterface $externalUser
+     * @param ResponseDataSource     $responseDataSource
+     * @param FeedbackDataSource     $feedbackDataSource
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        External_UserInterface $externalUser
+        External_UserInterface $externalUser,
+        ResponseDataSource $responseDataSource,
+        FeedbackDataSource $feedbackDataSource
     ) {
-        $this->baseMapper   = $baseMapper;
-        $this->translator   = $translator;
-        $this->externalUser = $externalUser;
+        $this->baseMapper         = $baseMapper;
+        $this->translator         = $translator;
+        $this->externalUser       = $externalUser;
+        $this->responseDataSource = $responseDataSource;
+        $this->feedbackDataSource = $feedbackDataSource;
     }
 
     /**
@@ -241,35 +259,34 @@ class MapperProxy
         $assessments = $this->findAllForFolderId($allFolders)
                             ->merge($this->findAllInCourseImplementationForFolderId($allFolders));
 
-//        $assessmentIds = $assessments->getColumnValues('id');
-//
-//
-//        // Also need assessments which this student may not participating in
-//        // via folder or class, but through a previous response or feedback.
-//        $extraAssessments = [];
-//
-//        // Find existing participations (from response)
-//        foreach ($this->responseDataSource->findForStudent($student) as $response) {
-//            $assessmentId = $response->getAssessable()->getId();
-//            if (!in_array($assessmentId, $assessmentIds)) {
-//                $extraAssessments[$assessmentId] = $assessmentId;
-//            }
-//        }
-//
-//        // Find existing participations (from feedback)
-//        foreach ($this->feedbackDataSource->findForStudent($student) as $feedback) {
-//            $assessmentId = $feedback->getAssessable()->getId();
-//            if (!in_array($assessmentId, $assessmentIds)) {
-//                $extraAssessments[$assessmentId] = $assessmentId;
-//            }
-//        }
-//
-//        if (!empty($extraAssessments)) {
-//            $assessments = $assessments->merge(
-//                $this->baseMapper->findByColumn('id', $extraAssessments)
-//                                 ->map([$this, 'translateToDomainModel'])
-//            );
-//        }
+
+        // Also need assessments which this student may not participating in
+        // via folder or class, but through a previous response or feedback.
+        $assessmentIds    = $assessments->getColumnValues('id');
+        $extraAssessments = [];
+
+        // Find existing participations (from response)
+        foreach ($this->responseDataSource->findForStudent($student) as $response) {
+            $assessmentId = $response->getAssessable()->getId();
+            if (!in_array($assessmentId, $assessmentIds)) {
+                $extraAssessments[$assessmentId] = $assessmentId;
+            }
+        }
+
+        // Find existing participations (from feedback)
+        foreach ($this->feedbackDataSource->findForStudent($student) as $feedback) {
+            $assessmentId = $feedback->getAssessable()->getId();
+            if (!in_array($assessmentId, $assessmentIds)) {
+                $extraAssessments[$assessmentId] = $assessmentId;
+            }
+        }
+
+        if (!empty($extraAssessments)) {
+            $assessments = $assessments->merge(
+                $this->baseMapper->findByColumn('id', $extraAssessments)
+                                 ->map([$this, 'translateToDomainModel'])
+            );
+        }
 
         return $assessments;
     }
