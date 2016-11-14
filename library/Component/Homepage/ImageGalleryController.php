@@ -57,13 +57,26 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             ]
         );
 
-        if (!is_array($allImages) && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
+        $this->setVar(
+            array(
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+                'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
+            )
+        );
+
+        if ($allImages->count() == 0) {
 
             $this->setBlock($templateHandle, 'gallery', 'gallery_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('gallery_block', '');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("empty_modify_block", "");
+            } else {
+                $this->parse("empty_modify_block", "empty_modify");
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
@@ -97,12 +110,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                  *
                  * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
                  */
-                $this->setVar(
-                    array(
-                        'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                        'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
-                    )
-                );
 
                 // Controls such as Post News
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
