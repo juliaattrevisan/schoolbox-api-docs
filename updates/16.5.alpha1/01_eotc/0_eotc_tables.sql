@@ -40,7 +40,7 @@ create procedure check_website()
         `name` varchar(255) DEFAULT NULL,
         `value` text CHARACTER SET utf8,
         PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
       INSERT INTO `eotc_config` (`name`, `value`) VALUES ('first_reminder', '10');
       INSERT INTO `eotc_config` (`name`, `value`) VALUES ('daily_reminder', '3');
@@ -180,7 +180,7 @@ create procedure check_website()
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `name` varchar(255) DEFAULT NULL,
         PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
       INSERT INTO `eotc_status` (`name`) VALUES ('Initial Application');
       INSERT INTO `eotc_status` (`name`) VALUES ('Approved In Principle');
@@ -196,11 +196,3 @@ create procedure check_website()
 delimiter ;
 call check_website();
 drop procedure check_website;
-
-
-
-
-
-
-
-
