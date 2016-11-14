@@ -25,7 +25,7 @@ $this->setTab('submission');
 // allow teachers to mark this?
 
 $box_mapper        = new SubmissionBoxMapper();
-$submission_mapper = Submission\FileMapper::getInstance();
+$submission_mapper = Submission\SubmissionMapper::getInstance();
 $conf              = ConfigMapper::getInstance();
 
 //

@@ -56,7 +56,7 @@ class Internal extends Base {
             }
         } elseif ($id = $this->isSubmission($uriObject)) {
             try {
-                $item = SubmissionBox\Submission\FileMapper::getInstance()->findById($id);
+                $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
                 $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
                 if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));

@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -29,7 +29,7 @@ use Schoolbox\UserMapper;
  * @method File findById($id)
  * @method File hydrate(array $row, $alias = '', $callback = null)
  */
-class FileMapper extends Mapper
+class SubmissionMapper extends BaseMapper
 {
     /**
      * @return void

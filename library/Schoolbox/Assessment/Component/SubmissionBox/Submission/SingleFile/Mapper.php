@@ -8,7 +8,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\File\Mimetype as Mimetype;
@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('student_submission_id', FileMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->joins('student_submission_id', SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('editable_inline', self::TYPE_BOOLEAN);

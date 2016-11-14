@@ -22,7 +22,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use External_Markbook;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 /**
@@ -76,7 +76,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // joins that have no column definition
         $this->hasJoin('submission', array(
             'multiple'  => true,
-            'mapper'    => SubmissionBox\Submission\FileMapper::class,
+            'mapper'    => SubmissionBox\Submission\SubmissionMapper::class,
             'this_key'  => 'id',
             'other_key' => 'box_id',
         ));

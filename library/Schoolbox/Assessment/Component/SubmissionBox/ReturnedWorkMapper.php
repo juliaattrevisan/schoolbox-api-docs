@@ -40,7 +40,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
         $this->joins('owner', Schoolbox\UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->joins('marker', Schoolbox\UserMapper::class, 'id', null, null, 'marker', 'marker');
-        $this->joins('student_submission_id', SubmissionBox\Submission\FileMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->joins('student_submission_id', SubmissionBox\Submission\SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->uses('comment', Schoolbox\Mapper::TYPE_STRING);
         $this->uses('mark', Schoolbox\Mapper::TYPE_STRING, null, 'humanReadableMark');
         $this->uses('norm_mark', Schoolbox\Mapper::TYPE_STRING, null, 'normalizedMark');

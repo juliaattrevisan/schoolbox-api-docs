@@ -20,7 +20,7 @@ if (is_numeric($_GET['id'])) {
     }
 
     $boxMapper        = new SubmissionBoxMapper();
-    $submissionMapper = new SubmissionBox\Submission\FileMapper();
+    $submissionMapper = new SubmissionBox\Submission\SubmissionMapper();
 
     $submissionBox = $boxMapper->findById($box_id);
     $zipName = Scrub::text($submissionBox->getName());

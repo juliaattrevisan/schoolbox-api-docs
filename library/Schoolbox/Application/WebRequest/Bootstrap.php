@@ -659,7 +659,7 @@ class Bootstrap implements BootstrapInterface {
                         ->addSubSource(
                             new \Schoolbox\Learning\Assessment\Response\SubSource\DueWork(
                                 new \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy(
-                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::class)
+                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class)
                                 )
                             )
                         )

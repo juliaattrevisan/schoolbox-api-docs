@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 $submissionId = $this->arg[0];
 
 try {
-    $submission = Submission\FileMapper::getInstance()->findById($this->arg[0]);
+    $submission = Submission\SubmissionMapper::getInstance()->findById($this->arg[0]);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(41);
     exit;

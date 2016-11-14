@@ -9,7 +9,7 @@
 
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;

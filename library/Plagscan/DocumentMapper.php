@@ -16,7 +16,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
  */
 class Plagscan_DocumentMapper extends Schoolbox\Mapper
 {
-    /** @var Submission\FileMapper */
+    /** @var Submission\SubmissionMapper */
     protected $submissionMapper;
 
 	/**
@@ -31,7 +31,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
-        $this->submissionMapper = new Submission\FileMapper();
+        $this->submissionMapper = new Submission\SubmissionMapper();
 
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}

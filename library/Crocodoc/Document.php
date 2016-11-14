@@ -104,7 +104,7 @@ class Document
         if (isset($result->uuid)) {
             /* Save reference to uploaded file */
             $this->getSubmission()->setUuid($result->uuid);
-            Submission\FileMapper::getInstance()->save($this->getSubmission());
+            Submission\SubmissionMapper::getInstance()->save($this->getSubmission());
         }
 
         return array(

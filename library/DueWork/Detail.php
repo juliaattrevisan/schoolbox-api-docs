@@ -95,7 +95,7 @@ class DueWork_Detail
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $insertion['user']['instance'] = $user;
-                $submissions = Submission\FileMapper::getInstance()->findByColumnList(
+                $submissions = Submission\SubmissionMapper::getInstance()->findByColumnList(
                     array(
                         'owner'  => $user->getId(),
                         'box_id' => $this->submissionBox->getId(),

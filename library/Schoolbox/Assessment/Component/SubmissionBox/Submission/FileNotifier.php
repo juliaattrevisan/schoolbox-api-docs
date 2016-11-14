@@ -76,7 +76,7 @@ class FileNotifier extends AbstractModuleNotifier
         $dependencies['submissionBoxMapper'] = isset($dependencies['submissionBoxMapper']) ? $dependencies['submissionBoxMapper'] : SubmissionBoxMapper::getInstance();
         $dependencies['userMapper']          = isset($dependencies['userMapper']) ? $dependencies['userMapper'] : UserMapper::getInstance();
         $dependencies['folderMapper']        = isset($dependencies['folderMapper']) ? $dependencies['folderMapper'] : Folder\Mapper::getInstance();
-        $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : FileMapper::getInstance();
+        $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : SubmissionMapper::getInstance();
         $dependencies['userAccessMapper']    = isset($dependencies['userAccessMapper']) ? $dependencies['userAccessMapper'] : UserAccessMapper::getInstance();
 
         parent::loadDependencies($dependencies);
@@ -147,7 +147,7 @@ class FileNotifier extends AbstractModuleNotifier
         $studentId = $submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        /** @var FileMapper $mapper */
+        /** @var SubmissionMapper $mapper */
         $mapper = $this->mapper;
 
         switch ($method) {

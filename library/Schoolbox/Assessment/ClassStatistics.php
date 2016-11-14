@@ -37,7 +37,7 @@ class ClassStatistics {
 	protected $submissionBoxMapper;
 
 	/**
-	 * @var Submission\FileMapper
+	 * @var Submission\SubmissionMapper
 	 */
 	protected $submissionMapper;
 
@@ -68,7 +68,7 @@ class ClassStatistics {
 
 		// compile the due work, assessments, marks returned, et al
 		$this->submissionBoxMapper = new SubmissionBoxMapper();
-		$this->submissionMapper = Submission\FileMapper::getInstance();
+		$this->submissionMapper = Submission\SubmissionMapper::getInstance();
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
 		$this->assessMapper = new QuizMapper();
