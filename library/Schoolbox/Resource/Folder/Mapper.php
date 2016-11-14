@@ -836,7 +836,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        return $this->hydrateSelect($statement);
+        $result = $this->hydrateSelect($statement);
+
+        // Reload codes for retrieved folders.
+        // The above query will not have fetched any codes that weren't in $subjectList.
+        $folderCodes = $this->getJoinMapper('codes')
+                            ->findByColumn('folder_id', $result->getColumnValues('id'))
+                            ->groupByCallback(function (Code\Model $code) {
+                                return $code->getFolder()->getId();
+                            });
+        foreach ($result as $folder) {
+            if (isset($folderCodes[$folder->getId()])) {
+                $folder->setCodes($folderCodes[$folder->getId()]);
+            }
+        }
+
+        return $result;
     }
 
     /**
