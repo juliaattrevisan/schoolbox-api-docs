@@ -11,8 +11,8 @@
  */
 
 namespace Alaress\Session;
+use Alaress\Redis;
 use Aura\Session as SessionLibrary;
-use Aura\Session\Phpfunc;
 
 class Factory {
 
@@ -49,7 +49,7 @@ class Factory {
      * @return Session
      */
     public function build() {
-        $func             = new Phpfunc();
+        $func             = new Phpfunc($this->config, Redis::getClientInstance(), $this->cookies);
         $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(
             new SessionLibrary\Randval($func)
