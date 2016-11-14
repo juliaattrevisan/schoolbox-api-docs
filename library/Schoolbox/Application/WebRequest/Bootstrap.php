@@ -653,11 +653,9 @@ class Bootstrap implements BootstrapInterface {
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [
-            'externalDb'         => $di->lazyGet('externalClass'),
-            'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
-            'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
-            'responseDataSource' => $di->lazyGet('responseDataSource'),
-            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+            'externalDb'       => $di->lazyGet('externalClass'),
+            'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
+            'userMapper'       => $mapperFactory->getLazy(UserMapper::class),
         ];
         $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
 

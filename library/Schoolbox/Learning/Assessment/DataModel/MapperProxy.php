@@ -59,36 +59,20 @@ class MapperProxy
     protected $externalUser;
 
     /**
-     * @var ResponseDataSource
-     */
-    protected $responseDataSource;
-
-    /**
-     * @var FeedbackDataSource
-     */
-    protected $feedbackDataSource;
-
-    /**
      * Constructor
      *
      * @param Mapper                 $baseMapper
      * @param Translator             $translator
      * @param External_UserInterface $externalUser
-     * @param ResponseDataSource     $responseDataSource
-     * @param FeedbackDataSource     $feedbackDataSource
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        External_UserInterface $externalUser,
-        ResponseDataSource $responseDataSource,
-        FeedbackDataSource $feedbackDataSource
+        External_UserInterface $externalUser
     ) {
-        $this->baseMapper         = $baseMapper;
-        $this->translator         = $translator;
-        $this->externalUser       = $externalUser;
-        $this->responseDataSource = $responseDataSource;
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->baseMapper   = $baseMapper;
+        $this->translator   = $translator;
+        $this->externalUser = $externalUser;
     }
 
     /**
