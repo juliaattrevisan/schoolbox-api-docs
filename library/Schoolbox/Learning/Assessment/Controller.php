@@ -131,7 +131,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment)
     {
-
         /* Modify particular fields
          */
         if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
@@ -403,6 +402,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
     }
 
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+    }
 
 
 
