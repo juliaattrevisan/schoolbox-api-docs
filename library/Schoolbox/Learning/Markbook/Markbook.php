@@ -176,13 +176,13 @@ class Markbook
         // First, average each assessable for all participants
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark(
-            $weightedSummator->summateAllAssessables(
-                $this->getAssessments(),
-                true,
-                new Average()
-            )
+
+        $this->markbookStatistics['normalisedMean'] = $weightedSummator->summateAllAssessables(
+            $this->getAssessments(),
+            true,
+            new Average()
         );
+        $this->markbookStatistics['weightedMean'] = $overallMarkScheme->getHumanReadableMark($this->markbookStatistics['normalisedMean']);
     }
 
     /**
