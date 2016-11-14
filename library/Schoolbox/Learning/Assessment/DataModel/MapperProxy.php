@@ -236,12 +236,42 @@ class MapperProxy
             'service' => UserAccess::SERVICE_HOMEPAGE,
         ])->getColumnValues('serviceIdentifier');
 
-        // Find existing participations (from response)
-
-        // Find existing participations (from feedback)
-
         // And find all the assessables
-        return $this->findAllForFolderId(array_merge($classFolderIds, $groupFolderIds));
+        $allFolders  = array_merge($classFolderIds, $groupFolderIds);
+        $assessments = $this->findAllForFolderId($allFolders)
+                            ->merge($this->findAllInCourseImplementationForFolderId($allFolders));
+
+//        $assessmentIds = $assessments->getColumnValues('id');
+//
+//
+//        // Also need assessments which this student may not participating in
+//        // via folder or class, but through a previous response or feedback.
+//        $extraAssessments = [];
+//
+//        // Find existing participations (from response)
+//        foreach ($this->responseDataSource->findForStudent($student) as $response) {
+//            $assessmentId = $response->getAssessable()->getId();
+//            if (!in_array($assessmentId, $assessmentIds)) {
+//                $extraAssessments[$assessmentId] = $assessmentId;
+//            }
+//        }
+//
+//        // Find existing participations (from feedback)
+//        foreach ($this->feedbackDataSource->findForStudent($student) as $feedback) {
+//            $assessmentId = $feedback->getAssessable()->getId();
+//            if (!in_array($assessmentId, $assessmentIds)) {
+//                $extraAssessments[$assessmentId] = $assessmentId;
+//            }
+//        }
+//
+//        if (!empty($extraAssessments)) {
+//            $assessments = $assessments->merge(
+//                $this->baseMapper->findByColumn('id', $extraAssessments)
+//                                 ->map([$this, 'translateToDomainModel'])
+//            );
+//        }
+
+        return $assessments;
     }
 
     /**
