@@ -136,8 +136,7 @@ class MapperProxy
     public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        return $this->baseMapper->findByColumn('spec.id', $assessmentId, $options)
-            ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('spec.id', $assessmentId, $options));
     }
 
     /**
@@ -283,8 +282,7 @@ class MapperProxy
 
         if (!empty($extraAssessments)) {
             $assessments = $assessments->merge(
-                $this->baseMapper->findByColumn('id', $extraAssessments)
-                                 ->map([$this, 'translateToDomainModel'])
+                $this->translateToDomainModelCollection($this->baseMapper->findByColumn('id', $extraAssessments))
             );
         }
 
