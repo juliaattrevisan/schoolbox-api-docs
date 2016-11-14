@@ -21,6 +21,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+
 /**
  * Class Mapper
  *
@@ -178,6 +180,40 @@ class Mapper extends BaseMapper
             $quizMapper->restoreSoftDeleted($quiz);
         }
     }
+
+    /**
+     * Somewhat efficient query for retrieving the assessments which this student has participated in.
+     *
+     * @param User $student
+     * @return array|int[]
+     */
+    public function findUniqueAssessmentIdsForStudent(User $student)
+    {
+        $query = "
+            SELECT DISTINCT
+                a.id
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            LEFT JOIN {$this->getJoinSql('task', 'a', 't', true)}
+            LEFT JOIN {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
+            LEFT JOIN {$this->getJoinSql('duework', 'a', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
+            LEFT JOIN {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
+            LEFT JOIN {$this->getJoinSql('quiz', 'a', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+            WHERE a.deleted_at IS NULL
+            AND (
+                tc.student_id IS NOT NULL
+                OR ds.owner IS NOT NULL
+                OR dr.owner IS NOT NULL
+                OR qa.user_id IS NOT NULL
+            )
+            ORDER BY a.id ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['userId' => $student->getId()]);
+        return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+    }
+
     /**
      * Selecting from the assessment table also returns whatever assessable
      * object is joined onto it.
