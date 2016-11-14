@@ -37,6 +37,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Zend\Json\Server\Error;
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -326,7 +327,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         if (!$this->userCanViewParticipation($this->getUser(), $participant)) {
             // could probably throw a 403, but that would give away the fact that, yes, the student is a participant of that assessment
-            throw new NotFound();
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
     }
 
