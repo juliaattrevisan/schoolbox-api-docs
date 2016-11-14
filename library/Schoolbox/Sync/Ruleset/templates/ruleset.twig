@@ -294,6 +294,9 @@ set upsConfig = {
 
                         <dt class="small-6">alpha</dt>
                         <dd class="small-6">Strips all non-alpha characters</dd>
+
+                        <dt class="small-6">num</dt>
+                        <dd class="small-6">Strips all non-numeric characters</dd>
                     </dl>
 
                     <p>
@@ -305,7 +308,10 @@ set upsConfig = {
                         {:lastname|lc} = allen-smith<br />
                         {:lastname|first} = A<br />
                         {:lastname|alpha} = AllenSmith<br />
-                        {:lastname|alpha|lc} = allensmith
+                        {:lastname|alpha|lc} = allensmith<br />
+                        <br />
+                        {:id} = P1234<br />
+                        {:id|num} = 1234<br />
                     </p>
                 </div>
             </div>
