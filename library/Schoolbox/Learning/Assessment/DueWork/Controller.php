@@ -121,7 +121,7 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
-
+new \Alaress_Probe($assessment->getResponses());
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
             'currentUser' => $this->getUser(),

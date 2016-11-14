@@ -50,10 +50,13 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('submission', 's')},
-                {$this->getJoinColumnString('storage', 'f')}
+                {$this->getJoinColumnString('storage', 'f')},
+                {$this->getJoinColumnString('storage.allowedFileExtension', 'm')}
+
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('submission', '', 's')}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
+            LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
         ";
     }
 
@@ -70,9 +73,14 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
             $result = $this->hydrate($row);
+
+            /** @var \Schoolbox\Resource\Storage\Model $storage */
+            $storage = $this->hydrateJoin($row, 'storage', 'f');
+            $storage->setMimetype($this->hydrateJoin($row, 'storage.allowedFileExtension', 'm'));
+
             $resultSet->add(
                 $result
-                    ->setStorage($this->hydrateJoin($row, 'storage', 'f'))
+                    ->setStorage($storage)
                     ->setSubmission($this->hydrateJoin($row, 'submission', 's'))
             );
         }
