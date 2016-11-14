@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as SubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 
 /**
  * A mapper for a student's submission to a due work.
