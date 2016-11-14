@@ -24,21 +24,41 @@
             {% set firstSubmissionIndex = 0 %}
             {% set isOlderInteraction = false %}
 
-             <ul id='history' class="information-list threaded">
-                 {% for currentInteraction in timeline %}
-                     {% if currentInteraction is response %}
-                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
-                         {% set firstSubmissionIndex = loop.index %}
-                         {% set isOlderInteraction = true %}
-                     {% elseif currentInteraction is feedback %}
-                         {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction} %}
-                     {% endif %}
-                 {% endfor %}
+            {# Lookahead to see if there was at least one submission
+             #}
+            {% for currentInteraction in timeline %}
+                {% if currentInteraction is response %}
+                    {% set firstSubmissionIndex = loop.index %}
+                {% endif %}
+            {% endfor %}
+
+            <ul id='history' class="information-list threaded">
+                {% for currentInteraction in timeline %}
+
+                    {# There is a submission somewhere in this history
+                     # Everything that comes after it should be Older Interactions
+                     #}
+                    {% if firstSubmissionIndex and loop.index > firstSubmissionIndex %}
+                        {% set isOlderInteraction = true %}
+                    {% elseif not firstSubmissionIndex and loop.index > 1 %}
+                        {% set isOlderInteraction = true %}
+                    {% endif %}
+
+                    {% if currentInteraction is response %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
+                    {% elseif currentInteraction is feedback %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction} %}
+                    {% endif %}
+                {% endfor %}
             </ul>
         </section>
 
         {% if timeline|length > 1 %}
-            {% set olderInteractions = timeline|length - firstSubmissionIndex %}
+            {% if firstSubmissionIndex %}
+                {% set olderInteractions = timeline|length - firstSubmissionIndex %}
+            {% else %}
+                {% set olderInteractions = timeline|length - 1 %}
+            {% endif %}
 
             {% if olderInteractions %}
             <a id="view-history" class="button full-width icon-down-arrow">View {{ olderInteractions }} older interaction{% if olderInteractions > 1 %}s{% endif %}</a>
