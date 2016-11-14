@@ -150,7 +150,7 @@ class Controller extends AbstractController
     public function getExportAttempts($assessmentId)
     {
         $format = strtolower($this->getRequest()->query->get('format'));
-        if(!in_array($format, ['csv'])){
+        if(!in_array($format, ['csv', 'xml'])){
             throw new \InvalidArgumentException("Unsupported export format: $format");
         }
         $quiz = $this->getQuizForAssessmentId($assessmentId);
