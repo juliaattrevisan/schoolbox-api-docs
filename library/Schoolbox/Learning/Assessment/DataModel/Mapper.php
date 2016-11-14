@@ -468,7 +468,7 @@ class Mapper extends BaseMapper
         // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (!$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof ProjectModel) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
                     // Add the folder into the context
