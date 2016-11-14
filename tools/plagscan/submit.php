@@ -17,7 +17,7 @@ $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('le
 $log = $kernel->logger();
 
 $mapper = Plagscan_DocumentMapper::getInstance();
-$docs   = $mapper->findByColumn('status', Plagscan_Document::STATUS_UNSCANNABLE);
+$docs   = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
 
 //
 // Hit the Plagscan API for each document.
@@ -45,7 +45,7 @@ foreach ($docs as $doc) {
 
             if($response) {
                 $doc->setPlagscanId($documentId);
-                $doc->setStatus(Plagscan_Document::STATUS_QUEUED);
+                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
                 $mapper->save($doc);
 
                 $log->info("Resubmitted document ".$doc->getId()." for processing: ".$documentId);

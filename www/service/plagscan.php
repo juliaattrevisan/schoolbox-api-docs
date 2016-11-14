@@ -27,9 +27,9 @@ class Plagscan_ServiceController {
      */
     public function notifyComplete ($documentId) {
         try {
-            /* @var $document Plagscan_Document */
+            /* @var $document \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan */
             $document = Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
-            if (!($document instanceof Plagscan_Document)) {
+            if (!($document instanceof \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan)) {
                 return false;
             }
 
@@ -37,7 +37,7 @@ class Plagscan_ServiceController {
             $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 
             $document->setScore($plagscanStat->LEVEL / 10);
-            $document->setStatus(Plagscan_Document::STATUS_COMPLETE);
+            $document->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
 
             $document->setHtml($plagscanHtml);
 

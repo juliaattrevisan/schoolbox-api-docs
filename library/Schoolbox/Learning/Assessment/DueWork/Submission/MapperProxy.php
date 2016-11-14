@@ -150,18 +150,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     ->setUuid($file->getCrocodocId())
                     ->setFilename($file->getFilename());
 
-                // Dehydrate Plagscan too, and save it
-                $plagscan = $file->getPlagscan();
-                if ($plagscan instanceof Plagscan) {
-                    $dataModelPlagscan = (new \Plagscan_Document())
-                        ->setPlagscanId($plagscan->getId())
-                        ->setStatus($plagscan->getStatus())
-                        ->setScore($plagscan->getScore())
-                        ->setHtml($plagscan->getHtml());
-
-                    $dataModelFile->setPlagscan($dataModelPlagscan);
-                }
-
                 $dataModel->getFiles()->add($dataModelFile);
             }
 
