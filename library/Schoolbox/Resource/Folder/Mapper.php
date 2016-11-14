@@ -120,7 +120,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'codes', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Code\\Mapper',
+                'mapper'    => Code\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
@@ -129,7 +129,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'homepages', array(
                 'multiple'  => false,
-                'mapper'    => '\\Schoolbox\\Resource\\HomepageConfigMapper',
+                'mapper'    => HomepageConfigMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
             )
@@ -138,7 +138,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'files', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\File\\Mapper',
+                'mapper'    => File\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'category',
             )
@@ -147,7 +147,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'groups', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\GroupMapper',
+                'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
             )
