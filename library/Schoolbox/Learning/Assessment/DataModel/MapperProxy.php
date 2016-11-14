@@ -183,7 +183,20 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
+        // Add term to search
+        $params = [
+            'f.id' => $folderId,
+        ];
+        if ($options['term'] instanceof Term) {
+            $term = $options['term'];
+            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+                $params['due_date >='] = $term->getStart()->getDatabaseDate();
+            }
+            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+                $params['due_date <='] = $term->getActualFinish()->getDatabaseDate();
+            }
+        }
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -196,7 +209,19 @@ class MapperProxy
      */
     public function findAllInCourseImplementationForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
+        $params = [
+            'uicf.id' => $folderId,
+        ];
+        if ($options['term'] instanceof Term) {
+            $term = $options['term'];
+            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+                $params['due_date >='] = $term->getStart()->getDatabaseDate();
+            }
+            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+                $params['due_date <='] = $term->getActualFinish()->getDatabaseDate();
+            }
+        }
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -238,8 +263,8 @@ class MapperProxy
 
         // And find all the assessables
         $allFolders  = array_merge($classFolderIds, $groupFolderIds);
-        $assessments = $this->findAllForFolderId($allFolders)
-                            ->merge($this->findAllInCourseImplementationForFolderId($allFolders));
+        $assessments = $this->findAllForFolderId($allFolders, ['term' => $term])
+                            ->merge($this->findAllInCourseImplementationForFolderId($allFolders, ['term' => $term]));
 
 
         // Also need assessments which this student may not participating in
