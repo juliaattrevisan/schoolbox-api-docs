@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper;
 
 /**
  * Task mapper
@@ -45,6 +46,34 @@ class TaskMapper extends Schoolbox\Mapper
             'this_key'  => 'id',
             'other_key' => 'task_id',
         ));
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCompletions'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreCompletions'));
+    }
+
+    /**
+     * Soft deletes all Completions for the specified Task
+     *
+     * @param Task $task
+     */
+    public function softDeleteCompletions(Task $task)
+    {
+        $taskCompletionMapper = CompletionMapper::getInstance();
+        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $taskCompletionMapper->delete($completions);
+    }
+
+
+    /**
+     * Restores all soft-deleted Completions for the specified Task
+     *
+     * @param Task $task
+     */
+    public function restoreCompletions(Task $task)
+    {
+        $taskCompletionMapper = CompletionMapper::getInstance();
+        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $taskCompletionMapper->restoreSoftDeleted($completions);
     }
 
     /**
