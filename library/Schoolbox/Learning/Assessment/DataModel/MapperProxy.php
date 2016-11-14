@@ -8,8 +8,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
-use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
-use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -215,11 +214,11 @@ class MapperProxy
     /**
      * Finds all assessables that this student is participating in.
      *
-     * @param User  $student
-     * @param array $options
+     * @param User $student
+     * @param Term $term    Restrict results to this term
      * @return Collection|IAssessable[]
      */
-    public function findAllForStudent(User $student, $options = [])
+    public function findAllForStudent(User $student, Term $term)
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -247,7 +246,7 @@ class MapperProxy
         // via folder or class, but through a previous response or feedback.
         $assessmentIds    = $assessments->getColumnValues('id');
         $extraAssessments = array_diff(
-            $this->baseMapper->findUniqueAssessmentIdsForStudent($student),
+            $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term),
             $assessmentIds
         );
 

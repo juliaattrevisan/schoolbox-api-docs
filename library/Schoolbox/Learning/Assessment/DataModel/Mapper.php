@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -185,10 +186,29 @@ class Mapper extends BaseMapper
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
      * @param User $student
+     * @param Term $term
      * @return array|int[]
      */
-    public function findUniqueAssessmentIdsForStudent(User $student)
+    public function findUniqueAssessmentIdsForStudent(User $student, Term $term)
     {
+        // Filter task/duework/quiz by term dates
+        $params   = [
+            'userId' => $student->getId(),
+        ];
+        $whereParts = [
+            'a.deleted_at IS NULL',
+            '(tc.student_id IS NOT NULL OR ds.owner IS NOT NULL OR dr.owner IS NOT NULL OR qa.user_id IS NOT NULL)',
+        ];
+        if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+            $params['from'] = $term->getStart()->getDatabaseDate();
+            $whereParts[]   = 'DATE(a.due_date) >= :from';
+        }
+        if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+            $params['to'] = $term->getActualFinish()->getDatabaseDate();
+            $whereParts[]   = 'DATE(a.due_date) <= :to';
+        }
+
+        $where = implode(' AND ', $whereParts);
         $query = "
             SELECT DISTINCT
                 a.id
@@ -200,17 +220,11 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
             LEFT JOIN {$this->getJoinSql('quiz', 'a', 'q', true)}
             LEFT JOIN {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
-            WHERE a.deleted_at IS NULL
-            AND (
-                tc.student_id IS NOT NULL
-                OR ds.owner IS NOT NULL
-                OR dr.owner IS NOT NULL
-                OR qa.user_id IS NOT NULL
-            )
+            WHERE {$where}
             ORDER BY a.id ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(['userId' => $student->getId()]);
+        $statement->execute($params);
         return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
     }
 
