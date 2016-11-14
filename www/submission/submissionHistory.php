@@ -363,7 +363,7 @@ if (count($submission_history)) {
             $submission = $activity_item->getSubmission();
 
             // submission file ID, submission file name
-            if ($submission instanceof Component\SubmissionBox\Submission\File) {
+            if ($submission instanceof Component\SubmissionBox\Submission\Submission) {
                 $history['HISTORY_SUBMISSION_FILE_ID'] = $submission->getId();
                 $history['HISTORY_SUBMISSION_FILE_NAME'] = $submission->getFilename();
             }
@@ -447,7 +447,7 @@ if (count($submission_history)) {
 
 
             // populate details into page
-            if ($student_submission instanceof Component\SubmissionBox\Submission\File) {
+            if ($student_submission instanceof Component\SubmissionBox\Submission\Submission) {
                 $output = array(
                     'MOST_RECENT_SUBMISSION_FILE_NAME' => $student_submission->getFilename(),
                     'MOST_RECENT_SUBMISSION_FILE_SIZE' => Alaress_Byte_Format::bytesToString($student_submission->getSize()),

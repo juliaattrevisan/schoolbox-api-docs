@@ -28,7 +28,7 @@ abstract class Base {
 	/**
 	 * The submission
 	 *
-	 * @var Submission\File
+	 * @var Submission\Submission
 	 */
 	protected $submission = null;
 
@@ -78,14 +78,14 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
 	 * @param Term\Model $term
 	 */
 	public function __construct(
 		$page,
-		Submission\File $submission = null,
+		Submission\Submission $submission = null,
 		$returnedWorkCollection = null,
 		$navigationElements = [],
 		Term\Model $term = null
@@ -194,7 +194,7 @@ abstract class Base {
 	/**
 	 * Set submission
 	 *
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 */
 	protected function setSubmission($submission) {
 		$this->submission = $submission;
@@ -203,7 +203,7 @@ abstract class Base {
 	/**
 	 * Get submission
 	 *
-	 * @return Submission\File
+	 * @return Submission\Submission
 	 */
 	protected function getSubmission() {
 		return $this->submission;

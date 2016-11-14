@@ -31,7 +31,7 @@ use Schoolbox\User;
  *
  * TODO remove IStorage once all uses are found and removed
  */
-class File implements IStorage
+class Submission implements IStorage
 {
     use Id;
     use CreatedAtDate;

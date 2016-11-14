@@ -26,8 +26,8 @@ use Schoolbox\UserMapper;
  * The name FileMapper is a misnomer, as student submissions may now contain multiple files.
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
- * @method File findById($id)
- * @method File hydrate(array $row, $alias = '', $callback = null)
+ * @method Submission findById($id)
+ * @method Submission hydrate(array $row, $alias = '', $callback = null)
  */
 class SubmissionMapper extends BaseMapper
 {
@@ -37,7 +37,7 @@ class SubmissionMapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('student_submission');
-        $this->hasModel(File::class);
+        $this->hasModel(Submission::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('owner', UserMapper::class);
@@ -84,7 +84,7 @@ class SubmissionMapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|File[] $resultSet */
+        /** @var Collection|Submission[] $resultSet */
         $resultSet = $this->createCollection();
         $ids       = [];
 
@@ -119,10 +119,10 @@ class SubmissionMapper extends BaseMapper
      *
      * Persists all files that have been attached to this submission.
      *
-     * @param File $object
-     * @param File $previous
+     * @param Submission $object
+     * @param Submission $previous
      */
-    public function persistFiles(File $object, File $previous = null)
+    public function persistFiles(Submission $object, Submission $previous = null)
     {
         $joinMapper = $this->getJoinMapper('file');
 
@@ -254,7 +254,7 @@ class SubmissionMapper extends BaseMapper
      *
      * @param array $row
      *
-     * @return File
+     * @return Submission
      */
     protected function hydrateForActivityList($row) {
         $boxJoin = $this->getJoinMapper('box_id');
@@ -277,7 +277,7 @@ class SubmissionMapper extends BaseMapper
      * @param int $box_id
      * @param int $limit
      *
-     * @return Collection|File[]
+     * @return Collection|Submission[]
      */
     public function getDrafts($user_id, $box_id, $limit = null)
     {
@@ -295,7 +295,7 @@ class SubmissionMapper extends BaseMapper
     /**
      * Get list of submissions that should be submitted to crocodoc
      *
-     * @return Collection|File[]
+     * @return Collection|Submission[]
      */
     public function getCrocodoc() {
 

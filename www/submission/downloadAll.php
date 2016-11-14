@@ -27,7 +27,7 @@ if (is_numeric($_GET['id'])) {
 
     $group = new Group();
     if ($group->getPermission($submissionBox->getCategory()->getId()) >= WRITE_ACCESS) {
-        /** @var SubmissionBox\Submission\File[] $submissionList */
+        /** @var SubmissionBox\Submission\Submission[] $submissionList */
         $submissionList = $submissionMapper->findByColumnList(
             ['box_id' => $box_id, 'draft' => false,],
             ['order' => ['submitted' => 'desc']]

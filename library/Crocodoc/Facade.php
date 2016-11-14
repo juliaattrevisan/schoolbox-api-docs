@@ -29,7 +29,7 @@ class Facade
     /**
      * The submission object itself
      *
-     * @var Submission\File
+     * @var Submission\Submission
      */
     private $submission;
 
@@ -165,7 +165,7 @@ class Facade
     }
 
     /**
-     * @return Submission\File
+     * @return Submission\Submission
      */
     private function getSubmission()
     {
@@ -173,7 +173,7 @@ class Facade
     }
 
     /**
-     * @param  Submission\File $submission
+     * @param  Submission\Submission $submission
      *
      * @return $this
      */

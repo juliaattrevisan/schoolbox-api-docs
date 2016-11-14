@@ -106,7 +106,7 @@ if (!in_array($submission_box->getCategory()->getId(), $categoryIDList)) {
 $drafts = $submission_mapper->getDrafts($user->getId(), $box_id, 10);
 
 if ($drafts->count()) {
-    /** @var Submission\File $draft */
+    /** @var Submission\Submission $draft */
     $draft = $drafts->first();
     $body  = $draft->getStorage()->read();
 } else {

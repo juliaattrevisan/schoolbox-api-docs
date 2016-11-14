@@ -149,10 +149,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
      *
      * TODO make this work with multiple files
      *
-     * @param  Submission\File $submission
+     * @param  Submission\Submission $submission
      * @return Plagscan_Document
      */
-    public function createFromSubmission(Submission\File $submission)
+    public function createFromSubmission(Submission\Submission $submission)
     {
         $plagMap = Plagscan_DocumentMapper::getInstance();
         return $plagMap->createModel()->setFile($submission);

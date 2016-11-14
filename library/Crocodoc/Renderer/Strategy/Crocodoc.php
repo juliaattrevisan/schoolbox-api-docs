@@ -67,7 +67,7 @@ class Crocodoc extends Base
     /**
      * Typehint override
      *
-     * @return Submission\File
+     * @return Submission\Submission
      */
     protected function getSubmission()
     {

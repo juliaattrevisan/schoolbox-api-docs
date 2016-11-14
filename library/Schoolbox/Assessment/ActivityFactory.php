@@ -74,10 +74,10 @@ class ActivityFactory {
 	}
 
 	/**
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 * @return Activity
 	 */
-	public function buildFromStudentSubmission(Submission\File $submission) {
+	public function buildFromStudentSubmission(Submission\Submission $submission) {
 		$activity = new Activity();
 		$activity
 			->setEvent('submitted')

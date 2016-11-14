@@ -140,7 +140,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $submission = $bundle->getEvent()->getObject();
         $diff       = $bundle->getEvent()->getDiff();
 
-        if (!$submission instanceof SubmissionBox\Submission\File) {
+        if (!$submission instanceof SubmissionBox\Submission\Submission) {
             return;
         }
 
@@ -206,7 +206,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $type
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -254,7 +254,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that students have submitted to their submission box
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -268,7 +268,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that a student has submitted to their submission box...again
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -282,7 +282,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a student that their (only) submission has been deleted, so they can resubmit.
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger

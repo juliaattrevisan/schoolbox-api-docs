@@ -47,7 +47,7 @@ class ReturnedWork implements ISoftDeletable
     /**
      * This Return is optionally linked to a Submission
      *
-     * @var SubmissionBox\Submission\File|null;
+     * @var SubmissionBox\Submission\Submission|null;
      */
     protected $submission;
 
@@ -207,7 +207,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @return null|Submission\File
+     * @return null|Submission\Submission
      */
     public function getSubmission()
     {
@@ -215,10 +215,10 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @param Submission\File|null $submission
+     * @param Submission\Submission|null $submission
      * @return static
      */
-    public function setSubmission(Submission\File $submission = null)
+    public function setSubmission(Submission\Submission $submission = null)
     {
         $this->submission = $submission;
         return $this;

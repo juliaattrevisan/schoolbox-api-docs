@@ -9,6 +9,8 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
+use Plagscan_Document;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -28,7 +30,7 @@ class Model implements IFile, ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * @var File
+     * @var Submission
      */
     protected $submission;
 
@@ -114,7 +116,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return File
+     * @return Submission
      */
     public function getSubmission()
     {
@@ -122,7 +124,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @param File $submission
+     * @param Submission $submission
      * @return static
      */
     public function setSubmission($submission)

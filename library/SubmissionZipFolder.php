@@ -10,7 +10,7 @@ class SubmissionZipFolder
 {
     /**
      * @param string $folder The name of the zip to create
-     * @param Submission\File[] $fileList A list of files to zip
+     * @param Submission\Submission[] $fileList A list of files to zip
      */
     function __construct($folder, $fileList) {
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
@@ -59,7 +59,7 @@ class SubmissionZipFolder
     /**
      *
      * @param string $currentDir The temp location to create the zip in
-     * @param Submission\File[] $fileList A list of files to zip
+     * @param Submission\Submission[] $fileList A list of files to zip
      * @param int $depth Unused
      */
     function createDirectory($currentDir, $fileList, $depth = 0) {

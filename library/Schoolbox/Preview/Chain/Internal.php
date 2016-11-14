@@ -196,11 +196,11 @@ class Internal extends Base {
      * * The current user is a parent of the owner
      * * The current user is a staff member
      *
-     * @param  SubmissionBox\Submission\File $file
+     * @param  SubmissionBox\Submission\Submission $file
      * @param  User                          $user
      * @return bool
      */
-    private function checkReturnPermissions(SubmissionBox\Submission\File $file, User $user)
+    private function checkReturnPermissions(SubmissionBox\Submission\Submission $file, User $user)
     {
         if ($file->getOwner()->getId() == $user->getId()) {
             return true;

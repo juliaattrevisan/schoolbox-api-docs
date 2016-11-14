@@ -84,7 +84,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         );
         foreach ($files as $file) {
 
-            if (!$file instanceof Submission\File) {
+            if (!$file instanceof Submission\Submission) {
                 continue;
             }
 
@@ -124,7 +124,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 
         $submit_date    = new DateTime('now');
 
-        $submission = new Submission\File();
+        $submission = new Submission\Submission();
         $submission
             ->setSubmissionBox($this->getAssessment())
             ->setOwner($this->getUser())

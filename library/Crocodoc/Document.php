@@ -33,7 +33,7 @@ class Document
     /**
      * The student submission containing the file we wish to preview
      *
-     * @var Submission\File
+     * @var Submission\Submission
      */
     private $submission = null;
 
@@ -47,9 +47,9 @@ class Document
     /**
      * Constructor
      *
-     * @param Submission\File $submission
+     * @param Submission\Submission $submission
      */
-    public function __construct(Submission\File $submission)
+    public function __construct(Submission\Submission $submission)
     {
         $this->setAuthenticator(new Authenticator());
         $this->setSubmission($submission);
@@ -180,9 +180,9 @@ class Document
     /**
      * Set submission
      *
-     * @param Submission\File $submission
+     * @param Submission\Submission $submission
      */
-    private function setSubmission(Submission\File $submission)
+    private function setSubmission(Submission\Submission $submission)
     {
         $this->submission = $submission;
     }
@@ -190,7 +190,7 @@ class Document
     /**
      * Get submission
      *
-     * @return Submission\File
+     * @return Submission\Submission
      */
     private function getSubmission()
     {
