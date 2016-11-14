@@ -230,17 +230,24 @@ class DataSource
             new Collection([$participant])
         );
 
+        // Add responses
         if ($returnResponses) {
-            // Add responses
             foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
                 if ($response->getSubmittedOnBehalfOf()->getId() == $user->getId()) {
                     $participant->getAllResponses()->add($response);
+
+                    /* Also add it to the assessment instance
+                     *
+                     * This allows us to build an entire history of Responses and Feedbacks
+                     * for everyone, or just for a particular person
+                     */
+                    $assessment->getResponses()->add($response);
                 }
             }
         }
 
+        // Add feedback
         if ($returnFeedbacks) {
-            // Add feedback
             foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
                 if ($feedback->getReviewee()->getId() == $user->getId()) {
                     $feedback->setAssessable($assessment);
@@ -264,6 +271,13 @@ class DataSource
                     }
 
                     $participant->getAllFeedbacks()->add($feedback);
+
+                    /* Also add it to the assessment instance
+                     *
+                     * This allows us to build an entire history of Responses and Feedbacks
+                     * for everyone, or just for a particular person
+                     */
+                    $assessment->getFeedbacks()->add($feedback);
                 }
             }
         }
