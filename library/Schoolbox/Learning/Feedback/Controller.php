@@ -133,7 +133,7 @@ class Controller extends Base
         }
 
         if ($postPublish == true) {
-            // recieved signal to publish this
+            // received signal to publish this
             if (!$feedback->isPublished()) {
                 $feedback->setPublishedAt(Alaress_Date_Format::now());
             }
