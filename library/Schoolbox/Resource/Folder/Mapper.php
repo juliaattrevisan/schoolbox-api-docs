@@ -788,6 +788,58 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
+     * Finds all folders for the given subject list.
+     *
+     * Designed to work with the output from `\External_User::getSubjectList`.
+     *
+     * @param array $subjectList Contains "code" and "campusCode" keys
+     * @return Collection|Model[]
+     */
+    public function findAllBySubjectList($subjectList)
+    {
+        $whereParts = [];
+        $params     = [];
+        $i          = 0;
+
+        // Build the set of where parts for this subject list
+        foreach (array_values($subjectList) as $subject) {
+            $code       = $subject['code'];
+            $campusCode = $subject['campusCode'];
+
+            $whereParts[]        = "cc.code = :code_{$i}";
+            $params["code_{$i}"] = $code;
+            if (strlen($campusCode) === 0) {
+                $whereParts[]             = "cc.code LIKE :fullCode_{$i}";
+                $params[":fullCode_{$i}"] = '%/' . $this->database->quoteForLike($code);
+            } else {
+                $whereParts[]             = "cc.code = :fullCode_{$i}";
+                $params[":fullCode_{$i}"] = $campusCode . '/' . $code;
+            }
+
+            $i++;
+        }
+
+        // Abort if no subjects
+        if (empty($whereParts)) {
+            return $this->createCollection();
+        }
+
+        // Query, hydrate and return
+        $where = implode(' OR ', $whereParts);
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
+            WHERE folder.deleted_at IS NULL
+            AND ($where)
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
      * Finds a list of category codes based on an archived category code.
      *
      * Expects the name of the category contains $code between [] at the end.
