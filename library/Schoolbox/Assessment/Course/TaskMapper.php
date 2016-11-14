@@ -14,6 +14,9 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\UserMapper;
 
 /**
  * Task mapper
@@ -42,6 +45,9 @@ class TaskMapper extends Schoolbox\Mapper
             'this_key'  => 'id',
             'other_key' => 'task_id',
         ));
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteRelatedObjects'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteRelatedObjects'));
     }
 
     /**
