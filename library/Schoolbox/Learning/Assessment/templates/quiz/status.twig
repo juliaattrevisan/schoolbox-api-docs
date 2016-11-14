@@ -60,7 +60,7 @@
                     {% else %}
                         Attempted
                     {% endif %}
-                    {% if latestResponse.submittedAt < assessment.dueAt %}
+                    {% if latestResponse.submittedOnTime %}
                         on time
                     {% else %}
                         late
