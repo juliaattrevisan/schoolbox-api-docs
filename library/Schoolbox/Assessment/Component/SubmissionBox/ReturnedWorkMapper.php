@@ -16,6 +16,8 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
+use PDOStatement;
 
 /**
  * Class ReturnedWorkMapper
@@ -47,6 +49,61 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        $markerMapper = $this->getJoinMapper('marker');
+
+        $select = "
+            SELECT
+                {$this->getColumnString()},
+                {$markerMapper->getColumnString('m')}
+        ";
+
+        return $select;
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     * To prevent cataclysmic backward-incompatibility, in the core, the FROM is absorbed into the SELECT... for now...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        $from = "
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
+        ";
+
+        return $from;
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Schoolbox\Mapper\Exception
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $markerMapper = $this->getJoinMapper('marker');
+
+        $collection = new Collection();
+
+        foreach ($statement as $row) {
+            $return = $this->hydrate($row);
+
+            $return->setMarker($markerMapper->hydrate($row, 'm'));
+
+            $collection->add($return);
+        }
+
+        return $collection;
     }
 
     /**
