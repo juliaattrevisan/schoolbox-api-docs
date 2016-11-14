@@ -52,6 +52,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
     }
 
     /**
+     * Include submission box (and its assessment ID)
+     *
      * @return string
      */
     protected function getSelectString()
@@ -61,7 +63,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $select = "
             SELECT
                 {$this->getColumnString()},
-                {$markerMapper->getColumnString('m')}
+                {$markerMapper->getColumnString('m')},
+                {$this->getJoinColumnString('submission_box', 'b')}
         ";
 
         return $select;
@@ -79,6 +82,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $from = "
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
+            INNER JOIN {$this->getJoinSql('submission_box', '', 'b')}
         ";
 
         return $from;
@@ -99,6 +103,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             $return = $this->hydrate($row);
 
             $return->setMarker($markerMapper->hydrate($row, 'm'));
+            $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
 
             $collection->add($return);
         }
