@@ -5,6 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
+
 use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -23,7 +24,10 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -38,12 +42,14 @@ class MapperProxy
      * @var Mapper
      */
     protected $baseMapper;
+
     /**
      * The translator between domain and data objects.
      *
      * @var Translator
      */
     protected $translator;
+
     /**
      * Constructor
      *
@@ -55,6 +61,7 @@ class MapperProxy
         $this->baseMapper = $baseMapper;
         $this->translator = $translator;
     }
+
     /**
      * Finds an assessable by ID
      *
@@ -73,6 +80,7 @@ class MapperProxy
             throw $e;
         }
     }
+
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -88,6 +96,7 @@ class MapperProxy
         $model = $this->baseMapper->findById($assessmentId);
         return $this->findById($model->getSpecificationAssessment()->getId());
     }
+
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -101,6 +110,7 @@ class MapperProxy
         return $this->baseMapper->findByColumn('spec.id', $assessmentId, $options)
             ->map([$this, 'translateToDomainModel']);
     }
+
     /**
      * Find all assessables for this context
      *
@@ -124,6 +134,7 @@ class MapperProxy
         }
         return new Collection();
     }
+
     /**
      * Finds all assessables for a unit specification
      *
@@ -135,6 +146,7 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
     }
+
     /**
      * Finds all assessables for a unit implementation
      *
@@ -146,6 +158,7 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
     }
+
     /**
      * Finds all assessables for a folder.
      *
@@ -161,6 +174,7 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
     }
+
     /**
      * Finds all assessables that have been imported into a folder through a
      * course import.
@@ -185,6 +199,33 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
     }
+
+    /**
+     * Finds all assessables that this student is participating in.
+     *
+     * @param User  $student
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForStudent(User $student, $options = [])
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
+
+        // Find folders (from class)
+
+        // Find folders (from group)
+        // TODO probably best to inject this rather than delve
+        $userAccessMapper = $this->baseMapper->getJoinMapper('task.owner.userAccess');
+        $userAccessMapper->findByColumnList([
+            'uid'     => $student->getId(),
+            'type'    => UserAccess::ACCESS_READ,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+        ])->getColumnValues('serviceIdentifier');
+
+        // Find existing participations (from feedback or response)
+    }
+
     /**
      * Saves an assessable
      *
@@ -248,6 +289,7 @@ class MapperProxy
             }
         }
     }
+
     /**
      * Deletes an assessable
      *
@@ -260,6 +302,7 @@ class MapperProxy
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
     }
+
     /**
      * Translates the data model to a domain object.
      *
@@ -279,6 +322,7 @@ class MapperProxy
         }
         return $assessable;
     }
+
     /**
      * Translates a collection of data models to a domain object.
      *
@@ -302,6 +346,7 @@ class MapperProxy
         }
         return $newCollection;
     }
+
     /**
      * Translates the domain object to a data model.
      *
