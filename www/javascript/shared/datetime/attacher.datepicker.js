@@ -51,8 +51,6 @@
             // Only skip ajax Validation if explicitly set to false
             var ajaxValidate = (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate);
             datepickerOnChange($(this), this.value, ajaxValidate);
-        }).on('blur', function () {
-            $(this).datepicker('hide');
         });
     });
 })(jQuery);

@@ -377,6 +377,18 @@
             CKEDITOR.instances[identifier].on('blur', function(event) {
                 config.blur($(element));
             });
+
+            CKEDITOR.instances[identifier].on('focus', function(event) {
+                /* Close any datepickers on the page
+                 * (this doesn't fire normally because this is an iframe)
+                 */
+                var datepickers = $('.hasDatepicker');
+                if (datepickers.length !== 0) {
+                    $.each(datepickers, function() {
+                        $(this).datepicker('hide');
+                    });
+                }
+            });
         }
 	}
 })(jQuery);
