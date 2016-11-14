@@ -103,9 +103,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $this->hasSoftDeleteBooleanField('deleted');
 
-        $this
-            ->registerCallback('preSave', array($this, 'preSave'))
-        ;
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
