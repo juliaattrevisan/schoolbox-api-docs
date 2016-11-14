@@ -153,6 +153,7 @@ class Factory
         $this->setDurationHours(trim($post['durationHours']));
         $this->setDurationMinutes(trim($post['durationMinutes']));
         $this->setMaxAttempts(intval($post['maxAttempts']));
+        $this->setMarkVisibility(intval($post['visibility']));
     }
 
     /**
@@ -237,7 +238,8 @@ class Factory
             $decorator = new QuizDecorator(
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
-                $this->getMaxAttempts()
+                $this->getMaxAttempts(),
+                $this->getMarkVisibility()
             );
 
         } else {

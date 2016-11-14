@@ -18,6 +18,7 @@ use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 
 class Model extends AbstractAssessment
 {
@@ -60,6 +61,11 @@ class Model extends AbstractAssessment
      * @var string
      */
     protected $completionMessage;
+
+    /**
+     * @var int
+     */
+    private $markVisibility = Quiz::MARK_VISIBILITY_PRIVATE;
 
     /**
      * @param GradeGroup|null $gradeGroup
@@ -193,6 +199,24 @@ class Model extends AbstractAssessment
     public function setCompletionMessage($completionMessage)
     {
         $this->completionMessage = $completionMessage;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarkVisibility()
+    {
+        return $this->markVisibility;
+    }
+
+    /**
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility)
+    {
+        $this->markVisibility = $markVisibility;
         return $this;
     }
 }

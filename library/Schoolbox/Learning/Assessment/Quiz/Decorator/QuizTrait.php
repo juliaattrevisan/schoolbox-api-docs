@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
+use Schoolbox\Learning\Quiz\Model as Quiz;
+
 trait QuizTrait
 {
 
@@ -27,6 +29,11 @@ trait QuizTrait
      * @var int
      */
     protected $maxAttempts = 0;
+
+    /**
+     * @var int
+     */
+    protected $markVisibility = Quiz::MARK_VISIBILITY_PRIVATE;
 
     /**
      * @return int
@@ -79,6 +86,24 @@ trait QuizTrait
     public function setMaxAttempts($maxAttempts)
     {
         $this->maxAttempts = $maxAttempts;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarkVisibility()
+    {
+        return $this->markVisibility;
+    }
+
+    /**
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility)
+    {
+        $this->markVisibility = $markVisibility;
         return $this;
     }
 }

@@ -21,12 +21,14 @@ class Decorator implements DecoratorInterface
      * @param int $durationHours
      * @param int $durationMinutes
      * @param int $maxAttempts
+     * @param int $markVisibility
      */
-    public function __construct($durationHours, $durationMinutes, $maxAttempts)
+    public function __construct($durationHours, $durationMinutes, $maxAttempts, $markVisibility)
     {
         $this->setDurationHours($durationHours);
         $this->setDurationMinutes($durationMinutes);
         $this->setMaxAttempts($maxAttempts);
+        $this->setMarkVisibility($markVisibility);
     }
 
     /**
@@ -41,5 +43,7 @@ class Decorator implements DecoratorInterface
         $assessment->setDuration($duration);
 
         $assessment->setMaxAttempts($this->getMaxAttempts());
+
+        $assessment->setMarkVisibility($this->getMarkVisibility());
     }
 }

@@ -38,9 +38,8 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setCompletionMessage($assessment->getCompletionMessage())
                 ->setDuration($assessment->getDuration())
                 ->setMaxAttempts($assessment->getMaxAttempts())
+                ->setMarkVisibility($assessment->getMarkVisibility())
             ;
-
-            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             return $model;
         }
         return null;
@@ -57,6 +56,7 @@ class Quiz implements IAssessmentTypeTranslator
             $assessable = (new QuizObject())
                 ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
                 ->setMaxAttempts($model->getMaxAttempts())
+                ->setMarkVisibility($model->getMarkVisibility())
                 ->setDuration($model->getDuration())
                 ->setCompletionMessage($model->getCompletionMessage())
                 ->setCreator($model->getUser())
