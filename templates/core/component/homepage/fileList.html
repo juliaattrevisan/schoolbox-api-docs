@@ -1,7 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     <script type="text/javascript">
-        $(function() {
-            $('[data-plugin="preview"]','#component{COMPONENT_INSTANCE_ID}').preview();
+        $(function () {
+            $('[data-plugin="preview"]', '#component{COMPONENT_INSTANCE_ID}').preview();
         });
     </script>
 
@@ -9,14 +9,80 @@
 
     <!-- BEGIN empty_state -->
 
-    <div class="empty-state">
-        <i class="icon-files"></i>
-        <p>No files available!</p>
-        <!-- BEGIN empty_modify -->
-        <p>
-            <a href="/cms/file/new/{FILE_CAT_ID}">Post a file</a>
-        </p>
-        <!-- END empty_modify -->
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list" data-dz-container></ul>
+            </section>
+        </div>
+    </div>
+
+    <div data-dz-wrap class="dropzone-wrap">
+        <div data-dz-container="">
+        </div>
+        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+        <div class="hide" data-dz-template>
+            <li>
+                <div class="card small-12">
+                    <div class="icon-audio icon-32"></div>
+                    <h3 data-dz-name></h3>
+                    <p class="meta" data-dz-status>Uploading...</p>
+                    <div class="progress dz-progress">
+                        <span class="meter dz-upload" style="width:0;"></span>
+                    </div>
+                </div>
+            </li>
+        </div>
+
+        <div class="empty-state">
+            <i class="icon-files"></i>
+            <p>No files available!</p>
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/cms/file/new/{FILE_CAT_ID}">Post a file</a> or drag one onto this component
+            </p>
+
+            <script type="text/javascript">
+                $(function () {
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        tplWrap: '<li class="dz-preview" />',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
+                        dictDefaultMessage: 'You can drag files into this space.',
+                        showIfEmpty: false,
+                        addedfile: function (file) {
+                            $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+                        },
+                        sending: function (file, xhr, formData) {
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('comment', '');
+                            formData.append('hidden', 0);
+                        },
+                        complete: function (file) {
+                            $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                        },
+                        success: function (file, response) {
+                            var el = $(file.previewElement);
+
+                            el.attr('data-file', response.id)
+                                    .removeClass('dz-processing')
+                                    .find('span.dz-upload')
+                                    .addClass('complete');
+
+                            el.find('[data-dz-status]').text('Success');
+                        },
+                        error: function (file, response) {
+                            $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                        }
+                    });
+                });
+            </script>
+            <!-- END empty_modify -->
+        </div>
     </div>
 
     <!-- END empty_state -->
@@ -36,7 +102,7 @@
                     <ul data-dz-template class="hide">
                         <li>
                             <div class="card small-12">
-                                <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif" />
+                                <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
                                 <p data-dz-name></p>
                                 <p class="meta" data-dz-status>Uploading...</p>
                                 <div class="progress dz-progress">
@@ -57,7 +123,7 @@
                                     </a>
                                     <!-- END file_url -->
                                     <!-- BEGIN file_no_url -->
-                                    <img class="mime" src="/images/mime/{FILE_MIME_IMAGE}" />
+                                    <img class="mime" src="/images/mime/{FILE_MIME_IMAGE}"/>
                                     <h3>{FILE_DESCRIPTION}</h3>
                                     <!-- END file_no_url -->
 
@@ -85,14 +151,14 @@
                         <!-- BEGIN submit_file -->
                         <a href="/cms/file/new/{FILE_CAT_ID}" class="button">Post File</a>
                         <script type="text/javascript">
-                            $(function() {
+                            $(function () {
                                 $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                                     wrapClass: 'dragging',
                                     previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                                     previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                                     tplWrap: '<li class="dz-preview" />',
                                     refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                                    refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                                     dictDefaultMessage: 'You can drag files into this space.',
                                     addedfile: function (file) {
                                         $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
