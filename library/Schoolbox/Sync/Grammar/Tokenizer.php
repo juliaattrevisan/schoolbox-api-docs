@@ -38,6 +38,7 @@ class Tokenizer extends Super {
         $this->addFilter(new Filter('uc',    'Converts to uppercase', function ($input) { return strtoupper($input); }));
         $this->addFilter(new Filter('first', 'Returns only the first character', function ($input) { return strlen($input) ? $input[0] : ''; }));
         $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) { return preg_replace('`[^a-z]`i', '', $input); }));
+        $this->addFilter(new Filter('num',   'Strips all non-numeric characters', function ($input) { return preg_replace('`[^0-9]`i', '', $input); }));
 
     }
 
