@@ -27,7 +27,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
      */
     public function testEmptyStacks()
     {
-        $this->assertCount(0, (new Timeline(new Participant(new User(), new DueWork())))->getTimeline());
+        $this->assertCount(0, (new Timeline(new Participant(new User(), new DueWork())))->getForParent());
     }
 
     /**
@@ -56,7 +56,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
          */
         $expected = (new Collection())->add($response1);
 
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -96,7 +96,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
         ;
 
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -144,7 +144,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
         ;
 
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -215,7 +215,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
             ->add($response3);
 
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -320,7 +320,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($floating3) // 333
             ->add($response3); // 3
 
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -420,7 +420,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         /* Does nothing - draft submissions and unpublished feedbacks
          * are both ignored by Timeline
          */
-        $timeline = (new Timeline($participant))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $expected = new Collection();
 

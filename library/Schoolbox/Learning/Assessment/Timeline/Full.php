@@ -19,6 +19,7 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 class Full
 {
@@ -52,6 +53,85 @@ class Full
         $this->setRecombined(new Collection());
     }
 
+
+    /**
+     * Get the timeline, as seen by a teacher on their child's summary page
+     * As a parent, you cannot see draft submissions or unpublished feedback
+     *
+     * @return Collection
+     */
+    public function getForParent()
+    {
+        return $this->getTimeline(false, false);
+    }
+
+    /**
+     * Get the timeline, as seen by a teacher grading a student.
+     * As a teacher, you cannot see submissions the student has drafted but not yet submitted.
+     *
+     * @return Collection
+     */
+    public function getForTeacher()
+    {
+        return $this->getTimeline(true, false);
+    }
+
+
+    /**
+     * Get the timeline, as seen by a student on their summary page
+     * As a student, you cannot see feedback the teacher has drafted but not yet published
+     *
+     * @return Collection
+     */
+    public function getForStudent()
+    {
+        return $this->getTimeline(false, true);
+    }
+
+
+    /**
+     * Get the admin-only form of a timeline, including EVERYTHING for when you need to perform admin functions
+     * As an admin, you can see damn well everything.
+     *
+     * @return Collection
+     */
+    public function getForAdmin()
+    {
+        return $this->getTimeline(true, true);
+    }
+
+
+    /**
+     * Get the timeline appropriate to the given user.
+     * Is probably a *bit* heavy-handed in its permission checking...
+     *
+     * @param User $u
+     * @return Collection
+     */
+    public function getForUser(User $u)
+    {
+        $r = $u->getRole();
+        $p = $this->getParticipant()->getUser();
+
+        if ($u->isSuperuser() || ($u->getId() == $p->getId() && $r->isStaff())) {
+            return $this->getForAdmin();
+        } elseif ($r->isStudent()) {
+            if ($u->getId() == $p->getId()) {
+                return $this->getForStudent();
+            }
+        } elseif ($r->isStaff()) {
+            return $this->getForTeacher();
+        } elseif ($r->isParent()) {
+            $p->loadParents();
+            if ($p->isChildOf($u)) {
+                return $this->getForParent();
+            }
+        }
+
+        // no timeline for you
+        return new Collection();
+    }
+
     /**
      * Get the timeline
      *
@@ -62,7 +142,7 @@ class Full
      * @param bool $includeDraftResponses
      * @return Collection
      */
-    public function getTimeline($includeUnpublishedFeedback = false, $includeDraftResponses = false)
+    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses)
     {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
