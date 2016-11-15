@@ -227,8 +227,13 @@ class Bootstrap implements BootstrapInterface {
         // How do I get this container elsewhere without using a global?
         $di = new Di\Container(new Di\Factory());
 
-        // Configuration
-        $di->set('config', $di->lazyNew('Schoolbox\\Config\\Loader'));
+        // Database
+        $di->set('database', $di->lazy(function() {
+            return Database::getInstance();
+        }));
+
+		// Configuration
+		$di->set('config', $di->lazyNew('Schoolbox\\Config\\Loader'));
 
         // Web router
         $di->set(

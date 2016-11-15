@@ -11,7 +11,6 @@ namespace Custom\Dlsc\AssessmentCSV;
 
 use Alaress\Web\Controller\Base;
 
-
 class Controller extends Base
 {
     /**
@@ -25,9 +24,10 @@ class Controller extends Base
     {
         /* Generate an updated csv
          */
-        $filename = 'testfile_temp.csv';
+        $filename = 'temp.csv';
         $file = fopen($filename, 'w');
-        $this->generate($file);
+        $exporter = new Exporter($this->getDi()->get('database'));
+        $exporter->generate($file);
 
         $now = date('Y-m-d-H-i-s');
         $newFilename = "results-{$now}.csv";
@@ -53,5 +53,4 @@ class Controller extends Base
 
         exit();
     }
-
 }
