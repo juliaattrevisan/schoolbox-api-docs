@@ -202,7 +202,7 @@ class Sync implements SyncInterface
                 t.e_mail            AS email,
                 ''                  AS staff_campus,
                 ''                  AS staff_year_level,
-                ''                  AS staff_year_level_description                
+                ''                  AS staff_year_level_description,
                 CASE
                     WHEN
                         (te.tch_code) IS NULL
