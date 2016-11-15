@@ -279,13 +279,18 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int   $folderId
+     * @param int|array $folderId A folder ID or list thereof
      * @param array $otherParams
      * @param array $options
      * @return Collection|Model[]
      */
     public function findAllForFolderId($folderId, $otherParams, $options = [])
     {
+        // Support stuff for query
+        $idList       = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $params       = BaseMapper\PredicateBuilder::getArrayParameters($idList, 'folder');
+        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($idList, 'folder');
+
         // There's no OR support in the predicate builder.
         // The best I can do is to get all IDs and fetch a union.
         // TODO replace with an OR through the predicate builder
@@ -296,12 +301,14 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', 'a', 'ui')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
-            WHERE (f.id = :folderId OR uicf.id = :folderId)
+            WHERE f.id    IN {$placeholders}
+            OR    uicf.id IN {$placeholders}
         ";
         $idStatement = $this->getDatabase()->prepare($idQuery);
-        $idStatement->execute(['folderId' => $folderId]);
+        $idStatement->execute($params);
         $idList = array_column($idStatement->fetchAll(), 'id');
 
+        // Send IDs to findByColumnList
         $params       = $otherParams;
         $params['id'] = $idList;
         return $this->findByColumnList($params, $options);
