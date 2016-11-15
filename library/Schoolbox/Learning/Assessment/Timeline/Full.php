@@ -14,6 +14,7 @@
 
 namespace Schoolbox\Learning\Assessment\Timeline;
 
+use Alaress_Date_Format;
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -122,23 +123,10 @@ class Full
             $date1 = null;
             $date2 = null;
 
-            /* Get the first date to compare against
+            /* Compare dates
              */
-            if ($a instanceof IResponse) {
-                $date1 = $a->getSubmittedAt();
-            }
-            elseif ($a instanceof IFeedback) {
-                $date1 = $a->getPublishedAt();
-            }
-
-            /* Get the second date to compare against
-             */
-            if ($b instanceof IResponse) {
-                $date2 = $b->getSubmittedAt();
-            }
-            elseif ($b instanceof IFeedback) {
-                $date2 = $b->getPublishedAt();
-            }
+            $date1 = $this->getDate($a);
+            $date2 = $this->getDate($b);
 
             /* Chooze wisely
              */
@@ -148,6 +136,27 @@ class Full
 
             throw new \InvalidArgumentException('Null date provided');
         });
+    }
+
+
+    /**
+     * @param IResponse|IFeedback $interaction
+     * @return Alaress_Date_Format
+     */
+    protected function getDate($interaction)
+    {
+        if ($interaction instanceof IResponse) {
+            if (!$interaction->getSubmittedAt()->isNull()) {
+                return $interaction->getSubmittedAt();
+            }
+
+        } elseif ($interaction instanceof IFeedback) {
+            if (!$interaction->getPublishedAt()->isNull()) {
+                return $interaction->getPublishedAt();
+            }
+        }
+
+        return $interaction->getUpdatedAt();
     }
 
     /* Getters/Setters
