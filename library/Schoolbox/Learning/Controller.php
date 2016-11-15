@@ -72,11 +72,6 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
-     * @var AssessableDataSource
-     */
-    protected $assessableDataSource;
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper            $errorMapper
@@ -86,7 +81,6 @@ class Controller extends Base
      * @param FolderMapper           $folderMapper
      * @param GradeGroup             $defaultGradeGroup
      * @param ShowcaseMapper         $showcaseMapper
-     * @param AssessableDataSource   $assessableDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -95,8 +89,7 @@ class Controller extends Base
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
-        ShowcaseMapper $showcaseMapper,
-        AssessableDataSource $assessableDataSource
+        ShowcaseMapper $showcaseMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -105,7 +98,6 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
-        $this->setAssessableDataSource($assessableDataSource);
     }
 
     /**
@@ -514,24 +506,6 @@ class Controller extends Base
         $this->participantDataSource = $participantDataSource;
         return $this;
     }
-
-    /**
-     * @return AssessableDataSource
-     */
-    protected function getAssessableDataSource()
-    {
-        return $this->assessableDataSource;
-    }
-
-    /**
-     * @param AssessableDataSource $assessableDataSource
-     * @return static
-     */
-    protected function setAssessableDataSource(AssessableDataSource $assessableDataSource)
-    {
-        $this->assessableDataSource = $assessableDataSource;
-        return $this;
-    }    
 
     /**
      * @return TermMapper
