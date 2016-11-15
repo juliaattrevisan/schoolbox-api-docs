@@ -71,7 +71,16 @@ class Kernel extends \Alaress\Application\Kernel
     {
         // Run router with requested path (trim trailing /)
         $path  = preg_replace('|/$|', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-        $route = $this->di->get('router')->match($path, $_SERVER);
+
+        // take a copy
+        $server = $_SERVER;
+
+        // check for a method override and act accordingly
+        if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+            $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
+        }
+
+        $route = $this->di->get('router')->match($path, $server);
 
         if ($route instanceof Route) {
             // The route name's format:
