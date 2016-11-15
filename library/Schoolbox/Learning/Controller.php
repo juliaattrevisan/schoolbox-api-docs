@@ -276,11 +276,18 @@ class Controller extends Base
         $markbooks = [];
         $markbooksFolders = [];
 
-        // Keep a collection of all folders for use in the dropdown
+        // Keep a collection of all folders student has an assessment in for use in the dropdown
+
+        $assessments = $this->getAssessmentMapperProxy()->findAllForStudent($student, $term);
+        foreach ($assessments as $assessment) {
+            $assessment->setAllParticipants(
+                new Collection([
+                    $this->participantDataSource->findForAssessmentAndUser($assessment, $student, false, true)
+                ])
+            );
+        }
 
         $folders = new Collection;
-
-        $assessments = $this->getAssessableDataSource()->findForUser($student, $term);
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
