@@ -21,11 +21,16 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Config;
 use Schoolbox\Resource;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 
 class Controller extends Base\Base
 {
@@ -33,7 +38,7 @@ class Controller extends Base\Base
     /** @var Unit\SpecificationMapperProxy */
     private $unitSpecificationMapperProxy;
 
-    /** @var Folder\Mapper */
+    /** @var FolderMapper */
     private $folderMapper;
 
     /** @var Course\SpecificationMapperProxy */
@@ -74,14 +79,19 @@ class Controller extends Base\Base
      * @api   GET /course/import/{courseSpecId}/class{/classCode}
      * @level 160
      *
-     * @param Course\Specification $courseSpec
-     * @param Folder\Model         $targetClass
+     * @param CourseSpecification $courseSpec
+     * @param Folder              $targetClass
      */
-    public function getImportForm(Course\Specification $courseSpec = null, Folder\Model $targetClass = null)
+    public function getImportForm(CourseSpecification $courseSpec = null, Folder $targetClass = null)
     {
-        $importer = new Import();
-
-        $context = $importer->importSelectize($courseSpec, $targetClass);
+        $context = [
+            'course'       => $courseSpec,
+            'destinations' => $targetClass ?
+                [
+                    'id'   => $targetClass->getId(),
+                    'name' => $targetClass->getTitle()
+                ] : [],
+        ];
 
         $this->tpl('import', $context);
     }
@@ -451,10 +461,10 @@ class Controller extends Base\Base
      * @api   GET /course/import/{courseImplId}/modify
      * @level 165
      *
-     * @param Course\Implementation $courseImplementation
+     * @param CourseImplementation $courseImplementation
      * @throws MapperException
      */
-    public function importModify(Course\Implementation $courseImplementation)
+    public function importModify(CourseImplementation $courseImplementation)
     {
         $compendium = [];
 
@@ -502,11 +512,11 @@ class Controller extends Base\Base
         foreach ($compendium as $id => $values) {
             /** @var UnitInstance $selected */
             $selected = $values['selected'];
-            /** @var Folder\Model $folder */
+            /** @var Folder $folder */
             $folder = $values['folder'];
             $unitTitle = '';
             $checkable = false;
-            if ($folder instanceof Folder\Model) {
+            if ($folder instanceof Folder) {
                 $unitTitle = $folder->getName();
                 $checkable = true;
             } elseif ($selected instanceof UnitInstance) {
@@ -626,7 +636,7 @@ class Controller extends Base\Base
     /**
      * Get folder mapper
      *
-     * @return Folder\Mapper
+     * @return FolderMapper
      */
     protected function getFolderMapper()
     {
@@ -636,7 +646,7 @@ class Controller extends Base\Base
     /**
      * Set folder mapper
      *
-     * @param Folder\Mapper $folderMapper
+     * @param FolderMapper $folderMapper
      */
     public function setFolderMapper($folderMapper)
     {

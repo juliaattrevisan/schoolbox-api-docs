@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\Learning\Course;
@@ -11,14 +16,7 @@ use Schoolbox\Assessment\Course\Unit\DeprecatedModel as Unit;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
 use Schoolbox\Permission\Access\Access;
 
-/**
- * Import
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+
 class Import
 {
 
@@ -79,6 +77,7 @@ class Import
      * @param Course\Specification $courseSpec
      * @param Folder\Model         $targetClass
      * @return array
+     * @deprecated 165
      */
     public function importSelectize(Course\Specification $courseSpec = null, Folder\Model $targetClass = null)
     {
