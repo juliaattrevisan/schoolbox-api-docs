@@ -228,7 +228,7 @@ class Kernel extends \Alaress\Application\Kernel
             /** @var OutputInterface $output */
             $output = $response->content->get();
             if (!$output instanceof OutputInterface) {
-                if (is_array($output)) {
+                if (is_array($output) || empty($output)) {
                     // Figure out output type.
                     // In order of preference, output type is:
                     // * set in the response content
