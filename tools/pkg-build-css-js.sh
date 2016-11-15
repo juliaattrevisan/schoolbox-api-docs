@@ -23,43 +23,26 @@ fullpath=${filepath%/*}
 instdir=`readlink -f $fullpath/../`;
 PATH="$PATH:$instdir/node_modules/.bin";
 
-echo "Installing NPM dependencies";
-npm install;
+echo "NPM";
+tools/pkg-build-npm.sh;
 if [ $? -ne 0 ];
 then
 	echo "An error occurred";
 	exit 1;
 fi
 
-echo "Install SASS";
-gem install sass --no-rdoc --no-ri --version "3.4.13"
+echo "Bower and Uglify/Min";
+tools/pkg-build-bower.sh;
 if [ $? -ne 0 ];
 then
 	echo "An error occurred";
 	exit 1;
 fi
 
-# Last test: bundler works but is MUCH slower to install than through gem
-#apt-get -y install ruby-bundler;
-#bundle install;
-
-echo "Installing Bower submodules";
-grunt bower;
-if [ $? -ne 0 ];
+echo "SASS";
+if [ $sass -eq 1 ];
 then
-	echo "An error occurred";
-	exit 1;
-fi
-
-echo "Building JS files via UglifyJS";
-grunt build.js;
-if [ $? -ne 0 ];
-then
-	echo "An error occurred";
-	exit 1;
-fi
-
-if [ $sass = 1 ]; then
-	echo "Build SASS files (Vagrant provision only, not package build)";
-	grunt sass;
+	tools/pkg-build-sass.sh --sass;
+else
+	tools/pkg-build-sass.sh;
 fi
