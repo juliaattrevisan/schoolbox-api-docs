@@ -34,10 +34,10 @@ $log->info("Plagscan scan started");
 $mapper = Plagscan_DocumentMapper::getInstance();
 if ($reRetrieveMode) {
     $log->info("Scanner running in re-retrieve mode");
-    $docs = $mapper->findByColumn('status', Plagscan_Document::STATUS_COMPLETE);
+    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
 } else {
     $log->info("Scanner running in scan mode");
-    $docs = $mapper->findByColumn('status', Plagscan_Document::STATUS_QUEUED);
+    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
 }
 
 $gateway      = new Plagscan_Gateway($username, $key);
@@ -65,7 +65,7 @@ foreach ($docs as $doc) {
         // Is this document scannable? If not, mark as such and don't scan again.
         if ((string)$stats->MSG === 'ERR') {
             if (!$reRetrieveMode) {
-                $doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
+                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
                 Plagscan_DocumentMapper::getInstance()->save($doc);
             }
             $log->error("Document unscannable: ". print_r( $stats, true ));
@@ -78,7 +78,7 @@ foreach ($docs as $doc) {
         if (strlen($level) > 0) {
             if (!$reRetrieveMode) {
                 $doc->setScore($level / 10)
-                    ->setStatus(Plagscan_Document::STATUS_COMPLETE);
+                    ->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
             }
             $doc->setHtml(
                 $gateway->retrieve(

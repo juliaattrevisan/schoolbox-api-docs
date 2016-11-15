@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmis
 use Schoolbox\Mapper;
 
 
+
 /**
  * The new (165+) LMS uses IResponses + IFeedback
  * The old (160-) LMS used traditional Mapper Models
@@ -106,21 +107,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     ->setStorage($file->getStorage())
                     ->setEditableInline($file->getEditableInline())
                     ->setCrocodocId($file->getUuid())
-                    ->setFilename($file->getFilename());
-
-                // Hydrate Plagscan too
-                $modelPlagscan = $responseFile->getPlagscan();
-                if ($modelPlagscan instanceof \Plagscan_Document) {
-                    // Assuming plagscan ID => id is the correct mapping
-                    // It will do for now ¯\_(ツ)_/¯
-                    $responsePlagscan = (new Plagscan())
-                        ->setId($modelPlagscan->getPlagscanId())
-                        ->setStatus($modelPlagscan->getStatus())
-                        ->setScore($modelPlagscan->getScore())
-                        ->setHtml($modelPlagscan->getHtml());
-
-                    $responseFile->setPlagscan($responsePlagscan);
-                }
+                    ->setFilename($file->getFilename())
+                    ->setPlagscan($file->getPlagscan());
 
                 $response->getAllFiles()->add($responseFile);
             }
@@ -161,18 +149,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     ->setEditableInline($file->getEditableInline())
                     ->setUuid($file->getCrocodocId())
                     ->setFilename($file->getFilename());
-
-                // Dehydrate Plagscan too, and save it
-                $plagscan = $file->getPlagscan();
-                if ($plagscan instanceof Plagscan) {
-                    $dataModelPlagscan = (new \Plagscan_Document())
-                        ->setPlagscanId($plagscan->getId())
-                        ->setStatus($plagscan->getStatus())
-                        ->setScore($plagscan->getScore())
-                        ->setHtml($plagscan->getHtml());
-
-                    $dataModelFile->setPlagscan($dataModelPlagscan);
-                }
 
                 $dataModel->getFiles()->add($dataModelFile);
             }

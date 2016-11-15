@@ -8,7 +8,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Aura\Web\Request;
 use DomainException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
@@ -326,7 +325,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         if (!$this->userCanViewParticipation($this->getUser(), $participant)) {
             // could probably throw a 403, but that would give away the fact that, yes, the student is a participant of that assessment
-            throw new NotFound();
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 

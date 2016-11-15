@@ -9,17 +9,17 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ assessment.title }}</h1>
+        <h1>{{ participant.assessable.title }}</h1>
 
-        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment, user: currentUser} %}
+        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: participant.assessable, user: currentUser} %}
     </div>
 </div>
 
-{% if assessment.useRubric %}
+{% if participant.assessable.useRubric %}
 {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
 {% endif %}
 
-{% if assessment.responses|length %}
+{% if participant.allResponses|length or participant.allFeedbacks|length %}
 {% include '@learningAssessment/fragments/dueWork/history.twig' %}
 {% endif %}
 
@@ -31,12 +31,12 @@
             <p>{{ submissionsBlocked }}</p>
         </div>
     {% else %}
-        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: assessment.id, studentId: student.id}) %}
+        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id}) %}
         {% if submitRoute %}
             {% set submitText %}{% spaceless %}
                 Create submission
                 {% if currentUser.role.isStaff %}
-                    on behalf of {{ student.fullname }}
+                    on behalf of {{ participant.user.fullname }}
                 {% endif %}
             {% endspaceless %}{% endset %}
             <a class="submit" href="{{ submitRoute }}">{{ submitText }}</a>

@@ -122,17 +122,11 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
-        /* TODO: Don't use temporary data
-         * Ram in some temporary responses so that I
-         * can make the Submission History section
-         */
-        (new TemporaryResponse())->produceResponse($assessment);
-
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
+            'participant' => $participant,
             'currentUser' => $this->getUser(),
             'student'     => $student,
-            'assessment'  => $assessment,
             'timeline'    => (new FullTimeline($assessment))->getTimeline(),
 
             /* Rubrics data
