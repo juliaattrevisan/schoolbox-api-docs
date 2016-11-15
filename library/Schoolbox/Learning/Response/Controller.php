@@ -16,7 +16,7 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
-
+use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
@@ -53,22 +53,14 @@ class Controller extends Base
      * Get a list of Responses by $student for a particular
      * IAssessable $assessment
      *
-     * @param DueWork $assessment
-     * @param User $student
+     * @param Participant $participant
      */
-    public function getResponseList(DueWork $assessment, User $student)
+    public function getResponseList(Participant $participant)
     {
-        /* TODO: Don't use temporary data
-         * Ram in some temporary responses so that I
-         * can make the Submission History section
-         */
-        (new TemporaryResponse())->produceResponse($assessment);
-
         $data = [
-            'assessment' => $assessment,
-            'student' => $student,
-            'carousel' => (new StudentCarousel($this->getRouter(), $student, $assessment, null))->produce(),
-            'timeline' => (new Timeline($assessment))->getTimeline(),
+            'participant' => $participant,
+            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
+            'timeline' => (new Timeline($participant->getAssessable()))->getTimeline(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));

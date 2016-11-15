@@ -108,12 +108,11 @@ class Module extends BaseModule
             }
 
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-
             $this->loadParticipantsIntoAssessment($assessment);
+            $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
 
             return [
-                'assessment' => $assessment,
-                'student'    => $student,
+                'participant' => $participant,
             ];
         });
 
