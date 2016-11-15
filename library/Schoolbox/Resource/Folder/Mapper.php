@@ -907,11 +907,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $get_subjects If false, subjects aren't retrieved.
      * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
      *                           any access level.
+     * @param bool $exactAccess If true, $access_level must be exact
      *
      * @return \Schoolbox\Collection|Model[]
      */
-    public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ)
-    {
+    public function findForUser(
+        User $user,
+        $get_subjects = true,
+        $access_level = UserAccess::ACCESS_READ,
+        $exactAccess = false
+    ) {
         $query = "
 			SELECT
 				{$this->getColumnString('c')},
@@ -921,8 +926,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-			WHERE c.deleted_at IS NULL AND a.uid = :user AND a.type >= :access
+			WHERE c.deleted_at IS NULL AND a.uid = :user
 		";
+        if ($exactAccess) {
+            $query .= ' AND a.type = :access';
+        } else {
+            $query .= ' AND a.type >= :access';
+        }
         $params = array(
             'user'    => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
