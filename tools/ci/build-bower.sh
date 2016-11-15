@@ -38,9 +38,6 @@ fi
 echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
-echo "Creating artifact checksum";
-sha1sum bower.json > www/javascript/components/bower.checksum;
-
 echo "Creating artifact";
 tar czf $initialdir/built-artifacts/"$branch"-bower.tar.gz www/javascript/components;
 

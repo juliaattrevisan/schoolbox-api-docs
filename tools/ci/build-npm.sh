@@ -30,9 +30,6 @@ fi
 echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
-echo "Creating artifact checksum";
-sha1sum npm-shrinkwrap.json > node_modules/npm.shrinkwrap.checksum;
-
 echo "Creating artifact";
 tar czf $initialdir/built-artifacts/"$branch"-npm.tar.gz node_modules;
 
