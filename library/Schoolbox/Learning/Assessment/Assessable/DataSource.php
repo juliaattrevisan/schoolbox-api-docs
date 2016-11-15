@@ -21,6 +21,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 
 /**
  * The single source of truth for assessment participants.
+ *
+ * @deprecated \Schoolbox\Learning\Assessment\DataModel\MapperProxy is probably what you want.
  */
 class DataSource
 {
