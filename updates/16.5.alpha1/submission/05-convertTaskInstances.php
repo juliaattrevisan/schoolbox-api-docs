@@ -44,8 +44,15 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:title, :description, :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
-        INSERT INTO assessment_course_unit_implementation (assessment_id, course_unit_implementation_id)
-        VALUES (:assessmentId, :courseUnitInstanceId)
+        INSERT INTO assessment_course_unit_implementation (
+          `assessment_id`,
+          `course_unit_implementation_id`,
+          `assessment_specification_id`
+        ) VALUES (
+          :assessmentId,
+          :courseUnitInstanceId,
+          :assessmentSpecificationId
+        )
     ");
 
     // Insert relation between spec and implementation
@@ -101,6 +108,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Use IDs from due work and quiz tables, because the task instance's quiz/duework IDs
     // can actually disappear, even though they have a duework/quiz.
     // I think this occurs when the duework/quiz is deleted, but the task instance isn't?
+    // Also get the assessment.id of the task instance's template so we can later link assessment_unitImpl to assessment_unitSpec
     $selectTaskInstanceQuery = $db->prepare("
         SELECT 
             ti.id,
@@ -111,11 +119,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             sb.id AS box_id,
             ti.created_at,
             ti.deleted_at,
-            ci.category_id
+            ci.category_id,
+            a.id AS `a.id`
         FROM task_instance ti
         INNER JOIN course_unit_implementation ci ON ti.course_unit_instance_id = ci.id
         LEFT JOIN submission_box sb ON ti.id = sb.task_instance_id
         LEFT JOIN assess `as` ON ti.id = `as`.task_instance_id
+        JOIN task t ON t.id = ti.task_id
+        JOIN assessment a ON a.id = t.assessment_id
         ORDER BY ti.id ASC
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
@@ -134,6 +145,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $taskId               = $row['id'];
         $courseUnitInstanceId = $row['course_unit_instance_id'];
+        $assessmentSpecId     = $row['a.id'];
         $folderId             = $row['category_id'];
         $title                = $row['title'];
         $description          = $row['description'];
@@ -205,7 +217,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created assessment');
 
             // Associate this assessment with the task's folder
-            $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'courseUnitInstanceId' => $courseUnitInstanceId]);
+            $insertAssessmentRelationQuery->execute([
+                'assessmentId'              => $assessmentId,
+                'courseUnitInstanceId'      => $courseUnitInstanceId,
+                'assessmentSpecificationId' => $assessmentSpecId,
+            ]);
             $log->debug('Created assessment/course implementation relation');
 
             // Add a relation between assessment spec and implementation
@@ -213,6 +229,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $insertAssessmentImplementationRelationQuery->execute([
                     'assessmentId'   => $assessmentId,
                     'taskInstanceId' => $taskId,
+
                 ]);
                 $log->debug('Created implementation/specification assessment relation');
             } catch (PDOException $e) {
