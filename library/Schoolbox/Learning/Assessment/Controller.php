@@ -325,7 +325,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         if (!$this->userCanViewParticipation($this->getUser(), $participant)) {
             // could probably throw a 403, but that would give away the fact that, yes, the student is a participant of that assessment
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 
