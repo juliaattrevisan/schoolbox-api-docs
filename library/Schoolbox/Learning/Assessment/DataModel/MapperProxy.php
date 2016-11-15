@@ -183,19 +183,8 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        // Add term to search
-        $params = [
-            'f.id' => $folderId,
-        ];
-        if ($options['term'] instanceof Term) {
-            $term = $options['term'];
-            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-                $params['due_date >='] = $term->getStart()->getDatabaseDate();
-            }
-            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-                $params['due_date <='] = $term->getActualFinish()->getDatabaseDate();
-            }
-        }
+        $params         = $this->convertOptionsToColumnList($options);
+        $params['f.id'] = $folderId;
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
@@ -209,18 +198,9 @@ class MapperProxy
      */
     public function findAllInCourseImplementationForFolderId($folderId, $options = [])
     {
-        $params = [
-            'uicf.id' => $folderId,
-        ];
-        if ($options['term'] instanceof Term) {
-            $term = $options['term'];
-            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-                $params['due_date >='] = $term->getStart()->getDatabaseDate();
-            }
-            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-                $params['due_date <='] = $term->getActualFinish()->getDatabaseDate();
-            }
-        }
+        $params            = $this->convertOptionsToColumnList($options);
+        // uicf.id = Unit Implementation Course Folder ID
+        $params['uicf.id'] = $folderId;
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
@@ -420,5 +400,28 @@ class MapperProxy
         $model = $dataModel->getAssessmentModel();
         $model->setSubObject($dataModel);
         return $model;
+    }
+
+    /**
+     * Helper function for converting a list of options into a column list.
+     *
+     * Currently, only converts "term" to a due date span.
+     *
+     * @param array $options
+     * @return array
+     */
+    protected function convertOptionsToColumnList($options)
+    {
+        $columnList = [];
+        if ($options['term'] instanceof Term) {
+            $term = $options['term'];
+            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+                $columnList['due_date >='] = $term->getStart()->getDatabaseDate();
+            }
+            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+                $columnList['due_date <='] = $term->getActualFinish()->getDatabaseDate();
+            }
+        }
+        return $columnList;
     }
 }
