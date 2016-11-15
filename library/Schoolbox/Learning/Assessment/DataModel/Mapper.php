@@ -338,19 +338,28 @@ class Mapper extends BaseMapper
             $filesQuery = "
                 SELECT
                     d.id as duework_id,
-                    {$this->getJoinColumnString('duework.submission_box_file', 's')}
+                    {$this->getJoinColumnString('duework.submission_box_file', 's')},
+                    {$this->getJoinColumnString('duework.submission_box_file.allowedFileExtension', 'm')}
                 FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
                 INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
+                LEFT JOIN {$this->getJoinSql('duework.submission_box_file.allowedFileExtension', 's', 'm')}
                 WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
                 ORDER BY d.id ASC
             ";
+
             $filesStatement = $this->getDatabase()->prepare($filesQuery);
             $filesStatement->execute($this->getArrayParameters($dueWorkIds, 'id'));
             foreach ($filesStatement as $row) {
                 if (!isset($files[$row['duework_id']])) {
                     $files[$row['duework_id']] = new Collection();
                 }
-                $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
+
+                $mimetype = $this->getJoinMapper('duework.submission_box_file.allowedFileExtension')->hydrate($row, 'm');
+
+                $file = $this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's');
+                $file->setMimeType($mimetype);
+
+                $files[$row['duework_id']]->add($file);
             }
             // Augment list with due work files
             foreach ($modelList as $model) {
