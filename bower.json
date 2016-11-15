@@ -10,7 +10,7 @@
   "private": true,
   "dependencies": {
     "jquery": "2.0.3",
-    "jquery-ui": "1.10.4",
+    "jquery-ui": "1.11.4",
     "jquery-timepicker-jt": "1.4.13",
     "jquery-validation": "1.11.1",
     "jqueryui-touch-punch-improved": "0.3.1",
