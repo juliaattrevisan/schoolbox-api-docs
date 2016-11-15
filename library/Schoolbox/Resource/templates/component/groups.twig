@@ -1,0 +1,24 @@
+{% for group in groupList %}!!!
+    <div class="columns small-12 medium-6 large-4 left">
+        <div class="row">
+            <div class="card-new small-12">
+                <a href="/homepage/{{ group.id }}">
+                    <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                </a>
+                <div class="card-content actions-small-1">
+                    <div class="list-item">
+                        <h3><a href="/homepage/{{ group.id }}">{{ group.name }}</a></h3>
+                    </div>
+                    {% if currentUser.getRole.isStaff == true %}
+                        <nav>
+                            <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
+                        </nav>
+                        <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
+                            <li><a href="/resource/folder/modify/{{ group.id }} " class="icon-modify">Modify</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
