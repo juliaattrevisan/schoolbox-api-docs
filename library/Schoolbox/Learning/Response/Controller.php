@@ -86,13 +86,11 @@ class Controller extends Base
         $file = null;
 
         if ($response->getAllFiles()->count()) {
-            $file = $response->getAllFiles()->first();
-
-            foreach ($response->getAllFiles() as $currentFile) {
-                if ($currentFile->getId() == $this->getRequest()->query['fileId']) {
-                    $file = $currentFile;
-                    break;
-                }
+            try {
+                $file = $response->findFileById($this->getRequest()->query['fileId']);
+            }
+            catch (\OutOfBoundsException $e) {
+                $file = $response->getAllFiles()->first();
             }
         }
 

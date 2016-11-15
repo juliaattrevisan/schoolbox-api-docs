@@ -119,6 +119,23 @@ class Model extends AbstractResponse
         return ($this->getSubmittedAt()->lt($this->getAssessable()->getDueAt()));
     }
 
+    /**
+     * Find a file with a particular $id
+     * @param $fileId
+     * @return File\Model
+     * @throws \OutOfBoundsException
+     */
+    public function findFileById($fileId)
+    {
+        foreach ($this->getAllFiles() as $currentFile) {
+            if ($currentFile->getId() == $fileId) {
+                return $currentFile;
+            }
+        }
+
+        throw new \OutOfBoundsException();
+    }
+
     /* Getters/Setters
      */
 
