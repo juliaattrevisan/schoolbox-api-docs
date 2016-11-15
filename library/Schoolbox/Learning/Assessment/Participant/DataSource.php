@@ -321,50 +321,50 @@ class DataSource
         return $this->cacheForFolder[$folder->getId()];
     }
 
-    /**
-     * Finds all assessments which this student is participating within.
-     *
-     * @param User $student
-     * @return Collection|IAssessable[]
-     */
-    public function findAllAssessmentsForStudent(User $student)
-    {
-        $assessments = new Collection();
-
-        // Find all classes by class code (students only)
-        $folderIds = [];
-        // TODO inject this
-        $folderMapper = FolderMapper::getInstance();
-        if ($student->getRole()->isStudent()) {
-            // TODO inject this
-            $externalUser = new \External_User();
-            foreach ($externalUser->getSubjectList($student) as $subject) {
-                try {
-                    $folderIds[] = $folderMapper->findByCode($subject['code'], $subject['campusCode'])->getId();
-                } catch (MapperException $e) {
-                    // This folder does not exist. That's okay.
-                    continue;
-                }
-            }
-        }
-
-        // Find all of this user's group memberships
-        return array_merge(
-            $folderIds,
-                $this->userAccessMapper->findByColumnList([
-                'uid'     => $student->getId(),
-                'type'    => UserAccess::ACCESS_READ,
-                'service' => UserAccess::SERVICE_HOMEPAGE,
-            ])->getColumnValues('serviceIdentifier')
-        );
-
-        // Find every assessment the student has created a response to
-
-        // Find every assessment the student has had a feedback created for
-
-        // TODO inject this
-        $assessmentDataSource = new AssessmentDataSource();
-
-        return $assessmentDataSource->findAllForFolderId($folderIds);
-    }
+//    /**
+//     * Finds all assessments which this student is participating within.
+//     *
+//     * @param User $student
+//     * @return Collection|IAssessable[]
+//     */
+//    public function findAllAssessmentsForStudent(User $student)
+//    {
+//        $assessments = new Collection();
+//
+//        // Find all classes by class code (students only)
+//        $folderIds = [];
+//        // TODO inject this
+//        $folderMapper = FolderMapper::getInstance();
+//        if ($student->getRole()->isStudent()) {
+//            // TODO inject this
+//            $externalUser = new \External_User();
+//            foreach ($externalUser->getSubjectList($student) as $subject) {
+//                try {
+//                    $folderIds[] = $folderMapper->findByCode($subject['code'], $subject['campusCode'])->getId();
+//                } catch (MapperException $e) {
+//                    // This folder does not exist. That's okay.
+//                    continue;
+//                }
+//            }
+//        }
+//
+//        // Find all of this user's group memberships
+//        return array_merge(
+//            $folderIds,
+//                $this->userAccessMapper->findByColumnList([
+//                'uid'     => $student->getId(),
+//                'type'    => UserAccess::ACCESS_READ,
+//                'service' => UserAccess::SERVICE_HOMEPAGE,
+//            ])->getColumnValues('serviceIdentifier')
+//        );
+//
+//        // Find every assessment the student has created a response to
+//
+//        // Find every assessment the student has had a feedback created for
+//
+//        // TODO inject this
+//        $assessmentDataSource = new AssessmentDataSource();
+//
+//        return $assessmentDataSource->findAllForFolderId($folderIds);
+//    }
 }
