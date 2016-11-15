@@ -41,6 +41,34 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverse('student_submission_file_id', \Plagscan_DocumentMapper::class, 'id', null, null, 'plagscan', 'plagscan');
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
+    }
+
+    /**
+     * Soft deletes any PlagScan for the specified File
+     *
+     * @param Model $file
+     */
+    public function softDeletePlagScan(Model $file)
+    {
+        $plagScanMapper = \Plagscan_DocumentMapper::getInstance();
+        $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $plagScanMapper->delete($plagScans);
+    }
+
+
+    /**
+     * Restores any PlagScan for the specified File
+     *
+     * @param Model $file
+     */
+    public function restorePlagScan(Model $file)
+    {
+        $plagScanMapper = \Plagscan_DocumentMapper::getInstance();
+        $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $plagScanMapper->restoreSoftDeleted($plagScans);
     }
 
     /**
