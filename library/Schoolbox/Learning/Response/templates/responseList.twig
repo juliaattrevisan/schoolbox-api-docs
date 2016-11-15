@@ -17,8 +17,10 @@
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
+
 <div class="row">
     <div class="small-12 island">
+        {% if timeline|length %}
         <h2 class="subheader">Submission History</h2>
 
         <section>
@@ -36,5 +38,11 @@
                 {% endfor %}
             </ul>
         </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>There are no interactions for {{ participant.user.fullname }}</p>
+            </div>
+        {% endif %}
     </div>
 </div>
