@@ -33,6 +33,19 @@ class Controller extends Base
         $this->feedbackDataSource = $feedbackDataSource;
     }
 
+    /**
+     * Delete the most recent feedback IF IT IS A DRAFT
+     *
+     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
+     *
+     * @api   DELETE /learning/assessments/{assessmentId}/{studentId}/feedback
+     * @level 165
+     *
+     * @param Participant $participant
+     */
+    public function deleteParticipantFeedback(Participant $participant)
+    {
+    }
 
     /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
