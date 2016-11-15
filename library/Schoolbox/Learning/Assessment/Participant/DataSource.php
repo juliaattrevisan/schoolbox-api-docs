@@ -225,6 +225,8 @@ class DataSource
             foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
                 if ($feedback->getReviewee()->getId() == $user->getId()) {
                     $feedback->setAssessable($assessment);
+
+                    // index the collection according to the ID of the feedback you retrieved
                     $participant->getAllFeedbacks()->setOffset($feedback->getId(), $feedback);
 
                     // Feedbacks may have a stub response.
@@ -243,8 +245,6 @@ class DataSource
                             }
                         }
                     }
-
-                    $participant->getAllFeedbacks()->add($feedback);
 
                     /* Also add it to the assessment instance
                      *
