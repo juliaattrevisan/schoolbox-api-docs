@@ -257,7 +257,7 @@ class PredicateBuilder
 
             } else {
                 // alias the param
-                $a = $columnName . '_0';
+                $a = $this->getNonCollidingParamAlias($columnName);
 
                 if ($fuzzy || ($operand == '=' && strpos($columnValue, '%') !== false)) {
                     // if wildcards are in the value, do a LIKE search rather than equals
@@ -423,6 +423,27 @@ class PredicateBuilder
     public function putParam($param, $value)
     {
         $this->params[$param] = $value;
+        return $this;
+    }
+
+    /**
+     * Find an alias for $param which isn't already in use in $this->params.
+     *
+     * @param string $param
+     * @return string
+     */
+    public function getNonCollidingParamAlias($param)
+    {
+        $i = 0;
+        while ($i < 10000) {
+            $candidate = "{$param}_{$i}";
+            if (!array_key_exists($candidate, $this->params)) {
+                return $candidate;
+            }
+            $i++;
+        }
+        // Couldn't generate? Crash and burn
+        return false;
     }
 
 }
