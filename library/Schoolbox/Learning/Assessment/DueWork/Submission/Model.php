@@ -133,7 +133,7 @@ class Model extends AbstractResponse
             }
         }
 
-        throw new \OutOfBoundsException();
+        throw new \OutOfBoundsException('File not found in this response');
     }
 
     /* Getters/Setters
