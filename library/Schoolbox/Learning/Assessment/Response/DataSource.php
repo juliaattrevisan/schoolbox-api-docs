@@ -83,7 +83,7 @@ class DataSource implements IResponseDataSource
 
         /* Requested response doesn't exist in this Assessment
          */
-        throw new \OutOfBoundsException();
+        throw new \OutOfBoundsException('Response not found in this assessment');
     }
 
     /**
