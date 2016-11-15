@@ -77,6 +77,7 @@ class DueWork implements IAssessmentTypeTranslator
                     (new StorageModel())
                         ->setHash($file->getHash())
                         ->setFilename($file->getFilename())
+                        ->setExtension($file->getExtension())
                 );
             }
 

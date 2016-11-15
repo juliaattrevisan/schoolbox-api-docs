@@ -35,6 +35,21 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateToDataModel()
     {
+        $storage1 = new StorageModel();
+        $storage1->setFilename('a file');
+        $storage1->setExtension('txt');
+        $storage1->setHash('1234567890123456789012345678901234567890');
+
+        $storage2 = new StorageModel();
+        $storage2->setFilename('an image');
+        $storage2->setExtension('jpg');
+        $storage2->setHash('0000000000000000000000000000000000000002');
+
+        $storage3 = new StorageModel();
+        $storage3->setFilename('a sound');
+        $storage3->setExtension('mp3');
+        $storage3->setHash('0000000000000000000000000000000000000001');
+
         $dueWork = (new DueWork())
             // Generic fields
             ->setId(908)
@@ -53,18 +68,18 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId(33)
-                    ->setFilename('a file.txt')
-                    ->setHash('1234567890123456789012345678901234567890')
+                    ->setFilename('a file')
+                    ->setStorage($storage1)
                 )
                 ->add((new DueWorkFile())
                     ->setId(65)
-                    ->setFilename('an image.png')
-                    ->setHash('0000000000000000000000000000000000000002')
+                    ->setFilename('an image')
+                    ->setStorage($storage2)
                 )
                 ->add((new DueWorkFile())
                     ->setId(82)
-                    ->setFilename('a sound.mp3')
-                    ->setHash('0000000000000000000000000000000000000001')
+                    ->setFilename('a sound')
+                    ->setStorage($storage3)
                 )
             )
             ->setWorkType((new DueWorkType())
@@ -92,15 +107,18 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $dueWorkModel->getAttachments());
 
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[0]);
-        $this->assertEquals('a file.txt', $dueWorkModel->getAttachments()[0]->getFilename());
+        $this->assertEquals('a file', $dueWorkModel->getAttachments()[0]->getFilename());
+        $this->assertEquals('a file.txt', $dueWorkModel->getAttachments()[0]->getBasename());
         $this->assertEquals('1234567890123456789012345678901234567890', $dueWorkModel->getAttachments()[0]->getHash());
 
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[1]);
-        $this->assertEquals('an image.png', $dueWorkModel->getAttachments()[1]->getFilename());
+        $this->assertEquals('an image', $dueWorkModel->getAttachments()[1]->getFilename());
+        $this->assertEquals('an image.jpg', $dueWorkModel->getAttachments()[1]->getBasename());
         $this->assertEquals('0000000000000000000000000000000000000002', $dueWorkModel->getAttachments()[1]->getHash());
 
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
-        $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getFilename());
+        $this->assertEquals('a sound', $dueWorkModel->getAttachments()[2]->getFilename());
+        $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getBasename());
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
         // Test type
@@ -237,6 +255,21 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateToDomainModel()
     {
+        $storage1 = new StorageModel();
+        $storage1->setFilename('a file');
+        $storage1->setExtension('txt');
+        $storage1->setHash('1234567890123456789012345678901234567890');
+
+        $storage2 = new StorageModel();
+        $storage2->setFilename('an image');
+        $storage2->setExtension('jpg');
+        $storage2->setHash('0000000000000000000000000000000000000002');
+
+        $storage3 = new StorageModel();
+        $storage3->setFilename('a sound');
+        $storage3->setExtension('mp3');
+        $storage3->setHash('0000000000000000000000000000000000000001');
+
         $dueWorkModel = (new DueWorkModel())
             ->setId(6789)
             ->setAssessmentModel(
@@ -250,18 +283,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setUseRubric(false)
             ->setOwner($this->teacher2)
             ->setAttachments((new Collection())
-                ->add((new StorageModel())
-                    ->setBasename('a file.txt')
-                    ->setHash('1234567890123456789012345678901234567890')
-                )
-                ->add((new StorageModel())
-                    ->setBasename('an image.png')
-                    ->setHash('0000000000000000000000000000000000000002')
-                )
-                ->add((new StorageModel())
-                    ->setBasename('a sound.mp3')
-                    ->setHash('0000000000000000000000000000000000000001')
-                )
+                ->add($storage1)
+                ->add($storage2)
+                ->add($storage3)
             )
             ->setWorkType((new WorkTypeModel())
                 ->setId(12)
@@ -283,17 +307,20 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(3, $dueWork->getAttachedFiles());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[0]);
-        $this->assertEquals('a file.txt', $dueWork->getAttachedFiles()[0]->getFilename());
-        $this->assertEquals('1234567890123456789012345678901234567890', $dueWork->getAttachedFiles()[0]->getHash());
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[0]);
+        $this->assertEquals('a file', $dueWorkModel->getAttachments()[0]->getFilename());
+        $this->assertEquals('a file.txt', $dueWorkModel->getAttachments()[0]->getBasename());
+        $this->assertEquals('1234567890123456789012345678901234567890', $dueWorkModel->getAttachments()[0]->getHash());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[1]);
-        $this->assertEquals('an image.png', $dueWork->getAttachedFiles()[1]->getFilename());
-        $this->assertEquals('0000000000000000000000000000000000000002', $dueWork->getAttachedFiles()[1]->getHash());
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[1]);
+        $this->assertEquals('an image', $dueWorkModel->getAttachments()[1]->getFilename());
+        $this->assertEquals('an image.jpg', $dueWorkModel->getAttachments()[1]->getBasename());
+        $this->assertEquals('0000000000000000000000000000000000000002', $dueWorkModel->getAttachments()[1]->getHash());
 
-        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[2]);
-        $this->assertEquals('a sound.mp3', $dueWork->getAttachedFiles()[2]->getFilename());
-        $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAttachedFiles()[2]->getHash());
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
+        $this->assertEquals('a sound', $dueWorkModel->getAttachments()[2]->getFilename());
+        $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getBasename());
+        $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
 
         $this->assertInstanceOf(DueWorkType::class, $dueWork->getWorkType());
         $this->assertEquals(12, $dueWork->getWorkType()->getId());
