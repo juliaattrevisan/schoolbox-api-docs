@@ -139,6 +139,7 @@ ENGINE = InnoDB;
 CREATE TABLE `assessment_course_unit_implementation` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_implementation_id` INT UNSIGNED NOT NULL,
+  `assessment_specification_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`assessment_id`, `course_unit_implementation_id`),
   INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
   INDEX `fk_assessment_course_unit_implementation_cui_id_idx` (`course_unit_implementation_id` ASC),
@@ -151,7 +152,12 @@ CREATE TABLE `assessment_course_unit_implementation` (
    FOREIGN KEY (`course_unit_implementation_id`)
    REFERENCES `course_unit_implementation` (`id`)
    ON DELETE NO ACTION
-   ON UPDATE NO ACTION)
+   ON UPDATE NO ACTION,
+  CONSTRAINT `fk_assessment_course_unit_implementation_as_id`
+  FOREIGN KEY (`assessment_specification_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
