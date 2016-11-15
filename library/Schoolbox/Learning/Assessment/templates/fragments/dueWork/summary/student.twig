@@ -15,30 +15,6 @@
     </div>
 </div>
 
-{% if assessment.attachedFiles|length %}
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Attached Files</h2>
-            <section>
-                <ul class="information-list">
-                    {% for currentFile in assessment.attachedFiles %}
-                        <li>
-                            <div class="list-item">
-                                <div class="compact card small-12">
-                                    <a href="/storage/fetch.php?hash={{ currentFile.hash }}">
-                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                                        <h3>{{ currentFile.filename }}</h3>
-                                    </a>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-    </div>
-{% endif %}
-
 {% if participant.assessable.useRubric %}
 {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
 {% endif %}
