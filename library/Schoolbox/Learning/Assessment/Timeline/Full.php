@@ -58,24 +58,31 @@ class Full
      * Recombine if required, otherwise return a cached
      * version of the recombination because reasons
      *
+     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeDraftResponses
      * @return Collection
      */
-    public function getTimeline()
+    public function getTimeline($includeUnpublishedFeedback = false, $includeDraftResponses = false)
     {
-        if (!$this->getHasRecombined()) {
-            $this->recombine();
-            $this->setHasRecombined(true);
-        }
+        // TODO evaluate the appropriateness of caching here
+//        if (!$this->getHasRecombined()) {
+        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses);
+//            $this->setHasRecombined(true);
+//        }
 
         return $this->getRecombined();
     }
+
 
     /**
      * Combining the collections
      *
      * 1 + 1 = 1
+     *
+     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeDraftResponses
      */
-    protected function recombine()
+    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses)
     {
         $processedFeedback = [];
 
@@ -83,7 +90,7 @@ class Full
 
             /* Only show Submitted submissions (ignore drafts)
              */
-            if ($currentResponse->isSubmitted()) {
+            if ($includeDraftResponses || $currentResponse->isSubmitted()) {
                 $this->getRecombined()->add($currentResponse);
 
                 /* Maintain a list of all the Feedbacks that were discovered
@@ -103,7 +110,7 @@ class Full
 
                 /* Only show Published feedbacks
                  */
-                if ($currentFeedback->isPublished()) {
+                if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
                     $this->getRecombined()->add($currentFeedback);
                 }
             }
