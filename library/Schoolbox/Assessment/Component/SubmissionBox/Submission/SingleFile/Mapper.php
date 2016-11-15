@@ -11,7 +11,10 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use \Schoolbox\File\Mimetype as Mimetype;
+use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -73,14 +76,14 @@ class Mapper extends BaseMapper
         $resultSet = $this->createCollection();
 
         foreach ($statement as $row) {
-            /** @var \Schoolbox\File\Mimetype $mimetype */
+            /** @var Mimetype $mimetype */
             $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
 
-            /** @var \Schoolbox\Resource\Storage\Model $storage */
+            /** @var Storage $storage */
             $storage = $this->hydrateJoin($row, 'storage', 'f');
             $storage->setMimetype($mimetype);
 
-            /** @var \Plagscan_Document $plagscan */
+            /** @var Plagscan $plagscan */
             $plagscan = $this->hydrateJoin($row, 'plagscan', 'ps');
 
             $submissionFile = $this->hydrate($row);
