@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use DueWork_ErrorMapper;
 use InvalidArgumentException;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -45,6 +46,48 @@ class Controller extends Base
      */
     public function deleteParticipantFeedback(Participant $participant)
     {
+        $feedbacks = $this->getFloatingFeedback($participant);
+
+        if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
+            // cannot delete non-existent or published feedback
+
+            $this->sendError("Cannot delete feedback for {$participant->getUser()->getFullName()}");
+            return;
+        }
+
+        try {
+            // drop the Collection wrapper now so we can do direct array manipulation
+            $feedbacks = array_reverse($feedbacks->getAll());
+            $toDelete  = array_pop($feedbacks);
+
+            $this->getFeedbackDataSource()->delete($toDelete);
+
+            // success: send back the now-most-recent feedback, if any
+            if (count($feedbacks)) {
+
+                /** @var IFeedback $latest */
+                $latest = array_pop($feedbacks);
+
+                $code = 200;
+                $data = [
+                    'mark' => [
+                        'humanReadable' => $latest->getHumanReadableMark(),
+                        'normalised'    => $latest->getNormalisedMark()
+                    ],
+                    'comment' => $latest->getComment()
+                ];
+
+            } else {
+                $code = 204;
+                $data = null;
+            }
+
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set($this->buildJsonOutput($data));
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -59,24 +102,7 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        // obtain a reference to the most recent floating feedback
-        // TODO it would be nice to do this via SQL rather than in here, but them's the breaks
-        $feedbacks = $this->getFeedbackDataSource()
-            ->findForAssessment($participant->getAssessable())
-            ->filter(
-                function (IFeedback $feedback) use ($participant)
-                {
-                    if ($feedback->getResponse()) {
-                        // floating feedback only
-                        return false;
-                    }
-
-                    // filter to current user only
-                    return $participant->getUser()->getId() == $feedback->getReviewee()->getId();
-                }
-            )
-            ->sortBy('updatedAt', 'desc')
-        ;
+        $feedbacks = $this->getFloatingFeedback($participant);
 
         if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
             // if none, or published: create new draft
@@ -160,6 +186,35 @@ class Controller extends Base
         $this->respond($template, $data, $responseCode);
     }
 
+
+    /**
+     * Retrieve the floating feedback for this participant, IN REVERSE CHRONOLOGICAL ORDER
+     *
+     * @param Participant $participant
+     * @return Collection|IFeedback[]
+     */
+    protected function getFloatingFeedback(Participant $participant)
+    {
+        // obtain a reference to the most recent floating feedback
+        // TODO it would be nice to do this via SQL rather than in here, but them's the breaks
+        return $this->getFeedbackDataSource()
+            ->findForAssessment($participant->getAssessable())
+            ->filter(
+                function (IFeedback $feedback) use ($participant)
+                {
+                    if ($feedback->getResponse()) {
+                        // floating feedback only
+                        return false;
+                    }
+
+                    // filter to current user only
+                    return $participant->getUser()->getId() == $feedback->getReviewee()->getId();
+                }
+            )
+            ->sortBy('updatedAt', 'desc')
+        ;
+
+    }
 
     /**
      * @param string $template
