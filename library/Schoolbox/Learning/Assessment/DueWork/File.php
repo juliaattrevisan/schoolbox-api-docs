@@ -11,19 +11,23 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 
+use Schoolbox\Resource\File\StorableTrait;
+
 class File
 {
+    use StorableTrait;
+
     /**
      * @var int
      */
     protected $id;
 
-    /**
-     * The hash of the file's contents
-     *
-     * @var string
-     */
-    protected $hash;
+//    /**
+//     * The hash of the file's contents
+//     *
+//     * @var string
+//     */
+//    protected $hash;
 
     /**
      * The filename which was submitted
@@ -59,25 +63,25 @@ class File
         $this->id = $id;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
-    }
-
+//
+//    /**
+//     * @return string
+//     */
+//    public function getHash()
+//    {
+//        return $this->hash;
+//    }
+//
+//    /**
+//     * @param string $hash
+//     * @return self
+//     */
+//    public function setHash($hash)
+//    {
+//        $this->hash = $hash;
+//        return $this;
+//    }
+//
     /**
      * @return string
      */
