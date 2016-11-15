@@ -213,6 +213,32 @@ class Interval implements JsonSerializable {
         );
     }
 
+
+    /**
+     * Convert this Interval to the format: (\d+)hours (\d+)min (\d+)sec
+     * Primarily used in quiz
+     *
+     * @param bool $padHours
+     * @return string
+     */
+    public function hms($padHours = false)
+    {
+        $format = '';
+
+        if ($this->getHourTotal()) {
+            // there is at least one whole hour
+            $format .= ($padHours ? "%02h" : "%H") . "hrs ";
+        }
+
+        if ($this->getHourTotal() || $this->getMinuteRemainder()) {
+            $format .= "%02imin ";
+        }
+
+        $format .= "%02ssec";
+
+        return $this->format($format);
+    }
+
     /**
      * Creates a DateInterval instance out of this object.
      *

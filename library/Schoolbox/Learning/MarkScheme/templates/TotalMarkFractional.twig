@@ -43,7 +43,7 @@
 
             <dt class="{{ dt }}">Time Taken</dt>
             <dd class="{{ dd }}">
-                {% if attempt.submittedAt.null %}In Progress...{% else %}{{ attempt.submittedAt.diffInSeconds(attempt.createdAt) | hms }}{% endif %}
+                {% if attempt.submittedAt.null %}In Progress...{% else %}{{ attempt.duration.hms }}{% endif %}
             </dd>
             {% endif %}
 

@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
+use Alaress\Date\Interval;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Model extends AbstractResponse
@@ -56,6 +57,20 @@ class Model extends AbstractResponse
     {
         $this->submittedAt = $submittedAt;
         return $this;
+    }
+
+
+    /**
+     * @return Interval
+     */
+    public function getDuration()
+    {
+        if (!$this->isSubmitted()) {
+            return null;
+        }
+        return new Interval(
+            $this->getSubmittedAt()->diffInSeconds($this->getCreatedAt())
+        );
     }
 
     /**
