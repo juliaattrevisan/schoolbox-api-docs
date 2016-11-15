@@ -42,7 +42,7 @@ module.exports = function(grunt) {
                     'www/javascript/jquery.alaressValidate.js',
 
                     // jQueryUI
-                    'www/javascript/components/jquery-ui/ui/jquery-ui.js',
+                    'www/javascript/components/jquery-ui/jquery-ui.js',
 
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
