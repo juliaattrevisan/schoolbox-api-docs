@@ -10,7 +10,6 @@
  */
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 /**
  * Class Plagscan_DocumentMapper
@@ -42,7 +41,6 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		$this->hasTable('plagscan_document');
 		$this->hasModel(Plagscan::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('student_submission_file_id', SubmissionFileMapper::class, 'id', null, null);
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
