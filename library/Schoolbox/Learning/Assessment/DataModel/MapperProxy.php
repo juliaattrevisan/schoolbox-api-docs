@@ -250,23 +250,17 @@ class MapperProxy
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
-        // Find folders (from class)
-        $classFolderIds = $folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student))
-                                       ->getColumnValues('id');
+        // Find this user's folders from folder mapper
+        $classFolderIds = $folderMapper->findForUser(
+            $student,
+            // Only actual students have classes
+            $student->getRole()->isStudent(),
+            UserAccess::ACCESS_READ,
+            true
+        )->getColumnValues('id');
 
-        // Find folders (from group)
-        // TODO probably best to inject this rather than delve
-        $userAccessMapper = $this->baseMapper->getJoinMapper('task.owner.userAccess');
-        $groupFolderIds   = $userAccessMapper->findByColumnList([
-            'uid'     => $student->getId(),
-            'type'    => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-        ])->getColumnValues('serviceIdentifier');
-
-        // And find all the assessables
-        $allFolders  = array_merge($classFolderIds, $groupFolderIds);
-        // Including ones in course implementations
-        $assessments = $this->findAllForFolderId($allFolders, ['term' => $term]);
+        // And find all the assessables therein
+        $assessments = $this->findAllForFolderId($classFolderIds, ['term' => $term]);
 
 
         // Also need assessments which this student may not participating in
