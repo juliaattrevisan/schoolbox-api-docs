@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -56,8 +56,8 @@ class SubmissionMapper extends BaseMapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteFiles' ]);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFiles'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
     }
 
     /**
