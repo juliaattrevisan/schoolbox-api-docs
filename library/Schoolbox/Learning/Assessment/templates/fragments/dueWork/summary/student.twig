@@ -19,7 +19,7 @@
 {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
 {% endif %}
 
-{% if assessment.responses|length or assessment.feedbacks|length %}
+{% if assessment.participant(currentUser).allResponses|length or assessment.participant(currentUser).allFeedbacks|length %}
 {% include '@learningAssessment/fragments/dueWork/history.twig' %}
 {% endif %}
 
