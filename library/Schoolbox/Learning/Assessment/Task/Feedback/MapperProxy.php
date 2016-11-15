@@ -55,20 +55,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * Overridden to only retrieve task completions that are status: complete
-     * (not requires confirmation)
-     *
-     * @param array $columnList
-     * @param array $options
-     * @return GenericCollection
-     */
-    public function findByColumnList(array $columnList, $options = array())
-    {
-        $columnList['completion_status'] = DataObject::COMPLETION_STATUS_COMPLETE;
-        return parent::findByColumnList($columnList, $options);
-    }
-
-    /**
      * @return string
      */
     protected function getExternalColumnName()
