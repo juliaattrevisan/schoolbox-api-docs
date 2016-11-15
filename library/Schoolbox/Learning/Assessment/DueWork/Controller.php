@@ -124,9 +124,9 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
+            'participant' => $participant,
             'currentUser' => $this->getUser(),
             'student'     => $student,
-            'assessment'  => $assessment,
             'timeline'    => (new FullTimeline($assessment))->getTimeline(),
 
             /* Rubrics data
