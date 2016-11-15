@@ -279,17 +279,18 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int|array $folderId A folder ID or list thereof
-     * @param array $otherParams
-     * @param array $options
+     * @param int|array $folderId   A folder ID or list thereof
+     * @param array     $columnList Any other columns to query on
+     *                              If "id" is one, these assessments are added to the final search.
+     * @param array     $options    Any other options to pass to the final search to `findByColumnList`.
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, $otherParams, $options = [])
+    public function findAllForFolderId($folderId, $columnList, $options = [])
     {
         // Support stuff for query
-        $idList       = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
-        $params       = BaseMapper\PredicateBuilder::getArrayParameters($idList, 'folder');
-        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($idList, 'folder');
+        $folderList   = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
+        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
 
         // There's no OR support in the predicate builder.
         // The best I can do is to get all IDs and fetch a union.
@@ -309,8 +310,15 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-        $params       = $otherParams;
-        $params['id'] = $idList;
+        $params = $columnList;
+        if (isset($params['id'])) {
+            if (!is_array($params['id'])) {
+                $params['id'] = [$params['id']];
+            }
+            $params['id'] = array_unique(array_merge($params['id'], $idList));
+        } else {
+            $params['id'] = $idList;
+        }
         return $this->findByColumnList($params, $options);
     }
 

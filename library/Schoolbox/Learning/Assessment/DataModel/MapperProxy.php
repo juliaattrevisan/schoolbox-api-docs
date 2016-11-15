@@ -180,7 +180,7 @@ class MapperProxy
      * implementation of the given folder.
      * This is more likely to be the expected behavior of this method.
      *
-     * @param int   $folderId
+     * @param int   $folderId A folder or list of folders
      * @param array $options
      * @return Collection|IAssessable[]
      */
@@ -259,25 +259,16 @@ class MapperProxy
             true
         )->getColumnValues('id');
 
-        // And find all the assessables therein
-        $assessments = $this->findAllForFolderId($classFolderIds, ['term' => $term]);
+        // Build a list of parameters to pass to findAllForFolderId
+        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
 
+        // Find assessments which this student is no longer in the class for,
+        // but has created a response or feedback for.
+        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
-        // Also need assessments which this student may not participating in
-        // via folder or class, but through a previous response or feedback.
-        $assessmentIds    = $assessments->getColumnValues('id');
-        $extraAssessments = array_diff(
-            $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term),
-            $assessmentIds
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
         );
-
-        if (!empty($extraAssessments)) {
-            $assessments = $assessments->merge(
-                $this->translateToDomainModelCollection($this->baseMapper->findByColumn('id', $extraAssessments))
-            );
-        }
-
-        return $assessments;
     }
 
     /**
