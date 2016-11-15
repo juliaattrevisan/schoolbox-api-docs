@@ -123,7 +123,10 @@ class MapperProxy
     }
 
     /**
-     * Find all assessables for this context
+     * Find all assessables for this context.
+     *
+     * If $context is a Folder, this method does not retrieve assessables that
+     * are within a course implementation that has been created on that folder.
      *
      * @param AssessmentContext $context
      * @param array             $options
@@ -173,9 +176,9 @@ class MapperProxy
     /**
      * Finds all assessables for a folder.
      *
-     * This only finds assessables that are directly within a folder context:
-     * see `findAllInCourseImplementationForFolderId` for finding assessables
-     * that have been imported into a folder through a course import.
+     * This now defaults to finding assessables that are within a course
+     * implementation of the given folder.
+     * This is more likely to be the expected behavior of this method.
      *
      * @param int   $folderId
      * @param array $options
