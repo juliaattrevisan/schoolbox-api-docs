@@ -64,6 +64,29 @@ class DataSource implements IResponseDataSource
     }
 
     /**
+     * Find a particular $response by its id among a set of IResponses
+     *
+     * @param $responseId
+     * @param IAssessable $assessment
+     * @return IResponse
+     * @throws \OutOfBoundsException
+     */
+    public function findInAssessment($responseId, IAssessable $assessment)
+    {
+        $allResponses = $this->findForAssessment($assessment);
+
+        foreach ($allResponses as $currentResponse) {
+            if ($currentResponse->getId() == $responseId) {
+                return $currentResponse;
+            }
+        }
+
+        /* Requested response doesn't exist in this Assessment
+         */
+        throw new \OutOfBoundsException('Response not found in this assessment');
+    }
+
+    /**
      * @param IResponse $response
      */
     public function save(IResponse $response)

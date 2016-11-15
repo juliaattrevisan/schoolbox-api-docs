@@ -7,25 +7,27 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Grading for {{ student.fullname }}</h1>
+            <h1>Grading for {{ participant.user.fullname }}</h1>
         </div>
     </div>
     <nav>
-        <a href="" class="icon-add" title="Add Feedback for {{ student.fullname }} in {{ assessment.title }}"></a>
+        <a href="" class="icon-add" title="Add Feedback for {{ participant.user.fullname }} in {{ participant.assessable.title }}"></a>
     </nav>
 </div>
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
+
 <div class="row">
     <div class="small-12 island">
+        {% if timeline|length %}
         <h2 class="subheader">Submission History</h2>
 
         <section>
             <ul id='history' class="information-list threaded">
                 {% for currentInteraction in timeline %}
                     {% if currentInteraction is response %}
-                        {% include '@learningResponse/inlineGrading/interaction/response.twig' with {response: currentInteraction} %}
+                        {% include '@learningResponse/inlineGrading/interaction/response.twig' with {assessment: participant.assessable, response: currentInteraction, student: participant.user} %}
 
                         {# I have the feeling people will want Feedbacks displayed here too
                          #
@@ -36,5 +38,11 @@
                 {% endfor %}
             </ul>
         </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>There are no interactions for {{ participant.user.fullname }}</p>
+            </div>
+        {% endif %}
     </div>
 </div>

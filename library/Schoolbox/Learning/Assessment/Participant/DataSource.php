@@ -223,12 +223,18 @@ class DataSource
      */
     public function findForAssessmentAndUser(IAssessable $assessment, User $user, $returnResponses = true, $returnFeedbacks = true)
     {
-        $participant = new Participant($user, $assessment);
+        /* Only add a Participant if they don't already exist
+         * Don't secretly mutate the contents of allParticipants!
+         */
+        if ($assessment->isParticipant($user)) {
+            $participant = $assessment->getParticipant($user);
+        }
+        else {
+            $participant = new Participant($user, $assessment);
 
-        // Need to add them into the assessment
-        $assessment->setAllParticipants(
-            new Collection([$participant])
-        );
+            // Need to add them into the assessment
+            $assessment->getAllParticipants()->add($participant);
+        }
 
         // Add responses
         if ($returnResponses) {
