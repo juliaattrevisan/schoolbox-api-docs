@@ -1,6 +1,11 @@
 {# TODO create feedback routes #}
 {% set fbUrl %}/learning/assessments/{{ participant.assessable.id }}/{{ participant.user.id }}/feedback{% endset %}
-{% set actionStyle = participant.allFeedbacks | length and not participant.findMostRecentFeedback.published ? '' : 'display:none;' %}
+{% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
+    {% set savedStatusText = 'Saved as Draft' %}
+{% else %}
+    {% set actionStyle     = 'display:none;' %}
+    {% set publishDisabled = 'disabled="disabled"' %}
+{% endif %}
 
 {% set tabIndex = {
     mark: (loop.index0 * 2) + 1,
@@ -22,8 +27,9 @@
                 <section>
                     <div style="{{ actionStyle }}" data-interaction-draft>
                         {%- spaceless %}
+                            <a class="button" data-draft="drafted" disabled="disabled">{{ savedStatusText }}</a>
                             <a class="button" data-draft="discard">Discard Draft</a>
-                            <a class="button" data-draft="publish">Publish</a>
+                            <a class="button" data-draft="publish" {{ publishDisabled }}>Publish</a>
                         {% endspaceless -%}
                     </div>
                 </section>
