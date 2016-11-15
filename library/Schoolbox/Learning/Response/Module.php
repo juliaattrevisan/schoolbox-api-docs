@@ -24,6 +24,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use \External_UserInterface;
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
@@ -54,7 +55,7 @@ class Module extends BaseModule
 
                 /* View a Response in the Inline Grader
                  */
-                '/responses/{responseId}'                                     => 'getParticularResponse',
+                '/responses/{assessmentId}/{responseId}'                      => 'getParticularResponse',
 
                 /* View a Response File's plagscan report
                  */
@@ -117,13 +118,8 @@ class Module extends BaseModule
         });
 
         $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
-
-            /* TODO: Arbitrarily assume 326 for now
-             * TODO: Generate a populated response for now
-             */
-            $assessment = $this->getAssessmentMapperProxy()->findById(326);
-            $this->loadParticipantsIntoAssessment($assessment);
-            $response = (new TemporaryResponse())->produceResponse($assessment);
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $response = $this->getResponseMapperProxy()->findForAssessment($assessment);
 
             return [
                 'response' => $response,
@@ -258,5 +254,13 @@ class Module extends BaseModule
     protected function getParticipantMapperProxy()
     {
         return $this->injector->get('participantDataSource');
+    }
+
+    /**
+     * @return ResponseMapperProxy
+     */
+    protected function getResponseMapperProxy()
+    {
+        return $this->injector->get('responseDataSource');
     }
 }
