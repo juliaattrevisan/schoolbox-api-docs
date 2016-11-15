@@ -39,44 +39,13 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	protected function mapping () {
 		$this->hasTable('plagscan_document');
 		$this->hasModel(Plagscan::class);
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'plagscan_id',
-			'property'   => 'plagscanId',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'status',
-			'property'   => 'status',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'score',
-			'property'   => 'score',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'html',
-			'property'   => 'html',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasSoftDeleteDateField('deleted');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('file_id', Submission\SingleFile\Mapper::class, 'id', null, null);
+        $this->uses('plagscan_id', self::TYPE_INTEGER);
+        $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('score', self::TYPE_STRING);
+        $this->uses('html', self::TYPE_STRING);
+        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
 	}
 
 	/**
