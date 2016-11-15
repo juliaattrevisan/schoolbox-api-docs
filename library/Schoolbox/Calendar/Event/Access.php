@@ -54,24 +54,26 @@ class Access
 
             /* Get list of calendar permissions this user has
              */
-            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_WRITE);
+            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
 
-                /* Loop through campuses for the event and check if one
-                 * matches with this access
-                 */
-                foreach ($campuses as $campus) {
+                if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                    /* Loop through campuses for the event and check if one
+                     * matches with this access
+                     */
+                    foreach ($campuses as $campus) {
 
-                    if (is_object($campus)) {
-                        $campusId = $campus->getCampusId();
-                    } else {
-                        $campusId = $campus;
-                    }
+                        if (is_object($campus)) {
+                            $campusId = $campus->getCampusId();
+                        } else {
+                            $campusId = $campus;
+                        }
 
-                    if ($campusId == $currentAccess->getServiceIdentifier()) {
-                        return true;
+                        if ($campusId == $currentAccess->getServiceIdentifier()) {
+                            return true;
+                        }
                     }
                 }
             }
