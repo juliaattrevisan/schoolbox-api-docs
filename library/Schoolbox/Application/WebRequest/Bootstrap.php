@@ -646,10 +646,11 @@ class Bootstrap implements BootstrapInterface {
 
         // Register assessable data source
         $di->params[AssessableDataSource::class] = [
-            'responseDataSource' => $di->lazyGet('responseDataSource'),
-            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+            'responseDataSource'    => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource'    => $di->lazyGet('feedbackDataSource'),
+            'participantDataSource' => $di->lazyGet('participantDataSource'),
         ];
-        $di->set('assessableDataSource', $di->lazyNew(ParticipantDataSource::class));
+        $di->set('assessableDataSource', $di->lazyNew(AssessableDataSource::class));
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [
