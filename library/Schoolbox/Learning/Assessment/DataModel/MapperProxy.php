@@ -135,7 +135,7 @@ class MapperProxy
     public function findAllForContext(AssessmentContext $context, $options = [])
     {
         if ($context instanceof Folder) {
-            return $this->findAllForFolderId($context->getId(), $options);
+            return $this->findAllForFolderIdExclusively($context->getId(), $options);
         }
         if ($context instanceof UnitSpecification) {
             return $this->findAllForUnitSpecificationId($context->getId(), $options);
@@ -185,6 +185,21 @@ class MapperProxy
      * @return Collection|IAssessable[]
      */
     public function findAllForFolderId($folderId, $options = [])
+    {
+        $params         = $this->convertOptionsToColumnList($options);
+        $params['f.id'] = $folderId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+    }
+
+    /**
+     * Finds all assessables for a folder, not including course implementation
+     * assessables.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForFolderIdExclusively($folderId, $options = [])
     {
         $params         = $this->convertOptionsToColumnList($options);
         $params['f.id'] = $folderId;
