@@ -152,14 +152,17 @@ class Controller extends Base\Base
     }
 
     /**
-     * This POST is the result of import stage 1. Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     * This POST is the result of import stage 1.
+     *
+     * Receives the CourseSpec and target Classes to import into.
+     * Returns a list of users who may own the generated Assessments for each target Class
      *
      * @api   POST /course/import/classes
      * @level 160
      */
     public function postClasses()
     {
-        $homepage = trim($this->getRequest()->post["importFolders"]);
+        $targetFolderIds = explode(',', trim($this->getRequest()->post["importFolders"]));
         $courseId = trim($this->getRequest()->post["importCourse"]);
 
         try {
@@ -171,26 +174,24 @@ class Controller extends Base\Base
             return;
         }
 
-        if ($homepage == "" && $courseId == "") {
+        if (empty($targetFolderIds) && empty($courseId)) {
             // They didn't select anything
 
             $this->sendError('You must select at least one class and a course to import before you can proceed');
             return;
 
-        } elseif ($homepage == "") {
+        } elseif (empty($targetFolderIds)) {
             // They didn't select a class code
 
             $this->sendError('You must select at least one class before you can proceed');
             return;
 
-        } elseif ($courseId == "") {
+        } elseif (empty($courseId)) {
             // They didn't select a course to import
 
             $this->sendError('You must select a course to import before you can proceed');
             return;
         }
-
-        $targetFolderIds = explode(',', $homepage);
 
         $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
@@ -214,7 +215,6 @@ class Controller extends Base\Base
             'importCourse' => $courseId,
             'ownershipCandidates' => $possibleOwnerships,
         ]);
-
     }
 
 
