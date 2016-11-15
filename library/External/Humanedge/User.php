@@ -42,6 +42,7 @@ class External_Humanedge_User implements External_UserInterface
         sc.Relationship = 'Stepmother' OR
         sc.Relationship = 'Step Father' OR
         sc.Relationship = 'Step Mother' OR
+        sc.Relationship = 'Houseparents' OR
         sc.Relationship LIKE '%Guardian%' OR
         sc.Relationship LIKE 'Foster%' OR
         sc.Relationship = 'Carer'
