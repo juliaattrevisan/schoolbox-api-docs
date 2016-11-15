@@ -15,7 +15,11 @@
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
         <li><a href="/task/export/{{ task.id }}?returnUrl={{ returnUrl }}" data-reveal-id="export-modal-{{ task.id }}" data-reveal-ajax="true" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        {% if task is quiz %}
+        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: task.id}) }}" class="icon-modify">Modify</a></li>
+        {% else %}
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: task.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
+        {% endif %}
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
     </ul>
     <div data-reveal class="reveal-modal" id="export-modal-{{ task.id }}"></div>
