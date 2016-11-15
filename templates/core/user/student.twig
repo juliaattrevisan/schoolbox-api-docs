@@ -540,7 +540,13 @@
                                                 <img src="/portrait.php?userId={{ teacher.getExternalId()|e('url') }}&amp;size=square64" />
                                                 <h3>{{ teacher.formatName() }}</h3>
                                             </a>
-                                            <p class="meta">{{ teacher.getRole().getName() }}</p>
+                                            <p class="meta">
+                                                {% if teacher.positionTitle is empty %}
+                                                    {{ teacher.getRole().getName() }}
+                                                {% else %}
+                                                    {{ teacher.positionTitle }}
+                                                {% endif %}
+                                            </p>
                                         </div>
                                     </div>
                                     <nav>
@@ -600,7 +606,13 @@
                                                 <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
                                                 <h3>{{ group.owner.formatName() }}</h3>
                                             </a>
-                                            <p class="meta">{{ group.owner.getRole().getName() }}</p>
+                                            <p class="meta">
+                                                {% if group.owner.positionTitle is empty %}
+                                                    {{ group.owner.getRole().getName() }}
+                                                {% else %}
+                                                    {{ group.owner.positionTitle }}
+                                                {% endif %}
+                                            </p>
                                         </div>
                                     </div>
                                     <nav>
