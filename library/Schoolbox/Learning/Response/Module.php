@@ -119,7 +119,13 @@ class Module extends BaseModule
 
         $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $response = $this->getResponseMapperProxy()->findForAssessment($assessment);
+
+            try {
+                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+            }
+            catch (\OutOfBoundsException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
             return [
                 'response' => $response,
