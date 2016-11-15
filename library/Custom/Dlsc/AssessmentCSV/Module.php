@@ -36,7 +36,6 @@ class Module extends BaseModule
      * These pages may be accessed by:
      *
      * * superusers
-     * * staff
      *
      * {@inheritdoc}
      */
@@ -44,10 +43,9 @@ class Module extends BaseModule
     {
         $permissionIndex = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\IsSuperuser()
         );
 
-        $this->addRoutePermission($authorizer, 'generateNightly', $permissionIndex);
         $this->addRoutePermission($authorizer, 'download', $permissionIndex);
     }
 

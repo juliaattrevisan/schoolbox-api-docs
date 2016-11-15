@@ -134,6 +134,10 @@ class Bootstrap implements BootstrapInterface {
 		$this->kernel->setDependencyInjector(new Di\Container(new Di\Factory()));
 		$di = $this->kernel->getDependencyInjector();
 
+        $di->set('database', $di->lazy(function() {
+            return Database::getInstance();
+        }));
+
 		// Configuration
 		$di->set('config', $di->lazyNew(ConfigMapper::class));
 		$di->set('notif', $di->lazy(function () {
