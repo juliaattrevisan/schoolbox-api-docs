@@ -325,7 +325,7 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        $assessments = $this->getAssessmentMapperProxy()->findAllForContext($subject)->sortBy('dueAt', 'asc');
+        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($subject->getId())->sortBy('dueAt', 'asc');
 
         // Grab all the participants
 
