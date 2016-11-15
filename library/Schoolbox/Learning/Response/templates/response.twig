@@ -1,4 +1,13 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
+
+{{ bread.crumbs(
+    ['Learning', routeLookup('learning.getPendingAssessments')],
+    ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
+    [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
+    ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+    ['Inline Grader', null]
+) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
