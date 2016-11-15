@@ -5,19 +5,32 @@
 {% set statusPending    = 'pending'    %}
 {% set statusComplete   = 'complete'   %}
 
+{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) %}
+
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 <script src="/javascript/shared/jquery.toast-timeout.js" type="text/javascript"></script>
 <script src="/javascript/shared/jquery.confirm-dialog.js" type="text/javascript"></script>
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% block title %}
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Status of {{ assessment.title }}</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Status of {{ assessment.title }}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+        {% if routeModify %}
+        <li>
+            <a class="icon-modify" href="{{ routeModify }}">Modify</a>
+        </li>
+        {% endif %}
+        {% block headerOptions %}{% endblock %}
+    </ul>
 </div>
-{% endblock %}
 <div class="row">
     <div class="small-12 large-4 columns">
         <ul class="meta">

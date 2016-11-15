@@ -15,17 +15,17 @@
 #}
 {% extends '@learningAssessment/status.twig' %}
 
-{% block title %}
-    <div class="row actions-small-1">
-        <div class="list-item">
-            <div class="small-12 columns">
-                <h1>Status of {{ assessment.title }}</h1>
-            </div>
-        </div>
-        <nav>
-            <a class="icon-class-list" title="Review horizontally" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}"></a>
-        </nav>
-    </div>
+{% block headerOptions %}
+    <li>
+        <a class="icon-class-list" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}">Review horizontally</a>
+    </li>
+    <li class="separator">Bulk Actions</li>
+    <li>
+        <a class="icon-approve" data-mass="publish">Mark visible as reviewed&hellip;</a>
+    </li>
+    <li>
+        <a class="icon-delete" data-mass="discard">Delete visible unreviewed&hellip;</a>
+    </li>
 {% endblock %}
 
 
