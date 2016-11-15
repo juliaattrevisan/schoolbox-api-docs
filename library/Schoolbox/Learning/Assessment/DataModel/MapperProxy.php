@@ -265,8 +265,8 @@ class MapperProxy
 
         // And find all the assessables
         $allFolders  = array_merge($classFolderIds, $groupFolderIds);
-        $assessments = $this->findAllForFolderId($allFolders, ['term' => $term])
-                            ->merge($this->findAllInCourseImplementationForFolderId($allFolders, ['term' => $term]));
+        // Including ones in course implementations
+        $assessments = $this->findAllForFolderId($allFolders, ['term' => $term]);
 
 
         // Also need assessments which this student may not participating in

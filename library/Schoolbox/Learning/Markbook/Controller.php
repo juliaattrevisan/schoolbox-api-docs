@@ -122,11 +122,6 @@ class Controller extends Base
         /** @var Collection|IAssessable[] $assessments */
         $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
 
-        // Also get anything in a unit spec for that folder
-        $assessments->merge(
-            $this->getAssessmentMapperProxy()->findAllInCourseImplementationForFolderId($class->getId())
-        );
-
         // Filter by term
         // TODO perform this filtering on a query level
         $assessments = $assessments->filter(
