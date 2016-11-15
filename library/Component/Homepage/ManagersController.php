@@ -131,7 +131,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                             'PERSON_UID' => $manager->getId(),
                             'PERSON_NAME' => \Scrub::text($name),
                             'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
-                            'PERSON_GROUP' => $manager->getRole()->getName(),
+                            'PERSON_GROUP' => empty($manager->getPositionTitle()) ? $manager->getRole()->getName() : $manager->getPositionTitle(),
                         )
                     );
 

@@ -67,7 +67,6 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         $user->setHideTimetable(!empty($_POST['hide_timetable']));
         $user->setLocalEmail(!empty($_POST['local_email']));
         $user->setUseInternalMail(!empty($_POST['mail_handler']));
-        $user->setWebmail(!empty($_POST['webmail']));
         $user->setSuperuser(isset($_POST['superuser']));
         $user->setEnabled(!empty($_POST['account_enabled']));
         $user->setPositionTitle($_POST['position_title']);
