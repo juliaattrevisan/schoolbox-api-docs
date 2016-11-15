@@ -46,12 +46,15 @@ class Exporter
             INNER JOIN      category AS c ON 
                             c.id = sb.category
             INNER JOIN      categoryCode AS cc ON
-                            cc.categoryID = c.id         
+                            cc.categoryID = c.id
+            WHERE           YEAR(sr.returned) = :currentYear
             ORDER BY        cc.code
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute([
+            'currentYear' => date('Y')
+        ]);
 
         $headings = [
             'student code',
