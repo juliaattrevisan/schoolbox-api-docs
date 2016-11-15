@@ -8,7 +8,9 @@
  * @version     SVN: $Id$
  * 
  */
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 /**
  * Class Plagscan_DocumentMapper
@@ -16,7 +18,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
  */
 class Plagscan_DocumentMapper extends Schoolbox\Mapper
 {
-    /** @var Submission\SubmissionMapper */
+    /** @var SubmissionMapper */
     protected $submissionMapper;
 
 	/**
@@ -31,7 +33,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
-        $this->submissionMapper = new Submission\SubmissionMapper();
+        $this->submissionMapper = SubmissionMapper::getInstance();
 
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}
@@ -40,7 +42,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		$this->hasTable('plagscan_document');
 		$this->hasModel(Plagscan::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('file_id', Submission\SingleFile\Mapper::class, 'id', null, null);
+        $this->joins('student_submission_file_id', SubmissionFileMapper::class, 'id', null, null);
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
@@ -53,7 +55,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	 *
 	 * @param Plagscan_Document $dirtyDocument
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function save($dirtyDocument)
 	{
@@ -118,10 +120,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
      *
      * TODO make this work with multiple files
      *
-     * @param  Submission\Submission $submission
+     * @param  Submission $submission
      * @return Plagscan_Document
      */
-    public function createFromSubmission(Submission\Submission $submission)
+    public function createFromSubmission(Submission $submission)
     {
         $plagMap = Plagscan_DocumentMapper::getInstance();
         return $plagMap->createModel()->setFile($submission);
