@@ -37,7 +37,7 @@ class Controller extends Base
         if (file_exists($filename)) {
             header('Content-Description: File Transfer');
             header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $newFilename . '.csv"');
+            header('Content-Disposition: attachment; filename="' . $newFilename . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
