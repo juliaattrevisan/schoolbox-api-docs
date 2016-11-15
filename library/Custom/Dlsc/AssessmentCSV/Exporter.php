@@ -43,7 +43,7 @@ class Exporter
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
                             sb.id = sr.box_id
-            INNER JOIN      category AS c ON 
+            INNER JOIN      folder AS c ON 
                             c.id = sb.category
             INNER JOIN      categoryCode AS cc ON
                             cc.categoryID = c.id
