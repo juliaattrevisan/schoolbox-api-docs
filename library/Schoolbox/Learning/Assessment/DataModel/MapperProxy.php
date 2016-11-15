@@ -186,9 +186,13 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        $params         = $this->convertOptionsToColumnList($options);
-        $params['f.id'] = $folderId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findAllForFolderId(
+                $folderId,
+                $this->convertOptionsToColumnList($options),
+                $options
+            )
+        );
     }
 
     /**

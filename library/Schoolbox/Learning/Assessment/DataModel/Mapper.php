@@ -273,6 +273,40 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
         ";
     }
+
+    /**
+     * Retrieves all assessable objects that are in this folder, whether they
+     * are attached directly to this folder or through a course implementation
+     * that is attached to this folder.
+     *
+     * @param int   $folderId
+     * @param array $otherParams
+     * @param array $options
+     * @return Collection|Model[]
+     */
+    public function findAllForFolderId($folderId, $otherParams, $options = [])
+    {
+        // There's no OR support in the predicate builder.
+        // The best I can do is to get all IDs and fetch a union.
+        // TODO replace with an OR through the predicate builder
+        $idQuery = "
+            SELECT DISTINCT a.id
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            LEFT JOIN {$this->getJoinSql('assessment_folder', 'a', 'f')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', 'a', 'ui')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
+            WHERE (f.id = :folderId OR uicf.id = :folderId)
+        ";
+        $idStatement = $this->getDatabase()->prepare($idQuery);
+        $idStatement->execute(['folderId' => $folderId]);
+        $idList = array_column($idStatement->fetchAll(), 'id');
+
+        $params       = $otherParams;
+        $params['id'] = $idList;
+        return $this->findByColumnList($params, $options);
+    }
+
     /**
      * Retrieves a list of assessments, along with their joined objects.
      *
