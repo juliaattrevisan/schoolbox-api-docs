@@ -382,7 +382,7 @@
                 /* Close any datepickers on the page
                  * (this doesn't fire normally because this is an iframe)
                  */
-                var datepickers = $('.hasDatepicker');
+                var datepickers = $('[data-datepicker]');
                 if (datepickers.length !== 0) {
                     $.each(datepickers, function() {
                         $(this).datepicker('hide');
