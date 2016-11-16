@@ -333,18 +333,25 @@ Usages:
                 </fieldset>
                 <fieldset class='content' data-mage="part-unit-select">
                     <legend>3. Units</legend>
-                    <div class="small-12 column{% if not _part3 %} hide" data-mage-collapsed{% else %}"{% endif %} >
+                    <div class="small-12 column{% if 3 != initialStage %} hide" data-mage-collapsed{% else %}"{% endif %} >
                         <div id="importUnits">
-{% if _part3 %}
-                                {% include '@course/unitImportForm.twig' %}
-{% endif %}
+                            {% if 3 == initialStage %}
+                                {% include '@course/unitImportForm.twig' with {
+                                    action:       action,
+                                    courseSpecId: courseSpecId,
+                                    courseImplId: componentId,
+                                    unitsImpls:   unitsImpls,
+                                    componentId:  componentId,
+                                    ownerships:   ownerships
+                                } only %}
+                            {% endif %}
                         </div>
                     </div>
                 </fieldset>
                 <fieldset class='content' data-mage="part-tasks-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importTasks">{# will be populated by ajax #}</div>
+                        <div id="importAssessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <input type="hidden" data-mage-next="none" name="part-tasks-select" value="1" />
                     </div>

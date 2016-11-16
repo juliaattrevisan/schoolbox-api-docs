@@ -1,3 +1,19 @@
+{# Usage:
+    {% include '@course/unitImportResullts.twig' with {
+        action:       string {'import'|'modify'},
+        courseSpecId: int,
+        courseImplId: int|null,
+        units:        array,
+        units[][unitSpecId]: int,
+        units[][unitImplId]: int | null,
+        units[][assessments]: array,
+        units[][assessments][][specId]: int | null,
+        units[][assessments][][implId]: int | null,
+        componentId:  int|null,
+        ownerships:   string
+    } only %}
+#}
+
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
@@ -7,7 +23,7 @@
 <script>
     $(function() {
 
-        var courseWorkStage = $('#importTasks');
+        var courseWorkStage = $('#importAssessments');
 
         courseWorkStage.find('[data-datepicker]')
             .datepicker('option', 'showButtonPanel', true)

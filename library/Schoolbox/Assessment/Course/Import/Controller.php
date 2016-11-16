@@ -274,7 +274,6 @@ class Controller extends Base\Base
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
             'action'       => 'import',
-            'homepages'    => implode(',', array_keys($ownerships)),
             'courseSpecId' => $courseSpecId,
             'componentId'  => $componentId,
             'unitsImpls'   => $unitImpls,
@@ -326,9 +325,11 @@ class Controller extends Base\Base
     public function postUnits()
     {
         $post = $this->getRequest()->post;
+        $action = trim($post["action"]);
         $ownerships = explode(',', $post["ownerships"]);
         $courseSpecId = trim($post["courseSpecId"]);
         $courseImplId = trim($post["courseImplId"]);
+        $componentId = trim($post["componentId"]);
         $units = $post["unit"];
 
         if (empty($ownerships)) {
@@ -403,19 +404,18 @@ class Controller extends Base\Base
             return;
         }
 
-
+        $assessments = null; //TODO
 
 
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
-            'ownerships'     => $post['ownerships'],
-            'homepage'       => $post["homepage"],
-            'courseHomepage' => $post["course_homepage"],
-            'unitDates'      => $post["unit"],
-            'assessmentSpecs'=> $assessmentSpecs,
-            'unitSpecs'      => $specs,
-            'unitImpls'      => $impls,
-            'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import',
+            'action'       => $action,
+            'courseSpecId' => $courseSpecId,
+            'courseImplId' => $courseImplId,
+            'componentId'  => $componentId,
+            'ownerships'   => $post['ownerships'],
+            'assessments'  => $assessments,
+            'submitValue'  => 'modify' == $action ? 'Modify' : 'Import',
         ]);
     }
 
