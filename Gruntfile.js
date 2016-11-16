@@ -30,8 +30,10 @@ module.exports = function(grunt) {
                     'www/javascript/components/fastclick/lib/fastclick.js',
 
                     // jQuery
-                    'www/javascript/components/jquery/jquery.js',
-                    'www/javascript/components/jquery/jquery-migrate.min.js',
+                    'www/javascript/components/jquery/dist/jquery.js',
+
+                    // jQuery Migrate
+                    'www/javascript/components/jquery-migrate/jquery-migrate.min.js',
 
                     // jQuery placeholder shim
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
