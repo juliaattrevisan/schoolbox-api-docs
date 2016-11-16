@@ -192,10 +192,12 @@ class Full
                  */
                 if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
                     $this->getRecombined()->add($currentFeedback);
+
+                    $processedFeedback[] = $currentFeedback->getId();
                 }
             }
         }
-new \Alaress_Probe($processedFeedback);
+
         /* Now sort them with a callback attack
          * Four possible cases to consider:
          *
