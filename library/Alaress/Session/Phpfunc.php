@@ -52,7 +52,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
         // start of with doing whatever the parent wanted to do
         parent::__call('session_start', []);
 
-        if ($_SESSION['id']) {
+        if (!(empty($_SESSION['id']))) {
             // if successful, do no more
             return true;
         }

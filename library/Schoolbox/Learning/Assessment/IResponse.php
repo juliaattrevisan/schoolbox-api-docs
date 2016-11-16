@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 
@@ -96,6 +97,21 @@ interface IResponse
      * @return $this
      */
     public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
+
+    /**
+     * Get the datetime at which this response was submitted.
+     * This is NOT the creation date; it's the date at which this transitioned from "draft" to "submitted".
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getSubmittedAt();
+
+    /**
+     * THIS MEANS "IS NOT DRAFT"
+     *
+     * @return bool
+     */
+    public function isSubmitted();
 
     /**
      * Get the IAssessable to which this IResponse belongs

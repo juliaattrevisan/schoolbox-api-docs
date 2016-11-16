@@ -51,6 +51,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         $assessment->setResponses((new Collection())->add($response1));
 
         $participant = new Participant($student, $assessment);
+        $participant->getAllResponses()->merge($assessment->getResponses());
 
         /* Compare these
          */
@@ -89,6 +90,8 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         );
 
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->merge($assessment->getResponses());
+        $participant->getAllFeedbacks()->merge($assessment->getFeedbacks());
 
         /* Compare these
          */
@@ -137,6 +140,8 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         );
 
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->merge($assessment->getResponses());
+        $participant->getAllFeedbacks()->merge($assessment->getFeedbacks());
 
         /* Compare these
          */
@@ -206,6 +211,8 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         );
 
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->merge($assessment->getResponses());
+        $participant->getAllFeedbacks()->merge($assessment->getFeedbacks());
 
 
         /* Compare these
@@ -302,6 +309,8 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
         );
 
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->merge($assessment->getResponses());
+        $participant->getAllFeedbacks()->merge($assessment->getFeedbacks());
 
         /* Compare these
          *

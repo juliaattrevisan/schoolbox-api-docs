@@ -16,7 +16,7 @@ use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class AbstractFeedback implements IFeedback
+abstract class AbstractFeedback implements IFeedback
 {
     use Id;
     use CreatedAtDate;

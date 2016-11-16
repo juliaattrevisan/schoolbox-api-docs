@@ -17,7 +17,7 @@ use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class AbstractResponse implements IResponse
+abstract class AbstractResponse implements IResponse
 {
     use Id;
     use CreatedAtDate;
@@ -153,6 +153,22 @@ class AbstractResponse implements IResponse
     {
         $this->submittedBy = $submittedBy;
         return $this;
+    }
+
+    /**
+     * This response is submitted (no longer a draft)
+     *
+     * @return bool
+     */
+    public function isSubmitted()
+    {
+        /* If it's a nulldate instance, it's not submitted
+         */
+        if ($this->getSubmittedAt() instanceof \Alaress_Date_NullDate) {
+            return false;
+        }
+
+        return $this->getSubmittedAt() !== null;
     }
 
     /**
