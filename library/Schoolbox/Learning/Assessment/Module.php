@@ -189,9 +189,6 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        // TODO evaluate the necessity of this expensive call here
-//        $this->loadParticipantsIntoAssessment($a);
-
         // set the controller
         $this->setControllerFromAssessment($a);
 
@@ -199,24 +196,6 @@ class Module extends BaseModule
             'assessment' => $a
         ];
     }
-
-//    /**
-//     * Recursive function for loading participation
-//     * TODO put this in the mapper
-//     *
-//     * @param IAssessable $a
-//     */
-//    private function loadParticipantsIntoAssessment(IAssessable $a)
-//    {
-//        $a->setAllParticipants($this->getParticipantMapperProxy()->findForAssessment($a));
-//
-//        if ($a instanceof Project) {
-//            foreach ($a->getAssessables() as $b) {
-//                // recurse
-//                $this->loadParticipantsIntoAssessment($b);
-//            }
-//        }
-//    }
 
     /**
      * @inheritdoc
