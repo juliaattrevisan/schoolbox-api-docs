@@ -1,8 +1,21 @@
+{# Usage:
+    {% include '@course/courseListResult.twig' with {
+         courseSpec:  CourseSpecification,
+         folder:      Folder,
+         component:   ComponentInstance | null,
+         cparents:    Folder[]
+         hasTot:      bool,
+         currentUser: User
+    } only %}
+#}
+
 {% set cparents = lineage[course.id] %}
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 {% set linkhref =
     folder.id
-        ? routeLookup('courseImport.getImportForm', { courseSpecId: course.id, classCode: folder.id, componentId: component.id })
+        ? (component.id > 0
+            ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: course.id, classCode: folder.id, componentId: component.id })
+            : routeLookup('courseImport.getImportToClassForm', { courseSpecId: course.id, classCode: folder.id }))
         : routeLookup('course.modifyCourse', { id: course.id })
 %}
 
@@ -11,7 +24,6 @@
     {% else %}
 <li class="actions-small-1">
     {% endif %}
-
     <div class="list-item">
         <div class="compact card small-12">
             <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.folder.name }}" data-component-id="{{ component.id }}">
