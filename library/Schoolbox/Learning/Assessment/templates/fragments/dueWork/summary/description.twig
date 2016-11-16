@@ -9,10 +9,29 @@
     {% endif %}
 </ul>
 
-{% if assessment.description|length %}
-<section class="content">
-    <article>
-        {{ assessment.description | purify }}
-    </article>
+<section>
+    {% if assessment.description|length %}
+        <article class="content">
+            {{ assessment.description | purify }}
+        </article>
+    {% endif %}
+
+    {# Attached files
+     #}
+    {% if assessment.attachedFiles|length %}
+        <ul class="information-list">
+            {% for currentFile in assessment.attachedFiles %}
+                <li>
+                    <div class="list-item">
+                        <div class="compact card small-12">
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <h3>{{ currentFile.filename }}</h3>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </section>
-{% endif %}

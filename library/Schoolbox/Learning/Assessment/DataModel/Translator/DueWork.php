@@ -77,6 +77,7 @@ class DueWork implements IAssessmentTypeTranslator
                     (new StorageModel())
                         ->setHash($file->getHash())
                         ->setFilename($file->getFilename())
+                        ->setExtension($file->getExtension())
                 );
             }
 
@@ -138,8 +139,8 @@ class DueWork implements IAssessmentTypeTranslator
             foreach ($model->getAttachments() as $attachment) {
                 $assessable->getAttachedFiles()->add(
                     (new DueWorkFile())
-                        ->setHash($attachment->getHash())
-                        ->setFilename($attachment->getBasename())
+                        ->setFilename($attachment->getFilename())
+                        ->setStorage($attachment)
                 );
             }
 

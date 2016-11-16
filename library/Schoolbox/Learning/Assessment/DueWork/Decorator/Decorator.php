@@ -111,7 +111,7 @@ class Decorator implements DecoratorInterface
             foreach ($attachments as $file) {
                 $newList->add(
                     (new DueWorkFile())
-                        ->setHash($file->getHash())
+                        ->setStorage($file)
                         ->setFilename($file->getBasename())
                 );
             }
