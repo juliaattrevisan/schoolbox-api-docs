@@ -189,7 +189,7 @@ class DataSource
          */
         if ($includeFeedbacks) {
             foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-                if ($user === null || ($user instanceof User) && ($feedback->hasReviewee($user))) {
+                if ($user === null || ($user instanceof User) && ($feedback->isReviewedFor($user))) {
                     $feedbackUser = $feedback->getReviewee();
 
                     // Find participant, creating if required

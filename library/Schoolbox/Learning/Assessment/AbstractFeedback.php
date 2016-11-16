@@ -111,7 +111,7 @@ abstract class AbstractFeedback implements IFeedback
      * @param User $user
      * @return bool
      */
-    public function hasReviewee(User $user)
+    public function isReviewedFor(User $user)
     {
         return $this->getReviewee()->getId() == $user->getId();
     }
