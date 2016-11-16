@@ -113,16 +113,9 @@ class DataSource
                 if ($term->contains($assessment->getDueAt())) {
 
                     // Grab requested participant with their feedback
-
-                    $assessment->setAllParticipants(
-                        new Collection([
-                            $this->participantDataSource->findForAssessmentAndUser($assessment, $user, false, true)
-                        ])
-                    );
+                    $this->participantDataSource->findForAssessment($assessment, $user, false, true);
 
                     // Add to return array
-
-
                     $returnAssessments->add($assessment);
                 }
             }
