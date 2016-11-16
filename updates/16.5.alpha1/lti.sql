@@ -148,3 +148,51 @@ INSERT INTO component_definition (
   'true',
   'true'
 );
+
+INSERT INTO component_config_definition (
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT id from component_definition WHERE class = 'Schoolbox\\LTI\\Component\\Homepage\\Controller' LIMIT 1),
+  'componentname',
+  'Learning Activity',
+  'Heading',
+  null
+);
+
+INSERT INTO component_config_definition (
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT id from component_definition WHERE class = 'Schoolbox\\LTI\\Component\\Homepage\\Controller' LIMIT 1),
+  'ltiprovider',
+  'Provider',
+  'LTI Provider',
+  null
+);
+
+CREATE TABLE lti_provider
+(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255),
+  `key` VARCHAR(255),
+  secret VARCHAR(255),
+  url VARCHAR(255),
+  created_at TIMESTAMP,
+  updated_at DATETIME,
+  deleted_at DATETIME
+);
+
+-- Some providers for testing
+
+INSERT INTO lti_provider (name, `key`, secret, url, created_at, updated_at, deleted_at) VALUES ('ChemVantage', 'schoolbox.edu', '14e75b9de5f8981e3b63a493d4bd7608', 'https://www.chemvantage.org/lti/', '2016-11-16 13:42:33', null, null);
+INSERT INTO lti_provider (name, `key`, secret, url, created_at, updated_at, deleted_at) VALUES ('Trello', null, null, 'https://www.edu-apps.org/tool_redirect?id=trello', '2016-11-16 13:50:48', null, null);
+INSERT INTO lti_provider (name, `key`, secret, url, created_at, updated_at, deleted_at) VALUES ('Programr', null, null, 'https://www.edu-apps.org/tool_redirect?id=programr', '2016-11-16 14:32:47', null, null);
+INSERT INTO lti_provider (name, `key`, secret, url, created_at, updated_at, deleted_at) VALUES ('Internet Archive', null, null, 'https://www.edu-apps.org/tool_redirect?id=archive', '2016-11-16 14:01:13', null, null);
+INSERT INTO lti_provider (name, `key`, secret, url, created_at, updated_at, deleted_at) VALUES ('Nearpad', '377350aa168a23bc20c98f15ab94ca09', 'ccfc8e5c8483a1dcabb6f4e00c0e5c57', 'https://np1.nearpod.com/lti.php', '2016-11-16 14:22:26', null, null);

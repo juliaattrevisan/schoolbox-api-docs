@@ -562,6 +562,9 @@ class Bootstrap implements BootstrapInterface {
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
+        // LTI Provider mapper
+        $di->set('providerMapper', $di->lazyNew(\Schoolbox\LTI\Provider\Mapper::class));
+
         // Register External_Class service
         $di->set('externalClass', $di->lazyNew(\External_Class::class));
 
