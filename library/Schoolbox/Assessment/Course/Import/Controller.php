@@ -130,28 +130,32 @@ class Controller extends Base\Base
      */
     protected function getImportForm(CourseSpecification $courseSpec, Folder $targetClass = null, $componentId)
     {
-        // Ensure that if present, the component instance is valid
+        // Ensure that if present, the component instance is an extant CourseOutline
+        $courseOutlineComponent = null;
         if($componentId){
             try{
-                \Component_InstanceMapper::getInstance()->findById($componentId);
+                $courseOutlineComponent = \Component_InstanceMapper::getInstance()->findById($componentId);
+                $COURSE_OUTLINE_DEFINITION_ID = 66;
+                if($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID){
+                    $msg = 'Not a CourseOutline component';
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
+                }
             } catch (MapperException $e){
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
         }
 
         $context = [
-            'action'       => 'import',
-            'stage'        => $courseSpec && $targetClass ? 2 : 1,
-            'courseSpec'   => $courseSpec,
-            'componentId'  => $componentId,
-            'destinations' => $targetClass ?
+            'action'        => 'import',
+            'initial-stage' => $courseSpec && $targetClass ? 2 : 1,
+            'courseSpec'    => $courseSpec,
+            'component'     => $courseOutlineComponent,
+            'destinations'  => $targetClass ?
                 [
                     'id'   => $targetClass->getId(),
                     'name' => $targetClass->getTitle()
                 ] : [],
         ];
-
-        var_dump($context); die();
 
         $this->tpl('import', $context);
     }
