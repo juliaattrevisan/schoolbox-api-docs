@@ -92,8 +92,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         foreach($this->assessments as $assessment){
             if ($assessment instanceof Task) {
                 try {
-                    $participant = $this->participantMapper->findForAssessmentAndUser($assessment, $this->getUser());
-                    $assessment->getAllParticipants()->add($participant);
+                    $this->participantMapper->findForAssessment($assessment, $this->getUser());
                 } catch (\OutOfBoundsException $e) {
                     // noop
                 }
