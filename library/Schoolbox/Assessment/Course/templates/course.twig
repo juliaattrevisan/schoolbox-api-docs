@@ -51,6 +51,8 @@
                     {% include 'sub/selectorShard.twig' with {
                             'formLabel': 'Faculty / Subject',
                             'formInputName': 'parent',
+                            'formInputValue': course.id,
+                            'formInputLabel': course.folder.name,
                             'folder': course.folder.parent,
                             'activator': 'data-course-selector',
                             'title': 'Click to change the faculty / subject this course belongs to'
