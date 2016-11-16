@@ -208,14 +208,14 @@ class DataSource
         if ($returnResponses) {
             foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
                 if ($response->getSubmittedOnBehalfOf()->getId() == $user->getId()) {
-                    $participant->getAllResponses()->add($response);
+                    $participant->getAllResponses()->setOffset($response->getId(), $response);
 
                     /* Also add it to the assessment instance
                      *
                      * This allows us to build an entire history of Responses and Feedbacks
                      * for everyone, or just for a particular person
                      */
-                    $assessment->getResponses()->add($response);
+                    $assessment->getResponses()->setOffset($response->getId(), $response);
                 }
             }
         }
@@ -239,7 +239,7 @@ class DataSource
                         foreach ($participant->getAllResponses() as $response) {
                             // For now assume that the types of response and feedback match
                             if ($stubResponseId == $response->getId()) {
-                                $response->getAllFeedback()->add($feedback);
+                                $response->getAllFeedback()->setOffset($feedback->getId(), $feedback);
                                 $feedback->setResponse($response);
                                 break;
                             }
@@ -251,7 +251,7 @@ class DataSource
                      * This allows us to build an entire history of Responses and Feedbacks
                      * for everyone, or just for a particular person
                      */
-                    $assessment->getFeedbacks()->add($feedback);
+                    $assessment->getFeedbacks()->setOffset($feedback->getId(), $feedback);
                 }
             }
         }

@@ -112,6 +112,13 @@ class Module extends BaseModule
             $this->loadParticipantsIntoAssessment($assessment);
             $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
 
+//
+//            $participant = $assessment->getParticipant($student);
+//new \Alaress_Probe(
+////    $assessment->getParticipant(\Schoolbox\UserMapper::getInstance()->findById(230))->getAllResponses(),
+//    $assessment->getParticipant(\Schoolbox\UserMapper::getInstance()->findById(230))->getAllFeedbacks()
+//);
+
             return [
                 'participant' => $participant,
             ];
