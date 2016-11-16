@@ -132,9 +132,11 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @param User $user
-     * @return Collection|Participant[]
+     * @param bool $includeResponses
+     * @param bool $includeFeedbacks
+     * @return Collection|\Schoolbox\Learning\Assessment\Participant[]
      */
-    public function findForAssessment(IAssessable $assessment, User $user = null)
+    public function findForAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
         // Build a participant list
         $participants = new Collection();
@@ -156,21 +158,23 @@ class DataSource
          *
          * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
          */
-        foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-            if ($user === null || ($user instanceof User) && ($response->hasAuthor($user))) {
-                $responseUser = $response->getSubmittedOnBehalfOf();
+        if ($includeResponses) {
+            foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
+                if ($user === null || ($user instanceof User) && ($response->hasAuthor($user))) {
+                    $responseUser = $response->getSubmittedOnBehalfOf();
 
-                // Find participant, creating if required
-                try {
-                    $responseParticipant = $assessment->getParticipant($responseUser);
+                    // Find participant, creating if required
+                    try {
+                        $responseParticipant = $assessment->getParticipant($responseUser);
 
-                } catch (\UnexpectedValueException $e) {
-                    // Not a participant: add them
-                    $responseParticipant = new Participant($responseUser, $assessment);
-                    $assessment->getAllParticipants()->add($responseParticipant);
+                    } catch (\UnexpectedValueException $e) {
+                        // Not a participant: add them
+                        $responseParticipant = new Participant($responseUser, $assessment);
+                        $assessment->getAllParticipants()->add($responseParticipant);
+                    }
+
+                    $responseParticipant->getAllResponses()->add($response);
                 }
-
-                $responseParticipant->getAllResponses()->add($response);
             }
         }
 
@@ -183,37 +187,39 @@ class DataSource
          *
          * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
          */
-        foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-            if ($user === null || ($user instanceof User) && ($feedback->hasReviewee($user))) {
-                $feedbackUser = $feedback->getReviewee();
+        if ($includeFeedbacks) {
+            foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
+                if ($user === null || ($user instanceof User) && ($feedback->hasReviewee($user))) {
+                    $feedbackUser = $feedback->getReviewee();
 
-                // Find participant, creating if required
-                try {
-                    $responseParticipant = $assessment->getParticipant($feedbackUser);
+                    // Find participant, creating if required
+                    try {
+                        $responseParticipant = $assessment->getParticipant($feedbackUser);
 
-                } catch (\UnexpectedValueException $e) {
-                    // Not a participant: add them
-                    $responseParticipant = new Participant($feedbackUser, $assessment);
-                    $assessment->getAllParticipants()->add($responseParticipant);
-                }
+                    } catch (\UnexpectedValueException $e) {
+                        // Not a participant: add them
+                        $responseParticipant = new Participant($feedbackUser, $assessment);
+                        $assessment->getAllParticipants()->add($responseParticipant);
+                    }
 
-                // Feedbacks may have a stub response.
-                // If so, use it to find the actual response, and associate them together.
-                $stubResponse = $feedback->getResponse();
-                if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
-                    $stubResponseId = $stubResponse->getId();
+                    // Feedbacks may have a stub response.
+                    // If so, use it to find the actual response, and associate them together.
+                    $stubResponse = $feedback->getResponse();
+                    if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                        $stubResponseId = $stubResponse->getId();
 
-                    foreach ($responseParticipant->getAllResponses() as $response) {
-                        // For now assume that the types of response and feedback match
-                        if ($stubResponseId == $response->getId()) {
-                            $response->getAllFeedback()->add($feedback);
-                            $feedback->setResponse($response);
-                            break;
+                        foreach ($responseParticipant->getAllResponses() as $response) {
+                            // For now assume that the types of response and feedback match
+                            if ($stubResponseId == $response->getId()) {
+                                $response->getAllFeedback()->add($feedback);
+                                $feedback->setResponse($response);
+                                break;
+                            }
                         }
                     }
-                }
 
-                $responseParticipant->getAllFeedbacks()->add($feedback);
+                    $responseParticipant->getAllFeedbacks()->add($feedback);
+                }
             }
         }
 
