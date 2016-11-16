@@ -123,6 +123,8 @@ class Module extends BaseModule
             $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
             try {
+                /* TODO: Severe inefficiency here, it gets data twice.
+                 */
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
             }
             catch (\OutOfBoundsException $e) {
