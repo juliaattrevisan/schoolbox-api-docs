@@ -9,11 +9,12 @@
     {% endif %}
 </ul>
 
-{% if assessment.description|length %}
 <section>
-    <article class="content">
-        {{ assessment.description | purify }}
-    </article>
+    {% if assessment.description|length %}
+        <article class="content">
+            {{ assessment.description | purify }}
+        </article>
+    {% endif %}
 
     {# Attached files
      #}
@@ -34,4 +35,3 @@
         </ul>
     {% endif %}
 </section>
-{% endif %}
