@@ -247,7 +247,7 @@ class Controller extends Base\Base
 
 
     /**
-     * This POST is the result of import stage 2 (not called during import-modify)
+     * This POST is the result of import stage 2 (ie only called during new-import)
      *
      * Receives Assessment ownership selections.
      * Returns a HTML fragment containing a list of unit implementations.
@@ -259,6 +259,7 @@ class Controller extends Base\Base
     {
         $ownerships = $this->getRequest()->post["ownership"];
         $courseSpecId = trim($this->getRequest()->post["courseSpecId"]);
+        $componentId = trim($this->getRequest()->post["componentId"]);
 
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseSpecId);
@@ -272,10 +273,12 @@ class Controller extends Base\Base
         // process ownership assignments
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
-            'homepages'  => implode(',', array_keys($ownerships)),
-            'courseId'   => $courseSpecId,
-            'unitsImpls' => $unitImpls,
-            'ownerships' => implode(',', array_map(
+            'action'       => 'import',
+            'homepages'    => implode(',', array_keys($ownerships)),
+            'courseSpecId' => $courseSpecId,
+            'componentId'  => $componentId,
+            'unitsImpls'   => $unitImpls,
+            'ownerships'   => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
         ]);
@@ -323,12 +326,12 @@ class Controller extends Base\Base
     public function postUnits()
     {
         $post = $this->getRequest()->post;
-        $homepageIds = trim($post["homepages"]);
-        $courseSpecId = trim($post["course_spec_id"]);
-        $courseImplId = trim($post["course_impl_id"]);
+        $ownerships = explode(',', $post["ownerships"]);
+        $courseSpecId = trim($post["courseSpecId"]);
+        $courseImplId = trim($post["courseImplId"]);
         $units = $post["unit"];
 
-        if (empty($homepageIds)) {
+        if (empty($ownerships)) {
             // The homepage IDs have gone missing
             $this->sendError('No class code was specified');
             return;
@@ -340,8 +343,6 @@ class Controller extends Base\Base
             return;
         }
 
-        $homepages = explode(",", $post["homepage"]);
-
         // Test permissions. Must have write permission on the destination page and read permission
         // on the course we are trying to import.
 
@@ -352,7 +353,8 @@ class Controller extends Base\Base
         }
 
         // Test each homepage for write access
-        foreach ($homepages as $homepage) {
+        foreach ($ownerships as $ownership) {
+            $homepage = explode(':', $ownership)[0];
             if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
                 $this->sendError('You do not have permission to import this unit');
             }
@@ -376,18 +378,16 @@ class Controller extends Base\Base
         }
 
         // Build UnitSpec + UnitImpl Assessment Lists
-        $specs = new Collection();
         $impls = new Collection();
 
         foreach ($units as $unit) {
             if($unit['import']){
-                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unit_spec_id']);
+                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unitSpecId']);
                 $spec->setAssessables($this->getAssessmentMapper()->findAllByUnitSpecificationId($spec->getId()));
-                $specs->add($spec);
 
                 // Is this a modification of prior import ?
                 if($courseImplId){
-                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unit_impl_id']);
+                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unitImplId']);
                     $impl->setAssessables($this->getAssessmentMapper()->findAllByUnitImplementationId($impl->getId()));
                 } else {
                     $impl = new UnitImplementation();
