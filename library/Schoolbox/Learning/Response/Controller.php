@@ -9,29 +9,21 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
-use Schoolbox\Learning\Assessment\DueWork\Timeline\ResponsesOnly as Timeline;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
-
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
-use \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\ListFactory as GradeLevelListFactory;
 
 class Controller extends Base
 {
@@ -60,7 +52,7 @@ class Controller extends Base
         $data = [
             'participant' => $participant,
             'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
-            'timeline' => (new Timeline($participant->getAssessable()))->getTimeline(),
+            'timeline' => (new Timeline($participant))->getForTeacher(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));

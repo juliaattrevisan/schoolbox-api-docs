@@ -14,7 +14,8 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Timeline\Full as Timeline;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use \Schoolbox\User;
 
 class TimelineTest extends \PHPUnit_Framework_TestCase
@@ -26,9 +27,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
      */
     public function testEmptyStacks()
     {
-        $assessment = new DueWork();
-
-        $this->assertCount(0, (new Timeline($assessment))->getTimeline());
+        $this->assertCount(0, (new Timeline(new Participant(new User(), new DueWork())))->getForParent());
     }
 
     /**
@@ -38,10 +37,12 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
     public function testOneResponse()
     {
         $assessment = new DueWork();
+        $student = new User();
 
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -49,11 +50,13 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
 
         $assessment->setResponses((new Collection())->add($response1));
 
+        $participant = new Participant($student, $assessment);
+
         /* Compare these
          */
         $expected = (new Collection())->add($response1);
 
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -85,13 +88,15 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
         );
 
+        $participant = new Participant(new User(), $assessment);
+
         /* Compare these
          */
         $expected = (new Collection())
             ->add($response1)
         ;
 
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -131,13 +136,15 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
         );
 
+        $participant = new Participant(new User(), $assessment);
+
         /* Compare these
          */
         $expected = (new Collection())
             ->add($response1)
         ;
 
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -198,6 +205,9 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response3)
         );
 
+        $participant = new Participant(new User(), $assessment);
+
+
         /* Compare these
          */
         $expected = (new Collection())
@@ -205,7 +215,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($response1)
             ->add($response3);
 
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -291,6 +301,8 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($floating3)
         );
 
+        $participant = new Participant(new User(), $assessment);
+
         /* Compare these
          *
          * $response2 2016-11-02 00:00:00
@@ -308,7 +320,7 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($floating3) // 333
             ->add($response3); // 3
 
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $this->assertEquals($expected, $timeline);
     }
@@ -392,6 +404,9 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
             ->add($floating3)
         );
 
+        $participant = new Participant(new User(), $assessment);
+
+
         /* Compare these
          *
          * $response2 2016-11-02 00:00:00
@@ -401,18 +416,11 @@ class TimelineTest extends \PHPUnit_Framework_TestCase
          * $floating3 2016-11-01 00:00:00
          * $response3 2016-10-31 04:34:34
          */
-        $expected = (new Collection())
-            ->add($response2) // 2
-            ->add($response1) // 1
-            ->add($floating2) // 222
-            ->add($floating1) // 111
-            ->add($floating3) // 333
-            ->add($response3); // 3
 
         /* Does nothing - draft submissions and unpublished feedbacks
          * are both ignored by Timeline
          */
-        $timeline = (new Timeline($assessment))->getTimeline();
+        $timeline = (new Timeline($participant))->getForParent();
 
         $expected = new Collection();
 

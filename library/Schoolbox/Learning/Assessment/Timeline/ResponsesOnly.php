@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Timeline;
+namespace Schoolbox\Learning\Assessment\Timeline;
 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 
@@ -20,7 +20,7 @@ class ResponsesOnly extends Full
     protected function recombine()
     {
         /** @var Submission $currentResponse */
-        foreach ($this->getAssessment()->getResponses() as $currentResponse) {
+        foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
             /* Only show Submitted submissions (ignore drafts)
              */
