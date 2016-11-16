@@ -195,7 +195,7 @@ class Full
                 }
             }
         }
-
+new \Alaress_Probe($processedFeedback);
         /* Now sort them with a callback attack
          * Four possible cases to consider:
          *

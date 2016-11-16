@@ -3,7 +3,12 @@
         <a href="/search/user/{{ student.id }}" title="View Profile">
             <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
             <p>{{ student.fullname }}</p>
-            <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
+
+            {% if currentInteraction.isSubmitted %}
+                <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
+            {% else %}
+                <p class="meta">Draft</p>
+            {% endif %}
         </a>
     </div>
 </div>

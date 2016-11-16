@@ -5,7 +5,12 @@
             <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">
                 <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
                 <p>{{ currentFeedback.reviewer.fullname }}</p>
-                <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
+
+                {% if currentFeedback.isPublished %}
+                    <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
+                {% else %}
+                    <p class="meta">Draft</p>
+                {% endif %}
             </a>
         </div>
         <div class="small-12 medium-4 columns text-right">
