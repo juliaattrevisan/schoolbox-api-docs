@@ -52,7 +52,7 @@ class Controller extends Base
         $data = [
             'participant' => $participant,
             'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
-            'timeline' => (new Timeline(new Participant($student, $assessment)))->getTimeline(),
+            'timeline' => (new Timeline($participant))->getForTeacher(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));

@@ -126,7 +126,7 @@ class Controller extends Assessment\Controller
             'participant' => $participant,
             'currentUser' => $this->getUser(),
             'student'     => $student,
-            'timeline'    => (new FullTimeline($participant))->getTimeline(),
+            'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
 
             /* Rubrics data
              */
