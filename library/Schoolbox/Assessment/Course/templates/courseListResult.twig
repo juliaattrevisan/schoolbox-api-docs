@@ -1,22 +1,21 @@
 {# Usage:
     {% include '@course/courseListResult.twig' with {
-         courseSpec:  CourseSpecification,
-         folder:      Folder,
-         component:   ComponentInstance | null,
-         cparents:    Folder[]
-         hasTot:      bool,
-         currentUser: User
+         courseSpec:     CourseSpecification,
+         folder:         Folder,
+         component:      ComponentInstance | null,
+         cparents:       Folder[]
+         hasTot:         bool,
+         currentUser:    User,
+         collapsePrefix: string | null
     } only %}
 #}
-
-{% set cparents = lineage[course.id] %}
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 {% set linkhref =
     folder.id
-        ? (component.id > 0
-            ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: course.id, classCode: folder.id, componentId: component.id })
-            : routeLookup('courseImport.getImportToClassForm', { courseSpecId: course.id, classCode: folder.id }))
-        : routeLookup('course.modifyCourse', { id: course.id })
+        ? (component
+            ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: courseSpec.id, classCode: folder.id, componentId: component.id })
+            : routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id, classCode: folder.id }))
+        : routeLookup('course.modifyCourse', { id: courseSpec.id })
 %}
 
     {% if hasTot %}
@@ -26,9 +25,9 @@
     {% endif %}
     <div class="list-item">
         <div class="compact card small-12">
-            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.folder.name }}" data-component-id="{{ component.id }}">
+            <a href="{{ linkhref }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component.id }}">
                 <div class="icon-course icon-16"></div>
-                <h3>{{ course.folder.name }}</h3>
+                <h3>{{ courseSpec.folder.name }}</h3>
             </a>
             <p class="meta">
                 {{ cparents[0].name }}
@@ -37,9 +36,9 @@
                     {% endfor %}
             </p>
         </div>
-        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ course.id }}">
+        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ courseSpec.id }}">
             <ul class="unit-list">
-                    {% for unit in course.units %}
+                    {% for unit in courseSpec.units %}
                 <li>
                     <div class="tiny card small-12">
                         {% if linkToUnits %}
@@ -54,29 +53,29 @@
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ course.id }}"></a>
+        <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}"></a>
             {% if hasTot %}
-        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.id }}" aria-expanded="false" title="Actions"></a>
+        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
             {% endif %}
     </nav>
 
         {% if hasTot %}
-    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.id }}">
+    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         <li>
-            <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: course.id }) }}" class="icon-download">Import into classes</a>
+            <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id }) }}" class="icon-download">Import into classes</a>
         </li>
         <li>
-            {% if course.folder.hasHomepage %}
-                <a href="/homepage/{{ course.folder.id }}/" class="icon-home">Course Homepage</a>
+            {% if courseSpec.folder.hasHomepage %}
+                <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home">Course Homepage</a>
             {% else %}
-                <a href="/resources/{{ course.folder.id }}/" class="icon-folder">Course Resources</a>
+                <a href="/resources/{{ courseSpec.folder.id }}/" class="icon-folder">Course Resources</a>
             {% endif %}
         </li>
-        <li><a href="{{ routeLookup('course.modifyCourse', {id: course.id}) }}" class="icon-modify">Modify</a></li>
+        <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
 
             {# Course delete: standard folder delete -#}
             {% if currentUser.isSuperuser() %}
-        <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: course.id}) }}" class="icon-delete" data-course-delete-id="{{ course.id }}" data-action="course-delete">Delete</a></li>
+        <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete">Delete</a></li>
             {% endif %}
 
     </ul>
