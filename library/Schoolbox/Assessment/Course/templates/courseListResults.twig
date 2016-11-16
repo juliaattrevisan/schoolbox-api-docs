@@ -5,7 +5,15 @@
             <h3>Suggested Courses</h3>
             <ul class="information-list">
                 {% for course in suggestions %}
-                    {% include '@course/courseListResult.twig' with { collapsePrefix: 'suggest' } %}
+                    {% include '@course/courseListResult.twig' with {
+                        courseSpec:     course,
+                        folder:         folder,
+                        component:      null,
+                        cparents:       lineage[course.id],
+                        hasTot:         hasTot,
+                        currentUser:    currentUser,
+                        collapsePrefix: 'suggest'
+                    } only %}
                 {% endfor %}
             </ul>
         </section>
@@ -18,7 +26,14 @@
             {% endif %}
             <ul class="information-list">
                 {% for course in courses %}
-                    {% include '@course/courseListResult.twig' %}
+                    {% include '@course/courseListResult.twig' with {
+                        courseSpec:  course,
+                        folder:      folder,
+                        component:   null,
+                        cparents:    lineage[course.id],
+                        hasTot:      hasTot,
+                        currentUser: currentUser
+                    } only %}
                 {% endfor %}
             </ul>
         </section>
