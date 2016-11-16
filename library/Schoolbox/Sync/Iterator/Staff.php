@@ -46,6 +46,8 @@ class Staff extends IteratorIterator
         // (copypasted from Adapter->getStaffUserAccountInfo)
         $currentResult = current($preStack);
         $staff         = new User\Staff();
+
+
         $staff
             ->setId($currentResult['staff_id'])
             ->setTitle($currentResult['staff_title'])
@@ -56,7 +58,6 @@ class Staff extends IteratorIterator
             ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
         ;
-
         $staff
             ->getYear()
             ->setLevel($currentResult['staff_year_level'])
@@ -106,15 +107,22 @@ class Staff extends IteratorIterator
             );
         }
         foreach (array_unique($workEmail) as $key => $anEmail) {
-            $currentEmail = new User\Common\Email();
-            $currentEmail->setAddress($anEmail);
-
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addWorkEmail($currentEmail);
             }
         }
 
+        /* Position - one for every item in stack
+         */
+        $position = [];
+        foreach ($preStack as $result) {
+            $position = array_merge(
+                $position,
+                preg_split('/[,;]/', $result['staff_position'])
+            );
+        }
+        $staff->getMeta()->setPosition($position);
         /* Campus
          */
         $campus = new User\Common\Campus();
