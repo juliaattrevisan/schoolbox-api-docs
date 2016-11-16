@@ -327,14 +327,16 @@ function Calendar(id, bubbleId, opts) {
                     // show related entries
                     if(this.checked) {
 
-                        var base = n.match(/^\D+/);
-                        if (base) {
-                            flist[i][1][k++] = n
-                            var ids = n.match(/\d+/g);
-                            if (ids) {
-                                ids.forEach(function(id) {
-                                    selected_classes.push(base + id);
-                                });
+                        if (n !== undefined) {
+                            var base = n.match(/^\D+/);
+                            if (base) {
+                                flist[i][1][k++] = n
+                                var ids = n.match(/\d+/g);
+                                if (ids) {
+                                    ids.forEach(function (id) {
+                                        selected_classes.push(base + id);
+                                    });
+                                }
                             }
                         }
                     }

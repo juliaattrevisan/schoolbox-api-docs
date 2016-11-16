@@ -10,7 +10,6 @@
   "private": true,
   "dependencies": {
     "jquery": "2.1.4",
-    "jquery-migrate": "1.1.1",
     "jquery-ui": "1.12.1",
     "jquery-timepicker-jt": "1.4.13",
     "jquery-validation": "1.11.1",

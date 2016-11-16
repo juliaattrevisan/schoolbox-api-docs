@@ -32,9 +32,6 @@ module.exports = function(grunt) {
                     // jQuery
                     'www/javascript/components/jquery/dist/jquery.js',
 
-                    // jQuery Migrate
-                    'www/javascript/components/jquery-migrate/jquery-migrate.min.js',
-
                     // jQuery placeholder shim
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
 
