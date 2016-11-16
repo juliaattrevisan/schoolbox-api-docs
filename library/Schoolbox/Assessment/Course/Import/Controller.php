@@ -14,6 +14,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\Unit;
@@ -37,6 +38,9 @@ class Controller extends Base\Base
 
     /** @var Unit\SpecificationMapperProxy */
     private $unitSpecificationMapperProxy;
+
+    /** @var Unit\ImplementationMapperProxy */
+    private $unitImplementationMapperProxy;
 
     /** @var FolderMapper */
     private $folderMapper;
@@ -74,18 +78,72 @@ class Controller extends Base\Base
     }
 
     /**
+     * This GET is the start of the import process.
+     *
+     * Import a Course into a CourseOutline Component on a Class page
+     *
+     * @api   GET /course/import/{courseSpecId}/class/{classCode}/{componentId}
+     * @level 160
+     *
+     * @param CourseSpecification $courseSpec
+     * @param Folder              $targetClass
+     * @param int                 $componentId The component instance this action was initiated from
+     */
+    public function getImportToComponentForm(CourseSpecification $courseSpec, Folder $targetClass, $componentId)
+    {
+        // Clean up URL if logical null $componentId supplied
+        if(!$componentId){
+            $data = [
+                'courseSpecId' => $courseSpec->getId(),
+                'classCode'    => $targetClass->getId(),
+            ];
+            $location = $this->getRouter()->generate("courseImport.getImportToClassForm", $data);
+            $this->getResponse()->redirect->to($location);
+            return;
+        }
+
+        $this->getImportForm($courseSpec, $targetClass, $componentId);
+    }
+
+    /**
      * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
      * @api   GET /course/import/{courseSpecId}/class{/classCode}
      * @level 160
      *
      * @param CourseSpecification $courseSpec
-     * @param Folder              $targetClass
+     * @param Folder|null         $targetClass
      */
-    public function getImportForm(CourseSpecification $courseSpec = null, Folder $targetClass = null)
+    public function getImportToClassForm(CourseSpecification $courseSpec, Folder $targetClass = null)
     {
+        $this->getImportForm($courseSpec, $targetClass, null);
+    }
+
+    /**
+     * This GET is the start of the import process. Import a Course into a set of Folders (classes)
+     *
+     * If both a CourseSpec + Folder are specified, populate stages 1 + 2 and jump straight to stage 2.
+     *
+     * @param CourseSpecification $courseSpec Will be null if set to '0' in URL
+     * @param Folder|null         $targetClass
+     * @param int|null            $componentId The component instance this action was initiated from
+     */
+    protected function getImportForm(CourseSpecification $courseSpec, Folder $targetClass = null, $componentId)
+    {
+        // Ensure that if present, the component instance is valid
+        if($componentId){
+            try{
+                \Component_InstanceMapper::getInstance()->findById($componentId);
+            } catch (MapperException $e){
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            }
+        }
+
         $context = [
-            'course'       => $courseSpec,
+            'action'       => 'import',
+            'stage'        => $courseSpec && $targetClass ? 2 : 1,
+            'courseSpec'   => $courseSpec,
+            'componentId'  => $componentId,
             'destinations' => $targetClass ?
                 [
                     'id'   => $targetClass->getId(),
@@ -93,63 +151,11 @@ class Controller extends Base\Base
                 ] : [],
         ];
 
+        var_dump($context); die();
+
         $this->tpl('import', $context);
     }
 
-    /**
-     * This POST is the result of import stage 2
-     *
-     * TODO: replace component ID parameter with course implementation ID?
-     * TODO: figure out how this should work with course specification
-     *
-     * @api   POST /course/import/ownership
-     * @level 160
-     */
-    public function postOwnership()
-    {
-        $ownerships  = $this->getRequest()->post["ownership"];
-        $courseId    = trim($this->getRequest()->post["importCourse"]);
-
-        $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseId);
-
-        // build implementation objects from the specs
-        // this may seem a little redundant, but the "new import" and "modify import" screen are one, and so require consistent data models
-        $unitImplFactory = new Course\Unit\ImplementationFactory();
-
-        $unitImpls = new Collection();
-
-        foreach ($unitSpecs as $spec) {
-            $unitImpls->add($unitImplFactory->build($spec));
-        }
-
-        // process ownership assignments
-        // respond with stage 3: unit selection
-        $this->tpl('unitImportForm', [
-            'homepage' => implode(',', array_keys($ownerships)),
-            'courseHomepage' => $courseId,
-            'units'          => $unitImpls,
-            'ownerships'     => implode(',', array_map(
-                    function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
-            )
-        ]);
-    }
-
-
-    /**
-     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
-     *
-     * @api   GET /course/import/classes
-     * @level 160
-     */
-    public function searchClasses()
-    {
-        $importer = new Import();
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => $importer->findMatchingClasses($this->getRequest()->query->get('query'))
-        ]);
-    }
 
     /**
      * This POST is the result of import stage 1.
@@ -163,10 +169,10 @@ class Controller extends Base\Base
     public function postClasses()
     {
         $targetFolderIds = explode(',', trim($this->getRequest()->post["importFolders"]));
-        $courseId = trim($this->getRequest()->post["importCourse"]);
+        $courseSpecId = trim($this->getRequest()->post["courseSpecId"]);
 
         try {
-            $this->getCourseSpecificationMapperProxy()->findById($courseId);
+            $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($courseSpecId);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -174,7 +180,7 @@ class Controller extends Base\Base
             return;
         }
 
-        if (empty($targetFolderIds) && empty($courseId)) {
+        if (empty($targetFolderIds) && empty($courseSpecId)) {
             // They didn't select anything
 
             $this->sendError('You must select at least one class and a course to import before you can proceed');
@@ -186,7 +192,7 @@ class Controller extends Base\Base
             $this->sendError('You must select at least one class before you can proceed');
             return;
 
-        } elseif (empty($courseId)) {
+        } elseif (empty($courseSpecId)) {
             // They didn't select a course to import
 
             $this->sendError('You must select a course to import before you can proceed');
@@ -211,16 +217,81 @@ class Controller extends Base\Base
         // Everything kosher, proceed with the mage
         // respond with stage 2: ownership
         $this->tpl('import/ownership', [
-            'targetFolders' => $folders,
-            'importCourse' => $courseId,
+            'targetFolders'       => $folders,
+            'courseSpec'          => $courseSpec,
             'ownershipCandidates' => $possibleOwnerships,
         ]);
     }
 
 
     /**
-     * This POST is the result of import stage 3. Retrieve friend with a list of tasks, quizzes
-     * and due work (and relevant date entry boxes) associated with the selected course.
+     * This POST is the result of import stage 2 (not called during import-modify)
+     *
+     * Receives Assessment ownership selections.
+     * Returns a HTML fragment containing a list of unit implementations.
+     *
+     * @api   POST /course/import/ownership
+     * @level 160
+     */
+    public function postOwnership()
+    {
+        $ownerships = $this->getRequest()->post["ownership"];
+        $courseSpecId = trim($this->getRequest()->post["courseSpecId"]);
+
+        // build implementation objects from the specs
+        $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseSpecId);
+        $unitImpls = new Collection();
+        foreach ($unitSpecs as $spec) {
+            $unitImpls->add((new UnitImplementation())
+                ->setTitle($spec->getFolder()->getName())
+                ->setSpecification($spec));
+        }
+
+        // process ownership assignments
+        // respond with stage 3: unit selection
+        $this->tpl('unitImportForm', [
+            'homepages'  => implode(',', array_keys($ownerships)),
+            'courseId'   => $courseSpecId,
+            'unitsImpls' => $unitImpls,
+            'ownerships' => implode(',', array_map(
+                    function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
+            )
+        ]);
+    }
+
+
+    /**
+     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
+     *
+     * @api   GET /course/import/classes
+     * @level 160
+     */
+    public function searchClasses()
+    {
+        $importer = new Import();
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $importer->findMatchingClasses($this->getRequest()->query->get('query'))
+        ]);
+    }
+
+
+    /**
+     * This POST is the result of import stage 3.
+     *
+     * Receives:
+     *  * courseSpecId to import from
+     *  * courseImplId to import to (empty if new import)
+     *  * homepageIds to import to
+     *  * componentId (empty if new import)
+     *  * foreach unitImp
+     *  * * unitSpecId
+     *  * * unitImplId (empty if new import)
+     *  * * whether to import the unitImpl
+     *  * * open + close dates
+     *
+     * Returns a HTML fragment containing a list of Assessments, grouped by UnitImpl
      *
      * @api   POST /course/import/units
      * @level 160
@@ -230,20 +301,22 @@ class Controller extends Base\Base
     public function postUnits()
     {
         $post = $this->getRequest()->post;
+        $homepageIds = trim($post["homepages"]);
+        $courseSpecId = trim($post["course_spec_id"]);
+        $courseImplId = trim($post["course_impl_id"]);
+        $units = $post["unit"];
 
-        if (trim($post["homepage"]) == "") {
-            // The homepage ID has gone missing
+        if (empty($homepageIds)) {
+            // The homepage IDs have gone missing
             $this->sendError('No class code was specified');
             return;
         }
 
-        if (trim($post["course_homepage"]) == "") {
+        if (empty($courseSpecId)) {
             // The course homepage ID has gone missing
             $this->sendError('No course was specified');
             return;
         }
-
-        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['course_homepage']);
 
         $homepages = explode(",", $post["homepage"]);
 
@@ -251,6 +324,7 @@ class Controller extends Base\Base
         // on the course we are trying to import.
 
         // Test course page read access
+        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($courseSpecId);
         if ($this->getAccess()->getFolderAccess($this->getUser(), [$courseSpec->getFolder()->getId()]) < READ_ACCESS) {
             $this->sendError('You do not have permission to import this course');
         }
@@ -262,43 +336,43 @@ class Controller extends Base\Base
             }
         }
 
+        // Validate dates
+        try {
+            foreach($units as $unit){
+                if($unit['import']){
+                    $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                    if ($openDate->gt($closeDate)) {
+                        $this->sendError('The open date must be before the close date');
+                        return;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->sendError('You must specify a valid open and close date for each unit you are importing');
+            return;
+        }
+
+        // Build UnitSpec + UnitImpl Assessment Lists
+        $specs = new Collection();
         $impls = new Collection();
 
-        foreach ($post["unit"] as $unit) {
-            if (empty($unit['import']) || $unit['import'] == 0) {
-                continue;
-            }
-
-            try {
-                // valiDate *puns* XD
-                $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                $dueDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
-                if ($openDate->gt($dueDate)) {
-                    $this->sendError('The open date must be before the close date');
-                    return;
-                }
-            } catch (\Exception $e) {
-                $this->sendError('You must specify a valid open and close date for each unit you are importing');
-                return;
-            }
-
-            try {
-                // TODO in import-modify context, support overlay of implementation assessments over spec
+        foreach ($units as $unit) {
+            if($unit['import']){
                 $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unit_spec_id']);
+                $spec->setAssessables($this->getAssessmentMapper()->findAllByUnitSpecificationId($spec->getId()));
+                $specs->add($spec);
 
-                $spec->setAssessables($this->getAssessmentMapper()->findAllByUnitSpecificationId($unit['unit_spec_id']));
-
-                $impl = new Unit\Implementation();
-                $impl->setOpenDate($openDate)
-                     ->setDueDate($dueDate)
-                     ->setSpecification($spec);
-
-                $impls[] = $impl;
-            } catch (MapperException $e) {
-                $this->sendError($e->getMessage(), array_map(function ($k, $v) { return "$k = $v"; }, array_keys($unit), array_values($unit)));
-                return;
+                // Is this a modification of prior import ?
+                if($courseImplId){
+                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unit_impl_id']);
+                    $impl->setAssessables($this->getAssessmentMapper()->findAllByUnitImplementationId($impl->getId()));
+                } else {
+                    $impl = new UnitImplementation();
+                    $impl->setSpecification($spec);
+                }
+                $impls->add($impl);
             }
-
         }
 
         // Make sure at least one unit was specified
@@ -307,13 +381,18 @@ class Controller extends Base\Base
             return;
         }
 
+
+
+
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
             'ownerships'     => $post['ownerships'],
             'homepage'       => $post["homepage"],
             'courseHomepage' => $post["course_homepage"],
             'unitDates'      => $post["unit"],
-            'units'          => $impls,
+            'assessmentSpecs'=> $assessmentSpecs,
+            'unitSpecs'      => $specs,
+            'unitImpls'      => $impls,
             'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import',
         ]);
     }
@@ -630,6 +709,24 @@ class Controller extends Base\Base
     public function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
     {
         $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return Unit\ImplementationMapperProxy
+     */
+    public function getUnitImplementationMapperProxy()
+    {
+        return $this->unitImplementationMapperProxy;
+    }
+
+    /**
+     * @param Unit\ImplementationMapperProxy $unitImplementationMapperProxy
+     * @return static
+     */
+    public function setUnitImplementationMapperProxy($unitImplementationMapperProxy)
+    {
+        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
         return $this;
     }
 

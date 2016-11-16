@@ -794,7 +794,6 @@ class Controller extends Base\Base
      */
     protected function displayCourseList($template)
     {
-
         $query = $this->getRequest()->query;
 
         $component = $query->get('component');
@@ -833,7 +832,6 @@ class Controller extends Base\Base
 
         if ($folder) {
             $options['folder']['id'] = $folder;
-            $options['component']['id'] = $component ?: "0.0"; // TODO replace: this is a hack to make the old import page work without an explicit component instance ID
         }
 
         $this->tpl($template, array_merge($data, $options));

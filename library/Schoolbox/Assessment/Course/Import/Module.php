@@ -37,6 +37,7 @@ class Module extends \Alaress\Module\Module
             return [
                 'courseSpec'  => $this->getCourseSpec($params['courseSpecId']),
                 'targetClass' => $this->getFolder($params['classCode']),
+                'componentId' => $params['componentId']
             ];
         };
 
@@ -47,8 +48,9 @@ class Module extends \Alaress\Module\Module
             ];
         };
 
-        $this->register('GET', '/{courseSpecId:\d+}/class{/classCode}', 'getImportForm', $staffOnly, $preloadImport);
-        $this->register('GET', '/{courseImplId:\d+}/modify',            'importModify',  $staffOnly, $preloadCourse);
+        $this->register('GET', '/{courseSpecId:\d+}/class/{classCode}/{componentId}', 'getImportToComponentForm', $staffOnly, $preloadImport);
+        $this->register('GET', '/{courseSpecId:\d+}/class{/classCode}', 'getImportToClassForm', $staffOnly, $preloadImport);
+        $this->register('GET', '/{courseImplId:\d+}/modify', 'importModify',  $staffOnly, $preloadCourse);
 
         $this->register('GET',  '/classes',   'searchClasses', $staffOnly);
         $this->register('POST', '/classes',   'postClasses',   $staffOnly);
@@ -79,6 +81,7 @@ class Module extends \Alaress\Module\Module
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
                 'setUnitSpecificationMapperProxy'   => $injector->lazyGet('unitSpecificationDataSource'),
+                'setUnitImplementationMapperProxy'   => $injector->lazyGet('unitImplementationDataSource'),
                 'setFolderMapper'                   => $this->getFolderMapper(),
                 'setCourseSpecificationMapperProxy' => $this->getCourseSpecificationMapperProxy(),
                 'setCourseImplementationMapperProxy' => $this->getCourseImplementationMapperProxy(),
