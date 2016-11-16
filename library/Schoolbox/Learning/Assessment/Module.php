@@ -129,7 +129,13 @@ class Module extends BaseModule
             // obtain the assessment from our other preload
             $assessment  = $this->preloadAssessment($params)['assessment'];
             $student     = $this->getUserMapper()->findById($params['studentId']);
-            $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
+
+            /* Load participant's Responses and Feedbacks
+             */
+            $this->getParticipantMapperProxy()->findForAssessment($assessment, $student);
+
+            /** @var IAssessable $assessment */
+            $participant = $assessment->getParticipant($student);
 
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant
