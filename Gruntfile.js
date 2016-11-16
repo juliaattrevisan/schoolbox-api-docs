@@ -41,8 +41,25 @@ module.exports = function(grunt) {
                     'www/javascript/shared/jquery.validate.extensions.js',
                     'www/javascript/jquery.alaressValidate.js',
 
-                    // jQueryUI
-                    'www/javascript/components/jquery-ui/jquery-ui.js',
+                    // jQuery UI
+                    // dependencies
+                    'www/javascript/components/jquery-ui/ui/version.js',
+                    'www/javascript/components/jquery-ui/ui/plugin.js',
+                    'www/javascript/components/jquery-ui/ui/widget.js',
+                    'www/javascript/components/jquery-ui/ui/data.js',
+                    'www/javascript/components/jquery-ui/ui/disable-selection.js',
+                    'www/javascript/components/jquery-ui/ui/ie.js',
+                    'www/javascript/components/jquery-ui/ui/keycode.js',
+                    'www/javascript/components/jquery-ui/ui/safe-active-element.js',
+                    'www/javascript/components/jquery-ui/ui/safe-blur.js',
+                    'www/javascript/components/jquery-ui/ui/scroll-parent.js',
+                    'www/javascript/components/jquery-ui/ui/widgets/mouse.js',
+                    // interactions
+                    'www/javascript/components/jquery-ui/ui/widgets/draggable.js',
+                    'www/javascript/components/jquery-ui/ui/widgets/resizable.js',
+                    'www/javascript/components/jquery-ui/ui/widgets/sortable.js',
+                    // widgets
+                    'www/javascript/components/jquery-ui/ui/widgets/datepicker.js',
 
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
