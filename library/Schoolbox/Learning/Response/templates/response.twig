@@ -32,10 +32,10 @@
             {% if response.allFiles %}
                 <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                     {% for currentFile in response.allFiles %}
-                        <li class="actions-small-1 {% if currentFile.id == selectedFileId %}selected{% endif %}">
+                        <li class="actions-small-1 {% if currentFile.hash == selectedFileHash %}selected{% endif %}">
                             <div class="list-item">
                                 <div class="card small-12 compact">
-                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?fileId={{ currentFile.id }}" title="{{ currentFile.filename }}">
+                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?hash={{ currentFile.id }}" title="{{ currentFile.filename }}">
                                         <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                         <p>{{ currentFile.filename }}</p>
 

@@ -120,15 +120,16 @@ class Model extends AbstractResponse
     }
 
     /**
-     * Find a file with a particular $id
-     * @param $fileId
+     * Find a file with a particular $hash
+     *
+     * @param $hash
      * @return File\Model
      * @throws \OutOfBoundsException
      */
-    public function findFileById($fileId)
+    public function findFileByHash($hash)
     {
         foreach ($this->getAllFiles() as $currentFile) {
-            if ($currentFile->getId() == $fileId) {
+            if ($currentFile->getHash() == $hash) {
                 return $currentFile;
             }
         }

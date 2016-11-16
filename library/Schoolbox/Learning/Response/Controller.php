@@ -61,7 +61,7 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response
      *
-     * Show the specified $_GET['fileId'] in iframe window if it's a crocodoc-compatible
+     * Show the specified $_GET['hash'] in iframe window if it's a crocodoc-compatible
      * file; otherwise display html/audio/video/image contents differently, inline with
      * the dom
      *
@@ -79,7 +79,7 @@ class Controller extends Base
 
         if ($response->getAllFiles()->count()) {
             try {
-                $file = $response->findFileById($this->getRequest()->query['fileId']);
+                $file = $response->findFileByHash($this->getRequest()->query['hash']);
             }
             catch (\OutOfBoundsException $e) {
                 $file = $response->getAllFiles()->first();
@@ -94,7 +94,7 @@ class Controller extends Base
                 'assessment' => $response->getAssessable(),
                 'response' => $response,
                 'attachzone' => (new Zone('feedbackFiles'))->getTwigContext(),
-                'selectedFileId' => $this->getRequest()->query['fileId'],
+                'selectedFileHash' => $this->getRequest()->query['hash'],
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
