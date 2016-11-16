@@ -15,6 +15,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\Unit;
@@ -145,16 +146,20 @@ class Controller extends Base\Base
             }
         }
 
+        $initialStage = $courseSpec && $targetClass ? 2 : 1;
+
         $context = [
-            'action'        => 'import',
-            'initial-stage' => $courseSpec && $targetClass ? 2 : 1,
-            'courseSpec'    => $courseSpec,
-            'component'     => $courseOutlineComponent,
-            'destinations'  => $targetClass ?
+            'action'       => 'import',
+            'initialStage' => $initialStage,
+            'courseSpec'   => $courseSpec,
+            'component'    => $courseOutlineComponent,
+            'folder'       => $targetClass,
+            'destinations' => $targetClass ?
                 [
                     'id'   => $targetClass->getId(),
                     'name' => $targetClass->getTitle()
                 ] : [],
+            'ownershipCandidates' => 2 == $initialStage ? $this->getPossibleOwnerships([$targetClass]) : [],
         ];
 
         $this->tpl('import', $context);
@@ -205,18 +210,7 @@ class Controller extends Base\Base
 
         $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
-        $possibleOwnerships = [];
-
-        foreach ($folders as $folder) {
-            $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
-                $folder, Role::STAFF, UserAccess::ACCESS_WRITE
-            );
-
-            if (count($possibleOwnerships[$folder->getId()]) == 0) {
-                // if nobody else was returned, jam the session user in there.
-                $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
-            }
-        }
+        $possibleOwnerships = $this->getPossibleOwnerships($folders);
 
         // Everything kosher, proceed with the mage
         // respond with stage 2: ownership
@@ -225,6 +219,30 @@ class Controller extends Base\Base
             'courseSpec'          => $courseSpec,
             'ownershipCandidates' => $possibleOwnerships,
         ]);
+    }
+
+    /**
+     * Generate sets of possible owners for a set of Folders.
+     *
+     * @param \Traversable|Folder[] $folders
+     * @return \User[][]|GenericCollection<Collection<User>> indexed by folderId
+     */
+    protected function getPossibleOwnerships($folders)
+    {
+        $possibleOwnerships = new GenericCollection(Collection::class);
+
+        foreach ($folders as $folder) {
+            $usersWithWritePerm = $this->getUserAccessMapper()->findUsersInCategory(
+                $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+            );
+            $possibleOwnerships->setOffset($folder->getId(), $usersWithWritePerm);
+
+            if (count($possibleOwnerships->getOffset($folder->getId())) == 0) {
+                // if nobody else was returned, jam the session user in there.
+                $possibleOwnerships->getOffset($folder->getId())->add($this->getUser());
+            }
+        }
+        return $possibleOwnerships;
     }
 
 
