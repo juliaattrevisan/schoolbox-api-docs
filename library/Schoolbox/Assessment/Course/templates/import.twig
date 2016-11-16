@@ -33,7 +33,7 @@
 
                     {# Have to manually call the change event as it doesn't trigger on scripted value updates #}
 
-                    $('#importCourse').val($(this).attr('data-course-id')).change();
+                    $('#courseSpecId').val($(this).attr('data-course-id')).change();
 
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
 
@@ -52,7 +52,7 @@
                 type:     'GET',
                 dataType: 'json'
             },
-            multiple: true,
+            multiple: {{ componentId ? 'false' : 'true' }},
             value: {{ destinations|json_encode|raw }}
         });
 
@@ -73,7 +73,7 @@
         {
             {# Stage 1 validation #}
 
-            if ($('#importCourse').val())
+            if ($('#courseSpecId').val())
             {
                 if ($('#import-folders').val())
                 {
@@ -282,7 +282,9 @@
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputName': 'importCourse',
+                                'formInputName': 'courseSpecId',
+                                'formInputValue': courseSpec.id,
+                                'formInputLabel': courseSpec.folder.name,
                                 'folder': folder,
                                 'activator': 'data-course-selector',
                                 'title': 'Select Course to import'

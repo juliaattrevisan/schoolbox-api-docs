@@ -34,8 +34,8 @@
 
     {# There were units in the selected course, create import form #}
 
-    <input type="hidden" name="homepage" value="{{ homepage }}"/>
-    <input type="hidden" name="course_homepage" value="{{ courseHomepage }}"/>
+    <input type="hidden" name="homepages" value="{{ homepages }}"/>
+    <input type="hidden" name="course_spec_id" value="{{ courseId }}"/>
     <input type="hidden" name="componentId" value="{{ componentId }}"/>
     <input type="hidden" name="ownerships" value="{{ ownerships }}" />
 
@@ -44,7 +44,7 @@
 
             {# Iterate each unit and create checkbox and dates #}
 
-            {% for unit in units %}
+            {% for unit in unitsImpls %}
                 <li>
                     <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unit.specification.id }}" />
                     <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unit.id }}" />
