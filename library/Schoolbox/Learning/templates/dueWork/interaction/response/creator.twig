@@ -7,7 +7,7 @@
             {% if currentInteraction.isSubmitted %}
                 <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
             {% else %}
-                <p class="meta">Draft</p>
+                <p class="meta">Draft last updated {{ currentInteraction.updatedAt.short }}</p>
             {% endif %}
         </a>
     </div>

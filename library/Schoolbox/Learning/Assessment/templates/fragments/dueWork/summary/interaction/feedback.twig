@@ -8,7 +8,7 @@
                 {% if currentFeedback.isPublished %}
                     <p class="meta">Published {{ currentFeedback.publishedAt.short }}</p>
                 {% else %}
-                    <p class="meta">Draft</p>
+                    <p class="meta">Draft last updated {{ currentFeedback.updatedAt.short }}</p>
                 {% endif %}
             </a>
         </div>
