@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -94,6 +95,28 @@ class DataSource
         $this->cacheForFolder           = new Collection();
     }
 
+
+    /**
+     * Decorator
+     *
+     * Recursive function for loading participation
+     *
+     * This includes records for responses and feedbacks for every participant in $assessment
+     *
+     * @param IAssessable $assessment
+     */
+    public function loadParticipantsIntoAssessment(IAssessable $assessment)
+    {
+        $assessment->setAllParticipants($this->findForAssessment($assessment));
+
+        if ($assessment instanceof Project) {
+            foreach ($assessment->getAssessables() as $currentAssessment) {
+                // recurse
+                $this->loadParticipantsIntoAssessment($currentAssessment);
+            }
+        }
+    }
+
     /**
      * Find all Participants for a given assessment.
      *
@@ -109,7 +132,6 @@ class DataSource
      * @param IAssessable $assessment
      * @return Collection|Participant[]
      */
-
     public function findForAssessment(IAssessable $assessment)
     {
         // Build a participant list
