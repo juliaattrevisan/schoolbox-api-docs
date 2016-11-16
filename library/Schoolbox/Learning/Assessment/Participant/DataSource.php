@@ -160,7 +160,7 @@ class DataSource
          */
         if ($includeResponses) {
             foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-                if ($user === null || ($user instanceof User) && ($response->hasAuthor($user))) {
+                if ($user === null || ($user instanceof User) && ($response->isAuthoredBy($user))) {
                     $responseUser = $response->getSubmittedOnBehalfOf();
 
                     // Find participant, creating if required

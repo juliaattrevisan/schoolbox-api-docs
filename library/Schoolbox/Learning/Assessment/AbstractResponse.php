@@ -122,7 +122,7 @@ abstract class AbstractResponse implements IResponse
      * @param User $user
      * @return bool
      */
-    public function hasAuthor(User $user)
+    public function isAuthoredBy(User $user)
     {
         return $this->getSubmittedOnBehalfOf()->getId() == $user->getId();
     }
