@@ -94,7 +94,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $consumer->name = $provider->getName();
             $consumer->secret = $provider->getSecret();
             $consumer->enabled = true;
-            var_dump($consumer->save());
+            $consumer->save();
 
             $service = new LTI\Service\Service($consumer,
                 $provider->getUrl(),
