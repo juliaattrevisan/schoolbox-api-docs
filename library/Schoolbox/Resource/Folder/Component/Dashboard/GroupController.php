@@ -1,13 +1,13 @@
 <?php
 /**
- * Show a list of the users classes on the dashboard
+ * Show a list of the users groups on the dashboard
  *
  * @author    James Leckie <jleckie@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource\Component\Dashboard;
+namespace Schoolbox\Resource\Folder\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
@@ -40,7 +40,6 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     ) {
         parent::__construct($instance, $user, $sitepage);
         $this->setGroupList(new Collection());
-
     }
 
     /**
@@ -54,9 +53,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
-
         foreach(FolderMapper::getInstance()->findForUser($this->getUser(), false) as $folder) {
-//            new \Alaress_Probe($folder);
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
@@ -66,12 +63,12 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         }
 
         return true;
-
     }
 
     /**
      * @param Collection $classList
      */
+
     public function setGroupList(Collection $groupList)
     {
         $this->groupList = $groupList;
@@ -82,12 +79,13 @@ class GroupController extends Component_Dashboard_ControllerAbstract
      *
      * @return bool
      */
+
     public function renderTemplate($templateHandle)
     {
         if ($this->getGroupList()->count()) {
             return $this->renderTwigTemplate(
                 $templateHandle,
-                '@resource/component/groups.twig',
+                '@folder/Component/groups.twig',
                 [
                     'componentInstanceId' => $this->getInstance()->getId(),
                     'componentClass'      => $this->getComponentName(),
@@ -108,6 +106,4 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     {
         return $this->groupList;
     }
-
-
 }

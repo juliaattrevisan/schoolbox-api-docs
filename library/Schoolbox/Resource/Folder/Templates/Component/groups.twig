@@ -1,9 +1,9 @@
-{% for group in groupList %}!!!
+{% for group in groupList %}
     <div class="columns small-12 medium-6 large-4 left">
         <div class="row">
             <div class="card-new small-12">
                 <a href="/homepage/{{ group.id }}">
-                    <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                    <div class="card-feature-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage.hash %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                 </a>
                 <div class="card-content actions-small-1">
                     <div class="list-item">
