@@ -142,7 +142,7 @@ class Module extends BaseModule
              * TODO: Generate a populated response for now
              */
             $assessment = $this->getAssessmentMapperProxy()->findById(326);
-            $this->getParticipantMapperProxy()->loadParticipantsIntoAssessment($assessment);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
             $response = (new TemporaryResponse())->produceResponse($assessment);
 
             $feedback = null;
