@@ -29,6 +29,7 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
         $this->uses('secret', self::TYPE_STRING);
+        $this->uses('xml', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

@@ -121,4 +121,25 @@ class Model implements ISoftDeletable
     {
         return $this->url;
     }
+
+    /** @var string */
+    protected $xml;
+
+    /**
+     * @param string $xml
+     * @return self
+     */
+    public function setXml($xml)
+    {
+        $this->xml = $xml;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getXml()
+    {
+        return $this->xml;
+    }    
 }
