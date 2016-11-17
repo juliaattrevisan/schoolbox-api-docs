@@ -34,7 +34,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
         if ($id == 0) {
             return $this->createModel()
                         ->setId(0)
-                        ->setName('Root')
+                        ->setName('Top Level')
                         ->setParent($this->createModel()->setId('#'));
         }
 

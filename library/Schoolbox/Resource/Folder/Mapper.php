@@ -892,7 +892,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         if ($id == 0) {
             return $this->createModel()
                         ->setId(0)
-                        ->setName('Root')
+                        ->setName('Top Level')
                         ->setParent($this->createModel()->setId('#'));
         }
 
@@ -1234,7 +1234,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         if ($folderId == 0) {
             return $this->createModel()
                 ->setId(0)
-                ->setName('Root')
+                ->setName('Top Level')
                 ->setParent($this->createModel()->setId('#'));
         }
 
