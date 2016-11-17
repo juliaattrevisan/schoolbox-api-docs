@@ -28,6 +28,7 @@ class Controller extends Base
         $file = fopen($filename, 'w');
         $exporter = new Exporter($this->getDi()->get('database'));
         $exporter->generate($file);
+        fclose($file);
 
         $now = date('Y-m-d-H-i-s');
         $newFilename = "results-{$now}.csv";
@@ -46,9 +47,8 @@ class Controller extends Base
             readfile($filename);
         }
 
-        /* Close the file pointer and delete the temp file
+        /* Delete the temp file
          */
-        fclose($file);
         unlink($filename);
 
         exit();
