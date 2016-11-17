@@ -91,16 +91,18 @@ class Controller extends Base
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
         // Student's subjects
-        // TODO show subjects without folders
         $subjects = [];
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
             if (count($folder->getCodes()) > 0) {
+                // Actual teachers only
                 $teachers = $this->userMapper->findByColumn(
                     'synergy_id',
                     $this->externalClass->getTeacherName($folder->getCodeString())
-                );
+                )->filter(function (User $teacher) {
+                    return $teacher->getRole()->isStaff();
+                });
             }
             $subjects[] = [
                 'teachers' => $teachers,
