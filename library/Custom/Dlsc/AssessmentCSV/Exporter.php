@@ -49,8 +49,8 @@ class Exporter
                             cc.categoryID = c.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
-            WHERE           YEAR(sr.returned) = :currentYear AND 
-                            sb.name LIKE '%[%' AND sb.name LIKE '%]%'
+            WHERE           YEAR(sr.returned) = :currentYear
+                            AND sb.name LIKE '%[%]%'
             ORDER BY        cc.code
         ";
 
