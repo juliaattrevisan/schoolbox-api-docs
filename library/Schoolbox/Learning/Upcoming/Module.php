@@ -99,9 +99,13 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'userMapper'    => $this->getUserMapper(),
-                    'folderMapper'  => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'externalClass' => $this->getInjector()->lazyGet('externalClass'),
+                    'userMapper'            => $this->getUserMapper(),
+                    'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
+                    'externalClass'         => $this->getInjector()->lazyGet('externalClass'),
+                    'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
+                    'participantDataSource' => $injector->lazyGet('participantDataSource'),
+                    'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
                 ]
             )
         );

@@ -14,9 +14,10 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
+use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -53,17 +54,58 @@ class Controller extends Base
     protected $userMapper;
 
     /**
+     * Term data source
+     *
+     * @var TermMapper
+     */
+    protected $termMapper;
+
+    /**
+     * Assessment data source
+     *
+     * @var AssessmentMapperProxy
+     */
+    protected $assessmentDataSource;
+
+    /**
+     * Participant data source
+     *
+     * @var ParticipantDataSource
+     */
+    protected $participantDataSource;
+
+    /**
+     * @var GradeGroup
+     */
+    protected $defaultGradeGroup;
+
+    /**
      * Constructor
      *
      * @param External_ClassInterface $externalClass
      * @param FolderMapper            $folderMapper
      * @param UserMapper              $userMapper
+     * @param TermMapper              $termMapper
+     * @param AssessmentMapperProxy   $assessmentDataSource
+     * @param ParticipantDataSource   $participantDataSource
+     * @param GradeGroup              $defaultGradeGroup
      */
-    public function __construct(External_ClassInterface $externalClass, FolderMapper $folderMapper, UserMapper $userMapper)
-    {
-        $this->externalClass = $externalClass;
-        $this->folderMapper  = $folderMapper;
-        $this->userMapper    = $userMapper;
+    public function __construct(
+        External_ClassInterface $externalClass,
+        FolderMapper $folderMapper,
+        UserMapper $userMapper,
+        TermMapper $termMapper,
+        AssessmentMapperProxy $assessmentDataSource,
+        ParticipantDataSource $participantDataSource,
+        GradeGroup $defaultGradeGroup
+    ) {
+        $this->externalClass         = $externalClass;
+        $this->folderMapper          = $folderMapper;
+        $this->userMapper            = $userMapper;
+        $this->termMapper            = $termMapper;
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->participantDataSource = $participantDataSource;
+        $this->defaultGradeGroup     = $defaultGradeGroup;
     }
 
     /**
@@ -90,6 +132,8 @@ class Controller extends Base
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
+        $term = $this->termMapper->findForDate($date);
+
         // Student's subjects and teachers
         $subjects = [];
         foreach ($this->folderMapper->findForUser($student) as $folder) {
@@ -104,9 +148,20 @@ class Controller extends Base
                     return $teacher->getRole()->isStaff();
                 });
             }
+
+            // Student's grades
+            $assessments = $this->assessmentDataSource->findAllForFolderId($folder->getId(), ['term' => $term]);
+            foreach ($assessments as $assessment) {
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            }
+            // Markbook
+            $markbook = new Markbook($assessments, $this->defaultGradeGroup);
+
+            // Data set
             $subjects[] = [
                 'teachers' => $teachers,
                 'folder'   => $folder,
+                'grade'    => $markbook->getStudentStatistics()[$student->getId()],
             ];
         }
 
