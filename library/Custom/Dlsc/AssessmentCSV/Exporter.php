@@ -43,13 +43,21 @@ class Exporter
             FROM            submission_return AS sr
             INNER JOIN      submission_box AS sb ON
                             sb.id = sr.box_id
+            LEFT JOIN       assessment_folder AS af ON 
+                            af.assessment_id = sb.assessment_id
+            LEFT JOIN       assessment_course_unit_implementation AS acui ON 
+                            acui.assessment_id = sb.assessment_id
+            LEFT JOIN       course_unit_implementation AS cui ON 
+                            cui.course_implementation_id = acui.course_unit_implementation_id
+            LEFT JOIN       course_unit_specification AS cus ON 
+                            cus.id = cui.course_unit_specification_id
             INNER JOIN      folder AS c ON 
-                            c.id = sb.category
-            INNER JOIN      categoryCode AS cc ON
-                            cc.categoryID = c.id
+                            c.id = af.assessment_id OR c.id = cus.folder_id
+            INNER JOIN      folder_code AS cc ON
+                            cc.folder_id = c.id
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
-            WHERE           YEAR(sr.returned) = :currentYear
+            WHERE           YEAR(sr.created_at) = :currentYear
                             AND sb.name LIKE '%[%]%'
                             AND sr.mark != ''
             ORDER BY        cc.code
