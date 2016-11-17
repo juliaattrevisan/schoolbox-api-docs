@@ -113,7 +113,7 @@ class DataSource
         if ($assessment instanceof Project) {
             foreach ($assessment->getAssessables() as $currentAssessment) {
                 // recurse
-                $this->loadParticipationIntoAssessment($currentAssessment);
+                $this->loadParticipationIntoAssessment($currentAssessment, $user);
             }
         }
     }
