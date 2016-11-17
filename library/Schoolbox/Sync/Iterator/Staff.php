@@ -107,6 +107,9 @@ class Staff extends IteratorIterator
             );
         }
         foreach (array_unique($workEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addWorkEmail($currentEmail);
@@ -117,10 +120,9 @@ class Staff extends IteratorIterator
          */
         $position = [];
         foreach ($preStack as $result) {
-            $position = array_merge(
-                $position,
-                preg_split('/[,;]/', $result['staff_position'])
-            );
+            if (!empty($result['staff_position'])) {
+                $position [] = $result['staff_position'];
+            }
         }
         $staff->getMeta()->setPosition($position);
         /* Campus
