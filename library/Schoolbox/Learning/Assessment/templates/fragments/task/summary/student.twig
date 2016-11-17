@@ -17,17 +17,25 @@
     {% if preview.type == 'image' %}
         <img src="{{ preview.fragment }}">
     {% elseif preview.type == 'file' %}
-
-                <section>
-                    <div class="card small-12">
-                        <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
-                            <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="{{ preview.file.mimetype }}" />
-                            <h3>{{ preview.file.filename }}</h3>
-                            <p class="meta">{{ preview.file.size|bytes}}</p>
-                        </a>
-                    </div>
-                </section>
-
+    <section>
+        <div class="card small-12">
+            <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
+                <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="{{ preview.file.mimetype }}" />
+                <h3>{{ preview.file.filename }}</h3>
+                <p class="meta">{{ preview.file.size|bytes}}</p>
+            </a>
+        </div>
+    </section>
+        {% elseif preview.type == 'redirect' %}
+        <section>
+            <div class="card small-12">
+                <a href="{{ assessment.url }}">
+                    <div class="icon-link"></div>
+                    <h3>{{ assessment.title }}</h3>
+                    <p class="meta">{{preview.fragment}}</p>
+                </a>
+            </div>
+        </section>
     {% else %}
         {{ preview.fragment | raw}}
     {% endif %}
