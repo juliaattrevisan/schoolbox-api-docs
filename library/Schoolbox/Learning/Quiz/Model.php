@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -41,11 +42,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';
-
-    const MARK_VISIBILITY_PRIVATE = 0;
-    const MARK_VISIBILITY_STUDENT = 1;
-    const MARK_VISIBILITY_PARENT_STUDENT = 2;
-
 
     /**
     * @var Folder
@@ -172,7 +168,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+            array(AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -183,7 +179,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**

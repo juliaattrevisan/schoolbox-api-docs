@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 
 trait QuizTrait
@@ -33,7 +34,7 @@ trait QuizTrait
     /**
      * @var int
      */
-    protected $markVisibility = Quiz::MARK_VISIBILITY_PRIVATE;
+    protected $markVisibility = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
 
     /**
      * @return int

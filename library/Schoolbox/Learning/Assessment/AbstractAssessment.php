@@ -30,6 +30,10 @@ abstract class AbstractAssessment implements IAssessable
     use UpdatedAtDate;
     use DeletedAtDate;
 
+    const MARK_VISIBILITY_PRIVATE = 0;
+    const MARK_VISIBILITY_STUDENT = 1;
+    const MARK_VISIBILITY_PARENT_STUDENT = 2;
+
     /**
      * @var string
      */
