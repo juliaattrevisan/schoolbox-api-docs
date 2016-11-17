@@ -33,7 +33,7 @@
         {% include '@learningAssessment/outline/unit.twig' %}
         <div class="component-action">
             <section>
-                <a href="/course/import/modify/{{ componentInstance.id }}" class="button">Modify</a>
+                <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}" class="button">Modify</a>
             </section>
         </div>
     {% else %}
