@@ -47,7 +47,7 @@ if (is_numeric($_GET['id'])) {
         }
     }
 
-    if (!$file->getMimeType()->getInline() || $_GET['save'])
+    if (!$file->getMimetype()->getInline() || $_GET['save'])
         $attach = "attachment;";
     else
         $attach = "";

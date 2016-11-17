@@ -57,7 +57,7 @@ if (is_numeric($_GET['id'])) {
 		error(5);
 	}
 
-    if ($_GET['save'])
+    if (!$file->getMimetype()->getInline() || $_GET['save'])
         $attach = "attachment;";
     else
         $attach = "";
@@ -65,7 +65,8 @@ if (is_numeric($_GET['id'])) {
     //send headers
     header("Content-Type: {$file->getMime()}");
     header("Pragma: ");
-    header("Cache-control: ");
+    header("Cache-control: private");
+    header("Content-Ranges: none");
     header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());

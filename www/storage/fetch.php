@@ -17,7 +17,7 @@ try {
         /* @var $resource Schoolbox\Resource\Storage\Model */
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
 
-        if (!$resource->getMimeType()->getInline() || $_GET['save']) {
+        if (!$resource->getMimetype()->getInline() || $_GET['save']) {
             $attach = "attachment;";
         } else {
             $attach = "";

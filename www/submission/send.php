@@ -124,9 +124,16 @@ if (is_numeric($_GET['return'])) {
     }
 }
 
+if (!$file->getMimetype()->getInline() || $_GET['save'])
+    $attach = "attachment;";
+else
+    $attach = "";
+
+
 //send headers (cache-control off stops IE8 from failing to download)
 header ("Pragma: ");
-header ("Cache-control: ");
+header ("Cache-control: private");
+header ("Content-Ranges: none");
 header ("Content-Type: $mime");
 header ("Content-Disposition: $attach filename=\"".$filename."\"");
 

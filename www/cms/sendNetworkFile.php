@@ -41,7 +41,8 @@ if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
         header("Content-Type: application/octet-stream");
 
     header("Pragma: ");
-    header("Cache-control: ");
+    header("Cache-control: private");
+    header("Content-Ranges: none");
     header("Content-Disposition: $attach filename=\"" . $file['realname'] . "\"");
     header("Content-Length: $filesize");
     readfile($filename);
