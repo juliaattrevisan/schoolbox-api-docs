@@ -80,6 +80,7 @@ class Calendar_Api_Factory
                  * Inject config settings, including the calendar_connector id
                  * so it knows from whence it came
                  */
+                /** @var Calendar_Api_EventType_Abstract $implementation */
                 if (class_exists($uniqueImplementation)) {
                     $implementation = new $uniqueImplementation($this->getUser(), $config);
                     $implementation->setConnectorId($config->getId());
