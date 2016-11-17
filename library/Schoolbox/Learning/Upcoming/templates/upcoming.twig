@@ -1,55 +1,60 @@
-<h1>TODO: upcoming work for {{ student.formatName }}</h1>
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+<h1>Upcoming work for {{ student.formatName }}</h1>
 
 {# subject list #}
-{% for subject in subjects %}
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="information-list">
-                    <li>
-                        <div class="list-item">
-                            <div class="small-8 card">
-                                <a href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: currentTerm.code, subjectId: subject.folder.id}) }}" title="View Grades">
-                                    <span class="icon-home icon-32" title="{{ subject.folder.title }}"></span>
-                                    <p>{{ subject.folder.title }}</p>
-                                </a>
-                                <p class="meta">{{ subject.folder.codeString }}</p>
+{% if subjects|length %}
+    <h2 class="subheader">Subjects</h2>
+    {% for subject in subjects %}
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                {% set gradePath = routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: currentTerm.code, subjectId: subject.folder.id}) %}
+                                <div class="small-{{ subject.grade ? 8 : 12 }} card">
+                                    <a href="{{ gradePath }}" title="View Grades">
+                                        <span class="icon-home icon-32" title="{{ subject.folder.title }}"></span>
+                                        <p>{{ subject.folder.title }}</p>
+                                    </a>
+                                    <p class="meta">{{ subject.folder.codeString }}</p>
+                                </div>
+
+                                {% if subject.grade %}
+                                    <div class="small-4 columns no-pad">
+                                        <div class="grade content">
+                                            <a href="{{ gradePath }}">
+                                            <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                {{ subject.grade.weightedMean }}
+                                            </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
+                        </li>
 
-                            {#<div class="small-4 columns no-pad">#}
-                                {#<!-- BEGIN subject_grade -->#}
-                                {#<div class="grade gradient-{SUBJ_GRADEIANT}-bg content">#}
-                                    {#<a href="/submission/allWork/{WORK_USER_ID}/{WORK_TERM}/{SUBJ_CAT_ID}">#}
-                                        {#<span class="gradient-{SUBJ_GRADEIANT}">#}
-                                            {#{SUBJ_GRADE}#}
-                                        {#</span>#}
-                                        {#{SUBJ_TREND_AMT} {SUBJ_TREND_DIR}#}
-                                    {#</a>#}
-                                {#</div>#}
-                                {#<!-- END subject_grade -->#}
-                            {#</div>#}
-                        </div>
-                    </li>
+                        {% for teacher in subject.teachers %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 card">
+                                        <a href="/search/user/{{ teacher.id }}" title="">
+                                            <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
+                                            <p>{{ teacher.formatName }}</p>
+                                        </a>
+                                        <p class="meta">{{ teacher.role.name }}</p>
+                                    </div>
 
-                    {% for teacher in subject.teachers %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 card">
-                                <a href="/search/user/{{ teacher.id }}" title="">
-                                    <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
-                                    <p>{{ teacher.formatName }}</p>
-                                </a>
-                                <p class="meta">{{ teacher.role.name }}</p>
-                            </div>
-
-                        </div>
-                        <nav>
-                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
-                        </nav>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </section>
+                                </div>
+                                <nav>
+                                    <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
+                                </nav>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
+{% endif %}

@@ -169,10 +169,11 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
                 [
-                    'student'    => $student,
-                    'date'       => $date,
-                    'subjects'   => $subjects,
-                    'mailHandle' => $this->getSession()->get('mailhandle'),
+                    'student'     => $student,
+                    'date'        => $date,
+                    'subjects'    => $subjects,
+                    'mailHandle'  => $this->getSession()->get('mailhandle'),
+                    'currentTerm' => $term,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
