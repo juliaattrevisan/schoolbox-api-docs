@@ -45,6 +45,7 @@ class ImportFactory
      * @var array $results[unitSpecId]['assessments']
      * @var IAssessable|null $results[unitSpecId]['assessments'][]['spec']
      * @var IAssessable|null $results[unitSpecId]['assessments'][]['impl']
+     * @todo enforce the return type by using an DTO (data-transfer-object)
      */
     public function build(array $args)
     {

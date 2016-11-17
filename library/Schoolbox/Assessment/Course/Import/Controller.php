@@ -315,7 +315,7 @@ class Controller extends Base\Base
      * @api   POST /course/import/units
      * @level 160
      *
-     * @var array $post
+     * @var $_POST $post
      * @var string $post['action']   {'import'|'modify'}
      * @var int $post['course_spec_id']
      * @var int $post['course_impl_id']
@@ -396,37 +396,8 @@ class Controller extends Base\Base
             $this->sendError('You must specify a valid open and close date for each unit you are importing');
             return;
         }
-//
-//        // Build UnitSpec + UnitImpl Assessment Lists
-//        $impls = new Collection();
-//
-//        foreach ($units as $unit) {
-//            if($unit['import']){
-//                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unitSpecId']);
-//                $spec->setAssessables($this->getAssessmentMapper()->findAllForUnitSpecificationId($spec->getId()));
-//
-//                // Is this a modification of prior import ?
-//                if($courseImplId){
-//                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unitImplId']);
-//                    $impl->setAssessables($this->getAssessmentMapper()->findAllForUnitImplementationId($impl->getId()));
-//                } else {
-//                    $impl = new UnitImplementation();
-//                    $impl->setSpecification($spec);
-//                }
-//                $impls->add($impl);
-//            }
-//        }
 
-        /**
-         * Superimposed data structure of UnitSpecs, UnitImpls, AssessmentSpecs + AssessmentImpls
-         *
-         * @var array[] $unitAssessments
-         * @var UnitSpecification $assessments[]['unitSpec']
-         * @var UnitImplementation|null $assessments[]['unitImpl']
-         * @var array $assessments[]['assessments']
-         * @var IAssessable|null $assessments[]['assessments'][]['spec']
-         * @var IAssessable|null $assessments[]['assessments'][]['impl']
-         */
+
         $factory = new ImportFactory();
         $args = [];
         if('import' == $action) {
@@ -470,13 +441,36 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/tasks
      * @level 160
+     * @var $_POST   $post
+     * @var string   $post['action']                                   {'import' | 'modify'}
+     * @var int      $post['course_spec_id']
+     * @var int|null $post['course_impl_id']
+     * @var int|null $post['component_id']
+     * @var string   $post['ownerships']
+     * @var array    $post['unit']  Indexed by unitSpec.id
+     * @var int      $post['unit'][unitSpecId]['unit_spec_id']
+     * @var int|null $post['unit'][unitSpecId]['unit_impl_id']
+     * @var string   $post['unit'][unitSpecId]['open_date']            UnitImpl's Open Date
+     * @var string   $post['unit'][unitSpecId]['close_date']           UnitImpl's Close Date
+     * @var array    $post['unit'][unitSpecId]['a']                    UnitImpl's Indexed by Assessment.id
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['type']     {'spec' | 'impl'}
+     * @var bool     $post['unit'][unitSpecId]['a'][assId]['checked']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['publish']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['open']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['due']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['date']
      */
-    public function postTasks()
+    public function postAssessments()
     {
+        // Parse form data
         $post = $this->getRequest()->post;
+        $action = trim($post['action']);
+        $courseSpecId = trim($post['course_spec_id']);
+        $courseImplId = trim($post['course_impl_id']);
+        $componentId = trim($post['component_id']);
+        $ownerships = trim($post['ownerships']);
+        $unitSpecs = $post['unit'];
 
-        // $post['unit'][$specId]              contains the information from which to spawn a unit instance
-        // $post['unit'][$specId]['a'][$assId] contains the information from which to spawn an assessment to jam into the instance
 
         $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['course_homepage'])->setUnits(new Collection()); // TODO what the actual fuck
 

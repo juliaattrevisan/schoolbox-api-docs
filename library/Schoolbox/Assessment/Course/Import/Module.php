@@ -52,13 +52,13 @@ class Module extends \Alaress\Module\Module
         $this->register('GET', '/{courseSpecId:\d+}/class{/classCode}', 'getImportToClassForm', $staffOnly, $preloadImport);
         $this->register('GET', '/{courseImplId:\d+}/modify', 'importModify',  $staffOnly, $preloadCourse);
 
-        $this->register('GET',  '/classes',   'searchClasses', $staffOnly);
-        $this->register('POST', '/classes',   'postClasses',   $staffOnly);
-        $this->register('POST', '/ownership', 'postOwnership', $staffOnly);
-        $this->register('POST', '/units',     'postUnits',     $staffOnly);
-        $this->register('POST', '/tasks',     'postTasks',     $staffOnly);
-        $this->register('POST', '/delete',    'importDelete',  $staffOnly);
-        $this->register('POST', '/restore',   'restoreCourse', $staffOnly);
+        $this->register('GET',  '/classes',    'searchClasses',   $staffOnly);
+        $this->register('POST', '/classes',    'postClasses',     $staffOnly);
+        $this->register('POST', '/ownership',  'postOwnership',   $staffOnly);
+        $this->register('POST', '/units',      'postUnits',       $staffOnly);
+        $this->register('POST', '/activities', 'postAssessments', $staffOnly);
+        $this->register('POST', '/delete',     'importDelete',    $staffOnly);
+        $this->register('POST', '/restore',    'restoreCourse',   $staffOnly);
     }
 
     /**
