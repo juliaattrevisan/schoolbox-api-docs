@@ -51,14 +51,6 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
