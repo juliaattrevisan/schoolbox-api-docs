@@ -71,6 +71,22 @@ class Model implements ISoftDeletable
         $this->answers = new GenericCollection(QuizAnswer::class);
     }
 
+    /**
+     * Clears any Answers from the clone, and clones this Question's Solution
+     * @return void
+     */
+    function __clone()
+    {
+        // clear ID
+        $this->id = null;
+
+        // Clear answers
+        $this->setAnswers(new GenericCollection(QuizAnswer::class));
+
+        // Clone Solution to clear its IDs, so subsequent save is INSERT instead of UPDATE
+        $this->setSolution(clone $this->solution);
+    }
+
     /* Getters / Setters
      */
 
