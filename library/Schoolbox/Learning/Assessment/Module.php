@@ -129,7 +129,13 @@ class Module extends BaseModule
             // obtain the assessment from our other preload
             $assessment  = $this->preloadAssessment($params)['assessment'];
             $student     = $this->getUserMapper()->findById($params['studentId']);
-            $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
+
+            /* Load participant's Responses and Feedbacks
+             */
+            $this->getParticipantMapperProxy()->findForAssessment($assessment, $student);
+
+            /** @var IAssessable $assessment */
+            $participant = $assessment->getParticipant($student);
 
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant
@@ -183,33 +189,12 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        // TODO evaluate the necessity of this expensive call here
-        $this->loadParticipantsIntoAssessment($a);
-
         // set the controller
         $this->setControllerFromAssessment($a);
 
         return [
             'assessment' => $a
         ];
-    }
-
-    /**
-     * Recursive function for loading participation
-     * TODO put this in the mapper
-     *
-     * @param IAssessable $a
-     */
-    private function loadParticipantsIntoAssessment(IAssessable $a)
-    {
-        $a->setAllParticipants($this->getParticipantMapperProxy()->findForAssessment($a));
-
-        if ($a instanceof Project) {
-            foreach ($a->getAssessables() as $b) {
-                // recurse
-                $this->loadParticipantsIntoAssessment($b);
-            }
-        }
     }
 
     /**

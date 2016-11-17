@@ -166,7 +166,7 @@ class Controller extends Base
         $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
         $assessments = $factory->getPendingAssessments();
 
-        /** @var IAssessable[] $assessmentsToMark */
+        /** @var Collection|IAssessable[] $assessmentsToMark */
         $assessmentsToMark = new Collection();
         foreach($assessments as $assessment){
             if($assessment->numMarkingRequired()){
@@ -272,14 +272,10 @@ class Controller extends Base
 
         $assessments = $this->getAssessmentMapperProxy()->findAllForStudent($student, $term);
         foreach ($assessments as $assessment) {
-            $assessment->setAllParticipants(
-                new Collection([
-                    $this->participantDataSource->findForAssessmentAndUser($assessment, $student, false, true)
-                ])
-            );
+            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
         }
 
-        $folders = new Collection;
+        $folders = new Collection();
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {

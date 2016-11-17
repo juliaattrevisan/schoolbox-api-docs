@@ -1,4 +1,13 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
+
+{{ bread.crumbs(
+    ['Learning', routeLookup('learning.getPendingAssessments')],
+    ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
+    [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
+    ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+    ['Inline Grader', null]
+) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -23,10 +32,10 @@
             {% if response.allFiles %}
                 <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                     {% for currentFile in response.allFiles %}
-                        <li class="actions-small-1 {% if currentFile.id == selectedFileId %}selected{% endif %}">
+                        <li class="actions-small-1 {% if currentFile.hash == selectedFileHash %}selected{% endif %}">
                             <div class="list-item">
                                 <div class="card small-12 compact">
-                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {responseId: response.id}) }}?fileId={{ currentFile.id }}" title="{{ currentFile.filename }}">
+                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                         <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                         <p>{{ currentFile.filename }}</p>
 

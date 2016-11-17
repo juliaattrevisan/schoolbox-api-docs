@@ -192,6 +192,8 @@ class Full
                  */
                 if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
                     $this->getRecombined()->add($currentFeedback);
+
+                    $processedFeedback[] = $currentFeedback->getId();
                 }
             }
         }

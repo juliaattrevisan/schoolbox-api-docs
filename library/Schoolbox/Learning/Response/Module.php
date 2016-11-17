@@ -109,8 +109,9 @@ class Module extends BaseModule
             }
 
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->loadParticipantsIntoAssessment($assessment);
-            $participant = $this->getParticipantMapperProxy()->findForAssessmentAndUser($assessment, $student);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment, $student);
+
+            $participant = $assessment->getParticipant($student);
 
             return [
                 'participant' => $participant,
@@ -119,9 +120,11 @@ class Module extends BaseModule
 
         $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->loadParticipantsIntoAssessment($assessment);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
             try {
+                /* TODO: Severe inefficiency here, it gets data twice.
+                 */
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
             }
             catch (\OutOfBoundsException $e) {
@@ -139,7 +142,7 @@ class Module extends BaseModule
              * TODO: Generate a populated response for now
              */
             $assessment = $this->getAssessmentMapperProxy()->findById(326);
-            $this->loadParticipantsIntoAssessment($assessment);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
             $response = (new TemporaryResponse())->produceResponse($assessment);
 
             $feedback = null;
@@ -208,24 +211,6 @@ class Module extends BaseModule
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );
-    }
-
-    /**
-     * Recursive function for loading participation
-     * TODO put this in the mapper
-     *
-     * @param IAssessable $a
-     */
-    private function loadParticipantsIntoAssessment(IAssessable $a)
-    {
-        $a->setAllParticipants($this->getParticipantMapperProxy()->findForAssessment($a));
-
-        if ($a instanceof Project) {
-            foreach ($a->getAssessables() as $b) {
-                // recurse
-                $this->loadParticipantsIntoAssessment($b);
-            }
-        }
     }
 
     /* Getters / Setters

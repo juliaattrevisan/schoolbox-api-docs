@@ -13,7 +13,7 @@ use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
-use Schoolbox\Learning\Assessment\AssessmentType;
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -84,13 +84,18 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        // Load current user's participant in each Assessment
+        /* Only show participation for tasks, as those can be altered inline
+         * The current user's participation determines state of the task checkbox
+         *
+         * Don't need to load data for any other assessment type (due work, quiz, etc)
+         */
         foreach($this->assessments as $assessment){
-            try{
-                $participant = $this->participantMapper->findForAssessmentAndUser($assessment, $this->getUser());
-                $assessment->getAllParticipants()->add($participant);
-            } catch (\OutOfBoundsException $e) {
-                // noop
+            if ($assessment instanceof Task) {
+                try {
+                    $this->participantMapper->findForAssessment($assessment, $this->getUser());
+                } catch (\OutOfBoundsException $e) {
+                    // noop
+                }
             }
         }
 
