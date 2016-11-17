@@ -79,7 +79,7 @@
                 {% set pTooltip         = '' %}
 
                 {% block config %}
-                <li data-status="{{ pStatusClass }}">
+                <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
                     {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
                     <div class="small-12 column">
                         <div class="row actions-small-{{ pActionCount }}">
@@ -102,10 +102,10 @@
                                 <nav>
                                     {%- spaceless %}
                                         {% if pActionResponses %}
-                                            <a class="icon-task" href="{{ pActionResponses }}"></a>
+                                            <a class="icon-task" href="{{ pActionResponses }}" title="View feedback overview for {{ participant.user.firstName }}"></a>
                                         {% endif %}
                                         {% if pActionSummary %}
-                                            <a class="icon-history" href="{{ pActionSummary }}"></a>
+                                            <a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history"></a>
                                         {% endif %}
                                     {% endspaceless -%}
                                 </nav>
