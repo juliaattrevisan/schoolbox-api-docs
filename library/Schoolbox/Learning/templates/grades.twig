@@ -75,7 +75,7 @@
 
                             </div>
                             <nav>
-                                <a href="/mail/createMail.php?replyto={{ teacher.email }}" class="icon-email" title="Mail"></a>
+                                <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
                             </nav>
                         </li>
                     {% endfor %}

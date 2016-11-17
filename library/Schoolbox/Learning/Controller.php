@@ -305,7 +305,8 @@ class Controller extends Base
             'term'          => $term,
             'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'       => $folders,
-            'markbooks'     => $markbooks
+            'markbooks'     => $markbooks,
+            'mailHandle'    => $this->getSession()->get('mailhandle'),
         ]));
     }
 
