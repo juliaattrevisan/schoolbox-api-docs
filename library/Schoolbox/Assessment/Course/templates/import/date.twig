@@ -1,11 +1,11 @@
 {#
-    inputPrefix:      a prefix to include on each input
-    assessmentId:     the ID of the assessment in question
-    assessmentDate:   assessment date object to work with
-    unitDate:         unit date object to fall back to
-    dateProperty:     the name of the property on the object
-    dateLabel:        the human-readable label to use
-    dateSyncProperty: the end-date to sync to
+    inputPrefix:      string - a prefix to include on each input
+    assessmentId:     int    - the ID of the assessment in question
+    assessmentDate:   ADF    - assessment date object to work with
+    unitDate:         ADF    - unit date object to fall back to
+    dateProperty:     string - the name of the property on the object
+    dateLabel:        string - the human-readable label to use
+    dateSyncProperty: string - the end-date to sync to
 #}
 
 {% if not inputPrefix %}{% set inputPrefix = 'a' %}{% endif %}
