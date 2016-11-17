@@ -36,7 +36,7 @@ if (is_numeric($_GET['delete'])) {
             error(5);
         }
 
-        if (!$file->getMimetype()->getInline() || $_GET['save'])
+        if (!$file->getStorage()->getMimetype()->getInline() || $_GET['save'])
             $attach = "attachment;";
         else
             $attach = "";
