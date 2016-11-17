@@ -31,18 +31,18 @@ PRIMARY KEY (`name`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
 -- These are the top menu items for Schoolbox
 
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (1, 'Classes', 'Classes', 'CLASSES', 'teacher', '/learning/classes', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (2, 'Submissions', 'Submissions', 'SUBMISSION', 'due-work', '/submission/dueWork', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (3, 'Timetable', 'Timetable', 'TIMETABLE', 'timetable', '/timetable', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (4, 'Calendar', 'Calendar', 'CALENDAR', 'calendar', '/calendar/week', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (5, 'News', 'News', 'NEWS', 'news', '/news', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (6, 'Webmail', 'Webmail', null, 'email', 'http://www.gmail.com', '_blank', null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (1, 'Access all your class information', 'Classes', 'CLASSES', 'teacher', '/learning/classes', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (2, 'Access your due work', 'Submissions', 'SUBMISSION', 'due-work', '/submission/dueWork', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (3, 'View your school timetable', 'Timetable', 'TIMETABLE', 'timetable', '/timetable', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (4, 'School calendar events', 'Calendar', 'CALENDAR', 'calendar', '/calendar/week', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (5, 'Current school news', 'News', 'NEWS', 'news', '/news', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (6, 'Access your messages here', 'Webmail', null, 'email', 'http://www.gmail.com', '_blank', null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (7, 'Grades', 'Grades', 'GRADE', 'approve', '/submission/allWork', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (8, 'Courses', 'Courses', 'COURSE', 'course', '/course/list', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (9, 'Resources', 'Resources', 'RESOURCES', 'folder', '/resources/', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (10, 'ePortfolio', 'ePortfolio', 'EPORTFOLIO', 'eportfolio', '/eportfolio/[ID]/profile', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (11, 'My Files', 'My Files', 'MYFILES', 'files', '/my-files/', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (12, 'Drives', 'Drives', 'NETWORK', 'network', '/drives/', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (8, 'View and build new courses', 'Courses', 'COURSE', 'course', '/course/list', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (9, 'Browse resources and homepage', 'Resources', 'RESOURCES', 'folder', '/resources/', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (10, 'Access your eportfolio area', 'ePortfolio', 'EPORTFOLIO', 'eportfolio', '/eportfolio/[ID]/profile', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (11, 'Access your files', 'My Files', 'MYFILES', 'files', '/my-files/', null, null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (12, 'Access your school network files', 'Drives', 'NETWORK', 'network', '/drives/', null, null);
 
 INSERT INTO menu_icons (name, title) VALUES ('timetable', 'Clock');
 INSERT INTO menu_icons (name, title) VALUES ('due-work', 'Tray');

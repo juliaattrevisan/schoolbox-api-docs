@@ -29,8 +29,8 @@
                         <label>
                             Section Visibility
                             <select name="visible">
-                                <option {% if section.visible == 1%}selected{% endif %} value="1">Visible</option>
-                                <option {% if section.visible == 0 %}selected{% endif %} value="0">Hidden</option>
+                                <option value="1">Visible</option>
+                                <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
                             </select>
                         </label>
                     </div>

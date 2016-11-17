@@ -21,7 +21,7 @@
                         <div class="grip"></div>
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="/search/user/206">
+                                <a>
                                     <div class="icon-{{ item.icon }} icon-32"></div>
                                     <h3>{{ item.text }}</h3>
                                     <p class="meta">{{ item.title }}</p>
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: ''}) }}{{ item.id }}"></a>
+                            <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: item.id}) }}"></a>
                             <a class="icon-delete" data-delete="{{ item.id }}" title="Delete menu item"></a>
                         </nav>
                     </li>

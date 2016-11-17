@@ -80,6 +80,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
+                'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 'item' => $this->getMenuTopMapper()->findById($id),
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
@@ -151,7 +152,13 @@ class Controller extends Base
         } else {
             $item = new MenuTop();
 
-            $itemOrder = $this->getMenuTopMapper()->findAll()->sortBy('sortOrder', 'desc')->first();
+            $itemOrder = $this->getMenuTopMapper()->findAll([
+                'limit' => 1,
+                'order' => [
+                    'sort_order' => 'DESC'
+                ]
+            ])->first();
+
             $item->setSortOrder($itemOrder->getSortOrder() + 1);
         }
 

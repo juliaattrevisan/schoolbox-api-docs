@@ -2,6 +2,18 @@
     $(function () {
         var form = $('form#itemForm');
 
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
+                }
+            });
+        });
+
         $('[data-cancel]').click(function () {
             window.location.href = '{{ routeLookup('adminMenuTop.getIndex') }}';
             return false;
@@ -71,6 +83,7 @@
                             Destination URL
                             <input name="url" required type="text" placeholder="Destination URL" value="{{ item.url }}">
                         </label>
+                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
                     </div>
                     <div class="small-12 columns">
                         <label>
