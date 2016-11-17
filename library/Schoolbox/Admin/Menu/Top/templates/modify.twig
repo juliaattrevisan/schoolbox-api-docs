@@ -90,8 +90,16 @@
                             Destination Target
                             <select name="target">
                                 <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
-                                <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window
-                                </option>
+                                <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Is This A Webmail Link?
+                            <select name="target">
+                                <option {% if item.webmail == '0' %}selected{% endif %} value="0">No</option>
+                                <option {% if item.webmail == '1' %}selected{% endif %} value="1">Yes</option>
                             </select>
                         </label>
                     </div>

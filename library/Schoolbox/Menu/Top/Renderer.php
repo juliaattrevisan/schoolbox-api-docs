@@ -50,66 +50,11 @@ class Renderer
         // Render this thing out
 
         $tabsRendered = new Collection;
-        $tabs = $this->getMenuTopMapper()->findAll()->sortBy('sortOrder', 'asc');
+
+        $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
 
         /** @var MenuTopModel $tab */
         foreach ($tabs as $tab) {
-            // Check visibility
-
-            // Campuses
-
-            $foundCampus = false;
-
-            $campuses = $this->getMenuTopCampusMapper()->findByColumn('menu_top_id', $tab->getId());
-
-            if ($campuses->count() > 0) {
-
-                /** @var MenuTopCampusModel $campus */
-                foreach ($campuses as $campus) {
-
-                    /** @var \Schoolbox\Campus $userCampus */
-                    foreach ($user->getCampusCollection() as $userCampus) {
-                        if ($campus->getCampusId() == $userCampus->getId()) {
-                            $foundCampus = true;
-                            break;
-                        }
-                    }
-
-                    if ($foundCampus) {
-                        break;
-                    }
-                }
-            }
-
-            // Campus wasn't found, skip to the next tab
-
-            if (!$foundCampus) {
-                continue;
-            }
-
-            // Groups
-
-            $foundGroup = false;
-
-            $roles = $this->getMenuTopRoleMapper()->findByColumn('menu_top_id', $tab->getId());
-
-            if ($roles->count() > 0) {
-
-                /** @var MenuTopRoleModel $role */
-                foreach ($roles as $role) {
-
-                    if ($role->getRoleId() == $user->getRole()->getId()) {
-                        $foundGroup = true;
-                        break;
-                    }
-                }
-
-            }
-
-            if (!$foundGroup) {
-                continue;
-            }
-
             // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
 
             $array_find = [
@@ -131,17 +76,13 @@ class Renderer
             $tab->setUrl(str_ireplace($array_find, $array_replace, $tab->getUrl()));
             $tab->setText(str_ireplace($array_find, $array_replace, $tab->getText()));
             $tab->setTitle(str_ireplace($array_find, $array_replace, $tab->getTitle()));
-
-            // Add the tab to the list that will be rendered
-
-            $tabsRendered->add($tab);
         }
 
         // Render whatever tabs passed muster
 
         return $twig->render('@menuTop/renderer.twig', array(
             'tabCurrent' => $tabCurrent,
-            'tabs' => $tabsRendered
+            'tabs' => $tabs
         ));
     }
 

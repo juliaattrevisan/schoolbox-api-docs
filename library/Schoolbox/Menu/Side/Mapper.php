@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
 
     /**
      * @param \Schoolbox\User $user
+     * @return \Schoolbox\Collection
      */
     public function findNodesForUser($user)
     {
@@ -43,7 +44,7 @@ class Mapper extends BaseMapper
         }
 
         $query = "
-                SELECT *
+                SELECT DISTINCT menu_side.*
                 FROM menu_side
                 INNER JOIN menu_side_campus ON menu_side.id = menu_side_campus.menu_side_id
                 INNER JOIN menu_side_role ON menu_side.id = menu_side_role.menu_side_id
@@ -63,6 +64,7 @@ class Mapper extends BaseMapper
 
     /**
      * @param \Schoolbox\User $user
+     * @return \Schoolbox\Collection
      */
     public function findGroupsForUser($user) {
 

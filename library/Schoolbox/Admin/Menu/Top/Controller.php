@@ -167,6 +167,7 @@ class Controller extends Base
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);
         $item->setTarget($post['target']);
+        $item->setWebmail($post['webmail']);
         $this->getMenuTopMapper()->save($item);
 
         $this->getMenuTopCampusMapper()->deleteByColumn('menu_top_id', $item->getId());
