@@ -20,7 +20,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 class Access
 {
     /**
-     * Checks if a given user has permission to write an event
+     * Checks if a given user has permission to write or modify an event
      *
      * @param User $user
      * @param Event $event
@@ -37,6 +37,7 @@ class Access
             return true;
         }
 
+
         /* If event is on a personal level, check user is the owner or the author
          */
         if ($event->isPersonalLevel()) {
@@ -45,34 +46,46 @@ class Access
             }
         }
 
+
         /* If the event is on a campus level, check if this user
          * is a calendar moderator for one of the campuses selected
          */
         if ($event->isCampusLevel()) {
-            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR)->filterBy('accessLevel', UserAccess::ACCESS_FULL);
+
+            /* Get list of calendar permissions this user has
+             */
+            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
-                // Loop through the campuses selected for the event
-                foreach ($campuses as $campus) {
-                    if (is_object($campus)) {
-                        $campusId = $campus->getCampusId();
-                    } else {
-                        $campusId = $campus;
-                    }
 
-                    if ($campusId == $currentAccess->getServiceIdentifier()) {
-                        return true;
+                if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                    /* Loop through campuses for the event and check if one
+                     * matches with this access
+                     */
+                    foreach ($campuses as $campus) {
+
+                        if (is_object($campus)) {
+                            $campusId = $campus->getCampusId();
+                        } else {
+                            $campusId = $campus;
+                        }
+
+                        if ($campusId == $currentAccess->getServiceIdentifier()) {
+                            return true;
+                        }
                     }
                 }
             }
         }
+
 
         /* If the event is on a group level, check if the user is a group manager
          */
         if ($event->isGroupLevel()) {
 
             $userAccessMapper = UserAccessMapper::getInstance();
+
             /* Loop through the groups selected for this event
              */
             foreach ($groups as $group) {
@@ -85,15 +98,23 @@ class Access
 
                 try {
                     $access = $userAccessMapper->getAccess($user, $groupId);
+                    /* TODO: write access should only be able to edit if they
+                     * are author or owner. The logic to show the modify button
+                     * will need to change first
+                     */
+                    if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                        return true;
+                    }
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    return false;
+                    /* User didn't have access for this group but might
+                     * for another one in this loop
+                     */
                 }
 
-                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-                    return true;
-                }
+
             }
         }
+
 
         /* User didn't pass any of the checks, deny!
          */
