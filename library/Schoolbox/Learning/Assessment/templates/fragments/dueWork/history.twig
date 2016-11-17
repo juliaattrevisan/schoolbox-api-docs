@@ -16,6 +16,39 @@
                 .show()
                 .animate({opacity:1}, 2000);
         });
+
+        $history.on('click', '[data-delete]', function (e) {
+            e.preventDefault();
+            var $a = $(this);
+
+            $a.confirmDialog({
+                header: 'Delete Interaction',
+                format: 'html',
+                text: 'Are you sure you want to delete this interaction? Anything attached to it will also be deleted.',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel',
+                confirmEvent: function () {
+                    $.ajax($a.data('delete'), {
+                        headers: {
+                            'X-HTTP-Method-Override': 'DELETE'
+                        },
+                        dataType: 'json',
+                        type: 'POST'
+                    })
+                    .done(function () {
+                        {# successful: reload the page to show the changed content -#}
+                        window.location.reload();
+                    })
+                    .fail(function () {
+                        {# i'll drink to that! -#}
+                        $history.find('[data-alert]').toastTimeout({
+                            text: 'Could not delete that',
+                            css: 'pop alert'
+                        });
+                    });
+                }
+            });
+        });
     });
 </script>
 
@@ -55,6 +88,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            <div class="toast" data-alert></div>
         </section>
 
         {% if timeline|length > 1 %}
