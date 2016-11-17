@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Upcoming;
 
+use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -46,14 +47,18 @@ class Controller extends Base
      * Displays upcoming work for the given user.
      *
      * @api   GET /learning/due/:studentId
-     * @param User $student
+     * @param User                $student
+     * @param Alaress_Date_Format $date
      */
-    public function getUpcomingForStudent(User $student)
+    public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
-                ['student' => $student,]
+                [
+                    'student' => $student,
+                    'date'    => $date,
+                ]
             )->setTitle('Upcoming Work for '.$student->formatName())
         );
     }

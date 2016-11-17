@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Upcoming;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
@@ -54,11 +55,28 @@ class Module extends BaseModule
         $this->register('GET', '', 'getUpcoming', new Rule\IsLoggedIn());
         $this->register(
             'GET',
-            '/{studentId}',
+            '/{studentId}{/date}',
             'getUpcomingForStudent',
             $access,
             function ($params) {
-                return ['student' => $this->getUserMapper()->findById($params['studentId']),];
+
+                // Build a date
+                if (isset($params['date'])) {
+                    try {
+                        $date = Alaress_Date_Format::newUrlDate($params['date']);
+                    } catch (\Exception $e) {
+                        // noop
+                    }
+                }
+                if (!isset($date)) {
+                    $date = Alaress_Date_Format::now();
+                }
+
+                // Pass the date and student to the controller action
+                return [
+                    'student' => $this->getUserMapper()->findById($params['studentId']),
+                    'date'    => $date,
+                ];
             }
         );
     }
