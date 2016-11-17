@@ -51,6 +51,7 @@ class Exporter
                             sr.owner = u.id
             WHERE           YEAR(sr.returned) = :currentYear
                             AND sb.name LIKE '%[%]%'
+                            AND sr.mark != ''
             ORDER BY        cc.code
         ";
 
@@ -85,7 +86,7 @@ class Exporter
                 $headings[0] => $result['synergy_id'],
                 $headings[1] => $result['code'],
                 $headings[2] => $assessmentCode,
-                $headings[3] => $result['norm_mark']
+                $headings[3] => $result['mark']
             ];
         }
 
