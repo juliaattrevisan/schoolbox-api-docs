@@ -177,6 +177,7 @@ class Controller extends Assessment\Controller
          */
         $latestResponse = null;
         $editorContents = '';
+        $dangerZone = null;
 
         /* Find all the records spawned by $participant
          *
@@ -186,19 +187,20 @@ class Controller extends Assessment\Controller
         /** @var Submission\File\Model $submission */
         $allResponses = $participant->getAllResponses();
 
-        /* Attach files if any exist
-         */
-        $zoneFactory = new Assessment\Attachzone\Factory();
-        $zone = $zoneFactory->buildForAssessment($assessment);
-
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
             /** @var Submission\Model $latestResponse */
             $latestResponse = $participant->findMostRecentResponse();
 
+            /* Files attached to the draft submission
+             * Attach files if any exist
+             */
+            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
+
             // Display the files that are a part of latest submission
             foreach ($latestResponse->getAllFiles() as $file) {
+
                 /* Load in the wizzywig instead of a file attachment,
                  * if the submission uses the wizzywig editor
                  */
@@ -206,7 +208,7 @@ class Controller extends Assessment\Controller
                     $editorContents .= $file->read();
                 } else {
                     // add it to the danger zone
-                    $zone->attachFiles([$file->getHash()]);
+                    $dangerZone->attachFiles([$file->getHash()]);
                 }
             }
 
@@ -216,6 +218,10 @@ class Controller extends Assessment\Controller
             if (!$latestResponse->isDraft()) {
                 $latestResponse = null;
             }
+        }
+
+        if (!$latestResponse) {
+            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
         }
 
         // TODO: what is this I don't even
@@ -243,7 +249,7 @@ class Controller extends Assessment\Controller
             'assessment'     => $assessment,
             'student'        => $student,
             'currentUser'    => $this->getUser(),
-            'attachzone'     => $zone->getTwigContext(),
+            'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
         ]));
