@@ -38,6 +38,8 @@ class Factory
     }
 
     /**
+     * Build a generic attachzone
+     *
      * @return Zone
      */
     protected function buildGeneric()
@@ -46,10 +48,12 @@ class Factory
     }
 
     /**
-     * @param Task|null $task
+     * Build an attachzone with any Attached Files preloaded into the attachzone
+     *
+     * @param Task $task
      * @return Zone
      */
-    protected function buildForTask(Task $task = null)
+    protected function buildForTask(Task $task)
     {
         $zone = new Zone('files');
         $zone->setMulti(false)->setAttachmentsLabel('');
@@ -81,20 +85,22 @@ class Factory
     }
 
     /**
+     * Build an attachzone with any Attached Files preloaded into the attachzone
+     *
      * @param DueWork $dueWork
      * @return Zone
      */
-    protected function buildForDueWork(DueWork $dueWork = null)
+    protected function buildForDueWork(DueWork $dueWork)
     {
         $zone = new Zone('files');
         $zone->setMulti(true)->setAttachmentsLabel('');
 
-        // Attach files
         $files = [];
-        foreach ($dueWork->getAttachedFiles() as $file) {
 
+        foreach ($dueWork->getAttachedFiles() as $file) {
             $files[] = $file->getHash();
         }
+
         $zone->attachFiles($files);
 
         return $zone;
