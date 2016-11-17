@@ -221,6 +221,7 @@ class Controller extends Assessment\Controller
                 /* Otherwise, spawn an entirely new draft
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
+                $latestResponse = null;
                 $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
             }
         }
