@@ -225,24 +225,6 @@ class Controller extends Assessment\Controller
             }
         }
 
-        // TODO: what is this I don't even
-        if (!$this->getUser()->isSuperuser()) {
-            $folderIds = [];
-
-            /* Sometimes subjectCollection is null ie. when superuser
-             * [subject_collection:protected] =>
-             */
-            if (count($this->getUser()->getSubjectCollection())) {
-                foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
-                    $folderIds[] = $currentSubject['id'];
-                }
-            }
-
-            if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
-                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_PAGE_VIEW);
-            }
-        }
-
         /* Pump into twig land
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
