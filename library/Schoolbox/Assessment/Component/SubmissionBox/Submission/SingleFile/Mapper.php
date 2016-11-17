@@ -40,7 +40,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('id', \Plagscan_DocumentMapper::class, 'student_submission_file_id', null, self::COLUMN_JOIN_MULTI, 'plagscan', 'plagscan');
+        $this->joins('id', \Plagscan_DocumentMapper::class, 'student_submission_file_id', null, self::COLUMN_JOIN_REVERSE, 'plagscan', 'plagscan');
     }
 
     /**
