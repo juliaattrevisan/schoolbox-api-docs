@@ -91,6 +91,7 @@ class Controller extends Base
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
         // Student's subjects
+        // TODO show subjects without folders
         $subjects = [];
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)
