@@ -116,6 +116,17 @@ abstract class AbstractResponse implements IResponse
         return null;
     }
 
+    /**
+     * $user is the author of this Response
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function hasAuthor(User $user)
+    {
+        return $this->getSubmittedOnBehalfOf()->getId() == $user->getId();
+    }
+
     /* Getters/Setters
      */
 

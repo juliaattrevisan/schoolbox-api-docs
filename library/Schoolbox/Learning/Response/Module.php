@@ -109,7 +109,7 @@ class Module extends BaseModule
             }
 
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->getParticipantMapperProxy()->loadParticipantsIntoAssessment($assessment);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment, $student);
 
             $participant = $assessment->getParticipant($student);
 
@@ -120,7 +120,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->getParticipantMapperProxy()->loadParticipantsIntoAssessment($assessment);
+            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
             try {
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
