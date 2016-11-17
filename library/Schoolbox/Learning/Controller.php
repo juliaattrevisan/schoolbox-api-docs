@@ -166,7 +166,7 @@ class Controller extends Base
         $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
         $assessments = $factory->getPendingAssessments();
 
-        /** @var IAssessable[] $assessmentsToMark */
+        /** @var Collection|IAssessable[] $assessmentsToMark */
         $assessmentsToMark = new Collection();
         foreach($assessments as $assessment){
             if($assessment->numMarkingRequired()){
@@ -279,7 +279,7 @@ class Controller extends Base
             );
         }
 
-        $folders = new Collection;
+        $folders = new Collection();
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
