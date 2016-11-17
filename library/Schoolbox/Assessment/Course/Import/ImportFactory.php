@@ -67,8 +67,8 @@ class ImportFactory
      *
      * @param array $unitSpecs                                          Units to import, indexed by unitSpecId
      * @var int  $unitSpecs[unitSpecId]['id']                           UnitSpec.id
-     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['open_date']    Open date as input by user
-     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['close_date']   Close date as input by user
+     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['openDate']    Open date as input by user
+     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['closeDate']   Close date as input by user
      * @return array
      */
     protected function buildFromUnitSpecs($unitSpecs)
@@ -110,12 +110,15 @@ class ImportFactory
             if(!is_array($unitAssessments[$unitSpecId])){
                 $unitAssessments[$unitSpecId] = [];
                 $unitSpec = new UnitSpecification();
+                $unitSpec->setId($unitSpecId);
                 $unitSpecFolder = new Folder();
                 $unitSpecFolder->setName($unitSpecFolderName);
                 $unitSpec->setFolder($unitSpecFolder);
                 $unitAssessments[$unitSpecId]['unitSpec'] = $unitSpec;
                 $unitImpl = new UnitImplementation();
                 $unitImpl->setSpecification($unitSpec);
+                $unitImpl->setOpenDate($unitSpecs[$unitSpecId]['openDate']);
+                $unitImpl->setDueDate($unitSpecs[$unitSpecId]['closeDate']);
                 $unitAssessments[$unitSpecId]['unitImpl'] = $unitImpl;
                 $unitAssessments[$unitSpecId]['assessments'] = [];
             }
@@ -129,6 +132,7 @@ class ImportFactory
             } else {
                 throw new \DomainException("Unknown assessment type: $assessmentSpecId");
             }
+            $assessment->setId($assessmentSpecId);
             $assessment->setTitle($assessmentSpecTitle);
 
             $unitAssessments[$unitSpecId]['assessments'][] = [

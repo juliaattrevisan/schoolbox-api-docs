@@ -54,7 +54,7 @@ Usages:
         });
 
         {# Setup class selectize #}
-        $('#import-folders').selectizeSelector({
+        $('#import_folders').selectizeSelector({
             ajax: {
                 url:      '/course/import/classes',
                 type:     'GET',
@@ -72,7 +72,7 @@ Usages:
             {# Stage 1 validation #}
             if ($('#course_spec_id').val())
             {
-                if ($('#import-folders').val())
+                if ($('#import_folders').val())
                 {
                     {# Everything okay #}
                     return {'result': true};
@@ -97,13 +97,14 @@ Usages:
         });
 
         stageOne.mage({onXhrDone: function (data) {
-            $('#ownershipAssignment').html(data);
+            $('#ownership_assignment').html(data);
         }});
 
         var stageTwo = $('input[data-mage-next="part-unit-select"]');
 
+
         stageTwo.mage({onXhrDone: function (data) {
-            $('#importUnits').html(data);
+            $('#import_units').html(data);
 
             {# Init stage 3 mage #}
 
@@ -112,16 +113,16 @@ Usages:
             stageThree.mage({
                 confirmRevert: confirmRevert,
                 onRevert: function () {
-                    $('#importUnits').find(':checkbox').closest('li').slideDown();
+                    $('#import_units').find(':checkbox').closest('li').slideDown();
                 },
                 onXhrDone: function (data) {
                 {# Slide away the things we're not using #}
 
-                $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
+                $('#import_units').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
 
                 {# Set content #}
 
-                $('#importTasks').html(data);
+                $('#import_assessments').html(data);
 
                 {# Init stage 4 mage #}
 
@@ -135,10 +136,10 @@ Usages:
                                 {# Go back to wherever you came from (hopefully) -#}
                                 window.location.href = data.redirect;
                             } else {
-                                window.history.back();
+//                                window.history.back();
                             }
                         } catch (e) {
-                            window.history.back();
+//                            window.history.back();
                         }
 
                     }
@@ -146,7 +147,7 @@ Usages:
 
                     {# Stage 4 validation #}
 
-                    if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0) {
+                    if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
 
                         {# Make sure every date has been entered #}
 
@@ -186,11 +187,11 @@ Usages:
 
                 {# Stage 3 validation #}
 
-                if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0)
+                if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0)
                 {
                     {# Check both dates are entered for each checked unit #}
 
-                    var dateFields = $('#importUnits')
+                    var dateFields = $('#import_units')
                             .find('input[type=checkbox]')
                             .filter(':checked')
                             .closest('li')
@@ -237,9 +238,7 @@ Usages:
                 }
 
             });
-{% if not _part3 %}
         }});
-{% endif %}
     });
 </script>
 <div class="row">
@@ -288,7 +287,7 @@ Usages:
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
                         <label>Class(es)
-                            <input id="import-folders" type="text" name="import_folders" />
+                            <input id="import_folders" type="text" name="import_folders" />
                         </label>
                     </div>
                     {% if 1 == initialStage %}
@@ -309,7 +308,7 @@ Usages:
                     <legend>2. Ownership</legend>
                     <div class="small-12 column {% if initialStage < 2 %}hide{% endif %}" data-mage-collapsed>
                         {% if 2 == initialStage %}
-                            <div id="ownershipAssignment">
+                            <div id="ownership_assignment">
                                 {% include '@course/import/ownership.twig' with {
                                     courseSpec:                    courseSpec,
                                     componentId:                   componentId,
@@ -319,7 +318,7 @@ Usages:
                                 } only %}
                             </div>
                         {% else %}
-                            <div id="ownershipAssignment">{# will be populated by ajax #}</div>
+                            <div id="ownership_assignment">{# will be populated by ajax #}</div>
                         {% endif %}
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
@@ -333,8 +332,8 @@ Usages:
                 </fieldset>
                 <fieldset class='content' data-mage="part-unit-select">
                     <legend>3. Units</legend>
-                    <div class="small-12 column{% if 3 != initialStage %} hide" data-mage-collapsed{% else %}"{% endif %} >
-                        <div id="importUnits">
+                    <div class="small-12 column{% if 3 != initialStage %} hide" data-mage-collapsed{% endif %} >
+                        <div id="import_units">
                             {% if 3 == initialStage %}
                                 {% include '@course/unitImportForm.twig' with {
                                     action:       action,
@@ -351,7 +350,7 @@ Usages:
                 <fieldset class='content' data-mage="part-tasks-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importAssessments">{# will be populated by ajax #}</div>
+                        <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <input type="hidden" data-mage-next="none" name="part-tasks-select" value="1" />
                     </div>
