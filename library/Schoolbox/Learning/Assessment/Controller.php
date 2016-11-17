@@ -191,17 +191,27 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $postReturnUrl = $this->getRequest()->post[Redirect::RETURN_URL];
+        $postReturnUrl = $this->getRequest()->query[Redirect::RETURN_URL];
+
+        /* Check for the presence of a returnUrl passed on GET request as well
+         */
 
         // Did caller explicitly specify a returnUrl ?
         if ($postReturnUrl) {
             $returnUrl = Redirect::decode($postReturnUrl);
-
         } else {
             $returnUrl = $this->determineRedirect($assessment, "/homepage/{$folder->getId()}");
         }
 
-        $this->redirect($returnUrl);
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                Redirect::RETURN_URL => $returnUrl,
+                'context' => get_class($assessment->getContext())
+            ]));
+        }
+        else {
+            $this->redirect($returnUrl);
+        }
     }
 
     /**
