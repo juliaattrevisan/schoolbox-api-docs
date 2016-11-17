@@ -77,7 +77,7 @@ class Exporter
 
             /* Get the assessment code out of the submission box name
              */
-            $closeBracketPos = strpos($result['name'], ']');
+            $closeBracketPos = strrpos($result['name'], ']');
             $codeLength = $closeBracketPos - $openBracketPos;
             $assessmentCode = substr($result['name'], $openBracketPos+1, $codeLength-1);
 
