@@ -51,7 +51,7 @@ class Module extends BaseModule
             $access->addRule(new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId'));
         }
 
-        $this->register('GET', '', 'getUpcoming');
+        $this->register('GET', '', 'getUpcoming', new Rule\IsLoggedIn());
         $this->register(
             'GET',
             '/{studentId}',
@@ -68,7 +68,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-//        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -76,17 +76,10 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-//        $injector->set(
-//            'controller:' . $this->basename,
-//            $injector->lazyNew(Controller::class, [
-//                'errorMapper'                    => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-//                'defaultGradeGroup'              => $this->getInjector()->get('defaultGradeGroup'),
-//                'assessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
-//                'participantDataSource'          => $injector->lazyGet('participantDataSource'),
-//                'courseImplementationDataSource' => $injector->lazyGet('courseImplementationDataSource'),
-//                'termMapper'                     => $this->getMapperFactory()->getLazy(TermMapper::class),
-//            ])
-//        );
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class)
+        );
     }
 
     /* Getters / Setters
