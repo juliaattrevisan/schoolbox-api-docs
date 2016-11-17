@@ -47,7 +47,7 @@ class Exporter
                             c.id = sb.category
             INNER JOIN      categoryCode AS cc ON
                             cc.categoryID = c.id
-            INNER JOIN      'user' AS u ON 
+            INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
             WHERE           YEAR(sr.returned) = :currentYear AND 
                             sb.name LIKE '%[%' AND sb.name LIKE '%]%'
