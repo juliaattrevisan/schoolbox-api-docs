@@ -737,6 +737,11 @@ abstract class Mapper implements IMapper, Serializable
             'mapper'    => $foreignMapper,
             'other_key' => $foreignKey
         ];
+
+        if ($options & self::COLUMN_JOIN_REVERSE) {
+            $map['join_def']['reverse'] = true;
+        }
+
         return $this->hasMap($map);
     }
 
@@ -2440,7 +2445,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $columnList = array();
         foreach ($this->map as $map) {
-            if (empty($map['column'])) {
+            if (empty($map['column']) || isset($map['join_def']['reverse'])) {
                 continue;
             }
             if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
@@ -2479,7 +2484,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $placeholderList = array();
         foreach ($this->map as $map) {
-            if (empty($map['column'])) {
+            if (empty($map['column']) || isset($map['join_def']['reverse'])) {
                 continue;
             }
             //
