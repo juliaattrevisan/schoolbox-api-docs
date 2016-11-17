@@ -301,6 +301,10 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-info;
   color: $icon-color-homepage-activity;
 }
+.icon-masonry-Component_Dashboard_HomepageNewsController {
+  @extend .icon-report;
+  color: $icon-color-homepage-news;
+}
 .icon-masonry-Component_Dashboard_CalendarController:before {
   @extend .icon-calendar;
   color: $icon-color-calendar;
