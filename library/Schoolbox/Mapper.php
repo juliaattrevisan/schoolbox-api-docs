@@ -101,7 +101,8 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_UPDATED_TIMESTAMP = 4;
     const COLUMN_JOIN_MULTI        = 8;
     const COLUMN_JOIN_READONLY     = 16;
-    const COLUMN_SOFTDELETE        = 32;
+    const COLUMN_JOIN_REVERSE      = 32;
+    const COLUMN_SOFTDELETE        = 64;
 
     /**
      * @var IDatabase
@@ -736,7 +737,32 @@ abstract class Mapper implements IMapper, Serializable
             'mapper'    => $foreignMapper,
             'other_key' => $foreignKey
         ];
+
+        if ($options & self::COLUMN_JOIN_REVERSE) {
+            $map['join_def']['reverse'] = true;
+        }
+
         return $this->hasMap($map);
+    }
+
+
+    /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     *
+     * @param string      $foreignKey
+     * @param string      $foreignMapper
+     * @param string      $localColumn
+     * @param IColumnType $hydrator
+     * @param int         $options
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = 'id', $hydrator = null, $options = null, $property = null, $name = null)
+    {
+        // enforce reverse joining
+        $options = $options | self::COLUMN_JOIN_REVERSE;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
     }
 
 
@@ -2419,7 +2445,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $columnList = array();
         foreach ($this->map as $map) {
-            if (empty($map['column'])) {
+            if (empty($map['column']) || isset($map['join_def']['reverse'])) {
                 continue;
             }
             if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
@@ -2458,7 +2484,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $placeholderList = array();
         foreach ($this->map as $map) {
-            if (empty($map['column'])) {
+            if (empty($map['column']) || isset($map['join_def']['reverse'])) {
                 continue;
             }
             //
