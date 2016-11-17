@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly as Timeline;
+use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\Exception as MapperException;
