@@ -194,28 +194,6 @@ class Controller extends Base
 
 
     /**
-     * @param string $template
-     * @param array  $data
-     * @return \Alaress\Web\Output\Base
-     */
-    protected function buildContent($template, array $data)
-    {
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
-            // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
-            return $this->buildJsonOutput($data);
-
-        } elseif ($this->getRequest()->isXhr()) {
-            // if the request is AJAX, don't return the chrome
-            return $this->buildUnthemedHtmlOutput($template, $data);
-
-        } else {
-            // full synchronous page
-            return $this->buildHtmlOutput($template, $data);
-        }
-    }
-
-
-    /**
      * @return IFeedbackDataSource
      */
     protected function getFeedbackDataSource()
