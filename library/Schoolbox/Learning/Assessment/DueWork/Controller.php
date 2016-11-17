@@ -333,12 +333,37 @@ class Controller extends Assessment\Controller
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
             foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
-                $response->getAllFiles()->add(
-                    (new DueWorkSubmissionFile())
-                        ->setStorage($attachment)
-                        ->setFilename($attachment->getFilename())
-                        ->setEditableInline(false)
-                );
+
+                /* Content made with the wizzywig editor is also attached as a file
+                 *
+                 * This attachment is known as online-submission.html
+                 * This is actually treated the same as any other attached file
+                 *
+                 * Don't stack the online-submission.html file here, it should never
+                 * appear in the attached files list at all (it should always be
+                 * loaded into the wizzywig)
+                 *
+                 * Since $attachment is a Storage model, it won't know about the
+                 * editableInline field - forcing is to infer wizzywig usage
+                 * from its filename
+                 */
+                $attachedFile = (new DueWorkSubmissionFile())
+                    ->setStorage($attachment)
+                    ->setFilename($attachment->getFilename());
+
+                if (!$attachedFile->isOnlineSubmission()) {
+
+                    /* Not sure how useful this actually is, since you can't infer
+                     * the value of editableInline from a Storage model without
+                     * inspecting its corresponding editabelInline field, which isn't
+                     * always available
+                     */
+                    $attachedFile->setEditableInline(false);
+
+                    /* Stack it up
+                     */
+                    $response->getAllFiles()->add($attachedFile);
+                }
             }
         }
 
