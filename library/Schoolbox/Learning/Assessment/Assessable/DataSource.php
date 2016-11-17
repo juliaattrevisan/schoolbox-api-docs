@@ -72,6 +72,9 @@ class DataSource
 
     /**
      * Find all assessments in which the user is participating
+     *
+     * @deprecated Try `\Schoolbox\Learning\Assessment\DataModel\MapperProxy::findAllForStudent` instead.
+     *
      * @param User $user
      * @param Term|null $term
      * @return Collection
