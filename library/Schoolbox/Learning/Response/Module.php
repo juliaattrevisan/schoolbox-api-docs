@@ -220,6 +220,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'responseDataSource' => $injector->lazyGet('responseDataSource'),
             ])
         );
     }

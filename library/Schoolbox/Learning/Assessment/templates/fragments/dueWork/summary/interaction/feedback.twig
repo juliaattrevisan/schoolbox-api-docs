@@ -19,6 +19,11 @@
             </div>
         </div>
     </div>
+    {% if showLineActions %}
+    <nav>
+        <a class="icon-delete" data-delete="{{ routeLookup('learningFeedback.deleteAssessmentFeedback', { assessmentId: participant.assessable.id, feedbackId: currentFeedback.id }) }}"></a>
+    </nav>
+    {% endif %}
 
     {% if currentFeedback.comment|length %}
         <article>

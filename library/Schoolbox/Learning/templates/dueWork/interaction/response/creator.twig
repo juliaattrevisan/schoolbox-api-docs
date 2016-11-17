@@ -13,3 +13,8 @@
         </a>
     </div>
 </div>
+{% if showLineActions %}
+<nav>
+    <a class="icon-delete" data-delete="{{ routeLookup('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: currentInteraction.id }) }}"></a>
+</nav>
+{% endif %}

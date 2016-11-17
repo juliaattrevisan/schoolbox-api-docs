@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
@@ -31,14 +32,22 @@ class Controller extends Base
      * @var ErrorMapper
      */
     protected $errorMapper;
+    /**
+     * @var DataSource
+     */
+    protected $responseDataSource;
+
 
     /**
      * Controller constructor.
+     *
      * @param ErrorMapper $errorMapper
+     * @param DataSource  $responseDataSource
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource)
     {
         $this->setErrorMapper($errorMapper);
+        $this->responseDataSource = $responseDataSource;
     }
 
     /**
@@ -122,6 +131,29 @@ class Controller extends Base
         catch (\DomainException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
+    }
+
+
+    /**
+     * @api   DELETE /assessments/:assessmentId/response/:responseId
+     * @level 165
+     * @param Submission $response
+     */
+    public function deleteParticularResponse(Submission $response)
+    {
+        $code = 204;
+        $data = null;
+
+        try {
+            $this->getResponseDataSource()->delete($response);
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $code = 400;
+            $data = $e->getMessage();
+        }
+
+        $this->getResponse()->status->set($code);
+        $this->getResponse()->content->set($this->buildContent('', $data));
     }
 
     /**
@@ -218,5 +250,25 @@ class Controller extends Base
     {
         $this->errorMapper = $errorMapper;
         return $this;
+    }
+
+
+    /**
+     * @param DataSource $responseDataSource
+     * @return static
+     */
+    public function setResponseDataSource($responseDataSource)
+    {
+        $this->responseDataSource = $responseDataSource;
+        return $this;
+    }
+
+
+    /**
+     * @return DataSource
+     */
+    protected function getResponseDataSource()
+    {
+        return $this->responseDataSource;
     }
 }
