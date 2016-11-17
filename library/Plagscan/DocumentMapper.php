@@ -1,7 +1,5 @@
 <?php
-
 /**
- * 
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
@@ -11,9 +9,9 @@
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+
 /**
- * Class Plagscan_DocumentMapper
- * @method Plagscan_Document createModel()
+ * @method Plagscan createModel()
  */
 class Plagscan_DocumentMapper extends Schoolbox\Mapper
 {
@@ -28,12 +26,9 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	protected function setup()
     {
 		parent::setup();
-
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
-
         $this->submissionMapper = SubmissionMapper::getInstance();
-
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}
 
@@ -51,7 +46,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	/**
 	 * Saves a Plagscan document.
 	 *
-	 * @param Plagscan_Document $dirtyDocument
+	 * @param Plagscan $dirtyDocument
 	 *
 	 * @return array|bool
 	 */
@@ -119,7 +114,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
      * TODO make this work with multiple files
      *
      * @param  Submission $submission
-     * @return Plagscan_Document
+     * @return Plagscan
      */
     public function createFromSubmission(Submission $submission)
     {

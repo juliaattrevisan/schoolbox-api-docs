@@ -8,8 +8,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
-use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -45,7 +43,7 @@ class Model implements IFile, ISoftDeletable
     protected $editableInline;
 
     /**
-     * @var Plagscan_Document
+     * @var Plagscan
      */
     protected $plagscan;
 
