@@ -27,8 +27,14 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        // TODO make this a single-column version of "progress book"
-        throw new NotFound();
+
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/task/summary/staff.twig",
+                $twigData
+            )
+        );
     }
 
 
@@ -41,8 +47,12 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
-        // this page does not exist
-        throw new NotFound();
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/fragments/task/summary/staff.twig",
+                $twigData
+            )
+        );
     }
 
 
