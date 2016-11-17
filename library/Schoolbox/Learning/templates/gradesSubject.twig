@@ -228,11 +228,18 @@
         </div>
     </div>
 
+    {% if comment|length or canComment %}
     <div class="row">
         <div class="small-12">
             <h2 class="subheader">Comments</h2>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 columns">
             {% if canComment %}
-                <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <input type="hidden" name="studentId" value="{{ student.id }}"/>
                     <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
                     <textarea name="comment" rows="3"></textarea>
