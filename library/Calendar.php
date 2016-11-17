@@ -604,6 +604,11 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $filter_query[] = 'event_category.category_id = ' . intval($filter['group']);
         }
 
+        if ($filter['type']) {
+//            $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
+            $filter_query[] = 'type = ' . intval($filter['type']);
+        }
+
         if ($filter['personal']) {
             $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
             $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);

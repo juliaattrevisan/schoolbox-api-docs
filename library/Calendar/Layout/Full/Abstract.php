@@ -200,6 +200,13 @@ abstract class Calendar_Layout_Full_Abstract
             TEMPLATE_content,
             array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
         );
+        $this->getPage()->dropDown(
+            'export_type',
+            $typeList,
+            array(),
+            TEMPLATE_content,
+            array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
+        );
         // Might need special PHPLibs here
         $this->getPage()->checkList(
             'filter_source',

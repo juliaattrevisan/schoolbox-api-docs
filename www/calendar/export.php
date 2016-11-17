@@ -25,10 +25,11 @@ try {
     $filename = 'calendar';
     $resourceId = $_GET['resource_id'];
     $resourceCategoryId = $_GET['resource_category_id'];
+    $eventTypeId = $_GET['event_type'];
     if($resourceId > 0) {
         $export_type = 'resource';
     }
-    if($resourceCategoryId >0){
+    if($resourceCategoryId >0) {
         $export_type = 'resource_category';
     }
     if (empty($token)) {
@@ -122,6 +123,12 @@ try {
             $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, array());
             $api->setCategoryId($resourceCategoryId);
             $filename =  sprintf('resourceCategory%d', $resourceCategoryId);
+            break;
+
+        case 'event_type':
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Type($user, array());
+            $api->setEventTypeId($eventTypeId);
+            $filename =  sprintf('eventType%d', $eventTypeId);
             break;
 
         case 'all':

@@ -170,7 +170,13 @@ $this->dropDown(
     TEMPLATE_content,
     array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
 );
-
+$this->dropDown(
+    'export_type',
+    $typeList,
+    array(),
+    TEMPLATE_content,
+    array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
+);
 $this->checkList(
     'filter_group',
     $category_list,
