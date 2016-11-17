@@ -229,8 +229,14 @@ cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS and JS";
-/vagrant/tools/pkg-build-css-js.sh --sass 2>&1;
+echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
+/vagrant/tools/pkg-build-npm.sh;
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Building Javascript";
+/vagrant/tools/pkg-build-bower.sh;
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
+/vagrant/tools/pkg-build-sass.sh --sass;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
