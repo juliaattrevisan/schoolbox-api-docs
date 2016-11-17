@@ -7,12 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use Schoolbox\Mapper;
@@ -90,6 +91,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $submissionReturn){
             $feedback = (new DomainObject())
                 ->setId($submissionReturn->getId())
+                ->setAssessable((new DueWork())->setId($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId()))
                 // TODO implement optional association due work feedback association with a response
 //                ->setResponse(
 //                    (new DueWorkResponse())
@@ -133,7 +135,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setSubmissionBox(
-                    (new SubmissionBox())
+                    (new DueWorkDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setOwner($domainObject->getReviewee())

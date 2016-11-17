@@ -9,14 +9,17 @@ namespace Schoolbox\Learning\Assessment\Participant;
 
 use External_ClassInterface;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -109,44 +112,9 @@ class DataSource
 
     public function findForAssessment(IAssessable $assessment)
     {
-        // This will use:
-        // External_ClassInterface
-        // UserAccessMapper
-        // various data sources depending on the variant of $assessment
-        // This will probably retrieve all Feedbacks and Responses for $assessment
-
+        // Build a participant list
         $participants = new Collection();
-
-        $context = $assessment->getContext();
-        if ($context instanceof UnitSpecification) {
-            // Unit specifications have no participants
-            return $participants;
-        }
-
-        $folder = $context->getFolder();
-
-        // Use cached list of users for a folder
-        if (!isset($this->cacheForFolder[$folder->getId()])) {
-            // Cache isn't set - populate
-            $users = new Collection();
-
-            // Class members: convert to list of users
-            $classCodes = $this->externalDb->getStudents($folder->getCodeString());
-            if (!empty($classCodes)) {
-                $users->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
-            }
-
-            // I want to search for ALL read-level users, not just students
-            // Deliberately don't search external DB, I have already done that
-            $users->mergeUnique(
-                $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
-                'id'
-            );
-            $this->cacheForFolder[$folder->getId()] = $users;
-        }
-
-        // Convert $users into a participant list
-        foreach ($this->cacheForFolder[$folder->getId()]  as $user) {
+        foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
             $participants->add(
                 new Participant($user, $assessment)
             );
@@ -313,4 +281,90 @@ class DataSource
         // if a.user.id > b.user.id, then a > b
         return ($a->getUser()->getId() - $b->getUser()->getId());
     }
+
+    /**
+     * Finds all students who are participating in this assessment.
+     *
+     * @param IAssessable $assessment
+     * @return Collection|User[]
+     */
+    public function findAllStudentsForAssessment(IAssessable $assessment)
+    {
+        $students = new Collection();
+
+        $context = $assessment->getContext();
+        if ($context instanceof UnitSpecification) {
+            // Unit specifications have no participants
+            return $students;
+        }
+
+        $folder = $context->getFolder();
+
+        // Use cached list of users for a folder
+        if (!isset($this->cacheForFolder[$folder->getId()])) {
+            // Cache isn't set - populate
+
+            // Class members: convert to list of users
+            $classCodes = $this->externalDb->getStudents($folder->getCodeString());
+            if (!empty($classCodes)) {
+                $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+            }
+
+            // I want to search for ALL read-level users, not just students
+            // Deliberately don't search external DB, I have already done that
+            $students->mergeUnique(
+                $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
+                'id'
+            );
+            $this->cacheForFolder[$folder->getId()] = $students;
+        }
+        return $this->cacheForFolder[$folder->getId()];
+    }
+
+//    /**
+//     * Finds all assessments which this student is participating within.
+//     *
+//     * @param User $student
+//     * @return Collection|IAssessable[]
+//     */
+//    public function findAllAssessmentsForStudent(User $student)
+//    {
+//        $assessments = new Collection();
+//
+//        // Find all classes by class code (students only)
+//        $folderIds = [];
+//        // TODO inject this
+//        $folderMapper = FolderMapper::getInstance();
+//        if ($student->getRole()->isStudent()) {
+//            // TODO inject this
+//            $externalUser = new \External_User();
+//            foreach ($externalUser->getSubjectList($student) as $subject) {
+//                try {
+//                    $folderIds[] = $folderMapper->findByCode($subject['code'], $subject['campusCode'])->getId();
+//                } catch (MapperException $e) {
+//                    // This folder does not exist. That's okay.
+//                    continue;
+//                }
+//            }
+//        }
+//
+//        // Find all of this user's group memberships
+//        return array_merge(
+//            $folderIds,
+//                $this->userAccessMapper->findByColumnList([
+//                'uid'     => $student->getId(),
+//                'type'    => UserAccess::ACCESS_READ,
+//                'service' => UserAccess::SERVICE_HOMEPAGE,
+//            ])->getColumnValues('serviceIdentifier')
+//        );
+//
+//        // Find every assessment the student has created a response to
+//
+//        // Find every assessment the student has had a feedback created for
+//
+//        // TODO inject this
+//        $assessmentDataSource = new AssessmentDataSource();
+//
+//        return $assessmentDataSource->findAllForFolderId($folderIds);
+//    }
 }

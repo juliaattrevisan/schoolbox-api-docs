@@ -7,12 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
+use Schoolbox\Learning\Quiz\Model as QuizDataObject;
 use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as DomainObject;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper;
 
 /**
@@ -102,6 +103,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new DomainObject())
                 ->setId($attempt->getId())
+                ->setAssessable((new Quiz())->setId($attempt->getAssessment()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($attempt->getUser())
                 ->setSubmittedOnBehalfOf($attempt->getUser())
                 ->setCreatedAt($attempt->getStart())
@@ -141,7 +143,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setAssessment(
-                    (new Quiz())
+                    (new QuizDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setUser($domainObject->getSubmittedOnBehalfOf())

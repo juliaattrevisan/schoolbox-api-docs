@@ -120,7 +120,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'codes', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Code\\Mapper',
+                'mapper'    => Code\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
@@ -129,7 +129,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'homepages', array(
                 'multiple'  => false,
-                'mapper'    => '\\Schoolbox\\Resource\\HomepageConfigMapper',
+                'mapper'    => HomepageConfigMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
             )
@@ -138,7 +138,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'files', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\File\\Mapper',
+                'mapper'    => File\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'category',
             )
@@ -147,7 +147,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'groups', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\GroupMapper',
+                'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
             )
@@ -748,25 +748,30 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Does not find codes that have been deleted
      *
      * @param  string $code
+     * @param  string $campusCode If provided, use this campus code in the query.
      * @throws MapperException if statement returned no category
      * @return Model
      */
-    public function findByCode($code)
+    public function findByCode($code, $campusCode = '')
     {
         // Retrieve all codes for category, not just $code
         $query = "
             {$this->getSelectString()}
             {$this->getFromString()}
             WHERE folder.deleted_at IS NULL
-            AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
+        $params = [];
+        if (strlen($campusCode) === 0) {
+            $query .= ' AND (cc.code = :code OR cc.code LIKE :codeLike)';
+            $params['code']     = $code;
+            $params['codeLike'] = '%/' . $this->database->quoteForLike($code);
+        } else {
+            $query .= ' AND (cc.code = :code OR cc.code = :fullCode)';
+            $params['code']     = $code;
+            $params['fullCode'] = $campusCode . '/' . $code;
+        }
         $statement = $this->database->prepare($query);
-        $statement->execute(
-            array(
-                'code'     => $code,
-                'codeLike' => '%/' . $this->database->quoteForLike($code),
-            )
-        );
+        $statement->execute($params);
         $model = $this->hydrateSelect($statement)->first();
 
         if (!$model instanceof Model) {
@@ -780,6 +785,73 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId())
         );
         return $model;
+    }
+
+    /**
+     * Finds all folders for the given subject list.
+     *
+     * Designed to work with the output from `\External_User::getSubjectList`.
+     *
+     * @param array $subjectList Contains "code" and "campusCode" keys
+     * @return Collection|Model[]
+     */
+    public function findAllBySubjectList($subjectList)
+    {
+        $whereParts = [];
+        $params     = [];
+        $i          = 0;
+
+        // Build the set of where parts for this subject list
+        foreach (array_values($subjectList) as $subject) {
+            $code       = $subject['code'];
+            $campusCode = $subject['campusCode'];
+
+            $whereParts[]        = "cc.code = :code_{$i}";
+            $params["code_{$i}"] = $code;
+            if (strlen($campusCode) === 0) {
+                $whereParts[]             = "cc.code LIKE :fullCode_{$i}";
+                $params[":fullCode_{$i}"] = '%/' . $this->database->quoteForLike($code);
+            } else {
+                $whereParts[]             = "cc.code = :fullCode_{$i}";
+                $params[":fullCode_{$i}"] = $campusCode . '/' . $code;
+            }
+
+            $i++;
+        }
+
+        // Abort if no subjects
+        if (empty($whereParts)) {
+            return $this->createCollection();
+        }
+
+        // Query, hydrate and return
+        $where = implode(' OR ', $whereParts);
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
+            WHERE folder.deleted_at IS NULL
+            AND ($where)
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $result = $this->hydrateSelect($statement);
+
+        // Reload codes for retrieved folders.
+        // The above query will not have fetched any codes that weren't in $subjectList.
+        $folderCodes = $this->getJoinMapper('codes')
+                            ->findByColumn('folder_id', $result->getColumnValues('id'))
+                            ->groupByCallback(function (Code\Model $code) {
+                                return $code->getFolder()->getId();
+                            });
+        foreach ($result as $folder) {
+            if (isset($folderCodes[$folder->getId()])) {
+                $folder->setCodes($folderCodes[$folder->getId()]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -835,11 +907,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $get_subjects If false, subjects aren't retrieved.
      * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
      *                           any access level.
+     * @param bool $exactAccess If true, $access_level must be exact
      *
      * @return \Schoolbox\Collection|Model[]
      */
-    public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ)
-    {
+    public function findForUser(
+        User $user,
+        $get_subjects = true,
+        $access_level = UserAccess::ACCESS_READ,
+        $exactAccess = false
+    ) {
         $query = "
 			SELECT
 				{$this->getColumnString('c')},
@@ -849,8 +926,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-			WHERE c.deleted_at IS NULL AND a.uid = :user AND a.type >= :access
+			WHERE c.deleted_at IS NULL AND a.uid = :user
 		";
+        if ($exactAccess) {
+            $query .= ' AND a.type = :access';
+        } else {
+            $query .= ' AND a.type >= :access';
+        }
         $params = array(
             'user'    => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,

@@ -17,6 +17,11 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 class Quiz extends AbstractSubSource
 {
     /**
+     * @inheritdoc
+     */
+    protected $studentField = 'user_id';
+
+    /**
      * Constructor
      *
      * @param MapperProxy $mapperProxy

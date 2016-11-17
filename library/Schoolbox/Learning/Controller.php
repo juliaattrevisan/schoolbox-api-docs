@@ -72,11 +72,6 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
-     * @var AssessableDataSource
-     */
-    protected $assessableDataSource;
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper            $errorMapper
@@ -86,7 +81,6 @@ class Controller extends Base
      * @param FolderMapper           $folderMapper
      * @param GradeGroup             $defaultGradeGroup
      * @param ShowcaseMapper         $showcaseMapper
-     * @param AssessableDataSource   $assessableDataSource
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -95,8 +89,7 @@ class Controller extends Base
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
-        ShowcaseMapper $showcaseMapper,
-        AssessableDataSource $assessableDataSource
+        ShowcaseMapper $showcaseMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -105,7 +98,6 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
-        $this->setAssessableDataSource($assessableDataSource);
     }
 
     /**
@@ -276,11 +268,18 @@ class Controller extends Base
         $markbooks = [];
         $markbooksFolders = [];
 
-        // Keep a collection of all folders for use in the dropdown
+        // Keep a collection of all folders student has an assessment in for use in the dropdown
+
+        $assessments = $this->getAssessmentMapperProxy()->findAllForStudent($student, $term);
+        foreach ($assessments as $assessment) {
+            $assessment->setAllParticipants(
+                new Collection([
+                    $this->participantDataSource->findForAssessmentAndUser($assessment, $student, false, true)
+                ])
+            );
+        }
 
         $folders = new Collection;
-
-        $assessments = $this->getAssessableDataSource()->findForUser($student, $term);
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
@@ -325,7 +324,13 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        $assessments = $this->getAssessmentMapperProxy()->findAllForContext($subject)->sortBy('dueAt', 'asc');
+        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId(
+            $subject->getId(),
+            [
+                'term'  => $term,
+                'order' => ['due_date' => 'asc'],
+            ]
+        );
 
         // Grab all the participants
 
@@ -501,24 +506,6 @@ class Controller extends Base
         $this->participantDataSource = $participantDataSource;
         return $this;
     }
-
-    /**
-     * @return AssessableDataSource
-     */
-    protected function getAssessableDataSource()
-    {
-        return $this->assessableDataSource;
-    }
-
-    /**
-     * @param AssessableDataSource $assessableDataSource
-     * @return static
-     */
-    protected function setAssessableDataSource(AssessableDataSource $assessableDataSource)
-    {
-        $this->assessableDataSource = $assessableDataSource;
-        return $this;
-    }    
 
     /**
      * @return TermMapper

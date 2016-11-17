@@ -120,20 +120,7 @@ class Controller extends Base
 
         // Generate data: assessments and their Participants
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId());
-
-        // Also get anything in a unit spec for that folder
-        $assessments->merge(
-            $this->getAssessmentMapperProxy()->findAllInCourseImplementationForFolderId($class->getId())
-        );
-
-        // Filter by term
-        // TODO perform this filtering on a query level
-        $assessments = $assessments->filter(
-            function (IAssessable $assessment) use ($term) {
-                return $term->contains($assessment->getDueAt());
-            }
-        );
+        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId(), ['term' => $term]);
 
         // Load participants
         foreach ($assessments as $assessment) {

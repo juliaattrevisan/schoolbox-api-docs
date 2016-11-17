@@ -638,15 +638,19 @@ class Bootstrap implements BootstrapInterface {
             'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
             'translator'            => $di->lazyGet('assessmentTranslator'),
             'participantDataSource' => $di->lazyGet('participantDataSource'),
+            'externalUser'          => $di->lazyGet('externalUser'),
+            'responseDataSource'    => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource'    => $di->lazyGet('feedbackDataSource'),
         ];
         $di->set('assessmentDataSource', $di->lazyNew(AssessmentMapperProxy::class));
 
         // Register assessable data source
         $di->params[AssessableDataSource::class] = [
-            'responseDataSource' => $di->lazyGet('responseDataSource'),
-            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+            'responseDataSource'    => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource'    => $di->lazyGet('feedbackDataSource'),
+            'participantDataSource' => $di->lazyGet('participantDataSource'),
         ];
-        $di->set('assessableDataSource', $di->lazyNew(ParticipantDataSource::class));
+        $di->set('assessableDataSource', $di->lazyNew(AssessableDataSource::class));
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [

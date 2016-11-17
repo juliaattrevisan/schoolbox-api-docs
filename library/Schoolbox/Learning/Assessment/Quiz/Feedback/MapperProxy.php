@@ -8,11 +8,12 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
 
-use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Model as QuizDataObject;
 use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponseDomainObject;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
@@ -107,6 +108,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new DomainObject())
                 ->setId($attempt->getId())
+                ->setAssessable((new Quiz())->setId($attempt->getAssessment()->getAssessmentModel()->getId()))
                 // The completion serves as both a response and a feedback.
                 // Add a corresponding stub response.
                 ->setResponse(
@@ -156,7 +158,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setAssessment(
-                    (new Quiz())
+                    (new QuizDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setUser($domainObject->getReviewee())

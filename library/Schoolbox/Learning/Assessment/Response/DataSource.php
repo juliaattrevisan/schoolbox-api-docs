@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Response;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\User;
 
 /**
  * The single source of truth for assessment responses.
@@ -84,6 +85,19 @@ class DataSource implements IResponseDataSource
         /* Requested response doesn't exist in this Assessment
          */
         throw new \OutOfBoundsException('Response not found in this assessment');
+    }
+
+    /**
+     * @param User $student
+     * @return Collection|IResponse[]
+     */
+    public function findForStudent(User $student)
+    {
+        $responses = new Collection();
+        foreach ($this->subSources as $subSource) {
+            $responses = $responses->merge($subSource->findForStudent($student));
+        }
+        return $responses;
     }
 
     /**

@@ -10,9 +10,10 @@ namespace Schoolbox\Learning\Assessment\Feedback;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\User;
 
 /**
- * Interface for all assessment response sources.
+ * Interface for all assessment feedback sources.
  */
 interface IFeedbackDataSource
 {
@@ -31,6 +32,14 @@ interface IFeedbackDataSource
      * @return Collection|IFeedback[]
      */
     public function findForAssessment(IAssessable $assessment);
+
+    /**
+     * Returns feedback for work that this student has submitted.
+     *
+     * @param User $student
+     * @return mixed
+     */
+    public function findForStudent(User $student);
 
     /**
      * Saves a feedback.

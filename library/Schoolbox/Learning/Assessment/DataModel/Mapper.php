@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -21,6 +22,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+
 /**
  * Class Mapper
  *
@@ -178,6 +181,53 @@ class Mapper extends BaseMapper
             $quizMapper->restoreSoftDeleted($quiz);
         }
     }
+
+    /**
+     * Somewhat efficient query for retrieving the assessments which this student has participated in.
+     *
+     * @param User $student
+     * @param Term $term
+     * @return array|int[]
+     */
+    public function findUniqueAssessmentIdsForStudent(User $student, Term $term)
+    {
+        // Filter task/duework/quiz by term dates
+        $params   = [
+            'userId' => $student->getId(),
+        ];
+        $whereParts = [
+            'a.deleted_at IS NULL',
+            '(tc.student_id IS NOT NULL OR ds.owner IS NOT NULL OR dr.owner IS NOT NULL OR qa.user_id IS NOT NULL)',
+        ];
+        if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+            $params['from'] = $term->getStart()->getDatabaseDate();
+            $whereParts[]   = 'DATE(a.due_date) >= :from';
+        }
+        if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+            $params['to'] = $term->getActualFinish()->getDatabaseDate();
+            $whereParts[]   = 'DATE(a.due_date) <= :to';
+        }
+
+        $where = implode(' AND ', $whereParts);
+        $query = "
+            SELECT DISTINCT
+                a.id
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            LEFT JOIN {$this->getJoinSql('task', 'a', 't', true)}
+            LEFT JOIN {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
+            LEFT JOIN {$this->getJoinSql('duework', 'a', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
+            LEFT JOIN {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
+            LEFT JOIN {$this->getJoinSql('quiz', 'a', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+            WHERE {$where}
+            ORDER BY a.id ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+    }
+
     /**
      * Selecting from the assessment table also returns whatever assessable
      * object is joined onto it.
@@ -223,6 +273,55 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
         ";
     }
+
+    /**
+     * Retrieves all assessable objects that are in this folder, whether they
+     * are attached directly to this folder or through a course implementation
+     * that is attached to this folder.
+     *
+     * @param int|array $folderId   A folder ID or list thereof
+     * @param array     $columnList Any other columns to query on
+     *                              If "id" is one, these assessments are added to the final search.
+     * @param array     $options    Any other options to pass to the final search to `findByColumnList`.
+     * @return Collection|Model[]
+     */
+    public function findAllForFolderId($folderId, $columnList, $options = [])
+    {
+        // Support stuff for query
+        $folderList   = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
+        $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
+
+        // There's no OR support in the predicate builder.
+        // The best I can do is to get all IDs and fetch a union.
+        // TODO replace with an OR through the predicate builder
+        $idQuery = "
+            SELECT DISTINCT a.id
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            LEFT JOIN {$this->getJoinSql('assessment_folder', 'a', 'f')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', 'a', 'ui')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
+            WHERE f.id    IN {$placeholders}
+            OR    uicf.id IN {$placeholders}
+        ";
+        $idStatement = $this->getDatabase()->prepare($idQuery);
+        $idStatement->execute($params);
+        $idList = array_column($idStatement->fetchAll(), 'id');
+
+        // Send IDs to findByColumnList
+        $params = $columnList;
+        if (isset($params['id'])) {
+            if (!is_array($params['id'])) {
+                $params['id'] = [$params['id']];
+            }
+            $params['id'] = array_unique(array_merge($params['id'], $idList));
+        } else {
+            $params['id'] = $idList;
+        }
+        return $this->findByColumnList($params, $options);
+    }
+
     /**
      * Retrieves a list of assessments, along with their joined objects.
      *
@@ -468,7 +567,7 @@ class Mapper extends BaseMapper
         // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (!$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof ProjectModel) {
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
@@ -477,7 +576,7 @@ class Mapper extends BaseMapper
         // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (!$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof ProjectModel) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
                     // Add the folder into the context

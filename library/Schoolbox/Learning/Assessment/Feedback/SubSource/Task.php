@@ -17,6 +17,11 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 class Task extends AbstractSubSource
 {
     /**
+     * @inheritdoc
+     */
+    protected $studentField = 'student_id';
+
+    /**
      * Constructor
      *
      * @param MapperProxy $mapperProxy

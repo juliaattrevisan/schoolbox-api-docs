@@ -73,7 +73,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             $data = [
                 'unit'   => $unit,
-                'tasks'  => $this->getAssessmentMapperProxy()->findAllForContext($unit),
+                'tasks'  => $this->getAssessmentMapperProxy()->findAllForUnitSpecificationId($unit->getId()),
                 'usages' => $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
                 'returnUrl'  => $_GET["page"],
             ];

@@ -82,9 +82,11 @@ class CompletionMapper extends Mapper {
         return "
             SELECT
                 {$this->getColumnString()},
+                {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('marking_user', 'm')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('task', '', 't')}
             LEFT JOIN {$this->getJoinSql('student', '', 's', true)}
             LEFT JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
         ";
@@ -102,6 +104,7 @@ class CompletionMapper extends Mapper {
             /** @var Completion $completion */
             $completion = $this->hydrate($row);
             $completion
+                ->setTask($this->hydrateJoin($row, 'task', 't'))
                 ->setStudent($this->hydrateJoin($row, 'student', 's'))
                 ->setMarkingUser($this->hydrateJoin($row, 'marking_user', 'm'))
             ;

@@ -7,11 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\Task as TaskDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Course\Task\Completion as DataObject;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskResponseDomainObject;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
@@ -54,20 +55,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     }
 
     /**
-     * Overridden to only retrieve task completions that are status: complete
-     * (not requires confirmation)
-     *
-     * @param array $columnList
-     * @param array $options
-     * @return GenericCollection
-     */
-    public function findByColumnList(array $columnList, $options = array())
-    {
-        $columnList['completion_status'] = DataObject::COMPLETION_STATUS_COMPLETE;
-        return parent::findByColumnList($columnList, $options);
-    }
-
-    /**
      * @return string
      */
     protected function getExternalColumnName()
@@ -104,6 +91,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
             $taskFeedback = (new DomainObject())
                 ->setId($completion->getId())
+                ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 // The completion serves as both a response and a feedback.
                 // Add a corresponding stub response.
                 ->setResponse(
@@ -149,7 +137,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setTask(
-                    (new Task())
+                    (new TaskDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setStudent($domainObject->getReviewee())

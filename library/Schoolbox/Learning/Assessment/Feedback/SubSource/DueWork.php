@@ -17,6 +17,11 @@ use Schoolbox\Learning\Assessment\IAssessable;
 class DueWork extends AbstractSubSource
 {
     /**
+     * @inheritdoc
+     */
+    protected $studentField = 'owner';
+
+    /**
      * Constructor
      *
      * @param MapperProxy $mapperProxy

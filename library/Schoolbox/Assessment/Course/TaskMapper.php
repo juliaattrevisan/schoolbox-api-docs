@@ -116,6 +116,11 @@ class TaskMapper extends Schoolbox\Mapper {
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
+        $this->hasJoin('completion', array(
+            'mapper'    => Task\CompletionMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'task_id',
+        ));
 
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
         $this->registerCallback('preSave', array($this, 'preSave'));

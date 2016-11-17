@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Feedback;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\User;
 
 /**
  * The single source of truth for assessment feedback.
@@ -61,6 +62,19 @@ class DataSource implements IFeedbackDataSource
             }
         }
         return $assessments;
+    }
+
+    /**
+     * @param User $student
+     * @return Collection|IFeedback[]
+     */
+    public function findForStudent(User $student)
+    {
+        $allFeedback = new Collection();
+        foreach ($this->subSources as $subSource) {
+            $allFeedback = $allFeedback->merge($subSource->findForStudent($student));
+        }
+        return $allFeedback;
     }
 
     /**

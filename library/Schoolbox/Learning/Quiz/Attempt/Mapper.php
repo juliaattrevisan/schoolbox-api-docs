@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
 use PDOStatement;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Collection;
@@ -84,24 +83,27 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('assessment', 'a')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
+            INNER JOIN {$this->getJoinSql('assessment', '', 'a')}
         ";
     }
 
     /**
      * @param PDOStatement $statement
      * @return Collection
-     * @throws Mapper\Exception
+     * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
         $c = $this->createCollection();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /** @var Attempt $attempt */
+            /** @var Model $attempt */
             $attempt = $this->hydrate($row);
             $attempt->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $attempt->setAssessment($this->hydrateJoin($row, 'assessment', 'a'));
             $c->add($attempt);
         }
         return $c;

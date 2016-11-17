@@ -5,7 +5,10 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
+
+use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -23,7 +26,10 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -38,23 +44,36 @@ class MapperProxy
      * @var Mapper
      */
     protected $baseMapper;
+
     /**
      * The translator between domain and data objects.
      *
      * @var Translator
      */
     protected $translator;
+
+    /**
+     * @var External_UserInterface
+     */
+    protected $externalUser;
+
     /**
      * Constructor
      *
-     * @param Mapper     $baseMapper
-     * @param Translator $translator
+     * @param Mapper                 $baseMapper
+     * @param Translator             $translator
+     * @param External_UserInterface $externalUser
      */
-    public function __construct(Mapper $baseMapper, Translator $translator)
-    {
-        $this->baseMapper = $baseMapper;
-        $this->translator = $translator;
+    public function __construct(
+        Mapper $baseMapper,
+        Translator $translator,
+        External_UserInterface $externalUser
+    ) {
+        $this->baseMapper   = $baseMapper;
+        $this->translator   = $translator;
+        $this->externalUser = $externalUser;
     }
+
     /**
      * Finds an assessable by ID
      *
@@ -73,6 +92,7 @@ class MapperProxy
             throw $e;
         }
     }
+
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -88,6 +108,7 @@ class MapperProxy
         $model = $this->baseMapper->findById($assessmentId);
         return $this->findById($model->getSpecificationAssessment()->getId());
     }
+
     /**
      * Finds the specification assessment for a implementation assessment
      *
@@ -98,11 +119,14 @@ class MapperProxy
     public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        return $this->baseMapper->findByColumn('spec.id', $assessmentId, $options)
-            ->map([$this, 'translateToDomainModel']);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('spec.id', $assessmentId, $options));
     }
+
     /**
-     * Find all assessables for this context
+     * Find all assessables for this context.
+     *
+     * If $context is a Folder, this method does not retrieve assessables that
+     * are within a course implementation that has been created on that folder.
      *
      * @param AssessmentContext $context
      * @param array             $options
@@ -111,7 +135,7 @@ class MapperProxy
     public function findAllForContext(AssessmentContext $context, $options = [])
     {
         if ($context instanceof Folder) {
-            return $this->findAllForFolderId($context->getId(), $options);
+            return $this->findAllForFolderIdExclusively($context->getId(), $options);
         }
         if ($context instanceof UnitSpecification) {
             return $this->findAllForUnitSpecificationId($context->getId(), $options);
@@ -124,6 +148,7 @@ class MapperProxy
         }
         return new Collection();
     }
+
     /**
      * Finds all assessables for a unit specification
      *
@@ -135,6 +160,7 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
     }
+
     /**
      * Finds all assessables for a unit implementation
      *
@@ -146,21 +172,44 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
     }
+
     /**
      * Finds all assessables for a folder.
      *
-     * This only finds assessables that are directly within a folder context:
-     * see `findAllInCourseImplementationForFolderId` for finding assessables
-     * that have been imported into a folder through a course import.
+     * This now defaults to finding assessables that are within a course
+     * implementation of the given folder.
+     * This is more likely to be the expected behavior of this method.
      *
-     * @param int   $folderId
+     * @param int   $folderId A folder or list of folders
      * @param array $options
      * @return Collection|IAssessable[]
      */
     public function findAllForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('f.id', $folderId, $options));
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findAllForFolderId(
+                $folderId,
+                $this->convertOptionsToColumnList($options),
+                $options
+            )
+        );
     }
+
+    /**
+     * Finds all assessables for a folder, not including course implementation
+     * assessables.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForFolderIdExclusively($folderId, $options = [])
+    {
+        $params         = $this->convertOptionsToColumnList($options);
+        $params['f.id'] = $folderId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+    }
+
     /**
      * Finds all assessables that have been imported into a folder through a
      * course import.
@@ -171,7 +220,10 @@ class MapperProxy
      */
     public function findAllInCourseImplementationForFolderId($folderId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('uicf.id', $folderId, $options));
+        $params            = $this->convertOptionsToColumnList($options);
+        // uicf.id = Unit Implementation Course Folder ID
+        $params['uicf.id'] = $folderId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -185,6 +237,40 @@ class MapperProxy
     {
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
     }
+
+    /**
+     * Finds all assessables that this student is participating in.
+     *
+     * @param User $student
+     * @param Term $term    Restrict results to this term
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForStudent(User $student, Term $term)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
+
+        // Find this user's folders from folder mapper
+        $classFolderIds = $folderMapper->findForUser(
+            $student,
+            // Only actual students have classes
+            $student->getRole()->isStudent(),
+            UserAccess::ACCESS_READ,
+            true
+        )->getColumnValues('id');
+
+        // Build a list of parameters to pass to findAllForFolderId
+        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
+
+        // Find assessments which this student is no longer in the class for,
+        // but has created a response or feedback for.
+        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
+
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+        );
+    }
+
     /**
      * Saves an assessable
      *
@@ -248,6 +334,7 @@ class MapperProxy
             }
         }
     }
+
     /**
      * Deletes an assessable
      *
@@ -260,6 +347,7 @@ class MapperProxy
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
     }
+
     /**
      * Translates the data model to a domain object.
      *
@@ -279,6 +367,7 @@ class MapperProxy
         }
         return $assessable;
     }
+
     /**
      * Translates a collection of data models to a domain object.
      *
@@ -302,6 +391,7 @@ class MapperProxy
         }
         return $newCollection;
     }
+
     /**
      * Translates the domain object to a data model.
      *
@@ -317,5 +407,28 @@ class MapperProxy
         $model = $dataModel->getAssessmentModel();
         $model->setSubObject($dataModel);
         return $model;
+    }
+
+    /**
+     * Helper function for converting a list of options into a column list.
+     *
+     * Currently, only converts "term" to a due date span.
+     *
+     * @param array $options
+     * @return array
+     */
+    protected function convertOptionsToColumnList($options)
+    {
+        $columnList = [];
+        if ($options['term'] instanceof Term) {
+            $term = $options['term'];
+            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
+                $columnList['due_date >='] = $term->getStart()->getDatabaseDate();
+            }
+            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
+                $columnList['due_date <='] = $term->getActualFinish()->getDatabaseDate();
+            }
+        }
+        return $columnList;
     }
 }

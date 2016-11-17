@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Mapper\AbstractMapperProxy;
+use Schoolbox\User;
 
 /**
  * Base class for response sub-sources.
@@ -22,6 +23,13 @@ abstract class AbstractSubSource implements IResponseDataSource
      * @var AbstractMapperProxy
      */
     protected $mapperProxy;
+
+    /**
+     * The field of the mapper proxy's table which contains the student ID.
+     *
+     * @var string
+     */
+    protected $studentField;
 
     /**
      * Constructor
@@ -47,6 +55,14 @@ abstract class AbstractSubSource implements IResponseDataSource
                                      });
         }
         return new Collection();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findForStudent(User $student)
+    {
+        return $this->mapperProxy->findByColumnList([$this->studentField => $student->getId()]);
     }
 
     /**

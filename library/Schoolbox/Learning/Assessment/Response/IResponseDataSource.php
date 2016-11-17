@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Response;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\User;
 
 /**
  * Interface for all assessment response sources.
@@ -31,6 +32,15 @@ interface IResponseDataSource
      * @return Collection|IResponse[]
      */
     public function findForAssessment(IAssessable $assessment);
+
+    /**
+     * Returns responses that this student has submitted, or that have been
+     * submitted on their behalf.
+     *
+     * @param User $student
+     * @return mixed
+     */
+    public function findForStudent(User $student);
 
     /**
      * Saves a response.

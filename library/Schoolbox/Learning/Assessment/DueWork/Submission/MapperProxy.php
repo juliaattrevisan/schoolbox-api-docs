@@ -7,12 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
@@ -93,6 +94,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($mapperModels as $studentSubmission) {
             $response = (new DomainObject())
                 ->setId($studentSubmission->getId())
+                ->setAssessable((new DueWork())->setId($studentSubmission->getSubmissionBox()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($studentSubmission->getOwner())
                 // TODO add submitted on behalf of as a separate column
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
@@ -131,7 +133,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setSubmissionBox(
-                    (new SubmissionBox())
+                    (new DueWorkDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
                 ->setOwner($domainObject->getSubmittedOnBehalfOf())
