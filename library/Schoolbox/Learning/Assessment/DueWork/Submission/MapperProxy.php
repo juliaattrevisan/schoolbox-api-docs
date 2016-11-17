@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as DataObject;
@@ -159,5 +160,19 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $dataModels;
+    }
+
+    /**
+     * Delete all the associated files then save them all again, to prevent
+     * exponential accumulation of dupe files
+     *
+     * @param object|Collection $model
+     * @return bool
+     */
+    public function save($model)
+    {
+        SingleFileMapper::getInstance()->deleteByColumn('student_submission_id', $model->getId());
+
+        return parent::save($model);
     }
 }
