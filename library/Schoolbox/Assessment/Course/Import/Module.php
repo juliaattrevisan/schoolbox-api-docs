@@ -19,6 +19,11 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 
 class Module extends \Alaress\Module\Module
 {
@@ -80,11 +85,11 @@ class Module extends \Alaress\Module\Module
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
-                'setUnitSpecificationMapperProxy'   => $injector->lazyGet('unitSpecificationDataSource'),
-                'setUnitImplementationMapperProxy'   => $injector->lazyGet('unitImplementationDataSource'),
-                'setFolderMapper'                   => $this->getFolderMapper(),
-                'setCourseSpecificationMapperProxy' => $this->getCourseSpecificationMapperProxy(),
-                'setCourseImplementationMapperProxy' => $this->getCourseImplementationMapperProxy(),
+                'setUnitSpecificationMapper'        => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
+                'setUnitImplementationMapper'       => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                'setFolderMapper'                   => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'setCourseSpecificationMapper'      => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+                'setCourseImplementationMapper'     => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
                 'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
                 'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),

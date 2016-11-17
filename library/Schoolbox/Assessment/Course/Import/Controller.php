@@ -29,29 +29,33 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Config;
 use Schoolbox\Resource;
-use Schoolbox\Learning\Course\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 class Controller extends Base\Base
 {
+    /** @var CourseSpecificationMapper */
+    private $courseSpecificationMapper;
 
-    /** @var Unit\SpecificationMapperProxy */
-    private $unitSpecificationMapperProxy;
+    /** @var CourseImplementationMapper */
+    private $courseImplementationMapper;
 
-    /** @var Unit\ImplementationMapperProxy */
-    private $unitImplementationMapperProxy;
+    /** @var UnitSpecificationMapper */
+    private $unitSpecificationMapper;
+
+    /** @var UnitImplementationMapper */
+    private $unitImplementationMapper;
 
     /** @var FolderMapper */
     private $folderMapper;
 
-    /** @var Course\SpecificationMapperProxy */
-    private $courseSpecificationMapperProxy;
-
-    /** @var Course\ImplementationMapperProxy */
-    private $courseImplementationMapperProxy;
 
     /** @var UserAccessMapper */
     private $userAccessMapper;
@@ -184,7 +188,7 @@ class Controller extends Base\Base
 
 
         try {
-            $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($courseSpecId);
+            $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -268,7 +272,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["component_id"]);
 
         // build implementation objects from the specs
-        $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseSpecId);
+        $unitSpecs = $this->getUnitSpecificationMapper()->findAllByCourseId($courseSpecId);
         $unitImpls = new Collection();
         foreach ($unitSpecs as $spec) {
             $unitImpls->add((new UnitImplementation())
@@ -357,7 +361,7 @@ class Controller extends Base\Base
         // on the course we are trying to import.
 
         // Test course page read access
-        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($courseSpecId);
+        $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
         if ($this->getAccess()->getFolderAccess($this->getUser(), [$courseSpec->getFolder()->getId()]) < READ_ACCESS) {
             $this->sendError('You do not have permission to import this course');
         }
@@ -469,17 +473,34 @@ class Controller extends Base\Base
         $courseImplId = trim($post['course_impl_id']);
         $componentId = trim($post['component_id']);
         $ownerships = trim($post['ownerships']);
-        $unitSpecs = $post['unit'];
+        $unitPairs = $post['unit'];
+
+        // Algorithm:
+        //
+        // 1. Create a graph of the CourseImpl that exists in DB
+        // 2. Create a graph of the CourseImpl as indicated in POST data
+        // 3. Traverse DB-graph
+        //   3.1 if(entity not in POST-graph)
+        //       3.1.1 delete entity
+        // 4. Traverse POST-graph
+        //   4.1 if(entity not in DB-graph)
+        //       4.1.1 create entity
+        //       4.1. 2 save entity
+
+        // Are we creating a new import or modifying an existing?
+        if('import'){
+            $dbCourseImpl = new \Schoolbox\Learning\Course\DataModel\Implementation\Model();
+        }
 
 
-        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['course_homepage'])->setUnits(new Collection()); // TODO what the actual fuck
+        $courseSpec = $this->getCourseSpecificationMapper()->findById($post['course_homepage'])->setUnits(new Collection()); // TODO what the actual fuck
 
         foreach ($post['unit'] as $unitSpecId => $unitPost) {
 //          $unitImplId = $unitPost['impl_id'];
 
             try {
                 // cache the spec
-                $unitSpec = $this->getUnitSpecificationMapperProxy()->findById($unitSpecId);
+                $unitSpec = $this->getUnitSpecificationMapper()->findById($unitSpecId);
 
                 // TODO in import-modify context, support overlay of implementation assessments over spec
 
@@ -559,7 +580,7 @@ class Controller extends Base\Base
         try {
             // aaaaaand, into the DB with you!
             foreach ($courseImplementations as $ci) {
-                $this->getCourseImplementationMapperProxy()->save($ci);
+                $this->getCourseImplementationMapper()->save($ci);
 
                 // save the assessments inside
                 foreach ($ci->getUnits() as $unit) {
@@ -753,38 +774,38 @@ class Controller extends Base\Base
 
 
     /**
-     * @return Unit\SpecificationMapperProxy
+     * @return UnitSpecificationMapper
      */
-    public function getUnitSpecificationMapperProxy()
+    public function getUnitSpecificationMapper()
     {
-        return $this->unitSpecificationMapperProxy;
+        return $this->unitSpecificationMapper;
     }
 
     /**
-     * @param Unit\SpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      * @return static
      */
-    public function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
+    public function setUnitSpecificationMapper(UnitSpecificationMapper $unitSpecificationMapper)
     {
-        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
         return $this;
     }
 
     /**
-     * @return Unit\ImplementationMapperProxy
+     * @return UnitImplementationMapper
      */
-    public function getUnitImplementationMapperProxy()
+    public function getUnitImplementationMapper()
     {
-        return $this->unitImplementationMapperProxy;
+        return $this->unitImplementationMapper;
     }
 
     /**
-     * @param Unit\ImplementationMapperProxy $unitImplementationMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
      * @return static
      */
-    public function setUnitImplementationMapperProxy($unitImplementationMapperProxy)
+    public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
     {
-        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
+        $this->unitImplementationMapper = $unitImplementationMapper;
         return $this;
     }
 
@@ -803,27 +824,27 @@ class Controller extends Base\Base
      *
      * @param FolderMapper $folderMapper
      */
-    public function setFolderMapper($folderMapper)
+    public function setFolderMapper(FolderMapper $folderMapper)
     {
         $this->folderMapper = $folderMapper;
     }
 
 
     /**
-     * @return Course\SpecificationMapperProxy
+     * @return CourseSpecificationMapper
      */
-    public function getCourseSpecificationMapperProxy()
+    public function getCourseSpecificationMapper()
     {
-        return $this->courseSpecificationMapperProxy;
+        return $this->courseSpecificationMapper;
     }
 
     /**
-     * @param Course\SpecificationMapperProxy $courseSpecificationMapperProxy
+     * @param CourseSpecificationMapper $courseSpecificationMapper
      * @return static
      */
-    public function setCourseSpecificationMapperProxy($courseSpecificationMapperProxy)
+    public function setCourseSpecificationMapper(CourseSpecificationMapper $courseSpecificationMapper)
     {
-        $this->courseSpecificationMapperProxy = $courseSpecificationMapperProxy;
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
         return $this;
     }
 
@@ -839,7 +860,7 @@ class Controller extends Base\Base
      * @param UserAccessMapper $userAccessMapper
      * @return static
      */
-    public function setUserAccessMapper($userAccessMapper)
+    public function setUserAccessMapper(UserAccessMapper $userAccessMapper)
     {
         $this->userAccessMapper = $userAccessMapper;
         return $this;
@@ -858,7 +879,7 @@ class Controller extends Base\Base
      * @param Access $access
      * @return static
      */
-    public function setAccess($access)
+    public function setAccess(Access $access)
     {
         $this->access = $access;
         return $this;
@@ -878,7 +899,7 @@ class Controller extends Base\Base
      * @param UserMapper $userMapper
      * @return static
      */
-    public function setUserMapper($userMapper)
+    public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
         return $this;
@@ -898,7 +919,7 @@ class Controller extends Base\Base
      * @param Assessment\DataModel\MapperProxy $assessmentMapper
      * @return static
      */
-    public function setAssessmentMapper($assessmentMapper)
+    public function setAssessmentMapper(Assessment\DataModel\MapperProxy $assessmentMapper)
     {
         $this->assessmentMapper = $assessmentMapper;
         return $this;
@@ -918,7 +939,7 @@ class Controller extends Base\Base
      * @param Course\ImplementationFactory $unitImplementationFactory
      * @return static
      */
-    public function setCourseImplementationFactory($unitImplementationFactory)
+    public function setCourseImplementationFactory(Course\ImplementationFactory $unitImplementationFactory)
     {
         $this->courseImplementationFactory = $unitImplementationFactory;
         return $this;
@@ -926,21 +947,21 @@ class Controller extends Base\Base
 
 
     /**
-     * @return Course\ImplementationMapperProxy
+     * @return CourseImplementationMapper
      */
-    public function getCourseImplementationMapperProxy()
+    public function getCourseImplementationMapper()
     {
-        return $this->courseImplementationMapperProxy;
+        return $this->courseImplementationMapper;
     }
 
 
     /**
-     * @param Course\ImplementationMapperProxy $courseImplementationMapperProxy
+     * @param CourseImplementationMapper $courseImplementationMapper
      * @return static
      */
-    public function setCourseImplementationMapperProxy($courseImplementationMapperProxy)
+    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
     {
-        $this->courseImplementationMapperProxy = $courseImplementationMapperProxy;
+        $this->courseImplementationMapper = $courseImplementationMapper;
         return $this;
     }
 
