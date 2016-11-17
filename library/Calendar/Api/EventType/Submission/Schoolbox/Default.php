@@ -62,7 +62,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
-        $assessmentDataSource = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy();
+        // TODO inject this - construction of calendar API objects needs to be cleaned up to allow this to happen
+        /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
+        global $kernel;
+        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $kernel->getDependencyInjector()->get('assessmentDataSource');
 
         // Find for student currently hacks together a term
         $term = (new Schoolbox\Assessment\Term\Model())
