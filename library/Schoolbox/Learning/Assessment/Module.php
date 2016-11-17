@@ -130,10 +130,6 @@ class Module extends BaseModule
             $assessment  = $this->preloadAssessment($params)['assessment'];
             $student     = $this->getUserMapper()->findById($params['studentId']);
 
-            /* Load participant's Responses and Feedbacks
-             */
-            $this->getParticipantMapperProxy()->findForAssessment($assessment, $student);
-
             /** @var IAssessable $assessment */
             $participant = $assessment->getParticipant($student);
 
@@ -182,9 +178,9 @@ class Module extends BaseModule
     protected function preloadAssessment(array $params)
     {
         try {
-            $a = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
         } catch (MapperException\Deleted $e){
-            $a = $e->getDeletedObject();
+            $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
@@ -192,10 +188,14 @@ class Module extends BaseModule
         $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($a);
 
         // set the controller
-        $this->setControllerFromAssessment($a);
+        $this->setControllerFromAssessment($assessment);
+
+        /* Load participant's Responses and Feedbacks
+         */
+        $this->getParticipantMapperProxy()->findForAssessment($assessment);
 
         return [
-            'assessment' => $a
+            'assessment' => $assessment
         ];
     }
 
