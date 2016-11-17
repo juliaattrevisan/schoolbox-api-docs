@@ -24,7 +24,7 @@ class Controller extends Base
     {
         /* Generate an updated csv
          */
-        $filename = 'temp.csv';
+        $filename = sb_tempnam();
         $file = fopen($filename, 'w');
         $exporter = new Exporter($this->getDi()->get('database'));
         $exporter->generate($file);
