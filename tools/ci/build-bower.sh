@@ -17,6 +17,14 @@ fi
 
 echo "Branch: $branch";
 
+echo "Unpacking npm build";
+tar xzf ../$2;
+if [ $? -ne 0 ];
+then
+	echo "Unable to unpack npm tarball";
+	exit 1;
+fi
+
 PATH="$PATH:$instdir/node_modules/.bin";
 
 echo "Building Bower submodules";
