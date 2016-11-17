@@ -89,7 +89,7 @@ if (!empty($article['userList'])) {
 }
 
 // Error out is user didn't pass any of the checks
-if (!$isSuperuser && !isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
+if (!$isSuperuser && !$isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
     error(19);
 }
 
