@@ -34,15 +34,22 @@ $newsAccess = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_NE
 // Check superuser
 $isSuperuser = false;
 
-if ($user->isSuperuser() ) {
+if ($user->isSuperuser()) {
     $isSuperuser = true;
 }
 
+// Check if user is author or owner
+$isOwner = false;
+if ($user->getId() == $article['item_owner']) {
+    $isOwner = true;
+}
+
 // Check if user has moderate access
+$isModerator = false;
 foreach ($article['campusList'] as $articleCampusId) {
     foreach($newsAccess as $access) {
-        if($access->getServiceIdentifier() == $articleCampusId ) {
-            $isSuperuser = true;
+        if ($access->getServiceIdentifier() == $articleCampusId) {
+            $isModerator = true;
         }
     }
 }
@@ -81,8 +88,8 @@ if (!empty($article['userList'])) {
     }
 }
 
-// If user is not a super user & does not have normal access - error out
-if (!$isSuperuser && !$hasNormalAccess && !$hasIndividualAccess) {
+// Error out is user didn't pass any of the checks
+if (!$isSuperuser && !$isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
     error(19);
 }
 
