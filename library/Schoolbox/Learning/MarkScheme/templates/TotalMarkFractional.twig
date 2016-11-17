@@ -9,15 +9,15 @@
 <div class="row">
 {% if participant.allResponses | length %}
 
-    <div class="small-12 large-4 column">
+    <div class="small-12 large-4 column content">
     {% set urgencyClass = review ? urgency.marks(review.normalisedMark) : '' %}
 
     {% if attempt %}
         {% if attempt.submitted %}
             {% if review %}
-                <p class="grade {{ urgencyClass }}">
+                <span class="grade {{ urgencyClass }}">
                     <span>{{ review.humanReadableMark }}</span>
-                </p>
+                </span>
             {% else %}
                 {#<a href="#" class="button expand">Review</a>#}
                 <h4>Awaiting Review</h4>
@@ -29,32 +29,11 @@
         &ndash;
     {% endif %}
     </div>
-    <div class="small-12 large-8 column">
-        {% set dt = 'small-6 large-3' %}
-        {% set dd = 'small-6 large-9' %}
-
-        <dl class="inline-dl">
-
-            {% if attempt.submitted %}
-            <dt class="{{ dt }}">Finish</dt>
-            <dd class="{{ dd }}">
-                {% if attempt.submittedAt.null %}&ndash;{% else %}{{ attempt.submittedAt.local }}{% endif %}
-            </dd>
-
-            <dt class="{{ dt }}">Time Taken</dt>
-            <dd class="{{ dd }}">
-                {% if attempt.submittedAt.null %}In Progress...{% else %}{{ attempt.duration.hms }}{% endif %}
-            </dd>
-            {% endif %}
-
-            {% if multipleResponses %}
-            <dt class="{{ dt }}">Previous Attempts</dt>
-            <dd class="{{ dd }}">
-                {{ participant.allResponses | length - 1 }}
-            </dd>
-            {% endif %}
-
-        </dl>
+    <div class="small-12 large-8 column content">
+        {% if attempt.submitted %}
+            Finished <time title="{{ attempt.submittedAt.local }}"><strong>{{ attempt.submittedAt.relativeTime }}</strong></time> in <strong>{{ attempt.duration.hms }}</strong>
+            {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+        {% endif %}
     </div>
 {% endif %}
     <div class="row">
