@@ -82,12 +82,14 @@ class Exporter
             $codeLength = $closeBracketPos - $openBracketPos;
             $assessmentCode = substr($result['name'], $openBracketPos+1, $codeLength-1);
 
-            $data[] = [
-                $headings[0] => $result['synergy_id'],
-                $headings[1] => $result['code'],
-                $headings[2] => $assessmentCode,
-                $headings[3] => $result['mark']
-            ];
+            if (strlen($assessmentCode) > 0) {
+                $data[] = [
+                    $headings[0] => $result['synergy_id'],
+                    $headings[1] => $result['code'],
+                    $headings[2] => $assessmentCode,
+                    $headings[3] => $result['mark']
+                ];
+            }
         }
 
         $writer = new CsvWriter($file, $data);
