@@ -90,7 +90,7 @@ class Controller extends Base
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
-        // Student's subjects
+        // Student's subjects and teachers
         $subjects = [];
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)
@@ -114,9 +114,10 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
                 [
-                    'student'  => $student,
-                    'date'     => $date,
-                    'subjects' => $subjects,
+                    'student'    => $student,
+                    'date'       => $date,
+                    'subjects'   => $subjects,
+                    'mailHandle' => $this->getSession()->get('mailhandle'),
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯

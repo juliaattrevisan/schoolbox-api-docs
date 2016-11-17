@@ -44,7 +44,7 @@
 
                         </div>
                         <nav>
-                            {#<a href="{{  }}" class="icon-email" title="Mail"></a>#}
+                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
                         </nav>
                     </li>
                     {% endfor %}
