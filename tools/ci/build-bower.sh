@@ -25,6 +25,9 @@ then
 	exit 1;
 fi
 
+echo "Ensure grunt available";
+tools/grunt.sh;
+
 PATH="$PATH:$instdir/node_modules/.bin";
 
 echo "Building Bower submodules";
