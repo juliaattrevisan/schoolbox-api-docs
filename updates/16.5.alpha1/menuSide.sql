@@ -5,18 +5,18 @@ CREATE TABLE menu_side (
   parent_id INT(11),
   sort_order INT,
   title VARCHAR(200),
-  url VARCHAR(1000),
+  url VARCHAR(2048),
   target VARCHAR(200),
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
-CREATE TABLE menu_side_user_options (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  user_id INT(11),
-  show_bookmarks INT,
-  show_groups INT,
-  show_subjects INT,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+-- CREATE TABLE menu_side_user_options (
+--   id INT(11) NOT NULL AUTO_INCREMENT,
+--   user_id INT(11),
+--   show_bookmarks INT,
+--   show_groups INT,
+--   show_subjects INT,
+--   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE menu_side_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -148,3 +148,11 @@ WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') IN ('peninsu
 
 INSERT INTO menu_side_section (section, sort_order, visible, title) SELECT 'bookmarks', 5, 1, ''
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') IN ('peninsula');
+
+SET FOREIGN_KEY_CHECKS  = 0;
+
+ALTER TABLE menu_side_campus ADD CONSTRAINT menu_side_campus_menu_side_id_fk FOREIGN KEY (menu_side_id) REFERENCES menu_side (id);
+ALTER TABLE menu_side_role ADD CONSTRAINT menu_side_role_menu_side_id_fk FOREIGN KEY (menu_side_id) REFERENCES menu_side (id);
+ALTER TABLE menu_side ADD CONSTRAINT menu_side_menu_side_id_fk FOREIGN KEY (parent_id) REFERENCES menu_side (id);
+
+SET FOREIGN_KEY_CHECKS  = 1;

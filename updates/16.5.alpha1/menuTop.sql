@@ -5,7 +5,7 @@ CREATE TABLE menu_top (
   `text` VARCHAR(200),
   token VARCHAR(200),
   icon VARCHAR(200),
-  url VARCHAR(1000),
+  url VARCHAR(2048),
   target VARCHAR(200),
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
@@ -82,3 +82,10 @@ INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 9, id FROM groups;
 INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 10, id FROM groups;
 INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 11, id FROM groups;
 INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 12, id FROM groups;
+
+SET FOREIGN_KEY_CHECKS  = 0;
+
+ALTER TABLE menu_top_campus ADD CONSTRAINT menu_top_campus_menu_top_id_fk FOREIGN KEY (menu_top_id) REFERENCES menu_top (id);
+ALTER TABLE menu_top_role ADD CONSTRAINT menu_top_role_menu_top_id_fk FOREIGN KEY (menu_top_id) REFERENCES menu_top (id);
+
+SET FOREIGN_KEY_CHECKS  = 1;

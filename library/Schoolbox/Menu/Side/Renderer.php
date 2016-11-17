@@ -11,8 +11,6 @@ namespace Schoolbox\Menu\Side;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Menu\Side\UserOptions\Mapper as MenuSideUserOptionsMapper;
-use Schoolbox\Menu\Side\UserOptions\Model as MenuSideUserOptionsModel;
 use Schoolbox\Menu\Side\Mapper as MenuSideMapper;
 use Schoolbox\Menu\Side\Model as MenuSide;
 use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
@@ -43,9 +41,6 @@ class Renderer extends \Twig_Extension
     /** @var MenuSideRoleMapper */
     protected $menuSideRoleMapper;
 
-    /** @var MenuSideUserOptionsMapper */
-    protected $menuSideUserOptionsMapper;
-
     /** @var FolderMapper */
     protected $folderMapper;
 
@@ -70,7 +65,6 @@ class Renderer extends \Twig_Extension
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setBookmarkMapper(BookmarkMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
-        $this->setMenuSideUserOptionsMapper(MenuSideUserOptionsMapper::getInstance());
         $this->configLoader = new ConfigLoader();
     }
 
@@ -98,17 +92,9 @@ class Renderer extends \Twig_Extension
         // Check if the user has groups or bookmarks hidden
 
         if ($user instanceof User) {
-            try {
-                /** @var MenuSideUserOptionsModel $options */
-                $options = $this->getMenuSideUserOptionsMapper()->findOneByColumn("user_id", $user->getId());
-                $showBookmarks = $options->getShowBookmarks();
-                $showGroups = $options->getShowGroups();
-                $showSubjects = $options->getShowSubjects();
-            } catch (MapperException $e) {
-                $showSubjects = true;
-                $showBookmarks = true;
-                $showGroups = true;
-            }
+            $showSubjects = true;
+            $showBookmarks = true;
+            $showGroups = true;
         } else {
             $showSubjects = false;
             $showBookmarks = false;
@@ -409,24 +395,6 @@ class Renderer extends \Twig_Extension
     public function setBookmarkMapper($bookmarkMapper)
     {
         $this->bookmarkMapper = $bookmarkMapper;
-        return $this;
-    }
-
-    /**
-     * @return MenuSideUserOptionsMapper
-     */
-    public function getMenuSideUserOptionsMapper()
-    {
-        return $this->menuSideUserOptionsMapper;
-    }
-
-    /**
-     * @param MenuSideUserOptionsMapper $menuSideUserOptionsMapper
-     * @return $this
-     */
-    public function setMenuSideUserOptionsMapper($menuSideUserOptionsMapper)
-    {
-        $this->menuSideUserOptionsMapper = $menuSideUserOptionsMapper;
         return $this;
     }
 }
