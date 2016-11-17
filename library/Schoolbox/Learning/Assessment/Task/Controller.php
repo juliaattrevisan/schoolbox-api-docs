@@ -28,10 +28,9 @@ class Controller extends Assessment\Controller
     public function getStatus(IAssessable $assessment)
     {
 
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/task/summary/staff.twig",
+                "@learningAssessment/fragments/task/status/staff.twig",
                 $twigData
             )
         );
@@ -47,9 +46,13 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
+        $task = $participant->getAssessable();
+
+        $twigData = ['assessment' => $task];
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/task/summary/staff.twig",
+                "@learningAssessment/fragments/task/summary/student.twig",
                 $twigData
             )
         );
