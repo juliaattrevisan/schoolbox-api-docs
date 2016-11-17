@@ -160,7 +160,7 @@ class DataSource
          */
         if ($includeResponses) {
             foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-                if ($user === null || ($user instanceof User) && ($response->isAuthoredBy($user))) {
+                if ($user instanceof User && $response->isAuthoredBy($user)) {
                     $responseUser = $response->getSubmittedOnBehalfOf();
 
                     // Find participant, creating if required
@@ -189,7 +189,7 @@ class DataSource
          */
         if ($includeFeedbacks) {
             foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-                if ($user === null || ($user instanceof User) && ($feedback->isReviewedFor($user))) {
+                if ($user instanceof User && $feedback->isReviewedFor($user)) {
                     $feedbackUser = $feedback->getReviewee();
 
                     // Find participant, creating if required
