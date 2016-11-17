@@ -6,6 +6,7 @@ CREATE TABLE menu_top (
   token VARCHAR(200),
   icon VARCHAR(200),
   url VARCHAR(2048),
+  webmail TINYINT(4) DEFAULT 0,
   target VARCHAR(200),
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
@@ -36,7 +37,7 @@ INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (3, 'View your school timetable', 'Timetable', 'TIMETABLE', 'timetable', '/timetable', null, null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (4, 'School calendar events', 'Calendar', 'CALENDAR', 'calendar', '/calendar/week', null, null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (5, 'Current school news', 'News', 'NEWS', 'news', '/news', null, null);
-INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (6, 'Access your messages here', 'Webmail', null, 'email', 'http://www.gmail.com', '_blank', null);
+INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, webmail, deleted_at) VALUES  (6, 'Access your messages here', 'Webmail', null, 'email', 'http://www.gmail.com', '_blank', 1, null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (7, 'Grades', 'Grades', 'GRADE', 'approve', '/submission/allWork', null, null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (8, 'View and build new courses', 'Courses', 'COURSE', 'course', '/course/list', null, null);
 INSERT INTO menu_top (sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (9, 'Browse resources and homepage', 'Resources', 'RESOURCES', 'folder', '/resources/', null, null);
