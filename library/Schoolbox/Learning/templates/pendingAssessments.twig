@@ -1,10 +1,11 @@
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+{% import 'sub/breadcrumbs.twig' as bread %}
 
-<ul class="breadcrumb">
-    <li><a href="/">Schoolbox</a></li>
-    <li class="active"><a href="{{ routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id }) }}" title="Pending Assessments">Pending Assessments</a></li>
-</ul>
+{{ bread.crumbs(
+    ['Learning', routeLookup('learning.getPendingAssessments')],
+    ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id })]
+) }}
 
 <div class="row">
     <div class="small-12 columns"><h1>{% if viewer.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
