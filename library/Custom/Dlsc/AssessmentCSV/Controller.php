@@ -36,21 +36,28 @@ class Controller extends Base
         /* Force download
          */
         if (file_exists($filename)) {
-            header('Content-Description: File Transfer');
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $newFilename . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($filename));
 
-            readfile($filename);
+            $headers  = $this->getResponse()->headers;
+
+            // per header
+            $headers->set('Content-Description', 'File Transfer');
+            $headers->set('Content-Type', 'text/csv');
+            $headers->set('Content-Description', 'File Transfer');
+            $headers->set('Content-Disposition', 'attachment; filename="' . $newFilename . '"');
+            $headers->set('Expires', 0);
+            $headers->set('Cache-Control', 'must-revalidate');
+            $headers->set('Pragma', 'public');
+            $headers->set('Content-Length', filesize($filename));
+
+            $this->getResponse()->content->set([
+                'format'     => 'file',
+                'file'       => $filename,
+                'postOutput' => [function () use ($filename) {
+                    /* Delete the temp file
+                     */
+                    unlink($filename);
+                }]
+            ]);
         }
-
-        /* Delete the temp file
-         */
-        unlink($filename);
-
-        exit();
     }
 }
