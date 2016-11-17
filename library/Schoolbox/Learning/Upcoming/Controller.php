@@ -48,7 +48,7 @@ class Controller extends Base
      *
      * @api   GET /learning/due/:studentId
      * @param User                $student
-     * @param Alaress_Date_Format $date
+     * @param Alaress_Date_Format $date    The date to show on the work calendar.
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
@@ -60,6 +60,7 @@ class Controller extends Base
                     'date'    => $date,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
+             ->setTab('submission') // ¯\_(ツ)_/¯
         );
     }
 }
