@@ -38,6 +38,12 @@ if ($user->isSuperuser()) {
     $isSuperuser = true;
 }
 
+// Check if user is author or owner
+$isOwner = false;
+if ($user->getId() == $article['item_owner']) {
+    $isOwner = true;
+}
+
 // Check if user has moderate access
 $isModerator = false;
 foreach ($article['campusList'] as $articleCampusId) {
@@ -83,7 +89,7 @@ if (!empty($article['userList'])) {
 }
 
 // Error out is user didn't pass any of the checks
-if (!$isSuperuser && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
+if (!$isSuperuser && !isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
     error(19);
 }
 
