@@ -63,11 +63,6 @@ class Model extends AbstractAssessment
     protected $completionMessage;
 
     /**
-     * @var int
-     */
-    private $markVisibility = Quiz::MARK_VISIBILITY_PRIVATE;
-
-    /**
      * @param GradeGroup|null $gradeGroup
      * @return static
      */
@@ -199,24 +194,6 @@ class Model extends AbstractAssessment
     public function setCompletionMessage($completionMessage)
     {
         $this->completionMessage = $completionMessage;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMarkVisibility()
-    {
-        return $this->markVisibility;
-    }
-
-    /**
-     * @param int $markVisibility
-     * @return static
-     */
-    public function setMarkVisibility($markVisibility)
-    {
-        $this->markVisibility = $markVisibility;
         return $this;
     }
 }
