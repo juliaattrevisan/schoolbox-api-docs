@@ -35,62 +35,6 @@ class Controller extends Base
     }
 
     /**
-     * Delete the most recent feedback IF IT IS A DRAFT
-     *
-     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
-     *
-     * @api   DELETE /learning/assessments/{assessmentId}/{studentId}/feedback
-     * @level 165
-     *
-     * @param Participant $participant
-     */
-    public function deleteParticipantFeedback(Participant $participant)
-    {
-        $feedbacks = $this->getFloatingFeedback($participant);
-
-        if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
-            // cannot delete non-existent or published feedback
-
-            $this->sendError("Cannot delete feedback for {$participant->getUser()->getFullName()}");
-            return;
-        }
-
-        try {
-            // drop the Collection wrapper now so we can do direct array manipulation
-            $feedbacks = array_reverse($feedbacks->getAll());
-            $toDelete  = array_pop($feedbacks);
-
-            $this->getFeedbackDataSource()->delete($toDelete);
-
-            // success: send back the now-most-recent feedback, if any
-            if (count($feedbacks)) {
-
-                /** @var IFeedback $latest */
-                $latest = array_pop($feedbacks);
-
-                $code = 200;
-                $data = [
-                    'mark' => [
-                        'humanReadable' => $latest->getHumanReadableMark(),
-                        'normalised'    => $latest->getNormalisedMark()
-                    ],
-                    'comment' => $latest->getComment()
-                ];
-
-            } else {
-                $code = 204;
-                $data = null;
-            }
-
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set($this->buildJsonOutput($data));
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
      * Post into the feedback collection for a participant. This will create "floating feedback"
      *
      * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.

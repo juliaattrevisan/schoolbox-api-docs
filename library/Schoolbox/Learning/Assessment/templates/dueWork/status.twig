@@ -20,9 +20,6 @@
     <li>
         <a class="icon-approve" data-mass="publish">Publish visible drafts&hellip;</a>
     </li>
-    <li>
-        <a class="icon-delete" data-mass="discard">Discard visible drafts&hellip;</a>
-    </li>
 {% endblock %}
 
 
@@ -152,7 +149,7 @@
                 })
                 .fail(function (xhr) { toast.call($form, xhr.responseText, false); })
                 .always(function () {
-                    $form.find('[data-draft=discard],[data-draft=publish]').removeAttr("disabled");
+                    $form.find('[data-draft=publish]').removeAttr("disabled");
                 });
         }
 
@@ -166,64 +163,6 @@
             this.find('[data-interaction-draft]').slideDown();
         }
 
-        assessmentList.on('click', '[data-draft="discard"]', function (e) {
-            e.preventDefault();
-
-            var $form      = $(this).closest('form'),
-                $actionBar = $form.find('[data-interaction-draft]');
-
-            var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
-                $btnDiscard = $actionBar.find('[data-draft=discard]'),
-                $btnPublish = $actionBar.find('[data-draft=publish]');
-
-            $btnPublish.addClass('closed');
-            $btnDrafted.addClass('closed');
-
-            $btnDiscard.attr('disabled', 'disabled').text('Discarding...');
-
-            $.ajax($form.attr('action'), {
-                headers: {
-                    'X-HTTP-Method-Override': 'DELETE'
-                },
-                dataType: 'json',
-                type: 'POST'
-            }).done(function (response) {
-
-                if (response) {
-                    if (response.comment) {
-                        $form.find('[name=comment]').val(response.comment)
-                    }
-                    if (response.mark) {
-                        var input = $form.find('[name=mark]'),
-                            tag   = input.prop("tagName");
-
-                        if (tag == 'INPUT') {
-                            input.val(response.mark.humanReadable)
-                        } else if (tag == 'SELECT') {
-                            input.val(response.mark.normalised)
-                        }
-                    }
-                } else {
-                    $form.find('textarea').val('');
-                }
-
-                $actionBar.slideUp(function () {
-                    $btnPublish.removeClass('closed').attr('disabled', 'disabled');
-                    $btnDrafted.removeClass('closed').text('');
-                    $btnDiscard.removeAttr('disabled').text('Discard Draft');
-                });
-
-            }).fail(function () {
-                toast.call($form, 'Unable to discard draft', false);
-                $btnPublish.removeClass('closed');
-                $btnDrafted.removeClass('closed');
-
-                $btnDiscard.removeAttr('disabled').text('Discard Draft');
-
-            });
-
-        });
-
         assessmentList.on('click', '[data-draft="publish"]', function (e) {
             e.preventDefault();
 
@@ -231,10 +170,8 @@
                 $actionBar = $form.find('[data-interaction-draft]');
 
             var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
-                $btnDiscard = $actionBar.find('[data-draft=discard]'),
                 $btnPublish = $actionBar.find('[data-draft=publish]');
 
-            $btnDiscard.addClass('closed');
             $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
             $.ajax($form.attr('action'), {
@@ -244,13 +181,11 @@
             }).done(function () {
                 $form.find('[data-interaction-draft]').slideUp(function () {
                     $btnPublish.text('Publish');
-                    $btnDiscard.removeClass('closed');
                     $btnDrafted.text('');
                 });
 
             }).fail(function (xhr) {
                 toast.call($form, xhr.responseText, false);
-                $btnDiscard.removeClass('closed');
                 $btnPublish.removeAttr('disabled').text('Publish');
 
             }).always(function () {

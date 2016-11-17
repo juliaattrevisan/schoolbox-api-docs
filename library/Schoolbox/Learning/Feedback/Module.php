@@ -42,7 +42,6 @@ class Module extends BaseModule
         $participantRoute = '/assessments/{assessmentId:\d+}/{studentId:\d+}';
 
         $this->register('POST',   "$participantRoute/feedback", 'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('DELETE', "$participantRoute/feedback", 'deleteParticipantFeedback', $canGiveFeedback, $preloadParticipant);
     }
 
 
