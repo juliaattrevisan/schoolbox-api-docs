@@ -101,7 +101,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_UPDATED_TIMESTAMP = 4;
     const COLUMN_JOIN_MULTI        = 8;
     const COLUMN_JOIN_READONLY     = 16;
-    const COLUMN_JOIN_REVERSE      = 32
+    const COLUMN_JOIN_REVERSE      = 32;
     const COLUMN_SOFTDELETE        = 64;
 
     /**
