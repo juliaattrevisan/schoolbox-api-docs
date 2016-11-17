@@ -56,7 +56,6 @@
 						var isNano = !!el.attributes && (el.attributes['class'] == "nanospell-typo" || el.attributes['class'] == "nanospell-typo-disabled")
 						if (isNano) {
 							el.replaceWith(el.children[0]);
-							return el.children[0]
 						}
 					}
 				}
