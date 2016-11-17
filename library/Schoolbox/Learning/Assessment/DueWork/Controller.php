@@ -193,35 +193,36 @@ class Controller extends Assessment\Controller
             /** @var Submission\Model $latestResponse */
             $latestResponse = $participant->findMostRecentResponse();
 
-            /* Files attached to the draft submission
-             * Attach files if any exist
+            /* If the latest response is a draft, collect all its contents for editing
              */
-            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
+            if ($latestResponse->isDraft()) {
 
-            // Display the files that are a part of latest submission
-            foreach ($latestResponse->getAllFiles() as $file) {
-
-                /* Load in the wizzywig instead of a file attachment,
-                 * if the submission uses the wizzywig editor
+                /* Files attached to the draft submission
+                 * Attach files if any exist
                  */
-                if ($file->getEditableInline()) {
-                    $editorContents = $file->read();
-                } else {
-                    // add it to the danger zone
-                    $dangerZone->attachFiles([$file->getHash()]);
+                $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
+
+                // Display the files that are a part of latest submission
+                foreach ($latestResponse->getAllFiles() as $file) {
+
+                    /* Load in the wizzywig instead of a file attachment,
+                     * if the $file uses the wizzywig editor
+                     */
+                    if ($file->getEditableInline()) {
+                        $editorContents = $file->read();
+                    } else {
+                        // add it to the danger zone
+                        $dangerZone->attachFiles([$file->getHash()]);
+                    }
                 }
             }
+            else {
 
-            // Is the latest response a draft? Update it if so, otherwise create a new one.
-            // (The files in the latest submission were added regardless, so a student can
-            //  create a new draft from their most recent live submission.)
-            if (!$latestResponse->isDraft()) {
-                $latestResponse = null;
+                /* Otherwise, spawn an entirely new draft
+                 * I would not expect it to recycle files from my previous Submitted submission
+                 */
+                $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
             }
-        }
-
-        if (!$latestResponse) {
-            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
         }
 
         // TODO: what is this I don't even
