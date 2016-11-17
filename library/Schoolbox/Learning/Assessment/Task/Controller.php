@@ -82,7 +82,7 @@ class Controller extends Assessment\Controller
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
         $data['acceptingResponses'] = false;
-        $data['attachzone'] = $zoneFactory->buildForAssessmentType($assessment)->getTwigContext();
+        $data['attachzone'] = $zoneFactory->buildForAssessment($assessment)->getTwigContext();
 
         return $data;
     }

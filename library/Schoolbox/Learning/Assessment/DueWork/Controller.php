@@ -189,7 +189,7 @@ class Controller extends Assessment\Controller
         /* Attach files if any exist
          */
         $zoneFactory = new Assessment\Attachzone\Factory();
-        $zone = $zoneFactory->buildForAssessmentType($assessment);
+        $zone = $zoneFactory->buildForAssessment($assessment);
 
         /* Assume the most recent record is the latest submission
          */
@@ -388,7 +388,7 @@ class Controller extends Assessment\Controller
         // setup some data...
         $data = [
             'acceptingResponses'=> true,
-            'attachzone'      => $zoneFactory->buildForAssessmentType($assessment)->getTwigContext(),
+            'attachzone'      => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allWorkTypes'    => $this->getWorkTypeMapper()->findAll(),
             'allMarkTypes'    => $this->getAllMarkTypes($assessment),
             'allGradeSchemes' => $this->getAllGradeSchemes(),

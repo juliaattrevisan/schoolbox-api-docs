@@ -38,22 +38,6 @@ class Factory
     }
 
     /**
-     * Creates a zone from a given assessment type.
-     *
-     * @param IAssessable $assessment
-     * @return Zone
-     */
-    public function buildForAssessmentType(IAssessable $assessment)
-    {
-        if ($assessment instanceof Task) {
-            return $this->buildForTask();
-        } elseif ($assessment instanceof DueWork) {
-            return $this->buildForDueWork();
-        }
-        return $this->buildGeneric();
-    }
-
-    /**
      * @return Zone
      */
     protected function buildGeneric()
@@ -112,6 +96,7 @@ class Factory
         if ($dueWork instanceof DueWork) {
             $files = [];
             foreach ($dueWork->getAttachedFiles() as $file) {
+
                 $files[] = $file->getHash();
             }
             $zone->attachFiles($files);
