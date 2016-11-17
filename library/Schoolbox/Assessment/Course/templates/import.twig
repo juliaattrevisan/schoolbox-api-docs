@@ -46,7 +46,7 @@ Usages:
                 {
                     event.preventDefault();
                     {# Have to manually call the change event as it doesn't trigger on scripted value updates #}
-                    $('#courseSpecId').val($(this).attr('data-course-id')).change();
+                    $('#course_spec_id').val($(this).attr('data-course-id')).change();
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
                     $('#course-selector-modal').foundation('reveal', 'close');
                 });
@@ -70,7 +70,7 @@ Usages:
         stageOne.bind('validate', function()
         {
             {# Stage 1 validation #}
-            if ($('#courseSpecId').val())
+            if ($('#course_spec_id').val())
             {
                 if ($('#import-folders').val())
                 {
@@ -266,7 +266,6 @@ Usages:
             <section>
                 <fieldset class="content" data-mage="part-course-select" {% if 1 != initialStage %}disabled="disabled"{% endif %}>
                     <legend>1. Course</legend>
-                    <input type="hidden" name="componentId" value="{{ componentId }}">
                     {% if 1 == initialStage %}
                     <div class="meta small-12 column" data-mage-helptext>
                         <p>Select the course that is to be imported, and one or more classes as the target destination.</p>
@@ -275,7 +274,7 @@ Usages:
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputName': 'courseSpecId',
+                                'formInputName': 'course_spec_id',
                                 'formInputValue': courseSpec.id,
                                 'formInputLabel': courseSpec.folder.name,
                                 'folder': folder,
@@ -289,7 +288,7 @@ Usages:
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
                         <label>Class(es)
-                            <input id="import-folders" type="text" name="importFolders" />
+                            <input id="import-folders" type="text" name="import_folders" />
                         </label>
                     </div>
                     {% if 1 == initialStage %}
@@ -304,6 +303,7 @@ Usages:
                             </div>
                         </div>
                     {% endif %}
+                    <input type="hidden" name="component_id" value="{{ componentId }}">
                 </fieldset>
                 <fieldset class="content" data-mage="part-ownership" {% if _part3 %}disabled{% endif %}>
                     <legend>2. Ownership</legend>
@@ -312,7 +312,7 @@ Usages:
                             <div id="ownershipAssignment">
                                 {% include '@course/import/ownership.twig' with {
                                     courseSpec:                    courseSpec,
-                                    component:                     component,
+                                    componentId:                   componentId,
                                     targetFolders:                 [ folder ],
                                     ownershipCandidates:           ownershipCandidates,
                                     _disabled:                     false

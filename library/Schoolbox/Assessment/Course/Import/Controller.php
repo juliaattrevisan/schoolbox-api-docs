@@ -33,6 +33,7 @@ use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 class Controller extends Base\Base
 {
@@ -152,7 +153,7 @@ class Controller extends Base\Base
             'action'       => 'import',
             'initialStage' => $initialStage,
             'courseSpec'   => $courseSpec,
-            'component'    => $courseOutlineComponent,
+            'componentId'  => $courseOutlineComponent->getId(),
             'folder'       => $targetClass,
             'destinations' => $targetClass ?
                 [
@@ -169,7 +170,7 @@ class Controller extends Base\Base
     /**
      * This POST is the result of import stage 1.
      *
-     * Receives the CourseSpec and target Classes to import into.
+     * Receives the CourseSpec, Component, + target Classes to import into.
      * Returns a list of users who may own the generated Assessments for each target Class
      *
      * @api   POST /course/import/classes
@@ -177,8 +178,10 @@ class Controller extends Base\Base
      */
     public function postClasses()
     {
-        $targetFolderIds = explode(',', trim($this->getRequest()->post["importFolders"]));
-        $courseSpecId = trim($this->getRequest()->post["courseSpecId"]);
+        $courseSpecId = trim($this->getRequest()->post['course_spec_id']);
+        $targetFolderIds = explode(',', trim($this->getRequest()->post['import_folders']));
+        $componentId = trim($this->getRequest()->post['component_id']);
+
 
         try {
             $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($courseSpecId);
@@ -212,11 +215,14 @@ class Controller extends Base\Base
 
         $possibleOwnerships = $this->getPossibleOwnerships($folders);
 
+
+
         // Everything kosher, proceed with the mage
         // respond with stage 2: ownership
         $this->tpl('import/ownership', [
-            'targetFolders'       => $folders,
             'courseSpec'          => $courseSpec,
+            'targetFolders'       => $folders,
+            'componentId'         => $componentId,
             'ownershipCandidates' => $possibleOwnerships,
         ]);
     }
@@ -258,8 +264,8 @@ class Controller extends Base\Base
     public function postOwnership()
     {
         $ownerships = $this->getRequest()->post["ownership"];
-        $courseSpecId = trim($this->getRequest()->post["courseSpecId"]);
-        $componentId = trim($this->getRequest()->post["componentId"]);
+        $courseSpecId = trim($this->getRequest()->post["course_spec_id"]);
+        $componentId = trim($this->getRequest()->post["component_id"]);
 
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseSpecId);
@@ -361,61 +367,89 @@ class Controller extends Base\Base
             }
         }
 
-        // Validate dates
+        // Hydrate + Validate dates
         try {
-            foreach($units as $unit){
+            foreach($units as $idx => $unit){
                 if($unit['import']){
-                    $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                    $openDate = \Alaress_Date_Format::newLocalShort($unit['openDate']);
+                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['closeDate']);
                     if ($openDate->gt($closeDate)) {
                         $this->sendError('The open date must be before the close date');
                         return;
                     }
+                    $units[$idx]['openDate'] = $openDate;
+                    $units[$idx]['closeDate'] = $closeDate;
                 }
             }
         } catch (\Exception $e) {
             $this->sendError('You must specify a valid open and close date for each unit you are importing');
             return;
         }
+//
+//        // Build UnitSpec + UnitImpl Assessment Lists
+//        $impls = new Collection();
+//
+//        foreach ($units as $unit) {
+//            if($unit['import']){
+//                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unitSpecId']);
+//                $spec->setAssessables($this->getAssessmentMapper()->findAllForUnitSpecificationId($spec->getId()));
+//
+//                // Is this a modification of prior import ?
+//                if($courseImplId){
+//                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unitImplId']);
+//                    $impl->setAssessables($this->getAssessmentMapper()->findAllForUnitImplementationId($impl->getId()));
+//                } else {
+//                    $impl = new UnitImplementation();
+//                    $impl->setSpecification($spec);
+//                }
+//                $impls->add($impl);
+//            }
+//        }
 
-        // Build UnitSpec + UnitImpl Assessment Lists
-        $impls = new Collection();
-
-        foreach ($units as $unit) {
-            if($unit['import']){
-                $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unitSpecId']);
-                $spec->setAssessables($this->getAssessmentMapper()->findAllByUnitSpecificationId($spec->getId()));
-
-                // Is this a modification of prior import ?
-                if($courseImplId){
-                    $impl = $this->getUnitImplementationMapperProxy()->findById($unit['unitImplId']);
-                    $impl->setAssessables($this->getAssessmentMapper()->findAllByUnitImplementationId($impl->getId()));
-                } else {
-                    $impl = new UnitImplementation();
-                    $impl->setSpecification($spec);
+        /**
+         * Superimposed data structure of UnitSpecs, UnitImpls, AssessmentSpecs + AssessmentImpls
+         *
+         * @var array[] $unitAssessments
+         * @var UnitSpecification $assessments[]['unitSpec']
+         * @var UnitImplementation|null $assessments[]['unitImpl']
+         * @var array $assessments[]['assessments']
+         * @var IAssessable|null $assessments[]['assessments'][]['spec']
+         * @var IAssessable|null $assessments[]['assessments'][]['impl']
+         */
+        $factory = new ImportFactory();
+        $args = [];
+        if($courseSpecId) {
+            $args['unitSpecs'] = [];
+            foreach ($units as $unit) {
+                if ($unit['import']) {
+                    $args['unitSpecs'][$unit['unitSpecId']] = [
+                        'openDate' => $unit['openDate'],
+                        'closeDate' => $unit['closeDate'],
+                    ];
                 }
-                $impls->add($impl);
             }
+        } elseif($courseImplId){
+            // TODO
+            $unitAssessments = $factory->build(['courseImplId' => $courseImplId]);
+        } else {
+            throw new \DomainException('You must specify a CourseSpec or CourseImpl to import');
         }
+        $unitAssessments = $factory->build($args);
 
         // Make sure at least one unit was specified
-        if (empty($impls)) {
+        if (!count($unitAssessments)) {
             $this->sendError('You must select at least one unit to import');
             return;
         }
 
-        $assessments = null; //TODO
-
-
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
-            'action'       => $action,
-            'courseSpecId' => $courseSpecId,
-            'courseImplId' => $courseImplId,
-            'componentId'  => $componentId,
-            'ownerships'   => $post['ownerships'],
-            'assessments'  => $assessments,
-            'submitValue'  => 'modify' == $action ? 'Modify' : 'Import',
+            'action'          => $action,
+            'courseSpecId'    => $courseSpecId,
+            'courseImplId'    => $courseImplId,
+            'componentId'     => $componentId,
+            'ownerships'      => $post['ownerships'],
+            'unitAssessments' => $unitAssessments,
         ]);
     }
 

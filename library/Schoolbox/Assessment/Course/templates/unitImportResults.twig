@@ -4,11 +4,11 @@
         courseSpecId: int,
         courseImplId: int|null,
         units:        array,
-        units[][unitSpecId]: int,
-        units[][unitImplId]: int | null,
-        units[][assessments]: array,
-        units[][assessments][][specId]: int | null,
-        units[][assessments][][implId]: int | null,
+        units[unitSpecId]['unitSpec']: UnitSpecification,
+        units[unitSpecId]['unitImpl']: UnitImplementation | null,
+        units[unitSpecId]['assessments']: array,
+        units[unitSpecId]['assessments'][]['spec']: IAssessable | null,
+        units[unitSpecId]['assessments'][]['impl']: IAssessable | null,
         componentId:  int|null,
         ownerships:   string
     } only %}
@@ -94,10 +94,13 @@
 
 {# Persist data from previous stages #}
 
-<input type="hidden" name="homepage"        value="{{ homepage }}" />
-<input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
-<input type="hidden" name="component_id"    value="{{ componentId }}" />
+<input type="hidden" name="action" value="{{ action }}" />
+<input type="hidden" name="courseSpecId" value="{{ courseSpecId }}" />
+<input type="hidden" name="courseImplId" value="{{ courseImplId }}" />
+<input type="hidden" name="componentId"    value="{{ componentId }}" />
 <input type="hidden" name="ownerships"      value="{{ ownerships }}" />
+
+
 
 {# Iterate through each unit being imported #}
 {% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
