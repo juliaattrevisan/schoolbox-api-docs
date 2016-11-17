@@ -11,9 +11,9 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Menu\Icon\Mapper as MenuIconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Top\Campus\Mapper as MenuTopCampusMapper;
-use \Schoolbox\Menu\Top\Group\Mapper as MenuTopGroupMapper;
+use \Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
 use Schoolbox\Menu\Top\Campus\Model as MenuTopCampus;
-use Schoolbox\Menu\Top\Group\Model as MenuTopGroup;
+use Schoolbox\Menu\Top\Role\Model as MenuTopRole;
 use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTop;
 use Schoolbox\CampusMapper;
@@ -33,7 +33,7 @@ class Controller extends Base
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setCampusMapper(CampusMapper::getInstance());
         $this->setMenuTopCampusMapper(MenuTopCampusMapper::getInstance());
-        $this->setMenuTopGroupMapper(MenuTopGroupMapper::getInstance());
+        $this->setMenuTopRoleMapper(MenuTopRoleMapper::getInstance());
     }
 
     /**
@@ -57,15 +57,15 @@ class Controller extends Base
      */
     public function getModify($id)
     {
-        // Get selected campuses and groups
+        // Get selected campuses and roles
 
-        $selections = $this->getMenuTopGroupMapper()->findByColumn('menu_top_id', $id);
+        $selections = $this->getMenuTopRoleMapper()->findByColumn('menu_top_id', $id);
 
-        $groupsSelected = [];
+        $rolesSelected = [];
 
-        /** @var MenuTopGroup $selection */
+        /** @var MenuTopRole $selection */
         foreach ($selections as $selection) {
-            $groupsSelected[$selection->getGroupId()] = true;
+            $rolesSelected[$selection->getRoleId()] = true;
         }
 
         $selections = $this->getMenuTopCampusMapper()->findByColumn('menu_top_id', $id);
@@ -83,8 +83,8 @@ class Controller extends Base
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 'item' => $this->getMenuTopMapper()->findById($id),
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
-                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
-                'groupsSelected' => $groupsSelected,
+                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'rolesSelected' => $rolesSelected,
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
                 'campusesSelected' => $campusesSelected                
             ],
@@ -102,7 +102,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
-                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
             'title' => 'Admin - Top Menu'
@@ -173,14 +173,14 @@ class Controller extends Base
             }
         }
         
-        $this->getMenuTopGroupMapper()->deleteByColumn('menu_top_id', $item->getId());
+        $this->getMenuTopRoleMapper()->deleteByColumn('menu_top_id', $item->getId());
 
-        if (is_array($post['groups'])) {
-            foreach ($post['groups'] as $groupId) {
-                $menuTopGroup = new MenuTopGroup();
-                $menuTopGroup->setMenuTopId($item->getId());
-                $menuTopGroup->setGroupId($groupId);
-                $this->getMenuTopGroupMapper()->save($menuTopGroup);
+        if (is_array($post['roles'])) {
+            foreach ($post['roles'] as $roleId) {
+                $menuTopRole = new MenuTopRole();
+                $menuTopRole->setMenuTopId($item->getId());
+                $menuTopRole->setRoleId($roleId);
+                $this->getMenuTopRoleMapper()->save($menuTopRole);
             }
         }
         
@@ -248,22 +248,22 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var MenuTopGroupMapper $menuTopGroupMapper */
-    private $menuTopGroupMapper;
+    /** @var MenuTopRoleMapper $menuTopRoleMapper */
+    private $menuTopRoleMapper;
 
     /**
-     * @return MenuTopGroupMapper
+     * @return MenuTopRoleMapper
      */
-    public function getMenuTopGroupMapper() {
-        return $this->menuTopGroupMapper;
+    public function getMenuTopRoleMapper() {
+        return $this->menuTopRoleMapper;
     }
 
     /**
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopGroupMapper($mapper) {
-        $this->menuTopGroupMapper = $mapper;
+    public function setMenuTopRoleMapper($mapper) {
+        $this->menuTopRoleMapper = $mapper;
         return $this;
     }
 

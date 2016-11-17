@@ -72,134 +72,50 @@ class Renderer
      * @param \Twig_Environment $twig
      * @param User $user
      * @param string $pageCurrent
-     * @return string
+     * @return null|string
      */
     public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
     {
-        // Check if the user has groups or bookmarks hidden
+        // Return null if no user logged in
 
-        if ($user instanceof User) {
-            $showSubjects = true;
-            $showBookmarks = true;
-            $showGroups = true;
-        } else {
-            $showSubjects = false;
-            $showBookmarks = false;
-            $showGroups = false;
-        }
-
-        // Work out what groups the user should have in their menu
-
-        $groupAccess = new Collection;
-
-        if ($showGroups) {
-            $groups = $this->getUserAccessMapper()->findAllGroupsForUser($user);
-
-            /** @var UserAccess $group */
-            foreach ($groups as $group) {
-                try {
-                    /** @var FolderModel $folder */
-                    $folder = $this->getFolderMapper()->findCheaplyById($group->getServiceIdentifier());
-
-                    $groupAccess->add($folder);
-                } catch (MapperException $e) {
-                    // Noop
-                }
-            }
-        }
-
-        // Work out what bookmarks the user should have in their menu
-
-        if ($showBookmarks) {
-            $bookmarks = $this->getBookmarkMapper()->findByColumn('owner', $user->getId());
-        } else {
-            $bookmarks = [];
+        if (!$user instanceof User) {
+            return null;
         }
 
         // Mangle subjects into usable format
 
-        if ($showSubjects) {
-            if (is_array($_SESSION["subjects"])) {
-                $subjects = [];
-                foreach ($_SESSION["subjects"] as $subject) {
-                    if (!isset($subjects[$subject['classType']])) {
-                        $subjects[$subject["classType"]] = [];
-                    }
-                    $subjects[$subject['classType']][] = $subject;
+        $subjects = [];
+
+        if (is_array($_SESSION["subjects"])) {
+            foreach ($_SESSION["subjects"] as $subject) {
+                if (!isset($subjects[$subject['classType']])) {
+                    $subjects[$subject["classType"]] = [];
                 }
-            } else {
-                $subjects = [];
+                $subjects[$subject['classType']][] = $subject;
             }
-        } else {
-            $subjects = [];
         }
 
-        // Find all menu items and work out if we have permission to view them
+        // Get the menu sections in their correct order
 
-        $nodes = $this->getMenuSideMapper()->findAll();
+        $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
 
-        $nodesRendered = new Collection();
+        // If there are no title overrides, use the default titles for each section
+
+        /** @var MenuSideSection $section */
+        foreach ($sections as $section) {
+            if (empty($section->getTitle())) {
+                $section->setTitle(
+                    MenuSideSectionMapper::getSectionNameDefaults()[$section->getSection()]
+                );
+            }
+        }
+
+        $nodes = $this->menuSideMapper->findNodesForUser($_SESSION["user"]);
+
+        // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
 
         /** @var MenuSide $node */
         foreach ($nodes as $node) {
-
-            // Check visibility
-
-            // Campuses
-
-            $foundCampus = false;
-
-            $campuses = $this->getMenuSideCampusMapper()->findByColumn('menu_side_id', $node->getId());
-
-            if ($campuses->count() > 0) {
-
-                /** @var MenuSideCampus $campus */
-                foreach ($campuses as $campus) {
-
-                    /** @var \Schoolbox\Campus $userCampus */
-                    foreach ($user->getCampusCollection() as $userCampus) {
-                        if ($campus->getCampusId() == $userCampus->getId()) {
-                            $foundCampus = true;
-                            break;
-                        }
-                    }
-
-                    if ($foundCampus) {
-                        break;
-                    }
-                }
-            }
-
-            // Campus wasn't found, skip to the next node
-
-            if (!$foundCampus) {
-                continue;
-            }
-
-            // Groups
-
-            $foundRole = false;
-
-            $roles = $this->getMenuSideRoleMapper()->findByColumn('menu_side_id', $node->getId());
-
-            if ($roles->count() > 0) {
-
-                /** @var MenuSideRole $role */
-                foreach ($roles as $role) {
-
-                    if ($role->getRoleId() == $user->getRole()->getId()) {
-                        $foundRole = true;
-                        break;
-                    }
-                }
-
-            }
-
-            if (!$foundRole) {
-                continue;
-            }
-
-            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
 
             $array_find = [
                 '[id]',
@@ -219,33 +135,19 @@ class Renderer
 
             $node->setUrl(str_ireplace($array_find, $array_replace, $node->getUrl()));
             $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
-
-            // Add the node to the list that will be rendered
-
-            $nodesRendered->add($node);
-        }
-
-        $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
-
-        /** @var MenuSideSection $section */
-        foreach ($sections as $section) {
-            if (empty($section->getTitle())) {
-                $section->setTitle(MenuSideSectionMapper::getSectionNameDefaults()[$section->getSection()]);
-            }
         }
 
         // Render this thing out
 
         return $twig->render('@menuSide/renderer.twig', array(
-            'pageCurrent' => $pageCurrent,
-            'nodes' => $nodesRendered->sortBy('sortOrder', 'asc'),
-            'groups' => $groupAccess,
-            'showBookmarks' => $showBookmarks,
-            'bookmarks' => $bookmarks,
-            'siteTitle' => $this->configLoader->get('title'),
-            'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : [],
+            'nodes' => $nodes,
             'subjects' => $subjects,
-            'sections' => $sections
+            'sections' => $sections,
+            'pageCurrent' => $pageCurrent,
+            'groups' => $this->getMenuSideMapper()->findGroupsForUser($user),
+            'bookmarks' => $this->getBookmarkMapper()->findByColumn('owner', $user->getId()),
+            'siteTitle' => $this->configLoader->get('title'),
+            'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
         ));
     }
 

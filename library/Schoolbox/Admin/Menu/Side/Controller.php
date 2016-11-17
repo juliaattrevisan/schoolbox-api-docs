@@ -9,10 +9,10 @@ namespace Schoolbox\Admin\Menu\Side;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
-use \Schoolbox\Menu\Side\Group\Mapper as MenuSideGroupMapper;
+use \Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
 use \Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
 use Schoolbox\Menu\Side\Campus\Model as MenuSideCampus;
-use Schoolbox\Menu\Side\Group\Model as MenuSideGroup;
+use Schoolbox\Menu\Side\Role\Model as MenuSideRole;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
 use Schoolbox\Menu\Side\Mapper as MenuSideMapper;
 use Schoolbox\Menu\Side\Model as MenuSide;
@@ -37,7 +37,7 @@ class Controller extends Base
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setCampusMapper(CampusMapper::getInstance());
         $this->setMenuSideCampusMapper(MenuSideCampusMapper::getInstance());
-        $this->setMenuSideGroupMapper(MenuSideGroupMapper::getInstance());
+        $this->setMenuSideRoleMapper(MenuSideRoleMapper::getInstance());
         $this->setMenuSideSectionMapper(MenuSideSectionMapper::getInstance());
     }
 
@@ -144,15 +144,15 @@ class Controller extends Base
      */
     public function getModify($id)
     {
-        // Get selected campuses and groups
+        // Get selected campuses and roles
 
-        $selections = $this->getMenuSideGroupMapper()->findByColumn('menu_side_id', $id);
+        $selections = $this->getMenuSideRoleMapper()->findByColumn('menu_side_id', $id);
 
-        $groupsSelected = [];
+        $rolesSelected = [];
 
-        /** @var MenuSideGroup $selection */
+        /** @var MenuSideRole $selection */
         foreach ($selections as $selection) {
-            $groupsSelected[$selection->getGroupId()] = true;
+            $rolesSelected[$selection->getRoleId()] = true;
         }
 
         $selections = $this->getMenuSideCampusMapper()->findByColumn('menu_side_id', $id);
@@ -171,8 +171,8 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 'item' => $this->getMenuSideMapper()->findById($id),
-                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
-                'groupsSelected' => $groupsSelected,
+                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'rolesSelected' => $rolesSelected,
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
                 'campusesSelected' => $campusesSelected
             ],
@@ -209,7 +209,7 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
             'title' => 'Admin - Side Menu'
@@ -249,14 +249,14 @@ class Controller extends Base
             }
         }
 
-        $this->getMenuSideGroupMapper()->deleteByColumn('menu_side_id', $item->getId());
+        $this->getMenuSideRoleMapper()->deleteByColumn('menu_side_id', $item->getId());
 
-        if (is_array($post['groups'])) {
-            foreach ($post['groups'] as $groupId) {
-                $menuSideGroup = new MenuSideGroup();
-                $menuSideGroup->setMenuSideId($item->getId());
-                $menuSideGroup->setGroupId($groupId);
-                $this->getMenuSideGroupMapper()->save($menuSideGroup);
+        if (is_array($post['roles'])) {
+            foreach ($post['roles'] as $roleId) {
+                $menuSideRole = new MenuSideRole();
+                $menuSideRole->setMenuSideId($item->getId());
+                $menuSideRole->setRoleId($roleId);
+                $this->getMenuSideRoleMapper()->save($menuSideRole);
             }
         }
 
@@ -426,22 +426,22 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var MenuSideGroupMapper $menuSideGroupMapper */
-    private $menuSideGroupMapper;
+    /** @var MenuSideRoleMapper $menuSideRoleMapper */
+    private $menuSideRoleMapper;
 
     /**
-     * @return MenuSideGroupMapper
+     * @return MenuSideRoleMapper
      */
-    public function getMenuSideGroupMapper() {
-        return $this->menuSideGroupMapper;
+    public function getMenuSideRoleMapper() {
+        return $this->menuSideRoleMapper;
     }
 
     /**
      * @param $mapper
      * @return $this
      */
-    public function setMenuSideGroupMapper($mapper) {
-        $this->menuSideGroupMapper = $mapper;
+    public function setMenuSideRoleMapper($mapper) {
+        $this->menuSideRoleMapper = $mapper;
         return $this;
     }
 

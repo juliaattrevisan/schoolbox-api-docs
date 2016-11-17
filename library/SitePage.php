@@ -498,13 +498,13 @@ class SitePage extends Page
             // Render side menu
 
             $menuSideRenderer = new \Schoolbox\Menu\Side\Renderer();
-            $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $_SESSION["user"]);
+            $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $this->user);
             $this->setVar('MENU_SIDE', $menuSideContents);
 
             // Render top menu
 
             $menuTopRenderer = new \Schoolbox\Menu\Top\Renderer();
-            $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $_SESSION["user"]);
+            $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
             $this->setVar('MENU_TOP', $menuTopContents);
 
             $this->parse('banner_logged_in_block', 'banner_logged_in');

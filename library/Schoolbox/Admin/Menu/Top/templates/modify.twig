@@ -99,14 +99,14 @@
                     <div class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>
-                                Display To These Groups
+                                Display To These Roles
                                 <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="">?</span>
                             </legend>
-                            <input id="group-all" type="checkbox">
-                            <label for="group-all">Select All</label>
-                            {% for group in groups %}
-                                <input name="groups[]" data-group id="group-{{ group.id }}" type="checkbox" {% if groupsSelected[group.id] %}checked{% endif %} value="{{ group.id }}">
-                                <label for="group-{{ group.id }}">{{ group.name }}</label>
+                            <input id="role-all" type="checkbox">
+                            <label for="role-all">Select All</label>
+                            {% for role in roles %}
+                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                <label for="role-{{ role.id }}">{{ role.name }}</label>
                             {% endfor %}
                         </fieldset>
                     </div>
@@ -142,16 +142,16 @@
 
         var allChecked = true;
 
-        {# Groups #}
+        {# Roles #}
 
-        $('[data-group]').each(function() {
+        $('[data-role]').each(function() {
             if (!$(this).prop('checked')) {
                 allChecked = false;
             }
         });
 
         if (allChecked) {
-            $('#group-all').prop('checked', true);
+            $('#role-all').prop('checked', true);
         }
 
         {# Campuses #}
@@ -177,13 +177,13 @@
             });
         });
 
-        $('[data-group]').change(function() {
-            $('#group-all').prop('checked', false);
+        $('[data-role]').change(function() {
+            $('#role-all').prop('checked', false);
         });
 
-        $('#group-all').change(function() {
+        $('#role-all').change(function() {
             var status = $(this).prop('checked');
-            $('[data-group]').each(function() {
+            $('[data-role]').each(function() {
                 $(this).prop('checked', status);
             });
         });

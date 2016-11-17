@@ -60,23 +60,21 @@
 
                         {% elseif section.section == 'bookmarks' %}
 
-                            {% if showBookmarks %}
-                                <li><h3>{{ section.title }}</h3></li>
-                                <div class="nav-wrapper my-links">
-                                    <ul class="off-canvas-list">
-                                        {% if bookmarks | length > 0 %}
-                                            {% for link in bookmarks %}
-                                                <li>
-                                                    <a href="{{ link.url }}">{{ link.description }}</a>
-                                                </li>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <li>
-                                            <a href="/cms/myLinks" class="icon-modify">Edit</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            {% endif %}
+                            <li><h3>{{ section.title }}</h3></li>
+                            <div class="nav-wrapper my-links">
+                                <ul class="off-canvas-list">
+                                    {% if bookmarks | length > 0 %}
+                                        {% for link in bookmarks %}
+                                            <li>
+                                                <a href="{{ link.url }}">{{ link.description }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <li>
+                                        <a href="/cms/myLinks" class="icon-modify">Edit</a>
+                                    </li>
+                                </ul>
+                            </div>
 
                         {% elseif section.section == 'subjects' %}
 
