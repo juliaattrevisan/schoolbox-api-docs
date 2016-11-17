@@ -120,7 +120,7 @@
                                 /* Concatenate everything
                                  */
                                 if (typeof infoIndex[this.x].displayMark != 'undefined') {
-                                    tooltipContent = template;
+                                    var tooltipContent = template;
 
                                     if (infoIndex[this.x].displayMark != null) {
                                         tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
