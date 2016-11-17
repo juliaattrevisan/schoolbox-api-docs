@@ -36,7 +36,7 @@ class Exporter
     public function generate($file)
     {
         $query = "
-            SELECT          sr.owner,
+            SELECT          u.synergy_id,
                             sr.norm_mark,
                             sb.name,
                             cc.code
@@ -47,6 +47,8 @@ class Exporter
                             c.id = sb.category
             INNER JOIN      categoryCode AS cc ON
                             cc.categoryID = c.id
+            INNER JOIN      'user' AS u ON 
+                            sr.owner = u.id
             WHERE           YEAR(sr.returned) = :currentYear AND 
                             sb.name LIKE '%[%' AND sb.name LIKE '%]%'
             ORDER BY        cc.code
@@ -80,7 +82,7 @@ class Exporter
             $assessmentCode = substr($result['name'], $openBracketPos+1, $codeLength-1);
 
             $data[] = [
-                $headings[0] => $result['owner'],
+                $headings[0] => $result['synergy_id'],
                 $headings[1] => $result['code'],
                 $headings[2] => $assessmentCode,
                 $headings[3] => $result['norm_mark']
