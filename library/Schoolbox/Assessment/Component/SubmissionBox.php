@@ -269,6 +269,12 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         return max(0, min(10, $urgency));
     }
 
+    function __clone()
+    {
+        $this->id = null;
+
+    }
+
     /* Getters/Setters
      */
 
