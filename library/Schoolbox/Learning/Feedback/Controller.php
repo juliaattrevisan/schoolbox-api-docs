@@ -132,6 +132,27 @@ class Controller extends Base
 
 
     /**
+     * @api   DELETE /assessments/:assessmentId/feedback/:feedback
+     * @level 165
+     * @param IFeedback $feedback
+     */
+    public function deleteAssessmentFeedback(IFeedback $feedback)
+    {
+        $code = 204;
+        $data = null;
+
+        try {
+            $this->getFeedbackDataSource()->delete($feedback);
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $code = 400;
+            $data = $e->getMessage();
+        }
+
+        $this->respond('', $data, $code);
+    }
+
+    /**
      * Retrieve the floating feedback for this participant, IN REVERSE CHRONOLOGICAL ORDER
      *
      * @param Participant $participant

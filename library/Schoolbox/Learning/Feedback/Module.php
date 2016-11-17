@@ -39,9 +39,18 @@ class Module extends BaseModule
             ];
         };
 
-        $participantRoute = '/assessments/{assessmentId:\d+}/{studentId:\d+}';
+        $preloadFeedback = function ($params) {
+            return [
+                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
+            ];
+        };
 
-        $this->register('POST',   "$participantRoute/feedback", 'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
+        $assessmentRoute  = 'assessments/{assessmentId:\d+}';
+        $participantRoute = $assessmentRoute . '/{studentId:\d+}';
+        $feedbackRoute    = 'feedback/{feedbackId:\d+}';
+
+        $this->register('POST',   "/$participantRoute/feedback",        'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",   'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
     }
 
 
@@ -95,6 +104,28 @@ class Module extends BaseModule
 
 
     /**
+     * @param int $assessmentId
+     * @param int $feedbackId
+     * @return Assessment\IFeedback
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function preloadFeedback($assessmentId, $feedbackId)
+    {
+        $feedbacks = $this->getFeedbackDataSource()->findForAssessment(
+            $this->getAssessmentDataSource()->findById($assessmentId)
+        );
+
+        // TODO migrate this to DataSource
+        foreach ($feedbacks as $f) {
+            if ($f->getId() == $feedbackId) {
+                return $f;
+            }
+        }
+
+        throw new \Schoolbox\Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+    }
+
+    /**
      * @return UserMapper
      */
     public function getUserDataSource()
@@ -116,5 +147,14 @@ class Module extends BaseModule
     public function getParticipantDataSource()
     {
         return $this->getInjector()->get('participantDataSource');
+    }
+
+
+    /**
+     * @return Assessment\Feedback\DataSource
+     */
+    public function getFeedbackDataSource()
+    {
+        return $this->getInjector()->get('feedbackDataSource');
     }
 }
