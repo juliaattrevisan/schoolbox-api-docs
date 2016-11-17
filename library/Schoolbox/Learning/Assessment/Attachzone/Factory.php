@@ -54,29 +54,26 @@ class Factory
         $zone = new Zone('files');
         $zone->setMulti(false)->setAttachmentsLabel('');
 
-        if ($task instanceof Task) {
+        /* Figure out what the hash is
+         * TODO: I'm sure there's a better way, but I can't remember it right now
+         */
+        $foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches);
+        $hash = $matches[1];
 
-            /* Figure out what the hash is
-             * TODO: I'm sure there's a better way, but I can't remember it right now
+        if ($foundHash) {
+            $zone->attachFiles([$hash]);
+
+            /* Ram in an actual file instance to the task
+             * Clear url field Since this is really about files now
              */
-            $foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches);
-            $hash = $matches[1];
-
-            if ($foundHash) {
-                $zone->attachFiles([$hash]);
-
-                /* Ram in an actual file instance to the task
-                 * Clear url field Since this is really about files now
+            try {
+                $task
+                    ->setAttachedFile(StorageMapper::getInstance()->findByHash($hash))
+                    ->setUrl('');
+            }
+            catch (MapperException $e) {
+                /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
                  */
-                try {
-                    $task
-                        ->setAttachedFile(StorageMapper::getInstance()->findByHash($hash))
-                        ->setUrl('');
-                }
-                catch (MapperException $e) {
-                    /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
-                     */
-                }
             }
         }
 
@@ -93,14 +90,12 @@ class Factory
         $zone->setMulti(true)->setAttachmentsLabel('');
 
         // Attach files
-        if ($dueWork instanceof DueWork) {
-            $files = [];
-            foreach ($dueWork->getAttachedFiles() as $file) {
+        $files = [];
+        foreach ($dueWork->getAttachedFiles() as $file) {
 
-                $files[] = $file->getHash();
-            }
-            $zone->attachFiles($files);
+            $files[] = $file->getHash();
         }
+        $zone->attachFiles($files);
 
         return $zone;
     }
