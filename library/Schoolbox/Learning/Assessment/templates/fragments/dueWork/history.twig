@@ -2,12 +2,15 @@
 
 <script type="text/javascript">
     $(function() {
+
+        var $history = $('#history');
+
         $('#view-history').on('click', function(event) {
             event.preventDefault();
 
             $(this).remove();
 
-            $('#history')
+            $history
                 .find('[data-history-row]:hidden')
                 .css({opacity:0})
                 .show()
