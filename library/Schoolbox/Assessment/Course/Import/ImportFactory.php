@@ -7,12 +7,18 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\IDatabase;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
+use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
+
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Assessment\Course\Task as Task;
+
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -125,11 +131,11 @@ class ImportFactory
             }
 
             if($dueWorkSpecId){
-                $assessment = new DueWork();
+                $assessment = new DueWorkAssessment();
             } elseif($quizSpecId){
-                $assessment = new Quiz();
+                $assessment = new QuizAssessment();
             } elseif($taskSpecId){
-                $assessment = new Task();
+                $assessment = new TaskAssessment();
             } else {
                 throw new \DomainException("Unknown assessment type: $assessmentSpecId");
             }
@@ -157,4 +163,34 @@ class ImportFactory
     {
         return [];
     }
+
+//    /**
+//     * Clones an AssessmentSpec to produce an AssessmentImpl
+//     *
+//     * Performs appropriate deep-cloning
+//     *
+//     * @param IAssessableDataModel $assessmentSpec
+//     * @return IAssessableDataModel
+//     */
+//    public function cloneAssessment(IAssessableDataModel $assessmentSpec)
+//    {
+//        switch(get_class($assessmentSpec)){
+//            case Quiz::class:
+//                /** @var Quiz $assessmentSpec */
+//                $assessmentImpl = clone $assessmentSpec;
+//                foreach($assessmentSpec->getSections() as $sectionSpec){
+//                    $sectionImpl = clone $sectionSpec;
+//                    foreach($sectionSpec->getQuestions() as $questionSpec){
+//                        $questionImpl = clone  $questionSpec;
+//                        $solutionImpl = clone $questionSpec->getSolution();
+//                        $solutionImpl->setQuestion($questionImpl);
+//                        $questionImpl->setSolution($solutionImpl);
+//                        $sectionImpl->get
+//                    }
+//                }
+//                $assessmentImpl->getSections()
+//        }
+//        $assessmentImpl = new
+//        return $assessmentSpec;
+//    }
 }

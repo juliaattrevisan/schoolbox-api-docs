@@ -50,7 +50,7 @@ class Module extends \Alaress\Module\Module
         $preloadCourse = function (array $params)
         {
             return [
-                'courseImplementation' => $this->getCourseImplementationMapperProxy()->findById($params['courseImplId'])
+                'courseImpl' => $this->getCourseImplementationMapperProxy()->findById($params['courseImplId'])
             ];
         };
 

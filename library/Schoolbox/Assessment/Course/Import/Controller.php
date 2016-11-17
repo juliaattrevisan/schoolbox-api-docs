@@ -29,6 +29,7 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Config;
 use Schoolbox\Resource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
@@ -66,11 +67,16 @@ class Controller extends Base\Base
     /** @var UserMapper */
     private $userMapper;
 
-    /** @var Assessment\DataModel\MapperProxy */
-    private $assessmentMapper;
+    /** @var AssessmentMapperProxy */
+    private $assessmentMapperProxy;
 
     /** @var Course\ImplementationFactory */
     private $courseImplementationFactory;
+
+    /**
+     * @var ImportFactory
+     */
+    private $importFactory;
 
     /**
      * Just a raw template render
@@ -153,7 +159,7 @@ class Controller extends Base\Base
 
         $initialStage = $courseSpec && $targetClass ? 2 : 1;
 
-        $context = [
+        $this->tpl('import', [
             'action'       => 'import',
             'initialStage' => $initialStage,
             'courseSpec'   => $courseSpec,
@@ -165,9 +171,7 @@ class Controller extends Base\Base
                     'name' => $targetClass->getTitle()
                 ] : [],
             'ownershipCandidates' => 2 == $initialStage ? $this->getPossibleOwnerships([$targetClass]) : [],
-        ];
-
-        $this->tpl('import', $context);
+        ]);
     }
 
 
@@ -402,7 +406,7 @@ class Controller extends Base\Base
         }
 
 
-        $factory = new ImportFactory();
+        $factory = $this->getImportFactory();
         $args = [];
         if('import' == $action) {
             $args['unitSpecs'] = [];
@@ -446,7 +450,7 @@ class Controller extends Base\Base
      * @api   POST /course/import/tasks
      * @level 160
      * @var $_POST   $post
-     * @var string   $post['action']                                   {'import' | 'modify'}
+     * @var string   $post['action']                                           {'import' | 'modify'}
      * @var int      $post['course_spec_id']
      * @var int|null $post['course_impl_id']
      * @var int|null $post['component_id']
@@ -454,15 +458,15 @@ class Controller extends Base\Base
      * @var array    $post['unit']  Indexed by unitSpec.id
      * @var int      $post['unit'][unitSpecId]['unit_spec_id']
      * @var int|null $post['unit'][unitSpecId]['unit_impl_id']
-     * @var string   $post['unit'][unitSpecId]['open_date']            UnitImpl's Open Date
-     * @var string   $post['unit'][unitSpecId]['close_date']           UnitImpl's Close Date
-     * @var array    $post['unit'][unitSpecId]['a']                    UnitImpl's Indexed by Assessment.id
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['type']     {'spec' | 'impl'}
+     * @var string   $post['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
+     * @var string   $post['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
+     * @var array    $post['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['type']             {'spec' | 'impl'}
      * @var bool     $post['unit'][unitSpecId]['a'][assId]['checked']
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['publish']
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['open']
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['due']
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['date']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['publish']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['open']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['due']
+     * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['date']
      */
     public function postAssessments()
     {
@@ -471,7 +475,7 @@ class Controller extends Base\Base
         $action = trim($post['action']);
         $courseSpecId = trim($post['course_spec_id']);
         $courseImplId = trim($post['course_impl_id']);
-        $componentId = trim($post['component_id']);
+        $componentId = trim($post['component_id']);   // TODO - link to CourseOutline component
         $ownerships = trim($post['ownerships']);
         $unitPairs = $post['unit'];
 
@@ -487,10 +491,155 @@ class Controller extends Base\Base
         //       4.1.1 create entity
         //       4.1. 2 save entity
 
+
+        // On new-import, we may be creating multiple courseImpls.
+        // Therefore store in array and index by ClassFolderId
+        /** @var CourseImplementation[] $courseImpls */
+        $courseImpls = [];
+
         // Are we creating a new import or modifying an existing?
-        if('import'){
-            $dbCourseImpl = new \Schoolbox\Learning\Course\DataModel\Implementation\Model();
+        if('import' == $action){
+            $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
+            $ownerships = explode(',',$ownerships);
+            foreach($ownerships as $ownership){
+                $courseImpl = $this->getCourseImplementationMapper()->createModel();
+                $courseImpl->setSpecification($courseSpec);
+                $classFolderId = explode(':',$ownership)[0];
+                $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
+                $courseImpls[$classFolderId] = $courseImpl;
+            }
+        } else {
+            $courseImpl = $this->getCourseImplementationMapper()->findById($courseImplId);
+            $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
+            // TODO load all units, and their assessables (deleted ones too?)
         }
+
+        // Traverse pre-existing course import, deleting any unitImpls not in POST
+        // Will be skipped during new-import
+        foreach($courseImpls as $classFolderId => $courseImpl){
+            foreach($courseImpl->getUnits() as $unitImpl){
+                $unitSpec = $unitImpl->getSpecification();
+
+                // Did user de-select this unit?
+                if(!array_key_exists($unitSpec->getId(), $unitPairs)){
+                    // Delete the unitImpl
+                    $this->getUnitImplementationMapper()->delete($unitImpl);
+                }
+
+                // Delete any Assessments in the UnitImpl if de-selected by user
+                foreach($unitImpl->getAssessables() as $assessableImpl){
+
+                    $postAssessmentImpl = $unitPairs[$unitSpec->getId()]['a'][$assessableImpl->getId()];
+                    // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
+                    if($postAssessmentImpl['type'] == 'impl'){
+                        // Did user de-select this Assessment ?
+                        if(!$postAssessmentImpl['checked']){
+                            $this->getAssessmentMapperProxy()->delete($assessableImpl);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        // Create any un-imported UnitSpecs + AssessmentSpecs
+        // Update any imported UnitImpls + AssessmentImpls
+        foreach($courseImpls as $classFolderId => $courseImpl) {
+            foreach ($unitPairs as $unitPair) {
+                try {
+                    $unitSpec = $this->getUnitSpecificationMapper()->findById($unitPair['unit_spec_id']);
+                } catch (MapperException\Deleted $e) {
+                    $unitSpec = $e->getDeletedObject();
+                }
+                $unitImplId = $unitPair['unit_impl_id']; // TODO - remove this from whole flow, a unitImpl will always have a unitSpec
+                $unitImplOpenDate = \Alaress_Date_Format::newLocalShort($unitPair['open_date']);
+                $unitImplCloseDate = \Alaress_Date_Format::newLocalShort($unitPair['close_date']);
+                $postAssessments = $unitPair['a'];
+
+                // Does the CourseImpl already contain this Unit ?
+                $unitSpecId = $unitSpec->getId();
+                $callback = function ($unitImpl) use ($unitSpecId) {
+                    /** @var UnitImplementation $unitImpl */
+                    return $unitSpecId == $unitImpl->getSpecification()->getId();
+                };
+                /** @var UnitImplementation $unitImpl */
+                $unitImpl = $courseImpl->getUnits()->filter($callback)->first();
+                if (!$unitImpl) {
+                    $unitImpl = $this->getUnitImplementationMapper()->createModel();
+                    $unitImpl->setSpecification($unitSpec);
+                    $unitImpl->setCourse($courseImpl);
+                    $unitImpl->setTitle($unitSpec->getFolder()->getTitle());
+                    $courseImpl->getUnits()->add($unitImpl);
+                }
+                $unitImpl->setOpenDate($unitImplOpenDate);
+                $unitImpl->setDueDate($unitImplCloseDate);
+
+
+                // Clone  Assessment Specs
+                // Update Assessment Impls
+                foreach ($postAssessments as $assessmentId => $aData) {
+                    if (!$aData['checked']) {
+                        continue;
+                    }
+                    // Is this a creation from the spec ?
+                    if ('spec' == $aData['type']) {
+                        $assessmentSpec = $this->getAssessmentMapperProxy()->findById($assessmentId);
+                        $assessmentImpl = clone $assessmentSpec;
+                        // TODO need to implement __clone() on DueWork to clone Rubric correctly
+                    } // Else we have been passed the Assessment Impl
+                    else {
+                        $assessmentImpl = $this->getAssessmentMapperProxy()->findById($assessmentId);
+                    }
+
+                    // Update Dates
+
+                    // set dates
+                    foreach ($aData['dates'] as $property => $localShort) {
+                        $method = "set{$property}at";
+                        if (!method_exists($assessmentImpl, $method)) {
+                            $this->sendError("Invalid date property: $property");
+                            return;
+                        }
+                        $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
+                    }
+                    $unitImpl->getAssessables()->add($assessmentImpl);
+                }
+            }
+        }
+
+        // Save each Course Import
+        try{
+            $this->getCourseImplementationMapper()->save($courseImpls);
+            foreach($courseImpls as $classFolderId => $courseImpl) {
+
+                // Save the Unit Imports
+                $this->getUnitImplementationMapper()->save($courseImpl->getUnits());
+
+                // For each UnitImport, save the non-deleted Assessments
+                foreach ($courseImpl->getUnits() as $unitImpl) {
+
+                    $extantAssessments = $unitImpl->getAssessables()->filter(function ($assessable) {
+                        /** @var IAssessable $assessable */
+                        return !$assessable->isDeleted();
+                    });
+
+                    foreach ($extantAssessments as $seq => $assessment) {
+                        $this->getAssessmentMapperProxy()->save($assessment, $seq + 1);
+                    }
+                }
+            }
+        } catch (\PDOException $e) {
+            $this->sendError($e->getMessage());
+            return;
+        }
+
+
+        if(true){
+            return;
+        }
+
+
 
 
         $courseSpec = $this->getCourseSpecificationMapper()->findById($post['course_homepage'])->setUnits(new Collection()); // TODO what the actual fuck
@@ -511,7 +660,7 @@ class Controller extends Base\Base
 
             foreach ($unitPost['a'] as $assId => $assDates) {
                 // get the assessment
-                $a = $this->getAssessmentMapper()->findById($assId);
+                $a = $this->getAssessmentMapperProxy()->findById($assId);
 
                 // locate its unit in the cache
                 $ctxId = $a->getContext()->getId();
@@ -551,10 +700,10 @@ class Controller extends Base\Base
         foreach ($ships as $folderId => $newOwnerId) {
 
             // convert the fully-loaded course spec into an implementation for this class
-            $courseImpl = $this->getCourseImplementationFactory()->build($courseSpec, $this->getFolderMapper()->findById($folderId));
+            $courseImpls = $this->getCourseImplementationFactory()->build($courseSpec, $this->getFolderMapper()->findById($folderId));
 
             // assign the new owner to every assessment
-            foreach ($courseImpl->getUnits() as $unit) {
+            foreach ($courseImpls->getUnits() as $unit) {
 
                 // locate the dates provided in post and assign to this now-created implementation
                 $unitSpecId = $unit->getSpecification()->getId();
@@ -574,7 +723,7 @@ class Controller extends Base\Base
                 }
             }
 
-            $courseImplementations->add($courseImpl);
+            $courseImplementations->add($courseImpls);
         }
 
         try {
@@ -585,7 +734,7 @@ class Controller extends Base\Base
                 // save the assessments inside
                 foreach ($ci->getUnits() as $unit) {
                     foreach ($unit->getAssessables() as $seq => $a) {
-                        $this->getAssessmentMapper()->save($a, $seq + 1);
+                        $this->getAssessmentMapperProxy()->save($a, $seq + 1);
                     }
                 }
 
@@ -611,112 +760,49 @@ class Controller extends Base\Base
     }
 
     /**
-     * TODO refactor to new object graph
-     *
      * This GET provides the import form, stepped in at stage 3 (since target and ownership cannot be changed)
      * Modify the Unit information for a previously imported Course
      *
      * @api   GET /course/import/{courseImplId}/modify
      * @level 165
      *
-     * @param CourseImplementation $courseImplementation
+     * @param CourseImplementation $courseImpl
      * @throws MapperException
      */
-    public function importModify(CourseImplementation $courseImplementation)
+    public function importModify(CourseImplementation $courseImpl)
     {
-        $compendium = [];
+        $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
 
-        /** @var Component_Instance $compInst */
-        $compInst = $this->getComponentInstanceMapper()->findById($componentId);
-
-        /** @var Collection|UnitInstance[] $selectedUnitInstances */
-        $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
-
-        /** @var Collection $tasks */
-        $tasks = $selectedUnitInstances->first()->getTasks();
-        if ($tasks->count() > 0) {
-            $owner = $this->getUserMapper()->findById($tasks->first()->getOwner()->getId());
-        } else {
-            // no tasks in this unit: use the session user
+        // Find the owner of any Assessment so we can display, even though it is disabled
+        try{
+            /** @var UnitImplementation $firstUnitImpl */
+            $firstUnitImpl = $courseImpl->getUnits()->first();
+            $assessables = $this->getAssessmentMapperProxy()->findAllForUnitImplementationId($firstUnitImpl->getId());
+            /** @var IAssessable $firstAssessable */
+            $firstAssessable = $assessables->first();
+            $owner = $this->getUserMapper()->findById($firstAssessable->getCreator()->getId());
+        } catch (MapperException $e){
             $owner = $this->getUser();
         }
 
-        $course = null;
-        foreach ($selectedUnitInstances as $selectedUnitInstance) {
-            $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
-            if (!$course instanceof CourseModel) {
-                try {
-                    $course = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstance);
-                } catch (MapperException $e) {
-                    // This unit doesn't actually exist - get course from next one
-                    continue;
-                }
-            }
-        }
-
-        // After testing every unit do I still not have a course? That's an error
-        if (!$course instanceof CourseModel) {
-            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        $allUnits = $course->getUnits();
-
-        foreach ($allUnits as $unit) {
-            $compendium[$unit->getId()]['folder'] = $unit;
-        }
-
-        $unitOutput = [];
-
-        foreach ($compendium as $id => $values) {
-            /** @var UnitInstance $selected */
-            $selected = $values['selected'];
-            /** @var Folder $folder */
-            $folder = $values['folder'];
-            $unitTitle = '';
-            $checkable = false;
-            if ($folder instanceof Folder) {
-                $unitTitle = $folder->getName();
-                $checkable = true;
-            } elseif ($selected instanceof UnitInstance) {
-                $unitTitle = $selected->getTitle();
-            }
-
-            $unitOutput[$id] = [
-                'id' => $id,
-                'name' => $unitTitle,
-                'checkable' => $checkable,
-            ];
-
-            if (isset($values['selected'])) {
-                $unitOutput[$id]['checked'] = true;
-                $unitOutput[$id]['openDate'] = $selected->getOpenDate();
-                $unitOutput[$id]['dueDate'] = $selected->getDueDate();
-            }
-        }
-
-        /* Find the destination for selectize
-         */
-        $allComponents = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
-
-        if ($allComponents->count()) {
-            $folderId = $allComponents->first()->getCategory()->getId();
-            $destination = $this->getFolderMapper()->findCheaplyById($folderId);
-        } else {
-            /* TODO: Error; component never existed
-             */
-            $destination = $this->getFolderMapper()->createModel();
-        }
-
         $this->tpl('import', [
-            '_part3' => true,
-            'units' => $unitOutput,
-            'folder' => $destination,
-            'sources' => $course,
-            'destinations' => array_combine(['id', 'name'], $destination->findValueLabelPair()),
-            'homepage' => $destination->getId(),
-            'courseHomepage' => $course->getId(),
-            'componentId' => $componentId,
-            'owner' => $owner
+            'action'       => 'modify',
+            'initialStage' => 3,
+            'courseSpec'   => $courseSpec,
+            'courseSpecId' => $courseSpec->getId(),
+            'courseImpl'   => $courseImpl,
+            'folder'       => $courseImpl->getFolder(),
+            'destinations' => [
+                'id'   => $courseImpl->getFolder()->getId(),
+                'name' => $courseImpl->getFolder()->getTitle()
+            ],
+            'ownershipCandidates' => [
+                $courseImpl->getFolder()->getId() => [
+                    $owner,
+                ],
+            ],
+            'unitsImpls'   => $courseImpl->getUnits(),
+            'ownerships'   => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}", // TODO is this redundant for modify?
         ]);
     }
 
@@ -907,21 +993,21 @@ class Controller extends Base\Base
 
 
     /**
-     * @return Assessment\DataModel\MapperProxy
+     * @return AssessmentMapperProxy
      */
-    public function getAssessmentMapper()
+    public function getAssessmentMapperProxy()
     {
-        return $this->assessmentMapper;
+        return $this->assessmentMapperProxy;
     }
 
 
     /**
-     * @param Assessment\DataModel\MapperProxy $assessmentMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      * @return static
      */
-    public function setAssessmentMapper(Assessment\DataModel\MapperProxy $assessmentMapper)
+    public function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
     {
-        $this->assessmentMapper = $assessmentMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         return $this;
     }
 
@@ -962,6 +1048,24 @@ class Controller extends Base\Base
     public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
     {
         $this->courseImplementationMapper = $courseImplementationMapper;
+        return $this;
+    }
+
+    /**
+     * @return ImportFactory
+     */
+    public function getImportFactory()
+    {
+        return $this->importFactory;
+    }
+
+    /**
+     * @param ImportFactory $importFactory
+     * @return static
+     */
+    public function setImportFactory(ImportFactory $importFactory)
+    {
+        $this->importFactory = $importFactory;
         return $this;
     }
 
