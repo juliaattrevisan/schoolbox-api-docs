@@ -37,7 +37,7 @@ class Exporter
     {
         $query = "
             SELECT          u.synergy_id,
-                            sr.norm_mark,
+                            sr.mark,
                             sb.name,
                             cc.code
             FROM            submission_return AS sr
