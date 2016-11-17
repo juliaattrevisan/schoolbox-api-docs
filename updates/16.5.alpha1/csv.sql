@@ -14,4 +14,4 @@ VALUES
     'true'
   );
 
-UPDATE allowedFileExtension SET allowedFileExtension.fileTypeID = (SELECT allowedFileTypes.fileTypeID FROM allowedFileTypes WHERE mime ='text/csv') WHERE extension = 'csv'
+UPDATE allowedFileExtension SET allowedFileExtension.fileTypeID = (SELECT allowedFileTypes.fileTypeID FROM allowedFileTypes WHERE mime ='text/csv') WHERE extension = 'csv';
