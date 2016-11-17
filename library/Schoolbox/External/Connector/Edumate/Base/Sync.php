@@ -73,6 +73,7 @@ class Sync implements SyncInterface
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
+                s.HOUSE                  AS "student_house",
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
@@ -96,6 +97,7 @@ class Sync implements SyncInterface
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
+                s.HOUSE                  AS "student_house",
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"

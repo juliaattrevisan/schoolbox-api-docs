@@ -92,6 +92,7 @@ class Sync implements SyncInterface
                 sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
                 s.campus_code    AS student_campus,
+                s.house          AS student_house,
                 s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname
@@ -126,6 +127,7 @@ class Sync implements SyncInterface
                 sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
                 s.campus_code    AS student_campus,
+                s.house          AS student_house,
                 s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname

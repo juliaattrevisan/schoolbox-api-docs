@@ -92,6 +92,7 @@ class Sync implements SyncInterface
                 s.StudentId                  AS student_id,
                 s.StudentYearLevel           AS student_year_level,
                 s.StudentCampus              AS student_campus,
+                s.StudentHouse               AS student_house,
                 s.StudentGender              AS student_gender,
                 s.StudentPreferred           AS student_preferred,
                 s.StudentSurname             AS student_surname
@@ -115,6 +116,7 @@ class Sync implements SyncInterface
                 s.StudentId                        AS student_id,
                 s.StudentYearLevel                 AS student_year_level,
                 s.StudentCampus                    AS student_campus,
+                s.StudentHouse                     AS student_house,
                 s.StudentGender                    AS student_gender,
                 s.StudentPreferred                 AS student_preferred,
                 s.StudentSurname                   AS student_surname

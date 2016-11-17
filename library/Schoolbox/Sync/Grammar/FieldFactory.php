@@ -76,6 +76,7 @@ class FieldFactory
                     'role'                     => 'Guardian Role',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
                     'students[].year.level'    => 'Student Year',
+                    'students[].house.code'    => 'Student House Code(s)',
                     'students[].gender'        => 'Student Gender',
                 ];
                 break;

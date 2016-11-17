@@ -73,6 +73,7 @@ class Sync implements SyncInterface
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                               AS student_year_level,
                 ST.CAMPUS     AS student_campus,
+                ST.HOUSE      AS student_house,
                 ST.FIRST_NAME AS student_preferred,
                 ST.SURNAME    AS student_surname
             FROM ST
@@ -93,6 +94,7 @@ class Sync implements SyncInterface
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                                AS student_year_level,
                 ST.CAMPUS      AS student_campus,
+                ST.HOUSE       AS student_house,
                 ST.FIRST_NAME  AS student_preferred,
                 ST.SURNAME     AS student_surname
             FROM ST
