@@ -27,7 +27,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\User;
 
-class Renderer extends \Twig_Extension
+class Renderer
 {
     /** @var MenuSideMapper */
     protected $menuSideMapper;
@@ -66,19 +66,6 @@ class Renderer extends \Twig_Extension
         $this->setBookmarkMapper(BookmarkMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->configLoader = new ConfigLoader();
-    }
-
-    /**
-     * @return array
-     */
-    public function getFunctions()
-    {
-        return array(
-            new \Twig_SimpleFunction('menuSideRenderer', [$this, 'menuSideRenderer'], [
-                'is_safe' => ['html'],
-                'needs_environment' => true
-            ]),
-        );
     }
 
     /**

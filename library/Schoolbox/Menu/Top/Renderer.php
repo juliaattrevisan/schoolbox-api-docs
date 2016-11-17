@@ -18,7 +18,7 @@ use Schoolbox\Menu\Top\Campus\Model as MenuTopCampusModel;
 use Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
 use Schoolbox\Menu\Top\Role\Model as MenuTopRoleModel;
 
-class Renderer extends \Twig_Extension
+class Renderer
 {
     /** @var MenuTopMapper */
     protected $menuTopMapper;
@@ -37,19 +37,6 @@ class Renderer extends \Twig_Extension
         $this->setMenuTopMapper(MenuTopMapper::getInstance());
         $this->setMenuTopCampusMapper(MenuTopCampusMapper::getInstance());
         $this->setMenuTopRoleMapper(MenuTopRoleMapper::getInstance());
-    }
-
-    /**
-     * @return array
-     */
-    public function getFunctions()
-    {
-        return array(
-            new \Twig_SimpleFunction('menuTopRenderer', [$this, 'menuTopRenderer'], [
-                'is_safe' => ['html'],
-                'needs_environment' => true
-            ]),
-        );
     }
 
     /**

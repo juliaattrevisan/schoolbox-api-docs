@@ -497,17 +497,15 @@ class SitePage extends Page
 
             // Render side menu
 
-            $menuSide = $this->getTwig()->getFunction('menuSideRenderer');
-            $menuSide = $menuSide->getCallable();
-            $menuSideContent = $menuSide($this->getTwig(), $_SESSION["user"]);
-            $this->setVar('MENU_SIDE', $menuSideContent);
+            $menuSideRenderer = new \Schoolbox\Menu\Side\Renderer();
+            $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $_SESSION["user"]);
+            $this->setVar('MENU_SIDE', $menuSideContents);
 
             // Render top menu
 
-            $menuTop = $this->getTwig()->getFunction('menuTopRenderer');
-            $menuTop = $menuTop->getCallable();
-            $menuTopContent = $menuTop($this->getTwig(), $this->currentTab, $_SESSION["user"]);
-            $this->setVar('MENU_TOP', $menuTopContent);
+            $menuTopRenderer = new \Schoolbox\Menu\Top\Renderer();
+            $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $_SESSION["user"]);
+            $this->setVar('MENU_TOP', $menuTopContents);
 
             $this->parse('banner_logged_in_block', 'banner_logged_in');
         } else {

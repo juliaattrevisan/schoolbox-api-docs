@@ -429,8 +429,6 @@ class Bootstrap implements BootstrapInterface {
                     $twig->addExtension(new Twig_Extensions_Extension_Text());
                     $twig->addExtension(new \Schoolbox\Admin\Navigation\Renderer());
                     $twig->addExtension(new \Schoolbox\Learning\Renderer());
-                    $twig->addExtension(new \Schoolbox\Menu\Top\Renderer());
-                    $twig->addExtension(new \Schoolbox\Menu\Side\Renderer());
 
                     // HTML Purifier escape strategy
                     // Please use the filter below instead.
