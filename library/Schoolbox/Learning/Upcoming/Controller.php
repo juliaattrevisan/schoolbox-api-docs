@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Upcoming;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use External_ClassInterface;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -17,17 +18,54 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for the upcoming work screen.
  */
 class Controller extends Base
 {
+    /**
+     * External Class data source
+     *
+     * @var External_ClassInterface
+     */
+    protected $externalClass;
+
+    /**
+     * Folder data source
+     *
+     * @var FolderMapper
+     */
+    protected $folderMapper;
+
+    /**
+     * User data source
+     *
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * Constructor
+     *
+     * @param External_ClassInterface $externalClass
+     * @param FolderMapper            $folderMapper
+     * @param UserMapper              $userMapper
+     */
+    public function __construct(External_ClassInterface $externalClass, FolderMapper $folderMapper, UserMapper $userMapper)
+    {
+        $this->externalClass = $externalClass;
+        $this->folderMapper  = $folderMapper;
+        $this->userMapper    = $userMapper;
+    }
+
     /**
      * Redirects to the upcoming work screen for the current user.
      *
@@ -52,12 +90,30 @@ class Controller extends Base
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
+        // Student's subjects
+        $subjects = [];
+        foreach ($this->folderMapper->findForUser($student) as $folder) {
+            // Load teachers for this subject (if this subject has them)
+            $teachers = [];
+            if (count($folder->getCodes()) > 0) {
+                $teachers = $this->userMapper->findByColumn(
+                    'synergy_id',
+                    $this->externalClass->getTeacherName($folder->getCodeString())
+                );
+            }
+            $subjects[] = [
+                'teachers' => $teachers,
+                'folder'   => $folder,
+            ];
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
                 [
-                    'student' => $student,
-                    'date'    => $date,
+                    'student'  => $student,
+                    'date'     => $date,
+                    'subjects' => $subjects,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯

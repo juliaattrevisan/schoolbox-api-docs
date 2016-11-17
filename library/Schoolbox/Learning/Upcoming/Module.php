@@ -96,7 +96,14 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'userMapper'    => $this->getUserMapper(),
+                    'folderMapper'  => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'externalClass' => $this->getInjector()->lazyGet('externalClass'),
+                ]
+            )
         );
     }
 
