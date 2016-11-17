@@ -742,6 +742,26 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * The concise, type-safe version of hasMap() + hasJoin(self::JOIN_REVERSE)
+     *
+     * @param string      $foreignKey
+     * @param string      $foreignMapper
+     * @param string      $localColumn
+     * @param IColumnType $hydrator
+     * @param int         $options
+     * @param string      $property
+     * @param string      $name
+     * @return bool
+     */
+    protected function joinsReverse($foreignKey, $foreignMapper, $localColumn = 'id', $hydrator = null, $options = null, $property = null, $name = null)
+    {
+        // enforce reverse joining
+        $options = $options | self::COLUMN_JOIN_REVERSE;
+        return $this->joins($localColumn, $foreignMapper, $foreignKey, $hydrator, $options, $property, $name);
+    }
+
+
+    /**
      * The concise, type-safe version of hasMap() + hasJoin(['multi'])
      *
      * @param string          $viaTable      the manymany jointable
