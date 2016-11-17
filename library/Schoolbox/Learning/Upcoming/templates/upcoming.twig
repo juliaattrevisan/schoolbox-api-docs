@@ -2,6 +2,222 @@
 
 <h1>Upcoming work for {{ student.formatName }}</h1>
 
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+
+        var height = null;
+
+        if (isSmallDevice()) {
+            height = 'auto';
+        }
+
+        c = new Calendar('calendar', 'calendar-bubble', {
+            userId: '{{ student.id|escape('js') }}',
+            filter: {
+                ajax: '/calendar/ajax/filter',
+                btnSelector: false,
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
+            },
+            fullCalendar: {
+                defaultDate: moment('{{ date|escape('js') }}'),
+                columnFormat: {
+                    month:      'ddd',
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
+                },
+                height: height,
+                defaultView: anchor || 'month',
+                timeFormat: { month: 'h(:mm)a' },
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: Boolean('{{ config.calendar_collapse_events|escape('js') }}'),
+                firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 */
+                eventRender: function(calEvent) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
+
+                    // Don't render me if I'm marked as do not render
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+                    return true;
+                },
+
+                /**
+                 * Nothing's resizable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventResize: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * Nothing's movable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventDrop: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $(window).height();
+                    var calTop = c.dom.offset().top;
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         */
+                        $.magnificPopup.close();
+                        var d = c.dom.fullCalendar('getDate');
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
+                    }
+                },
+
+                // Stream location
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '/submission/ajax/events',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: Number('{{ student.id|escape('js') }}')
+                        },
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                }
+            },
+            x: false
+        }).init();
+    })
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
 {# subject list #}
 {% if subjects|length %}
     <h2 class="subheader">Subjects</h2>
