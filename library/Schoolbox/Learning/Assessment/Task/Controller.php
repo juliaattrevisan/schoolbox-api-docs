@@ -12,6 +12,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Preview\Factory as PreviewFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class Controller extends Assessment\Controller
 {
@@ -47,8 +49,31 @@ class Controller extends Assessment\Controller
     public function getSummary(Participant $participant)
     {
         $task = $participant->getAssessable();
+        $previewFragment = [];
 
-        $twigData = ['assessment' => $task];
+        if($task->getUrl()) {
+            $previewFragment = (new PreviewFactory())->urlFragment($task->getUrl(), $this->getUser());
+            //Just foward if we only have a URL
+            if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
+                $this->getResponse()->redirect->temporaryRedirect($task->getUrl());
+                return;
+            }
+            else if($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
+                    $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+                    $previewFragment['type'] = 'file';
+            }
+        }
+
+        if($previewFragment['type'] == 'inline') {
+            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+        }
+
+        $twigData = [ 'breadcrumbs' => $this->getBakery()->produceFromAssessment($task)->add([ $task->getTitle(), '' ]),
+                      'assessment'  => $task,
+                      'preview'     => $previewFragment,
+                      'currentUser' => $this->getUser(),
+                      'student'     => $participant->getUser(),
+        ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(

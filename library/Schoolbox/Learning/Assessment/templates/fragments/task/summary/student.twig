@@ -10,7 +10,34 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
-
         {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment, user: currentUser} %}
     </div>
+{% if preview.fragment|length %}
+    <div class="small-12 island">
+    {% if preview.type == 'image' %}
+        <img src="{{ preview.fragment }}">
+    {% elseif preview.type == 'file' %}
+
+                <section>
+                    <div class="card small-12">
+                        <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
+                            <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="{{ preview.file.mimetype }}" />
+                            <h3>{{ preview.file.filename }}</h3>
+                            <p class="meta">{{ preview.file.size|bytes}}</p>
+                        </a>
+                    </div>
+                </section>
+
+    {% else %}
+        {{ preview.fragment | raw}}
+    {% endif %}
+    </div>
+{% endif %}
 </div>
+{% if assessment.isSelfAssessed %}
+<div class="row">
+    <div class="small-12 island">
+        <button class="full-width submit">Task Completed</button>
+    </div>
+</div>
+{% endif %}

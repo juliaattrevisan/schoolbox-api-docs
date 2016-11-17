@@ -8,11 +8,6 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Preview\Chain\Internal;
-use Schoolbox\Preview\Chain\External;
-use Schoolbox\Preview\Registry\Decoder\LinkRedir;
-use Schoolbox\Preview\Registry\Decoder\TaskRedir;
-use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -74,73 +69,32 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Test method
      */
     public function preview($params) {
-
-        /* Distill a url from an encapsulating structure, if necessary
-         */
-        $decoderRegistry = new Registry\Registry($params['encodedUrl']);
-        $decoderRegistry->add(new LinkRedir());
-        $decoderRegistry->add(new TaskRedir());
-
-        $testUrl = $decoderRegistry->findUrl();
-
-        /* No decoder could distill a url from the encapsulated structure
-         * or there was no encapsulating structure: just use the url by
-         * default, since nothing can be done about it
-         */
-        if (!strlen($testUrl)) {
-            $testUrl = $params['encodedUrl'];
-        }
-
-        /* Detect whether to use a Local or External chain
-         * Each has a different way to determine their type
-         */
-        $url = new \Url($testUrl);
-
-        /* Local Chain
-         */
-        if ($url->isLocalUrl()) {
-            $user = $_SESSION['user'];
-            if (!$user instanceof User) {
-                $user = new User();
-            }
-            $chain = new Internal($url->getUrl(), $user);
-            $result = $chain->getResult();
-        }
-        /* External Chain
-         */
-        else {
-            $chain = new External($url->getUrl());
-            $result = $chain->getResult();
-        }
-
-        /* Set up html fragment
-         */
-        if($result['type'] == 'inline') {
-            $this->getResponse()->content->set($result['twig']);
-
-            /* Render it
-             */
-            $output = $this->di->get("webOutput:nochrome");
-            $output->setResponse($this->getResponse());
-            $fragment = $output->getAsString();
-        }
-        else {
-            $fragment = $result['src'];
-        }
-
-        $previewResponse = [
-            'type' => $result['type'],
-            'fragment' => $fragment
-        ];
-
         /* Regurgitate it
          */
-        $this->getResponse()->content->set([
-            'data' => $previewResponse
-        ]);
+
+        $previewFragment = (new Factory())->urlFragment($params['encodedUrl'], $this->getUser());
+
+        if($previewFragment['type'] == 'inline') {
+            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+        }
+
+        //Not required by preview.js
+        unset($previewFragment['twig']);
+
+        $this->getResponse()->content->set(
+            [
+                'data' => $previewFragment
+            ]
+        );
+
+
+
+
+
     }
 }
