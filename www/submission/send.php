@@ -55,7 +55,7 @@ if (is_numeric($_GET['return'])) {
     $size     = $return->getSize();
     $filename = $return->getBasename();
     $mime     = $return->getMime();
-
+    $attach   = !$file->getMimetype()->getInline() ?: 'attach';
 } else {
     $mapper = new FileMapper();
 
@@ -107,6 +107,7 @@ if (is_numeric($_GET['return'])) {
 
     $mime = $file->getMime();
     $size = $file->getSize();
+    $attach = !$file->getMimetype()->getInline() ?: 'attach';
 
     // wrap HTML in niceness
     if ($studentSub->getMimetype()->matches('text/html')) {
@@ -123,12 +124,6 @@ if (is_numeric($_GET['return'])) {
         }
     }
 }
-
-if (!$file->getMimetype()->getInline() || $_GET['save'])
-    $attach = "attachment;";
-else
-    $attach = "";
-
 
 //send headers (cache-control off stops IE8 from failing to download)
 header ("Pragma: ");
