@@ -14,7 +14,7 @@
 <div class="small-12 medium-3 large-2 columns">
     <label for="{{ inputPrefix }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
     <input id="{{ inputPrefix }}_{{ dateProperty }}_date"
-           name="{{ inputPrefix }}[{{ dateProperty }}]"
+           name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
            value="{% if assessmentDate.valid %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
            data-role="{{ dateProperty }}_date"
