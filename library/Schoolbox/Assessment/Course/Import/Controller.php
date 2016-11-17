@@ -139,7 +139,7 @@ class Controller extends Base\Base
                 $courseOutlineComponent = \Component_InstanceMapper::getInstance()->findById($componentId);
                 $COURSE_OUTLINE_DEFINITION_ID = 66;
                 if($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID){
-                    $msg = 'Not a CourseOutline component';
+                    $msg = 'Not a Course-Outline component';
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
                 }
             } catch (MapperException $e){
@@ -153,7 +153,7 @@ class Controller extends Base\Base
             'action'       => 'import',
             'initialStage' => $initialStage,
             'courseSpec'   => $courseSpec,
-            'componentId'  => $courseOutlineComponent->getId(),
+            'componentId'  => $courseOutlineComponent ? $courseOutlineComponent->getId() : null,
             'folder'       => $targetClass,
             'destinations' => $targetClass ?
                 [
@@ -310,32 +310,35 @@ class Controller extends Base\Base
     /**
      * This POST is the result of import stage 3.
      *
-     * Receives:
-     *  * courseSpecId to import from
-     *  * courseImplId to import to (empty if new import)
-     *  * homepageIds to import to
-     *  * componentId (empty if new import)
-     *  * foreach unitImp
-     *  * * unitSpecId
-     *  * * unitImplId (empty if new import)
-     *  * * whether to import the unitImpl
-     *  * * open + close dates
-     *
      * Returns a HTML fragment containing a list of Assessments, grouped by UnitImpl
      *
      * @api   POST /course/import/units
      * @level 160
+     *
+     * @var array $post
+     * @var string $post['action']   {'import'|'modify'}
+     * @var int $post['course_spec_id']
+     * @var int $post['course_impl_id']
+     * @var int $post['component_id']
+     * @var string $post['ownerships']
+     * @var array $post['unit']
+     * @var int $post['unit'][]['unit_spec_id']
+     * @var int|null $post['unit'][]['unit_impl_id']
+     * @var string $post['unit'][]['open_date']
+     * @var string $post['unit'][]['close_date']
      *
      * @throws Unauthorized
      **/
     public function postUnits()
     {
         $post = $this->getRequest()->post;
-        $action = trim($post["action"]);
-        $ownerships = explode(',', $post["ownerships"]);
-        $courseSpecId = trim($post["courseSpecId"]);
-        $courseImplId = trim($post["courseImplId"]);
-        $componentId = trim($post["componentId"]);
+
+        $action = trim($post['action']);
+        $courseSpecId = trim($post['course_spec_id']);
+        $courseImplId = trim($post['course_impl_id']);
+        $componentId = trim($post['component_id']);
+        $ownerships = explode(',', $post['ownerships']);
+
         $units = $post["unit"];
 
         if (empty($ownerships)) {
@@ -369,17 +372,25 @@ class Controller extends Base\Base
 
         // Hydrate + Validate dates
         try {
+            $countImportedUnits = 0;
             foreach($units as $idx => $unit){
                 if($unit['import']){
-                    $openDate = \Alaress_Date_Format::newLocalShort($unit['openDate']);
-                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['closeDate']);
+                    $countImportedUnits++;
+                    $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['close_date']);
                     if ($openDate->gt($closeDate)) {
                         $this->sendError('The open date must be before the close date');
                         return;
                     }
-                    $units[$idx]['openDate'] = $openDate;
-                    $units[$idx]['closeDate'] = $closeDate;
+                    $units[$idx]['open_date'] = $openDate;
+                    $units[$idx]['close_date'] = $closeDate;
                 }
+            }
+
+            // Ensure at least one unit was selected for import
+            if (!$countImportedUnits) {
+                $this->sendError('You must select at least one unit to import');
+                return;
             }
         } catch (\Exception $e) {
             $this->sendError('You must specify a valid open and close date for each unit you are importing');
@@ -418,29 +429,26 @@ class Controller extends Base\Base
          */
         $factory = new ImportFactory();
         $args = [];
-        if($courseSpecId) {
+        if('import' == $action) {
             $args['unitSpecs'] = [];
             foreach ($units as $unit) {
                 if ($unit['import']) {
-                    $args['unitSpecs'][$unit['unitSpecId']] = [
-                        'openDate' => $unit['openDate'],
-                        'closeDate' => $unit['closeDate'],
+                    $args['unitSpecs'][$unit['unit_spec_id']] = [
+                        'unitSpecId' => $unit['unit_spec_id'],
+                        'openDate'   => $unit['open_date'],
+                        'closeDate'  => $unit['close_date'],
                     ];
                 }
             }
-        } elseif($courseImplId){
+        } elseif('modify' == $action){
             // TODO
             $unitAssessments = $factory->build(['courseImplId' => $courseImplId]);
         } else {
-            throw new \DomainException('You must specify a CourseSpec or CourseImpl to import');
+            throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
         $unitAssessments = $factory->build($args);
 
-        // Make sure at least one unit was specified
-        if (!count($unitAssessments)) {
-            $this->sendError('You must select at least one unit to import');
-            return;
-        }
+
 
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [

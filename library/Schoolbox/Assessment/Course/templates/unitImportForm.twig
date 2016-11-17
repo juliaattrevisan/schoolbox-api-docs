@@ -45,6 +45,7 @@
 
     {# There were units in the selected course, create import form #}
 
+    <input type="hidden" name="action" value="{{ action|e }}"/>
     <input type="hidden" name="course_spec_id" value="{{ courseSpecId }}"/>
     <input type="hidden" name="course_impl_id" value="{{ courseImplId }}"/>
     <input type="hidden" name="component_id" value="{{ componentId }}"/>
@@ -57,8 +58,8 @@
 
             {% for unitImpl in unitsImpls %}
                 <li>
-                    <input name="unit[{{ loop.index }}][unitSpecId]" type="hidden" value="{{ unitImpl.specification.id }}" />
-                    <input name="unit[{{ loop.index }}][unitImplId]" type="hidden" value="{{ unitImpl.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unitImpl.specification.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unitImpl.id }}" />
 
                     <div class="list-item" data-type="unit_row">
 
@@ -98,7 +99,7 @@
                         <div class="small-12 medium-3 columns" data-hide-watch="#import-{{ loop.index }}">
                             <label for="due_date-{{ loop.index }}">Close</label>
                             <input id="due_date-{{ loop.index }}"
-                                   name="unit[{{ loop.index }}][due_date]"
+                                   name="unit[{{ loop.index }}][close_date]"
                                    type="text"
                                    value="{{ unitImpl.dueDate.localShort }}"
                                    data-role="due_date"
