@@ -32,9 +32,7 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% if latestResponse %}
-        {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}
-    {% endif %}
+    {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getResponseList', routeArgs) %}
 
     {% if assessment.acceptsNone %}
         {% set pStatusClass = '' %}
