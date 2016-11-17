@@ -96,10 +96,12 @@ class Module extends BaseModule
      */
     protected function preloadParticipant($assessmentId, $studentId)
     {
-        return $this->getParticipantDataSource()->findForAssessmentAndUser(
-            $this->getAssessmentDataSource()->findById($assessmentId),
-            $this->getUserDataSource()->findById($studentId)
-        );
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        $student    = $this->getUserDataSource()->findById($studentId);
+
+        $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment, $student);
+
+        return $assessment->getParticipant($student);
     }
 
 
