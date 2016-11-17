@@ -19,8 +19,8 @@ use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
 use Schoolbox\Menu\Side\Campus\Model as MenuSideCampus;
 use Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
-use Schoolbox\Menu\Side\Group\Mapper as MenuSideGroupMapper;
-use Schoolbox\Menu\Side\Group\Model as MenuSideGroup;
+use Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
+use Schoolbox\Menu\Side\Role\Model as MenuSideRole;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
@@ -40,8 +40,8 @@ class Renderer extends \Twig_Extension
     /** @var MenuSideSectionMapper */
     protected $menuSideSectionMapper;
 
-    /** @var MenuSideGroupMapper */
-    protected $menuSideGroupMapper;
+    /** @var MenuSideRoleMapper */
+    protected $menuSideRoleMapper;
 
     /** @var MenuSideUserOptionsMapper */
     protected $menuSideUserOptionsMapper;
@@ -66,7 +66,7 @@ class Renderer extends \Twig_Extension
         $this->setMenuSideMapper(MenuSideMapper::getInstance());
         $this->setMenuSideCampusMapper(MenuSideCampusMapper::getInstance());
         $this->setMenuSideSectionMapper(MenuSideSectionMapper::getInstance());
-        $this->setMenuSideGroupMapper(MenuSideGroupMapper::getInstance());
+        $this->setMenuSideRoleMapper(MenuSideRoleMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setBookmarkMapper(BookmarkMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
@@ -205,24 +205,24 @@ class Renderer extends \Twig_Extension
 
             // Groups
 
-            $foundGroup = false;
+            $foundRole = false;
 
-            $groups = $this->getMenuSideGroupMapper()->findByColumn('menu_side_id', $node->getId());
+            $roles = $this->getMenuSideRoleMapper()->findByColumn('menu_side_id', $node->getId());
 
-            if ($groups->count() > 0) {
+            if ($roles->count() > 0) {
 
-                /** @var MenuSideGroup $group */
-                foreach ($groups as $group) {
+                /** @var MenuSideRole $role */
+                foreach ($roles as $role) {
 
-                    if ($group->getGroupId() == $user->getRole()->getId()) {
-                        $foundGroup = true;
+                    if ($role->getRoleId() == $user->getRole()->getId()) {
+                        $foundRole = true;
                         break;
                     }
                 }
 
             }
 
-            if (!$foundGroup) {
+            if (!$foundRole) {
                 continue;
             }
 
@@ -260,7 +260,7 @@ class Renderer extends \Twig_Extension
                 $section->setTitle(MenuSideSectionMapper::getSectionNameDefaults()[$section->getSection()]);
             }
         }
-        
+
         // Render this thing out
 
         return $twig->render('@menuSide/renderer.twig', array(
@@ -341,20 +341,20 @@ class Renderer extends \Twig_Extension
     }
 
     /**
-     * @return MenuSideGroupMapper
+     * @return MenuSideRoleMapper
      */
-    public function getMenuSideGroupMapper()
+    public function getMenuSideRoleMapper()
     {
-        return $this->menuSideGroupMapper;
+        return $this->menuSideRoleMapper;
     }
 
     /**
-     * @param MenuSideGroupMapper $menuSideGroupMapper
+     * @param MenuSideRoleMapper $menuSideRoleMapper
      * @return $this
      */
-    public function setMenuSideGroupMapper($menuSideGroupMapper)
+    public function setMenuSideRoleMapper($menuSideRoleMapper)
     {
-        $this->menuSideGroupMapper = $menuSideGroupMapper;
+        $this->menuSideRoleMapper = $menuSideRoleMapper;
         return $this;
     }
 

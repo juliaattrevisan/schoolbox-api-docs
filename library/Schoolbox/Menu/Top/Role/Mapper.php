@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Menu\Side\Group;
+namespace Schoolbox\Menu\Top\Role;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -18,11 +18,11 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('menu_side_group');
+        $this->hasTable('menu_top_role');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('menu_side_id', self::TYPE_INTEGER);
-        $this->uses('group_id', self::TYPE_INTEGER);
+        $this->uses('menu_top_id', self::TYPE_INTEGER);
+        $this->uses('role_id', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');
     }

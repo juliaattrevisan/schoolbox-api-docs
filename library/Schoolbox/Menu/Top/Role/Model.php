@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Menu\Side\Group;
+namespace Schoolbox\Menu\Top\Role;
 
 use Schoolbox\ISoftDeletable;
 
@@ -17,10 +17,10 @@ class Model implements ISoftDeletable
     protected $id;
 
     /** @var int */
-    protected $menuSideId;
+    protected $menuTopId;
 
     /** @var int */
-    protected $groupId;
+    protected $roleId;
 
     /** @var \Alaress_Date_Format */
     protected $deletedAt;
@@ -44,39 +44,39 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $menuSideId
+     * @param int $menuTopId
      * @return self
      */
-    public function setMenuSideId($menuSideId)
+    public function setMenuTopId($menuTopId)
     {
-        $this->menuSideId = $menuSideId;
+        $this->menuTopId = $menuTopId;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getMenuSideId()
+    public function getMenuTopId()
     {
-        return $this->menuSideId;
+        return $this->menuTopId;
     }
 
     /**
-     * @param int $groupId
+     * @param int $roleId
      * @return self
      */
-    public function setGroupId($groupId)
+    public function setRoleId($roleId)
     {
-        $this->groupId = $groupId;
+        $this->roleId = $roleId;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getGroupId()
+    public function getRoleId()
     {
-        return $this->groupId;
+        return $this->roleId;
     }
 
     /**

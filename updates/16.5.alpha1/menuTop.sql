@@ -10,10 +10,10 @@ CREATE TABLE menu_top (
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
-CREATE TABLE menu_top_group (
+CREATE TABLE menu_top_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_top_id INT,
-  group_id INT,
+  role_id INT,
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
@@ -70,15 +70,15 @@ INSERT INTO menu_top_campus(menu_top_id, campus_id) SELECT 10, id FROM luCampus;
 INSERT INTO menu_top_campus(menu_top_id, campus_id) SELECT 11, id FROM luCampus;
 INSERT INTO menu_top_campus(menu_top_id, campus_id) SELECT 12, id FROM luCampus;
 
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 1, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 2, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 3, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 4, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 5, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 6, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 7, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 8, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 9, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 10, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 11, id FROM groups;
-INSERT INTO menu_top_group(menu_top_id, group_id) SELECT 12, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 1, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 2, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 3, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 4, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 5, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 6, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 7, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 8, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 9, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 10, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 11, id FROM groups;
+INSERT INTO menu_top_role(menu_top_id, role_id) SELECT 12, id FROM groups;

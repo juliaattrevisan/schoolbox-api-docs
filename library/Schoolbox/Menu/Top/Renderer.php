@@ -15,8 +15,8 @@ use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTopModel;
 use Schoolbox\Menu\Top\Campus\Mapper as MenuTopCampusMapper;
 use Schoolbox\Menu\Top\Campus\Model as MenuTopCampusModel;
-use Schoolbox\Menu\Top\Group\Mapper as MenuTopGroupMapper;
-use Schoolbox\Menu\Top\Group\Model as MenuTopGroupModel;
+use Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
+use Schoolbox\Menu\Top\Role\Model as MenuTopRoleModel;
 
 class Renderer extends \Twig_Extension
 {
@@ -26,8 +26,8 @@ class Renderer extends \Twig_Extension
     /** @var MenuTopCampusMapper */
     protected $menuTopCampusMapper;
 
-    /** @var MenuTopGroupMapper */
-    protected $menuTopGroupMapper;
+    /** @var MenuTopRoleMapper */
+    protected $menuTopRoleMapper;
 
     /**
      * Renderer constructor
@@ -36,7 +36,7 @@ class Renderer extends \Twig_Extension
     {
         $this->setMenuTopMapper(MenuTopMapper::getInstance());
         $this->setMenuTopCampusMapper(MenuTopCampusMapper::getInstance());
-        $this->setMenuTopGroupMapper(MenuTopGroupMapper::getInstance());
+        $this->setMenuTopRoleMapper(MenuTopRoleMapper::getInstance());
     }
 
     /**
@@ -104,14 +104,14 @@ class Renderer extends \Twig_Extension
 
             $foundGroup = false;
 
-            $groups = $this->getMenuTopGroupMapper()->findByColumn('menu_top_id', $tab->getId());
+            $roles = $this->getMenuTopRoleMapper()->findByColumn('menu_top_id', $tab->getId());
 
-            if ($groups->count() > 0) {
+            if ($roles->count() > 0) {
 
-                /** @var MenuTopGroupModel $group */
-                foreach ($groups as $group) {
+                /** @var MenuTopRoleModel $role */
+                foreach ($roles as $role) {
 
-                    if ($group->getGroupId() == $user->getRole()->getId()) {
+                    if ($role->getRoleId() == $user->getRole()->getId()) {
                         $foundGroup = true;
                         break;
                     }
@@ -187,20 +187,20 @@ class Renderer extends \Twig_Extension
     }
 
     /**
-     * @return MenuTopGroupMapper
+     * @return MenuTopRoleMapper
      */
-    public function getMenuTopGroupMapper()
+    public function getMenuTopRoleMapper()
     {
-        return $this->menuTopGroupMapper;
+        return $this->menuTopRoleMapper;
     }
 
     /**
-     * @param MenuTopGroupMapper $menuTopGroupMapper
+     * @param MenuTopRoleMapper $menuTopRoleMapper
      * @return $this
      */
-    public function setMenuTopGroupMapper($menuTopGroupMapper)
+    public function setMenuTopRoleMapper($menuTopRoleMapper)
     {
-        $this->menuTopGroupMapper = $menuTopGroupMapper;
+        $this->menuTopRoleMapper = $menuTopRoleMapper;
         return $this;
     }
 

@@ -18,10 +18,10 @@ CREATE TABLE menu_side_user_options (
   show_subjects INT,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
-CREATE TABLE menu_side_group (
+CREATE TABLE menu_side_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_side_id INT,
-  group_id INT,
+  role_id INT,
   deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
@@ -45,7 +45,7 @@ CREATE TABLE menu_side_section (
 
 INSERT INTO menu_side (id, sort_order, title, url, target, parent_id) SELECT id, sequence, txt, url, target, parent FROM sideMenu;
 INSERT INTO menu_side_campus (menu_side_id, campus_id) SELECT id, campus FROM sideMenuCampus;
-INSERT INTO menu_side_group (menu_side_id, group_id) SELECT id, gid FROM sideMenuGroup;
+INSERT INTO menu_side_role (menu_side_id, role_id) SELECT id, gid FROM sideMenuGroup;
 
 -- Cater for existing custom templates
 
