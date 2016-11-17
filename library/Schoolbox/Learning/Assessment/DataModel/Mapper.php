@@ -156,7 +156,11 @@ class Mapper extends BaseMapper
         );
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreDueWork'));
     }
+
     /**
      * When deleting an Assessment that is a Quiz, we need to delete all sub-objects of the Quiz
      * @param Model $assessment
@@ -179,6 +183,32 @@ class Mapper extends BaseMapper
             $quizMapper = QuizMapper::getInstance();
             $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $quizMapper->restoreSoftDeleted($quiz);
+        }
+    }
+
+
+    /**
+     * When deleting an Assessment that is a DueWork, we need to delete all sub-objects of the DueWork
+     * @param Model $assessment
+     */
+    public function softDeleteDueWork(Model $assessment)
+    {
+        if($assessment->getDueWork() instanceof SubmissionBox){
+            $dueWorkMapper = SubmissionBoxMapper::getInstance();
+            $dueWork = $dueWorkMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $dueWorkMapper->delete($dueWork);
+        }
+    }
+    /**
+     * When restoring an Assessment that is a DueWork, we need to restore all sub-objects of the DueWork
+     * @param Model $assessment
+     */
+    public function restoreDueWork(Model $assessment)
+    {
+        if($assessment->getDueWork() instanceof SubmissionBox){
+            $dueWorkMapper = SubmissionBoxMapper::getInstance();
+            $dueWork = $dueWorkMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
+            $dueWorkMapper->restoreSoftDeleted($dueWork);
         }
     }
 
