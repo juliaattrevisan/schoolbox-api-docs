@@ -249,12 +249,14 @@
 
         <div id="configurator">
             {% for namespace in config %}
-            <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
-            <section data-namespace="{{ ns[namespace.id].slug }}">
-                {% for source in namespace.sources %}
-                    {% include '@messages/source.twig' with { source: source } %}
-                {% endfor %}
-            </section>
+                {% if ns[namespace.id].slug != false %}
+                <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
+                <section data-namespace="{{ ns[namespace.id].slug }}">
+                    {% for source in namespace.sources %}
+                        {% include '@messages/source.twig' with { source: source } %}
+                    {% endfor %}
+                </section>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

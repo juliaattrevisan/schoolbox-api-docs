@@ -10,6 +10,8 @@
  * @version     SVN: $Id$
  */
 
+new \EOTC\Authenticator($this);
+
 $configMapper = \EOTC\ConfigMapper::getInstance();
 $config = $configMapper->findByColumn('name', 'policy')->first();
 

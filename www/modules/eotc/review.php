@@ -15,7 +15,7 @@ use \EOTC\EventMapper;
 
 /* Only EOTC Administrators can view this page
  */
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];

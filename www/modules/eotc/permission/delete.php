@@ -12,6 +12,8 @@ require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
+new \EOTC\Authenticator($this);
+
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 

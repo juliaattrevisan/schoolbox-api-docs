@@ -32,7 +32,7 @@ $page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block'
 $page->setBlock('can_add_resources', 'resource', 'resource_block');
 $page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
 
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];

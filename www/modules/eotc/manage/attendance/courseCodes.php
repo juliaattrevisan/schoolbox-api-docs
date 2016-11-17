@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $externalHandler = new \External_Synergetic_Class();

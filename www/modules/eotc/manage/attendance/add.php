@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-$authenticator = new \EOTC\Authenticator();
+$authenticator = new \EOTC\Authenticator($this);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$eventMapper = \EOTC\EventMapper::getInstance();
