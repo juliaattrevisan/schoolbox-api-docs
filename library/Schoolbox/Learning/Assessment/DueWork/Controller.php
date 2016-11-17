@@ -328,7 +328,7 @@ class Controller extends Assessment\Controller
                  * loaded into the wizzywig)
                  *
                  * Since $attachment is a Storage model, it won't know about the
-                 * editableInline field - forcing is to infer wizzywig usage
+                 * editableInline field - forcing us to infer wizzywig usage
                  * from its filename
                  */
                 $attachedFile = (new DueWorkSubmissionFile())
