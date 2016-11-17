@@ -118,5 +118,9 @@
 // jqmath
 @import "../../javascript/math/jqmath-0.4.0.css";
 
-// client custom CSS overrides
+// jQuery UI
+@import "../../javascript/components/jquery-ui/themes/base/draggable.css";
+@import "../../javascript/components/jquery-ui/themes/base/sortable.css";
+
+// client custom CSS overrrides
 @import "utils/custom";
