@@ -317,8 +317,8 @@ th, td{
 // Radio button blocks
 input[type=radio]{
 	+ .block{
-		background-color: $content-ui-background;
-		border: 1px solid transparent;
+		background-color: $white;
+		border: 3px solid $content-ui-background;
 		color: $content-ui-foreground;
 		margin: 0 0 1rem 0;
 		padding: ($base-font-size - 4);
@@ -334,13 +334,15 @@ input[type=radio]{
 			line-height: 1;
 		}
 		&:hover{
-			border: 1px solid $content-ui-foreground;
+			//border: 1px solid $content-ui-foreground;
+			background-color: $content-ui-background;
 			color: $content-ui-foreground;
 		}
 	}
 	&:checked{
 		+ .block{
 			background-color: $content-ui-foreground;
+			border: 3px solid $content-ui-foreground;
 			color: $content-ui-selected;
 			i{
 				color: $content-ui-selected;
