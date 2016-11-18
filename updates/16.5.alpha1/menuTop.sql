@@ -45,6 +45,19 @@ INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, del
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (11, 11, 'Access your files', 'My Files', 'MYFILES', 'files', '/my-files/', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (12, 12, 'Access your school network files', 'Drives', 'NETWORK', 'network', '/drives/', null, null);
 
+INSERT INTO menu_icons (name, title) VALUES ('office-365', 'Office 365');
+INSERT INTO menu_icons (name, title) VALUES ('google-drive', 'Google Drive');
+INSERT INTO menu_icons (name, title) VALUES ('phone', 'Telephone');
+INSERT INTO menu_icons (name, title) VALUES ('sport', 'Sport');
+INSERT INTO menu_icons (name, title) VALUES ('group', 'People');
+INSERT INTO menu_icons (name, title) VALUES ('user', 'Person');
+INSERT INTO menu_icons (name, title) VALUES ('help', 'Help');
+INSERT INTO menu_icons (name, title) VALUES ('showcase', 'Trophy');
+INSERT INTO menu_icons (name, title) VALUES ('locked', 'Padlock');
+INSERT INTO menu_icons (name, title) VALUES ('venue', 'Location');
+INSERT INTO menu_icons (name, title) VALUES ('rain', 'Rain Cloud');
+INSERT INTO menu_icons (name, title) VALUES ('clear', 'Sun');
+INSERT INTO menu_icons (name, title) VALUES ('cloudy', 'Cloud');
 INSERT INTO menu_icons (name, title) VALUES ('timetable', 'Clock');
 INSERT INTO menu_icons (name, title) VALUES ('due-work', 'Tray');
 INSERT INTO menu_icons (name, title) VALUES ('teacher', 'Graduation Cap');
