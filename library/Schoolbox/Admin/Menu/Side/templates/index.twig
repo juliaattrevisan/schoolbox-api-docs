@@ -1,3 +1,10 @@
+<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#sections').mightyList({});
+    });
+</script>
+
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
@@ -13,38 +20,37 @@
             </nav>
         </div>
         <section>
-            <ul class="information-list sortable-card ui-sortable" data-sortable="">
-                {% for section in sections %}
-                    <li class="actions-small-2" data-menu-section="{{ section.section }}">
-                        <div class="grip"></div>
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a>
-                                    <h3>
-                                        {{ sectionName[section.section] }}
-                                    </h3>
-                                    <p class="meta">
-                                        {% if section.title == '' and section.section == 'menu' %}
-                                            {{ configTitle }}
-                                        {% else %}
-                                            {{ section.title }}
-                                        {% endif %}
-                                        {% if section.visible %}
-                                            (Visible)
-                                        {% else %}
-                                            (Hidden)
-                                        {% endif %}
-                                    </p>
-                                </a>
+            <div id="sections">
+                <ul class="information-list sortable-card ui-sortable" data-sortable="">
+                    {% for section in sections %}
+                        {% if section.title is empty %}
+                            {% set title = sectionName[section.section] %}
+                        {% else %}
+                            {% set title = section.title %}
+                        {% endif %}
+                        <li>
+                            <div class="grip"></div>
+                            <div class="list-item">
+                                    <div class="small-9 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                        <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field: 'title'}) }}">
+                                            <input type="text" name="title" value="{{ title }}" data-item-original-value="{{ title }}" placeholder="{{ sectionName[section.section] }}" data-item-element/>
+                                        </label>
+                                        <span class="toast" data-save-item></span>
+                                    </div>
+                                    <div class="small-3 column" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                        <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field:'visible'}) }}">
+                                            <select name="visible" data-item-element data-item-original-value="{{ section.visible }}">
+                                                <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
+                                                <option {% if section.visible %}selected{% endif %} value="1">Visible</option>
+                                            </select>
+                                        </label>
+                                        <span class="toast" data-save-item></span>
+                                    </div>
                             </div>
-                        </div>
-                        <nav>
-                            <a class="icon-modify" title="Edit menu item"
-                               href="{{ routeLookup('adminMenuSide.getSectionModify', {id: section.section}) }}"></a>
-                        </nav>
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </section>
     </div>
 </div>
@@ -141,3 +147,5 @@
     });
 </script>
 <!-- END custom_head -->
+
+

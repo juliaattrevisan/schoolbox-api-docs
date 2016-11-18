@@ -40,7 +40,7 @@ class Module extends BaseModule
                 '/order' => 'postOrder',
                 '/order-section' => 'postSectionOrder',
                 '/modify' => 'postModify',
-                '/modify-section' => 'postSectionModify',
+                '/modify-section/{sectionId}/{field}' => 'postSectionModify',
             ]
         ];
 

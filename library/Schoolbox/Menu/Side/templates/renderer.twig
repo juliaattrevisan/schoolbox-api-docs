@@ -6,7 +6,7 @@
 
                     {% for section in sections %}
 
-                        {% if section.section == 'menu' %}
+                        {% if section.section == 'menu' and section.visible %}
 
                             <li><h3>{{ section.title }}</h3></li>
                             <div class="nav-wrapper">
@@ -30,7 +30,7 @@
                                 </ul>
                             </div>
 
-                        {% elseif section.section == 'children' %}
+                        {% elseif section.section == 'children' and section.visible %}
 
                             {% if children | length > 0 %}
                                 <li><h3>{{ section.title }}</h3></li>
@@ -43,7 +43,7 @@
                                 </div>
                             {% endif %}
 
-                        {% elseif section.section == 'groups' %}
+                        {% elseif section.section == 'groups' and section.visible %}
 
                             {% if groups | length > 0 %}
                                 <li><h3>{{ section.title }}</h3></li>
@@ -58,7 +58,7 @@
                                 </div>
                             {% endif %}
 
-                        {% elseif section.section == 'bookmarks' %}
+                        {% elseif section.section == 'bookmarks' and section.visible %}
 
                             <li><h3>{{ section.title }}</h3></li>
                             <div class="nav-wrapper my-links">
@@ -76,7 +76,7 @@
                                 </ul>
                             </div>
 
-                        {% elseif section.section == 'subjects' %}
+                        {% elseif section.section == 'subjects' and section.visible %}
 
                             {% if subjects | length > 0 %}
                                 <li><h3>{{ section.title }}</h3></li>

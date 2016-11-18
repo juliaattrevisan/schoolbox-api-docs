@@ -267,23 +267,45 @@ class Controller extends Base
     /**
      * Save menu item
      */
-    public function postSectionModify()
+    public function postSectionModify($sectionId, $field)
     {
         $post = $this->getRequest()->post;
 
-        /** @var MenuSideSection $section */
-        $section = $this->getMenuSideSectionMapper()->findOneByColumn('section', $post['id']);
+        try {
+            /** @var MenuSideSection $section */
+            $section = $this->getMenuSideSectionMapper()->findOneByColumn('section', $sectionId);
+            switch ($field) {
+                case 'title':
+                    if (empty($post['name'])) {
+                        $post['name'] = MenuSideSectionMapper::getSectionNameDefaults()[$sectionId];
+                    }
+                    $section->setTitle($post['name']);
+                    break;
 
-        if (empty($post['title'])) {
+                case 'visible':
+                    $section->setVisible($post['name']);
+                    break;
+            }
 
-            $post['title'] = MenuSideSectionMapper::getSectionNameDefaults()[$post['id']];
+            $this->getMenuSideSectionMapper()->save($section);
+
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => [
+                    'result' => 'OK'
+                ],
+            ]);
+
+        } catch (MapperException $e) {
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => [
+                    'result' => 'Error updating record'
+                ],
+            ]);
         }
-
-        $section->setTitle($post['title']);
-        $section->setVisible($post['visible']);
-        $this->getMenuSideSectionMapper()->save($section);
-
-        $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
     }
 
     /**
