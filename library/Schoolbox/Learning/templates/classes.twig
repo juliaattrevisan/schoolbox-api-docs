@@ -6,7 +6,7 @@
 
 <div class="row">
     {% for class in classList %}
-    <div class="small-12 medium-6 large-4 island">
+    <div class="small-6 medium-6 large-4 island">
         <section>
             <div class="card-new small-12">
                 <a href="/homepage/{{ class.id }}">
@@ -14,7 +14,7 @@
                 </a>
                 <div class="card-content actions-small-1">
                     <h3><a href="/homepage/{{ class.id }}">{{ class.name }}</a></h3>
-                    <p class="meta">{{ class.getCodeString() }}</p>
+                    <p class="meta">{{ classTypes[class.id] }} > {{ class.getCodeString() }}</p>
                     {% if currentUser.getRole.isStaff == true %}
                     <nav>
                         <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
