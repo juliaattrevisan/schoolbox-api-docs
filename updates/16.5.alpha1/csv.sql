@@ -1,4 +1,4 @@
-INSERT INTO `schoolbox`.`allowedFileTypes`
+INSERT INTO `allowedFileTypes`
 (
   `description`,
   `mime`,

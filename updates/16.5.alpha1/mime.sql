@@ -1,4 +1,4 @@
-ALTER TABLE `schoolbox`.`allowedFileTypes`
+ALTER TABLE `allowedFileTypes`
   CHANGE COLUMN `iconFile` `iconFile` VARCHAR(80) NOT NULL DEFAULT 'none.svg' ;
 
 
