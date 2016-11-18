@@ -168,6 +168,35 @@ class Controller extends Base
         $item->setUrl($post['url']);
         $item->setTarget($post['target']);
         $item->setWebmail($post['webmail']);
+
+        // Populate token
+
+        if (stripos($post['url'], '/learning/classes') === 0) {
+            $item->setToken('CLASSES');
+        } else if (stripos($post['url'], '/submission/dueWork') === 0) {
+            $item->setToken('SUBMISSION');
+        } else if (stripos($post['url'], '/timetable') === 0) {
+            $item->setToken('TIMETABLE');
+        } else if (stripos($post['url'], '/calendar/week') === 0) {
+            $item->setToken('CALENDAR');
+        } else if (stripos($post['url'], '/news') === 0) {
+            $item->setToken('NEWS');
+        } else if (stripos($post['url'], '/submission/allWork') === 0) {
+            $item->setToken('GRADE');
+        } else if (stripos($post['url'], '/course/list') === 0) {
+            $item->setToken('COURSE');
+        } else if (stripos($post['url'], '/resources') === 0) {
+            $item->setToken('RESOURCES');
+        } else if (stripos($post['url'], '/eportfolio') === 0) {
+            $item->setToken('EPORTFOLIO');
+        } else if (stripos($post['url'], '/my-files') === 0) {
+            $item->setToken('MYFILES');
+        } else if (stripos($post['url'], '/drives') === 0) {
+            $item->setToken('NETWORK');
+        } else {
+            $item->setToken('');
+        }
+        
         $this->getMenuTopMapper()->save($item);
 
         $this->getMenuTopCampusMapper()->deleteByColumn('menu_top_id', $item->getId());
