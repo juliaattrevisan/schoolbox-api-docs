@@ -80,8 +80,8 @@ $this->setVar(
 );
 
 
-$factory = new Calendar_Api_Factory($user);
-$api     = $factory->produce();
+$factory = new Calendar_Api_Factory();
+$api     = $factory->produceForUser($user);
 
 // Extend finish by one day for search
 $calendar = new Lister(

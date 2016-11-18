@@ -25,19 +25,10 @@ class Calendar_Api_Factory
     protected $allTypes = array();
 
     /**
-     * An instance of Schoolbox\User
-     *
-     * @var null
-     */
-    protected $user = null;
-
-    /**
      * Constructor
      */
-    public function __construct($user)
+    public function __construct()
     {
-        $this->setUser($user);
-
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
         /* These configs are base64-encode()'d to get around a weird issue with unserialize
@@ -64,15 +55,16 @@ class Calendar_Api_Factory
     /**
      * Produce an API Composite
      *
+     * @param \Schoolbox\User $user
      * @return Calendar_Api_Composite
      */
-    public function produce()
+    public function produceForUser(\Schoolbox\User $user)
     {
         $compositeApi = new Calendar_Api_Composite();
 
         foreach ($this->getAllTypes() as $config) {
             try {
-                $compositeApi->add($this->produceFromConfig($config));
+                $compositeApi->add($this->produceFromConfig($config, $user));
             } catch (DomainException $e) {
                 // Calendar API has an issue. Skip to next.
                 continue;
@@ -93,12 +85,12 @@ class Calendar_Api_Factory
      * Handle unique construction logic for each variant of the calendar connector.
      *
      * @param Calendar_Api_Config_Record $config
-     * @param \Schoolbox\User            $user   If set, override $this->user
+     * @param \Schoolbox\User            $user
      * @return Calendar_Api_EventType_Abstract
      * @throws InvalidArgumentException if the item can't be built
      * @throws ReflectionException could be thrown by the Reflection API
      */
-    public function produceFromConfig($config, \Schoolbox\User $user = null)
+    public function produceFromConfig($config, \Schoolbox\User $user)
     {
         $base    = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass();
         $default = $base . '_Default';
@@ -107,17 +99,11 @@ class Calendar_Api_Factory
         switch ($default) {
             case 'Calendar_Api_EventType_Submission_Schoolbox_Default':
                 // Same as default constructor, but add the assessment data source
-                $params = [
-                    ($user instanceof \Schoolbox\User ? $user : $this->getUser()),
-                    $config,
-                ];
+                $params = [$user, $config,];
                 break;
 
             default:
-                $params = [
-                    ($user instanceof \Schoolbox\User ? $user : $this->getUser()),
-                    $config,
-                ];
+                $params = [$user, $config,];
                 break;
         }
 
@@ -172,25 +158,5 @@ class Calendar_Api_Factory
     protected function getAllTypes()
     {
         return $this->allTypes;
-    }
-
-    /**
-     * Set user
-     *
-     * @param null $user
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * Get user
-     *
-     * @return null
-     */
-    private function getUser()
-    {
-        return $this->user;
     }
 }

@@ -41,8 +41,8 @@ abstract class Calendar_Layout_Full_Abstract
      */
     public function __construct($page, \Schoolbox\User $user, $date, \Schoolbox\User $viewer)
     {
-        $factory = new Calendar_Api_Factory($user);
-        $api = $factory->produce();
+        $factory = new Calendar_Api_Factory();
+        $api = $factory->produceForUser($user);
 
         $this->setApi($api);
 

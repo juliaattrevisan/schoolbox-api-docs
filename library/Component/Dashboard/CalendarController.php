@@ -63,8 +63,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         /* A list of submissions
          */
-        $eventFactory = new Calendar_Api_Factory($this->getUser());
-        $api = $eventFactory->produce();
+        $eventFactory = new Calendar_Api_Factory();
+        $api = $eventFactory->produceForUser($this->getUser());
         $this->eventRenderer = new Lister(
             $api,
             $this->start->getUnixTimeStamp(),
