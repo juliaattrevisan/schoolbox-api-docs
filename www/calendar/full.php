@@ -49,6 +49,14 @@ if (count($this->arg) == 2) {
     $user = $_SESSION['user'];
 }
 
-$calendar = new Calendar_Layout_Full_Javascript($this, $user, $selectedDate, $_SESSION['user']);
+/** @var Calendar_Api_Factory $factory */
+$factory  = $this->getDi()->get('calendarApiFactory');
+$calendar = new Calendar_Layout_Full_Javascript(
+    $this,
+    $user,
+    $selectedDate,
+    $_SESSION['user'],
+    $factory
+);
 $calendar->render();
 

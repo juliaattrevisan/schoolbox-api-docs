@@ -38,10 +38,10 @@ abstract class Calendar_Layout_Full_Abstract
      * @param \Schoolbox\User $user
      * @param $date
      * @param \Schoolbox\User $viewer
+     * @param Calendar_Api_Factory $factory
      */
-    public function __construct($page, \Schoolbox\User $user, $date, \Schoolbox\User $viewer)
+    public function __construct($page, \Schoolbox\User $user, $date, \Schoolbox\User $viewer, Calendar_Api_Factory $factory)
     {
-        $factory = new Calendar_Api_Factory();
         $api = $factory->produceForUser($user);
 
         $this->setApi($api);
