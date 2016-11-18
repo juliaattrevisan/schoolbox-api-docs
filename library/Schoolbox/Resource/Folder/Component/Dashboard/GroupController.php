@@ -66,8 +66,6 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
-//                new \Alaress_Probe($folder->GetId());
-
             }
             $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
             $this->getGroupList()->add($folder);
