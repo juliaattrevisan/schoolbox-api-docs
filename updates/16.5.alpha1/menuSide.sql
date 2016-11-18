@@ -8,7 +8,7 @@ CREATE TABLE menu_side (
   url VARCHAR(2048),
   target VARCHAR(200),
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 -- CREATE TABLE menu_side_user_options (
 --   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -16,21 +16,21 @@ CREATE TABLE menu_side (
 --   show_bookmarks INT,
 --   show_groups INT,
 --   show_subjects INT,
---   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+--   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_side_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_side_id INT,
   role_id INT,
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_side_campus (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_side_id INT,
   campus_id INT,
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_side_section (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -38,7 +38,7 @@ CREATE TABLE menu_side_section (
   sort_order INT(11),
   `visible` INT(11),
   `title` VARCHAR(100),
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 
 -- Transfer from old tables

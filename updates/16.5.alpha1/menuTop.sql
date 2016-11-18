@@ -9,26 +9,26 @@ CREATE TABLE menu_top (
   webmail TINYINT(4) DEFAULT 0,
   target VARCHAR(200),
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_top_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_top_id INT,
   role_id INT,
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_top_campus (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_top_id INT,
   campus_id INT,
   deleted_at DATETIME,
-  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+  PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_icons (
   name VARCHAR(200),
   title VARCHAR(200),
-PRIMARY KEY (`name`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+PRIMARY KEY (`name`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 -- These are the top menu items for Schoolbox
 
