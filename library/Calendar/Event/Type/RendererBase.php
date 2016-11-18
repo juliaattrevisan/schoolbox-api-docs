@@ -7,6 +7,8 @@
 
 namespace Calendar\Event\Type;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Router;
 use Calendar\Event\Type\EventBase;
 use \SitePage;
 use Twig_Environment;
@@ -200,8 +202,35 @@ abstract class RendererBase implements RendererInterface
         return $this->groupHandler;
     }
 
+    /**
+     * Helper function - gets whether access to a route is allowed.
+     *
+     * @param string $name
+     * @param array  $params
+     *
+     * @return bool|string False if not authorized, a URL if it is.
+     */
+    public function getRouteIfAuthorized($name, array $params = array())
+    {
+        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->getViewer())) {
+            return $this->getRouter()->generate($name, $params);
+        }
+        return false;
+    }
 
+    /**
+     * @return Authorizer
+     */
+    public function getAuthorizer()
+    {
+        return $this->getPage()->getDi()->get('authorizer');
+    }
 
-
-
-} 
+    /**
+     * @return Router
+     */
+    public function getRouter()
+    {
+        return $this->getPage()->getDi()->get('router');
+    }
+}

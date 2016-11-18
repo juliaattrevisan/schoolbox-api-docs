@@ -10,9 +10,12 @@
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
-use Aura\Router\Router;
-use Alaress\Authorizer\Authorizer;
 
+/**
+ * Class Base
+ *
+ * @method \Calendar\Event\Type\ResourceBooking\Event getEvent()
+ */
 abstract class Base extends RendererBase
 {
 
@@ -61,34 +64,4 @@ abstract class Base extends RendererBase
             return '';
         }
     }
-
-    /**
-     * Helper function - gets whether access to a route is allowed.
-     *
-     * @param string $name
-     * @param array  $params
-     *
-     * @return bool|string False if not authorized, a URL if it is.
-     */
-    public function getRouteIfAuthorized($name, array $params = array())
-    {
-        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->getViewer())) {
-            return $this->getRouter()->generate($name, $params);
-        }
-        return false;
-    }
-
-    /**
-     * @return Authorizer
-     */
-    public function getAuthorizer() {
-        return $this->getPage()->getDi()->get('authorizer');
-    }
-
-    /**
-     * @return Router
-     */
-    public function getRouter() {
-        return $this->getPage()->getDi()->get('router');
-    }
-} 
+}
