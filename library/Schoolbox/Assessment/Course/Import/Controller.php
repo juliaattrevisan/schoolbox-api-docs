@@ -406,26 +406,29 @@ class Controller extends Base\Base
         }
 
 
-        $factory = $this->getImportFactory();
-        $args = [];
-        if('import' == $action) {
-            $args['unitSpecs'] = [];
-            foreach ($units as $unit) {
-                if ($unit['import']) {
-                    $args['unitSpecs'][$unit['unit_spec_id']] = [
-                        'unitSpecId' => $unit['unit_spec_id'],
-                        'openDate'   => $unit['open_date'],
-                        'closeDate'  => $unit['close_date'],
-                    ];
-                }
+        $importFactory = $this->getImportFactory();
+        $unitImpls = [];
+        foreach ($units as $unit) {
+            if ($unit['import']) {
+                $unitImpl = new UnitImplementation();
+                $unitImpl->setId($unit['unit_impl_id']);
+                $unitSpec = new UnitSpecification();
+                $unitSpec->setId($unit['unit_spec_id']);
+                $unitImpl->setSpecification($unitSpec);
+                $unitImpl->setOpenDate($unit['open_date']);
+                $unitImpl->setDueDate($unit['close_date']);
+                $unitImpls[] = $unitImpl;
             }
+        }
+
+        if('import' == $action) {
+            $unitAssessments = $importFactory->buildForNewImport($unitImpls);
         } elseif('modify' == $action){
-            // TODO
-            $unitAssessments = $factory->build(['courseImplId' => $courseImplId]);
+            $unitAssessments = $importFactory->buildForImportModify($unitImpls);
         } else {
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
-        $unitAssessments = $factory->build($args);
+
 
 
 

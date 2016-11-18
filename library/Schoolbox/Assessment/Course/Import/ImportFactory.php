@@ -45,41 +45,42 @@ class ImportFactory
     /**
      * @param array $args Determines what we search on
      *
-     * @return array[] $results Indexed by unitSpec.id
-     * @var UnitSpecification $results[unitSpecId]['unitSpec']
-     * @var UnitImplementation|null $results[unitSpecId]['unitImpl']
-     * @var array $results[unitSpecId]['assessments']
-     * @var IAssessable|null $results[unitSpecId]['assessments'][]['spec']
-     * @var IAssessable|null $results[unitSpecId]['assessments'][]['impl']
+     * @return UnitImplementation[] $results Indexed by unitSpec.id
+     * @var UnitImplementation $results[unitSpecId] Will have no ID if doesn't exist. Will always link to a UnitSpec
+     * @var IAssessable[] UnitImplementation->getAssessables()[idx] An AssessmentImpl. No id if not exist. May link to AssessmentSpec
+
      * @todo enforce the return type by using an DTO (data-transfer-object)
      */
-    public function build(array $args)
-    {
-        if(array_key_exists('unitSpecs', $args)){
-            $results = $this->buildFromUnitSpecs($args['unitSpecs']);
-        } elseif(array_key_exists('courseImplId', $args)){
-            $results = $this->buildFromCourseImplId($args['courseImplId']);
-        } else {
-            throw new \InvalidArgumentException('Invalid args: '.print_r($args, true));
-        }
-
-        return $results;
-    }
+//    public function build(array $args)
+//    {
+//        if(array_key_exists('unitSpecs', $args)){
+//            $results = $this->buildFromUnitSpecs($args['unitSpecs']);
+//        } elseif(array_key_exists('courseImplId', $args)){
+//            $results = $this->buildFromCourseImplId($args['courseImplId']);
+//        } else {
+//            throw new \InvalidArgumentException('Invalid args: '.print_r($args, true));
+//        }
+//
+//        return $results;
+//    }
 
     /**
      * Called during a new import.
      *
-     * UnitImpls will all have no id, but will have dates populated according to previous stage.
+     * UnitImpls will all have no id, but will have dates already set.
      * AssessmentImpls will have no id, but will have dates populated according to previous stage
+     * All AssessmentImpls will link to an AssessmentSpec
      *
-     * @param array $unitSpecs                                          Units to import, indexed by unitSpecId
-     * @var int  $unitSpecs[unitSpecId]['id']                           UnitSpec.id
-     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['openDate']    Open date as input by user
-     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['closeDate']   Close date as input by user
-     * @return array
+     * @param UnitImplementation[] $unitImpls        Each UnitImpl links to a UnitSpec to get Assessments for
+     * @return DataTransferObject
      */
-    protected function buildFromUnitSpecs($unitSpecs)
+    public function buildForNewImport($unitImpls)
     {
+        $unitSpecIds = [];
+        foreach($unitImpls as $unitImpl){
+            $unitSpecIds[] = $unitImpl->getSpecification()->getId();
+        }
+
         $query = "
             SELECT 
                 us.id AS 'us.id',
@@ -96,13 +97,15 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            WHERE  us.id IN (".implode(',', array_keys($unitSpecs)).") AND sa.deleted_at IS NULL
+            WHERE  us.id IN (".implode(',', $unitSpecIds).") AND sa.deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute();
 
-        $unitAssessments = [];
+        // No Implementations (this is a new import)
+        $implToSpecMap = [];
+        $dto = new DataTransferObject($implToSpecMap);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $unitSpecId = $row['us.id'];
@@ -157,10 +160,118 @@ class ImportFactory
      * UnitImpl + AssessmentImpl will be non-null if already imported.
      *
      * @param int $courseImplId
-     * @return array
+     * @param array $unitSpecs                                          Units to import, indexed by unitSpecId
+     * @var int $unitSpecs[unitSpecId]['id']                            UnitSpec.id
+     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['openDate']     Open date as input by user
+     * @var \Alaress_Date_Format $unitSpecs[unitSpecId]['closeDate']    Close date as input by user
+     * @param array $unitImpls // TODO is this required?
+     * @return DataTransferObject
      */
-    protected function buildFromCourseImplId($courseImplId)
+    public function buildForImportModify($courseImplId, array $unitSpecs, array $unitImpls)
     {
+        /**
+         * Maps each AssessmentImplId to an AssessmentSpecId.
+         * SpecId will be null if Impl was created in UnitImpl.
+         * Array will be empty if no UnitImps, or if no Assessments imported to UnitImps.
+         *
+         * @var int[]
+         */
+        $assessmentImplToSpecMap = [];
+        if(count($unitImpls)){
+            // We DO want to retrieve records for deleted Specs.
+            // We DO NOT want to retrieve records for deleted Impls.
+            $query = "
+                SELECT 
+                    aui.assessment_id               AS 'ia.id',
+                    aui.assessment_specification_id AS 'sa.id'
+                FROM assessment_course_unit_implementation aui
+                JOIN assessment `ai` ON `ai`.`id` = aui.assessment_id AND `ai`.deleted_at IS NULL
+                WHERE  aui.course_unit_implementation_id IN (".implode(',', $unitImpls).")
+            ";
+            $statement = $this->database->prepare($query);
+            $statement->execute();
+            while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+                $assessmentImplToSpecMap[$row['ia.id']] = $row['sp.id'];
+            }
+        }
+
+        // Get all Assessments in either UnitSpecs or UnitImpls
+
+        $query1 = "
+            SELECT 
+                us.id AS 'us.id',
+                null  AS 'ui.id',
+                usf.name as 'usf.name',
+                sa.id AS 'sa.id',
+                sa.title AS 'sa.title',
+                sdw.assessment_id AS 'sdw.id',
+                sqz.assessment_id AS 'sqz.id',
+                stk.assessment_id AS 'stk.id',
+                null AS 'ia.id',
+                null AS 'ia.title',
+                null AS 'idw.id',
+                null AS 'iqz.id',
+                null AS 'itk.id'                
+            FROM course_unit_specification us
+            LEFT JOIN folder usf ON usf.id = us.folder_id
+            LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
+            LEFT JOIN assessment sa ON sa.id = aus.assessment_id
+            LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
+            LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
+            LEFT JOIN task stk ON stk.assessment_id = sa.id
+            WHERE  us.id IN (".implode(',', array_keys($unitSpecs)).") AND sa.deleted_at IS NULL
+        ";
+
+        $query2 = "
+            SELECT 
+                us.id AS 'us.id',
+                ui.id AS 'ui.id',
+                usf.name as 'usf.name',
+                sa.id AS 'sa.id',
+                sa.title AS 'sa.title',
+                sdw.assessment_id AS 'sdw.id',
+                sqz.assessment_id AS 'sqz.id',
+                stk.assessment_id AS 'stk.id',
+                ia.id AS 'ia.id',
+                ia.title AS 'ia.title',
+                idw.assessment_id AS 'idw.id',
+                iqz.assessment_id AS 'iqz.id',
+                itk.assessment_id AS 'itk.id'
+            FROM course_unit_specification us
+            LEFT JOIN folder usf ON usf.id = us.folder_id
+            LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
+            LEFT JOIN assessment sa ON sa.id = aus.assessment_id
+            LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
+            LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
+            LEFT JOIN task stk ON stk.assessment_id = sa.id
+            WHERE  us.id IN (".implode(',', array_keys($unitSpecs)).") AND sa.deleted_at IS NULL
+        ";
+
+        $query = "
+            SELECT 
+                us.id AS 'us.id',
+                ui.id AS 'ui.id',
+                usf.name as 'usf.name',
+                sa.id AS 'sa.id',
+                sa.title AS 'sa.title',
+                sdw.assessment_id AS 'sdw.id',
+                sqz.assessment_id AS 'sqz.id',
+                stk.assessment_id AS 'stk.id',
+                ia.id AS 'ia.id',
+                ia.title AS 'ia.title',
+                idw.assessment_id AS 'idw.id',
+                iqz.assessment_id AS 'iqz.id',
+                itk.assessment_id AS 'itk.id'
+            FROM course_unit_specification us
+            LEFT JOIN folder usf ON usf.id = us.folder_id
+            LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
+            LEFT JOIN assessment sa ON sa.id = aus.assessment_id
+            LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
+            LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
+            LEFT JOIN task stk ON stk.assessment_id = sa.id
+            WHERE  us.id IN (".implode(',', array_keys($unitSpecs)).") AND sa.deleted_at IS NULL
+        ";
+
         return [];
     }
 
