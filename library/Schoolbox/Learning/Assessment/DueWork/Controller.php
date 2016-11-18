@@ -225,6 +225,13 @@ class Controller extends Assessment\Controller
                 $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
             }
         }
+        else {
+
+            /* Init a dangerZone that is ready to accept files for
+             * the first ever draft
+             */
+            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
+        }
 
         /* Pump into twig land
          */
