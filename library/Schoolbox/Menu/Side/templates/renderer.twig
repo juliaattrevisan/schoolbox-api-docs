@@ -21,7 +21,7 @@
                                                     {% endif %}
                                                 {% endfor %}
                                         >
-                                            <a href="{{ node.url }}">
+                                            <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
                                                 <span>{{ node.title }}</span>
                                             </a>
                                             {% include "@menuSide/includes/treeLevel.twig" with {'parent': node} %}
