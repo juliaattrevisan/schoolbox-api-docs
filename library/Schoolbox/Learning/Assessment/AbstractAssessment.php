@@ -116,6 +116,15 @@ abstract class AbstractAssessment implements IAssessable
     private $context;
 
     /**
+     * If published, then who can see the feedback for this Assessment.
+     *
+     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
+     *
+     * @var int
+     */
+    private $markVisibility;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
@@ -770,6 +779,24 @@ abstract class AbstractAssessment implements IAssessable
     public function getBaseContext()
     {
         return $this->getContext()->getBaseContext();
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarkVisibility()
+    {
+        return $this->markVisibility;
+    }
+
+    /**
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility)
+    {
+        $this->markVisibility = $markVisibility;
+        return $this;
     }
 }
 
