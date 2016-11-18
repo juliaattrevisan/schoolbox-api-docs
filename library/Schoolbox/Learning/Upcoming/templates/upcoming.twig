@@ -230,8 +230,8 @@
                         <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id}) }}" title="View upcoming work">
                             <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
                             <p>{{ child.formatName }}</p>
+                            <p class="meta">{{ child.role.name }}</p>
                         </a>
-                        <p class="meta">{{ child.role.name }}</p>
                     </div>
                 </li>
                 {% endfor %}
