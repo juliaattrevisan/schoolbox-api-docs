@@ -110,11 +110,10 @@
         <p class="meta" data-mage-helptext>The list of coursework to be imported is below. You can deselect assessments and change dates before completing the import.</p>
     </div>
 </div>
-{% for unitPair in unitAssessments %}
+{% for unitImpl in dto.unitImplementations %}
 
-    {% set unitSpec = unitPair.unitSpec %}
-    {% set unitImpl = unitPair.unitImpl %}
-    {% set assessmentPairs = unitPair.assessments %}
+    {% set unitSpec = unitImpl.specification %}
+    {% set assessmentPairs = dto.getUnitSpecAssessments(unitSpec) %}
     {% set unitAssessmentCount = assessmentPairs | length %}
 
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
@@ -146,16 +145,15 @@
                                 {% for assessmentPair in assessmentPairs %}
 
                                     {# decide some things about this assessment #}
-                                    {% set assessmentSpec = assessmentPair.spec %}
-                                    {% set assessmentImpl = assessmentPair.impl %}
+                                    {% set assessmentSpec = assessmentPair.specification %}
+                                    {% set assessmentImpl = assessmentPair.implementation %}
                                     {% set assessment = assessmentImpl ?: assessmentSpec %}
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                     {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
 
-                                    <input type="hidden" name="{{ inputPrefix }}[type]" value="{% if assessmentImpl %}impl{% else %}spec{% endif %}" />
                                     <li data-type="unit_row">
-
+                                        <input type="hidden" name="{{ inputPrefix }}[type]" value="{% if assessmentImpl %}impl{% else %}spec{% endif %}" />
                                         <div class="compact card small-12 large-4">
                                             <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                             <input type="checkbox"

@@ -422,9 +422,9 @@ class Controller extends Base\Base
         }
 
         if('import' == $action) {
-            $unitAssessments = $importFactory->buildForNewImport($unitImpls);
+            $dto = $importFactory->buildForNewImport($unitImpls);
         } elseif('modify' == $action){
-            $unitAssessments = $importFactory->buildForImportModify($unitImpls);
+            $dto = $importFactory->buildForImportModify($unitImpls);
         } else {
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
@@ -434,12 +434,12 @@ class Controller extends Base\Base
 
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
-            'action'          => $action,
-            'courseSpecId'    => $courseSpecId,
-            'courseImplId'    => $courseImplId,
-            'componentId'     => $componentId,
-            'ownerships'      => $post['ownerships'],
-            'unitAssessments' => $unitAssessments,
+            'action'       => $action,
+            'courseSpecId' => $courseSpecId,
+            'courseImplId' => $courseImplId,
+            'componentId'  => $componentId,
+            'ownerships'   => $post['ownerships'],
+            'dto'          => $dto,
         ]);
     }
 
