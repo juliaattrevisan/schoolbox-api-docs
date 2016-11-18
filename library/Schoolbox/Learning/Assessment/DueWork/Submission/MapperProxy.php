@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
 use Schoolbox\Collection;
@@ -147,11 +148,34 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
 
-                $dataModelFile = (new StudentSubmissionFile())
-                    ->setStorage($file->getStorage())
-                    ->setEditableInline($file->getEditableInline())
-                    ->setUuid($file->getCrocodocId())
-                    ->setFilename($file->getFilename());
+                /* Try to find an existing record of this file that was previously saved
+                 * If one exists, just use that - otherwise spawn a new one
+                 */
+                try {
+                    $dataModelFile = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance()->findOneByColumnList([
+                        'student_submission_id' => $dataModel->getId(),
+                        'hash'                  => $file->getHash()
+                    ]);
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+
+                    /* File not found, add it
+                     */
+                    $dataModelFile = (new StudentSubmissionFile())
+                        ->setSubmission($dataModel)
+                        ->setStorage($file->getStorage())
+                        ->setEditableInline($file->getEditableInline())
+                        ->setUuid($file->getCrocodocId())
+                        ->setFilename($file->getFilename());
+                }
+                catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+
+                    /* File was deleted - undelete it because we decided to use it after all
+                     */
+                    /** @var StudentSubmissionFile $dataModelFile */
+                    $dataModelFile = $e->getDeletedObject();
+                    $dataModelFile->setDeletedAt(null);
+                }
 
                 $dataModel->getFiles()->add($dataModelFile);
             }
@@ -160,19 +184,5 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         }
 
         return $dataModels;
-    }
-
-    /**
-     * Delete all the associated files then save them all again, to prevent
-     * exponential accumulation of dupe files
-     *
-     * @param object|Collection $model
-     * @return bool
-     */
-    public function save($model)
-    {
-        SingleFileMapper::getInstance()->deleteByColumn('student_submission_id', $model->getId());
-
-        return parent::save($model);
     }
 }

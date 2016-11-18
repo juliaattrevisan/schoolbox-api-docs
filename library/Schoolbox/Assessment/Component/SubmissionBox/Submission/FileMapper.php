@@ -129,10 +129,13 @@ class FileMapper extends Mapper
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
-        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
-        $joinMapper->delete($removedFiles);
 
-        // Save files that are now attached
+        /* Just blow them all away
+         */
+        $joinMapper->hardDelete($existingFiles);
+
+        /* Resave EVERYTHING
+         */
         foreach ($object->getFiles() as $file) {
             $file->setSubmission($object);
         }
