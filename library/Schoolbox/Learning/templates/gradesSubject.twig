@@ -47,7 +47,7 @@
                     {% for teacher in subject.teachers %}
                         <li>
                             <div class="small-12 card">
-                                <a href="/search/user/151" title="View Profile">
+                                <a href="/search/user/{{ teacher.id }}" title="View Profile">
                                     <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
                                          alt="{{ teacher.fullName }}">
                                     <p>{{ teacher.fullName }}</p>
@@ -120,7 +120,7 @@
                                 /* Concatenate everything
                                  */
                                 if (typeof infoIndex[this.x].displayMark != 'undefined') {
-                                    tooltipContent = template;
+                                    var tooltipContent = template;
 
                                     if (infoIndex[this.x].displayMark != null) {
                                         tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
@@ -179,11 +179,11 @@
                             <div class="list-item clearfix content">
                                 <div class="row">
                                     <div class="small-12 large-5 card column xl">
-                                        <a href="/submission/submissionHistory/24/229">
+                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}">
                                             <h3>{{ assessment.title }}</h3>
                                         </a>
                                         <p class="meta">
-                                            <a href="/homepage/176">{{ subject.name }}</a> {{ assessment.typeName }}
+                                            <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
                                         </p>
                                     </div>
 
