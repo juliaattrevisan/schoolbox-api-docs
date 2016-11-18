@@ -62,8 +62,10 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $this->end->addDays($days);
 
         /* A list of submissions
+         * TODO inject the event factory
          */
-        $eventFactory = new Calendar_Api_Factory();
+        /** @var Calendar_Api_Factory $eventFactory */
+        $eventFactory = $this->getSitePage()->getDi()->get('calendarApiFactory');
         $api = $eventFactory->produceForUser($this->getUser());
         $this->eventRenderer = new Lister(
             $api,
