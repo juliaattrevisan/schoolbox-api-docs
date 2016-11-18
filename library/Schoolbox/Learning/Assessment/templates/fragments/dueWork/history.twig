@@ -67,4 +67,13 @@
         {% endif %}
     </div>
 </div>
+{% else %}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>There are no Submissions or Feedback for {{ participant.user.fullname }}</p>
+        </div>
+    </div>
+</div>
 {% endif %}
