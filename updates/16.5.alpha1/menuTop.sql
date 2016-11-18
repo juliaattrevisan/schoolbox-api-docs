@@ -155,6 +155,7 @@ DELETE FROM menu_top_role WHERE menu_top_id = 6 AND (SELECT `value` FROM `config
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 6, id FROM groups WHERE group_type = 'staff' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 13, id FROM groups WHERE group_type = 'student' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 
+-- Demo webmail test
 
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
   SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://outlook.com/owa/tps.vic.edu.au', '_blank', 1, null
