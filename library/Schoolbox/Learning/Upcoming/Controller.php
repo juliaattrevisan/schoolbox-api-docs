@@ -165,6 +165,9 @@ class Controller extends Base
             ];
         }
 
+        // TODO Populate $_SESSION[children] properly
+        $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
@@ -174,7 +177,7 @@ class Controller extends Base
                     'subjects'    => $subjects,
                     'mailHandle'  => $this->getSession()->get('mailhandle'),
                     'currentTerm' => $term,
-                    'children'    => $this->getSession()->get('children', []),
+                    'children'    => $children,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯

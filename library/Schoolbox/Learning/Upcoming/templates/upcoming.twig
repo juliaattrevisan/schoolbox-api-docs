@@ -228,9 +228,10 @@
                 <li>
                     <div class="card small-12">
                         <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id}) }}" title="View upcoming work">
-                            <img src="/portrait.php?userId={{ child.sid }}&size=square64" alt="View upcoming work" />
-                            <p>{{ child.name }}</p>
+                            <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
+                            <p>{{ child.formatName }}</p>
                         </a>
+                        <p class="meta">{{ child.role.name }}</p>
                     </div>
                 </li>
                 {% endfor %}
