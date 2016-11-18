@@ -62,7 +62,11 @@
                     // Re-init the autosave
                     initAutosave();
                 },
-                success: function () {
+                success: function (responseText) {
+
+                    /* Recycle the id ><
+                     */
+                    form.find('input[name=responseId]').val(responseText.id);
                     formSaveLabel.toastTimeout({
                         text: 'Draft Saved',
                         css: 'success'
