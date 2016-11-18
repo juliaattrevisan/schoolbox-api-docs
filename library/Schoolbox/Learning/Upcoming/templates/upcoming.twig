@@ -249,12 +249,13 @@
     </div>
 </div>
 
-{# subject list #}
 {% if subjects|length %}
-    <h2 class="subheader">Subjects</h2>
-    {% for subject in subjects %}
+<div class="row">
+    <div class="small-12 columns">
         <div class="row">
             <div class="small-12 island">
+                <h2 class="subheader">Subjects</h2>
+                {% for subject in subjects %}
                 <section>
                     <ul class="information-list">
                         <li>
@@ -301,9 +302,11 @@
                         {% endfor %}
                     </ul>
                 </section>
+                {% endfor %}
             </div>
         </div>
-    {% endfor %}
+    </div>
+</div>
 {% endif %}
 
 <div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble">
