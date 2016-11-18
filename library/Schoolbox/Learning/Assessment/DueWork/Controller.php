@@ -339,7 +339,7 @@ class Controller extends Assessment\Controller
 
                     /* Not sure how useful this actually is, since you can't infer
                      * the value of editableInline from a Storage model without
-                     * inspecting its corresponding editabelInline field, which isn't
+                     * inspecting its corresponding editableInline field, which isn't
                      * always available
                      */
                     $attachedFile->setEditableInline(false);
