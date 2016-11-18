@@ -341,9 +341,9 @@ input[type=radio]{
 	&:checked{
 		+ .block{
 			background-color: $content-ui-foreground;
-			color: $white;
+			color: $content-ui-selected;
 			i{
-				color: $white;
+				color: $content-ui-selected;
 			}
 		}
 	}
