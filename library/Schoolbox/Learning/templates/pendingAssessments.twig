@@ -3,7 +3,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbs(
-    ['Learning', routeLookup('learning.getPendingAssessments')],
+    ['Learning', routeLookup('learning.getClasses')],
     ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id })]
 ) }}
 
