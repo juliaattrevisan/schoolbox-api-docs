@@ -16,6 +16,7 @@
     });
 </script>
 
+{% if timeline|length %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
@@ -66,3 +67,4 @@
         {% endif %}
     </div>
 </div>
+{% endif %}
