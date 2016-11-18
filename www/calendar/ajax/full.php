@@ -13,7 +13,7 @@ $user = $user_mapper->findById($_GET['userId']);
 $viewer = $_SESSION['user'];
 
 try {
-    Calendar_Layout_Full_Javascript::permissionCheck($_GET['userId'], $viewer, new Group());
+    Calendar_Layout_Full_Ajax_JSON::permissionCheck($_GET['userId'], $viewer, new Group());
 }
 catch (Exception $e) {
     error($e->getCode());
