@@ -56,10 +56,10 @@ class EventConverter {
 
         // Set the event's type and color if there's a type for bookings
         if($booking->getStatus()->isApproved()) {
-            $event->setColour('e7f5e0');
+            $event->setColour('#e7f5e0');
         }
         if($booking->getStatus()->isPending()) {
-            $event->setColour('ffffe5');
+            $event->setColour('#ffffe5');
         }
 
         $event->setDetail($booking->getNotes());
