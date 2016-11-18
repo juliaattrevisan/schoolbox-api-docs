@@ -14,9 +14,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+
 class Calendar_Api_Factory
 {
-
     /**
      * A list of all the possible event types to display
      *
@@ -25,10 +27,20 @@ class Calendar_Api_Factory
     protected $allTypes = array();
 
     /**
-     * Constructor
+     * A data source for assessments.
+     *
+     * @var AssessmentDataSource
      */
-    public function __construct()
+    protected $assessmentDataSource;
+
+    /**
+     * Constructor
+     *
+     * @param AssessmentDataSource $assessmentDataSource
+     */
+    public function __construct(AssessmentDataSource $assessmentDataSource)
     {
+        $this->assessmentDataSource = $assessmentDataSource;
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
         /* These configs are base64-encode()'d to get around a weird issue with unserialize
@@ -99,7 +111,7 @@ class Calendar_Api_Factory
         switch ($default) {
             case 'Calendar_Api_EventType_Submission_Schoolbox_Default':
                 // Same as default constructor, but add the assessment data source
-                $params = [$user, $config,];
+                $params = [$user, $config, $this->assessmentDataSource,];
                 break;
 
             default:

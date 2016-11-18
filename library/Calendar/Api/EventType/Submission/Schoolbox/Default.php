@@ -9,6 +9,7 @@
  */
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
@@ -17,15 +18,22 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     private $calendarHandler = null;
 
     /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
      * Constructor
      *
-     * @param \Schoolbox\User $user
-     * @param                 $config
+     * @param \Schoolbox\User      $user
+     * @param                      $config
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
     {
         $this->setCalendarHandler(new Calendar());
         $this->setUser($user);
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
     /**
@@ -60,20 +68,14 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $eventType = 1;
         }
 
-        // Get a timeline of events
-        // Use the assessment data source to get everything for this user
-        // TODO inject this - construction of calendar API objects needs to be cleaned up to allow this to happen
-        /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
-        global $kernel;
-        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $kernel->getDependencyInjector()->get('assessmentDataSource');
-
         // Find for student currently hacks together a term
         $term = (new Schoolbox\Assessment\Term\Model())
             ->setStart(new Alaress_Date_Format($startTimestamp, Alaress_Date_Format::TIMESTAMP))
             ->setActualFinish(new Alaress_Date_Format($endTimestamp, Alaress_Date_Format::TIMESTAMP));
 
-        foreach ($assessmentDataSource->findAllForStudent($this->getUser(), $term) as $assessment) {
+        // Get a timeline of events
+        // Use the assessment data source to get everything for this user
+        foreach ($this->assessmentDataSource->findAllForStudent($this->getUser(), $term) as $assessment) {
             $event = new Event();
 
             $folder = $assessment->getBaseContext()->getFolder();
