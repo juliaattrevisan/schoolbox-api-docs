@@ -1,7 +1,5 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-<h1>Upcoming work for {{ student.formatName }}</h1>
-
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
@@ -209,6 +207,38 @@
     })
 </script>
 <!-- END custom_head -->
+
+{# Header #}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>Upcoming work for {{ student.formatName }}</h1>
+                </div>
+            </div>
+
+            {% if children|length > 0 %}
+            <nav>
+                <a class='icon-group' data-dropdown='header-options'></a>
+            </nav>
+
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                {% for child in children %}
+                <li>
+                    <div class="card small-12">
+                        <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id}) }}" title="View upcoming work">
+                            <img src="/portrait.php?userId={{ child.sid }}&size=square64" alt="View upcoming work" />
+                            <p>{{ child.name }}</p>
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="small-12 island">

@@ -174,6 +174,7 @@ class Controller extends Base
                     'subjects'    => $subjects,
                     'mailHandle'  => $this->getSession()->get('mailhandle'),
                     'currentTerm' => $term,
+                    'children'    => $this->getSession()->get('children', []),
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
