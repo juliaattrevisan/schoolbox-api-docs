@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
+
 class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 	/**
@@ -148,7 +150,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				$submissionBox->setRubricResultSet(0);
 				$submissionBox->setWeight($edumateTask->getWeighting());
 				$submissionBox->setMaxMark($edumateTask->getTotalMark());
-				$submissionBox->setMarkVisibility($submissionBox::MARK_VISIBILITY_PRIVATE);
+				$submissionBox->setMarkVisibility(AbstractAssessment::MARK_VISIBILITY_PRIVATE);
 
 				/* Add this submission box to the tableau
 				 */

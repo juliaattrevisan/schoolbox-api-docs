@@ -9,6 +9,8 @@
  */
 namespace Assess;
 
+use Schoolbox\Learning\Assessment\AbstractAssessment;
+
 class Visibility {
 
 	/**
@@ -48,18 +50,18 @@ class Visibility {
 	{
 		$visibilities = array();
 		if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 		else if ($currentUser->getRole()->isStudent()) {
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 		else {
 			$student->loadParents();
 			if ($currentUser->isParentOf($student)) {
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+				$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
 			}
 		}
 
@@ -72,7 +74,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaff() {
-		if ($this->getId() == \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE) {
+		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_PRIVATE) {
 			return true;
 		}
 
@@ -85,7 +87,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaffStudent() {
-		if ($this->getId() == \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT) {
+		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_STUDENT) {
 			return true;
 		}
 
@@ -98,7 +100,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaffStudentParent() {
-		if ($this->getId() == \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
+		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT) {
 			return true;
 		}
 

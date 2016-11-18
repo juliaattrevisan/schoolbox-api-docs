@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -30,10 +31,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
 {
     use HasCurriculumNodes;
     use AssessmentModelTrait;
-
-    const MARK_VISIBILITY_PRIVATE = 0;
-    const MARK_VISIBILITY_STUDENT = 1;
-    const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
     /**
      * @var int
@@ -208,7 +205,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+            array(AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -219,7 +216,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**
@@ -248,11 +245,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function getMarkVisibilityDescription() {
         switch($this->getMarkVisibility()) {
-            case self::MARK_VISIBILITY_PRIVATE:
+            case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
                 return 'Staff Only';
-            case self::MARK_VISIBILITY_STUDENT:
+            case AbstractAssessment::MARK_VISIBILITY_STUDENT:
                 return 'Staff and Students';
-            case self::MARK_VISIBILITY_PARENT_STUDENT:
+            case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
                 return 'Staff, Students and Parents';
         }
         return '';

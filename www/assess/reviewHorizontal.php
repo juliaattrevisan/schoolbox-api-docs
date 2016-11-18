@@ -15,6 +15,7 @@
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -185,13 +186,13 @@ else {
 
 	// Visibility copypaste
 	switch ($assess['mark_visibility']) {
-		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+		case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
 			$this->parse('visible_staff_block', 'visible_staff');
 			break;
-		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+		case AbstractAssessment::MARK_VISIBILITY_STUDENT:
 			$this->parse('visible_staff_students_block', 'visible_staff_students');
 			break;
-		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+		case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
 			$this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
 			break;
 	}

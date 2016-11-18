@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Assessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Widgets {
 
@@ -42,16 +43,16 @@ class Widgets {
     public static function getAvailableOptions() {
         $options = self::getOptions();
         switch (\Cfg::get('submission_visibility_max')) {
-            case SubmissionBox::MARK_VISIBILITY_PRIVATE:
+            case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
                 // drop MARK_VISIBILITY_PARENT_STUDENT, MARK_VISIBILITY_STUDENT
                 array_pop($options);
                 array_pop($options);
                 break;
-            case SubmissionBox::MARK_VISIBILITY_STUDENT:
+            case AbstractAssessment::MARK_VISIBILITY_STUDENT:
                 // drop MARK_VISIBILITY_PARENT_STUDENT
                 array_pop($options);
                 break;
-            case SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+            case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
             default:
                 // drop nothing
                 break;
@@ -67,17 +68,17 @@ class Widgets {
     static public function getOptions() {
         $options = array(
             array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
+                'id'   => AbstractAssessment::MARK_VISIBILITY_PRIVATE,
                 'name' => html_entity_decode('&#xe66b;&nbsp;&nbsp;Staff Only'),
                 'css' => 'icon-locked',
             ),
             array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
+                'id'   => AbstractAssessment::MARK_VISIBILITY_STUDENT,
                 'name' => html_entity_decode('&#xe667;&nbsp;&nbsp;Staff and Students'),
                 'css' => 'icon-staff-students',
             ),
             array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+                'id'   => AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT,
                 'name' => html_entity_decode('&#xe666;&nbsp;&nbsp;Staff, Students and their Parents'),
                 'css' => 'icon-staff',
             ),

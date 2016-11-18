@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -167,15 +168,15 @@ class StudentReportCard
         // if viewing own, all permissions enabled
         if ($this->viewingUserId == $this->targetUserId) {
             $this->permissionSet     = array(true, true, true, $displayClassAverage, true, $showOverallGrade);
-            $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_STUDENT;
+            $this->minimumVisibility = AbstractAssessment::MARK_VISIBILITY_STUDENT;
         } // if superuser, all permissions enabled
         elseif ($this->getViewingUser()->isSuperuser()) {
             $this->permissionSet     = array(true, true, true, true, true, true);
-            $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+            $this->minimumVisibility = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
         } // if staff, all READ permissions enabled
         elseif ($this->getViewingUser()->getRole()->isStaff()) {
             $this->permissionSet     = array(false, false, true, true, true, true);
-            $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+            $this->minimumVisibility = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
         } // if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
         elseif ($this->groupHandler->isParentOfChild($this->targetUserId)) {
             $this->permissionSet     = array(
@@ -186,7 +187,7 @@ class StudentReportCard
                 !$restrictStudentSubmissions,
                 (!$restrictStudentSubmissions) && $showOverallGrade
             );
-            $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT + ($restrictStudentSubmissions ? 1 : 0);
+            $this->minimumVisibility = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT + ($restrictStudentSubmissions ? 1 : 0);
         } // all other cases, no permissions granted
         else {
             $this->permissionSet     = array(false, false, false, false, false, false);
@@ -235,13 +236,13 @@ class StudentReportCard
         $this->targetCategoryId = $subjectId;
         // populate data for the subject using the category and user
         $duework_visibilities = array(
-            Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+            AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT,
         );
         if ($this->groupHandler->isStudent()) {
-            $duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+            $duework_visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
         } elseif ($this->groupHandler->isStaff() || $this->groupHandler->isSuperuser()) {
-            $duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-            $duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+            $duework_visibilities[] = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
+            $duework_visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
         }
         $this->subjectData = new SubjectReportCard(
             $subjectId,
@@ -259,7 +260,7 @@ class StudentReportCard
     public function renderPage(\SitePage $page, $template = 'submission/allWork.html', $tab = 'grade')
     {
         // visibility minimum is too high, can't see anything
-        if ($this->minimumVisibility > SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
+        if ($this->minimumVisibility > AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT) {
             error(19);
         }
         $page->setFile(TEMPLATE_content, $template);
@@ -921,13 +922,13 @@ class StudentReportCard
             );
             // determine default visibilities from submission_access config
             switch (\Cfg::get('submission_access')) {
-                case SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+                case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
                     $visibilities['PARENT'] = self::ENABLED;
                     continue;
-                case SubmissionBox::MARK_VISIBILITY_STUDENT:
+                case AbstractAssessment::MARK_VISIBILITY_STUDENT:
                     $visibilities['STUDENT'] = self::ENABLED;
                     continue;
-                case SubmissionBox::MARK_VISIBILITY_PRIVATE:
+                case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
                     break;
             }
             if ($sessionRole == Role::PARENT) {
@@ -1044,13 +1045,13 @@ class StudentReportCard
         $synClass      = new \External_Class;
         $j             = 0;
         $visibilities  = array(
-            SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+            AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT,
         );
         if ($groupHandler->isStudent()) {
-            $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+            $visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
         } elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-            $visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
-            $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+            $visibilities[] = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
+            $visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
         }
         foreach ($this->categoriesInTerm as $category) {
             $categoryID   = $category->getId();

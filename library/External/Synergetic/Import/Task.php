@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
+
 class External_Synergetic_Import_Task {
 
 	/**
@@ -149,7 +151,7 @@ class External_Synergetic_Import_Task {
 				$submissionBox->setRubricResultSet(0);
 				$submissionBox->setWeight($synergeticTask->getWeighting());
 				$submissionBox->setMaxMark($synergeticTask->getTotalMark());
-				$submissionBox->setMarkVisibility($submissionBox::MARK_VISIBILITY_PRIVATE);
+				$submissionBox->setMarkVisibility(AbstractAssessment::MARK_VISIBILITY_PRIVATE);
 
 				/* Add this submission box to the tableau
 				 */
