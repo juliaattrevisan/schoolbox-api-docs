@@ -125,6 +125,12 @@ abstract class AbstractAssessment implements IAssessable
     private $markVisibility;
 
     /**
+     * Cache to assist in finding Participants for User object
+     * @var array
+     */
+    private $participantCache = [];
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
