@@ -205,8 +205,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
-                Redirect::RETURN_URL => $returnUrl,
-                'context' => get_class($assessment->getContext())
+                Redirect::RETURN_URL => $returnUrl
             ]));
         }
         else {
