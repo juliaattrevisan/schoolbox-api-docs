@@ -147,35 +147,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
-
-                /* Try to find an existing record of this file that was previously saved
-                 * If one exists, just use that - otherwise spawn a new one
-                 */
-                try {
-                    $dataModelFile = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance()->findOneByColumnList([
-                        'student_submission_id' => $dataModel->getId(),
-                        'hash'                  => $file->getHash()
-                    ]);
-                }
-                catch (\Schoolbox\Mapper\Exception $e) {
-
-                    /* File not found, add it
-                     */
-                    $dataModelFile = (new StudentSubmissionFile())
-                        ->setSubmission($dataModel)
-                        ->setStorage($file->getStorage())
-                        ->setEditableInline($file->getEditableInline())
-                        ->setUuid($file->getCrocodocId())
-                        ->setFilename($file->getFilename());
-                }
-                catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-
-                    /* File was deleted - undelete it because we decided to use it after all
-                     */
-                    /** @var StudentSubmissionFile $dataModelFile */
-                    $dataModelFile = $e->getDeletedObject();
-                    $dataModelFile->setDeletedAt(null);
-                }
+                $dataModelFile = (new StudentSubmissionFile())
+                    ->setSubmission($dataModel)
+                    ->setStorage($file->getStorage())
+                    ->setEditableInline($file->getEditableInline())
+                    ->setUuid($file->getCrocodocId())
+                    ->setFilename($file->getFilename());
 
                 $dataModel->getFiles()->add($dataModelFile);
             }
