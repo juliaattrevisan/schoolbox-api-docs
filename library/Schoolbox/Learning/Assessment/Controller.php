@@ -405,6 +405,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Update particular fields of an existing IAssessable
      *
+     * Default Abstract implementation does nothing, Concrete class to override.
+     *
      * @param IAssessable $assessment
      * @return void
      */
