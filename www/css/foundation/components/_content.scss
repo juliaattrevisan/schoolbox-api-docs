@@ -637,7 +637,6 @@ $rotate-th-width: $square-grid-td-size;
 .island {
   	@include grid-column();
 	@include responsive-sides(1, padding);
-
 	position: relative;
 	// Only sections inside islands have these styles
   	section{
@@ -646,6 +645,15 @@ $rotate-th-width: $square-grid-td-size;
 	}
 	.content{
 		@extend %content;
+	}
+	fieldset.content{
+		padding: 1rem 0;
+		@media #{$small-only} {
+			padding: 0.5rem 0;
+		}
+		@media #{$medium-only} {
+			padding: 0.25rem 0;
+		}
 	}
 }
 
