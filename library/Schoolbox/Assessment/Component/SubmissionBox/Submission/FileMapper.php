@@ -131,6 +131,10 @@ class FileMapper extends Mapper
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
 
         /* Just blow them all away
+         *
+         * Draft-wise, the worst thing that can happen is that this hardDelete()
+         * is followed immediately by a crash, thereby irretrievably deleting the
+         * contents of the student's draft submission.
          */
         $joinMapper->hardDelete($existingFiles);
 
