@@ -78,12 +78,12 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         foreach ($this->assessmentDataSource->findAllForStudent($this->getUser(), $term) as $assessment) {
             $event = new Event();
 
-            $folder = $assessment->getBaseContext()->getFolder();
-            $event->setCategory($folder);
+            $event->setAssessment($assessment);
             $event->setType($eventType);
 
             // Use the folder's color if it has one
-            $color = $folder->getColour();
+            $folder = $assessment->getBaseContext()->getFolder();
+            $color  = $folder->getColour();
             if ($color instanceof \Alaress\Color\Color) {
                 $event->setColour($color);
             } else {
