@@ -15,6 +15,7 @@
 namespace Calendar\Event\Type\Submission;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase implements EventInterface {
@@ -54,21 +55,20 @@ class Event extends EventBase implements EventInterface {
     protected $is_assessment = false;
 
     /**
+     * The assessment that this event relates to.
+     *
+     * @var IAssessable
+     */
+    protected $assessment;
+
+    /**
      * Get submission note
 	 *
 	 * @return string
 	 */
-    public function getTitle() {
-
-        /* Optional categoryCodes suffix
-         */
-        if (count($this->getCategoryCodes())) {
-            $extended = ' (' . $this->getCategoryCodeString() . ')';
-        } else {
-            $extended = '';
-        }
-
-        return $this->getCategory()->getName() . $extended . "\n" . $this->title;
+    public function getTitle()
+    {
+        return $this->getAssessment()->getBaseContext()->getFolder()->getTitle() . "\n" . $this->title;
     }
 
 	/**
@@ -101,28 +101,33 @@ class Event extends EventBase implements EventInterface {
     }
 
     /**
+     * @deprecated
      * @param  bool $is_assessment
      *
      * @return $this
      */
     public function setIsAssessment($is_assessment) {
-        $this->is_assessment = $is_assessment;
+//        $this->is_assessment = $is_assessment;
         return $this;
     }
 
     /**
+     * @deprecated
      * @return bool
      */
     public function getIsAssessment() {
-        return $this->is_assessment;
+        return true;
+//        return $this->is_assessment;
     }
 
     /**
+     * @deprecated
+     *
      * @param Folder $category
      */
     public function setCategory($category)
     {
-        $this->category = $category;
+//        $this->category = $category;
     }
 
     /**
@@ -130,9 +135,24 @@ class Event extends EventBase implements EventInterface {
      */
     public function getCategory()
     {
-        return $this->category;
+        return $this->getAssessment()->getBaseContext()->getFolder();
     }
 
+    /**
+     * @return IAssessable
+     */
+    public function getAssessment()
+    {
+        return $this->assessment;
+    }
 
-
+    /**
+     * @param IAssessable $assessment
+     * @return static
+     */
+    public function setAssessment(IAssessable $assessment)
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
 }

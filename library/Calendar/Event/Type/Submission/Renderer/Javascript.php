@@ -13,6 +13,11 @@ namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Scrub;
 
+/**
+ * Class Javascript
+ *
+ * @method \Calendar\Event\Type\Submission\Event getEvent()
+ */
 class Javascript extends Base
 {
 
@@ -35,7 +40,7 @@ class Javascript extends Base
         /* Congeal all that stuff
          */
         $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
-        $all_day = $this->getEvent()->getAllDay();
+        $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
             $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
         }
