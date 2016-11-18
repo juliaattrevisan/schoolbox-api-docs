@@ -27,37 +27,36 @@ class AssessmentPair
     private $implementation;
 
     /**
-     * @param IAssessable|null $specification
-     * @param IAssessable|null $implementation
+     * @param IAssessable|null $spec
+     * @param IAssessable|null $impl
      */
-    public function __construct(IAssessable $specification = null, IAssessable $implementation = null)
+    public function __construct(IAssessable $spec = null, IAssessable $impl = null)
     {
         // Ensure at least one is present
-        if(is_null($specification) && is_null($implementation)){
+        if (is_null($spec) && is_null($impl)) {
             throw new \DomainException('Cannot have null Specification and null Implementation');
         }
 
         // Are we setting an Implementation ?
-        if($implementation instanceof IAssessable) {
+        if ($impl instanceof IAssessable) {
             // Ensure Implementation is not deleted
-            if (is_null($implementation->getDeletedAt())) {
-                throw new \DomainException('Implementation date must be set to perform validity check: ' . $implementation->getId());
-            } elseif (!$implementation->getDeletedAt() instanceof \Alaress_Date_NullDate) {
-                throw new \DomainException('Implementation cannot be deleted: ' . $implementation->getId());
+            if (is_null($impl->getDeletedAt())) {
+                throw new \DomainException("AssessmentImpl deletedAt required for integrity check: {$impl->getId()}");
+            } elseif (!$impl->getDeletedAt() instanceof \Alaress_Date_NullDate) {
+                throw new \DomainException('AssessmentImpl cannot be deleted: ' . $impl->getId());
             }
-        }
-        // else we must have just received a Spec
+        } // else we must have just received a Spec
         else {
             // Ensure it is not deleted
-            if (is_null($specification->getDeletedAt())) {
-                throw new \DomainException('Specification date must be set to perform validity check: ' . $specification->getId());
-            } elseif (!$specification->getDeletedAt() instanceof \Alaress_Date_NullDate) {
-                throw new \DomainException('Specification cannot be deleted if no Implementation present: ' . $specification->getId());
+            if (is_null($spec->getDeletedAt())) {
+                throw new \DomainException("AssessmentSpec deletedAt required for integrity check: {$spec->getId()}");
+            } elseif (!$spec->getDeletedAt() instanceof \Alaress_Date_NullDate) {
+                throw new \DomainException("AssessmentSpec cannot be deleted if no AssessmentImpl present: {$spec->getId()}");
             }
         }
 
-        $this->specification = $specification;
-        $this->implementation = $implementation;
+        $this->specification = $spec;
+        $this->implementation = $impl;
     }
 
     /**

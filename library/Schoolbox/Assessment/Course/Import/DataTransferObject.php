@@ -39,9 +39,9 @@ class DataTransferObject
      * A Collection of IAssessable pairs, each Collection indexed by UnitSpec.id
      *
      * Each pair may contain:
-     * 1. Just an AssessmentSpec               => UnitSpec not imported, or AssessmentSpec not imported
-     * 2. Both AssessmentSpec + AssessmentImpl => UnitSpec imported and AssessmentSpec imported
-     * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl
+     * 1. Just an AssessmentSpec               => UnitSpec not imported, or AssessmentSpec not imported, or Impl deleted.
+     * 2. Both AssessmentSpec + AssessmentImpl => UnitSpec imported and AssessmentSpec imported. Spec may be deleted.
+     * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
      * @var IAssessable[][][] $unitSpecAssessments
      * @var IAssessable|null $unitSpecAssessments[unitSpec.id][]['spec']
@@ -103,11 +103,6 @@ class DataTransferObject
             return false;
         }
         $this->unitImplementations->setOffset($unitSpecId, $unitImpl);
-
-        // Ensure we can add Assessments for this UnitImpl
-        if(!$this->unitSpecAssessments->getOffset($unitSpecId) instanceof GenericCollection){
-            $this->unitSpecAssessments->setOffset($unitSpecId, new GenericCollection(GenericCollection::class));
-        }
         return true;
     }
 
@@ -122,22 +117,10 @@ class DataTransferObject
     {
         // Ensure this AssessmentSpec is being added correctly
         if(array_key_exists($assessmentSpec->getId(), $this->assessmentSpecToImplMap)){
-            throw new \DomainException('AssessmentSpec has an Impl. Must be added as a Pair: '.$assessmentSpec->getId());
+            throw new \DomainException("AssessmentSpec has an Impl. Must be added as a Pair: {$assessmentSpec->getId()}");
         }
-
-        // Ensure not adding a deleted Spec. We are not interested in deleted AssSpecs unless they are part of a pair
-        if(is_null($assessmentSpec->getDeletedAt())){
-            throw new \DomainException('AssessmentSpec deletion must be set for integrity check: '.$assessmentSpec->getId());
-        }
-        if(!$assessmentSpec->getDeletedAt() instanceof \Alaress_Date_NullDate){
-            throw new \DomainException('AssessmentSpec is deleted. Must be added as a Pair: '.$assessmentSpec->getId());
-        }
-
-
-        $this->unitSpecAssessments[$unitSpec->getId()][] = [
-            'spec' => $assessmentSpec,
-            'impl' => null,
-        ];
+        $this->checkUnitSpecCollection($unitSpec);
+        $this->unitSpecAssessments->getOffset($unitSpec->getId())->add(new AssessmentPair($assessmentSpec, null));
         return true;
     }
 
@@ -152,21 +135,10 @@ class DataTransferObject
     {
         // Ensure this AssessmentImpl does not have a Spec
         if(array_key_exists($assessmentImpl->getId(), $this->assessmentImplToSpecMap)){
-            throw new \DomainException('AssessmentImpl has a Spec. Must be added as a Pair: '.$assessmentImpl->getId());
+            throw new \DomainException("AssessmentImpl has a Spec. Must be added as a Pair: {$assessmentImpl->getId()}");
         }
-
-        // Ensure not adding a deleted Impl.
-        if(is_null($assessmentImpl->getDeletedAt())){
-            throw new \DomainException('AssessmentImpl deletion must be set for integrity check: '.$assessmentImpl->getId());
-        }
-        if(!$assessmentImpl->getDeletedAt() instanceof \Alaress_Date_NullDate){
-            throw new \DomainException('AssessmentImpl is deleted: '.$assessmentImpl->getId());
-        }
-
-        $this->unitSpecAssessments[$unitSpec->getId()][] = [
-            'spec' => null,
-            'impl' => $assessmentImpl,
-        ];
+        $this->checkUnitSpecCollection($unitSpec);
+        $this->unitSpecAssessments->getOffset($unitSpec->getId())->add(new AssessmentPair(null, $assessmentImpl));
         return true;
     }
 
@@ -180,26 +152,12 @@ class DataTransferObject
      */
     public function addAssessmentPair(UnitSpecification $unitSpec, IAssessable $assessmentSpec, IAssessable $assessmentImpl)
     {
-        $specId = $assessmentSpec->getId();
-        $implId = $assessmentImpl->getId();
-
         // Ensure these Assessments are a valid pair
-        if($this->assessmentImplToSpecMap[$implId] != $specId){
-            throw new \DomainException("Assessments not a valid pair: Spec: $specId, Impl: $implId");
+        if($this->assessmentImplToSpecMap[$assessmentImpl->getId()] != $assessmentSpec->getId()){
+            throw new \DomainException("Assessments not a valid pair: Spec: {$assessmentSpec->getId()}, Impl: {$assessmentImpl->getId()}");
         }
-
-        // Ensure not adding a deleted Impl. We are not interested in deleted AssSpecs unless they are part of a pair
-        if(is_null($assessmentImpl->getDeletedAt())){
-            throw new \DomainException('AssessmentImpl deletion must be set for integrity check: '.$assessmentImpl->getId());
-        }
-        if(!$assessmentImpl->getDeletedAt() instanceof \Alaress_Date_NullDate){
-            throw new \DomainException('AssessmentImpl is deleted: '.$assessmentImpl->getId());
-        }
-
-        $this->unitSpecAssessments[$unitSpec->getId()][] = [
-            'spec' => $assessmentSpec,
-            'impl' => $assessmentImpl,
-        ];
+        $this->checkUnitSpecCollection($unitSpec);
+        $this->unitSpecAssessments->getOffset($unitSpec->getId())->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
         return true;
     }
 
@@ -217,13 +175,24 @@ class DataTransferObject
      * Call from TWIG to get a set of IAssessable pairs
      *
      * @param UnitSpecification $unitSpec
-     * @return IAssessable[][] Set of IAssessable pairs
-     * @var IAssessable|null $return[]['spec']
-     * @var IAssessable|null $return[]['impl']
+     * @return AssessmentPair[]|GenericCollection<AssessmentPair> Set of IAssessable pairs
      */
     public function getUnitSpecAssessments(UnitSpecification $unitSpec)
     {
         return $this->unitSpecAssessments->getOffset($unitSpec->getId());
+    }
+
+    /**
+     * Ensures an AssessmentPair collection exists for the specified UnitSpec
+     * @param UnitSpecification $unitSpec
+     * @return bool
+     */
+    protected function checkUnitSpecCollection(UnitSpecification $unitSpec)
+    {
+        // Ensure AssessmentPair collection exists for this UnitSpec
+        if(!$this->unitSpecAssessments->getOffset($unitSpec->getId()) instanceof GenericCollection){
+            $this->unitSpecAssessments->setOffset($unitSpec->getId(), new GenericCollection(AssessmentPair::class));
+        }
     }
 
 }
