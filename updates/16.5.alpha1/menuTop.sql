@@ -26,7 +26,7 @@ CREATE TABLE menu_top_campus (
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_icons (
-  name VARCHAR(200),
+  name VARCHAR(100),
   title VARCHAR(200),
 PRIMARY KEY (`name`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
