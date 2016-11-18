@@ -457,7 +457,7 @@ DELETE FROM msg_namespace WHERE slug = 'sports_fixtures_import';
 -- Create notification namespace and get its ID
 
 INSERT INTO msg_namespace (slug, label) VALUES ('sports_fixtures_import', 'Sports Fixture Import');
-SET @namespace = LAST_INSERT_ID();show
+SET @namespace = LAST_INSERT_ID();
 
 -- Staff create message source
 
