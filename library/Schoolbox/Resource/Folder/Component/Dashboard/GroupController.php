@@ -18,6 +18,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Timetable_ColourMapper;
 use Schoolbox\User;
 use SitePage;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class GroupController extends Component_Dashboard_ControllerAbstract
 {
@@ -25,6 +27,11 @@ class GroupController extends Component_Dashboard_ControllerAbstract
      * @var Collection|FolderModel
      */
     protected $groupList;
+
+    /**
+     * @var Array|UserAccess
+     */
+    protected $userAccess;
 
     /**
      * Injectable constructor
@@ -53,15 +60,19 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
+        $userAccess  = Array();
         foreach(FolderMapper::getInstance()->findForUser($this->getUser(), false) as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
+//                new \Alaress_Probe($folder->GetId());
+
             }
+            $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
             $this->getGroupList()->add($folder);
         }
-
+        $this->setUserAccess($userAccess);
         return true;
     }
 
@@ -72,6 +83,15 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     public function setGroupList(Collection $groupList)
     {
         $this->groupList = $groupList;
+    }
+
+    /**
+     * @param Array $userAccess
+     */
+
+    public function setUserAccess($userAccess)
+    {
+        $this->userAccess = $userAccess;
     }
 
     /**
@@ -91,6 +111,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                     'componentClass'      => $this->getComponentName(),
                     'currentUser'         => $this->getUser(),
                     'groupList'           => $this->getGroupList(),
+                    'userAccess'          => $this->getUserAccess()
                 ]
             );
 
@@ -102,8 +123,18 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     /**
      * @return Collection
      */
+
     public function getGroupList()
     {
         return $this->groupList;
+    }
+
+    /**
+     * @return Array
+     */
+
+    public function getUserAccess()
+    {
+        return $this->userAccess;
     }
 }
