@@ -192,7 +192,7 @@ class Module extends BaseModule
 
         /* Load participant's Responses and Feedbacks
          */
-        $this->getParticipantMapperProxy()->findForAssessment($assessment);
+        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
         return [
             'assessment' => $assessment
