@@ -15,14 +15,12 @@ CREATE TABLE menu_top_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_top_id INT,
   role_id INT,
-  deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_top_campus (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_top_id INT,
   campus_id INT,
-  deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_icons (
