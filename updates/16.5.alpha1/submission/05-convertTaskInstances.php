@@ -41,7 +41,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             updated_at,
             deleted_at
         )
-        VALUES (:title, '', :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
+        VALUES (:title, :description, :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_implementation (assessment_id, course_unit_implementation_id)
@@ -106,6 +106,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ti.id,
             ti.course_unit_instance_id,
             ti.title,
+            COALESCE(`as`.description, sb.description, '') AS description,
             `as`.assess_id,
             sb.id AS box_id,
             ti.created_at,
@@ -135,6 +136,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $courseUnitInstanceId = $row['course_unit_instance_id'];
         $folderId             = $row['category_id'];
         $title                = $row['title'];
+        $description          = $row['description'];
         $quizId               = $row['assess_id'];
         $boxId                = $row['box_id'];
         $created              = $row['created_at'];
@@ -188,15 +190,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
             // Create assessment
             $insertAssessmentQuery->execute([
-                'title'   => $title,
-                'weight'  => intval($weight),
-                'publish' => $publishDate,
-                'open'    => $openDate,
-                'due'     => $dueDate,
-                'close'   => $closeDate,
-                'created' => $created,
-                'updated' => $created,
-                'deleted' => $deleted,
+                'title'       => $title,
+                'description' => $description,
+                'weight'      => intval($weight),
+                'publish'     => $publishDate,
+                'open'        => $openDate,
+                'due'         => $dueDate,
+                'close'       => $closeDate,
+                'created'     => $created,
+                'updated'     => $created,
+                'deleted'     => $deleted,
             ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');

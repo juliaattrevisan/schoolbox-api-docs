@@ -40,7 +40,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             updated_at,
             deleted_at
         )
-        VALUES (:title, '', NULL, NULL, NULL, NULL, :weight, 1, :created, :updated, :deleted)
+        VALUES (:title, :description, NULL, NULL, NULL, NULL, :weight, 1, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id)
@@ -60,6 +60,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             t.id,
             t.category_id,
             t.title,
+            COALESCE(`as`.description, sb.description, '') AS description,
             `as`.assess_id,
             sb.id AS box_id,
             t.created_at,
@@ -116,13 +117,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $warningCount = 0;
     $failureCount = 0;
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $taskId   = $row['id'];
-        $folderId = $row['category_id'];
-        $title    = $row['title'];
-        $quizId   = $row['assess_id'];
-        $boxId    = $row['box_id'];
-        $created  = $row['created_at'];
-        $deleted  = $row['deleted_at'];
+        $taskId      = $row['id'];
+        $folderId    = $row['category_id'];
+        $title       = $row['title'];
+        $description = $row['description'];
+        $quizId      = $row['assess_id'];
+        $boxId       = $row['box_id'];
+        $created     = $row['created_at'];
+        $deleted     = $row['deleted_at'];
 
         // Convert this task
         $log->info(sprintf('Converting task "%s" (id: %d)...', $title, $taskId));
@@ -142,11 +144,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
             // Create assessment
             $insertAssessmentQuery->execute([
-                'title'   => $title,
-                'weight'  => intval($weight),
-                'created' => $created,
-                'updated' => $created,
-                'deleted' => $deleted,
+                'title'       => $title,
+                'description' => $description,
+                'weight'      => intval($weight),
+                'created'     => $created,
+                'updated'     => $created,
+                'deleted'     => $deleted,
             ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');
