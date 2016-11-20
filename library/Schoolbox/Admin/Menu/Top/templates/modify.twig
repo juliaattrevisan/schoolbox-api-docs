@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
 <script>
     $(function () {
         var form = $('form#itemForm');
@@ -44,22 +45,22 @@
     <div class="row">
         <div class="small-12 island">
             {% if item.id is empty %}
-                <h1>Insert Menu Item</h1>
+                <h1>Add Tab Item</h1>
             {% else %}
-                <h1>Edit Menu Item</h1>
+                <h1>Edit Tab Item</h1>
             {% endif %}
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            Item Label
-                            <input required type="text" name='text' placeholder="Hover Description" value="{{ item.text }}">
+                            Name
+                            <input required type="text" name='text' value="{{ item.text }}">
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>
                             Hover Description
-                            <input name='title' type="text" placeholder="Item Label" value="{{ item.title }}">
+                            <input name='title' type="text" value="{{ item.title }}">
                         </label>
                     </div>
                     <div class="small-11 columns">
@@ -78,14 +79,17 @@
                             <div id="icon" style="margin-top:5px" class="icon-32 icon-{{ item.icon }}"></div>
                         </label>
                     </div>
+                </fieldset>
+                <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
                             Destination URL
-                            <input name="url" required type="text" placeholder="Destination URL" value="{{ item.url }}">
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [externalId], [username] in your URLs, these will be replaced for the user">?</span>
+                                <input name="url" required type="text" value="{{ item.url }}">
+                                <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
                         </label>
-                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
                     </div>
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <label>
                             Destination Target
                             <select name="target">
@@ -94,20 +98,26 @@
                             </select>
                         </label>
                     </div>
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <label>
-                            Is This A Webmail Link?
-                            <select name="target">
-                                <option {% if item.webmail == '0' %}selected{% endif %} value="0">No</option>
-                                <option {% if item.webmail == '1' %}selected{% endif %} value="1">Yes</option>
-                            </select>
+                            Webmail Link
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Special logic is used for webmail display based on the individual, this will indicate that this item represents the webmail tab">?</span>
+                            <div class="switch round">
+                            <input id="target" type="checkbox" name="target" data-checkbox-group="target" />
+                            <label for="target">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                            </div>
                         </label>
                     </div>
+                </fieldset>
+                <fieldset class="content">
                     <div class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>
-                                Display To These Campuses
-                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="">?</span>
+                                Visible Campus
+                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these campus will see the tab, remember users can be in multiple campus">?</span>
                             </legend>
                             <input id="campus-all" type="checkbox">
                             <label for="campus-all">Select All</label>
@@ -120,8 +130,8 @@
                     <div class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>
-                                Display To These Roles
-                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="">?</span>
+                                Visible Roles
+                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these roles will see the tab">?</span>
                             </legend>
                             <input id="role-all" type="checkbox">
                             <label for="role-all">Select All</label>

@@ -27,7 +27,6 @@ class Mapper extends BaseMapper
         $this->uses('token', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
-        $this->uses('webmail', self::TYPE_BOOLEAN);
         $this->uses('target', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');

@@ -96,7 +96,7 @@ class Controller extends Base
     /**
      * Display create screen
      */
-    public function getInsert()
+    public function getCreate()
     {
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',

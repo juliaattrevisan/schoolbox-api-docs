@@ -182,29 +182,9 @@ class Controller extends Base
     }
 
     /**
-     * Display section modification screen
-     * @param $id
-     */
-    public function getSectionModify($id)
-    {
-        // Render this mess out
-
-        $this->getResponse()->content->set([
-            'template' => '@adminMenuSide/modifySection.twig',
-            'data'     => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                'section' => $this->getMenuSideSectionMapper()->findOneByColumn('section', $id),
-                'configTitle' => $this->getConfigLoader()->get('title'),
-                'sectionName' => MenuSideSectionMapper::getSectionNameDefaults()
-            ],
-            'title' => 'Admin - Side Menu'
-        ]);
-    }
-
-    /**
      * Display create screen
      */
-    public function getInsert()
+    public function getCreate()
     {
         $this->getResponse()->content->set([
             'template' => '@adminMenuSide/modify.twig',
