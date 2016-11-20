@@ -153,6 +153,5 @@ SET FOREIGN_KEY_CHECKS  = 0;
 
 ALTER TABLE menu_side_campus ADD CONSTRAINT menu_side_campus_menu_side_id_fk FOREIGN KEY (menu_side_id) REFERENCES menu_side (id);
 ALTER TABLE menu_side_role ADD CONSTRAINT menu_side_role_menu_side_id_fk FOREIGN KEY (menu_side_id) REFERENCES menu_side (id);
-ALTER TABLE menu_side ADD CONSTRAINT menu_side_menu_side_id_fk FOREIGN KEY (parent_id) REFERENCES menu_side (id);
 
 SET FOREIGN_KEY_CHECKS  = 1;
