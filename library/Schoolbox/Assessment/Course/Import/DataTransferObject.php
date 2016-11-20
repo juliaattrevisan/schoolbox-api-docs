@@ -44,8 +44,8 @@ class DataTransferObject
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
      * @var IAssessable[][][] $unitSpecAssessments
-     * @var IAssessable|null $unitSpecAssessments[unitSpec.id][]['spec']
-     * @var IAssessable|null $unitSpecAssessments[unitSpec.id][]['impl']
+     * @var IAssessable|null $unitSpecAssessments [unitSpec.id][]['spec']
+     * @var IAssessable|null $unitSpecAssessments [unitSpec.id][]['impl']
      */
     private $unitSpecAssessments;
 
@@ -73,6 +73,9 @@ class DataTransferObject
     private $assessmentSpecToImplMap;
 
 
+    /**
+     * @param int[]|null[] $assessmentImplToSpecMap Maps extant Impl Ids to Spec Id (null if Impl created in UnitImpl)
+     */
     public function __construct(array $assessmentImplToSpecMap)
     {
         $this->assessmentImplToSpecMap = $assessmentImplToSpecMap;
@@ -99,7 +102,7 @@ class DataTransferObject
     public function addUnitImplementation(UnitImplementation $unitImpl)
     {
         $unitSpecId = $unitImpl->getSpecification()->getId();
-        if($this->unitImplementations->getOffset($unitSpecId) instanceof UnitImplementation){
+        if ($this->unitImplementations->getOffset($unitSpecId) instanceof UnitImplementation) {
             return false;
         }
         $this->unitImplementations->setOffset($unitSpecId, $unitImpl);
@@ -116,7 +119,7 @@ class DataTransferObject
     public function addAssessmentSpec(UnitSpecification $unitSpec, IAssessable $assessmentSpec)
     {
         // Ensure this AssessmentSpec is being added correctly
-        if(array_key_exists($assessmentSpec->getId(), $this->assessmentSpecToImplMap)){
+        if (array_key_exists($assessmentSpec->getId(), $this->assessmentSpecToImplMap)) {
             throw new \DomainException("AssessmentSpec has an Impl. Must be added as a Pair: {$assessmentSpec->getId()}");
         }
         $this->checkUnitSpecCollection($unitSpec);
@@ -134,7 +137,7 @@ class DataTransferObject
     public function addAssessmentImpl(UnitSpecification $unitSpec, IAssessable $assessmentImpl)
     {
         // Ensure this AssessmentImpl does not have a Spec
-        if(array_key_exists($assessmentImpl->getId(), $this->assessmentImplToSpecMap)){
+        if (array_key_exists($assessmentImpl->getId(), $this->assessmentImplToSpecMap)) {
             throw new \DomainException("AssessmentImpl has a Spec. Must be added as a Pair: {$assessmentImpl->getId()}");
         }
         $this->checkUnitSpecCollection($unitSpec);
@@ -153,11 +156,12 @@ class DataTransferObject
     public function addAssessmentPair(UnitSpecification $unitSpec, IAssessable $assessmentSpec, IAssessable $assessmentImpl)
     {
         // Ensure these Assessments are a valid pair
-        if($this->assessmentImplToSpecMap[$assessmentImpl->getId()] != $assessmentSpec->getId()){
+        if ($this->assessmentImplToSpecMap[$assessmentImpl->getId()] != $assessmentSpec->getId()) {
             throw new \DomainException("Assessments not a valid pair: Spec: {$assessmentSpec->getId()}, Impl: {$assessmentImpl->getId()}");
         }
         $this->checkUnitSpecCollection($unitSpec);
-        $this->unitSpecAssessments->getOffset($unitSpec->getId())->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
+        $this->unitSpecAssessments->getOffset($unitSpec->getId())->add(new AssessmentPair($assessmentSpec,
+            $assessmentImpl));
         return true;
     }
 
@@ -190,7 +194,7 @@ class DataTransferObject
     protected function checkUnitSpecCollection(UnitSpecification $unitSpec)
     {
         // Ensure AssessmentPair collection exists for this UnitSpec
-        if(!$this->unitSpecAssessments->getOffset($unitSpec->getId()) instanceof GenericCollection){
+        if (!$this->unitSpecAssessments->getOffset($unitSpec->getId()) instanceof GenericCollection) {
             $this->unitSpecAssessments->setOffset($unitSpec->getId(), new GenericCollection(AssessmentPair::class));
         }
     }

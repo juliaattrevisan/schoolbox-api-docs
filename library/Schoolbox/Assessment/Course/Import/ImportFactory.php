@@ -135,15 +135,10 @@ class ImportFactory
      *
      * UnitImpl + AssessmentImpl will be non-null if already imported.
      *
-     * @param int $courseImplId
-     * @param array $unitSpecs Units to import, indexed by unitSpecId
-     * @var int $unitSpecs [unitSpecId]['id']                            UnitSpec.id
-     * @var \Alaress_Date_Format $unitSpecs [unitSpecId]['openDate']     Open date as input by user
-     * @var \Alaress_Date_Format $unitSpecs [unitSpecId]['closeDate']    Close date as input by user
-     * @param array $unitImpls // TODO is this required?
+     * @param UnitImplementation[] $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
      * @return DataTransferObject
      */
-    public function buildForImportModify($courseImplId, array $unitSpecs, array $unitImpls)
+    public function buildForImportModify(array $unitImpls)
     {
         /**
          * Maps each AssessmentImplId to an AssessmentSpecId.
@@ -170,24 +165,44 @@ class ImportFactory
                 $assessmentImplToSpecMap[$row['ia.id']] = $row['sp.id'];
             }
         }
+        $dto = new DataTransferObject($assessmentImplToSpecMap);
 
-        // Get all Assessments in either UnitSpecs or UnitImpls
+        /**
+         * Extract all UnitSpecs into a cache, indexed by unitSpec.id, so we can use their IDs in queries
+         * @var UnitSpecification[] $unitSpecCache
+         */
+        $unitSpecCache = [];
+        foreach($unitImpls as $unitImpl){
+            $unitSpecCache[$unitImpl->getSpecification()->getId()] = $unitImpl->getSpecification();
+        }
 
-        $query1 = "
+        /**
+         * Maintains a list of UnitSpecs encountered while traversing DB query result set.
+         * Required so we can set the UnitSpec name once only.
+         * @var UnitSpecification[] $unitSpecCache
+         */
+        $unitSpecDBCache = [];
+
+        // Get the following Assessments:
+        // 1. AssessmentSpec in UnitSpec where UnitSpec not imported to UnitImpl
+        // 2. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, but AssessmentSpec not imported
+        // 3. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported
+        // 4. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported but deleted
+        $query = "
             SELECT 
                 us.id AS 'us.id',
-                NULL  AS 'ui.id',
                 usf.name AS 'usf.name',
                 sa.id AS 'sa.id',
                 sa.title AS 'sa.title',
+                sa.deleted_at AS 'sa.deleted_at',
                 sdw.assessment_id AS 'sdw.id',
                 sqz.assessment_id AS 'sqz.id',
                 stk.assessment_id AS 'stk.id',
-                NULL AS 'ia.id',
-                NULL AS 'ia.title',
-                NULL AS 'idw.id',
-                NULL AS 'iqz.id',
-                NULL AS 'itk.id'                
+                ia.id AS 'ia.id',
+                ia.title AS 'ia.title',
+                idw.assessment_id AS 'idw.id',
+                iqz.assessment_id AS 'iqz.id',
+                itk.assessment_id AS 'itk.id'                
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -195,8 +210,74 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            WHERE  us.id IN (" . implode(',', array_keys($unitSpecs)) . ") AND sa.deleted_at IS NULL
+            LEFT JOIN assessment_course_unit_implementation aui ON aui.assessment_specification_id = sa.id
+            LEFT JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
+            LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
+            LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
+            LEFT JOIN task itk ON itk.assessment_id = ia.id            
+            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
+            ORDER BY us.id, ia.sequence
         ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            // Is is the first time this UnitSpec has been seen?
+            if(!$unitSpecDBCache[$row['us.id']] instanceof UnitSpecification){
+                // Add a Folder and name it so we can later render out this UnitSpec's name.
+                $unitSpecDBCache[$row['us.id']] = $unitSpecCache[$row['us.id']];
+                $folder = new Folder();
+                $folder->setName($row['usf.name']);
+                $unitSpecCache[$row['us.id']]->setFolder($folder);
+            }
+
+            // Create AssessmentSpec
+            if ($row['sdw.id']) {
+                $assessmentSpec = new DueWorkAssessment();
+            } elseif ($row['sqz.id']) {
+                $assessmentSpec = new QuizAssessment();
+            } elseif ($row['stk.id']) {
+                $assessmentSpec = new TaskAssessment();
+            } else {
+                throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
+            }
+            $assessmentSpec->setId($row['sa.id']);
+            $assessmentSpec->setTitle($row['sa.title']);
+            if(is_null($row['sa.deleted_at'])){
+                $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+            } else {
+                $assessmentSpec->setDeletedAt(\Alaress_Date_Format::newLocalShort($row['sa.deleted_at']));
+            }
+
+            // Create corresponding AssessmentImpl (if one exists)
+            if(is_null($row['ia.id'])){
+                $assessmentImpl = null;
+            } else {
+                if ($row['idw.id']) {
+                    $assessmentImpl = new DueWorkAssessment();
+                } elseif ($row['iqz.id']) {
+                    $assessmentImpl = new QuizAssessment();
+                } elseif ($row['itk.id']) {
+                    $assessmentImpl = new TaskAssessment();
+                } else {
+                    throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
+                }
+                $assessmentImpl->setId($row['ia.id']);
+                $assessmentImpl->setTitle($row['ia.title']);
+                $assessmentImpl->setDeletedAt(new \Alaress_Date_NullDate());
+            }
+
+            if($assessmentImpl instanceof IAssessable){
+                $dto->addAssessmentPair($unitSpecCache[$row['us.id']], $assessmentSpec, $assessmentImpl);
+            } else {
+                $dto->addAssessmentSpec($unitSpecCache[$row['us.id']], $assessmentSpec);
+            }
+        }
+        return $dto;
+
+
+
 
         $query2 = "
             SELECT 
