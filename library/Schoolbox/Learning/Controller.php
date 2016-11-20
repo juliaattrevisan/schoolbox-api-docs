@@ -336,7 +336,7 @@ class Controller extends Base
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
-            $assessment->setAllParticipants($this->getParticipantDataSource()->findForAssessment($assessment));
+            $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment);
         }
 
         // Let markbook calculate the statistics
