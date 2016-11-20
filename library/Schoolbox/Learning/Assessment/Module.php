@@ -30,6 +30,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -127,8 +128,8 @@ class Module extends BaseModule
     {
         try {
             // obtain the assessment from our other preload
-            $assessment  = $this->preloadAssessment($params)['assessment'];
             $student     = $this->getUserMapper()->findById($params['studentId']);
+            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
 
             /** @var IAssessable $assessment */
             $participant = $assessment->getParticipant($student);
@@ -173,9 +174,10 @@ class Module extends BaseModule
      * Convert route params into an assessment object
      *
      * @param array $params
+     * @param User  $student If provided, only load this student's participation
      * @return array
      */
-    protected function preloadAssessment(array $params)
+    protected function preloadAssessment(array $params, User $student = null)
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -192,7 +194,7 @@ class Module extends BaseModule
 
         /* Load participant's Responses and Feedbacks
          */
-        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
+        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment, $student);
 
         return [
             'assessment' => $assessment
