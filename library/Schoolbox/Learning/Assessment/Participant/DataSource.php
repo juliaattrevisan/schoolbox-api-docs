@@ -138,7 +138,7 @@ class DataSource
      * @param bool $includeFeedbacks
      * @return Collection|\Schoolbox\Learning\Assessment\Participant[]
      */
-    public function findForAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
+    protected function findForAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
         // Build a participant list
         $participants = new Collection();
@@ -261,7 +261,7 @@ class DataSource
      * @param IAssessable $assessment
      * @return Collection|User[]
      */
-    public function findAllStudentsForAssessment(IAssessable $assessment)
+    protected function findAllStudentsForAssessment(IAssessable $assessment)
     {
         $students = new Collection();
 
