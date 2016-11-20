@@ -104,16 +104,18 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in $assessment
      *
      * @param IAssessable $assessment
-     * @param User $user
+     * @param User        $user
+     * @param bool        $includeResponses
+     * @param bool        $includeFeedbacks
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null)
+    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
-        $assessment->setAllParticipants($this->findForAssessment($assessment, $user));
+        $assessment->setAllParticipants($this->findForAssessment($assessment, $user, $includeResponses, $includeFeedbacks));
 
         if ($assessment instanceof Project) {
             foreach ($assessment->getAssessables() as $currentAssessment) {
                 // recurse
-                $this->loadParticipationIntoAssessment($currentAssessment, $user);
+                $this->loadParticipationIntoAssessment($currentAssessment, $user, $includeResponses, $includeFeedbacks);
             }
         }
     }
