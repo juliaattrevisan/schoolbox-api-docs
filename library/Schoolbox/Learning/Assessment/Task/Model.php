@@ -17,12 +17,12 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
-use Schoolbox\Collection;
-use Schoolbox\Learning\MarkScheme\Completion;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Resource\Storage\Model as StorageFile;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+
 
 class Model extends AbstractAssessment
 {

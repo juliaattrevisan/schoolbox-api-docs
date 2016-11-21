@@ -12,21 +12,12 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
-use \Schoolbox\Collection;
-use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Project as Project;
-
-use \Schoolbox\Learning\Assessment\Summator\ISummator;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
-
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-
 use \Schoolbox\Resource\Folder\Model as FolderModel;
 
 class DateTest extends \PHPUnit_Framework_TestCase
