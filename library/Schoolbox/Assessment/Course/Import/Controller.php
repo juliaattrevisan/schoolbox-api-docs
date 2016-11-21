@@ -471,6 +471,9 @@ class Controller extends Base\Base
      */
     public function postAssessments()
     {
+        // TODO -don't use any Proxies !!
+
+
         // Parse form data
         $post = $this->getRequest()->post;
         $postedAction = trim($post['action']);
@@ -601,11 +604,8 @@ class Controller extends Base\Base
                     if ('spec' == $aData['type']) {
 
                         $assessmentMapper = AssessmentMapper::getInstance();
-
                         $assessmentSpec = $assessmentMapper->findById($assessmentId);
                         $assessmentImpl = clone $assessmentSpec;
-
-
                         $assessmentImpl->setContextUnitImplementation($unitImpl);
                         $assessmentImpl->setContextUnitSpecification($unitSpec);
                         // TODO need to implement __clone() on DueWork to clone Rubric correctly
@@ -649,7 +649,6 @@ class Controller extends Base\Base
 
                     foreach ($extantAssessments as $seq => $assessment) {
                         $this->getAssessmentMapperProxy()->save($assessment, $seq + 1);
-                        $f = 1;
                     }
                 }
 
