@@ -77,7 +77,9 @@ class MapperProxy
     }
 
     /**
-     * Finds an assessable by ID
+     * Finds an assessable by ID.
+     *
+     * This method does not load participants.
      *
      * @param int $id
      * @return IAssessable
@@ -96,7 +98,39 @@ class MapperProxy
     }
 
     /**
-     * Finds the specification assessment for a implementation assessment
+     * Find by ID for modification.
+     *
+     * This method does not load participants.
+     *
+     * @param int $id
+     * @return IAssessable
+     */
+    public function findByIdForModify($id)
+    {
+        return $this->findById($id);
+    }
+
+    /**
+     * Find by ID for review, either of a single student or all in the class.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $id
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     */
+    public function findByIdForReview($id, User $student = null)
+    {
+        $assessment = $this->findById($id);
+        $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+        return $assessment;
+    }
+
+    /**
+     * Finds the specification assessment for a implementation assessment.
+     *
+     * This method does not load participants, because assessments in a unit spec
+     * do not have participants.
      *
      * @param int $assessmentId
      * @return IAssessable
@@ -112,7 +146,10 @@ class MapperProxy
     }
 
     /**
-     * Finds the specification assessment for a implementation assessment
+     * Finds the specification assessment for a implementation assessment.
+     *
+     * Currently, this does not load participants - I am not yet sure which
+     * context this method will be used.
      *
      * @param int $assessmentId
      * @param array $options
@@ -131,6 +168,8 @@ class MapperProxy
      *
      * If $context is a Folder, this method does not retrieve assessables that
      * are within a course implementation that has been created on that folder.
+     *
+     * This method does not load participants.
      *
      * @param AssessmentContext $context
      * @param array             $options
@@ -154,7 +193,10 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables for a unit specification
+     * Finds all assessables for a unit specification.
+     *
+     * This method does not load participants, because assessments in a unit spec
+     * do not have participants.
      *
      * @param int   $unitSpecId
      * @param array $options
@@ -168,7 +210,9 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables for a unit implementation
+     * Finds all assessables for a unit implementation.
+     *
+     * This method does not currently load participants.
      *
      * @param int   $unitImplId
      * @param array $options
@@ -187,6 +231,8 @@ class MapperProxy
      * This now defaults to finding assessables that are within a course
      * implementation of the given folder.
      * This is more likely to be the expected behavior of this method.
+     *
+     * This method does not currently load participants.
      *
      * @param int   $folderId A folder or list of folders
      * @param array $options
@@ -207,6 +253,8 @@ class MapperProxy
      * Finds all assessables for a folder, not including course implementation
      * assessables.
      *
+     * This method does not currently load participants.
+     *
      * @param int   $folderId
      * @param array $options
      * @return Collection|IAssessable[]
@@ -222,6 +270,11 @@ class MapperProxy
      * Finds all assessables that have been imported into a folder through a
      * course import.
      *
+     * This method does not currently load participants.
+     *
+     * @deprecated Use `findAllForFolderId` to find assessables in a folder,
+     *             along with any that are in a unit import on that folder.
+     *
      * @param int   $folderId
      * @param array $options
      * @return Collection|IAssessable[]
@@ -235,7 +288,7 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables that are part of the given project
+     * Finds all assessables that are part of the given project.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
@@ -250,6 +303,8 @@ class MapperProxy
 
     /**
      * Finds all assessables that this student is participating in.
+     *
+     * This method loads participation for $student only.
      *
      * @param User $student
      * @param Term $term    Restrict results to this term
@@ -440,5 +495,49 @@ class MapperProxy
             }
         }
         return $columnList;
+    }
+
+    /**
+     * Loads participants into the given assessable.
+     *
+     * @param IAssessable $assessable
+     * @param User        $user
+     * @param bool        $includeResponses
+     * @param bool        $includeFeedbacks
+     * @return IAssessable
+     */
+    public function loadParticipantsIntoAssessment(
+        IAssessable $assessable,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        $this->participantDataSource->loadParticipationIntoAssessment(
+            $assessable,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+        return $assessable;
+    }
+
+    /**
+     * Loads participants into a collection of assessables.
+     *
+     * @param Collection $collection
+     * @param User       $user
+     * @param bool       $includeResponses
+     * @param bool       $includeFeedbacks
+     * @return Collection
+     */
+    public function loadParticipantsIntoAssessmentCollection(
+        Collection $collection,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        return $collection->map(function(IAssessable $assessable) use ($user, $includeResponses, $includeFeedbacks) {
+            return $this->loadParticipantsIntoAssessment($assessable, $user, $includeResponses, $includeFeedbacks);
+        });
     }
 }
