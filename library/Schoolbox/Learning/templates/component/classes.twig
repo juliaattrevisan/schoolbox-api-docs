@@ -7,7 +7,7 @@
                 </a>
                 <div class="card-content actions-small-1">
                     <div class="list-item">
-                        <h3><a href="/homepage/{{ class.id }}">{{ class.name }} ({{ class.getCodeString() }})</a></h3>
+                        <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
                         <p class="meta">{{ classTypes[class.id] }}</p>
                     </div>
                     {% if currentUser.getRole.isStaff == true %}
