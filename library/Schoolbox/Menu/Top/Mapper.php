@@ -28,8 +28,7 @@ class Mapper extends BaseMapper
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('target', self::TYPE_STRING);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 
@@ -39,8 +38,6 @@ class Mapper extends BaseMapper
      */
     public function findTabsForUser($user)
     {
-        $service = HOMEPAGE_SERVICE;
-
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
@@ -53,7 +50,7 @@ class Mapper extends BaseMapper
         }
 
         $query = "
-                SELECT DISTINCT menu_top.*
+                SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_top
                 INNER JOIN menu_top_campus ON menu_top.id = menu_top_campus.menu_top_id
                 INNER JOIN menu_top_role ON menu_top.id = menu_top_role.menu_top_id

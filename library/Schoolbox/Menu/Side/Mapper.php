@@ -26,8 +26,7 @@ class Mapper extends BaseMapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('target', self::TYPE_STRING);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -36,15 +35,13 @@ class Mapper extends BaseMapper
      */
     public function findNodesForUser($user)
     {
-        $service = HOMEPAGE_SERVICE;
-
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
         }
 
         $query = "
-                SELECT DISTINCT menu_side.*
+                SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_side
                 INNER JOIN menu_side_campus ON menu_side.id = menu_side_campus.menu_side_id
                 INNER JOIN menu_side_role ON menu_side.id = menu_side_role.menu_side_id

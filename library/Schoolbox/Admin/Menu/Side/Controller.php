@@ -28,6 +28,25 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
+
+    /** @var MenuSideMapper $menuSideMapper */
+    private $menuSideMapper;
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+    /** @var CampusMapper $campusMapper */
+    private $campusMapper;
+
+    /** @var MenuSideCampusMapper $menuSideCampusMapper */
+    private $menuSideCampusMapper;
+
+    /** @var MenuSideRoleMapper $menuSideRoleMapper */
+    private $menuSideRoleMapper;
+
+    /** @var MenuSideSectionMapper $menuSideSectionMapper */
+    private $menuSideSectionMapper;
+
     /**
      * Controller constructor.
      */
@@ -43,6 +62,9 @@ class Controller extends Base
 
     /**
      * Display tree
+     *
+     * @api   GET /adminv2/menu-side
+     * @level 165
      */
     public function getIndex()
     {
@@ -140,6 +162,10 @@ class Controller extends Base
 
     /**
      * Display modification screen
+     *
+     * @api   GET /adminv2/menu-side/modify/{id}
+     * @level 165
+     *
      * @param $id
      */
     public function getModify($id)
@@ -183,6 +209,9 @@ class Controller extends Base
 
     /**
      * Display create screen
+     *
+     * @api   GET /adminv2/menu-side/insert
+     * @level 165
      */
     public function getCreate()
     {
@@ -199,6 +228,9 @@ class Controller extends Base
 
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-side/modify
+     * @level 165
      */
     public function postModify()
     {
@@ -244,8 +276,15 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
     }
 
+
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-side/modify-section/{sectionId}/{field}
+     * @level 165
+     *
+     * @param int    $sectionId
+     * @param string $field
      */
     public function postSectionModify($sectionId, $field)
     {
@@ -290,6 +329,9 @@ class Controller extends Base
 
     /**
      * Delete menu item
+     *
+     * @api   POST /adminv2/menu-side/delete
+     * @level 165
      */
     public function postDelete()
     {
@@ -299,6 +341,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-side/order
+     * @level 165
      */
     public function postOrder()
     {
@@ -332,6 +377,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-side/order-section
+     * @level 165
      */
     public function postSectionOrder()
     {
@@ -353,13 +401,11 @@ class Controller extends Base
 
     /** Here be mappers and stuff */
 
-    /** @var MenuSideMapper $menuSideMapper */
-    private $menuSideMapper;
-
     /**
      * @return MenuSideMapper
      */
-    public function getMenuSideMapper() {
+    public function getMenuSideMapper()
+    {
         return $this->menuSideMapper;
     }
 
@@ -367,18 +413,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuSideMapper($mapper) {
+    public function setMenuSideMapper($mapper)
+    {
         $this->menuSideMapper = $mapper;
         return $this;
     }
 
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
-
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
@@ -386,18 +431,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setRoleMapper($mapper) {
+    public function setRoleMapper($mapper)
+    {
         $this->roleMapper = $mapper;
         return $this;
     }
 
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
-
     /**
      * @return CampusMapper
      */
-    public function getCampusMapper() {
+    public function getCampusMapper()
+    {
         return $this->campusMapper;
     }
 
@@ -405,18 +449,18 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setCampusMapper($mapper) {
+    public function setCampusMapper($mapper)
+    {
         $this->campusMapper = $mapper;
         return $this;
     }
 
-    /** @var MenuSideCampusMapper $menuSideCampusMapper */
-    private $menuSideCampusMapper;
 
     /**
      * @return MenuSideCampusMapper
      */
-    public function getMenuSideCampusMapper() {
+    public function getMenuSideCampusMapper()
+    {
         return $this->menuSideCampusMapper;
     }
 
@@ -424,18 +468,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuSideCampusMapper($mapper) {
+    public function setMenuSideCampusMapper($mapper)
+    {
         $this->menuSideCampusMapper = $mapper;
         return $this;
     }
 
-    /** @var MenuSideRoleMapper $menuSideRoleMapper */
-    private $menuSideRoleMapper;
-
     /**
      * @return MenuSideRoleMapper
      */
-    public function getMenuSideRoleMapper() {
+    public function getMenuSideRoleMapper()
+    {
         return $this->menuSideRoleMapper;
     }
 
@@ -443,18 +486,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuSideRoleMapper($mapper) {
+    public function setMenuSideRoleMapper($mapper)
+    {
         $this->menuSideRoleMapper = $mapper;
         return $this;
     }
 
-    /** @var MenuSideSectionMapper $menuSideSectionMapper */
-    private $menuSideSectionMapper;
-
     /**
      * @return MenuSideSectionMapper
      */
-    public function getMenuSideSectionMapper() {
+    public function getMenuSideSectionMapper()
+    {
         return $this->menuSideSectionMapper;
     }
 
@@ -462,7 +504,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuSideSectionMapper($mapper) {
+    public function setMenuSideSectionMapper($mapper)
+    {
         $this->menuSideSectionMapper = $mapper;
         return $this;
     }

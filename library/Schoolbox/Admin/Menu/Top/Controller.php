@@ -26,6 +26,25 @@ use Schoolbox\RoleMapper;
  */
 class Controller extends Base
 {
+
+    /** @var MenuIconMapper $menuIconMapper */
+    private $menuIconMapper;
+
+    /** @var MenuTopMapper $menuTopMapper */
+    private $menuTopMapper;
+
+    /** @var MenuTopCampusMapper $menuTopCampusMapper */
+    private $menuTopCampusMapper;
+
+    /** @var MenuTopRoleMapper $menuTopRoleMapper */
+    private $menuTopRoleMapper;
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+    /** @var CampusMapper $campusMapper */
+    private $campusMapper;
+
     public function __construct()
     {
         $this->setMenuIconMapper(MenuIconMapper::getInstance());
@@ -38,6 +57,9 @@ class Controller extends Base
 
     /**
      * Display re-order screen
+     *
+     * @api   GET /adminv2/menu-top
+     * @level 165
      */
     public function getIndex()
     {
@@ -53,6 +75,10 @@ class Controller extends Base
 
     /**
      * Display modification screen
+     *
+     * @api   GET /adminv2/menu-top/modify/{id}
+     * @level 165
+     *
      * @param $id
      */
     public function getModify($id)
@@ -95,6 +121,10 @@ class Controller extends Base
 
     /**
      * Display create screen
+     *W
+     * @api   GET /adminv2/insert
+     * @level 165
+     *
      */
     public function getCreate()
     {
@@ -112,6 +142,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-top/order
+     * @level 165
      */
     public function postOrder()
     {
@@ -133,6 +166,9 @@ class Controller extends Base
 
     /**
      * Delete menu item
+     *
+     * @api   POST /adminv2/menu-top/delete
+     * @level 165
      */
     public function postDelete()
     {
@@ -142,6 +178,9 @@ class Controller extends Base
 
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-top/modify
+     * @level 165
      */
     public function postModify()
     {
@@ -226,13 +265,11 @@ class Controller extends Base
 
     /** Here be mappers and stuff */
 
-    /** @var MenuIconMapper $menuIconMapper */
-    private $menuIconMapper;
-
     /**
      * @return MenuIconMapper
      */
-    public function getMenuIconMapper() {
+    public function getMenuIconMapper()
+    {
         return $this->menuIconMapper;
     }
 
@@ -240,20 +277,19 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuIconMapper($mapper) {
+    public function setMenuIconMapper($mapper)
+    {
         $this->menuIconMapper = $mapper;
         return $this;
     }
 
     // Top menu mapper
 
-    /** @var MenuTopMapper $menuTopMapper */
-    private $menuTopMapper;
-
     /**
      * @return MenuTopMapper
      */
-    public function getMenuTopMapper() {
+    public function getMenuTopMapper()
+    {
         return $this->menuTopMapper;
     }
 
@@ -261,18 +297,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopMapper($mapper) {
+    public function setMenuTopMapper($mapper)
+    {
         $this->menuTopMapper = $mapper;
         return $this;
     }
 
-    /** @var MenuTopCampusMapper $menuTopCampusMapper */
-    private $menuTopCampusMapper;
-
     /**
      * @return MenuTopCampusMapper
      */
-    public function getMenuTopCampusMapper() {
+    public function getMenuTopCampusMapper()
+    {
         return $this->menuTopCampusMapper;
     }
 
@@ -280,18 +315,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopCampusMapper($mapper) {
+    public function setMenuTopCampusMapper($mapper)
+    {
         $this->menuTopCampusMapper = $mapper;
         return $this;
     }
 
-    /** @var MenuTopRoleMapper $menuTopRoleMapper */
-    private $menuTopRoleMapper;
-
     /**
      * @return MenuTopRoleMapper
      */
-    public function getMenuTopRoleMapper() {
+    public function getMenuTopRoleMapper()
+    {
         return $this->menuTopRoleMapper;
     }
 
@@ -299,18 +333,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopRoleMapper($mapper) {
+    public function setMenuTopRoleMapper($mapper)
+    {
         $this->menuTopRoleMapper = $mapper;
         return $this;
     }
 
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
-
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
@@ -318,18 +351,17 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setRoleMapper($mapper) {
+    public function setRoleMapper($mapper)
+    {
         $this->roleMapper = $mapper;
         return $this;
     }
 
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
-
     /**
      * @return CampusMapper
      */
-    public function getCampusMapper() {
+    public function getCampusMapper()
+    {
         return $this->campusMapper;
     }
 
@@ -337,7 +369,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setCampusMapper($mapper) {
+    public function setCampusMapper($mapper)
+    {
         $this->campusMapper = $mapper;
         return $this;
     }
