@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 use IMSGlobal\LTI\ToolProvider as LTI;
+use IMSGlobal\LTI\ToolProvider\ToolProvider as LTIToolProvider;
 use IMSGlobal\LTI\ToolProvider\Service as LTIService;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
@@ -96,16 +97,21 @@ class Controller extends Component_Homepage_ControllerAbstract
             $consumer->enabled = true;
             $consumer->save();
 
-            $service = new LTI\Service\Service($consumer,
-                $provider->getUrl(),
-                'basic-lti-launch-request'
+            $consumer->doServiceRequest(
+                $service = new LTI\Service\Service($consumer,
+                    $provider->getUrl(),
+                    'basic-lti-launch-request'
+                ),
+                'POST',
+                '',
+                $params
             );
 
             if (!empty($provider->getSecret())) {
                 $params = $consumer->signParameters(
-                    $service->endpoint,
+                    $provider->getUrl(),
                     'basic-lti-launch-request',
-                    'LTI-1p0',
+                    LTIToolProvider::LTI_VERSION1,
                     $params
                 );
             }
@@ -142,7 +148,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'session'               => $_SESSION,
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
-                'location'              => $location
+                'location'              => $location,
+                'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel'))
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );

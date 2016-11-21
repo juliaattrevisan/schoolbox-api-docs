@@ -59,7 +59,11 @@
         {
             "type": "vcs",
             "url":  "https://github.com/armatronic/Imagine"
-        }
+        },
+	{
+	    "type": "vcs",
+	    "url": "https://github.com/dddaaammmooo/LTI-Tool-Provider-Library-PHP"
+	}
     ],
     "require": {
         "gggeek/phpxmlrpc": "0.1.0",
@@ -101,7 +105,7 @@
         "imagine/imagine": "dev-0.6.2-patches",
         "jenssegers/date": "~2.0.22",
         "mpratt/embera": "~1.8.6",
-        "imsglobal/lti": "*"
+        "imsglobal/lti": "dev-master"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

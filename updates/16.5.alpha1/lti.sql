@@ -177,6 +177,20 @@ INSERT INTO component_config_definition (
   null
 );
 
+INSERT INTO component_config_definition (
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT id from component_definition WHERE class = 'Schoolbox\\LTI\\Component\\Homepage\\Controller' LIMIT 1),
+  'pixel',
+  '200',
+  'Component Height',
+  null
+);
+
 CREATE TABLE lti_provider
 (
   id INT PRIMARY KEY AUTO_INCREMENT,
