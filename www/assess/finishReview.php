@@ -13,6 +13,12 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
  * @version     SVN: $Id$
  */
 
+/**
+ * u r in a sitepage
+ *
+ * @var SitePage $this
+ */
+
 $assessHandler = new Assess_Main();
 $attemptHandler = false;
 $groupHandler = new Group();
@@ -60,7 +66,10 @@ if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPer
 $attempt->setReviewed(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $attemptMapper->save($attempt);
 
-SitePage::localRedir('/assess/results/' . $this->arg[0]);
+// TODO someone please tell me the alternative -_-'
+$assessmentId = Database::getInstance()->query("SELECT assessment_id FROM assess WHERE assess_id = ? LIMIT 1", [ $assess->getId() ])->fetchColumn();
+
+$this->localRedir($this->routeLookup('learningAssessment.getStatus', [ 'assessmentId' => $assessmentId ]));
 
 die();
 
