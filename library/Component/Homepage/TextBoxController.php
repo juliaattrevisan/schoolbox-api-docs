@@ -165,7 +165,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             /* Need title injected here
              */
             if ($editing) {
-                $this->getConfig()['collapse']['value'] = false;
+                $this->getConfig()['collapse'] = false;
             }
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
