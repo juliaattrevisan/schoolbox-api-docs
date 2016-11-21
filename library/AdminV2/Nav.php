@@ -11,7 +11,8 @@ class AdminV2_Nav
     private $nav = array(
         'home'             => 'Home',
         'user'             => 'Users',
-        'side-menu'        => 'Side Menu',
+        'menu-side'        => 'Side Menu',
+        'menu-top'         => 'Top Menu',
         'dashboard'        => 'Dashboard',
         'homepage'         => 'Homepages',
         'eportfolio'       => 'ePortfolios',

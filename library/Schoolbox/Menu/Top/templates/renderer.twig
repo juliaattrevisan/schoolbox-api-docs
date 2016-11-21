@@ -1,0 +1,3 @@
+        {% for tab in tabs %}
+            <li><a class="icon-{{ tab.getIcon }} {% if tabCurrent | lower == tab.getToken | lower and tab.getToken is not empty %}navthis{% endif %}" href="{{ tab.getUrl }}" title="{{ tab.getTitle }}" {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}><span>{{ tab.getText }}</span></a></li>
+        {% endfor %}

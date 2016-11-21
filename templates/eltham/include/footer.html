@@ -1,0 +1,58 @@
+<div id="footer" class="clearfix">
+	<ul>
+	<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+	<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+	<li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
+	{SITE_VERSION} by <a href="http://www.alaress.com.au">Alaress</a></li>
+	<li class="last"><a href="/feedback.php">Support and Feedback</a></li>
+  </ul>
+</div>
+<script type="text/javascript">
+	Foundation.global.namespace = '';
+	$(document).foundation();
+
+	$(function () {
+		var s = $('#search');
+
+		s.on('focus blur', 'input', function (e) {
+			if (e.type == 'focusin') {
+				s.addClass('focus');
+			} else {
+				s.removeClass('focus');
+			}
+		});
+
+
+		// Replace any links with '/synergetic-sso/' at the start with '#' and add data-portal attribute instead
+		// this is for side menu items and tiles
+
+		$("a[href^='/synergetic-sso/']").each(function(e) {
+			$(this).attr('data-portal', $(this).attr('href').replace('/synergetic-sso/', ''));
+			$(this).attr('href', '#');
+		});
+
+		$('#content, #nav').find('a[data-portal]').click(function(e) {
+			e.preventDefault();
+			// Get link we need to go to
+
+			var deeplink = "/" + $(this).attr('data-portal');
+
+			// Check if we have already gone through the SSO popup process
+
+			if ({SYNERGETIC_SSO}) {
+				// Already done, just go to the page
+
+				window.location.href='/synergetic' + deeplink;
+			} else {
+				// Launch portal in a popup to allow SSO to work, then go to the page after a timeout
+
+				window.loginWindow = window.open('/synRedir.php', 'synRedir', 'height=200,width=150');
+				setTimeout(function() {
+					window.loginWindow.close();
+					window.location.href='/synergetic' + deeplink;
+				}, 6500);
+			}
+		});
+});
+</script>
+{SITE_ANALYTICS}

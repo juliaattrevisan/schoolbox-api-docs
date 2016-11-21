@@ -1,21 +1,19 @@
 <?php
 
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Realtime\Message\RoutePermission;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
-class SitePage extends \Page
+class SitePage extends Page
 {
     /**
      * The site that this SitePage uses to get templates from
-     *
      * @var string
      */
     public $site;
 
     /**
      * Is this a responsive skin? Calculated in $this->setSite().
-     *
      * @var bool
      */
     private $responsive;
@@ -34,30 +32,57 @@ class SitePage extends \Page
         'policy/*.html',
     ];
 
-    private $ajax;
-
-    private $lite;
-
     /**
      * The dependency injection container, injected into SitePage!
-     *
      * @var Aura\Di\Container
      */
     protected $di;
 
     /**
      * List of arguments passed in URL
-     *
      * @var array
      */
     public $arg = array();
 
+    /** @var string $currentTab */
+    private $currentTab;
 
+    /** @var string $pageName */
+    private $pageName;
+
+    /** @var array $jscript */
+    private $jscript;
+
+    /** @var array $css */
+    private $css;
+
+    /** @var bool $ajax */
+    private $ajax;
+
+    /** @var bool $lite */
+    private $lite;
+
+    /** @var User $user */
+    private $user;
+
+    /** @var Config */
+    private $config;
+
+    /** @var DeprecatedDatabase $db */
+    private $db;
+
+    /**
+     * SitePage constructor.
+     * @param bool $login
+     *
+     */
     public function SitePage($login = true)
     {
         parent::Page();
 
-        $this->db = DeprecatedDatabase::getInstance();
+        $this->config = \Config::getInstance();
+        $this->db = \DeprecatedDatabase::getInstance();
+        $this->user = $_SESSION["user"];
 
         if ($login) {
             $this->initSession();
@@ -65,7 +90,6 @@ class SitePage extends \Page
 
         $this->setSite();
     }
-
 
     /**
      * @param  Aura\Di\ContainerInterface $di
@@ -76,7 +100,6 @@ class SitePage extends \Page
         $this->di = $di;
         return $this;
     }
-
 
     /**
      * @return Aura\Di\ContainerInterface
@@ -95,8 +118,7 @@ class SitePage extends \Page
      * if there is one.
      *
      * @return Twig_Environment
-     * @throws RuntimeException if Twig renderer wasn't found in this Sitepage
-     *                          object's dependency injector.
+     * @throws RuntimeException if Twig renderer wasn't found in this Sitepage object's dependency injector.
      */
     public function getTwig()
     {
@@ -115,14 +137,13 @@ class SitePage extends \Page
      */
     public static function conType()
     {
-        $contype = "http://";
+        $type = "http://";
         if (getenv("SERVER_PORT") == 443) {
-            $contype = "https://";
+            $type = "https://";
         }
 
-        return $contype;
+        return $type;
     }
-
 
     /**
      * Get websocket port
@@ -132,13 +153,17 @@ class SitePage extends \Page
     public function getWebsocketPort()
     {
         if ($this->conType() == 'https://') {
-            return Cfg::get('websocket_port_ssl') ? : 8081;
+            return $this->config->get('websocket_port_ssl') ?: 8081;
         }
 
-        return Cfg::get('websocket_port') ? : 8080;
+        return $this->config->get('websocket_port') ?: 8080;
     }
 
-
+    /**
+     * @param $pageFile
+     * @param bool $execute
+     * @return bool
+     */
     function loadContent($pageFile, $execute = true)
     {
         $this->pageName = $pageFile;
@@ -154,7 +179,7 @@ class SitePage extends \Page
         }
 
         $this->arg = array();
-        $path      = explode('/', trim($pageFile, '/'));
+        $path = explode('/', trim($pageFile, '/'));
 
         $total = count($path);
 
@@ -183,6 +208,7 @@ class SitePage extends \Page
         }
 
         $this->pageNotFound();
+        return false;
     }
 
 
@@ -201,18 +227,20 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @return bool
+     */
     function setSite()
     {
-        if (Config::get('skin_builder')) {
+        if ($this->config->get('skin_builder')) {
             // If config.skin_builder is on - set $site to core
             $this->responsive = true;
         } else {
             // detect responsiveness: if there's no override for body.html, that school has gone responsive
-            $this->responsive = !file_exists(SITE_root . '/templates/' . Cfg::get('site_location') . '/include/body.html');
+            $this->responsive = !file_exists(SITE_root . '/templates/' . $this->config->get('site_location') . '/include/body.html');
         }
 
-        if (Cfg::get('site_detect') == 'domain') {
+        if ($this->config->get('site_detect') == 'domain') {
             //Get site templates via domain name
             if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
                 $this->site = $match[1];
@@ -220,33 +248,41 @@ class SitePage extends \Page
             }
         }
 
-        $this->site = Cfg::get('site_location');
+        $this->site = $this->config->get('site_location');
         return true;
     }
 
-
+    /**
+     * @return bool
+     */
     public function getAjax()
     {
         return $this->ajax;
     }
 
-
+    /**
+     * @return bool
+     */
     public function getLite()
     {
         return $this->lite;
     }
 
-
+    /**
+     * @param bool $state
+     */
     function setAjax($state = true)
     {
         $this->ajax = $state;
     }
 
+    /**
+     * @param $state
+     */
     function setLite($state)
     {
         $this->lite = $state;
     }
-
 
     /**
      * Detects AJAX state based on value of request header X-Requested-With - if
@@ -262,14 +298,13 @@ class SitePage extends \Page
         return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
 
-
     /**
      * Outputs a JSON response, with appropriate header.
      *
-     * @param mixed $output         Variable contents to output
-     * @param bool  $keepProcessing True if processing continues after output.
+     * @param mixed $output Variable contents to output
+     * @param bool $keepProcessing True if processing continues after output.
      *                              Exits after output if false.
-     * @param int   $responseCode   If set, output this response code.
+     * @param int $responseCode If set, output this response code.
      */
     public function outputJson($output, $keepProcessing = false, $responseCode = null)
     {
@@ -285,7 +320,10 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param bool $lite
+     * @return bool
+     */
     function outputPage($lite = false)
     {
         if ($this->ajax) {
@@ -293,7 +331,6 @@ class SitePage extends \Page
         }
 
         if (!$lite && !$this->lite) {
-
             $this->buildPage();
             $this->saveHistory();
         }
@@ -308,38 +345,37 @@ class SitePage extends \Page
             $debug_bar_body = $renderer->render();
         }
 
-        $user = $_SESSION['user'];
-        if (!$user instanceof \Schoolbox\User) {
-            $user = new \Schoolbox\User();
+        if (!$this->user instanceof User) {
+            $this->user = new User();
         }
-        $dateFormat  = Config::get('date_local');
+        $dateFormat = $this->config->get('date_local');
         $templateVar = array(
-            'TEMPLATE_YEAR'          => date('Y'),
-            'SITE_NAME'              => Cfg::get('school_name'),
-            'SITE_TITLE'             => Cfg::get('title'),
-            'SITE_GREETING'          => TextFormatter::greeting(), // TODO: This should be an object
-            'SITE_LOGINNAME'         => $user->formatName(),
-            'SITE_USERNAME'          => $user->getUsername(),
-            'SITE_LOCATION'          => $this->site,
-            'SITE_ANALYTICS'         => Cfg::get('site_analytics'),
-            'SITE_CHROME_LOCATION'   => (Config::get('skin_builder') ? 'demo' : $this->site),
-            'USER_ID'                => $user->getId(),
-            'EXTERNAL_ID'            => $user->getExternalId(),
-            'USER_ROLE'              => $user->getRole()->getName(),
-            'SITE_VERSION'           => Cfg::get('site_version'),
-            'SCHOOL_ADDRESS'         => Cfg::get('school_address'),
-            'DEBUGBAR'               => $debug_bar_body,
-            'DEBUGBAR_HEAD'          => $debug_bar_head,
-            'WEBSOCKET_HOST'         => self::parseRequestUrl(PHP_URL_HOST),
-            'WEBSOCKET_PATH'         => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
-            'WEBSOCKET_PORT'         => $this->getWebsocketPort(),
-            'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ? : 0,
-            'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ? : '',
-            'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
-            'DATEPICKER_FORMAT'      => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
-            'MOMENTJS_FORMAT'        => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
-            'SYNERGETIC_SSO'         => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
+            'TEMPLATE_YEAR' => date('Y'),
+            'SITE_NAME' => $this->config->get('school_name'),
+            'SITE_TITLE' => $this->config->get('title'),
+            'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
+            'SITE_LOGINNAME' => $this->user->formatName(),
+            'SITE_USERNAME' => $this->user->getUsername(),
+            'SITE_LOCATION' => $this->site,
+            'SITE_ANALYTICS' => $this->config->get('site_analytics'),
+            'SITE_CHROME_LOCATION' => ($this->config->get('skin_builder') ? 'demo' : $this->site),
+            'USER_ID' => $this->user->getId(),
+            'EXTERNAL_ID' => $this->user->getExternalId(),
+            'USER_ROLE' => $this->user->getRole()->getName(),
+            'SITE_VERSION' => $this->config->get('site_version'),
+            'SCHOOL_ADDRESS' => $this->config->get('school_address'),
+            'DEBUGBAR' => $debug_bar_body,
+            'DEBUGBAR_HEAD' => $debug_bar_head,
+            'WEBSOCKET_HOST' => self::parseRequestUrl(PHP_URL_HOST),
+            'WEBSOCKET_PATH' => $this->config->get('websocket_path') ? $this->config->get('websocket_path') : '/',
+            'WEBSOCKET_PORT' => $this->getWebsocketPort(),
+            'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
+            'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?: '',
+            'WEBSOCKET_STACK_LIMIT' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
+            'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true',
+            'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
+            'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
+            'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
         );
 
         $this->setVar($templateVar);
@@ -350,28 +386,25 @@ class SitePage extends \Page
             $this->setTitle();
         }
         $this->disableXssProtectionAfterForm();
-        $this->template->pparse('finaloutput', TEMPLATE_body);
+        $this->template->pParse('finaloutput', TEMPLATE_body);
+
+        return true;
     }
 
-
+    /**
+     * @param bool $customHead
+     */
     function buildPage($customHead = true)
     {
         $this->setFile(TEMPLATE_body, 'include/body.html');
         $this->setFile('headerTpl', 'include/header.html');
         $this->setFile('footerTpl', 'include/footer.html');
         $this->setFile('bannerTpl', 'include/banner.html');
-        $this->setFile('navTpl', 'include/nav.html');
-        $this->setFile('tabTpl', 'include/tab.html');
         $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
-        if ($_SESSION['user'] instanceof \Schoolbox\User) {
-            $this->renderSideNav();
-            $this->renderTabBar();
-            $this->renderGroupList();
-            $this->renderSubjectList();
-            $this->renderLinkList();
-            $this->renderStudents();
+
+        if ($this->user instanceof User) {
             $this->renderInstantMessages();
         } else {
             // Go away phantom block
@@ -390,11 +423,10 @@ class SitePage extends \Page
 
             /* Output superuser link to administration */
             $this->setBlock('banner_logged_in', 'admin_only_menu', 'admin_only_menu_block');
-            if($_SESSION['user']->isSuperuser()) {
+            if ($this->user->isSuperuser()) {
                 $this->parse('admin_only_menu_block', 'admin_only_menu');
-            }
-            else {
-                $this->setVar('admin_only_menu_block','');
+            } else {
+                $this->setVar('admin_only_menu_block', '');
             }
 
             $canSwitch = false;
@@ -408,14 +440,14 @@ class SitePage extends \Page
 
             $this->setVar([
                 'switch_user_block' => '',
-                'can_switch_block'  => ''
+                'can_switch_block' => ''
             ]);
             $linkedUserList = array();
 
             $previousUser = $_SESSION['previous']['user'];
-            foreach($_SESSION['user']->getLinkedUser() as $linkedUser) {
+            foreach ($this->user->getLinkedUser() as $linkedUser) {
                 // Don't link to this user if I was that user
-                if ($previousUser instanceof \Schoolbox\User) {
+                if ($previousUser instanceof User) {
                     if ($linkedUser->getId() == $previousUser->getId()) {
                         continue;
                     }
@@ -425,34 +457,34 @@ class SitePage extends \Page
                     continue;
                 }
                 /* Fully hydrate, note this stores back in session so it only happens once */
-                if($linkedUser->getRole()->getName() == null) {
+                if ($linkedUser->getRole()->getName() == null) {
                     $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($linkedUser->getId());
                     $linkedUserList[] = $linkedUser;
                 }
 
                 $this->setVar(array(
-                        'MENU_SWITCH_USERID'        => $linkedUser->getId(),
-                        'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
+                        'MENU_SWITCH_USERID' => $linkedUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID' => $linkedUser->getExternalId(),
                         'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
-                        'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
+                        'MENU_SWITCH_USER_ROLE' => $linkedUser->getRole()->getName(),
                     )
                 );
                 $this->parse('switch_user_block', 'switch_user', true);
                 $canSwitch = true;
             }
-            if(count($linkedUserList) > 0) {
-                $_SESSION['user']->setLinkedUser($linkedUserList);
+            if (count($linkedUserList) > 0) {
+                $this->user->setLinkedUser($linkedUserList);
             }
 
             $this->setBlock('banner_logged_in', 'recover_user', 'recover_user_block');
             $this->setVar('recover_user_block', '');
 
-            if($previousUser instanceof \Schoolbox\User) {
+            if ($previousUser instanceof User) {
                 $this->setVar(array(
-                        'MENU_SWITCH_USERID'        => $previousUser->getId(),
-                        'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
+                        'MENU_SWITCH_USERID' => $previousUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID' => $previousUser->getExternalId(),
                         'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
-                        'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
+                        'MENU_SWITCH_USER_ROLE' => $previousUser->getRole()->getName(),
                     )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
@@ -463,12 +495,22 @@ class SitePage extends \Page
                 $this->parse('can_switch_block', 'can_switch');
             }
 
-            $this->parse('MAIN_NAV_REGION', 'navTpl');
-            $this->parse('MAIN_TAB_REGION', 'tabTpl');
+            // Render side menu
+
+            $menuSideRenderer = new \Schoolbox\Menu\Side\Renderer();
+            $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $this->user);
+            $this->setVar('MENU_SIDE', $menuSideContents);
+
+            // Render top menu
+
+            $menuTopRenderer = new \Schoolbox\Menu\Top\Renderer();
+            $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
+            $this->setVar('MENU_TOP', $menuTopContents);
+
             $this->parse('banner_logged_in_block', 'banner_logged_in');
         } else {
-            $this->setVar('MAIN_NAV_REGION', '');
-            $this->setVar('MAIN_TAB_REGION', '');
+            $this->setVar('MENU_SIDE', '');
+            $this->setVar('MENU_TOP', '');
             $this->setVar('banner_logged_in_block', '');
         }
 
@@ -482,13 +524,17 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param $tab
+     */
     function setTab($tab)
     {
         $this->currentTab = $tab;
     }
 
-
+    /**
+     *
+     */
     function initSession()
     {
         session_start();
@@ -503,11 +549,11 @@ class SitePage extends \Page
         }
 
         if (!isset($_SESSION['id']) || //If session does not exist
-            ( ($_SESSION['lasttime'] + \Config::get('session_length')) < time() ) || //If session has expired
-            ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
+            (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
+            ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
             //Catch users with the remember me cookie
-            if (\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
+            if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
                 $redis = \Alaress\Redis::getClientInstance();
                 $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
@@ -519,8 +565,8 @@ class SitePage extends \Page
                     session_regenerate_id(true);
                 }
             } //Catch already logged in users via kerberos or other means
-            elseif (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
-                list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
+            elseif ($this->config->get('kerb_enable') && $_SERVER['REMOTE_USER']) {
+                list($username) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
                     $this->goLoginPage();
@@ -551,6 +597,9 @@ class SitePage extends \Page
         }
     }
 
+    /**
+     * @param string $override
+     */
     function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
@@ -570,7 +619,9 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param $page
+     */
     static function backToTheFuture($page)
     {
         /* In Dans honour, time is ours */
@@ -586,15 +637,14 @@ class SitePage extends \Page
 
     }
 
-
     /**
      * Outputs an error message.
      *
-     * @param mixed  $ec
+     * @param mixed $ec
      *                        Integer: retrieves error text from code from database
      *                        null:    outputs whatever's in $message as error
      * @param array $args Replaces '%MESSAGE%' in $ec
-     * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+     * @param int $code HTTP response code, defaults to 400 (Bad Request)
      */
     function error($ec, $args = [], $code = 400)
     {
@@ -630,13 +680,11 @@ class SitePage extends \Page
         if (isset($ec)) {
             try {
                 $error = $errorMapper->findById($ec);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $error = $errorMapper->createModel();
                 $error->setMessage('%MESSAGE%');
             }
-        }
-        else {
+        } else {
             $error = $errorMapper->createModel();
             $error->setMessage('%MESSAGE%');
         }
@@ -651,8 +699,7 @@ class SitePage extends \Page
         if ($this->ajax) {
             header('Content-Type: application/json');
             die(json_encode($error->getMessage()));
-        }
-        else {
+        } else {
             $errorContents = $this->getTwig()->render('common/error/general.twig', [
                 'code' => $ec,
                 'header' => isset($args['message']) ? $args['message'] : '',
@@ -663,7 +710,6 @@ class SitePage extends \Page
                 'meta' => $args['error'],
                 'outputStackTrace' => $args['outputStackTrace'],
                 'stackTrace' => $args['stackTrace'],
-                'exceptionClass' => is_object($args['stackTrace']) ? get_class($args['stackTrace']) : 'Error'
             ]);
 
             $this->renderError('Error Encountered', $errorContents);
@@ -691,349 +737,19 @@ class SitePage extends \Page
         exit();
     }
 
-
-    function renderSideNav()
-    {
-        $mapper = new \Schoolbox\SideMenu\Mapper();
-        $tree   = $mapper->getCollectionAsTree($mapper->findByUser($_SESSION['user']));
-        $renderer = new \Schoolbox\SideMenu\Renderer(new Scrub());
-        $this->setVar("MCSSMENU", $renderer->renderTree($tree));
-    }
-
-
-    function renderTabBar()
-    {
-        //this section hanldes the display of the timetable tab
-        $this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
-        //if the have a timetable or their children have a timetable
-
-        $user = $_SESSION['user'];
-        /**
-         * @var $user \Schoolbox\User
-         */
-
-        if (($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) && !$user->getHideTimetable()) {
-            $this->parse('tt_tab', 'timetable_tab');
-        } else {
-            $this->setVar('tt_tab', '');
-        }
-
-        /* output submission box links */
-        $this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
-        $this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
-        $this->setBlock('tabTpl', 'grades_tab', 'grades_tab_block');
-        $this->setBlock('tabTpl', 'courses_tab', 'courses_tab_block');
-
-        $this->setVar('dw_tab', '');
-        $this->setVar('grades_tab_block', '');
-        $this->setVar('courses_tab_block', '');
-        $this->setVar('sm_tab', '');
-
-        if ($user->getRole()->isStaff()) {
-            $this->parse('sm_tab', 'submission_tab');
-            $this->parse('courses_tab_block', 'courses_tab');
-        } elseif ($user->getRole()->isStudent()) {
-            $this->parse('dw_tab', 'duework_tab');
-            $this->parse('grades_tab_block', 'grades_tab');
-        }
-
-
-        $this->setBlock('tabTpl', 'parent_tab', 'p_tab');
-        if ($user->getRole()->isParent()) {
-            $this->parse('p_tab', 'parent_tab');
-        } else {
-            $this->setVar('p_tab', '');
-        }
-
-        //this section handles the display of the webmail tab
-        // if configuration states mail is available and user has access to local mail account display it
-        $this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
-        $this->setVar('wm_tab', '');
-
-        if ($_SESSION['webmail']) {
-            $location = ''; //Webmail location
-
-            switch ($this->site) {
-                case 'shore':
-                    if ($user->getRole()->isStaff()) {
-                        $location = 'https://owa.shore.nsw.edu.au/owa';
-                    } elseif ($user->getRole()->isStudent()) {
-                        if (strpos(Session::getIP(), '192.168.') === false) {
-                            $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
-                        } else {
-                            $location = 'http://cassandra.student.shore.nsw.edu.au/exchange/';
-                        }
-                    }
-                    break;
-
-                case 'moriah':
-                    if ($user->getRole()->isStaff()) {
-                        $location = 'https://mail.moriah.nsw.edu.au/owa';
-                    } elseif ($user->getRole()->isStudent()) {
-                        $location = 'http://www.google.com/a/student.moriah.nsw.edu.au/';
-                    }
-                    break;
-
-                case 'oakburn':
-                    if ($user->getRole()->isStaff()) {
-                        $location = 'https://mail.soc.tas.edu.au/owa/';
-                    } elseif ($user->getRole()->isStudent()) {
-                        $location = 'https://www.outlook.com/my.soc.tas.edu.au';
-                    }
-                    break;
-
-                case 'tigs':
-                    if ($user->getRole()->isStaff()) {
-                        $location = 'https://webmail.tigs.nsw.edu.au/owa';
-                    } elseif ($user->getRole()->isStudent()) {
-                        $location = 'https://mail.google.com/a/tigs.com.au';
-                    }
-                    break;
-
-                case 'peninsula':
-                    if ($user->getRole()->isStaff()) {
-                        $location = Cfg::get('mail_webmail');
-                    } elseif ($user->getRole()->isStudent()) {
-                        $location = 'https://outlook.com/owa/tps.vic.edu.au';
-                    }
-                    break;
-
-                default:
-                    $location = Cfg::get('mail_webmail');
-                    break;
-            }
-
-            /* Only set webmail tab if we have a location set and user has webmail enabled */
-            if ($location) {
-                $this->setVar('WEBMAIL_LOCATION', 'href="' . $location . '" rel="external"');
-                $this->parse('wm_tab', 'webmail_tab');
-            }
-        }
-
-        //custom code for each site is performed here
-        if ($this->site == 'wenona') {
-            require_once WEB_root . '/include/wenona.php';
-            //provide encoded login details for intranet
-            $this->setVar(
-                "ENC_LOGIN",
-                urlencode(
-                    base64_encode(
-                        xorEncrypt(
-                            INTRANET_encryption_key,
-                            $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
-                        )
-                    )
-                )
-            );
-
-            $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($user->getRole()->isStaff() || $user->getRole()->isStudent()) {
-                $this->parse('mf_tab', 'myfiles_tab');
-            } else {
-                $this->setVar('mf_tab', '');
-            }
-        }
-        if ($this->site == 'shore') {
-            $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($user->getRole()->isStaff()) {
-                $this->setVar('MYFILES_LOCATION', 'https://myfiles.shore.nsw.edu.au/');
-                $this->parse('mf_tab', 'myfiles_tab');
-            } elseif ($user->getRole()->isStudent()) {
-                $this->setVar('MYFILES_LOCATION', 'https://myfiles.student.shore.nsw.edu.au/');
-                $this->parse('mf_tab', 'myfiles_tab');
-            } else {
-                $this->setVar('MYFILES_LOCATION', '#');
-                $this->setVar('mf_tab', '');
-            }
-
-            /* Remove these links if parent logged in:
-               * Webmail, Resources, Network
-               */
-            if ($user->getRole()->isParent()) {
-                $this->setVar('wm_tab', '');
-
-                $this->setBlock('tabTpl', 'resource_tab', 'res_tab');
-                $this->setVar('res_tab', '');
-
-                $this->setBlock('bannerTpl', 'user_name', 'usr_name');
-                $this->setVar('usr_name', '');
-
-            }
-
-        } else {
-            $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($user->getRole()->isStaff() || $user->getRole()->isStudent()) {
-                $this->parse('mf_tab', 'myfiles_tab');
-            } else {
-                $this->setVar('mf_tab', '');
-            }
-        }
-
-        /* Output webdav client tab if enabled */
-        $this->setBlock('tabTpl', 'network_tab', 'network_tab_block');
-        if (Cfg::get('webdav_enable') && !$user->getRole()->isParent() && !$user->getRole()->isGuest()) {
-            $this->parse('network_tab_block', 'network_tab');
-        } else {
-            $this->setVar('network_tab_block', '');
-        }
-
-        /* Check if eportfolio tab should be enabled
-                      */
-        $this->setBlock('tabTpl', 'eportfolio_tab', 'ep_tab');
-
-        if ($_SESSION['eportfolio_enabled']) {
-            $this->parse('ep_tab', 'eportfolio_tab');
-            $this->setVar('EPORTFOLIO_USER_ID', $_SESSION['id']);
-        } else {
-            $this->setVar('ep_tab', '');
-        }
-
-        // choose tab to highlight
-        $output = array(
-            'TAB_MAIN_ON'                                  => '',
-            'TAB_NEWS_ON'                                  => '',
-            'TAB_WEBMAIL_ON'                               => '',
-            'TAB_CALENDAR_ON'                              => '',
-            'TAB_TIMETABLE_ON'                             => '',
-            'TAB_RESOURCES_ON'                             => '',
-            'TAB_MYFILES_ON'                               => '',
-            'TAB_NETWORK_ON'                               => '',
-            'TAB_PORTFOLIO_ON'                             => '',
-            'TAB_EPORTFOLIO_ON'                            => '',
-            'TAB_SUBMISSION_ON'                            => '',
-            'TAB_COURSE_ON'                                => '',
-            'TAB_GRADE_ON'                                 => '',
-            'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
-        );
-
-
-        $this->setVar($output);
-    }
-
-
-    function renderGroupList()
-    {
-        //this section handle mygroups section in the template
-        $this->setBlock("navTpl", "mgroup", "mgroup_section");
-        $this->setBlock("mgroup", "mgroup_block", "my_groups");
-
-        // get overrides for this user
-        $overrides = RerouteOverrideMapper::getInstance()->getMatchingRoutes(
-            'service.'.HOMEPAGE_SERVICE,
-            RoutePermission::MUTE,
-            $_SESSION['id'],
-            true
-        )->map(function($v) {
-            if (preg_match('`service.\d+.(\d+)`', $v->getRouteKey(), $matches)) {
-                return (int)$matches[1];
-            }
-            return null;
-        }, false)->getAll();
-
-        $overrides = $overrides ?: array(0);
-
-        $query = "
-            SELECT cat.name, ua.sid, ua.type
-            FROM userAccess AS ua
-            INNER JOIN folder AS cat ON ua.sid=cat.id AND cat.deleted_at IS NULL
-            INNER JOIN homepage_config AS hc ON cat.id=hc.cid
-            WHERE ua.uid = %d
-            AND service = %d
-            AND ua.sid NOT IN (%s)
-            AND ua.type > 0
-            ORDER BY cat.name
-        ";
-        $this->db->query(sprintf($query, $_SESSION['id'], HOMEPAGE_SERVICE, implode(', ', $overrides)));
-        if ($this->db->countRows() > 0) {
-            while ($group = $this->db->getNextArray()) {
-                $this->setVar("MGNAME", Scrub::text($group['name']));
-                $this->setVar("MGID", $group['sid']);
-                $this->parse("my_groups", "mgroup_block", true);
-            }
-            $this->parse("mgroup_section", "mgroup");
-        } else {
-            $this->setVar("mgroup_section", "");
-        }
-    }
-
-
     /**
-     * Render "My Subjects" list in the side navigation
-     * (not to be confused with "My Groups")
+     *
      */
-    public function renderSubjectList()
-    {
-        $renderer = new \Schoolbox\SubjectList\SideNav($this, $_SESSION['subjects']);
-        $renderer->render();
-    }
-
-
-    function renderLinkList()
-    {
-        $this->setBlock("navTpl", "mlink_block", "my_links");
-        $query = "SELECT url, description FROM bookmarks WHERE owner = '" . $_SESSION['id'] . "'";
-        $this->db->query($query);
-        if ($this->db->countRows() > 0) {
-            while ($link = $this->db->getNextArray()) {
-                $url = new Url($link['url']);
-
-                if ($url->isLocalUrl()) {
-                    $this->setVar(
-                        "MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text($link['description']) . "</span></a>"
-                    );
-                } else {
-                    $this->setVar(
-                        "MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text($link['description']) . "</span></a>"
-                    );
-                }
-
-                $this->parse("my_links", "mlink_block", true);
-            }
-        } else {
-            $this->setVar("my_links", "");
-        }
-    }
-
-
-    public function renderStudents()
-    {
-        /* My students section
-                       */
-        $this->setBlock('navTpl', 'mstudent', 'mstudent_section');
-        $this->setBlock('mstudent', 'mstudent_block', 'my_students');
-
-        if (is_array($_SESSION['children'])) {
-            $userHandler = new User();
-
-            foreach ($_SESSION['children'] as $child) {
-                $query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-                $user  = $this->db->getRow($query);
-                $this->setVar("MSTUDENT_ID", $child['id']);
-                $this->setVar("MSTUDENT_NAME", $userHandler->formatName($user, '{firstname}'));
-                $this->setVar("MSTUDENT_YEAR", $user['year']);
-
-                $this->parse("my_students", "mstudent_block", true);
-            }
-
-            $this->parse("mstudent_section", "mstudent");
-        } else {
-            $this->setVar("mstudent_section", "");
-        }
-    }
-
-
     function renderInstantMessages()
     {
-
         /* Docking the tray
          */
-        if ($_SESSION['user']->getHideNotificationsTray()) {
+        if ($this->user->getHideNotificationsTray()) {
 
             $this->setVar([
                 'HIDE_NOTIFICATIONS_TRAY' => ''
             ]);
-        }
-        else {
+        } else {
             $this->setVar([
                 'HIDE_NOTIFICATIONS_TRAY' => 'docking'
             ]);
@@ -1042,14 +758,14 @@ class SitePage extends \Page
         if ($this->responsive) {
             $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
 
-            if (Cfg::get('messaging_enabled')) {
+            if ($this->config->get('messaging_enabled')) {
                 $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
             } else {
                 $this->setVar('instantmessage_toggle_block', '');
             }
         }
 
-        if (Cfg::get('messaging_enabled')) {
+        if ($this->config->get('messaging_enabled')) {
             $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
             $this->setVar('NOTIFICATION_CLASS', '');
         } else {
@@ -1058,6 +774,9 @@ class SitePage extends \Page
         }
     }
 
+    /**
+     *
+     */
     function renderScriptIncludes()
     {
         $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
@@ -1083,19 +802,28 @@ class SitePage extends \Page
 
     }
 
-
+    /**
+     * @param $file
+     */
     function setJavascript($file)
     {
         $this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
     }
 
-
+    /**
+     * @param $file
+     * @param string $type
+     */
     function setCSS($file, $type = 'screen')
     {
         $this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
     }
 
-
+    /**
+     * @param $handle
+     * @param $file
+     * @return bool
+     */
     function setFile($handle, $file)
     {
         if (!$this->template->setFile($handle, $this->getTemplate($file))) {
@@ -1103,7 +831,6 @@ class SitePage extends \Page
         }
 
         if ($handle == TEMPLATE_content) {
-            $this->templateFile = $file;
             $this->setBlock($handle, "custom_head", "custom_head_block");
             $this->setVar('custom_head_block', '');
         }
@@ -1111,21 +838,26 @@ class SitePage extends \Page
         return true;
     }
 
-
+    /**
+     * @param string $title
+     */
     function setTitle($title = '')
     {
-        $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
+        $this->setVar('TITLE', $this->config->get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
     }
 
-
+    /**
+     * @param $template
+     * @return bool|string
+     */
     function getTemplate($template)
     {
         // Chrome/skin templates are always core if skin builder is on,
         // except if the version in the skin is newer than 15.5 release date (this is determined if instant.html is included)
-        if (Config::get('skin_builder')) {
+        if ($this->config->get('skin_builder')) {
             foreach ($this->chromePaths as $chromePath) {
                 if (fnmatch($chromePath, $template) &&
-                    is_file($this->templateRoot . '/' . $this->site . '/include/instant.html' )
+                    is_file($this->templateRoot . '/' . $this->site . '/include/instant.html')
                 ) {
                     return 'core/' . $template;
                 }
@@ -1145,12 +877,14 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param $varname
+     * @return mixed
+     */
     function getVar($varname)
     {
         return $this->template->getVar($varname);
     }
-
 
     /**
      * Redirect to a specific url
@@ -1161,8 +895,8 @@ class SitePage extends \Page
      *
      * @static
      * @param  string $file
-     * @param  bool   $keepProcessing True if processing continues in background
-     * @param  int    $responseCode   If set, output this response code.
+     * @param  bool $keepProcessing True if processing continues in background
+     * @param  int $responseCode If set, output this response code.
      * @return void
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)
@@ -1177,7 +911,6 @@ class SitePage extends \Page
             exit;
         }
     }
-
 
     /**
      * Keeps the script running in the background, and switches off the ability
@@ -1194,19 +927,18 @@ class SitePage extends \Page
         echo $output;
         $size = ob_get_length();
         header("Content-Length: $size");
-//        // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
+        // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
         ob_end_flush();
         flush();
         session_write_close();
     }
 
-
     /**
      * Redirects to a broken image with a given size.
      *
-     * @param int $width  Width of image to show
+     * @param int $width Width of image to show
      * @param int $height Height of image to show
-     * @param int $code   The HTTP error number
+     * @param int $code The HTTP error number
      */
     public static function redirectToBrokenImageOfSize($width, $height, $code = 500)
     {
@@ -1216,13 +948,12 @@ class SitePage extends \Page
         );
     }
 
-
     /**
      * Redirects to a broken image with a given transform.
      *
      * @param string $transform_type A string corresponding to an Alaress_Image_Transformation_Abstract instance
-     * @param string $transform      A key associated with a list of transforms to execute upon an image
-     * @param int    $code           The HTTP error number
+     * @param string $transform A key associated with a list of transforms to execute upon an image
+     * @param int $code The HTTP error number
      */
     public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500)
     {
@@ -1232,25 +963,24 @@ class SitePage extends \Page
         );
     }
 
-
     /**
      * Redirects to a broken image.
      *
-     * @param int   $code    The HTTP error number
+     * @param int $code The HTTP error number
      * @param array $options Options for the size and transformation of the
      *                       broken image.
      */
     public static function redirectToBrokenImage($code = 500, $options = array())
     {
-        $query           = array(
-            'code'           => true,
-            'width'          => true,
-            'height'         => true,
-            'transform'      => true,
+        $query = array(
+            'code' => true,
+            'width' => true,
+            'height' => true,
+            'transform' => true,
             'transform_type' => true,
         );
         $options['code'] = $code;
-        $options         = array_intersect_key($options, $query);
+        $options = array_intersect_key($options, $query);
         static::localRedir("/images/fail.php?" . http_build_query($options));
     }
 
@@ -1258,7 +988,7 @@ class SitePage extends \Page
     /**
      *
      * @param string $error An error message to display on the login page.
-     * @param string $page  If set, this page is set as the path to redirect to.
+     * @param string $page If set, this page is set as the path to redirect to.
      */
     function goLoginPage($error = '', $page = '')
     {
@@ -1273,7 +1003,7 @@ class SitePage extends \Page
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setBlock(TEMPLATE_body, 'login_terms', 'login_terms_block');
         $this->setBlock(TEMPLATE_body, 'remember_me', 'remember_me_block');
-        $this->setVar('TITLE', Cfg::get('title') . " - Login");
+        $this->setVar('TITLE', $this->config->get('title') . " - Login");
         if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
             $this->setVar('HIDDEN', htmlspecialchars($page, ENT_QUOTES));
         } elseif (preg_match('#^[\w_=\-:\/.\&\?]+$#i', $_GET['page'])) {
@@ -1282,18 +1012,18 @@ class SitePage extends \Page
             $this->setVar('HIDDEN', '');
         }
 
-        $loginTerms = Config::get('login_terms_and_conditions');
+        $loginTerms = $this->config->get('login_terms_and_conditions');
         if ($loginTerms) {
             $this->setVar([
-                'LOGIN_TERMS_AND_CONDITIONS'       => $loginTerms,
-                'LOGIN_TERMS_AND_CONDITIONS_ERROR' => Config::get('login_terms_and_conditions_error'),
+                'LOGIN_TERMS_AND_CONDITIONS' => $loginTerms,
+                'LOGIN_TERMS_AND_CONDITIONS_ERROR' => $this->config->get('login_terms_and_conditions_error'),
             ]);
             $this->parse('login_terms_block', 'login_terms');
         } else {
             $this->setVar('login_terms_block', '');
         }
 
-        if (\Config::get('session_remember')) {
+        if ($this->config->get('session_remember')) {
             $this->parse('remember_me_block', 'remember_me');
         } else {
             $this->setVar('remember_me_block', '');
@@ -1315,8 +1045,7 @@ class SitePage extends \Page
             ));
 
             $this->parse('forgotten_password_block', 'forgotten_password');
-        }
-        else {
+        } else {
             $this->setVar(array(
                 'forgotten_password_block' => ''
             ));
@@ -1351,9 +1080,9 @@ class SitePage extends \Page
 
         // choose a background picture
 
-        $backgrounds = explode(",", Config::get('skin_login_bg'));
+        $backgrounds = explode(",", $this->config->get('skin_login_bg'));
 
-        if (count($backgrounds) && $backgrounds[0] ) {
+        if (count($backgrounds) && $backgrounds[0]) {
             $this->setVar('LOGIN_BG', '/storage/image.php?hash=' . $backgrounds[array_rand($backgrounds)] . '&size=maxsize');
         } else {
             $this->setVar('LOGIN_BG', '/images/core/login-bg.jpg');
@@ -1370,7 +1099,7 @@ class SitePage extends \Page
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
-        if (Config::get('saml_enabled') == '1' && strlen(Config::get('saml_sso_url')) && $_GET['samlAuth'] !== '0') {
+        if ($this->config->get('saml_enabled') == '1' && strlen($this->config->get('saml_sso_url')) && $_GET['samlAuth'] !== '0') {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
                 $redirectUrl .= '?page=' . urlencode($_GET['page']);
@@ -1394,6 +1123,13 @@ class SitePage extends \Page
         $this->renderError('Page Not Found', $errorContents);
     }
 
+    /**
+     * @param $handle
+     * @param $data
+     * @param array $selected
+     * @param string $template
+     * @param array $mapping
+     */
     function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
         $this->setBlock($template, $handle, $handle . '_block');
@@ -1402,7 +1138,7 @@ class SitePage extends \Page
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
-                        $mapping[$key] ? $key = $mapping[$key] : '';
+                        $mapping[$key] ? $key = $mapping[$key] : $key = '';
                         $this->setVar($key, Scrub::text($value));
                         if (in_array($value, $selected)) {
                             $this->setVar($key . '_SELECTED', 'checked="checked"');
@@ -1418,7 +1154,7 @@ class SitePage extends \Page
                     // array access.
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get' . ucfirst($property);
-                        $value      = $row->$get_method();
+                        $value = $row->$get_method();
                         $this->setVar($template_var, Scrub::text($value));
                         if (in_array($value, $selected)) {
                             $this->setVar($template_var . '_SELECTED', 'checked="checked"');
@@ -1436,7 +1172,13 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param $handle
+     * @param $data
+     * @param array $selected
+     * @param string $template
+     * @param array $mapping
+     */
     function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
         $this->setBlock($template, $handle, $handle . '_block');
@@ -1445,7 +1187,7 @@ class SitePage extends \Page
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
-                        $mapping[$key] ? $key = $mapping[$key] : '';
+                        $mapping[$key] ? $key = $mapping[$key] : $key = '';
                         if (is_scalar($value) || is_null($value)) {
                             $this->setVar($key, Scrub::text($value));
                             if (in_array($value, $selected)) {
@@ -1463,7 +1205,7 @@ class SitePage extends \Page
                     // array access.
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get' . ucfirst($property);
-                        $value      = $row->$get_method();
+                        $value = $row->$get_method();
                         if (is_scalar($value) || is_null($value)) {
                             $this->setVar($template_var, Scrub::text($value));
                             if (in_array($value, $selected)) {
@@ -1482,18 +1224,23 @@ class SitePage extends \Page
         }
     }
 
-
+    /**
+     * @param $perm
+     * @return bool
+     */
     function canRead($perm)
     {
-        return $perm >= 1 ? true : false;
+        return $perm >= UserAccess::ACCESS_READ ? true : false;
     }
 
-
+    /**
+     * @param $perm
+     * @return bool
+     */
     function canWrite($perm)
     {
-        return $perm >= 2 ? true : false;
+        return $perm >= UserAccess::ACCESS_WRITE ? true : false;
     }
-
 
     /**
      * Disables XSS protections for the request immediately proceeding a form
@@ -1542,7 +1289,6 @@ class SitePage extends \Page
         return false;
     }
 
-
     /**
      * Attempt to (safely) parse $_SERVER for a URL component
      *
@@ -1584,7 +1330,6 @@ class SitePage extends \Page
         }
     }
 
-
     /**
      * Jam localisation vars into the template. Uncomment / modify the list as required
      */
@@ -1598,9 +1343,9 @@ class SitePage extends \Page
             $upperTerm = strtoupper($term);
 
             $this->setVar([
-                "TPL_LOCAL_$upperTerm"             => $l10n->translate($term, false, false),
-                "TPL_LOCAL_{$upperTerm}_PC"        => $l10n->translate($term, false, true),
-                "TPL_LOCAL_{$upperTerm}_PLURAL"    => $l10n->translate($term, true, false),
+                "TPL_LOCAL_$upperTerm" => $l10n->translate($term, false, false),
+                "TPL_LOCAL_{$upperTerm}_PC" => $l10n->translate($term, false, true),
+                "TPL_LOCAL_{$upperTerm}_PLURAL" => $l10n->translate($term, true, false),
                 "TPL_LOCAL_{$upperTerm}_PLURAL_PC" => $l10n->translate($term, true, true)
             ]);
         }
@@ -1610,8 +1355,8 @@ class SitePage extends \Page
      * Returns the localised version of this term. Convenience method.
      *
      * @param string $term
-     * @param bool   $plural
-     * @param bool   $capital Ca
+     * @param bool $plural
+     * @param bool $capital Ca
      *
      * @return string
      */
