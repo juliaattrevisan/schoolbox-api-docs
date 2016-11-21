@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Breadcrumbs;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 /* /submission/inline/viewStudent/<submission_id>
  */
@@ -44,13 +45,13 @@ if ($accessLevel >= Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE) {
     $hasPermission = true;
 } elseif ($_SESSION['user']->getId() == $currentUid) {
     if ($submissionBox->getMarkVisibility()
-        >= AbstractAssessment::MARK_VISIBILITY_STUDENT
+        >= IAssessable::MARK_VISIBILITY_STUDENT
     ) {
         $hasPermission = true;
     }
 } elseif ($groupHandler->isParentOfChild($currentUid)) {
     if ($submissionBox->getMarkVisibility()
-        >= AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT
+        >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT
         && !Config::get('restrict_student_submissions')
     ) {
         $hasPermission = true;

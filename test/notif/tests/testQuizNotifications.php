@@ -7,6 +7,7 @@
  */
 
 use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
@@ -112,9 +113,9 @@ class QuizNotifications extends AbstractNotificationTest
         $quizzes = [];
 
         // set these up 5 seconds apart
-        $quizzes[] = $this->generateQuiz(AbstractAssessment::MARK_VISIBILITY_PRIVATE,        '1 second',  '5 second');
-        $quizzes[] = $this->generateQuiz(AbstractAssessment::MARK_VISIBILITY_STUDENT,        '6 second',  '10 second');
-        $quizzes[] = $this->generateQuiz(AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
+        $quizzes[] = $this->generateQuiz(QuizMapper::MARK_VISIBILITY_PRIVATE,        '1 second',  '5 second');
+        $quizzes[] = $this->generateQuiz(QuizMapper::MARK_VISIBILITY_STUDENT,        '6 second',  '10 second');
+        $quizzes[] = $this->generateQuiz(QuizMapper::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
 
         foreach ($quizzes as $quiz) {
             $this->saveQuiz($quiz, $this->getUser(self::ZANE_SMITH));

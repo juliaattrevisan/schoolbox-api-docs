@@ -13,6 +13,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -186,13 +187,13 @@ else {
 
 	// Visibility copypaste
 	switch ($assess['mark_visibility']) {
-		case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
+		case FolderMapper::MARK_VISIBILITY_PRIVATE:
 			$this->parse('visible_staff_block', 'visible_staff');
 			break;
-		case AbstractAssessment::MARK_VISIBILITY_STUDENT:
+		case FolderMapper::MARK_VISIBILITY_STUDENT:
 			$this->parse('visible_staff_students_block', 'visible_staff_students');
 			break;
-		case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
+		case FolderMapper::MARK_VISIBILITY_PARENT_STUDENT:
 			$this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
 			break;
 	}

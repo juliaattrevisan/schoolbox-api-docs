@@ -10,6 +10,7 @@
 namespace Assess;
 
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 class Visibility {
 
@@ -50,18 +51,18 @@ class Visibility {
 	{
 		$visibilities = array();
 		if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
-			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
-			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
+			$visibilities[] = IAssessable::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 		else if ($currentUser->getRole()->isStudent()) {
-			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
+			$visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 		else {
 			$student->loadParents();
 			if ($currentUser->isParentOf($student)) {
-				$visibilities[] = AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
+				$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 			}
 		}
 
@@ -74,7 +75,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaff() {
-		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_PRIVATE) {
+		if ($this->getId() == IAssessable::MARK_VISIBILITY_PRIVATE) {
 			return true;
 		}
 
@@ -87,7 +88,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaffStudent() {
-		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_STUDENT) {
+		if ($this->getId() == IAssessable::MARK_VISIBILITY_STUDENT) {
 			return true;
 		}
 
@@ -100,7 +101,7 @@ class Visibility {
 	 * @return bool
 	 */
 	public function isStaffStudentParent() {
-		if ($this->getId() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT) {
+		if ($this->getId() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
 			return true;
 		}
 

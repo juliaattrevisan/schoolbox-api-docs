@@ -2,6 +2,7 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -38,15 +39,15 @@ $submissionHandler = new Submission();
 // If student: allow student
 // If staff or superuser: allow private
 $visibilities = array(
-    AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT,
+    QuizAttemptMapper::MARK_VISIBILITY_PARENT_STUDENT,
 );
 $isStaff = false;
 if ($groupHandler->isStudent()) {
-    $visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_STUDENT;
 } elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $isStaff        = true;
-    $visibilities[] = AbstractAssessment::MARK_VISIBILITY_PRIVATE;
-    $visibilities[] = AbstractAssessment::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_PRIVATE;
+    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_STUDENT;
 }
 
 /* Instantiate for current date time

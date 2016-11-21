@@ -20,6 +20,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
@@ -168,7 +169,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT)
+            array(QuizAttempt::MARK_VISIBILITY_STUDENT, QuizAttempt::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -179,7 +180,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == QuizAttempt::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**

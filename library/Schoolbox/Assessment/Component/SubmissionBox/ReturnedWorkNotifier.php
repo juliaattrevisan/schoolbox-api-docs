@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
@@ -85,7 +86,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		/** @var SubmissionBox $box */
 		$box = $this->boxMapper->findById($mark->getSubmissionBox()->getId());
 
-		if($box->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PRIVATE) {
+		if($box->getMarkVisibility() == FolderMapper::MARK_VISIBILITY_PRIVATE) {
 			// don't. even. bother.
 			return;
 		}
@@ -111,7 +112,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @return bool
 	 */
 	protected function parentCanView($box) {
-		return $box->getMarkVisibility() >= AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT && !$this->conf->get('restrict_parent_duework_access');
+		return $box->getMarkVisibility() >= FolderMapper::MARK_VISIBILITY_PARENT_STUDENT && !$this->conf->get('restrict_parent_duework_access');
 	}
 
 	/* ----------------------------------------------------------------------------------------------------------
@@ -154,7 +155,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		$href = "/submission/submissionHistory/$boxId/$studentId";
 
 		// if student, 2nd-person language
-		if($target == 'student' && $box->getMarkVisibility() >= AbstractAssessment::MARK_VISIBILITY_STUDENT) {
+		if($target == 'student' && $box->getMarkVisibility() >= FolderMapper::MARK_VISIBILITY_STUDENT) {
 			$msg = new Message(":teacher has marked your work for :boxname in :catname", $icon, $href);
 
 			$params = array(

@@ -16,6 +16,7 @@ use Marksheet_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Mapper;
 use Schoolbox\User;
@@ -284,7 +285,7 @@ class Factory
 
             /* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
              */
-            if ($this->getSubmissionBox()->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PRIVATE
+            if ($this->getSubmissionBox()->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PRIVATE
                 || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()
             ) {
                 $returnedWork->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));

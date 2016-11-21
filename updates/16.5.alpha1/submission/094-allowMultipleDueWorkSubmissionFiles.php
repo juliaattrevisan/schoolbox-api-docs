@@ -11,6 +11,7 @@
  */
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
@@ -68,7 +69,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
       // Create assessment
       $updateSubmissionReturnQuery->execute([
-          'published' => AbstractAssessment::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
+          'published' => MapperException::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
           'updated'   => $returnCreatedAt,
           'id'        => intval($returnId),
       ]);

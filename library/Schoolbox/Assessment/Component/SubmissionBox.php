@@ -16,6 +16,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -205,7 +206,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT)
+            array(FolderModel::MARK_VISIBILITY_STUDENT, FolderModel::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -216,7 +217,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == FolderModel::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**
@@ -245,11 +246,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function getMarkVisibilityDescription() {
         switch($this->getMarkVisibility()) {
-            case AbstractAssessment::MARK_VISIBILITY_PRIVATE:
+            case FolderModel::MARK_VISIBILITY_PRIVATE:
                 return 'Staff Only';
-            case AbstractAssessment::MARK_VISIBILITY_STUDENT:
+            case FolderModel::MARK_VISIBILITY_STUDENT:
                 return 'Staff and Students';
-            case AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT:
+            case FolderModel::MARK_VISIBILITY_PARENT_STUDENT:
                 return 'Staff, Students and Parents';
         }
         return '';
