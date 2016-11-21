@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -31,6 +33,19 @@ class Task implements IAssessableDataModel
      * @var User
      */
     protected $owner;
+
+    /**
+     * @var GenericCollection
+     */
+    private $completions;
+
+    /**
+     * Task constructor.
+     */
+    public function __construct()
+    {
+        $this->completions = new GenericCollection(Completion::class);
+    }
 
 
     /**
