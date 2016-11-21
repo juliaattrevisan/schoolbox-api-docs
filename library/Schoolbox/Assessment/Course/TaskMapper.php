@@ -41,7 +41,8 @@ class TaskMapper extends Schoolbox\Mapper
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel');
         $this->joins('user_id', Schoolbox\UserMapper::class, 'id', null, null, 'owner');
 
-        $this->hasJoin('completion', array(
+        $this->hasJoin('completions', array(
+            'multiple'  => true,
             'mapper'    => Task\CompletionMapper::class,
             'this_key'  => 'id',
             'other_key' => 'task_id',

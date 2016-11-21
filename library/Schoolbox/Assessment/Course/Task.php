@@ -47,7 +47,6 @@ class Task implements IAssessableDataModel
         $this->completions = new GenericCollection(Completion::class);
     }
 
-
     /**
      * Clears any attempts from the clone, and clones each Section in the Quiz
      * @return void
@@ -114,5 +113,24 @@ class Task implements IAssessableDataModel
     public function getRequiresConfirmation()
     {
         return $this->requires_confirmation;
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getCompletions()
+    {
+        return $this->completions;
+    }
+
+    /**
+     * @param GenericCollection $completions
+     * @return static
+     */
+    public function setCompletions(GenericCollection $completions)
+    {
+        $this->completions->assertSameItemClass($completions);
+        $this->completions = $completions;
+        return $this;
     }
 }
