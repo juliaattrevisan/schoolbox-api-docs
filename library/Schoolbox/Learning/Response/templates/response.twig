@@ -32,7 +32,15 @@
             {% if response.allFiles %}
                 <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                     {% for currentFile in response.allFiles %}
-                        <li class="actions-small-1 {% if currentFile.hash == selectedFileHash %}selected{% endif %}">
+                        {% set selected = '' %}
+                        {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
+                        {% set hasSelectedFile = selectedFileHash|length or currentFile.hash == selectedFileHash %}
+
+                        {% if hasSelectedFile or defaultSelectedFile %}
+                            {% set selected = 'selected' %}
+                        {% endif %}
+
+                        <li class="actions-small-1 {{ selected }}">
                             <div class="list-item">
                                 <div class="card small-12 compact">
                                     <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
