@@ -115,7 +115,7 @@ Usages:
         {# Init stage 3 mage #}
         var initStage3 = function() {
 
-            var stageThree = $('input[data-mage-next="part-tasks-select"]');
+            var stageThree = $('input[data-mage-next="part-assessments-select"]');
 
             stageThree.mage({
                 confirmRevert: confirmRevert,
@@ -373,12 +373,12 @@ Usages:
                         </div>
                     </div>
                 </fieldset>
-                <fieldset class='content' data-mage="part-tasks-select">
+                <fieldset class='content' data-mage="part-assessments-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                        <input type="hidden" data-mage-next="none" name="part-tasks-select" value="1" />
+                        <input type="hidden" data-mage-next="none" name="part-assessments-select" value="1" />
                     </div>
                 </fieldset>
             </section>
