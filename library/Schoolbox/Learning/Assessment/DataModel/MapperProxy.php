@@ -349,8 +349,11 @@ class MapperProxy
         // but has created a response or feedback for.
         $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
-        return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            ),
+            $student
         );
     }
 
