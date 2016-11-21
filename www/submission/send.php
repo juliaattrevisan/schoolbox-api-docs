@@ -26,7 +26,6 @@ $size     = null;
 $mime     = null;
 
 $page     = new SitePage;
-$attach   = $_GET['save'] ? 'attachment;' : '';
 
 if (is_numeric($_GET['return'])) {
     $mapper = new ReturnedWorkMapper();
@@ -55,7 +54,6 @@ if (is_numeric($_GET['return'])) {
     $size     = $return->getSize();
     $filename = $return->getBasename();
     $mime     = $return->getMime();
-    $attach   = !$file->getMimetype()->getInline() ?: 'attach';
 } else {
     $mapper = new FileMapper();
 
@@ -107,7 +105,6 @@ if (is_numeric($_GET['return'])) {
 
     $mime = $file->getMime();
     $size = $file->getSize();
-    $attach = !$file->getMimetype()->getInline() ?: 'attach';
 
     // wrap HTML in niceness
     if ($studentSub->getMimetype()->matches('text/html')) {
@@ -123,6 +120,12 @@ if (is_numeric($_GET['return'])) {
             error(9, "the requested file could not be read.<br/>Please try again, and if the problem persists contact your system administrator.");
         }
     }
+}
+
+if (!$file->getMimetype()->getInline() || $_GET['save']) {
+    $attach = "attachment;";
+} else {
+    $attach = "";
 }
 
 //send headers (cache-control off stops IE8 from failing to download)
