@@ -36,9 +36,14 @@ if (is_numeric($_GET['delete'])) {
             error(5);
         }
 
-        $attach = $_GET['save'] ? 'attachment;' : '';
+        if (!$file->getStorage()->getMimetype()->getInline() || $_GET['save'])
+            $attach = "attachment;";
+        else
+            $attach = "";
 
         //send headers
+        header("Cache-control: private");
+        header("Content-Ranges: none");
         header("Content-Type: {$file->getStorage()->getMimetype()->getMime()}");
         header("Content-Disposition: $attach filename=\"" . $file->getStorage()->getBasename() . "\"");
         header("Content-Length: " . $file->getStorage()->getSize());

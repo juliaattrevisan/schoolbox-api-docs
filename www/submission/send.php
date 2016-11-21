@@ -26,7 +26,6 @@ $size     = null;
 $mime     = null;
 
 $page     = new SitePage;
-$attach   = $_GET['save'] ? 'attachment;' : '';
 
 if (is_numeric($_GET['return'])) {
     $mapper = new ReturnedWorkMapper();
@@ -55,7 +54,6 @@ if (is_numeric($_GET['return'])) {
     $size     = $return->getSize();
     $filename = $return->getBasename();
     $mime     = $return->getMime();
-
 } else {
     $mapper = new FileMapper();
 
@@ -124,9 +122,16 @@ if (is_numeric($_GET['return'])) {
     }
 }
 
+if (!$file->getMimetype()->getInline() || $_GET['save']) {
+    $attach = "attachment;";
+} else {
+    $attach = "";
+}
+
 //send headers (cache-control off stops IE8 from failing to download)
 header ("Pragma: ");
-header ("Cache-control: ");
+header ("Cache-control: private");
+header ("Content-Ranges: none");
 header ("Content-Type: $mime");
 header ("Content-Disposition: $attach filename=\"".$filename."\"");
 
