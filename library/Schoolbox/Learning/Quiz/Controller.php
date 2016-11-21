@@ -124,7 +124,7 @@ class Controller extends AbstractController
      */
     public function getQuizReviewHorizontal($assessmentId)
     {
-        $assessId = $this->getQuizIdForAssessmentId($assessmentId);
+        $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $this->getResponse()->redirect->to("/assess/reviewHorizontal/$assessId");
     }
 
