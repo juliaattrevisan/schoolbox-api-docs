@@ -207,6 +207,7 @@ class Controller extends Base
         $colourIndex = 0;
 
         $folderList = new Collection();
+        $classTypes = Array();
 
         /* Convert external subjects to folders */
         foreach($this->getUser()->getSubjectCollection() as $subject ) {
@@ -218,16 +219,16 @@ class Controller extends Base
                     $colourIndex = ($colourIndex + 1) % $colourList->count();
                 }
                 $folderList->add($folder);
+                $classTypes[$folder->getId()] = $subject['classType'];
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //not found
             }
         }
-
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser'    => $this->getUser(),
             'currentSemester'=> TermMapper::getInstance()->findForToday(),
             'classList'      => $folderList,
+            'classTypes'     => $classTypes
 
         ]));
     }
