@@ -424,13 +424,10 @@ class Controller extends Base\Base
         if('import' == $action) {
             $dto = $importFactory->buildForNewImport($unitImpls);
         } elseif('modify' == $action){
-            $dto = $importFactory->buildForImportModify($unitImpls);
+            $dto = $importFactory->buildForImportModify($courseImplId, $unitImpls);
         } else {
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
-
-
-
 
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
@@ -775,6 +772,27 @@ class Controller extends Base\Base
     public function importModify(CourseImplementation $courseImpl)
     {
         $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
+        $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
+
+        // Add un-imported UnitSpecs to CourseImpl
+        foreach($courseSpec->getUnits() as $unitSpec){
+            // Has this UnitSpec been imported?
+            foreach($courseImpl->getUnits() as $unitImpl){
+                if($unitImpl->getSpecification()->getId() == $unitSpec->getId()){
+                    // unitSpec already imported, do nothing
+                    continue 2;
+                }
+            }
+            // unitSpec not imported, add it to CourseImpl as available for import
+            $unitImpl = new UnitImplementation();
+            $unitImpl->setSpecification($unitSpec);
+            $unitImpl->setTitle($unitSpec->getFolder()->getName());
+            $courseImpl->getUnits()->add($unitImpl);
+        }
+
+        // Re-order UnitImpls alphabetically
+        $courseImpl->setUnits($courseImpl->getUnits()->sortBy('title', 'ASC'));
+
 
         // Find the owner of any Assessment so we can display, even though it is disabled
         $owner = null;
@@ -792,7 +810,6 @@ class Controller extends Base\Base
         if(!$owner) {
             $owner = $this->getUser();
         }
-
 
         $this->tpl('import', [
             'action'       => 'modify',
