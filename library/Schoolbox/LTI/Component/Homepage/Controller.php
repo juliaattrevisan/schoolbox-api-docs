@@ -82,13 +82,16 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'context_label' => $this->getContext()->getFolder()->getCodeString(),
                 'launch_presentation_locale' => 'en-AU',
                 'launch_presentation_document_target' => 'iframe',
-                'launch_presentation_width' => 320,
-                'launch_presentation_height' => 240,
-                'launch_presentation_return_url' => 'http://192.168.36.10/lti.php',
+                'launch_presentation_width' => 800,
+                'launch_presentation_height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
+                'launch_presentation_return_url' => urlencode('http://192.168.36.10/lti.php'),
                 'tool_consumer_instance_guid' => 'schoolbox.edu',
                 'tool_consumer_instance_name' => 'Schoolbox',
                 'tool_consumer_instance_description' => 'Schoolbox LMS',
                 'tool_consumer_instance_contact_email' => 'support@alaress.com.au',
+                'tool_consumer_info_product_family_code' => 'schoolbox',
+                'tool_consumer_info_version' => '16.5',
+                'ext_lms' => 'schoolbox-16.5'
             ];
 
             $consumer = new LTI\ToolConsumer($provider->getKey());
