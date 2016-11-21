@@ -412,6 +412,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function patchUpdateAssessment(IAssessable $assessment)
     {
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
 
