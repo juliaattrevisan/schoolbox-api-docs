@@ -114,7 +114,8 @@
 
     {% set unitSpec = unitImpl.specification %}
     {% set assessmentPairs = dto.getUnitSpecAssessments(unitSpec) %}
-    {% set unitAssessmentCount = assessmentPairs | length %}
+    {% set unitAssessmentCount = dto.getCountAssessments(unitSpec) %}
+    {% set unitAssessmentCountSelected = dto.getCountSelectedAssessments(unitSpec) %}
 
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_impl_id]" value="{{ unitImpl.id }}" />
@@ -128,7 +129,7 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
-                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ unitAssessmentCount }}"> selected</span>{% endif %}</p>
+                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ unitAssessmentCountSelected }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
                     <nav>

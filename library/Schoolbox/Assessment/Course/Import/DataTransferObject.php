@@ -23,7 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
  * 2. Pass around an object that stores the pair, but provides a consistent interface via methods
  *
  * This class is the manifestation of the latter approach
- *
+ * @todo - Ideally this class would have no setters(). The Factory would build required data and inject via constructor.
  */
 class DataTransferObject
 {
@@ -184,6 +184,31 @@ class DataTransferObject
     public function getUnitSpecAssessments(UnitSpecification $unitSpec)
     {
         return $this->unitSpecAssessments->getOffset($unitSpec->getId());
+    }
+
+    /**
+     * @param UnitSpecification $unitSpec
+     * @return int
+     */
+    public function getCountAssessments(UnitSpecification $unitSpec)
+    {
+        return count($this->unitSpecAssessments->getOffset($unitSpec->getId()));
+    }
+
+    /**
+     * @param UnitSpecification $unitSpec
+     * @return int
+     */
+    public function getCountSelectedAssessments(UnitSpecification $unitSpec)
+    {
+        $count = 0;
+        foreach($this->unitSpecAssessments->getOffset($unitSpec->getId()) as $pair){
+            /** @var AssessmentPair $pair */
+            if($pair->getImplementation() instanceof IAssessable){
+                $count++;
+            }
+        }
+        return $count;
     }
 
     /**
