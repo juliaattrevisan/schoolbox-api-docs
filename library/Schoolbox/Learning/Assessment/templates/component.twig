@@ -1,5 +1,12 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{% set createRoute -%}
+    {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
+{%- endset %}
+{% if createRoute and assessmentType  %}
+    {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
+{% endif %}
+
 {% if assessables is empty %}
 
 <div class="empty-state">
@@ -7,12 +14,12 @@
     <p>No {{ typeLabel | lower }}, yet!</p>
     {% if user.role.isStudent %}
         <p>
-            <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}" class="button">View your grades</a>
+            <a href="/submission/allWork/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>
         </p>
     {% endif %}
     {% if createRoute %}
         <p>
-            <a href="{{ createRoute }}" class="button">Create {{ typeLabel }}</a>
+            <a href="{{ createRouteType }}">Create {{ typeLabel }}</a>
         </p>
     {% endif %}
 </div>
@@ -20,13 +27,6 @@
 {% else %}
 
 <section>
-    {% set createRoute -%}
-        {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
-    {%- endset %}
-    {% if createRoute and assessmentType  %}
-        {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
-    {% endif %}
-
     <ul class="action-list">
         {% for assessable in assessables %}
 
