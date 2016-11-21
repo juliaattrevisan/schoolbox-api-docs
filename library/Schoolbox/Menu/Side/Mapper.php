@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
         }
 
         $query = "
-                SELECT DISTINCT menu_side.*
+                SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_side
                 INNER JOIN menu_side_campus ON menu_side.id = menu_side_campus.menu_side_id
                 INNER JOIN menu_side_role ON menu_side.id = menu_side_role.menu_side_id
