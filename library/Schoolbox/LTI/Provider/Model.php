@@ -79,7 +79,6 @@ class Model implements ISoftDeletable
         return $this->key;
     }
 
-
     /** @var string */
     protected $secret;
 
@@ -141,5 +140,26 @@ class Model implements ISoftDeletable
     public function getXml()
     {
         return $this->xml;
-    }    
+    }
+
+    /** @var string */
+    protected $icon;
+
+    /**
+     * @param string $icon
+     * @return self
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
 }

@@ -45,6 +45,11 @@ class Admin implements ModuleConfigInterface
         $lists = new \Schoolbox\Admin\Lists\Module($di);
         $lists->init('/adminv2/lists');
 
+        // LTI
+
+        $lti = new \Schoolbox\Admin\LTI\Module($di);
+        $lti->init('/adminv2/lti');
+
         // Admin cleanup page
 
         $clean = new \Schoolbox\Admin\Clean\Module($di);

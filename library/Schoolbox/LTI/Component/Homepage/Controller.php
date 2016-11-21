@@ -61,7 +61,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $provider = $this->providerMapper->findById($this->getConfig('ltiprovider'));
 
             $params = [
-                'resource_link_id' => $this->getInstance()->getId(),
+                'resource_link_id' => $this->getContext()->getFolder()->getId() . "_" . $this->getInstance()->getId(),
                 'resource_link_title' => $this->getConfig('componentname'),
                 'resource_link_description' => '',
                 'user_id' => $this->getUser()->getId(),

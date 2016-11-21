@@ -1,0 +1,41 @@
+{% if provider.getId() %}
+    {% set saveValue = 'Update Provider' %}
+    {% set saveType  = 'update' %}
+{% else %}
+    {% set saveValue = 'Create Provider' %}
+    {% set saveType  = 'create' %}
+{% endif %}
+
+<form method="post" action="{{ routeLookup('adminLti.postModify') }}" class="row" data-term-form="{{ saveType }}">
+    <input type="hidden" name="id" value="{{ provider.id }}">
+    <div data-mage-wrapper>
+        <div class="small-6 columns">
+            <label>
+                Provider Name
+                <input required type="text" name="name" value="{{ provider.name }}">
+            </label>
+        </div>
+        <div class="small-6 columns">
+            <label>
+                Configuration XML URL
+                <input required type="text" name="xml" value="{{ provider.xml }}">
+            </label>
+        </div>
+        <div class="small-6 columns">
+            <label>
+                Consumer Key (Optional)
+                <input type="text" name="key" value="{{ provider.key }}">
+            </label>
+        </div>
+        <div class="small-6 columns">
+            <label>
+                Consumer Secret (Optional)
+                <input type="text" name="secret" value="{{ provider.secret }}">
+            </label>
+        </div>
+        <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
+        <!-- Don't delete the inline style, it's needed -->
+        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+        <p data-mage-custom-error class="hide alert alert-box icon-alert"></p>
+    </div>
+</form>
