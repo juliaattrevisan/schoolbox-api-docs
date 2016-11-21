@@ -3,6 +3,17 @@
  # Originally:
  # This lets you spawn a Course Selector modal, whose
  # onCourseSelect() callback deals with selection
+ #
+ # Usage:
+    {% include 'sub/selectorShard.twig' with {
+            'formLabel':      string,
+            'formInputName':  string,
+            'formInputValue': mixed,
+            'formInputLabel': string,
+            'activator':      string,
+            'title':          string
+        } only
+    %}
  #}
 
 {# Manufacture form label
