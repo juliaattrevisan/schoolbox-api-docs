@@ -180,7 +180,7 @@ class Module extends BaseModule
     protected function preloadAssessment(array $params, User $student = null)
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e){
             $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
@@ -191,10 +191,6 @@ class Module extends BaseModule
 
         // set the controller
         $this->setControllerFromAssessment($assessment);
-
-        /* Load participant's Responses and Feedbacks
-         */
-        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment, $student);
 
         return [
             'assessment' => $assessment
