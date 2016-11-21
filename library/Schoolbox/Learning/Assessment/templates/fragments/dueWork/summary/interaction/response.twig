@@ -23,10 +23,6 @@
         </li>
     </ul>
 
-    <article>
-        {{ currentInteraction.onlineSubmissionContent|purify }}
-    </article>
-
     {% if currentInteraction.allFiles %}
     <ul class="information-list">
         {% for currentFile in currentInteraction.allFiles %}
