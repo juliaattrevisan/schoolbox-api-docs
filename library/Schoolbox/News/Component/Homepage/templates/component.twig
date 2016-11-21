@@ -61,12 +61,13 @@
             {% endif %}
 
         </ul>
-
-        <div class="content">
-            <a href="/homepage/newsArchive/{{ code }}" class="button icon-archive">View Archive</a>
-            {% if modify %}
-                <a href="/news/homepage/new/{{ code }}" class="button icon-upload">Post News</a>
-            {% endif %}
+        <div class="component-action">
+            <section>
+                <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
+                {% if modify %}
+                    <a href="/news/homepage/new/{{ code }}" class="button">Post News</a>
+                {% endif %}
+            </section>
         </div>
 
     </section>
