@@ -248,7 +248,7 @@ class Factory
             );
 
         } else {
-            throw new \DomainException('select a valid assessment type');
+            throw new \DomainException('Select a valid assessment type');
         }
 
         /* Check required data
@@ -266,7 +266,7 @@ class Factory
             try {
                 $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a publish date');
+                throw new \InvalidArgumentException('Set a publish date');
             }
 
             // Projects and tasks have only publish and due date
@@ -276,14 +276,14 @@ class Factory
                 try {
                     $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
                 } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('set a open date');
+                    throw new \InvalidArgumentException('Set an open date');
                 }
             }
 
             try {
                 $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a due date');
+                throw new \InvalidArgumentException('Set a due date');
             }
 
             if($assessment instanceof Task || $assessment instanceof Project) {
@@ -292,7 +292,7 @@ class Factory
                 try {
                     $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
                 } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('set a close date');
+                    throw new \InvalidArgumentException('Set a close date');
                 }
             }
         }
@@ -322,6 +322,11 @@ class Factory
         /* Decorate with Assessable-specific data
          */
         $decorator->decorate($assessment);
+
+        /** Last minute check all the dates are valid after everything has been configured */
+        if(!$assessment->isValidDates()) {
+            throw new \InvalidArgumentException('The dates are not valid');
+        }
 
         return $assessment;
     }

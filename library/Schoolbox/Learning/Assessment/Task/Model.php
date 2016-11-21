@@ -152,6 +152,21 @@ class Model extends AbstractAssessment
         return $this;
     }
 
+    /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+            if ( $this->getPublishAt()->gt($this->getDueAt())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /* Getters/Setters
      */
 
@@ -213,7 +228,7 @@ class Model extends AbstractAssessment
      * @param \Alaress_Date_Format $openAt
      * @return static
      */
-    public function setOpenAt($openAt)
+    public function setOpenAt(\Alaress_Date_Format $openAt)
     {
         //noop
         return $this;
@@ -231,7 +246,7 @@ class Model extends AbstractAssessment
      * @param \Alaress_Date_Format $closeAt
      * @return static
      */
-    public function setCloseAt($closeAt)
+    public function setCloseAt(\Alaress_Date_Format  $closeAt)
     {
         // noop
         return $this;

@@ -478,79 +478,6 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numPublished() / $numParticipants);
     }
 
-    /* Validations
-     */
-
-    /**
-     * Check that all four dates are set validly
-     *
-     * @return bool
-     */
-    public function isValidDates()
-    {
-        /* Null dates are invalid
-         * Each date must be provided
-         */
-        if (!($this->getPublishAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
-            return false;
-        }
-
-        if (!($this->getOpenAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
-            return false;
-        }
-
-        if (!($this->getDueAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
-            return false;
-        }
-
-        if (!($this->getCloseAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
-            return false;
-        }
-
-        /* Check publish date against everything else
-         */
-        if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
-            return false;
-        }
-
-        /* Check open date against everything else
-         */
-        if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
-            return false;
-        }
-
-        /* Check due date against everything else
-         */
-        if ($this->getDueAt()->gt($this->getCloseAt())) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Is feedback on this assessment visible to $viewingUser?
-     *
-     * @param User $viewingUser
-     * @return bool
-     */
-    public function isFeedbackVisibleToUser(User $viewingUser)
-    {
-        $role = $viewingUser->getRole();
-
-        switch ($this->getMarkVisibility()) {
-            case self::MARK_VISIBILITY_PARENT_STUDENT:
-                return $role->isStaff() || $role->isStudent() || $role->isParent();
-
-            case self::MARK_VISIBILITY_STUDENT:
-                return $role->isStaff() || $role->isStudent();
-
-            case self::MARK_VISIBILITY_PRIVATE:
-            default:
-                return $role->isStaff();
-        }
-    }
-
     /* Getters/Setters
      */
 
@@ -602,7 +529,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param \Alaress_Date_Format $publishAt
      * @return $this
      */
-    public function setPublishAt($publishAt)
+    public function setPublishAt(\Alaress_Date_Format $publishAt)
     {
         $this->publishAt = $publishAt;
         return $this;
@@ -620,7 +547,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param \Alaress_Date_Format $openAt
      * @return $this
      */
-    public function setOpenAt($openAt)
+    public function setOpenAt(\Alaress_Date_Format $openAt)
     {
         $this->openAt = $openAt;
         return $this;
@@ -638,7 +565,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param \Alaress_Date_Format $dueAt
      * @return $this
      */
-    public function setDueAt($dueAt)
+    public function setDueAt(\Alaress_Date_Format $dueAt)
     {
         $this->dueAt = $dueAt;
         return $this;
@@ -656,7 +583,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param \Alaress_Date_Format $closeAt
      * @return $this
      */
-    public function setCloseAt($closeAt)
+    public function setCloseAt(\Alaress_Date_Format $closeAt)
     {
         $this->closeAt = $closeAt;
         return $this;

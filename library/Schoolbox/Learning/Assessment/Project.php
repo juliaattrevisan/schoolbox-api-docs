@@ -175,6 +175,21 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+            if ( $this->getPublishAt()->gt($this->getDueAt())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @inheritdoc
      *
      * @return string

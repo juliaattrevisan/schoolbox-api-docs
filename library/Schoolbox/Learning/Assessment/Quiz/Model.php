@@ -122,6 +122,35 @@ class Model extends AbstractAssessment
         return [];
     }
 
+    /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Check publish date against everything else
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+
+            if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+
+            /* Check open date against everything else
+             */
+            if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+
+            /* Check due date against everything else
+             */
+            if ($this->getDueAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /* Getters/Setters
      */
 
