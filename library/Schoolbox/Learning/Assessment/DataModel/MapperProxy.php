@@ -290,6 +290,9 @@ class MapperProxy
     /**
      * Finds all assessables that are part of the given project.
      *
+     * This method does not load participants - see `$this->findAllByProjectIdForReview`
+     * for a version which does.
+     *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
      * @return Collection|IAssessable[]
@@ -299,6 +302,21 @@ class MapperProxy
         $params                     = $this->convertOptionsToColumnList($options);
         $params['pa.assessment_id'] = $projectId;
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+    }
+
+    /**
+     * Finds all assessables that are part of the given project, along with
+     * all participation.
+     *
+     * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
+     * @param User  $student If provided, load only this student's participation
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByProjectIdForReview($projectId, User $student = null, $options = [])
+    {
+        $assessments = $this->findAllByProjectId($projectId, $options);
+        return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
     }
 
     /**
