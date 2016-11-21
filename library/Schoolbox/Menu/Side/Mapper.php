@@ -36,8 +36,6 @@ class Mapper extends BaseMapper
      */
     public function findNodesForUser($user)
     {
-        $service = HOMEPAGE_SERVICE;
-
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
