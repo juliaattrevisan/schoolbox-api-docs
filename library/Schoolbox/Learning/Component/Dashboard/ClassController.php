@@ -28,6 +28,12 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     protected $classList;
 
     /**
+     * @var Array
+     */
+
+    protected $classTypes;
+
+    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
@@ -55,6 +61,8 @@ class ClassController extends Component_Dashboard_ControllerAbstract
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
 
+        $classTypes = Array();
+
         /* Convert external subjects to folders */
         foreach($this->getUser()->getSubjectCollection() as $subject ) {
             try {
@@ -65,11 +73,12 @@ class ClassController extends Component_Dashboard_ControllerAbstract
                     $colourIndex = ($colourIndex + 1) % $colourList->count();
                 }
                 $this->getClassList()->add($folder);
+                $classTypes[$folder->getId()] = $subject['classType'];
             } catch (MapperException $e) {
                 //not found
             }
         }
-
+        $this->setClassTypes($classTypes);
         return true;
     }
 
@@ -90,6 +99,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
                     'currentUser'         => $this->getUser(),
                     'currentSemester'     => TermMapper::getInstance()->findForToday(),
                     'classList'           => $this->getClassList(),
+                    'classTypes'          => $this->getClassTypes()
                 ]
             );
 
@@ -107,6 +117,14 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
+     * @return Array
+     */
+    public function getClassTypes()
+    {
+        return $this->classTypes;
+    }
+
+    /**
      * @param Collection $classList
      */
     public function setClassList(Collection $classList)
@@ -114,5 +132,12 @@ class ClassController extends Component_Dashboard_ControllerAbstract
         $this->classList = $classList;
     }
 
+    /**
+     * @param Array $classTypes
+     */
+    public function setClassTypes($classTypes)
+    {
+        $this->classTypes = $classTypes;
+    }
 
 }
