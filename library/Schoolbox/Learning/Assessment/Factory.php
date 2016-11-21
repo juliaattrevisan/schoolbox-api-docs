@@ -312,6 +312,7 @@ class Factory
             ->setDescription($this->getDescription())
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
+            ->setMarkVisibility($this->getMarkVisibility())
             ->setPublishAt($publishAt)
             ->setOpenAt($openAt)
             ->setDueAt($dueAt)

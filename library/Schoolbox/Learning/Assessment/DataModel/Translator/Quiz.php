@@ -33,6 +33,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setStart($assessment->getOpenAt())
                 ->setFinish($assessment->getDueAt())
                 ->setWeight($assessment->getWeight())
+                ->setMarkVisibility($assessment->getMarkVisibility())
                 ->setAnonymousResult(false)
                 ->setUser($assessment->getCreator())
                 ->setCompletionMessage($assessment->getCompletionMessage())

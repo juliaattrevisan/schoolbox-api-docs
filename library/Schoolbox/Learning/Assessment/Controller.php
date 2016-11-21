@@ -271,6 +271,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'          => $context->getFolder(),
             'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
             'assessmentType'  => AssessmentType::objectToString($assessment),
+            'visibility'      => $assessment->getMarkVisibility(),
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
