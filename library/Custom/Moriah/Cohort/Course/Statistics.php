@@ -111,7 +111,7 @@ class Statistics
         // SB-12505 - only items visible to parents are visible
         $quizVisibilities = array_diff(
             $quizVisibilities,
-            [Folder::MARK_VISIBILITY_PRIVATE, Folder::MARK_VISIBILITY_STUDENT,]
+            [IAssessable::MARK_VISIBILITY_PRIVATE, IAssessable::MARK_VISIBILITY_STUDENT,]
         );
 
         // Get any classes which use this course.

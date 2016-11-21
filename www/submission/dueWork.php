@@ -39,15 +39,15 @@ $submissionHandler = new Submission();
 // If student: allow student
 // If staff or superuser: allow private
 $visibilities = array(
-    QuizAttemptMapper::MARK_VISIBILITY_PARENT_STUDENT,
+    IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
 );
 $isStaff = false;
 if ($groupHandler->isStudent()) {
-    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
 } elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $isStaff        = true;
-    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_PRIVATE;
-    $visibilities[] = QuizAttemptMapper::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = IAssessable::MARK_VISIBILITY_PRIVATE;
+    $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
 }
 
 /* Instantiate for current date time

@@ -69,7 +69,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
       // Create assessment
       $updateSubmissionReturnQuery->execute([
-          'published' => MapperException::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
+          'published' => IAssessable::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
           'updated'   => $returnCreatedAt,
           'id'        => intval($returnId),
       ]);

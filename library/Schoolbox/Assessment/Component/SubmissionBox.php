@@ -206,7 +206,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(FolderModel::MARK_VISIBILITY_STUDENT, FolderModel::MARK_VISIBILITY_PARENT_STUDENT)
+            array(IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -217,7 +217,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == FolderModel::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**
@@ -246,11 +246,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function getMarkVisibilityDescription() {
         switch($this->getMarkVisibility()) {
-            case FolderModel::MARK_VISIBILITY_PRIVATE:
+            case IAssessable::MARK_VISIBILITY_PRIVATE:
                 return 'Staff Only';
-            case FolderModel::MARK_VISIBILITY_STUDENT:
+            case IAssessable::MARK_VISIBILITY_STUDENT:
                 return 'Staff and Students';
-            case FolderModel::MARK_VISIBILITY_PARENT_STUDENT:
+            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
                 return 'Staff, Students and Parents';
         }
         return '';

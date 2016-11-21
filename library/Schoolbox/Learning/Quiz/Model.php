@@ -169,7 +169,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     {
         return in_array(
             $this->getMarkVisibility(),
-            array(QuizAttempt::MARK_VISIBILITY_STUDENT, QuizAttempt::MARK_VISIBILITY_PARENT_STUDENT)
+            array(IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
         );
     }
 
@@ -180,7 +180,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == QuizAttempt::MARK_VISIBILITY_PARENT_STUDENT;
+        return $this->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
     /**

@@ -187,13 +187,13 @@ else {
 
 	// Visibility copypaste
 	switch ($assess['mark_visibility']) {
-		case FolderMapper::MARK_VISIBILITY_PRIVATE:
+		case IAssessable::MARK_VISIBILITY_PRIVATE:
 			$this->parse('visible_staff_block', 'visible_staff');
 			break;
-		case FolderMapper::MARK_VISIBILITY_STUDENT:
+		case IAssessable::MARK_VISIBILITY_STUDENT:
 			$this->parse('visible_staff_students_block', 'visible_staff_students');
 			break;
-		case FolderMapper::MARK_VISIBILITY_PARENT_STUDENT:
+		case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
 			$this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
 			break;
 	}
