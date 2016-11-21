@@ -61,6 +61,8 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         if ($eventRenderer->getAllEvents()->count() == 0) {
 
+            // No events, show empty state
+
             $this->setBlock($templateHandle, 'event_list', 'event_list_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
@@ -77,11 +79,15 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         } else {
 
-            //event output
-            $this->setBlock($templateHandle, 'event_day', 'event_day_block');
+            // List events
+
             $this->setBlock($templateHandle, 'event_list', 'event_list_block');
+            $this->setBlock('event_list', 'event_day', 'event_day_block');
             $this->setBlock('event_day', 'group_events', 'group_events_block');
-            $this->setBlock($templateHandle, 'import_events', 'import_events_block');
+            $this->setBlock('event_list', 'import_events', 'import_events_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('empty_state_block', '');
 
             $this->setVar(
                 array(
@@ -101,32 +107,32 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     break;
                 }
 
-                //
                 // Current day: will never be before the start time
+
                 $currentDay = $currentEvent->getStartTime();
+
                 if ($this->start->compare($currentDay) > 0) {
                     $currentDay = $this->start;
                 }
+
                 if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
                     $this->parse('event_day_block', 'event_day', true);
                     $this->setVar('group_events_block', '');
                 }
 
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
-
                 $this->setVar('group_events', $eventRenderer->renderEvent($currentEvent, 'html'));
-
                 $this->parse('group_events_block', 'group_events', true);
 
                 $prevDay = $currentDay;
             }
 
-
             $this->parse('event_day_block', 'event_day', true);
 
+            $this->parse('event_list_block', 'event_list', true);
 
             //setup block for submission button
-            $this->setBlock($templateHandle, "submit_event", "submit_event_block");
+            $this->setBlock("event_list", "submit_event", "submit_event_block");
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar(array(
                     'submit_event_block' => '',
