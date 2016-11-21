@@ -777,16 +777,22 @@ class Controller extends Base\Base
         $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
 
         // Find the owner of any Assessment so we can display, even though it is disabled
+        $owner = null;
         try{
-            /** @var UnitImplementation $firstUnitImpl */
-            $firstUnitImpl = $courseImpl->getUnits()->first();
-            $assessables = $this->getAssessmentMapperProxy()->findAllForUnitImplementationId($firstUnitImpl->getId());
-            /** @var IAssessable $firstAssessable */
-            $firstAssessable = $assessables->first();
-            $owner = $this->getUserMapper()->findById($firstAssessable->getCreator()->getId());
+            foreach($courseImpl->getUnits() as $unitImpl){
+                $assessables = $this->getAssessmentMapperProxy()->findAllForUnitImplementationId($unitImpl->getId());
+                foreach($assessables as $assessable){
+                    $owner = $this->getUserMapper()->findById($assessable->getCreator()->getId());
+                    break 2;
+                }
+            }
         } catch (MapperException $e){
+            // noop
+        }
+        if(!$owner) {
             $owner = $this->getUser();
         }
+
 
         $this->tpl('import', [
             'action'       => 'modify',
