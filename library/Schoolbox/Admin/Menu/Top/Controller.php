@@ -26,6 +26,25 @@ use Schoolbox\RoleMapper;
  */
 class Controller extends Base
 {
+
+    /** @var MenuIconMapper $menuIconMapper */
+    private $menuIconMapper;
+
+    /** @var MenuTopMapper $menuTopMapper */
+    private $menuTopMapper;
+
+    /** @var MenuTopCampusMapper $menuTopCampusMapper */
+    private $menuTopCampusMapper;
+
+    /** @var MenuTopRoleMapper $menuTopRoleMapper */
+    private $menuTopRoleMapper;
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+    /** @var CampusMapper $campusMapper */
+    private $campusMapper;
+
     public function __construct()
     {
         $this->setMenuIconMapper(MenuIconMapper::getInstance());
@@ -102,7 +121,7 @@ class Controller extends Base
 
     /**
      * Display create screen
-     *
+     *W
      * @api   GET /adminv2/insert
      * @level 165
      *
@@ -246,9 +265,6 @@ class Controller extends Base
 
     /** Here be mappers and stuff */
 
-    /** @var MenuIconMapper $menuIconMapper */
-    private $menuIconMapper;
-
     /**
      * @return MenuIconMapper
      */
@@ -267,9 +283,6 @@ class Controller extends Base
 
     // Top menu mapper
 
-    /** @var MenuTopMapper $menuTopMapper */
-    private $menuTopMapper;
-
     /**
      * @return MenuTopMapper
      */
@@ -285,9 +298,6 @@ class Controller extends Base
         $this->menuTopMapper = $mapper;
         return $this;
     }
-
-    /** @var MenuTopCampusMapper $menuTopCampusMapper */
-    private $menuTopCampusMapper;
 
     /**
      * @return MenuTopCampusMapper
@@ -305,9 +315,6 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var MenuTopRoleMapper $menuTopRoleMapper */
-    private $menuTopRoleMapper;
-
     /**
      * @return MenuTopRoleMapper
      */
@@ -324,9 +331,6 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
-
     /**
      * @return RoleMapper
      */
@@ -342,9 +346,6 @@ class Controller extends Base
         $this->roleMapper = $mapper;
         return $this;
     }
-
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
 
     /**
      * @return CampusMapper

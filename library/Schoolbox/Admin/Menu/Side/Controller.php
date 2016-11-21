@@ -28,6 +28,25 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
+
+    /** @var MenuSideMapper $menuSideMapper */
+    private $menuSideMapper;
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+    /** @var CampusMapper $campusMapper */
+    private $campusMapper;
+
+    /** @var MenuSideCampusMapper $menuSideCampusMapper */
+    private $menuSideCampusMapper;
+
+    /** @var MenuSideRoleMapper $menuSideRoleMapper */
+    private $menuSideRoleMapper;
+
+    /** @var MenuSideSectionMapper $menuSideSectionMapper */
+    private $menuSideSectionMapper;
+
     /**
      * Controller constructor.
      */
@@ -382,9 +401,6 @@ class Controller extends Base
 
     /** Here be mappers and stuff */
 
-    /** @var MenuSideMapper $menuSideMapper */
-    private $menuSideMapper;
-
     /**
      * @return MenuSideMapper
      */
@@ -400,9 +416,6 @@ class Controller extends Base
         $this->menuSideMapper = $mapper;
         return $this;
     }
-
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
 
     /**
      * @return RoleMapper
@@ -420,9 +433,6 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
-
     /**
      * @return CampusMapper
      */
@@ -438,9 +448,6 @@ class Controller extends Base
         $this->campusMapper = $mapper;
         return $this;
     }
-
-    /** @var MenuSideCampusMapper $menuSideCampusMapper */
-    private $menuSideCampusMapper;
 
     /**
      * @return MenuSideCampusMapper
@@ -458,9 +465,6 @@ class Controller extends Base
         return $this;
     }
 
-    /** @var MenuSideRoleMapper $menuSideRoleMapper */
-    private $menuSideRoleMapper;
-
     /**
      * @return MenuSideRoleMapper
      */
@@ -476,9 +480,6 @@ class Controller extends Base
         $this->menuSideRoleMapper = $mapper;
         return $this;
     }
-
-    /** @var MenuSideSectionMapper $menuSideSectionMapper */
-    private $menuSideSectionMapper;
 
     /**
      * @return MenuSideSectionMapper
