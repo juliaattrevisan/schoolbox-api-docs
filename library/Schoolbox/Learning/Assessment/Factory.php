@@ -244,8 +244,7 @@ class Factory
             $decorator = new QuizDecorator(
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
-                $this->getMaxAttempts(),
-                $this->getMarkVisibility()
+                $this->getMaxAttempts()
             );
 
         } else {
