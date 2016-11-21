@@ -28,8 +28,6 @@ class Task implements IAssessmentTypeTranslator
             // task currently has its own ID, but that will be handled in the mapper proxy
             $model = new TaskModel();
             $model
-                ->setTitle($assessment->getTitle())
-                ->setOrder(0)
                 ->setOwner($assessment->getCreator())
                 ->setLink($assessment->getUrl())
                 ->setRequiresConfirmation($assessment->isTeacherAssessed())
