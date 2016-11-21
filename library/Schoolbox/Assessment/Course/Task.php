@@ -65,6 +65,20 @@ class Task implements ISoftDeletable, IAssessableDataModel
      */
     protected $deleted;
 
+
+    /**
+     * Clears any attempts from the clone, and clones each Section in the Quiz
+     * @return void
+     */
+    function __clone()
+    {
+        // Mark this object as a clone
+        $this->id = null;
+    }
+
+    /* Getters / Setters
+     */
+
     /**
      * @param  \Schoolbox\Resource\Folder\Model $category
      * @return $this
