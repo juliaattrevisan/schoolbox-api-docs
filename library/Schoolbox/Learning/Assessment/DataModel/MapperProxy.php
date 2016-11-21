@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -52,17 +53,27 @@ class MapperProxy
     protected $translator;
 
     /**
+     * Data source for participants in assessments.
+     *
+     * @var ParticipantDataSource
+     */
+    protected $particpantDataSource;
+
+    /**
      * Constructor
      *
-     * @param Mapper                 $baseMapper
-     * @param Translator             $translator
+     * @param Mapper                $baseMapper
+     * @param Translator            $translator
+     * @param ParticipantDataSource $participantDataSource
      */
     public function __construct(
         Mapper $baseMapper,
-        Translator $translator
+        Translator $translator,
+        ParticipantDataSource $participantDataSource
     ) {
-        $this->baseMapper   = $baseMapper;
-        $this->translator   = $translator;
+        $this->baseMapper            = $baseMapper;
+        $this->translator            = $translator;
+        $this->participantDataSource = $participantDataSource;
     }
 
     /**
