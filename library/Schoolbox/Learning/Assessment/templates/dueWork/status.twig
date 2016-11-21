@@ -79,30 +79,17 @@
         var filters        = $('#filters');
         var tt;
 
+        // setup pre-values
+        assessmentList.find(':input').each(function () {
+            // stash the current state, so we can compare on blur and prevent unnecessary firing
+            $(this).data('preval', $(this).val());
+        });
+
         $('[data-combobox]').combobox({{ errors | json_encode | raw }});
 
         assessmentList
-            .on('change keydown paste keypress', 'textarea', function () {
-                var input = this;
-                window.clearTimeout(tt);
-
-                tt = window.setTimeout(function () {
-                    doASaveActionNao.apply(input);
-                }, 600);
-
-                if ($(this).val() == $(this).data('preval')) {
-                    return;
-                }
-
-                var $form = $(this).closest('form');
-                $form.find('[data-interaction-draft]').slideDown();
-
-            })
-            .on('focus', ':input', function () {
-                // stash the current state, so we can compare on blur and prevent unnecessary firing
-                $(this).data('preval', $(this).val());
-
-            })
+            .on('keydown paste keypress', 'textarea', timeoutUpdate)
+            .on('change', ':input', timeoutUpdate)
             .on('blur', ':input', doASaveActionNao);
 
 
@@ -112,7 +99,7 @@
                 return;
             }
 
-            // clear the pre-val
+            // update the pre-value
             $(this).data('preval', $(this).val());
 
             var $form = $(this).closest('form');
@@ -149,6 +136,22 @@
                 .always(function () {
                     $form.find('[data-draft=publish]').removeAttr("disabled");
                 });
+        }
+
+        function timeoutUpdate() {
+            var input = this;
+            window.clearTimeout(tt);
+
+            tt = window.setTimeout(function () {
+                doASaveActionNao.apply(input);
+            }, 600);
+
+            if ($(this).val() == $(this).data('preval')) {
+                return;
+            }
+
+            var $form = $(this).closest('form');
+            $form.find('[data-interaction-draft]').slideDown();
         }
 
         function toast(text, success) {
