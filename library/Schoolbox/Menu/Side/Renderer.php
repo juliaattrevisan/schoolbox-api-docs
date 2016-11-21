@@ -86,6 +86,7 @@ class Renderer
 
         $subjects = [];
 
+        // TODO eradicate this session dependency
         if (is_array($_SESSION["subjects"])) {
             foreach ($_SESSION["subjects"] as $subject) {
                 if (!isset($subjects[$subject['classType']])) {
@@ -110,7 +111,7 @@ class Renderer
             }
         }
 
-        $nodes = $this->menuSideMapper->findNodesForUser($_SESSION["user"]);
+        $nodes = $this->menuSideMapper->findNodesForUser($user);
 
         // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
 
@@ -147,6 +148,7 @@ class Renderer
             'groups' => $this->getMenuSideMapper()->findGroupsForUser($user),
             'bookmarks' => $this->getBookmarkMapper()->findByColumn('owner', $user->getId()),
             'siteTitle' => $this->configLoader->get('title'),
+            // TODO eradicate this session dependency
             'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
         ));
     }
