@@ -10,11 +10,14 @@
             targetElements: $('[name=description]')
         });
 
-        $('#open').hide();
-        $('#close').hide();
-
-        $('#acceptOnline').change(function () {
-            if (this.value < 1) {
+        /**
+         * Decide which date fields to show, depending on
+         * Accept Online Submissions value
+         *
+         * @param element
+         */
+        function toggleDates(element) {
+            if ($(element).val() < 1) {
                 $('#open').hide();
                 $('#close').hide();
             }
@@ -22,6 +25,16 @@
                 $('#open').show();
                 $('#close').show();
             }
+        }
+
+        /* Initial state
+         */
+        toggleDates($('#acceptOnline'));
+
+        /* Update upon change
+         */
+        $('#acceptOnline').change(function() {
+            toggleDates($(this));
         });
     });
 </script>
