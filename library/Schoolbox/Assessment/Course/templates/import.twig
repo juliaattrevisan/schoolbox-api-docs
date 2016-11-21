@@ -64,49 +64,56 @@ Usages:
             value: {{ destinations|json_encode|raw }}
         });
 
-
-        {# Init stage 1 mage #}
-        var stageOne = $('input[data-mage-next="part-ownership"]');
-        stageOne.bind('validate', function()
-        {
-            {# Stage 1 validation #}
-            if ($('#course_spec_id').val())
-            {
-                if ($('#import_folders').val())
-                {
-                    {# Everything okay #}
-                    return {'result': true};
+        var initStage1 = function() {
+            {# Init stage 1 mage #}
+            var stageOne = $('input[data-mage-next="part-ownership"]');
+            stageOne.bind('validate', function () {
+                {# Stage 1 validation #}
+                if ($('#course_spec_id').val()) {
+                    if ($('#import_folders').val()) {
+                        {# Everything okay #}
+                        return {'result': true};
+                    }
+                    else {
+                        {# Class was missing #}
+                        return {
+                            'result': false,
+                            'message': 'You must specify at least one class before you can proceed.'
+                        };
+                    }
                 }
-                else
-                {
-                    {# Class was missing #}
+                else {
+                    {# Course was missing #}
                     return {
                         'result': false,
-                        'message': 'You must specify at least one class before you can proceed.'
+                        'message': 'You must select a course to import before you can proceed.'
                     };
                 }
-            }
-            else
-            {
-                {# Course was missing #}
-                return {
-                    'result': false,
-                    'message': 'You must select a course to import before you can proceed.'
-                };
-            }
-        });
+            });
 
-        stageOne.mage({onXhrDone: function (data) {
-            $('#ownership_assignment').html(data);
-        }});
-
-        var stageTwo = $('input[data-mage-next="part-unit-select"]');
+            stageOne.mage({
+                onXhrDone: function (data) {
+                    $('#ownership_assignment').html(data);
+                    initStage2();
+                }
+            });
+        };
 
 
-        stageTwo.mage({onXhrDone: function (data) {
-            $('#import_units').html(data);
+        var initStage2 = function() {
 
-            {# Init stage 3 mage #}
+            var stageTwo = $('input[data-mage-next="part-unit-select"]');
+
+            stageTwo.mage({
+                onXhrDone: function (data) {
+                    $('#import_units').html(data);
+                    initStage3();
+                }
+            });
+        };
+
+        {# Init stage 3 mage #}
+        var initStage3 = function() {
 
             var stageThree = $('input[data-mage-next="part-tasks-select"]');
 
@@ -116,74 +123,17 @@ Usages:
                     $('#import_units').find(':checkbox').closest('li').slideDown();
                 },
                 onXhrDone: function (data) {
-                {# Slide away the things we're not using #}
+                    {# Slide away the things we're not using #}
 
-                $('#import_units').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
+                    $('#import_units').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
 
-                {# Set content #}
+                    {# Set content #}
 
-                $('#import_assessments').html(data);
-
-                {# Init stage 4 mage #}
-
-                var stageFour = $('input[data-mage-next="part-results-select"]');
-
-                stageFour.mage({
-                    onXhrDone: function(data) {
-
-                        try {
-                            if (typeof data == 'object' && 'redirect' in data && data.redirect) {
-                                {# Go back to wherever you came from (hopefully) -#}
-                                window.location.href = data.redirect;
-                            } else {
-//                                window.history.back();
-                            }
-                        } catch (e) {
-//                            window.history.back();
-                        }
-
-                    }
-                }).bind('validate', function() {
-
-                    {# Stage 4 validation #}
-
-                    if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
-
-                        {# Make sure every date has been entered #}
-
-                        var dateFields = $('input[data-mage-next="part-results-select"]')
-                                .closest('fieldset')
-                                .find('input[type=text]');
-
-                        var blankFound = false;
-
-                        $.each(dateFields, function (index, field) {
-                            if (!$(field).val()) {
-
-                                {# Date field was blank #}
-
-                                blankFound = true;
-                                $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                                $(field).addClass('error');
-                            } else {
-                                $(field).removeClass('error');
-                                $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                            }
-                        });
-
-                        if (blankFound) {
-                            return {
-                                'result': false,
-                                'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
-                            };
-                        }
-
-                        {# Everything okay #}
-
-                        return { 'result': true };
-                    }
-                });
-            }}).bind('validate', function() {
+                    $('#import_assessments').html(data);
+                    initStage4();
+                }
+            })
+            .bind('validate', function() {
 
                 {# Stage 3 validation #}
                 var $importUnits = $('#import_units');
@@ -238,7 +188,72 @@ Usages:
                 }
 
             });
-        }});
+        };
+
+        var initStage4 = function(){
+
+            {# Init stage 4 mage #}
+
+            var stageFour = $('input[data-mage-next="part-results-select"]');
+
+            stageFour.mage({
+                onXhrDone: function(data) {
+
+                    try {
+                        if (typeof data == 'object' && 'redirect' in data && data.redirect) {
+                            {# Go back to wherever you came from (hopefully) -#}
+                            window.location.href = data.redirect;
+                        } else {
+//                                window.history.back();
+                        }
+                    } catch (e) {
+//                            window.history.back();
+                    }
+                }
+            }).bind('validate', function() {
+
+                {# Stage 4 validation #}
+
+                if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
+
+                    {# Make sure every date has been entered #}
+
+                    var dateFields = $('input[data-mage-next="part-results-select"]')
+                            .closest('fieldset')
+                            .find('input[type=text]');
+
+                    var blankFound = false;
+
+                    $.each(dateFields, function (index, field) {
+                        if (!$(field).val()) {
+
+                            {# Date field was blank #}
+
+                            blankFound = true;
+                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
+                            $(field).addClass('error');
+                        } else {
+                            $(field).removeClass('error');
+                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
+                        }
+                    });
+
+                    if (blankFound) {
+                        return {
+                            'result': false,
+                            'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
+                        };
+                    }
+
+                    {# Everything okay #}
+
+                    return { 'result': true };
+                }
+            });
+        };
+
+        // Initialise JS at correct stage
+        eval('initStage' + {{ initialStage }})();
     });
 </script>
 <div class="row">
