@@ -139,7 +139,7 @@ ENGINE = InnoDB;
 CREATE TABLE `assessment_course_unit_implementation` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_implementation_id` INT UNSIGNED NOT NULL,
-  `assessment_specification_id` INT UNSIGNED NOT NULL,
+  `assessment_specification_id` INT UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`assessment_id`, `course_unit_implementation_id`),
   INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
   INDEX `fk_assessment_course_unit_implementation_cui_id_idx` (`course_unit_implementation_id` ASC),
