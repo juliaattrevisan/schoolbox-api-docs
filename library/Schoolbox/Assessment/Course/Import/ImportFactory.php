@@ -193,8 +193,6 @@ class ImportFactory
             $dto->addUnitImplementation($unitImpl);
         }
 
-
-
         // Get Assessment Spec with optional AssessmentImpl
         // 1. AssessmentSpec in UnitSpec where UnitSpec not imported to UnitImpl
         // 2. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, but AssessmentSpec not imported
@@ -215,8 +213,8 @@ class ImportFactory
                 ia.publish_date   AS 'ia.publish_date',
                 ia.open_date      AS 'ia.open_date',
                 ia.due_date       AS 'ia.due_date',
-                ia.sequence       AS 'ia.sequence',
                 ia.close_date     AS 'ia.close_date',
+                ia.sequence       AS 'ia.sequence',                
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id'                
@@ -303,7 +301,7 @@ class ImportFactory
                 if(is_null($row['sa.deleted_at'])){
                     $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
                 } else {
-                    $assessmentSpec->setDeletedAt(\Alaress_Date_Format::newLocalShort($row['sa.deleted_at']));
+                    $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
                 }
             }
 
