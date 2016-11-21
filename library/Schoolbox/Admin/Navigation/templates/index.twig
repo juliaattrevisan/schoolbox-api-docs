@@ -1,8 +1,10 @@
-<div class="small-12 columns">
-    <h1>Schoolbox Administration › {{ links[pageCurrent] }}</h1>
-    <ul class="sub-nav">
-        {% for key,value in links %}
-            <li class="{% if key == pageCurrent %}active{% endif %}"><a href="/adminv2/{{ key }}">{{ value }}</a></li>
-        {% endfor %}
-    </ul>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Schoolbox Administration › {{ links[pageCurrent] }}</h1>
+        <ul class="sub-nav">
+            {% for key,value in links %}
+                <li class="{% if key == pageCurrent %}active{% endif %}"><a href="/adminv2/{{ key }}">{{ value }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>

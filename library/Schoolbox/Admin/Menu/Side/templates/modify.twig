@@ -55,15 +55,27 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
+<div class="row actions-small-2">
+    <div class="small-12 column list-item">
+        {% if item.id is empty %}
+            <h2 class="subheader">Create Menu Item</h2>
+        {% else %}
+            <h2 class="subheader">Edit Menu Item</h2>
+        {% endif %}
+    </div>
+    <nav>
+        <a class="icon-more" title="Actions" data-dropdown="header-options2" aria-expanded="false"></a>
+    </nav>
+    <ul id="header-options2" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-delete" title="Delete Item" data-cancel data-delete="{{ item.id }}">Delete Item</a></li>
+    </ul>
+</div>
+
 <form id="itemForm" action="{{ routeLookup('adminMenuSide.postModify') }}" method="post">
     <input type="hidden" name="id" value="{{ item.id }}">
+
     <div class="row">
         <div class="small-12 island">
-            {% if item.id is empty %}
-                <h1>Create Menu Item</h1>
-            {% else %}
-                <h1>Edit Menu Item</h1>
-            {% endif %}
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -124,7 +136,6 @@
         <div class="small-12 column">
             <ul class="flex-list buttons">
                 <li><input data-submit type="submit" class="submit expand" value="Save"></li>
-                <li><button data-cancel data-delete="{{ item.id }}" class="button expand icon-cancel">Delete</button></li>
                 <li><button data-cancel class="button expand icon-cancel">Cancel Changes</button></li>
             </ul>
         </div>
