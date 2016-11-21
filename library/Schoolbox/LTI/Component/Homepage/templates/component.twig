@@ -1,1 +1,5 @@
-<iframe src="{{ location }}" frameborder="0"></iframe>
+{% if location is empty %}
+
+{% else %}
+    <iframe src="{{ location }}" frameborder="0"></iframe>
+{% endif %}

@@ -122,7 +122,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             } else if ($response->status == 200) {
                 $location = $provider->getUrl();
             } else {
-                $location = "about:blank";
+                $location = "";
             }
 
         } catch (MapperException $e) {
@@ -130,7 +130,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             // Could not locate provider in database- most likely its a new component and the provider hasn't been chosen in
             // the component configuration
 
-            $location = "about:blank";
+            $location = "";
         }
 
         // Render this component out
