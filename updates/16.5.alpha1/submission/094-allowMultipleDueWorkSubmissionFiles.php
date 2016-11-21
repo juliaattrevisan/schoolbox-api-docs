@@ -68,7 +68,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
       // Create assessment
       $updateSubmissionReturnQuery->execute([
-          'published' => AbstractAssessment::MARK_VISIBILITY_PRIVATE ? null : $returnCreatedAt,
+          'published' => AbstractAssessment::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
           'updated'   => $returnCreatedAt,
           'id'        => intval($returnId),
       ]);
