@@ -301,6 +301,10 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-info;
   color: $icon-color-homepage-activity;
 }
+.icon-masonry-Component_Dashboard_HomepageNewsController {
+  @extend .icon-report;
+  color: $icon-color-homepage-news;
+}
 .icon-masonry-Component_Dashboard_CalendarController:before {
   @extend .icon-calendar;
   color: $icon-color-calendar;
@@ -313,7 +317,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-chat;
   color: $icon-color-greeting;
 }
-.icon-masonry-Component_Dashboard_HomepageNewsController:before {
+.icon-masonry-Schoolbox_News_Component_Dashboard_Controller:before {
   @extend .icon-news;
   color: $icon-color-news;
 }
@@ -392,4 +396,8 @@ $masonry-drop-background: $input-focus-bg-color;
 .icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController:before {
   @extend .icon-teacher;
   color: $icon-color-class-teachers;
+}
+.icon-masonry-Schoolbox_Resource_Folder_Component_Dashboard_GroupController:before {
+  @extend .icon-group;
+  color: $icon-color-group;
 }

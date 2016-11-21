@@ -39,6 +39,8 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder\Code\Mapper as ClassCodeMapper;
+use Timetable_ColourMapper;
+use Schoolbox\Collection;
 
 class Controller extends BaseController
 {
@@ -779,6 +781,47 @@ class Controller extends BaseController
         ]);
     }
 
+    /**
+     * Displays a list of groups for the current logged in user
+     *
+     * @api GET /resource/mygroups
+     */
+    public function getGroups() {
+
+        /* Get Timetable colours to use as random colours for null set folders */
+        $colourList = Timetable_ColourMapper::getInstance()->findAll();
+        $colourIndex = 0;
+        $folderList = new Collection();
+        $userAccess  = Array();
+        foreach($this->getFolderMapper()->findForUser($this->getUser(), false)->sortBy('name', 'asc') as $folder) {
+            if (!$folder->getColour()) {
+                /* Apply colour from list if no colour exists */
+                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $colourIndex = ($colourIndex + 1) % $colourList->count();
+            }
+            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            switch ($accessType) {
+                case UserAccess::ACCESS_READ:
+                    $userAccess[$folder->getId()] = Array('read' => true);
+                    break;
+                case UserAccess::ACCESS_WRITE:
+                    $userAccess[$folder->getId()] = Array('write' => true);
+                    break;
+                case UserAccess::ACCESS_FULL:
+                    $userAccess[$folder->getId()] = Array('admin' => true);
+                    break;
+                default:
+                    $userAccess[$folder->getId()] = Array();
+                    break;
+            }
+            $folderList->add($folder);
+        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
+            'currentUser'         => $this->getUser(),
+            'groupList'           => $folderList,
+            'userAccess'          => $userAccess
+        ]));
+    }
 
     /**
      * @return Mapper

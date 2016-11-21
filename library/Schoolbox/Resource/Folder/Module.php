@@ -39,6 +39,7 @@ class Module extends BaseModule
             'GET' => [
                 '/folder/modify/{id}'                   => 'getFolderModify',
                 '/folder/create/{parentId}'             => 'getFolderCreate',
+                '/mygroups'                             => 'getGroups',
             ],
             'POST' => [
                 '/folder/move'                          => 'postMoveFolder',
