@@ -272,9 +272,6 @@ class Controller extends Base
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($student, $term);
-        foreach ($assessments as $assessment) {
-            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-        }
 
         $folders = new Collection();
 
