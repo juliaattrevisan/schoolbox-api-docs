@@ -121,7 +121,9 @@ class MapperProxy
     public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('spec.id', $assessmentId, $options));
+        $params            = $this->convertOptionsToColumnList($options);
+        $params['spec.id'] = $assessmentId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -160,7 +162,9 @@ class MapperProxy
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
+        $params          = $this->convertOptionsToColumnList($options);
+        $params['us.id'] = $unitSpecId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -172,7 +176,9 @@ class MapperProxy
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
+        $params          = $this->convertOptionsToColumnList($options);
+        $params['ui.id'] = $unitImplId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -237,7 +243,9 @@ class MapperProxy
      */
     public function findAllForProjectId($projectId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
+        $params                     = $this->convertOptionsToColumnList($options);
+        $params['pa.assessment_id'] = $projectId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
