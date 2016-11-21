@@ -38,6 +38,9 @@ class Controller extends Base
 
     /**
      * Display re-order screen
+     *
+     * @api   GET /adminv2/menu-top
+     * @level 165
      */
     public function getIndex()
     {
@@ -53,6 +56,10 @@ class Controller extends Base
 
     /**
      * Display modification screen
+     *
+     * @api   GET /adminv2/menu-top/modify/{id}
+     * @level 165
+     *
      * @param $id
      */
     public function getModify($id)
@@ -95,6 +102,10 @@ class Controller extends Base
 
     /**
      * Display create screen
+     *
+     * @api   GET /adminv2/insert
+     * @level 165
+     *
      */
     public function getCreate()
     {
@@ -112,6 +123,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-top/order
+     * @level 165
      */
     public function postOrder()
     {
@@ -133,6 +147,9 @@ class Controller extends Base
 
     /**
      * Delete menu item
+     *
+     * @api   POST /adminv2/menu-top/delete
+     * @level 165
      */
     public function postDelete()
     {
@@ -142,6 +159,9 @@ class Controller extends Base
 
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-top/modify
+     * @level 165
      */
     public function postModify()
     {

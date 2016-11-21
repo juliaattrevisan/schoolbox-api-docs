@@ -43,6 +43,9 @@ class Controller extends Base
 
     /**
      * Display tree
+     * 
+     * @api   GET /adminv2/menu-side
+     * @level 165
      */
     public function getIndex()
     {
@@ -140,6 +143,10 @@ class Controller extends Base
 
     /**
      * Display modification screen
+     *
+     * @api   GET /adminv2/menu-side/modify/{id}
+     * @level 165
+     *
      * @param $id
      */
     public function getModify($id)
@@ -183,6 +190,9 @@ class Controller extends Base
 
     /**
      * Display create screen
+     *
+     * @api   GET /adminv2/menu-side/insert
+     * @level 165
      */
     public function getCreate()
     {
@@ -199,6 +209,9 @@ class Controller extends Base
 
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-side/modify
+     * @level 165
      */
     public function postModify()
     {
@@ -244,8 +257,15 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
     }
 
+
     /**
      * Save menu item
+     *
+     * @api   POST /adminv2/menu-side/modify-section/{sectionId}/{field}
+     * @level 165
+     *
+     * @param int    $sectionId
+     * @param string $field
      */
     public function postSectionModify($sectionId, $field)
     {
@@ -290,6 +310,9 @@ class Controller extends Base
 
     /**
      * Delete menu item
+     *
+     * @api   POST /adminv2/menu-side/delete
+     * @level 165
      */
     public function postDelete()
     {
@@ -299,6 +322,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-side/order
+     * @level 165
      */
     public function postOrder()
     {
@@ -332,6 +358,9 @@ class Controller extends Base
 
     /**
      * Update menu item order
+     *
+     * @api   POST /adminv2/menu-side/order-section
+     * @level 165
      */
     public function postSectionOrder()
     {
