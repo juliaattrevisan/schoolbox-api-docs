@@ -22,14 +22,12 @@ CREATE TABLE menu_side_role (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_side_id INT,
   role_id INT,
-  deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_side_campus (
   id INT(11) NOT NULL AUTO_INCREMENT,
   menu_side_id INT,
   campus_id INT,
-  deleted_at DATETIME,
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8mb4;
 
 CREATE TABLE menu_side_section (
