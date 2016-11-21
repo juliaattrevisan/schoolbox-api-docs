@@ -82,12 +82,13 @@
 
                     <legend>Choose activity type</legend>
 
-                    <fieldset class="radiolist">
-                        <div class="column small-12">
-                            {% for type in types %}
-                                <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}"><label for="{{ type.id }}" class="radio-label">{{ type.label }}</label>
-                            {% endfor %}
+                    <fieldset>
+                        {% for type in types %}
+                        <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
+                            <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}">
+                            <label title="{{ type.title }}" for="{{ type.id }}" class="block"><i class="icon-{{ type.label|replace(' ', '-')|lower }}"></i>{{ type.label }}</label>
                         </div>
+                        {% endfor %}
                     </fieldset>
 
                     <div class="small-12 column">

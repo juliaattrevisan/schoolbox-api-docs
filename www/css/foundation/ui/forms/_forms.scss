@@ -314,6 +314,43 @@ th, td{
     }
 }
 
+// Radio button blocks
+input[type=radio]{
+	+ .block{
+		background-color: $white;
+		border: $input-border-width solid $content-ui-background;
+		color: $content-ui-foreground;
+		margin: 0 0 1rem 0;
+		padding: ($base-font-size - 4);
+		width: 100%;
+		font-size: $base-font-size;
+		line-height: 2;
+		@include transition(all, 0.1s, ease-in);
+		i{
+			@extend .icon-32;
+			color: $content-ui-foreground;
+			padding-right: 0.35rem;
+			float: left;
+			line-height: 1;
+		}
+		&:hover{
+			//border: 1px solid $content-ui-foreground;
+			background-color: $content-ui-background;
+			color: $content-ui-foreground;
+		}
+	}
+	&:checked{
+		+ .block{
+			background-color: $content-ui-foreground;
+			border: $input-border-width solid $content-ui-foreground;
+			color: $content-ui-selected;
+			i{
+				color: $content-ui-selected;
+			}
+		}
+	}
+}
+
 // Toggle Checkbox (VAPORWAVE)
 @mixin vaporwave($label-class: false, $toggle-size: ($input-height), $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
 
