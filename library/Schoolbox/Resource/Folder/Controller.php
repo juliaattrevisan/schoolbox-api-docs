@@ -799,7 +799,21 @@ class Controller extends BaseController
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            $userAccess[$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            switch ($accessType) {
+                case UserAccess::ACCESS_READ:
+                    $userAccess[$folder->getId()] = Array('read' => true);
+                    break;
+                case UserAccess::ACCESS_WRITE:
+                    $userAccess[$folder->getId()] = Array('write' => true);
+                    break;
+                case UserAccess::ACCESS_FULL:
+                    $userAccess[$folder->getId()] = Array('admin' => true);
+                    break;
+                default:
+                    $userAccess[$folder->getId()] = Array();
+                    break;
+            }
             $folderList->add($folder);
         }
         $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
