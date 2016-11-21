@@ -268,7 +268,8 @@ class Controller extends Base
     /**
      * @return MenuIconMapper
      */
-    public function getMenuIconMapper() {
+    public function getMenuIconMapper()
+    {
         return $this->menuIconMapper;
     }
 
@@ -276,7 +277,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuIconMapper($mapper) {
+    public function setMenuIconMapper($mapper)
+    {
         $this->menuIconMapper = $mapper;
         return $this;
     }
@@ -286,7 +288,8 @@ class Controller extends Base
     /**
      * @return MenuTopMapper
      */
-    public function getMenuTopMapper() {
+    public function getMenuTopMapper()
+    {
         return $this->menuTopMapper;
     }
 
@@ -294,7 +297,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopMapper($mapper) {
+    public function setMenuTopMapper($mapper)
+    {
         $this->menuTopMapper = $mapper;
         return $this;
     }
@@ -302,7 +306,8 @@ class Controller extends Base
     /**
      * @return MenuTopCampusMapper
      */
-    public function getMenuTopCampusMapper() {
+    public function getMenuTopCampusMapper()
+    {
         return $this->menuTopCampusMapper;
     }
 
@@ -310,7 +315,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopCampusMapper($mapper) {
+    public function setMenuTopCampusMapper($mapper)
+    {
         $this->menuTopCampusMapper = $mapper;
         return $this;
     }
@@ -318,7 +324,8 @@ class Controller extends Base
     /**
      * @return MenuTopRoleMapper
      */
-    public function getMenuTopRoleMapper() {
+    public function getMenuTopRoleMapper()
+    {
         return $this->menuTopRoleMapper;
     }
 
@@ -326,7 +333,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setMenuTopRoleMapper($mapper) {
+    public function setMenuTopRoleMapper($mapper)
+    {
         $this->menuTopRoleMapper = $mapper;
         return $this;
     }
@@ -334,7 +342,8 @@ class Controller extends Base
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
@@ -342,7 +351,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setRoleMapper($mapper) {
+    public function setRoleMapper($mapper)
+    {
         $this->roleMapper = $mapper;
         return $this;
     }
@@ -350,7 +360,8 @@ class Controller extends Base
     /**
      * @return CampusMapper
      */
-    public function getCampusMapper() {
+    public function getCampusMapper()
+    {
         return $this->campusMapper;
     }
 
@@ -358,7 +369,8 @@ class Controller extends Base
      * @param $mapper
      * @return $this
      */
-    public function setCampusMapper($mapper) {
+    public function setCampusMapper($mapper)
+    {
         $this->campusMapper = $mapper;
         return $this;
     }
