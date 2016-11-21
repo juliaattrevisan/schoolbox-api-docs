@@ -27,7 +27,7 @@
 </label>
 
 {% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.visibility) }}
+{{ visibility.dropdown(assessment.markVisibility) }}
 
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}

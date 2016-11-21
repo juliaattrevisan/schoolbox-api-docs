@@ -99,14 +99,4 @@ class Controller extends Assessment\Controller
     {
         return $defaultReturnUrl;
     }
-
-    /**
-     * Update particular fields of an existing IAssessable
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    public function patchUpdateAssessment(IAssessable $assessment)
-    {
-    }
 }

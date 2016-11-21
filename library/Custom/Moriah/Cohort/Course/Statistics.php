@@ -8,6 +8,8 @@
 namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -109,7 +111,7 @@ class Statistics
         // SB-12505 - only items visible to parents are visible
         $quizVisibilities = array_diff(
             $quizVisibilities,
-            [SubmissionBox::MARK_VISIBILITY_PRIVATE, SubmissionBox::MARK_VISIBILITY_STUDENT,]
+            [IAssessable::MARK_VISIBILITY_PRIVATE, IAssessable::MARK_VISIBILITY_STUDENT,]
         );
 
         // Get any classes which use this course.

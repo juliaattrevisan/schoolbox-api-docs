@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use PDOStatement;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
  * Class ReturnedWorkMapper
@@ -124,7 +126,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      *
      * @return ActivityCollection
      */
-    public function getActivities($user_id, $limit, array $categories, array $visibilities = [ SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT ])
+    public function getActivities($user_id, $limit, array $categories, array $visibilities = [IAssessable::MARK_VISIBILITY_PARENT_STUDENT])
     {
         // TODO - SA-1308 This method has been commented out so the page can work without a fatal error.
         // Need to update the query below, and build the new object graph, then use it accordingly in

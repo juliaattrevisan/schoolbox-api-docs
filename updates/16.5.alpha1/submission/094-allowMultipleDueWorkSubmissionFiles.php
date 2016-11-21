@@ -11,8 +11,10 @@
  */
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
+
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -67,7 +69,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
       // Create assessment
       $updateSubmissionReturnQuery->execute([
-          'published' => SubmissionBox::MARK_VISIBILITY_PRIVATE ? null : $returnCreatedAt,
+          'published' => IAssessable::MARK_VISIBILITY_PRIVATE == $boxVisibility ? null : $returnCreatedAt,
           'updated'   => $returnCreatedAt,
           'id'        => intval($returnId),
       ]);

@@ -41,6 +41,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setDueDate($assessment->getDueAt())
                 ->setLateDate($assessment->getCloseAt())
                 ->setWeight($assessment->getWeight())
+                ->setMarkVisibility($assessment->getMarkVisibility())
                 ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
@@ -109,6 +110,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setCreator($model->getOwner())
                 ->setMaxMark($model->getMaxMark())
                 ->setGradeGroup($model->getGradeGroup())
+                ->setMarkVisibility($model->getMarkVisibility())
 
             ;
 

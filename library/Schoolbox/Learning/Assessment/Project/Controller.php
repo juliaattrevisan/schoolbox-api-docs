@@ -226,16 +226,4 @@ class Controller extends Assessment\Controller
         // at the end of a mutation, a project will redirect back to its status screen
         return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
     }
-
-    /**
-     * Update particular fields of an existing IAssessable
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    public function patchUpdateAssessment(IAssessable $assessment)
-    {
-    }
-
-
 }

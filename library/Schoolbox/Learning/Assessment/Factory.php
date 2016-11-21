@@ -99,6 +99,12 @@ class Factory
     protected $closeAt;
 
     /**
+     * @var int
+     */
+    private $markVisibility;
+
+
+    /**
      * Factory constructor.
      * @param User $creator
      * @param $post (an array of post vars from the create/update forms)
@@ -153,6 +159,7 @@ class Factory
         $this->setDurationHours(trim($post['durationHours']));
         $this->setDurationMinutes(trim($post['durationMinutes']));
         $this->setMaxAttempts(intval($post['maxAttempts']));
+        $this->setMarkVisibility(intval($post['visibility']));
     }
 
     /**
@@ -304,6 +311,7 @@ class Factory
             ->setDescription($this->getDescription())
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
+            ->setMarkVisibility($this->getMarkVisibility())
             ->setPublishAt($publishAt)
             ->setOpenAt($openAt)
             ->setDueAt($dueAt)
@@ -498,6 +506,24 @@ class Factory
     protected function setContext($context)
     {
         $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getMarkVisibility()
+    {
+        return $this->markVisibility;
+    }
+
+    /**
+     * @param int $markVisibility
+     * @return static
+     */
+    protected function setMarkVisibility($markVisibility)
+    {
+        $this->markVisibility = $markVisibility;
         return $this;
     }
 }

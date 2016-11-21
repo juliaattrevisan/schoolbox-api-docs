@@ -14,6 +14,9 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
+
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
@@ -163,13 +166,13 @@ if ($attempt['reviewed_at'] != '') {
 }
 
 switch ($assess['mark_visibility']) {
-    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+    case IAssessable::MARK_VISIBILITY_PRIVATE:
         $this->parse('visible_staff_block', 'visible_staff');
         break;
-    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+    case IAssessable::MARK_VISIBILITY_STUDENT:
         $this->parse('visible_staff_students_block', 'visible_staff_students');
         break;
-    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+    case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
         $this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
         break;
 }

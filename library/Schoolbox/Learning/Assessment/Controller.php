@@ -131,7 +131,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment)
     {
-
         /* Modify particular fields
          */
         if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
@@ -272,6 +271,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'          => $context->getFolder(),
             'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
             'assessmentType'  => AssessmentType::objectToString($assessment),
+            'visibility'      => $assessment->getMarkVisibility(),
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -403,6 +403,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
     }
 
+    /**
+     * Update particular fields of an existing IAssessable
+     *
+     * Default Abstract implementation does nothing, Concrete class to override.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function patchUpdateAssessment(IAssessable $assessment)
+    {
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
 
 
 
