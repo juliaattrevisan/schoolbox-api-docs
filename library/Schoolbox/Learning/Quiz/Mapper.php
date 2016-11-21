@@ -163,7 +163,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
             'curriculumNodes'
         );
 
-        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
+        $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'am');
 
 		$this->hasSoftDeleteDateField('deleted_at');
 
@@ -631,7 +631,8 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 {$this->getJoinColumnString('curriculum_node_for_assess.level', 'cnl')},
                 {$this->getJoinColumnString('curriculum_node_for_assess.level.source', 'cnls')},
                 {$this->getJoinColumnString('curriculum_node_for_assess.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_assess.area.source', 'cnas')}
+                {$this->getJoinColumnString('curriculum_node_for_assess.area.source', 'cnas')},
+                {$this->getJoinColumnString('am', 'am')}
             FROM
                 `{$this->getTable()}` `a`
                 LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
@@ -642,6 +643,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.level.source', 'cnl', 'cnls')}
                 LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area', 'cn', 'cna')}
                 LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area.source', 'cna', 'cnas')}
+				LEFT JOIN {$this->getJoinSql('am', 'a', 'am')}
             WHERE
                 `a`.assess_id = :id
         ");
@@ -656,6 +658,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 $quiz->setCategory($this->hydrateJoin($row, 'category', 'c'));
                 $quiz->setWorkType($this->hydrateJoin($row, 'work_type', 't'));
                 $quiz->setUser($this->hydrateJoin($row, 'user', 'u'));
+				$quiz->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'));
             }
             // Hydrate curriculum nodes
             /** @var Node\Model $curriculumNode */
