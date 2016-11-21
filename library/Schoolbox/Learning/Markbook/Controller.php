@@ -12,8 +12,6 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -32,11 +30,6 @@ class Controller extends Base
      * @var AssessmentMapperProxy
      */
     protected $assessmentMapperProxy;
-
-    /**
-     * @var Participant\DataSource
-     */
-    protected $participantDataSource;
 
     /**
      * @var GradeGroup
@@ -58,7 +51,6 @@ class Controller extends Base
      *
      * @param ErrorMapper                    $errorMapper
      * @param AssessmentMapperProxy          $assessmentMapperProxy
-     * @param Participant\DataSource         $participantDataSource
      * @param GradeGroup                     $defaultGradeGroup
      * @param CourseImplementationDataSource $courseImplementationDataSource
      * @param TermMapper                     $termMapper
@@ -66,14 +58,12 @@ class Controller extends Base
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        Participant\DataSource $participantDataSource,
         GradeGroup $defaultGradeGroup,
         CourseImplementationDataSource $courseImplementationDataSource,
         TermMapper $termMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setParticipantDataSource($participantDataSource);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setCourseImplementationDataSource($courseImplementationDataSource);
         $this->setTermMapper($termMapper);
@@ -199,24 +189,6 @@ class Controller extends Base
     protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        return $this;
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantDataSource()
-    {
-        return $this->participantDataSource;
-    }
-
-    /**
-     * @param Participant\DataSource $participantDataSource
-     * @return static
-     */
-    protected function setParticipantDataSource(Participant\DataSource $participantDataSource)
-    {
-        $this->participantDataSource = $participantDataSource;
         return $this;
     }
 

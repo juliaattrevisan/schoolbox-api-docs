@@ -254,7 +254,6 @@ class Module extends BaseModule
 
         // quiz specific
         $qc =& $injector->params[Assessment\Quiz\Controller::class];
-        $qc['participantMapper'] = $injector->lazyGet('participantDataSource');
         $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
         $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
         $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
@@ -359,14 +358,6 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantMapperProxy()
-    {
-        return $this->injector->get('participantDataSource');
     }
 
 }

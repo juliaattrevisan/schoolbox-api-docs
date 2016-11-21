@@ -14,16 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Summator\Average;
-use Schoolbox\Learning\Assessment\Summator\Count;
-use Schoolbox\Learning\Assessment\Summator\Maximum;
-use Schoolbox\Learning\Assessment\Summator\Minimum;
-use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
-use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -66,16 +57,10 @@ class Controller extends Base
     protected $assessmentMapperProxy;
 
     /**
-     * @var Participant\DataSource
-     */
-    protected $participantDataSource;
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper            $errorMapper
      * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param Participant\DataSource $participantDataSource
      * @param TermMapper             $termMapper
      * @param FolderMapper           $folderMapper
      * @param GradeGroup             $defaultGradeGroup
@@ -84,7 +69,6 @@ class Controller extends Base
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        Participant\DataSource $participantDataSource,
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
@@ -92,7 +76,6 @@ class Controller extends Base
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setParticipantDataSource($participantDataSource);
         $this->setTermMapper($termMapper);
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
@@ -480,24 +463,6 @@ class Controller extends Base
     protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        return $this;
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantDataSource()
-    {
-        return $this->participantDataSource;
-    }
-
-    /**
-     * @param Participant\DataSource $participantDataSource
-     * @return static
-     */
-    protected function setParticipantDataSource(Participant\DataSource $participantDataSource)
-    {
-        $this->participantDataSource = $participantDataSource;
         return $this;
     }
 

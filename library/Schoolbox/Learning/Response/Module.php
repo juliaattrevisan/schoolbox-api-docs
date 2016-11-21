@@ -250,14 +250,6 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantMapperProxy()
-    {
-        return $this->injector->get('participantDataSource');
-    }
-
-    /**
      * @return ResponseMapperProxy
      */
     protected function getResponseMapperProxy()
