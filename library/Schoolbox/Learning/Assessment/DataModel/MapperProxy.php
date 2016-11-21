@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -53,25 +52,17 @@ class MapperProxy
     protected $translator;
 
     /**
-     * @var External_UserInterface
-     */
-    protected $externalUser;
-
-    /**
      * Constructor
      *
      * @param Mapper                 $baseMapper
      * @param Translator             $translator
-     * @param External_UserInterface $externalUser
      */
     public function __construct(
         Mapper $baseMapper,
-        Translator $translator,
-        External_UserInterface $externalUser
+        Translator $translator
     ) {
         $this->baseMapper   = $baseMapper;
         $this->translator   = $translator;
-        $this->externalUser = $externalUser;
     }
 
     /**
