@@ -318,7 +318,7 @@ th, td{
 input[type=radio]{
 	+ .block{
 		background-color: $white;
-		border: 3px solid $content-ui-background;
+		border: $input-border-width solid $content-ui-background;
 		color: $content-ui-foreground;
 		margin: 0 0 1rem 0;
 		padding: ($base-font-size - 4);
@@ -342,7 +342,7 @@ input[type=radio]{
 	&:checked{
 		+ .block{
 			background-color: $content-ui-foreground;
-			border: 3px solid $content-ui-foreground;
+			border: $input-border-width solid $content-ui-foreground;
 			color: $content-ui-selected;
 			i{
 				color: $content-ui-selected;
