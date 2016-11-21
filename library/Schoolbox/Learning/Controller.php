@@ -321,20 +321,17 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderId(
+        // Despite the fact that this is displaying grades for a single student,
+        // ALL participants are still required (because the student is compared
+        // against all other participants).
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview(
             $subject->getId(),
+            null,
             [
                 'term'  => $term,
                 'order' => ['due_date' => 'asc'],
             ]
         );
-
-        // Grab all the participants
-
-        /** @var IAssessable $assessment */
-        foreach ($assessments as $assessment) {
-            $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment);
-        }
 
         // Let markbook calculate the statistics
 

@@ -70,7 +70,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
             $this->assessments = $this->getAssessmentMapper()
-                ->findAllByFolderId($this->getSource()->getId())
+                ->findAllByFolderIdForReview($this->getSource()->getId(), $this->getUser())
                 ->filter(
                     function (IAssessable $assessment)
                     {
@@ -84,20 +84,20 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        /* Only show participation for tasks, as those can be altered inline
-         * The current user's participation determines state of the task checkbox
-         *
-         * Don't need to load data for any other assessment type (due work, quiz, etc)
-         */
-        foreach($this->assessments as $assessment){
-            if ($assessment instanceof Task) {
-                try {
-                    $this->participantMapper->loadParticipationIntoAssessment($assessment, $this->getUser());
-                } catch (\OutOfBoundsException $e) {
-                    // noop
-                }
-            }
-        }
+//        /* Only show participation for tasks, as those can be altered inline
+//         * The current user's participation determines state of the task checkbox
+//         *
+//         * Don't need to load data for any other assessment type (due work, quiz, etc)
+//         */
+//        foreach($this->assessments as $assessment){
+//            if ($assessment instanceof Task) {
+//                try {
+//                    $this->participantMapper->loadParticipationIntoAssessment($assessment, $this->getUser());
+//                } catch (\OutOfBoundsException $e) {
+//                    // noop
+//                }
+//            }
+//        }
 
         return true;
     }

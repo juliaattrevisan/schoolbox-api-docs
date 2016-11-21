@@ -250,6 +250,28 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for a folder for review.
+     *
+     * @param int   $folderId A folder or list of folders
+     * @param User  $student If provided, load only this student's participation
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByFolderIdForReview($folderId, User $student = null, $options = [])
+    {
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId(
+                    $folderId,
+                    $this->convertOptionsToColumnList($options),
+                    $options
+                )
+            ),
+            $student
+        );
+    }
+
+    /**
      * Finds all assessables for a folder, not including course implementation
      * assessables.
      *
