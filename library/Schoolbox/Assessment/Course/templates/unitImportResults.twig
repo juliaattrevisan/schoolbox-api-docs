@@ -164,8 +164,12 @@
                                                    value="1"
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
-                                                <span class="{{ icon.renderClass(assessment) }}"></span>
-                                                <span>{{ assessment.title }}</span>
+                                                <span {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
+                                                    title="Originally named '{{ assessmentSpec.title }}'"
+                                                    {% endif %}>
+                                                    <span class="{{ icon.renderClass(assessment) }}"></span>
+                                                    <span>{{ assessment.title }}</span>
+                                                </span>
                                             </label>
                                         </div>
                                         <div data-assessment-dates="{{ assessment.id }}">
