@@ -15,7 +15,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Assessable\DataSource as AssessableDataSource;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Count;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
