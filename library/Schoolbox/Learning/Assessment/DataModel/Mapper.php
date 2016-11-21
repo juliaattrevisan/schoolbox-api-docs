@@ -590,4 +590,42 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
+
+
+    /**
+     * Updates the 'assessment_course_unit_implementation' with links from AssessmentImpls to their AssessmentSpec
+     *
+     * This is required because this relationship does not exist in the models.
+     *
+     * @param array $implIdsToSpecIds keys = AssessmentImplId, values = AssessmentSpecId (may be null)
+     * @return bool
+     */
+    public function updateImplToSpecLinks(array $implIdsToSpecIds)
+    {
+        try{
+            $this->database->beginTransaction();
+
+            $query = $this->database->prepare("
+                UPDATE
+                  `assessment_course_unit_implementation` aui
+                SET
+                  assessment_specification_id = :specId
+                WHERE
+                  assessment_id = :implId
+            ");
+
+            foreach($implIdsToSpecIds as $implId => $specId){
+                $query->execute([
+                    'specId' => $specId,
+                    'implId' => $implId,
+                ]);
+            }
+
+            $this->database->commit();
+        } catch (\PDOException $e) {
+            $this->database->rollBack();
+            return false;
+        }
+        return true;
+    }
 }
