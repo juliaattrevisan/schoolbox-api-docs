@@ -26,8 +26,7 @@ class Mapper extends BaseMapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('target', self::TYPE_STRING);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
