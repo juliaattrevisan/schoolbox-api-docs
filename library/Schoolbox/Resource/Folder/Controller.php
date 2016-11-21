@@ -793,7 +793,7 @@ class Controller extends BaseController
         $colourIndex = 0;
         $folderList = new Collection();
         $userAccess  = Array();
-        foreach($this->getFolderMapper()->findForUser($this->getUser(), false) as $folder) {
+        foreach($this->getFolderMapper()->findForUser($this->getUser(), false)->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
@@ -802,7 +802,6 @@ class Controller extends BaseController
             $userAccess[$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
             $folderList->add($folder);
         }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
             'currentUser'         => $this->getUser(),
             'groupList'           => $folderList,

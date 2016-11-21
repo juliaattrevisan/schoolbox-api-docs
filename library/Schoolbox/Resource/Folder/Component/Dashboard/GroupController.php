@@ -61,7 +61,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
         $userAccess  = Array();
-        foreach(FolderMapper::getInstance()->findForUser($this->getUser(), false) as $folder) {
+        foreach(FolderMapper::getInstance()->findForUser($this->getUser(), false)->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
