@@ -103,7 +103,7 @@ class ListController extends Web\Controller\Base
             $user = $this->getUser();
         }
 
-        $assessments = $this->getAssessmentMapper()->findAllForContext($context, [ 'hydrateParticipants' => true ]);
+        $assessments = $this->getAssessmentMapper()->findAllByContext($context, ['hydrateParticipants' => true ]);
 
         if ($readOnly) {
             $hasContextWrite = false;

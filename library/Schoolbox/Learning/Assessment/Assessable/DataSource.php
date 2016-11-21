@@ -106,7 +106,7 @@ class DataSource
         /** @var Folder $folderCurrent */
         foreach ($userFolders as $folderCurrent) {
 
-            $assessments = $this->assessmentMapperProxy->findAllForFolderId($folderCurrent->getId());
+            $assessments = $this->assessmentMapperProxy->findAllByFolderId($folderCurrent->getId());
 
             /** @var IAssessable $assessment */
             foreach ($assessments as $assessment) {

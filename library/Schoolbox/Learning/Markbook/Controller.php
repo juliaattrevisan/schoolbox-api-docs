@@ -120,7 +120,7 @@ class Controller extends Base
 
         // Generate data: assessments and their Participants
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId($class->getId(), ['term' => $term]);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderId($class->getId(), ['term' => $term]);
 
         // Load participants
         foreach ($assessments as $assessment) {

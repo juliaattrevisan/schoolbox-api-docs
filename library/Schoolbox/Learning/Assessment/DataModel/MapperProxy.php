@@ -137,7 +137,7 @@ class MapperProxy
      * @throws MapperException\Deleted if the assessment was deleted
      * @throws MapperException         if the assessment doesn't exist at all
      */
-    public function findSpecificationForImplementationId($assessmentId)
+    public function findSpecificationByImplementationId($assessmentId)
     {
         // Find the assessable which this assessment implements
         // TODO figure out how to do this in one query
@@ -155,7 +155,7 @@ class MapperProxy
      * @param array $options
      * @return IAssessable[]
      */
-    public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
+    public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
         $params            = $this->convertOptionsToColumnList($options);
@@ -175,19 +175,19 @@ class MapperProxy
      * @param array             $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForContext(AssessmentContext $context, $options = [])
+    public function findAllByContext(AssessmentContext $context, $options = [])
     {
         if ($context instanceof Folder) {
-            return $this->findAllForFolderIdExclusively($context->getId(), $options);
+            return $this->findAllByFolderIdExclusively($context->getId(), $options);
         }
         if ($context instanceof UnitSpecification) {
-            return $this->findAllForUnitSpecificationId($context->getId(), $options);
+            return $this->findAllByUnitSpecificationId($context->getId(), $options);
         }
         if ($context instanceof UnitImplementation) {
-            return $this->findAllForUnitImplementationId($context->getId(), $options);
+            return $this->findAllByUnitImplementationId($context->getId(), $options);
         }
         if ($context instanceof ProjectObject) {
-            return $this->findAllForProjectId($context->getId(), $options);
+            return $this->findAllByProjectId($context->getId(), $options);
         }
         return new Collection();
     }
@@ -202,7 +202,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForUnitSpecificationId($unitSpecId, $options = [])
+    public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
         $params          = $this->convertOptionsToColumnList($options);
         $params['us.id'] = $unitSpecId;
@@ -218,7 +218,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForUnitImplementationId($unitImplId, $options = [])
+    public function findAllByUnitImplementationId($unitImplId, $options = [])
     {
         $params          = $this->convertOptionsToColumnList($options);
         $params['ui.id'] = $unitImplId;
@@ -238,7 +238,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForFolderId($folderId, $options = [])
+    public function findAllByFolderId($folderId, $options = [])
     {
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId(
@@ -259,7 +259,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForFolderIdExclusively($folderId, $options = [])
+    public function findAllByFolderIdExclusively($folderId, $options = [])
     {
         $params         = $this->convertOptionsToColumnList($options);
         $params['f.id'] = $folderId;
@@ -279,7 +279,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllInCourseImplementationForFolderId($folderId, $options = [])
+    public function findAllByCourseImplementationFolderId($folderId, $options = [])
     {
         $params            = $this->convertOptionsToColumnList($options);
         // uicf.id = Unit Implementation Course Folder ID
@@ -294,7 +294,7 @@ class MapperProxy
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForProjectId($projectId, $options = [])
+    public function findAllByProjectId($projectId, $options = [])
     {
         $params                     = $this->convertOptionsToColumnList($options);
         $params['pa.assessment_id'] = $projectId;
@@ -310,7 +310,7 @@ class MapperProxy
      * @param Term $term    Restrict results to this term
      * @return Collection|IAssessable[]
      */
-    public function findAllForStudent(User $student, Term $term)
+    public function findAllByStudent(User $student, Term $term)
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -428,7 +428,7 @@ class MapperProxy
         // Retrieve sub-projects
         $assessable = $this->translator->translateToDomainModel($subModel);
         if ($assessable instanceof ProjectObject) {
-            $assessable->setAssessables($this->findAllForProjectId($assessable->getId()));
+            $assessable->setAssessables($this->findAllByProjectId($assessable->getId()));
         }
         return $assessable;
     }

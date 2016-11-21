@@ -70,7 +70,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
             $this->assessments = $this->getAssessmentMapper()
-                ->findAllForFolderId($this->getSource()->getId())
+                ->findAllByFolderId($this->getSource()->getId())
                 ->filter(
                     function (IAssessable $assessment)
                     {

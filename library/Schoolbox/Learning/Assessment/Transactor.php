@@ -217,7 +217,7 @@ class Transactor
     protected function deriveSaveSequence($context)
     {
         $sequence = 1;
-        foreach ($this->getAssessmentMapperProxy()->findAllForContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
+        foreach ($this->getAssessmentMapperProxy()->findAllByContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
             if ($otherAssessment->getId() == $this->getAssessment()->getId()) {
                 break;
             }

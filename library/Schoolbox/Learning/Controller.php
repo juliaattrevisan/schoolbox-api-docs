@@ -271,7 +271,7 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $assessments = $this->getAssessmentMapperProxy()->findAllForStudent($student, $term);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($student, $term);
         foreach ($assessments as $assessment) {
             $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
         }
@@ -324,7 +324,7 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
-        $assessments = $this->getAssessmentMapperProxy()->findAllForFolderId(
+        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderId(
             $subject->getId(),
             [
                 'term'  => $term,
