@@ -41,6 +41,13 @@ class Markbook
     protected $gradeGroup;
 
     /**
+     * The user viewing the markbook, usually whoever is logged in
+     *
+     * @var User
+     */
+    protected $viewingUser;
+
+    /**
      * Statistics for the whole markbook.
      *
      * @var array Currently, only contains weightedMean
@@ -74,11 +81,13 @@ class Markbook
      *
      * @param Collection|IAssessable[] $assessments
      * @param GradeGroup               $gradeGroup
+     * @param User                     $viewingUser
      */
-    public function __construct(Collection $assessments, GradeGroup $gradeGroup)
+    public function __construct(Collection $assessments, GradeGroup $gradeGroup, User $viewingUser)
     {
         $this->assessments = $assessments;
         $this->gradeGroup  = $gradeGroup;
+        $this->viewingUser = $viewingUser;
         $this->collateStatistics();
     }
 
@@ -167,7 +176,7 @@ class Markbook
         // Not all assessables are used in stats:
         // only ones for which feedback is visible are usable.
         $visibleAssessments = $this->getAssessments()->filter(function(IAssessable $assessable) {
-            return $assessable->isFeedbackVisibleToUser($_SESSION['user']);
+            return $assessable->isFeedbackVisibleToUser($this->viewingUser);
         });
 
         foreach ($this->getStudents() as $student) {
@@ -212,8 +221,8 @@ class Markbook
         // Just get marks for all students, and let the summators do the rest.
         $normMarks = [];
 
-        // TODO inject $_SESSION['user']
-        if ($assessment->isFeedbackVisibleToUser($_SESSION['user'])) {
+        // Only collate stats for assessments whose feedback may be viewed by this user
+        if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
             }
