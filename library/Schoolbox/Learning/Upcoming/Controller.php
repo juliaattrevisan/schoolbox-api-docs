@@ -155,7 +155,7 @@ class Controller extends Base
                 $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
             // Markbook
-            $markbook = new Markbook($assessments, $this->defaultGradeGroup);
+            $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
             // Data set
             $subjects[] = [
