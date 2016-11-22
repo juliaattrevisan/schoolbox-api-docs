@@ -34,9 +34,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 
     // select this textBox
     $cim       = Component_InstanceMapper::getInstance();
-    $instances = array_values($cim->findByInstanceId($_POST['componentID']));
-    /* @var $instance Component_Instance */
-    $instance = $instances[0];
+    $instance = $cim->findByInstanceId($_POST['componentID']);
 
     $ccm    = Component_ConfigMapper::getInstance();
     $config = new Component_Config();

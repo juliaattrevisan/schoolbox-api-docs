@@ -93,10 +93,8 @@ if ($_POST['type'] == 'components') {
     $factory        = $factoryFactory->build($_POST['context'], $page->getDi()->get('session')->get('user'), $page, true);
 
     // $component instanceof Component_ControllerAbstract
-    $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-    $cList         = array_values($componentList);
-
-    $component = $factory->buildComponent($cList[0]);
+    $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+    $component = $factory->buildComponent($instance);
 
     if (!($component instanceof Component_ControllerAbstract)) {
         die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
@@ -109,7 +107,7 @@ if ($_POST['type'] == 'components') {
     $config = $_GET;
 
     /** @var Component_Instance $instance */
-    $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
+    $instance = $componentInstanceMapper->findByInstanceId($config['component']);
 
     if (is_object($instance)) {
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -158,7 +156,7 @@ if ($_POST['type'] == 'components') {
         }
         if (SitePage::detectAjax()) {
             // Just refetch the instance
-            $instance         = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
+            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId());
             $factoryFactory   = new Component_FactoryFactory();
             $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
             $renderer         = new Component_Renderer();

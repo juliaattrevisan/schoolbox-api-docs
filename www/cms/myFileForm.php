@@ -135,25 +135,21 @@ if (isset($_POST['description'])) {
                     // set uploaded file as the current image
                     $componentId = $_POST['component_instance_id'];
                     if (!empty($componentId)) {
-                        $components = Component_InstanceMapper::getInstance()
-                            ->findByInstanceId($componentId);
-                        if (!empty($components[$componentId])) {
-                            $component = $components[$componentId];
-                            if ($component instanceof Component_Instance
-                                && in_array($component->getIdentifier(), array_keys($pageIds))
-                                && $component->getDefinition()->getClass() == 'Component_Eportfolio_ImageController'
-                            ) {
-                                // set this component's image to this one
-                                foreach ($component->getConfig() as $config) {
-                                    if ($config->getKey() == 'eportfolioImage') {
-                                        $configInstance = new Component_Config();
-                                        $configInstance->setId(null);
-                                        $configInstance->setConfigDefinitionId($config->getId());
-                                        $configInstance->setInstanceId($component->getId());
-                                        $configInstance->setValue($file->getId());
-                                        Component_ConfigMapper::getInstance()->save($configInstance);
-                                        break;
-                                    }
+                        $component = Component_InstanceMapper::getInstance()->findByInstanceId($componentId);
+                        if ($component instanceof Component_Instance
+                            && in_array($component->getIdentifier(), array_keys($pageIds))
+                            && $component->getDefinition()->getClass() == 'Component_Eportfolio_ImageController'
+                        ) {
+                            // set this component's image to this one
+                            foreach ($component->getConfig() as $config) {
+                                if ($config->getKey() == 'eportfolioImage') {
+                                    $configInstance = new Component_Config();
+                                    $configInstance->setId(null);
+                                    $configInstance->setConfigDefinitionId($config->getId());
+                                    $configInstance->setInstanceId($component->getId());
+                                    $configInstance->setValue($file->getId());
+                                    Component_ConfigMapper::getInstance()->save($configInstance);
+                                    break;
                                 }
                             }
                         }

@@ -73,8 +73,7 @@ class TaskRedir extends Base {
 
                         /** @var \Component_Instance $component */
                         $component_id   = $unit_instance->getComponent()->getId();
-                        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-                        $component      = $component_list[$component_id];
+                        $component      = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
 
                         // Only proceed to marking if the logged in user is actually in this folder
 

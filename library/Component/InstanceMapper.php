@@ -196,7 +196,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 
     /**
      * @param $id
-     * @return Component_Instance[]|GenericCollection
+     * @return Component_Instance|null
      */
     public function findByInstanceId($id)
     {
@@ -213,7 +213,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
 
-        return $this->findByFields($sql, array(':id' => $id));
+        return $this->findByFields($sql, array(':id' => $id))->first();
     }
 
     /**
@@ -532,7 +532,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     *
     * @param $key
     * @param $value
-    * @return \Collection
+    * @return \Schoolbox\Collection
     */
     public function findComponentByConfigValue($key, $value)
     {
@@ -556,10 +556,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 
         $collection = new Schoolbox\Collection();
         while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // findByInstanceID() always returns an array
-            foreach ($this->findByInstanceId($record['component_instance_id']) as $c) {
-                $collection->add($c);
-            }
+            $collection->add($this->findByInstanceId($record['component_instance_id']));
         }
         return $collection;
     }

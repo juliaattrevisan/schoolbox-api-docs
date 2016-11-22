@@ -136,18 +136,12 @@ if ($page->detectAjax()) {
         $result['error']   = 403;
         $result['message'] = 'Permission Denied';
     } else {
-        // Load the component that this task was added to.
-        /** @var Component_Instance[] $component_list */
-        $component_id   = $component->getId();
-        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-        $component      = $component_list[$component_id];
-
         if ($component instanceof Component_Instance) {
             // Dump out template contents
             // There ought to be a method which does this.
             $chf = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
-            /** @var Component_Homepage_CourseOutlineController $controller */
+            /** @var Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller $controller */
             $controller = $chf->buildComponent($component);
             $controller->setup($category);
 

@@ -103,11 +103,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $componentSitepage->setDi($kernel->getDependencyInjector());
             $factory = new Component_Eportfolio_Factory(new \Schoolbox\User(), $componentSitepage);
 
-            // $component instanceof Component_ControllerAbstract
-            $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-            $cList = array_values($componentList);
-
-            $component = $factory->buildComponent($cList[0]);
+            $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+            $component = $factory->buildComponent($instance);
 
             if (!($component instanceof Component_ControllerAbstract)) {
                 die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
@@ -180,7 +177,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $config = $_POST;
 
             /** @var Component_Instance $instance */
-            $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
+            $instance = $componentInstanceMapper->findByInstanceId($config['component']);
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
@@ -244,9 +241,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $sitepage = new SitePage(false);
                 $sitepage->setDi($kernel->getDependencyInjector());
                 $factory       = new Component_Eportfolio_Factory(new \Schoolbox\User(), $sitepage);
-                $componentList = $componentInstanceMapper->findByInstanceId($instance->getId());
-                $cList         = array_values($componentList);
-                $component     = $factory->buildComponent($cList[0]);
+                $component     = $factory->buildComponent($instance);
                 $renderer      = new Component_Renderer();
                 $renderer->renderEportfolioComponent(
                     new Eportfolio_Page_Instance(

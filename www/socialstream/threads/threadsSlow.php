@@ -16,9 +16,7 @@ $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);
 $end = intval($_GET['end']);
 $offset = intval($_GET['offset']);
-
-$instanceArray = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId);
-$instance = $instanceArray[$instanceId];
+$instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId);
 
 /* Sew thread if instance exists
  */
