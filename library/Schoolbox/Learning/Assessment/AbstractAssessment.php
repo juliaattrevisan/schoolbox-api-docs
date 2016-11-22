@@ -500,6 +500,8 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
+     * Is feedback on this assessment visible to $viewingUser?
+     *
      * @param User $viewingUser
      * @return bool
      */
