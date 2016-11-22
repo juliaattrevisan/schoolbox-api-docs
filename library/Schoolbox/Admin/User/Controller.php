@@ -344,15 +344,13 @@ class Controller extends Base
                 $user = $this->userMapper->findById($post['userID']);
             } catch (MapperException $e) {
                 // User could not be found
-                error(31);
-                exit;
+                throw new \Schoolbox\Application\Exception\NotFound();
             }
 
             // Username check - if any other user has this username, abort
             foreach ($this->userMapper->findByColumn('username', $post['modusername']) as $userWithUsername) {
                 if ($userWithUsername->getId() != $user->getId()) {
-                    error(138);
-                    exit;
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_USERNAME_EXISTS);
                 }
             }
         } else {
@@ -360,8 +358,7 @@ class Controller extends Base
             if ($post['modusername']) {
                 // Username check - if any other user has this username, abort
                 if ($this->userMapper->countByColumn('username', $post['modusername']) > 0) {
-                    error(138);
-                    exit;
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_USERNAME_EXISTS);
                 }
             }
         }
