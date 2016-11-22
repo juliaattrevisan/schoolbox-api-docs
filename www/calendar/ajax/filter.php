@@ -9,6 +9,7 @@
 
 // don't bother trying if fList isn't set
 if(!(isset($_POST['fList']) && isset($_POST['view']))) {
+    header(':', true, 400);
     die('Not enough data supplied');
 }
 
