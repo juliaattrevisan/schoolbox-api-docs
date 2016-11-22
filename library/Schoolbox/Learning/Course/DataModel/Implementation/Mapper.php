@@ -11,9 +11,10 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 
 /**
  * Mapper for the data model for Course Implementations.
@@ -36,6 +37,35 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitImpls']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreUnitImpls']);
+    }
+
+    /**
+     * Soft deletes all UnitImpls for the specified CourseImpl
+     *
+     * @param Model $courseImpl
+     */
+    public function softDeleteUnitImpls(Model $courseImpl)
+    {
+        $unitImplMapper = UnitImplementationMapper::getInstance();
+        $unitImpls = $unitImplMapper->findByColumn('course_implementation_id', $courseImpl->getId(), ['deleted' => true]);
+        $unitImplMapper->delete($unitImpls);
+    }
+
+
+    /**
+     * Soft deletes all UnitImpls for the specified CourseImpl
+     *
+     * @param Model $courseImpl
+     */
+    public function restoreUnitImpls(Model $courseImpl)
+    {
+        $unitImplMapper = UnitImplementationMapper::getInstance();
+        $unitImpls = $unitImplMapper->findByColumn('course_implementation_id', $courseImpl->getId(), ['deleted' => true]);
+        $unitImplMapper->restoreSoftDeleted($unitImpls);
     }
 
     /**
@@ -81,12 +111,12 @@ class Mapper extends BaseMapper
             /** @var Model $model */
             $model = $this->hydrate($row);
 
-            /** @var FolderModel $folder */
+            /** @var Folder $folder */
             $folder = $this->hydrateJoin($row, 'folder', 'f');
             $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
             $model->setFolder($folder);
 
-            /** @var CourseSpecificationModel $specification */
+            /** @var CourseSpecification $specification */
             $specification = $this->hydrateJoin($row, 'specification', 's');
             $specification->setFolder($this->hydrateJoin($row, 'specification.folder', 'sf'));
             $model->setSpecification($specification);
