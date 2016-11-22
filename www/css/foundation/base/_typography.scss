@@ -15,9 +15,9 @@ $header-bottom-margin: 1rem;
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-$h1-font-size: rem-calc(($base-font-size * 3));
-$h2-font-size: rem-calc(($base-font-size + 4));
-$h3-font-size: rem-calc(($base-font-size + 2));
+$h1-font-size: rem-calc(($base-font-size * 2));
+$h2-font-size: rem-calc(($base-font-size + 2));
+$h3-font-size: rem-calc(($base-font-size + 1));
 $h4-font-size: rem-calc(($base-font-size));
 $h5-font-size: rem-calc(($base-font-size));
 $h6-font-size: rem-calc(($base-font-size - 2));
@@ -137,8 +137,8 @@ $blockquote-cite-link-color: $blockquote-cite-font-color;
 }
 
              //  s,     m,      l+
-$h1-font-scale: (1.5,    1.75,   2.125);
-$h2-font-scale: (1.25,   1.3125, 1.3125);
+$h1-font-scale: (1.5,    1.75,   1.75);
+$h2-font-scale: (1.125,   1.125, 1.125);
 $h3-font-scale: (1,  1,   1);
 $h4-font-scale: (0.9375,  0.93755,   0.9375);
 $h5-font-scale: (0.875,   0.875, 0.875);

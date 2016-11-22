@@ -24,24 +24,24 @@
         <!-- BEGIN socialstream_post_has_attachment -->
         <div class="socialstream-attachment">
             <!-- BEGIN socialstream_post_has_icon -->
-            <div class="card small-12">
+            <div class="compact card wrap-down small-12">
                 <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
                     <img src="/images/mime/{SOCIALSTREAM_POST_ICON}" />
                     <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
                 </a>
+                <p class="meta">{SOCIALSTREAM_POST_EXTERNAL_BODY}</p>
             </div>
-            <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
 
             <!-- END socialstream_post_has_icon -->
 
             <!-- BEGIN socialstream_post_has_thumbnail -->
-            <div class="card small-12">
+            <div class="card wrap-down small-12">
                 <a href="{SOCIALSTREAM_POST_URL}">
                     <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
                     <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
                 </a>
+                <p class="meta">{SOCIALSTREAM_POST_EXTERNAL_BODY}</p>
             </div>
-            <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
             <!-- END socialstream_post_has_thumbnail -->
 
             <!-- BEGIN socialstream_post_has_link -->
@@ -118,13 +118,13 @@
                 <div class="socialstream-attachment">
 
                     <!-- BEGIN socialstream_comment_has_icon -->
-                    <div class="card small-12">
+                    <div class="compact card wrap-down small-12">
                         <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
                             <img src="/images/mime/{SOCIALSTREAM_COMMENT_ICON}" />
                             <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
                         </a>
+                        <p class="meta">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</p>
                     </div>
-                    <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
                     <!-- END socialstream_comment_has_icon -->
 
                     <!-- BEGIN socialstream_comment_has_image -->
@@ -139,8 +139,8 @@
                             <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
                             <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
                         </a>
+                        <p class="meta">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</p>
                     </div>
-                    <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
                     <!-- END socialstream_comment_has_thumbnail -->
 
                     <!-- BEGIN socialstream_comment_has_link -->
@@ -207,13 +207,13 @@
                         <!-- BEGIN socialstream_reply_has_attachment -->
                         <div data-socialstream-attachment>
                             <!-- BEGIN socialstream_reply_has_icon -->
-                            <div class="card small-12">
+                            <div class="compact card wrap-down small-12">
                                 <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
                                     <img src="/images/mime/{SOCIALSTREAM_REPLY_ICON}" />
                                     <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
                                 </a>
+                                <p class="meta">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</p>
                             </div>
-                            <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
                             <!-- END socialstream_reply_has_icon -->
 
                             <!-- BEGIN socialstream_reply_has_image -->
@@ -228,8 +228,8 @@
                                     <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
                                     <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
                                 </a>
+                                <p class="meta">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</p>
                             </div>
-                            <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
                             <!-- END socialstream_reply_has_thumbnail -->
 
                             <!-- BEGIN socialstream_reply_has_link -->

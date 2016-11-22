@@ -3,24 +3,15 @@
         <div class="nav-wrapper">
             <div id="nav">
                 <ul class="off-canvas-list">
-
+                    {% spaceless %}
                     {% for section in sections %}
-
                         {% if section.section == 'menu' and section.visible %}
-
                             <li><h3>{{ section.title }}</h3></li>
                             <div class="nav-wrapper">
                                 <ul class="off-canvas-list">
                                     {% for node in nodes if node.parentId == 0 %}
                                         {% set submenu = false %}
-                                        <li
-                                                {% for subnode in nodes if subnode.parentId == node.id %}
-                                                    {% if submenu == false %}
-                                                        {% set submenu = true %}
-                                                        class="has-submenu"
-                                                    {% endif %}
-                                                {% endfor %}
-                                        >
+                                        <li {% for subnode in nodes if subnode.parentId == node.id %}{% if submenu == false %}{% set submenu = true %}class="has-submenu"{% endif %}{% endfor %}>
                                             <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
                                                 <span>{{ node.title }}</span>
                                             </a>
@@ -83,7 +74,9 @@
                                 <div class="nav-wrapper">
                                     <ul class="off-canvas-list">
                                         {% for type,subjectTypes in subjects %}
+                                            {% if type %}
                                             <li><h4>{{ type }}</h4></li>
+                                            {% endif %}
                                             {% for subject in subjectTypes %}
                                                 <li>
                                                     <a href="/homepage/code/{{ subject.code }}">{{ subject.name }}</a>
@@ -97,7 +90,7 @@
                         {% endif %}
 
                     {% endfor %}
-
+                    {% endspaceless %}
                 </ul>
             </div>
         </div>

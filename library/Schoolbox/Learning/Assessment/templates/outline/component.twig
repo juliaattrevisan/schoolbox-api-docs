@@ -31,8 +31,10 @@
             <a class="icon-course" href="/homepage/{{ course.folder.id }}" title="Visit course page">{{ course.title }}</a>
         </p>
         {% include '@learningAssessment/outline/unit.twig' %}
-        <div class="content">
-            <a href="/course/import/modify/{{ componentInstance.id }}" class="button icon-modify">Modify</a>
+        <div class="component-action">
+            <section>
+                <a href="/course/import/modify/{{ componentInstance.id }}" class="button">Modify</a>
+            </section>
         </div>
     {% else %}
         <div class="content">
