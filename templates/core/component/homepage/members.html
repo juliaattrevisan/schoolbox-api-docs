@@ -41,25 +41,26 @@
                     <p class="meta">Showing the first {MAX_MEMBERS} members. A further {HIDDEN_COUNT} member(s) are not shown.</p>
                 </div>
                 <!-- END people_hidden -->
+                <!-- BEGIN member_email -->
+                <div class="component-action">
+                    <section>
+                        <form id="email-all"  action="/mail/createMail.php" method="post">
+                            <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
+                            <input type="hidden" name="bcc" value="{EMAILALL}"/>
+                        </form>
+                        <script>
+                            $(function() {
+                                $('[data-email]').click(function() {
+                                    $('#email-all').submit();
+                                });
+                            });
+                        </script>
+                        <a href="#" data-email class="button">Email All</a>
+                    </section>
+                </div>
+                <!-- END member_email -->
             </section>
-            <!-- BEGIN member_email -->
-            <div class="component-action">
-                <section>
-                    <a href="#" data-email class="button">Email All</a>
-                </section>
-            </div>
-            <form id="email-all" action="/mail/createMail.php" method="post">
-                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
-                <input type="hidden" name="bcc" value="{EMAILALL}"/>
-            </form>
-            <script>
-                $(function() {
-                    $('[data-email]').click(function() {
-                        $('#email-all').submit();
-                    });
-                });
-            </script>
-            <!-- END member_email -->
+
         </div>
     </div>
 
