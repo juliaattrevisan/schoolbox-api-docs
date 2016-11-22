@@ -198,7 +198,8 @@ class ImportFactory
         // 2. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, but AssessmentSpec not imported
         // 3. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported
         // 4. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported but deleted
-        $query1 = "
+
+        $query1a = "
             SELECT 
                 us.id             AS 'us.id',
                 usf.name          AS 'usf.name',
@@ -207,17 +208,7 @@ class ImportFactory
                 sa.deleted_at     AS 'sa.deleted_at',
                 sdw.assessment_id AS 'sdw.id',
                 sqz.assessment_id AS 'sqz.id',
-                stk.assessment_id AS 'stk.id',
-                ia.id             AS 'ia.id',
-                ia.title          AS 'ia.title',
-                ia.publish_date   AS 'ia.publish_date',
-                ia.open_date      AS 'ia.open_date',
-                ia.due_date       AS 'ia.due_date',
-                ia.close_date     AS 'ia.close_date',
-                ia.sequence       AS 'ia.sequence',                
-                idw.assessment_id AS 'idw.id',
-                iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id'                
+                stk.assessment_id AS 'stk.id'
             FROM course_unit_specification us
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -225,15 +216,57 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            LEFT JOIN course_unit_implementation ui ON ui.course_unit_specification_id = us.id AND ui.course_implementation_id = $courseImplId
-            LEFT JOIN assessment_course_unit_implementation aui ON aui.assessment_specification_id = sa.id AND aui.course_unit_implementation_id = ui.id
-            LEFT JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
+            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
+        ";
+
+        $query1b = "
+            SELECT
+                ia.id                           AS 'ia.id',
+                ia.title                        AS 'ia.title',
+                ia.publish_date                 AS 'ia.publish_date',
+                ia.open_date                    AS 'ia.open_date',
+                ia.due_date                     AS 'ia.due_date',
+                ia.close_date                   AS 'ia.close_date',
+                ia.sequence                     AS 'ia.sequence',
+                idw.assessment_id               AS 'idw.id',
+                iqz.assessment_id               AS 'iqz.id',
+                itk.assessment_id               AS 'itk.id',
+                aui.assessment_specification_id AS 'sa.id'
+            FROM assessment ia
+            JOIN assessment_course_unit_implementation aui ON aui.assessment_id = ia.id AND ia.deleted_at IS NULL
+            JOIN course_unit_implementation ui ON ui.id = aui.course_unit_implementation_id
+            JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
+            JOIN course_implementation ci ON ci.id = ui.course_implementation_id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
             WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
+            AND ci.id = $courseImplId
         ";
 
+        $query1 = "
+          SELECT
+            `us.id`,
+            `usf.name`,
+            t1b.`sa.id` AS `sa.id`,
+            `sa.title`,
+            `sa.deleted_at`,
+            `sdw.id`,
+            `sqz.id`,
+            `stk.id`,
+            `ia.id`,
+            `ia.title`,
+            `ia.publish_date`,
+            `ia.open_date`,
+            `ia.due_date`,
+            `ia.close_date`,
+            `ia.sequence`,
+            `idw.id`,
+            `iqz.id`,
+            `itk.id`
+          FROM (SELECT * FROM ($query1a) AS t1a) AS t1b
+          LEFT JOIN (SELECT * FROM ($query1b) AS t2a) AS t2b ON t1b.`sa.id` = t2b.`sa.id`
+        ";
 
         // Get the following Assessments:
         // 5. AssessmentImpls created directly in UnitImpl, no corresponding AssessmentSpec
@@ -273,7 +306,6 @@ class ImportFactory
         $statement = $this->database->prepare($query);
         $statement->execute();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             // Is is the first time this UnitSpec has been seen?
             if(!$unitSpecDBCache[$row['us.id']] instanceof UnitSpecification){
                 // Add a Folder and name it so we can later render out this UnitSpec's name.

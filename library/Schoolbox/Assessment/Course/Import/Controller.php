@@ -462,7 +462,8 @@ class Controller extends Base\Base
      * @var string   $post['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
      * @var string   $post['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
      * @var array    $post['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
-     * @var string   $post['unit'][unitSpecId]['a'][assId]['type']             {'spec' | 'impl'}
+     * @var int      $post['unit'][unitSpecId]['a'][assId]['specId']
+     * @var int      $post['unit'][unitSpecId]['a'][assId]['implId']
      * @var bool     $post['unit'][unitSpecId]['a'][assId]['checked']
      * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['publish']
      * @var string   $post['unit'][unitSpecId]['a'][assId]['dates']['open']
@@ -473,15 +474,21 @@ class Controller extends Base\Base
     {
         // TODO -don't use any Proxies !!
 
-
         // Parse form data
         $post = $this->getRequest()->post;
         $postedAction = trim($post['action']);
         $postedCourseSpecId = trim($post['course_spec_id']);
-        $postedCourseImplId = trim($post['course_impl_id']);
+        $courseImplId = trim($post['course_impl_id']);
         $postedComponentId = trim($post['component_id']);   // TODO - link to CourseOutline component
         $postedOwnerships = trim($post['ownerships']);
-        $postedUnitImpls = $post['unit'];
+        $unitImplData = $post['unit'];
+
+        // We need to maintain a link between AssessmentImpls and their Specs.
+        // This is because this relationship is not present in the models.
+        // We will use this array later to update the DB to reflect this relationship
+        // Initially this array holds pairs of AssessmentImplModels and AssessmentSpecIds where the SpecId may be null.
+        // After saving the Impl and assigning an ID, we can dehydrate to ints and update the DB
+        $assessmentImplToSpecPairs = [];
 
         // Algorithm:
         //
@@ -501,7 +508,7 @@ class Controller extends Base\Base
         /** @var CourseImplementation[] $courseImpls */
         $courseImpls = [];
 
-        // Are we creating a new import or modifying an existing?
+        // Are we creating a new import?
         if('import' == $postedAction){
             $courseSpec = $this->getCourseSpecificationMapper()->findById($postedCourseSpecId);
             $postedOwnerships = explode(',', $postedOwnerships);
@@ -512,9 +519,11 @@ class Controller extends Base\Base
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
             }
-        } else {
+        }
+        // Else we are modifying an existing import
+        else {
             // We can only modify a single Course Import at a time.
-            $courseImpl = $this->getCourseImplementationMapper()->findById($postedCourseImplId);
+            $courseImpl = $this->getCourseImplementationMapper()->findById($courseImplId);
             $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
 
             // Load UnitImplementations
@@ -534,20 +543,20 @@ class Controller extends Base\Base
                 $unitSpec = $unitImpl->getSpecification();
 
                 // Did user de-select this unit?
-                if(!array_key_exists($unitSpec->getId(), $postedUnitImpls)){
+                if(!array_key_exists($unitSpec->getId(), $unitImplData)){
                     // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
                     $this->getUnitImplementationMapper()->delete($unitImpl);
                 }
-                // Else still selected
+                // Else UnitImpl still selected
                 else {
                     // Delete any Assessments in the UnitImpl if de-selected by user
                     foreach($unitImpl->getAssessables() as $assessableImpl){
 
-                        $postAssessmentImpl = $postedUnitImpls[$unitSpec->getId()]['a'][$assessableImpl->getId()];
+                        $assessmentImplData = $unitImplData[$unitSpec->getId()]['a'][$assessableImpl->getId()];
                         // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
-                        if($postAssessmentImpl['type'] == 'impl'){
+                        if($assessmentImplData['impl_id']){
                             // Did user de-select this Assessment ?
-                            if(!$postAssessmentImpl['checked']){
+                            if(!$assessmentImplData['checked']){
                                 $this->getAssessmentMapperProxy()->delete($assessableImpl);
                             }
                         }
@@ -556,11 +565,10 @@ class Controller extends Base\Base
             }
         }
 
-
         // Create any un-imported UnitSpecs + AssessmentSpecs
         // Update any imported UnitImpls + AssessmentImpls
         foreach($courseImpls as $classFolderId => $courseImpl) {
-            foreach ($postedUnitImpls as $unitPair) {
+            foreach ($unitImplData as $unitPair) {
                 try {
                     $unitSpec = $this->getUnitSpecificationMapper()->findById($unitPair['unit_spec_id']);
                 } catch (MapperException\Deleted $e) {
@@ -590,7 +598,6 @@ class Controller extends Base\Base
                 }
                 $unitImpl->setOpenDate($unitImplOpenDate);
                 $unitImpl->setDueDate($unitImplCloseDate);
-                $unitImpl->setFolder($courseImpl->getFolder());
 
 
                 // Clone  Assessment Specs
@@ -601,19 +608,25 @@ class Controller extends Base\Base
                         continue;
                     }
                     // Is this a creation from the spec ?
-                    if ('spec' == $aData['type']) {
+                    if (!$aData['impl_id']) {
 
                         $assessmentMapper = AssessmentMapper::getInstance();
                         $assessmentSpec = $assessmentMapper->findById($assessmentId);
                         $assessmentImpl = clone $assessmentSpec;
                         $assessmentImpl->setContextUnitImplementation($unitImpl);
-                        $assessmentImpl->setContextUnitSpecification($unitSpec);
+                        $assessmentImpl->setContextUnitSpecification(null);
                         // TODO need to implement __clone() on DueWork to clone Rubric correctly
                         $assessmentImplDomain = $this->getAssessmentMapperProxy()->translateToDomainModel($assessmentImpl);
+                        $unitImpl->getAssessables()->add($assessmentImplDomain);
                     } // Else we have been passed the Assessment Impl
                     else {
-                        $assessmentImplDomain = $this->getAssessmentMapperProxy()->findById($assessmentId);
+                        $filter = function($impl) use ($aData){
+                            /** @var IAssessable $impl */
+                            return $impl->getId() == $aData['impl_id'];
+                        };
+                        $assessmentImplDomain = $unitImpl->getAssessables()->filter($filter)->first();
                     }
+                    $assessmentImplToSpecPairs[] = [$assessmentImplDomain, $aData['spec_id']];
 
                     // Update Dates
 
@@ -626,28 +639,34 @@ class Controller extends Base\Base
                         }
                         $assessmentImplDomain->$method(\Alaress_Date_Format::newLocalShort($localShort));
                     }
-                    $unitImpl->getAssessables()->add($assessmentImplDomain);
                 }
             }
         }
 
         // Save each Course Import
         try{
+            // Even if an import-modify, we need to explicitly save to update timestamps, and possibly the folderId
             $this->getCourseImplementationMapper()->save($courseImpls);
             foreach($courseImpls as $classFolderId => $courseImpl) {
-
-                // Save the Unit Imports
-                $this->getUnitImplementationMapper()->save($courseImpl->getUnits());
-
-                // For each UnitImport, save the non-deleted Assessments
+                // For each UnitImpl in the CourseImpl
                 foreach ($courseImpl->getUnits() as $unitImpl) {
+
+                    // Don't save assessments in deleted unitImpl
+                    if($unitImpl->isDeleted()){
+                        continue;
+                    }
+                    $this->getUnitImplementationMapper()->save($unitImpl);
 
                     $extantAssessments = $unitImpl->getAssessables()->filter(function ($assessable) {
                         /** @var IAssessable $assessable */
                         return !$assessable->isDeleted();
                     });
-
                     foreach ($extantAssessments as $seq => $assessment) {
+
+                        // Ensure Assessment's UnitImpl's Id is set (because object got swapped out during save ><)
+                        /** @var IAssessable $assessment */
+                        $assessment->getContext()->setId($unitImpl->getId());
+
                         $this->getAssessmentMapperProxy()->save($assessment, $seq + 1);
                     }
                 }
@@ -660,6 +679,17 @@ class Controller extends Base\Base
             return;
         }
 
+        // Now that all AssessmentImpls have been saved to DB and assigned an ID, we can dehydrate them to their IDs
+        // and update the Impl to Spec mapping in the DB
+        $implIdsToSpecIds = [];
+        foreach($assessmentImplToSpecPairs as $pair){
+            /** @var IAssessable $impl */
+            $impl = $pair[0];
+            if(!$impl->isDeleted()){
+                $implIdsToSpecIds[$impl->getId()] = $pair[1];
+            }
+        }
+        AssessmentMapper::getInstance()->updateImplToSpecLinks($implIdsToSpecIds);
 
         if(true){
             return;

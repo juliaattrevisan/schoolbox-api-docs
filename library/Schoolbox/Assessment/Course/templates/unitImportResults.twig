@@ -129,7 +129,8 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
-                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ unitAssessmentCountSelected }}"> selected</span>{% endif %}</p>
+                            {% set countSelected = 'import' == action ? unitAssessmentCount : unitAssessmentCountSelected %}
+                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
                     <nav>
@@ -154,7 +155,9 @@
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
 
                                     <li data-type="unit_row">
-                                        <input type="hidden" name="{{ inputPrefix }}[type]" value="{% if assessmentImpl %}impl{% else %}spec{% endif %}" />
+                                        <input type="hidden" name="{{ inputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
+                                        <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
+
                                         <div class="compact card small-12 large-4">
                                             <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                             <input type="checkbox"

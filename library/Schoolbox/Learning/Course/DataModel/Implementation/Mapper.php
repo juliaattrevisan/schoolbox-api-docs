@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\DataModel\Implementation;
 
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
@@ -42,7 +43,7 @@ class Mapper extends BaseMapper
      *
      * @param int   $folderId
      * @param array $options
-     * @return Model
+     * @return Model[]|Collection
      */
     public function findByFolderId($folderId, $options = [])
     {

@@ -607,11 +607,11 @@ class Mapper extends BaseMapper
 
             $query = $this->database->prepare("
                 UPDATE
-                  `assessment_course_unit_implementation` aui
+                  `assessment_course_unit_implementation`
                 SET
-                  assessment_specification_id = :specId
+                  `assessment_specification_id` = :specId
                 WHERE
-                  assessment_id = :implId
+                  `assessment_id` = :implId
             ");
 
             foreach($implIdsToSpecIds as $implId => $specId){
