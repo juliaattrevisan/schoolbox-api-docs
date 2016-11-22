@@ -82,9 +82,10 @@ class Controller extends Base
      *
      * @param Participant $participant
      * @param Collection $feedbacks
+     * @param IResponse $response
      * @throws \Alaress\Web\Controller\Exception
      */
-    private function processFeedback(Participant $participant, Collection $feedbacks)
+    private function processFeedback(Participant $participant, Collection $feedbacks, IResponse $response = null)
     {
         if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
             // if none, or published: create new draft
@@ -159,6 +160,11 @@ class Controller extends Base
             if (!$feedback->isPublished()) {
                 $feedback->setPublishedAt(Alaress_Date_Format::now());
             }
+        }
+
+        /* Attach feedback to a particular Response instance
+         */
+        if ($response) {
         }
 
         $this->getFeedbackDataSource()->save($feedback);
