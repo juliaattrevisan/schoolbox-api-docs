@@ -1148,17 +1148,13 @@ class Controller extends Base\Base
      */
     public function management($folderId)
     {
-        /* TODO: Exception falls directly on to carpet
-         */
-        $folder = $this->getFolderMapper()->findCheaplyById($folderId);
-
         /* Find all the Courses associated with this Folder, via imported Units
          */
-        $allCourses = $this->getCourseImplementationMapper()->findByFolderId($folderId);
+        $courseImpls = $this->getCourseImplementationMapper()->findByFolderId($folderId);
 
         $this->tpl('management', [
-            'folder' => $folder,
-            'allCourses' => $allCourses,
+            'folder'      => $courseImpls->first()->getFolder(),
+            'courseImpls' => $courseImpls,
         ]);
     }
 

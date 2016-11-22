@@ -83,14 +83,14 @@
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
             </nav>
         </div>
 
-        {% if allCourses|length %}
+        {% if courseImpls|length %}
         <section>
             <ul class="action-list" id="courseList">
-                {% for currentCourse in allCourses %}
+                {% for currentCourse in courseImpls %}
                 <li class="actions-small-2">
                     <div class="list-item">
                         <div class="card small-12">
