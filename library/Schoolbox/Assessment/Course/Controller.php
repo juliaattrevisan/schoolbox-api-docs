@@ -1138,31 +1138,6 @@ class Controller extends Base\Base
         ]);
     }
 
-    /**
-     * View a list of courses associated with a homepage
-     *
-     * @api   GET /course/management/{folderId}
-     * @level 160
-     *
-     * @param int $folderId
-     */
-    public function management($folderId)
-    {
-        /* Find all the Courses associated with this Folder, via imported Units
-         */
-        $courseImpls = $this->getCourseImplementationMapper()->findByFolderId($folderId);
-
-        // Short cut if possible.
-        $folder = $courseImpls->count()
-            ? $courseImpls->first()->getFolder()
-            : $this->getFolderMapper()->findById($folderId);
-
-        $this->tpl('management', [
-            'folder'      => $folder,
-            'courseImpls' => $courseImpls,
-        ]);
-    }
-
 
     /**
      * Delete a course specification

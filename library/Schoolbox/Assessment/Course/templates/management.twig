@@ -83,7 +83,7 @@
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
     <li class="active">
-        <a href="{{ routeLookup('course.management', { folderId: folder.id }) }}">Modify Course</a>
+        <a href="{{ routeLookup('courseImport.getManagement', { folderId: folder.id }) }}">Modify Course</a>
     </li>
 </ul>
 <div class="row">

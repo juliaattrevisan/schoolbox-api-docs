@@ -41,7 +41,7 @@
             <p>To get started with courses you need to first import an existing course to display</p>
 
             <a href="#" class="button icon-course" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import New Course</a>
-            <a href="/course/management/{{ context.id }}" class="button icon-export">Manage Courses</a>
+            <a href="{{ routeLookup('courseImport.getManagement', { folderId: context.id }) }}" class="button icon-export">Manage Courses</a>
         </div>
     {% endif %}
 </section>

@@ -65,6 +65,7 @@ class Module extends \Alaress\Module\Module
         $this->register('GET',    '/{courseSpecId:\d+}/class{/classCode}',               'getImportToClassForm',     $staffOnly, $preloadImport);
         $this->register('GET',    '/{courseImplId:\d+}/modify',                          'importModify',             $staffOnly, $preloadCourse);
         $this->register('GET',    '/classes',                                            'searchClasses',            $staffOnly);
+        $this->register('GET',    '/management/{folderId}',                              'getManagement',            $staffOnly);
 
         $this->register('POST',   '/classes',                                            'postClasses',              $staffOnly);
         $this->register('POST',   '/ownership',                                          'postOwnership',            $staffOnly);
