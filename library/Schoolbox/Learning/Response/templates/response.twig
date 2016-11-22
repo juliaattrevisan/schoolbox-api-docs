@@ -79,7 +79,9 @@
 </div>
 <div class="row">
     <div class="small-12 columns">
-        {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+        {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+            markScheme: assessment.markScheme
+        } %}
     </div>
     <div class="small-12 columns">
         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}

@@ -119,6 +119,7 @@ class Controller extends Base
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+                'participant' => (new Participant($response->getSubmittedOnBehalfOf(), $response->getAssessable())),
 
                 /* Rubrics data
                  */
