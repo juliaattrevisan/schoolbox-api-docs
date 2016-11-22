@@ -21,10 +21,11 @@
         <div data-dz-container="">
         </div>
         <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
-        <div class="hide" data-dz-template>
+
+        <ul class="hide" data-dz-template>
             <li>
                 <div class="card small-12">
-                    <div class="icon-audio icon-32"></div>
+                    <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
                     <h3 data-dz-name></h3>
                     <p class="meta" data-dz-status>Uploading...</p>
                     <div class="progress dz-progress">
@@ -32,7 +33,7 @@
                     </div>
                 </div>
             </li>
-        </div>
+        </ul>
 
         <div class="empty-state">
             <i class="icon-files"></i>
