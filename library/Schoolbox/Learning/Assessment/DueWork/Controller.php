@@ -187,6 +187,8 @@ class Controller extends Assessment\Controller
         /** @var Submission\File\Model $submission */
         $allResponses = $participant->getAllResponses();
 
+        $attachZoneFactory = new Assessment\Attachzone\Factory();
+
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
@@ -200,7 +202,7 @@ class Controller extends Assessment\Controller
                 /* Files attached to the draft submission
                  * Attach files if any exist
                  */
-                $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse($latestResponse);
 
                 /* Load in the wizzywig instead of a file attachment,
                  * if the $file uses the wizzywig editor
@@ -217,7 +219,7 @@ class Controller extends Assessment\Controller
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
                 $latestResponse = null;
-                $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
             }
         }
         else {
@@ -225,7 +227,7 @@ class Controller extends Assessment\Controller
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
-            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
+            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
         }
 
         /* Pump into twig land
