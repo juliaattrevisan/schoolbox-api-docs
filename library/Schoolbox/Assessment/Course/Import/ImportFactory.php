@@ -362,7 +362,10 @@ class ImportFactory
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
                 $dto->addAssessmentPair($unitSpecCache[$row['us.id']], $assessmentSpec, $assessmentImpl);
             } else if($assessmentSpec instanceof IAssessable) {
-                $dto->addAssessmentSpec($unitSpecCache[$row['us.id']], $assessmentSpec);
+                // Don't add deleted AssessmentSpecs
+                if(!$assessmentSpec->isDeleted()){
+                    $dto->addAssessmentSpec($unitSpecCache[$row['us.id']], $assessmentSpec);
+                }
             } else {
                 $dto->addAssessmentImpl($unitSpecCache[$row['us.id']], $assessmentImpl);
             }
