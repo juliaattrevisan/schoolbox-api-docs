@@ -174,6 +174,25 @@ class Participant
     }
 
     /**
+     * Find the authoritative published AND visible Feedback for an Assessment for this Participant
+     *
+     * This assessment may have a mark visibility setting - if it does, and $viewingUser
+     * doesn't match it, they may not view feedback for this assessment.
+     *
+     * @param User $viewingUser The user who is attempting to view feedback.
+     *                          Usually this will come from the user's session.
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentVisibleFeedback(User $viewingUser)
+    {
+        if (!$this->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
+            return null;
+        }
+        return $this->findMostRecentPublishedFeedback();
+    }
+
+    /**
      * Determine what sort of objects are permitted in the Response collection
      *
      * @return string|null
