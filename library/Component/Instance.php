@@ -32,8 +32,10 @@ class Component_Instance
     protected $module;
 
     /**
-    * @var int
-    */
+     * Id of the Folder where this Component resides
+     *
+     * @var int
+     */
     protected $identifier;
 
     /**
@@ -151,7 +153,6 @@ class Component_Instance
     }
 
     /**
-     * Return the id of the Folder where this Component resides
      * @return int
      */
     public function getIdentifier()
