@@ -48,6 +48,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if (!$this->getTextbox()->getHeading()) {
             $this->getTextbox()->setHeading('Text Box');
         }
+
+        $this->setComponentName(Scrub::text($this->getTextbox()->getHeading()));
+
         return true;
     }
 
@@ -68,7 +71,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
             $this->setBlock($templateHandle, 'textbox', 'textbox_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
             $this->setBlock('empty_state', 'empty_create', 'empty_create_block');
 
             $this->setVar('textbox_block', '');
@@ -76,11 +78,12 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 if ($this->getTextbox()->getId()) {
                     $this->setVar('empty_create_block', '');
-                    $this->parse('empty_modify_block', 'empty_modify');
                 } else {
-                    $this->setVar('empty_modify_block', '');
                     $this->parse('empty_create_block', 'empty_create');
                 }
+            }
+            else {
+                $this->setVar('empty_create_block', '');
             }
 
             $this->parse('empty_state_block', 'empty_state');
@@ -108,7 +111,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * inadvertently steal ownership of it
                  */
                 $heading = Scrub::text($this->getTextbox()->getHeading());
-                $this->setComponentName($heading);
+
 
                 $this->setVar(array(
                     'TEXTBOX_HEADING' => $heading,
