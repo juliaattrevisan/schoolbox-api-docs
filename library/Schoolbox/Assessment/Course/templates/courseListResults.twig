@@ -21,7 +21,7 @@
                     {% include '@course/courseListResult.twig' with {
                         courseSpec:     course,
                         folder:         folder,
-                        component:      null,
+                        componentId:    componentId,
                         cparents:       lineage[course.id],
                         hasTot:         hasTot,
                         currentUser:    currentUser,
@@ -42,7 +42,7 @@
                     {% include '@course/courseListResult.twig' with {
                         courseSpec:  course,
                         folder:      folder,
-                        component:   null,
+                        componentId: componentId,
                         cparents:    lineage[course.id],
                         hasTot:      hasTot,
                         currentUser: currentUser

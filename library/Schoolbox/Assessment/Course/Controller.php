@@ -796,7 +796,7 @@ class Controller extends Base\Base
     {
         $query = $this->getRequest()->query;
 
-        $component = $query->get('component');
+        $componentId = $query->get('component');
         $folder = $query->get('folder');
         $search = $query->get('query');
 
@@ -819,6 +819,7 @@ class Controller extends Base\Base
                 'hasTot' => false,
                 'linkToUnits' => false,
                 'hasClose' => true,
+                'componentId' => $componentId,
             ];
         } else {
             $options = [
@@ -833,7 +834,6 @@ class Controller extends Base\Base
         if ($folder) {
             $options['folder']['id'] = $folder;
         }
-
         $this->tpl($template, array_merge($data, $options));
     }
 
