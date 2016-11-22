@@ -106,14 +106,22 @@ class Participant
      */
     public function isMarkingRequired()
     {
-        if (!count($this->allResponses)) {
+        $latestResponse = $this->findMostRecentSubmittedResponse();
+        $latestFeedback = $this->findMostRecentFeedback();
+
+        /* If there is a feedback sans response, is ok
+         * No marking is required
+         */
+        if (!$latestResponse) {
             return false;
         }
-        if (!count($this->allFeedbacks)) {
+
+        if (!$latestFeedback) {
             return true;
         }
-        $latestResponse = $this->findMostRecentResponse();
-        $latestFeedback = $this->findMostRecentFeedback();
+
+        /* Otherwise determine based on the timeline of events
+         */
         return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
     }
 
@@ -180,6 +188,19 @@ class Participant
             }
         }
         return $mostRecentResponse;
+    }
+
+
+    /**
+     * @return IResponse|null
+     */
+    public function findMostRecentSubmittedResponse()
+    {
+        $filteredResponses = $this->allResponses->filter(function(IResponse $response) {
+            return $response->isSubmitted();
+        });
+
+        return $filteredResponses->sortBy('submittedAt', 'desc')->first();
     }
 
     /**
