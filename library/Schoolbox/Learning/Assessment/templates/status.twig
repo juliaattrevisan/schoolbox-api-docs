@@ -82,19 +82,12 @@
                     <div class="small-12 column">
                         <div class="row actions-small-{{ pActionCount }}">
                             <div class="list-item">
-
-
-                                {# TODO snap this card out so it can be used in the inlineGrader carousel #}
-                                <div class="small-12 card">
-                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
-                                    <h3>{{ participant.user.fullName }}</h3>
-                                    <p class="meta">
-                                        <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
-                                        <span>{{ pStatusText }}</span>
-                                    </p>
-                                </div>
-
-
+                                {% include '@learningAssessment/fragments/participantStatus.twig' with {
+                                    user: participant.user,
+                                    statusClass: pStatusClass,
+                                    statusText: pStatusText,
+                                    statusTip: pTooltip
+                                } only %}
                             </div>
                             {% if pActionCount %}
                                 <nav>
