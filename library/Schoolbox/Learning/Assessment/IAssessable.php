@@ -206,6 +206,14 @@ interface IAssessable extends ISoftDeletable
      */
     public function isValidDates();
 
+    /**
+     * Is feedback on this Assessment visible to this user?
+     *
+     * @param User $viewingUser
+     * @return bool
+     */
+    public function isFeedbackVisibleToUser(User $viewingUser);
+
     /* Getters/Setters
      */
 
