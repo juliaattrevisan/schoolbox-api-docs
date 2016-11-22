@@ -1152,8 +1152,13 @@ class Controller extends Base\Base
          */
         $courseImpls = $this->getCourseImplementationMapper()->findByFolderId($folderId);
 
+        // Short cut if possible.
+        $folder = $courseImpls->count()
+            ? $courseImpls->first()->getFolder()
+            : $this->getFolderMapper()->findById($folderId);
+
         $this->tpl('management', [
-            'folder'      => $courseImpls->first()->getFolder(),
+            'folder'      => $folder,
             'courseImpls' => $courseImpls,
         ]);
     }
