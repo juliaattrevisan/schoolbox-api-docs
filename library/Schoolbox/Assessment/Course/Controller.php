@@ -1158,55 +1158,6 @@ class Controller extends Base\Base
         ]);
     }
 
-    /**
-     * Restore a Course instance via rebuilding its component
-     *
-     * @deprecated Course (implementation) existence is not tied to the existence of its component anymore.
-     *
-     * @api   POST /course/import/restore
-     * @level 160
-     *
-     */
-    public function restoreCourse()
-    {
-        $folderId = $this->getRequest()->post->get('folderId');
-        $componentId = $this->getRequest()->post->get('componentId');
-
-        $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
-
-        /* Spawn a new Course Builder instance
-         */
-        $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-            'class',
-            'Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller'
-        );
-
-        $componentDefinitionId = $componentDefinition->first()->getId();
-
-        $component = new \Component_Instance();
-        $component
-            ->setDefinitionId($componentDefinitionId)
-            ->setModule('homepage')
-            ->setIdentifier($folderId)
-            ->setPosition('top')
-            ->setSequence(1);
-
-        $this->getComponentInstanceMapper()->save($component);
-
-        /* Reassign the new Course Builder instance id to each
-         * unit that previously used $componentId
-         */
-        foreach ($allUnits as $currentUnit) {
-            $currentUnit->setComponent($component->getId());
-
-            $this->getUnitInstanceMapper()->save($currentUnit);
-        }
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => ['result' => 'success']
-        ]);
-    }
 
     /**
      * Delete a course specification

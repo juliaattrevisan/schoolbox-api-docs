@@ -946,8 +946,8 @@ class Controller extends Base\Base
      *
      * Deletes an import, along with ALL of its associated data
      *
-     * @api   POST /import/delete
-     * @level 160
+     * @api   DELETE /course/import/{courseImplId}
+     * @level 165
      */
     public function importDelete()
     {
@@ -990,6 +990,58 @@ class Controller extends Base\Base
             return;
         }
 
+    }
+
+
+    /**
+     * Create a CourseOutline component for the specified CourseImpl.
+     *
+     * This action is available from a homepage's course management page.
+     * If the courseImpl already has a CourseOutline component, send caller some helpful info
+     * and do not add another CourseOutline component.
+     *
+     * @api   POST /course/import/{courseImplId}/restore
+     * @level 165
+     */
+    public function restoreCourse()
+    {
+        $folderId = $this->getRequest()->post->get('folderId');
+        $componentId = $this->getRequest()->post->get('componentId');
+
+        $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
+
+        /* Spawn a new Course Builder instance
+         */
+        $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
+            'class',
+            'Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller'
+        );
+
+        $componentDefinitionId = $componentDefinition->first()->getId();
+
+        $component = new \Component_Instance();
+        $component
+            ->setDefinitionId($componentDefinitionId)
+            ->setModule('homepage')
+            ->setIdentifier($folderId)
+            ->setPosition('top')
+            ->setSequence(1);
+
+        $this->getComponentInstanceMapper()->save($component);
+
+        /* Reassign the new Course Builder instance id to each
+         * unit that previously used $componentId
+         */
+        foreach ($allUnits as $currentUnit) {
+            $currentUnit->setComponent($component->getId());
+
+            $this->getUnitInstanceMapper()->save($currentUnit);
+        }
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
     }
 
 
