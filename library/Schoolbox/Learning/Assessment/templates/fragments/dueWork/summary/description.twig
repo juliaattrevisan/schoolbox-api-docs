@@ -1,14 +1,3 @@
-{% import '@learning/macro/urgency.twig' as urgency %}
-
-<ul class="meta">
-    <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
-    <li class="icon-due-work">{{ assessment.typeName }}</li>
-
-    {% if currentUser.role.isStaff %}
-    <li class="icon-staff-students">{{ student.fullname }}</li>
-    {% endif %}
-</ul>
-
 <section>
     {% if assessment.description|length %}
         <article class="content">

@@ -1,20 +1,33 @@
 <li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
-    {% include '@learning/dueWork/interaction/response/creator.twig' %}
+    <ul class="action-list">
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="card small-12">
+                    <a href="/search/user/{{ student.id }}" title="View Profile">
+                        <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
+                        <p>{{ student.fullname }}</p>
 
-    <article>
-        {{ currentInteraction.onlineSubmissionContent|purify }}
-    </article>
+                        {% if currentInteraction.isSubmitted %}
+                            <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
+                        {% else %}
+                            <p class="meta">Draft last updated {{ currentInteraction.updatedAt.short }}</p>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            <nav>
+                {% if isRouteAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) %}
+                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) }}" class="icon-next" title="View in Inline Grader"></a>
+                {% endif %}
+            </nav>
+        </li>
+    </ul>
 
     {% if currentInteraction.allFiles %}
     <ul class="information-list">
         {% for currentFile in currentInteraction.allFiles %}
-        <li class="actions-small-1">
+        <li>
             {% include '@learning/dueWork/interaction/response/files.twig' %}
-            <nav>
-                {% if isRouteAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) %}
-                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) }}?hash={{ currentFile.hash }}" class="icon-next" title="View in Inline Grader"></a>
-                {% endif %}
-            </nav>
         </li>
         {% endfor %}
     </ul>
@@ -31,3 +44,4 @@
         </ul>
     {% endif %}
 </li>
+

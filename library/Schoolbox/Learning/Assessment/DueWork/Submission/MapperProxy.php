@@ -8,7 +8,9 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as DataObject;
@@ -145,8 +147,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
-
                 $dataModelFile = (new StudentSubmissionFile())
+                    ->setSubmission($dataModel)
                     ->setStorage($file->getStorage())
                     ->setEditableInline($file->getEditableInline())
                     ->setUuid($file->getCrocodocId())

@@ -75,7 +75,7 @@ class Model extends AbstractResponse
     public function getOnlineSubmissionContent()
     {
         foreach ($this->getAllFiles() as $currentFile) {
-            if ($currentFile->isOnlineSubmission()) {
+            if ($currentFile->getEditableInline()) {
                 return $currentFile->getStorage()->read();
             }
         }

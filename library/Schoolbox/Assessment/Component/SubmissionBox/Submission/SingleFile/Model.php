@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
-use Plagscan_Document;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -96,7 +96,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return Plagscan_Document
+     * @return Plagscan
      */
     public function getPlagscan()
     {
@@ -104,7 +104,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @param Plagscan_Document $plagscan
+     * @param Plagscan $plagscan
      * @return static
      */
     public function setPlagscan($plagscan)

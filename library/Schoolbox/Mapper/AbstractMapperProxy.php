@@ -88,6 +88,7 @@ abstract class AbstractMapperProxy
     public function save($model)
     {
         foreach ($this->getMapper()->getModelAsCollection($model) as $domainObject) {
+
             $dataModel = $this->transformDomainObject($domainObject);
             $this->getMapper()->save($dataModel);
 

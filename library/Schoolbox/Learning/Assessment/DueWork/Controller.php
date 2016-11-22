@@ -187,59 +187,47 @@ class Controller extends Assessment\Controller
         /** @var Submission\File\Model $submission */
         $allResponses = $participant->getAllResponses();
 
+        $attachZoneFactory = new Assessment\Attachzone\Factory();
+
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
             /** @var Submission\Model $latestResponse */
             $latestResponse = $participant->findMostRecentResponse();
 
-            /* Files attached to the draft submission
-             * Attach files if any exist
+            /* If the latest response is a draft, collect all its contents for editing
              */
-            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
+            if ($latestResponse->isDraft()) {
 
-            // Display the files that are a part of latest submission
-            foreach ($latestResponse->getAllFiles() as $file) {
+                /* Files attached to the draft submission
+                 * Attach files if any exist
+                 */
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse($latestResponse);
 
                 /* Load in the wizzywig instead of a file attachment,
-                 * if the submission uses the wizzywig editor
+                 * if the $file uses the wizzywig editor
                  */
-                if ($file->getEditableInline()) {
-                    $editorContents .= $file->read();
-                } else {
-                    // add it to the danger zone
-                    $dangerZone->attachFiles([$file->getHash()]);
+                foreach ($latestResponse->getAllFiles() as $file) {
+                    if ($file->getEditableInline()) {
+                        $editorContents = $file->read();
+                    }
                 }
             }
+            else {
 
-            // Is the latest response a draft? Update it if so, otherwise create a new one.
-            // (The files in the latest submission were added regardless, so a student can
-            //  create a new draft from their most recent live submission.)
-            if (!$latestResponse->isDraft()) {
+                /* Otherwise, spawn an entirely new draft
+                 * I would not expect it to recycle files from my previous Submitted submission
+                 */
                 $latestResponse = null;
+                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
             }
         }
+        else {
 
-        if (!$latestResponse) {
-            $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse(new Submission\Model());
-        }
-
-        // TODO: what is this I don't even
-        if (!$this->getUser()->isSuperuser()) {
-            $folderIds = [];
-
-            /* Sometimes subjectCollection is null ie. when superuser
-             * [subject_collection:protected] =>
+            /* Init a dangerZone that is ready to accept files for
+             * the first ever draft
              */
-            if (count($this->getUser()->getSubjectCollection())) {
-                foreach ($this->getUser()->getSubjectCollection() as $currentSubject) {
-                    $folderIds[] = $currentSubject['id'];
-                }
-            }
-
-            if (!in_array($assessment->getContext()->getFolder()->getId(), $folderIds)) {
-                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_PAGE_VIEW);
-            }
+            $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission\Model());
         }
 
         /* Pump into twig land
@@ -327,18 +315,27 @@ class Controller extends Assessment\Controller
 
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
+
+        // Add the online submission to this response's list of files
         $response->attachOnlineSubmissionContent($body);
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
             foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
-                $response->getAllFiles()->add(
-                    (new DueWorkSubmissionFile())
-                        ->setStorage($attachment)
-                        ->setFilename($attachment->getFilename())
-                        ->setEditableInline(false)
-                );
+
+                /* Don't stack the online-submission.html file here, it should never
+                 * appear in the attached files list at all (it should always be
+                 * loaded into the wizzywig)
+                 */
+                $attachedFile = (new DueWorkSubmissionFile())
+                    ->setStorage($attachment)
+                    ->setFilename($attachment->getFilename())
+                    ->setEditableInline(false);
+
+                /* Stack it up
+                 */
+                $response->getAllFiles()->add($attachedFile);
             }
         }
 

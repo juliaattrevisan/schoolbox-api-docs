@@ -78,23 +78,6 @@ class Model implements IStorage
         return '';
     }
 
-    /**
-     * Is this a file that was spawned via Submit Online wizzywig?
-     */
-    public function isOnlineSubmission()
-    {
-        /* Known versions of the Online Submission file which stores
-         * the wizzywig contents
-         */
-        $knownFilenames = ['online-submission', 'Online Submission'];
-
-        if (in_array($this->getFilename(), $knownFilenames) && ($this->getStorage()->getMimetype() == 'text/html')) {
-            return true;
-        }
-
-        return false;
-    }
-
     /* Getters/Setters
      */
 

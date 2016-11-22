@@ -120,7 +120,12 @@ class Factory
         $files = [];
 
         foreach ($response->getAllFiles() as $file) {
-            $files[] = $file->getHash();
+
+            /* Ignore accumulation of wizzywig contents
+             */
+            if (!$file->getEditableInline()) {
+                $files[] = $file->getHash();
+            }
         }
 
         $zone->attachFiles($files);
