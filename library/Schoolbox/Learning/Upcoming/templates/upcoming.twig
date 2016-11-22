@@ -257,23 +257,24 @@
             {% if upcomingWork|length %}
             <ul class="action-list">
                 {% for upcoming in upcomingWork %}
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <h3><a class="title" href="#">{{ upcoming.title }}</a></h3>
+                <li>
+                    <div class="card small-12">
+                        <h3>
+                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: upcoming.id, studentId: student.id}) }}">
+                                {{ upcoming.title }}
+                            </a>
+                        </h3>
 
-                            <p class="meta">
-                                <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a> {UPCOMING_TYPE}
-                            </p>
+                        <p class="meta">
+                            <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
+                            {{ upcoming.typeName }}
+                        </p>
 
-                            <p class="meta">
-                                <span class="{{ urgency.datetime(upcoming.dueAt) }}">Due {{ upcoming.dueAt }}</span> on {{ upcoming.dueAt }}
-                            </p>
-                        </div>
+                        <p class="meta">
+                            <span class="{{ urgency.datetime(upcoming, student) }}">Due {{ upcoming.dueAt.relativeTime }}</span>
+                            on {{ upcoming.dueAt.isAtEndOfDay ? upcoming.dueAt.dateOnly : upcoming.dueAt.short }}
+                        </p>
                     </div>
-                    <nav>
-                        {#<a href="{UPCOMING_BUTTON_HREF}" class="{UPCOMING_BTN_ICON}"></a>#}
-                    </nav>
                 </li>
                 {% endfor %}
             </ul>
