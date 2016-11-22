@@ -166,6 +166,15 @@ class Controller extends Base
             ];
         }
 
+        // Student's upcoming work
+        // TODO add a findAllForStudentBetweenDates to findAllForStudentForTerm
+        $upcomingWork = $this->assessmentDataSource->findAllForStudent($student, $term)
+            ->sortBy('dueAt', 'asc')
+            ->filter(function (IAssessable $assessable) {
+                return ($assessable->getDueAt()->isFuture());
+            })
+        ;
+
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
@@ -180,6 +189,7 @@ class Controller extends Base
                     'mailHandle'   => $this->getSession()->get('mailhandle'),
                     'currentTerm'  => $term,
                     'children'     => $children,
+                    'upcomingWork' => $upcomingWork,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯

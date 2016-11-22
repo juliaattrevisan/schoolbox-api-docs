@@ -251,13 +251,42 @@
 
 {% if subjects|length %}
 <div class="row">
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 island">
         <h2 class="subheader">Upcoming Due Work</h2>
         <section>
-            <div class="empty-state">
-                <i class="icon-due-work"></i>
-                <p>Currently no work has been set, nice one.</p>
+            {% if upcomingWork|length %}
+            <ul class="action-list">
+                {% for upcoming in upcomingWork %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <h3><a class="title" href="#">{{ upcoming.title }}</a></h3>
+
+                            <p class="meta">
+                                <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a> {UPCOMING_TYPE}
+                            </p>
+
+                            <p class="meta">
+                                <span class="{{ urgency.datetime(upcoming.dueAt) }}">Due {{ upcoming.dueAt }}</span> on {{ upcoming.dueAt }}
+                            </p>
+                        </div>
+                    </div>
+                    <nav>
+                        {#<a href="{UPCOMING_BUTTON_HREF}" class="{UPCOMING_BTN_ICON}"></a>#}
+                    </nav>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="row">
+                <div class="small-12 island">
+                </div>
             </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="icon-due-work"></i>
+                    <p>Currently no work has been set, nice one.</p>
+                </div>
+            {% endif %}
         </section>
     </div>
 
