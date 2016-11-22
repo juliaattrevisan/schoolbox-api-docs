@@ -57,7 +57,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
             'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
-            'pastoral_moderator' => $_GET['pastoral_moderator'] == 1?1:0,
             'hide_contacts'      => $_GET["hide_contacts"] == 1?1:0,
             'hide_timetable'     => $_GET["hide_timetable"] == 1?1:0,
 			'enabled'			 => 1
