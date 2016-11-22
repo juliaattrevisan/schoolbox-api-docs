@@ -107,6 +107,12 @@ class External_Liss_Server
                 'liss.publishTeachers'         => array(
                     'function' => 'External_Liss_Server::publishTeachers',
                 ),
+                'liss.publishCalendar'         => array(
+                    'function' => 'External_Liss_Server::publishCalendar',
+                ),
+                'liss.publishRooms'         => array(
+                    'function' => 'External_Liss_Server::publishRooms',
+                ),
                 'liss.publishBellTimes'        => array(
                     'function' => 'External_Liss_Server::publishBellTimes',
                 ),
@@ -217,6 +223,10 @@ class External_Liss_Server
              */
             $log->info("publishTeachers: unable to process request, not implemented");
 
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishTeachers: ".json_encode($allData));
+
             return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
         }
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
@@ -239,7 +249,65 @@ class External_Liss_Server
              */
             $log->info("publishStudents: unable to process request, not implemented");
 
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishStudents: ".json_encode($allData));
+
+
             return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
+
+    /**
+     * Publish Calendar to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishCalendar(xmlrpcmsg $message)
+    {
+        $log = self::log();
+
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+            $log->info("publishCalendar: unable to process request, not implemented");
+
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishCalendar: ".json_encode($allData));
+
+            return new xmlrpcresp(new xmlrpcval('Calendar Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
+
+    /**
+     * Publish Rooms to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishRooms(xmlrpcmsg $message)
+    {
+        $log = self::log();
+
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+
+            $log->info("publishRooms: unable to process request, not implemented");
+
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishRooms: ".json_encode($allData));
+
+            return new xmlrpcresp(new xmlrpcval('Rooms Imported', 'string'));
         }
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
