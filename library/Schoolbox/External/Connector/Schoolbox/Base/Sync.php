@@ -119,12 +119,12 @@ class Sync implements SyncInterface
                 u.lastname           AS staff_surname,
                 ''                   AS default_email_code,
                 ''                   AS work_email,
-                ''                   AS email,
+                u.alt_email          AS email,
                 c.ext_timetable_code AS staff_campus,
                 ''                   AS staff_category_type,
                 ''                   AS staff_category,
                 ''                   AS staff_department,
-                ''                   AS staff_year_level,
+                u.year               AS staff_year_level,
                 ''                   AS staff_year_level_description                
                 
             FROM `user` `u`
