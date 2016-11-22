@@ -6,6 +6,7 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Mapper\Exception as MapperException;
 
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
@@ -91,21 +92,22 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 )
             );
 
-            $userHandler = new User();
-            $emailHandler = new Email();
+        /* Get all the students belonging to this category code
+         */
+        $externalClassHandler = new External_Class();
+        $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
+
+        $userMapper           = \Schoolbox\UserMapper::getInstance();
 
             $allStudentEmails = array();
 
-            if (is_array($allStudents)) {
-                $j = 0;
-                foreach ($allStudents as $currentStudent) {
-                    $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
+        if (is_array($allStudents)) {
+            $j = 0;
+            foreach ($allStudents as $currentStudent) {
+                try {
+                    $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 
-                    /* Get the schoolbox user and process it if it exists
-                       */
-                    if (is_array($user)) {
-                        $name = $userHandler->formatName($user);
-                        $email = $emailHandler->formatEmailFromArray($user);
+                    $email = $user->getEmail();
 
                         /* Accumulate this for a giant parent-based bcc
                             */
@@ -117,15 +119,14 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             $allStudentEmails[] = $email;
                         }
 
-                        $this->setVar(
-                            array(
-                                'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                                'PERSON_UID' => $user['uid'],
-                                'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                                'PERSON_NAME' => $name,
-                                'PERSON_GROUP' => Scrub::text($user['gname']),
-                            )
-                        );
+                    $this->setVar(
+                        array(
+                            'PERSON_UID'         => $user->getId(),
+                            'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                            'PERSON_NAME'        => Scrub::text($user->getFullName()),
+                            'PERSON_GROUP'       => Scrub::text(empty($user->getPositionTitle()) ? $user->getRole()->getName() : $user->getPositionTitle()),
+                        )
+                    );
 
                         /* Don't display images in list view
                             */
@@ -147,24 +148,28 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         $this->parse('person_block', 'person', true);
 
-                        /* Clear children after parsing out the parent
-                            */
-                        $this->setVar('has_thumbnail_block', '');
-                        $this->setVar('has_icon_block', '');
-                    }
+                    /* Clear children after parsing out the parent
+                        */
+                    $this->setVar('has_thumbnail_block', '');
+                    $this->setVar('has_icon_block', '');
                 }
+                catch (MapperException $e) {
+                    //noop
+                }
+            }
+
 
                 $emailAllStudents = implode(',', $allStudentEmails);
 
-                /* Student bulk email
-                  */
-                if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
-                    $this->setVar(
-                        array(
-                            'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
-                            'EMAIL_ALL_STUDENTS' => $emailAllStudents,
-                        )
-                    );
+            /* Student bulk email
+              */
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
+                $this->setVar(
+                    array(
+                        'REPLY_TO'           => $this->getUser()->getEmail(),
+                        'EMAIL_ALL_STUDENTS' => $emailAllStudents,
+                    )
+                );
 
                     $this->parse('student_email_block', 'student_email');
                 } else {
@@ -185,12 +190,12 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     */
                     $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
 
-                    $this->setVar(
-                        array(
-                            'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
-                            'EMAIL_ALL_PARENTS' => $emailAllParents,
-                        )
-                    );
+                $this->setVar(
+                    array(
+                        'REPLY_TO'          => $this->getUser()->getEmail(),
+                        'EMAIL_ALL_PARENTS' => $emailAllParents,
+                    )
+                );
 
                     $this->parse('parent_email_block', 'parent_email');
                 } else {

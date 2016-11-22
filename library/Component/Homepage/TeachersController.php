@@ -82,15 +82,15 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                         try {
                             $teacher = $userMapper->findByExternalId($synid);
 
-                            if ($teacher->getRole()->isStaff()) {
-                                $this->setVar(
-                                    array(
-                                        'PERSON_UID' => $teacher->getId(),
-                                        'PERSON_NAME' => Scrub::text($teacher->getFullName()),
-                                        'PERSON_EXTERNAL_ID' => $synid,
-                                        'PERSON_GROUP' => Scrub::text($teacher->getRole()->getName()),
-                                    )
-                                );
+                        if($teacher->getRole()->isStaff()) {
+                            $this->setVar(
+                                array(
+                                    'PERSON_UID'         => $teacher->getId(),
+                                    'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
+                                    'PERSON_EXTERNAL_ID' => $synid,
+                                    'PERSON_GROUP'       => Scrub::text(empty($teacher->getPositionTitle()) ? $teacher->getRole()->getName() : $teacher->getPositionTitle()),
+                                )
+                            );
 
                                 /* Don't display images in list view
                                  */

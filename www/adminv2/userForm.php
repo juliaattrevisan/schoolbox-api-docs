@@ -92,7 +92,6 @@ elseif ($_POST['modusername']) {
     $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
     $user->setAltEmail($_POST['alt_email']);
     $user->setPositionTitle($_POST['position_title']);
-    $user->setWebmail($_POST['webmail']);
     $user->getRole()->setId($_POST['group']);
     foreach ($_POST['campus'] as $campusId) {
         /** @var \Schoolbox\Campus $campus */
