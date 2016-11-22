@@ -39,21 +39,27 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getInsert', $basePath, "/insert");
-        $this->addGetRoute($router, 'getModify', $basePath, "/modify/{userId}");
+        $this->addGetRoute($router, 'getModify', $basePath, "/{userId}/modify");
+        $this->addGetRoute($router, 'getInsert', $basePath, "/create");
 
-        $this->addGetRoute($router, 'getDeletePermission', $basePath, "/permission/{userId}/{sid}/{service}");
-        $this->addGetRoute($router, 'getDeleteGroup', $basePath, "/delete/group/{userId}/{folderId}");
-        $this->addGetRoute($router, 'getDeleteLinked', $basePath, "/delete/linked/{userId}/{linkedId}");
+        // CRUD Actions
 
-        $this->addPostRoute($router, 'postAlert', $basePath, "/alert");
-        $this->addPostRoute($router, 'postImpersonate', $basePath, "/impersonate");
-        $this->addPostRoute($router, 'postDetails', $basePath, "/details");
-        $this->addPostRoute($router, 'postInsertGroup', $basePath, "/insert/group");
-        $this->addPostRoute($router, 'postInsertPermission', $basePath, "/insert/permission");
-        $this->addPostRoute($router, 'postInsertLinked', $basePath, "/insert/linked");
-        $this->addPostRoute($router, 'postUpdateGroup', $basePath, "/update/group");
-        $this->addPostRoute($router, 'postUpdateService', $basePath, "/update/service");
+        $this->addPostRoute($router, 'postDetails', $basePath, "/{userId}");
+        $this->addPostRoute($router, 'postInsertGroup', $basePath, "/{userId}/group");
+        $this->addPostRoute($router, 'postInsertPermission', $basePath, "/{userId}/permission");
+        $this->addPostRoute($router, 'postInsertLinked', $basePath, "/{userId}/linked");
+
+        $this->addPostRoute($router, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
+        $this->addPostRoute($router, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
+
+        $this->addPostRoute($router, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
+        $this->addPostRoute($router, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");
+        $this->addPostRoute($router, 'postDeleteLinked', $basePath, "/{userId}/linked/{linkedId}/delete");
+
+        // Other stuff
+
+        $this->addPostRoute($router, 'postAlert', $basePath, "/{userId}/alert");
+        $this->addPostRoute($router, 'postImpersonate', $basePath, "/{userId}/impersonate");
     }
 
     /**
@@ -61,7 +67,6 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
@@ -85,7 +90,7 @@ class Module extends BaseModule
                 }
 
                 if (array_key_exists('linkedId', $params)) {
-                    $params['linked'] = $this->getFolderMapper()->findById($params['linkedId']);
+                    $params['linked'] = $this->getUserMapper()->findById($params['linkedId']);
                 }
 
                 return $params;

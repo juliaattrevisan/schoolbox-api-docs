@@ -196,15 +196,16 @@ class Controller extends Base
 
     /**
      * Add group membership
+     * @param \Schoolbox\User $user
      */
-    public function postInsertGroup()
+    public function postInsertGroup($user)
     {
         $post = $this->getRequest()->post;
 
         try {
             $userAccess = new UserAccess();
             $userAccess->setService(UserAccess::SERVICE_HOMEPAGE);
-            $userAccess->setUser($this->userMapper->findById($post['uid']));
+            $userAccess->setUser($user);
             $userAccess->setAccessLevel($post['type']);
             $userAccess->setServiceIdentifier($post['sid']);
             $this->userAccessMapper->save($userAccess);
@@ -212,20 +213,21 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#groups");
+        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#groups");
     }
 
     /**
      * Add service permission
+     * @param \Schoolbox\User $user
      */
-    public function postInsertPermission()
+    public function postInsertPermission($user)
     {
         $post = $this->getRequest()->post;
 
         try {
             $userAccess = new UserAccess();
             $userAccess->setService($post['service']);
-            $userAccess->setUser($this->userMapper->findById($post['uid']));
+            $userAccess->setUser($user);
             $userAccess->setAccessLevel($post['type']);
             $userAccess->setServiceIdentifier(empty($post['sid']) ? 0 : $post['sid']);
             $this->userAccessMapper->save($userAccess);
@@ -233,32 +235,31 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['uid']}#permissions");
+        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#permissions");
     }
 
     /**
      * Add linked user
+     * @param \Schoolbox\User $user
      */
-    public function postInsertLinked()
+    public function postInsertLinked($user)
     {
         $post = $this->getRequest()->post;
 
         try {
-            $originalUser = $this->userMapper->findById($post['userID']);
-
             foreach ($post['linkUser'] as $userId) {
                 try {
                     $linkedUser = $this->userMapper->findById($userId);
-                    $originalUser->getLinkedUser()->add($linkedUser);
+                    $user->getLinkedUser()->add($linkedUser);
                 } catch (MapperException $e) {
                 }
             }
 
-            $this->userMapper->save($originalUser);
+            $this->userMapper->save($user);
         } catch (MapperException $e) {
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$post['userID']}#linked");
+        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#linked");
     }
 
     /**
@@ -266,7 +267,7 @@ class Controller extends Base
      * @param User $user
      * @param \Schoolbox\Resource\Folder\Model $folder
      */
-    public function getDeleteGroup($user, $folder)
+    public function postDeleteGroup($user, $folder)
     {
         $this->userAccessMapper->deleteByColumnList([
             'service' => UserAccess::SERVICE_HOMEPAGE,
@@ -274,7 +275,10 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#groups");
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 
     /**
@@ -283,7 +287,7 @@ class Controller extends Base
      * @param int $sid
      * @param int $service
      */
-    public function getDeletePermission($user, $sid, $service)
+    public function postDeletePermission($user, $sid, $service)
     {
         $this->userAccessMapper->deleteByColumnList([
             'service' => $service,
@@ -291,7 +295,10 @@ class Controller extends Base
             'uid' => $user->getId()
         ]);
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#permissions");
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 
     /**
@@ -299,7 +306,7 @@ class Controller extends Base
      * @param User $user Account to remove link from
      * @param User $linked Linked user to remove
      */
-    public function getDeleteLinked($user, $linked)
+    public function postDeleteLinked($user, $linked)
     {
         $linkedUserList = new Collection();
 
@@ -313,7 +320,10 @@ class Controller extends Base
 
         $this->userMapper->save($user);
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}#linked");
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 
 
@@ -412,27 +422,32 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$user->getId()}");
+        $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify");
     }
 
     /**
      * Delete a user
      * @param User $user
      */
-    public function getDeleteUser($user)
+    public function postDeleteUser($user)
     {
         $this->userMapper->delete($user);
-        $this->getResponse()->redirect->afterPost("/adminv2/user");
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 
     /**
      * Send instant alert to user
+     * @param \Schoolbox\User $user
      */
-    public function postAlert()
+    public function postAlert($user)
     {
         $post = $this->getRequest()->post;
 
-        $userId = (int)$post['user'];
+        $userId = $user->getId();
 
         $bob = new NotificationInstanceBuilder();
         $bob->setTitle(Scrub::text($post['body']))
@@ -449,21 +464,20 @@ class Controller extends Base
 
         // Redirect back to modify page
 
-        $this->getResponse()->redirect->afterPost("/adminv2/user/modify/{$userId}");
+        $this->getResponse()->redirect->afterPost("/adminv2/user/{$userId}/modify");
     }
 
     /**
      * Impersonate user
+     * @param \Schoolbox\User $user
      */
-    public function postImpersonate()
+    public function postImpersonate($user)
     {
-        $post = $this->getRequest()->post;
-
         $oldSession = $_SESSION;
 
         $sessionHandler = new Session();
 
-        if ($sessionHandler->create($post['login'])) {
+        if ($sessionHandler->create($user->getUsername())) {
             $this->getSession()->set('previous', $oldSession);
             $logger = new User_Logger_AssumeUser($oldSession['user'], $_SESSION['user']);
             $logger->notify();
@@ -475,8 +489,10 @@ class Controller extends Base
 
     /**
      * Update a groups access level
+     * @param \Schoolbox\User $user
+     * @param \Schoolbox\Resource\Folder\Model $folder
      */
-    public function postUpdateGroup()
+    public function postUpdateGroup($user, $folder)
     {
         $post = $this->getRequest()->post;
 
@@ -485,9 +501,9 @@ class Controller extends Base
 
             if ($post['type'] == FULL_ACCESS) {
                 $admins = $this->userAccessMapper->findByColumnList([
-                    'uid' => $post['uid'],
-                    'sid' => $post['sid'],
-                    'service' => $post['service'],
+                    'uid' => $user->getId(),
+                    'sid' => $folder->getId(),
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
                     'type' => FULL_ACCESS
                 ]);
 
@@ -500,26 +516,32 @@ class Controller extends Base
 
             /** @var UserAccess $userAccess */
             $userAccess = $this->userAccessMapper->findOneByColumnList([
-                'uid' => $post['uid'],
-                'sid' => $post['sid'],
-                'service' => $post['service']
+                'uid' => $user->getId(),
+                'sid' => $folder->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE
             ]);
             $userAccess->setAccessLevel($post['type']);
             $this->userAccessMapper->save($userAccess);
         } catch (MapperException $e) {
         }
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 
     /**
      * Update a service permission level
+     * @param \Schoolbox\User $user
      */
-    public function postUpdateService()
+    public function postUpdateService($user)
     {
         $post = $this->getRequest()->post;
 
         try {
             $userAccess = $this->userAccessMapper->findOneByColumnList([
-                'uid' => $post['uid'],
+                'uid' => $user->getId(),
                 'sid' => $post['sid'],
                 'service' => $post['service']
             ]);
@@ -527,5 +549,10 @@ class Controller extends Base
             $this->userAccessMapper->save($userAccess);
         } catch (MapperException $e) {
         }
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => true
+        ]);
     }
 }

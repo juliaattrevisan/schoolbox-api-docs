@@ -49,7 +49,7 @@
     <div class="small-12 island">
         <section class="content">
             <div class="row">
-                <form method="POST" action="{{ routeLookup('adminUser.postDetails') }}" data-validatable-as="userDetails" data-modify-user-form>
+                <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
                     <input type="hidden" name="type" value="modify"/>
                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
@@ -204,7 +204,7 @@
 
     {# Impersonate user form #}
 
-    <form method="POST" action="{{ routeLookup('adminUser.postImpersonate') }}" data-assimilator-form>
+    <form method="POST" action="{{ routeLookup('adminUser.postImpersonate', {userId: user.id}) }}" data-assimilator-form>
         <input type="hidden" name="login" value="{{ user.username }}"/>
     </form>
 
@@ -250,18 +250,13 @@
 
                         {% for access in userAccess if access.serviceIdentifier == folder.id %}
 
-                            <li class="actions-small-1">
+                            <li class="actions-small-1" data-group>
                                 <div class="list-item">
                                     <div class="card small-7">
                                         <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
                                     </div>
                                     <div class="card small-5">
-                                        <form action="{{ routeLookup('adminUser.postUpdateGroup') }}" method="post">
-                                            <input type="hidden" name="uid" value="{{ user.id }}"/>
-                                            <input type="hidden" name="sid" value="{{ folder.id }}"/>
-                                            <input type="hidden" name="service" value="1"/>
-                                            <input type="hidden" name="updateGroups" value="1"/>
-
+                                        <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, service: 'service', sid: 'sid'}) }}" method="post">
                                             {% if access.accessLevel == 1 %}
                                                 {% set readSelected = 'selected' %}
                                             {% endif %}
@@ -272,7 +267,7 @@
                                                 {% set adminSelected = 'selected' %}
                                             {% endif %}
 
-                                            <select name="type" data-autosubmit-group>
+                                            <select name="type" data-autosubmit-group data-folder="{{ folder.id }}">
                                                 <option value="1" {{ readSelected }}>Read</option>
                                                 <option value="2" {{ writeSelected }}>Write</option>
                                                 <option value="3" {{ adminSelected }}>Group Admin</option>
@@ -281,16 +276,14 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-delete" title="Remove"
-                                       href="{{ routeLookup('adminUser.getDeleteGroup', {userId: user.id, folderId: folder.id}) }}"></a>
+                                    <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
                                 </nav>
                             </li>
                         {% endfor %}
                     {% endfor %}
 
                     <li class="actions-small-1">
-                        <form action="{{ routeLookup('adminUser.postInsertGroup') }}" method="post" id="groupAdd" data-validatable-as="addGroup"
-                              class="list-item">
+                        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                     <option value="">Select a Group</option>
@@ -307,9 +300,6 @@
                                 </select>
                             </div>
                             <div class="card small-12">
-                                <input type="hidden" name="groupSubmit"/>
-                                <input type="hidden" value="{{ user.id }}" name="uid"/>
-                                <input type="hidden" value="1" name="service"/>
                                 <p><input type="submit" value="Add"/></p>
                             </div>
                         </form>
@@ -335,7 +325,7 @@
                     </li>
                     {% for permission in userPermissions if permission.service != constant('HOMEPAGE_SERVICE') %}
 
-                        <li class="actions-small-1">
+                        <li class="actions-small-1" data-permission>
                             <div class="list-item">
                                 <div class="small-4 card">
                                     {% if permission.service == constant('CALENDAR_SERVICE') %}Calendar{% endif %}
@@ -366,7 +356,7 @@
                                         <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
                                         <input type="hidden" name="service" value="{{ permission.service }}"/>
                                         <input type="hidden" name="updateServices" value="1"/>
-                                        <select name="type" data-autosubmit-service>
+                                        <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
                                             <option value="1" {% if permission.accessLevel == 1 %}selected{% endif %}>Read</option>
                                             <option value="2" {% if permission.accessLevel == 2 %}selected{% endif %}>Write</option>
                                             <option value="3" {% if permission.accessLevel == 3 %}selected{% endif %}>Moderate</option>
@@ -375,14 +365,13 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="{{ routeLookup('adminUser.getDeletePermission', {userId: user.id, sid: permission.serviceIdentifier, service: permission.service }) }}"
-                                   class="icon-delete" title="Remove"></a>
+                                <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
                             </nav>
                         </li>
                     {% endfor %}
 
                     <li class="actions-small-1">
-                        <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postInsertPermission') }}" method="post" data-validatable-as="addService"
+                        <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postInsertPermission', {userId: user.id}) }}" method="post" data-validatable-as="addService"
                               data-action="addService" class="list-item">
                             <div class="small-4 card">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
@@ -420,8 +409,6 @@
                                     <option value="2">Write</option>
                                     <option value="3">Moderate</option>
                                 </select>
-                                <input type="hidden" name="addService"/>
-                                <input type="hidden" value="{{ user.id }}" name="uid">
                             </div>
                             <div class="small-12 card">
                                 <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
@@ -445,27 +432,26 @@
                             <div class="small-12 columns">User</div>
                         </div>
                     </li>
+
                     {% for linkedUser in user.linkedUser %}
-                        <li class="actions-small-1">
+                        <li class="actions-small-1" data-linked-user>
                             <div class="list-item">
                                 <div class="card small-12">
-                                    <a href="/adminv2/user/modify/{{ linkedUser.id }}">{{ linkedUser.fullName }}</a>
+                                    <a href="/adminv2/user/{{ linkedUser.id }}/modify">{{ linkedUser.fullName }}</a>
                                 </div>
                             </div>
                             <nav>
-                                <a href="{{ routeLookup('adminUser.getDeleteLinked', {userId: user.id, linkedId: linkedUser.id}) }}" class="icon-delete"
-                                   title="Remove"></a>
+                                <a href="#" data-delete-linked="{{ linkedUser.id }}" class="icon-delete" title="Remove"></a>
                             </nav>
                         </li>
                     {% endfor %}
 
                     <li class="actions-small-1">
-                        <form action="{{ routeLookup('adminUser.postInsertLinked') }}" method="post" id="linkedUserAdd" class="list-item">
+                        <form action="{{ routeLookup('adminUser.postInsertLinked', {userId: user.id}) }}" method="post" id="linkedUserAdd" class="list-item">
                             <div class="small-12 card">
                                 <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                             </div>
                             <div class="small-12 card">
-                                <input type="hidden" name="userID" value="{{ user.id }}"/>
                                 <input type="submit" value="Add" disabled/>
                             </div>
                         </form>
@@ -577,9 +563,7 @@
                 <p class="no-margin">{{ user.firstName }} must be signed in to receive a popup alert.</p>
             </div>
 
-            <form action="{{ routeLookup('adminUser.postAlert') }}" method="POST">
-                <input type="hidden" name="user" value="{USERID}"/>
-
+            <form action="{{ routeLookup('adminUser.postAlert', {userId: user.id}) }}" method="POST">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -678,6 +662,64 @@
                 });
             });
 
+            {# Delete linked user #}
+    
+            $('[data-delete-linked]').click(function (event) {
+                event.preventDefault();
+    
+                var linkedId = $(this).data('delete-linked');
+                var linkedUserRow = $(this).closest('[data-linked-user]');
+    
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this linked user?',
+                    confirmEvent: function () {
+                        $.post('{{ routeLookup('adminUser.postDeleteLinked', {userId: user.id, linkedId: 'linkedId'}) }}'.replace(/linkedId/g, linkedId)).done(function() {
+                            linkedUserRow.remove();
+                        });
+                    }
+                });
+            });
+
+            {# Delete group #}
+
+            $('[data-delete-group]').click(function (event) {
+                event.preventDefault();
+
+                var folderId = $(this).data('delete-group');
+                var groupRow = $(this).closest('[data-group]');
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this group?',
+                    confirmEvent: function () {
+                        $.post('{{ routeLookup('adminUser.postDeleteGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId)).done(function() {
+                            groupRow.remove();
+                        });
+                    }
+                });
+            });
+
+            {# Delete permission #}
+
+            $('[data-delete-permission]').click(function (event) {
+                event.preventDefault();
+
+                var sid = $(this).data('delete-permission');
+                var service = $(this).data('service');
+                var permissionRow = $(this).closest('[data-permission]');
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this permission?',
+                    confirmEvent: function () {
+                        $.post('{{ routeLookup('adminUser.postDeletePermission', {userId: user.id, service: 'service', sid: 'sid'}) }}'
+                                .replace(/service/g, service)
+                                .replace(/sid/g, sid)
+                        ).done(function() {
+                            permissionRow.remove();
+                        });
+                    }
+                });
+            });
+
             {# Impersonate user #}
 
             $('[data-assimilator]').click(function (event) {
@@ -723,14 +765,23 @@
 
             $(':input[data-autosubmit-group]').change(function () {
                 var form = $(this.form);
-                $.post('{{ routeLookup('adminUser.postUpdateGroup') }}', form.serializeArray());
+                var folderId = $(this).data('folder');
+
+                $.post('{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId), form.serializeArray());
             });
 
             {# AJAX submission of services #}
 
             $(':input[data-autosubmit-service]').change(function () {
                 var form = $(this.form);
-                $.post('{{ routeLookup('adminUser.postUpdateService') }}', form.serializeArray());
+                var service = $(this).data('service');
+                var sid = $(this).data('sid');
+
+                $.post('{{ routeLookup('adminUser.postUpdateService', {userId: user.id, service: 'service', sid: 'sid'}) }}'
+                        .replace(/service/g, service)
+                        .replace(/sid/g, sid),
+                    form.serializeArray()
+                );
             });
 
             {# Hide campus selector if user selected a service that doesn't use them #}
