@@ -66,8 +66,7 @@ if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPer
 $attempt->setReviewed(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $attemptMapper->save($attempt);
 
-// TODO someone please tell me the alternative -_-'
-$assessmentId = Database::getInstance()->query("SELECT assessment_id FROM assess WHERE assess_id = ? LIMIT 1", [ $assess->getId() ])->fetchColumn();
+$assessmentId = $assess->getAssessmentModel()->getId();
 
 $this->localRedir($this->routeLookup('learningAssessment.getStatus', [ 'assessmentId' => $assessmentId ]));
 
