@@ -13,6 +13,7 @@
 } %}
 
 <form method="post" action="{{ fbUrl }}" class="row">
+    <input type="hidden" name="responseId" value="{{ response.id }}" />
     <div class="small-12 medium-3 column">
         {% block grading %}{% endblock %}
     </div>
