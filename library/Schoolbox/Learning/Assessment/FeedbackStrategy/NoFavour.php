@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\FeedbackStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 class NoFavour implements IFeedbackTraversalStrategy
 {
@@ -48,5 +49,21 @@ class NoFavour implements IFeedbackTraversalStrategy
             }
         }
         return $mostRecentFeedback;
+    }
+
+    /**
+     * Find the most recent IFeedback published and visible for the Participant
+     *
+     * @param Participant $participant
+     * @param User $viewingUser
+     * @return IFeedback|null
+     */
+    public function getMostRecentVisibleFeedback(Participant $participant, User $viewingUser)
+    {
+        if ($participant->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
+            return $this->getMostRecentFeedback($participant, true);
+        } else {
+            return null;
+        }
     }
 }

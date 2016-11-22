@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 class FavourFloating implements IFeedbackTraversalStrategy
 {
@@ -93,5 +94,21 @@ class FavourFloating implements IFeedbackTraversalStrategy
             }
         }
         return $mostRecentLinkedFeedback;
+    }
+
+    /**
+     * Find the most recent IFeedback published and visible for the Participant
+     *
+     * @param Participant $participant
+     * @param User $viewingUser
+     * @return IFeedback|null
+     */
+    public function getMostRecentVisibleFeedback(Participant $participant, User $viewingUser)
+    {
+        if ($participant->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
+            return $this->getMostRecentFeedback($participant, true);
+        } else {
+            return null;
+        }
     }
 }
