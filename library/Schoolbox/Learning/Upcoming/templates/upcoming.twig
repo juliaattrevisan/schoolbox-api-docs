@@ -260,9 +260,12 @@
                 <li>
                     <div class="card small-12">
                         <h3>
-                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: upcoming.id, studentId: student.id}) }}">
+                            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, studentId: student.id}) %}
+                            {% if route %}
+                                <a class="title" href="{{ route }}">{{ upcoming.title }}</a>
+                            {% else %}
                                 {{ upcoming.title }}
-                            </a>
+                            {% endif %}
                         </h3>
 
                         <p class="meta">
