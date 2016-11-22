@@ -365,7 +365,7 @@ class Controller extends Base
 
             $graphAssessments[] = $assessment->getTitle();
 
-            $feedback = $assessment->getParticipant($student)->findMostRecentFeedback();
+            $feedback = $assessment->getParticipant($student)->findMostRecentVisibleFeedback($this->getUser());
 
             if ($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
@@ -444,7 +444,8 @@ class Controller extends Base
             'graphFeedback'     => $graphFeedback,
             'canComment'        => $conversation->canComment($this->getUser()),
             'comments'          => $conversation->getVisibleComments($this->getUser()),
-            'showcase'          => $showcase
+            'showcase'          => $showcase,
+            'currentUser'       => $this->getUser(),
         ]));
     }
 
