@@ -138,15 +138,10 @@ class Controller extends Base
         $subjects = [];
 
         // Student's work
-        // TODO add a findAllForStudentBetweenDates to findAllForStudentForTerm
+        // TODO add a findAllByStudentBetweenDates to findAllByStudentForTerm
         $allWork = $this->assessmentDataSource
-            ->findAllForStudent($student, $term)
+            ->findAllByStudent($student, $term)
             ->sortBy('dueAt', 'asc');
-
-        // TODO remove manual participant hydration when SA-977 is merged
-        foreach ($allWork as $assessment) {
-            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-        }
 
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)

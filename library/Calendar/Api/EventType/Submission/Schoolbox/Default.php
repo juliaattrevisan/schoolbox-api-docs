@@ -75,7 +75,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
-        foreach ($this->assessmentDataSource->findAllForStudent($this->getUser(), $term) as $assessment) {
+        foreach ($this->assessmentDataSource->findAllByStudent($this->getUser(), $term) as $assessment) {
             $event = new Event();
 
             $event->setAssessment($assessment);
