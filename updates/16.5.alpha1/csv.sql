@@ -1,4 +1,4 @@
-INSERT INTO `allowedFileTypes`
+INSERT IGNORE INTO `allowedFileTypes`
 (
   `description`,
   `mime`,
