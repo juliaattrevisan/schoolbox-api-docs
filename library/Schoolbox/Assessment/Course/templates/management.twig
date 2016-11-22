@@ -11,33 +11,48 @@
             }
         });
 
-        $('#courseList').find('[data-delete]').click(function(event) {
+        var $courseList = $('#course_list');
+
+        // CourseImpl Deletion
+        $courseList.on('click','[data-delete]', function(event) {
             event.preventDefault();
 
-            var element = $(this);
+            var $element = $(this);
+            var $courseImpl = $element.closest('[data-course-impl]');
+            var name = $courseImpl.attr('data-course-name');
 
-            var name = element.data('coursename');
-
-            $(this).confirmDialog({
+            $element.confirmDialog({
                 header: 'Confirm Import Deletion of ' + name,
                 format: 'html',
-                text: 'Are you sure you want to delete your import of '
-                + name
-                + '? All tasks, due work and quizzes you have imported via this course, <em>as well as any you have created on it since</em>, will be permanently deleted from this class. The original course will be unaffected.'
+                text: 'Are you sure you want to delete your import of ' + name + '? All tasks, due work and quizzes ' +
+                'you have imported via this course, <em>as well as any you have created on it since</em>, will be ' +
+                'permanently deleted from this class. The original course will be unaffected.'
                 + '<br/><br/><strong><em>This is an irreversible operation.</em></strong>',
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
-                    $.post('{{ routeLookup('courseImport.importDelete') }}', { componentId: element.attr('data-delete') }, function(responseText) {
-                        window.location.href = window.location.href;
+
+                    $.ajax($element[0].href, {
+                        headers: {
+                            'X-HTTP-Method-Override': 'DELETE'
+                        },
+                        type: 'POST',
+                        data: {
+                            mKey: 'mValue'
+                        }
+                    }, function(responseText) {
+                        console.log(responseText);
+//                        window.location.href = window.location.href;
                     });
                 }
             });
         });
 
-        /* Restore courses
-         */
-        $('#courseList').on('click', '[data-restore-course]', function(event) {
+
+
+
+        // CourseImpl's CourseOutlineComponent Restoration
+        $courseList.on('click', '[data-restore-course]', function(event) {
             event.preventDefault();
 
             var self = $(this);
@@ -52,18 +67,16 @@
                 else {
                     $('#restoreCourseName').html(self.attr('data-restore-course'));
 
-                    $('#restoreCourseModal').foundation('reveal', 'open');
+                    $('#restore_course_modal').foundation('reveal', 'open');
                 }
             });
         });
     });
 </script>
 
-<div id="restoreCourseModal" class="reveal-modal" data-reveal>
+<div id="restore_course_modal" class="reveal-modal" data-reveal>
     <h2>Error restoring course</h2>
-
-    <p>Could not restore <span id="restoreCourseName"></span>.</p>
-
+    <p>Could not restore <span id="restore_course_name"></span>.</p>
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
@@ -79,7 +92,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">Courses for {{ folder.name }}</h2>
+                    <h2 class="subheader">Courses Imported to {{ folder.name }}</h2>
                 </div>
             </div>
             <nav>
@@ -89,9 +102,9 @@
 
         {% if courseImpls|length %}
         <section>
-            <ul class="action-list" id="courseList">
+            <ul class="action-list" id="course_list">
                 {% for currentCourse in courseImpls %}
-                <li class="actions-small-2">
+                <li class="actions-small-2" data-course-impl="{{ currentCourse.id }}" data-course-name="{{ currentCourse.specification.folder.name }}">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/homepage/{{ currentCourse.specification.folder.id }}">
@@ -102,12 +115,12 @@
                         </div>
                     </div>
                     <nav>
-                        {% if courseComponentRemoved %}
-                            <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
-                        {% else %}
-                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import"></a>
+                        {% if noCourseOutlineComponentsForThisCourseImpl %}
+                            <a href="{{ routeLookup('courseImport.restoreCourse') }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% endif %}
-                        <a href="" class="icon-delete" title="Permanently Delete Import" data-delete="{{ currentCourse.id }}" data-coursename="{{ currentCourse.name }}"></a>
+
+                        <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import"></a>
+                        <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete></a>
                     </nav>
                 </li>
                 {% endfor %}
@@ -120,7 +133,7 @@
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
-                <a href="{{ routeLookup('courseImport.getImportForm', { courseSpecId: 0, classCode: folder.id }) }}">import one</a>.
+                <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: 0, classCode: folder.id }) }}">import one</a>.
             </p>
         </div>
 

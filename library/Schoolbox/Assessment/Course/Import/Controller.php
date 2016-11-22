@@ -957,13 +957,12 @@ class Controller extends Base\Base
      */
     public function importDelete(CourseImplementation $courseImpl)
     {
-        $a= 3;
         if (!$courseImpl instanceof CourseImplementation) {
             $this->sendError('Course Import not found');
             return;
         }
 
-//        // Will delete subsidiary Units, Assessments, Responses + Feedbacks
+        // Will delete subsidiary Units, Assessments, Responses + Feedbacks
 //        if(!$this->getCourseImplementationMapper()->delete($courseImpl)){
 //            $this->sendError('Unable to delete Course Import');
 //            return;
@@ -974,8 +973,10 @@ class Controller extends Base\Base
         $folderId = $courseImpl->getFolder()->getId();
         $class = HomepageOutlineComponentController::class;
         $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
+        $this->getComponentInstanceMapper()->delete($components);
 
         $a=4;
+        die('xxxx');
 
 
 
