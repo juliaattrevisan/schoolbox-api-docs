@@ -90,6 +90,17 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Tasks have no concept of mark visibility - marks are always visible.
+     *
+     * @param User $viewingUser
+     * @return bool
+     */
+    public function isFeedbackVisibleToUser(User $viewingUser)
+    {
+        return true;
+    }
+
+    /**
      * Tasks do not have any weight.
      *
      * @return int

@@ -296,7 +296,9 @@ class Controller extends Base
         }
 
         foreach ($markbooksFolders as $folderId => $assessments) {
-            $markbooks[$folderId] = (new Markbook($assessments, $this->getDefaultGradeGroup()))->getStudentStatistics()[$student->getId()];
+            $markbooks[$folderId] =
+                (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
+                    ->getStudentStatistics()[$student->getId()];
         }
 
         // Squish this mess out
@@ -339,7 +341,7 @@ class Controller extends Base
 
         // Let markbook calculate the statistics
 
-        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup());
+        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
         $statistics = $markbook->getAssessmentStatistics();
 
         // Get the data for the graph
@@ -365,7 +367,7 @@ class Controller extends Base
 
             $graphAssessments[] = $assessment->getTitle();
 
-            $feedback = $assessment->getParticipant($student)->findMostRecentFeedback();
+            $feedback = $assessment->getParticipant($student)->findMostRecentVisibleFeedback($this->getUser());
 
             if ($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
@@ -444,7 +446,8 @@ class Controller extends Base
             'graphFeedback'     => $graphFeedback,
             'canComment'        => $conversation->canComment($this->getUser()),
             'comments'          => $conversation->getVisibleComments($this->getUser()),
-            'showcase'          => $showcase
+            'showcase'          => $showcase,
+            'currentUser'       => $this->getUser(),
         ]));
     }
 

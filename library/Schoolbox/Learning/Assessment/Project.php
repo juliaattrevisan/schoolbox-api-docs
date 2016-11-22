@@ -183,6 +183,17 @@ class Project extends AbstractAssessment implements AssessmentContext
         return 'Project';
     }
 
+    /**
+     * Projects have no concept of mark visibility - marks are always visible.
+     *
+     * @param User $viewingUser
+     * @return bool
+     */
+    public function isFeedbackVisibleToUser(User $viewingUser)
+    {
+        return true;
+    }
+
     /* Getters/Setters
      */
 
