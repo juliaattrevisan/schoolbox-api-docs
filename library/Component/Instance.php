@@ -246,7 +246,12 @@ class Component_Instance
     }
 
 
-
+    /**
+     * Converts a Collection of ConfigDefinitions into an array of $key => $val
+     *
+     * @param bool $compat
+     * @return array
+     */
     public function getConfigArray($compat = true)
     {
         if (isset($this->config)) {

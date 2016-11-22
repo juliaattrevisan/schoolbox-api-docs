@@ -988,51 +988,24 @@ class Controller extends Base\Base
         }
 
         // Will delete subsidiary Units, Assessments, Responses + Feedbacks
-//        if(!$this->getCourseImplementationMapper()->delete($courseImpl)){
-//            $this->sendError('Unable to delete Course Import');
-//            return;
-//        }
-
-        // Delete any CourseOutline components that display this CourseImport
-        $module = \Component_Definition::MODULE_HOMEPAGE;
-        $folderId = $courseImpl->getFolder()->getId();
-        $class = HomepageOutlineComponentController::class;
-        $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
-        $this->getComponentInstanceMapper()->delete($components);
-
-        $a=4;
-        die('xxxx');
-
-
-
-
-
-        $componentId = $post['componentId'];
-        $requiresDelete = false;
-
-        try {
-            /** @var Component_Instance $componentInstance */
-            $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
-            $requiresDelete = true;
-        } catch (MapperException $e) {
-            // the component doesn't exist, so just fake it
-            $componentInstance = $this->getComponentInstanceMapper()->createModel()->setId($componentId);
+        if(!$this->getCourseImplementationMapper()->delete($courseImpl)){
+            $this->sendError('Unable to delete Course Import');
+            return;
         }
 
-        $unitInstances = $this->getUnitInstanceMapper()->findForComponent($componentInstance);
-
+        // Delete any CourseOutline components that display this CourseImport
         try {
-            $this->getUnitInstanceMapper()->delete($unitInstances);
+            $module = \Component_Definition::MODULE_HOMEPAGE;
+            $folderId = $courseImpl->getFolder()->getId();
+            $class = HomepageOutlineComponentController::class;
+            $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
+            $componentsForCourse = $components->filter(function($componentInstance) use ($courseImpl){
+                /** @var Component_Instance $componentInstance */
+                return $courseImpl->getId() == $componentInstance->getConfigArray()['importedCourse']['value'];
+            });
+            $this->getComponentInstanceMapper()->delete($componentsForCourse);
 
-            if ($requiresDelete) {
-                $this->getComponentInstanceMapper()->delete($componentInstance);
-            }
-
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => true
-            ]);
-
+            $this->getResponse()->content->set($this->buildJsonOutput(['data' => true]));
 
         } catch (\Exception $e) {
             $this->sendError($e->getMessage(), [], 500);

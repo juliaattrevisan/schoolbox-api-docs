@@ -12,6 +12,7 @@
         });
 
         var $courseList = $('#course_list');
+        var $emptyState = $('[data-empty-state]');
 
         // CourseImpl Deletion
         $courseList.on('click','[data-delete]', function(event) {
@@ -32,18 +33,26 @@
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
 
-                    $.ajax($element[0].href, {
+                    var url = $element[0].href;
+                    var settings = {
                         headers: {
                             'X-HTTP-Method-Override': 'DELETE'
                         },
                         type: 'POST',
-                        data: {
-                            mKey: 'mValue'
+                        success: function(resp) {
+                            if(resp.data){
+                                $courseImpl.fadeOut({
+                                    done: function(){
+                                        $courseImpl.remove();
+                                        if(!$courseList.find('[data-course-impl]').length){
+                                            $emptyState.removeClass('hide');
+                                        }
+                                    }
+                                });
+                            }
                         }
-                    }, function(responseText) {
-                        console.log(responseText);
-//                        window.location.href = window.location.href;
-                    });
+                    };
+                    $.ajax(url, settings);
                 }
             });
         });
@@ -126,10 +135,10 @@
                 {% endfor %}
             </ul>
         </section>
+        {% endif %}
 
-        {% else %}
 
-        <div class="empty-state">
+        <div class="empty-state{% if courseImpls|length %} hide{% endif %}" data-empty-state>
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
@@ -137,7 +146,6 @@
             </p>
         </div>
 
-        {% endif %}
     </div>
 </div>
 
