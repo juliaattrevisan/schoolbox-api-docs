@@ -8,14 +8,13 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
-use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\Unit;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
@@ -24,7 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Assessment\Course\Import\ImportFactory;
+use \Component_InstanceMapper;
 
 class Module extends \Alaress\Module\Module
 {
@@ -40,8 +39,16 @@ class Module extends \Alaress\Module\Module
 
         $preloadImport = function ($params)
         {
+            try{
+                $courseSpec = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
+            } catch (MapperException $e){
+                // Null is ok, use will be able to select from dropdown
+                $courseSpec = null;
+            }
+
+
             return [
-                'courseSpec'  => $this->getCourseSpec($params['courseSpecId']),
+                'courseSpec'  => $courseSpec,
                 'targetClass' => $this->getFolder($params['classCode']),
                 'componentId' => $params['componentId']
             ];
@@ -50,7 +57,7 @@ class Module extends \Alaress\Module\Module
         $preloadCourse = function (array $params)
         {
             return [
-                'courseImpl' => $this->getCourseImplementationMapperProxy()->findById($params['courseImplId'])
+                'courseImpl' => $this->getCourseImplementationMapper()->findById($params['courseImplId'])
             ];
         };
 
@@ -63,7 +70,7 @@ class Module extends \Alaress\Module\Module
         $this->register('POST',   '/ownership',                                          'postOwnership',            $staffOnly);
         $this->register('POST',   '/units',                                              'postUnits',                $staffOnly);
         $this->register('POST',   '/activities',                                         'postAssessments',          $staffOnly);
-        $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',             $staffOnly);
+        $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',             $staffOnly, $preloadCourse);
         $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',            $staffOnly);
     }
 
@@ -91,6 +98,7 @@ class Module extends \Alaress\Module\Module
                 'setFolderMapper'                   => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'setCourseSpecificationMapper'      => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
                 'setCourseImplementationMapper'     => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'setComponentInstanceMapper'        => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
                 'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
                 'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
@@ -105,19 +113,19 @@ class Module extends \Alaress\Module\Module
     }
 
     /**
-     * @return Course\ImplementationMapperProxy
+     * @return CourseSpecificationMapper
      */
-    protected function getCourseImplementationMapperProxy()
+    protected function getCourseSpecificationMapper()
     {
-        return $this->injector->get('courseImplementationDataSource');
+        return $this->injector->get('mapperFactory')->get(CourseSpecificationMapper::class);
     }
 
     /**
-     * @return Course\SpecificationMapperProxy
+     * @return CourseImplementationMapper
      */
-    protected function getCourseSpecificationMapperProxy()
+    protected function getCourseImplementationMapper()
     {
-        return $this->injector->get('courseSpecificationDataSource');
+        return $this->injector->get('mapperFactory')->get(CourseImplementationMapper::class);
     }
 
     /**
@@ -128,20 +136,6 @@ class Module extends \Alaress\Module\Module
         return $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
     }
 
-    /**
-     * @param int $id
-     * @return Course\Specification
-     */
-    protected function getCourseSpec($id)
-    {
-        try {
-            return $this->getCourseSpecificationMapperProxy()->findById($id);
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // null is ok
-            return null;
-        }
-    }
 
     /**
      * @param string $codeOrId
@@ -152,14 +146,14 @@ class Module extends \Alaress\Module\Module
         try {
             try {
                 $targetClass = $this->getFolderMapper()->findByCode($codeOrId);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (MapperException $e) {
                 if ($codeOrId) {
                     $targetClass = $this->getFolderMapper()->findById($codeOrId);
                 } else {
                     $targetClass = null;
                 }
             }
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // null is ok
             $targetClass = null;
         }

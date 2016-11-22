@@ -41,6 +41,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
+use \Component_InstanceMapper;
 
 class Controller extends Base\Base
 {
@@ -74,6 +75,9 @@ class Controller extends Base\Base
 
     /** @var Course\ImplementationFactory */
     private $courseImplementationFactory;
+
+    /** @var Component_InstanceMapper */
+    private $componentInstanceMapper;
 
     /**
      * @var ImportFactory
@@ -148,7 +152,7 @@ class Controller extends Base\Base
         $courseOutlineComponent = null;
         if($componentId){
             try{
-                $courseOutlineComponent = \Component_InstanceMapper::getInstance()->findById($componentId);
+                $courseOutlineComponent = $this->getComponentInstanceMapper()->findById($componentId);
                 $COURSE_OUTLINE_DEFINITION_ID = 66;
                 if($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID){
                     $msg = 'Not a Course-Outline component';
@@ -882,6 +886,9 @@ class Controller extends Base\Base
         $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
         $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
 
+        // Load UnitImpls
+        $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
+
         // Add un-imported UnitSpecs to CourseImpl
         foreach($courseSpec->getUnits() as $unitSpec){
             // Has this UnitSpec been imported?
@@ -942,21 +949,37 @@ class Controller extends Base\Base
 
 
     /**
-     * TODO refactor to new object graph
-     *
      * Deletes an import, along with ALL of its associated data
      *
      * @api   DELETE /course/import/{courseImplId}
      * @level 165
+     * @param CourseImplementation $courseImpl
      */
-    public function importDelete()
+    public function importDelete(CourseImplementation $courseImpl)
     {
-        $post = $this->getRequest()->post;
-
-        if (!isset($post['componentId'])) {
-            $this->sendError('Component ID not defined');
+        $a= 3;
+        if (!$courseImpl instanceof CourseImplementation) {
+            $this->sendError('Course Import not found');
             return;
         }
+
+//        // Will delete subsidiary Units, Assessments, Responses + Feedbacks
+//        if(!$this->getCourseImplementationMapper()->delete($courseImpl)){
+//            $this->sendError('Unable to delete Course Import');
+//            return;
+//        }
+
+        // Delete any CourseOutline components that display this CourseImport
+        $module = \Component_Definition::MODULE_HOMEPAGE;
+        $folderId = $courseImpl->getFolder()->getId();
+        $class = HomepageOutlineComponentController::class;
+        $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
+
+        $a=4;
+
+
+
+
 
         $componentId = $post['componentId'];
         $requiresDelete = false;
@@ -1235,6 +1258,26 @@ class Controller extends Base\Base
     {
         $this->courseImplementationMapper = $courseImplementationMapper;
         return $this;
+    }
+
+    /**
+     * Get component instance mapper
+     *
+     * @return \Component_InstanceMapper
+     */
+    protected function getComponentInstanceMapper()
+    {
+        return $this->componentInstanceMapper;
+    }
+
+    /**
+     * Set component instance mapper
+     *
+     * @param \Component_InstanceMapper $componentInstanceMapper
+     */
+    public function setComponentInstanceMapper($componentInstanceMapper)
+    {
+        $this->componentInstanceMapper = $componentInstanceMapper;
     }
 
     /**
