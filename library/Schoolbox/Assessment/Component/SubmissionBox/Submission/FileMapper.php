@@ -129,21 +129,16 @@ class FileMapper extends Mapper
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
+        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
+        $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
+        $joinMapper->hardDelete($removedFiles);
 
-        /* Just blow them all away
-         *
-         * Draft-wise, the worst thing that can happen is that this hardDelete()
-         * is followed immediately by a crash, thereby irretrievably deleting the
-         * contents of the student's draft submission.
+        /* Save only files that are new
          */
-        $joinMapper->hardDelete($existingFiles);
-
-        /* Resave EVERYTHING
-         */
-        foreach ($object->getFiles() as $file) {
+        foreach ($addedFiles as $file) {
             $file->setSubmission($object);
         }
-        $joinMapper->save($object->getFiles());
+        $joinMapper->save($addedFiles);
     }
 
     /**
