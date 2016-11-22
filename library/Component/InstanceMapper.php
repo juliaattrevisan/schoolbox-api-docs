@@ -10,6 +10,7 @@
  */
 
 use Schoolbox\Resource\Folder;
+use Schoolbox\GenericCollection;
 
 /**
  * Class Component_InstanceMapper
@@ -67,7 +68,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     *
     * @param $module
     * @param $definitionId
-    * @return array
+    * @return Component_Instance[]|GenericCollection
     */
     public function findByDefinition($module, $definitionId)
     {
@@ -95,7 +96,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     * Find component records by a module, but without an identifier
     *
     * @param $module
-    * @return array
+    * @return Component_Instance[]|GenericCollection
     */
     public function findByModule($module)
     {
@@ -119,7 +120,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     * @param string $module
     * @param string $identifier
     *
-    * @return array
+    * @return Component_Instance[]|GenericCollection
     */
     public function findByContext($module, $identifier)
     {
@@ -165,7 +166,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
      * @param string $identifier
      * @param string $class
      *
-     * @return array
+     * @return Component_Instance[]|GenericCollection
      */
     public function findByContextAndClass($module, $identifier, $class)
     {
@@ -195,7 +196,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 
     /**
      * @param $id
-     * @return array
+     * @return Component_Instance[]|GenericCollection
      */
     public function findByInstanceId($id)
     {
@@ -212,15 +213,13 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
 
-        $foo = $this->findByFields($sql, array(':id' => $id));
-
-        return $foo;
+        return $this->findByFields($sql, array(':id' => $id));
     }
 
     /**
     * @param $sql
     * @param $fields
-    * @return array
+    * @return Component_Instance[]|GenericCollection
     */
     protected function findByFields($sql, $fields)
     {
@@ -236,7 +235,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         $configInstanceCollection   = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
         $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
-        $finalCollection = array();
+        $finalCollection = new GenericCollection(Component_Instance::class);
 
         // map the definitions into their instances
         foreach ($instanceCollection as $i => $instance) {
