@@ -34,7 +34,7 @@
                     {% for currentFile in response.allFiles %}
                         {% set selected = '' %}
                         {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
-                        {% set hasSelectedFile = selectedFileHash|length or currentFile.hash == selectedFileHash %}
+                        {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
 
                         {% if hasSelectedFile or defaultSelectedFile %}
                             {% set selected = 'selected' %}
