@@ -40,7 +40,7 @@ class Tokenizer extends Super {
         $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) { return preg_replace('`[^a-z]`i', '', $input); }));
         $this->addFilter(new Filter('num',   'Strips all non-numeric characters', function ($input) { return preg_replace('`[^0-9]`i', '', $input); }));
         $this->addFilter(new Filter('preat', 'All characters before the first @ symbol', function ($input) { return substr($input, 0, strpos($input, '@')); }));
-        $this->addFilter(new Filter('postslash', 'All characters after the last backslash symbol', function ($input) { return substr($input, strrpos($input, '\\') + 1); }));
+        $this->addFilter(new Filter('postslash', 'All characters after the last \\ symbol', function ($input) { return substr($input, strrpos($input, '\\') + 1); }));
 
     }
 
