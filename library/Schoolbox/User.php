@@ -42,6 +42,9 @@ class User implements JsonSerializable, ISoftDeletable
     /** @var string */
     private $altEmail;
 
+    /** @var string */
+    private $positionTitle;
+
     /** @var bool */
     private $webmail;
 
@@ -369,6 +372,15 @@ class User implements JsonSerializable, ISoftDeletable
         return $this;
     }
 
+    /**
+     * @param string $positionTitle
+     * @return string
+     */
+    public function setPositionTitle($positionTitle)
+    {
+        $this->positionTitle = $positionTitle;
+        return $this;
+    }
 
     /**
      * @return string
@@ -376,6 +388,23 @@ class User implements JsonSerializable, ISoftDeletable
     public function getAltEmail()
     {
         return $this->altEmail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPositionTitle()
+    {
+        return $this->positionTitle;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPositionTitle()
+    {
+        $positionTitle = trim($this->positionTitle);
+        return !empty($positionTitle);
     }
 
     /**
@@ -816,7 +845,7 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
-     * @param CampusCollection $campusCollection
+     * @param Collection $campusCollection
      * @return self
      */
     public function setCampusCollection(CampusCollection $campusCollection)

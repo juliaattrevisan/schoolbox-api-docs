@@ -70,6 +70,7 @@ if(is_numeric($this->arg[0])) {
                         'ESCAPE_LASTNAME'   => addslashes($user['lastname']),
                         'FULLNAME'          => $userHandler->formatName($user),
                         'ALT_EMAIL'         => $user['alt_email'],
+                        'POSITION_TITLE'    => $user['position_title'],
                         'PASSWORD'          => 'donotchange',  // set to foreign string to avoid reveals and to indicate password has not been changed
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',

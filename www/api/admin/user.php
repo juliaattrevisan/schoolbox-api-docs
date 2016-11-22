@@ -53,6 +53,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'synergy_id'		 => $_GET['database_id']==''?'NULL':$_GET['database_id'],
             'local_email'		 => $_GET['local_email'],
             'alt_email'			 => $_GET['alt_email'],
+            'position_title'	 => $_GET['position_title'],
             'password'			 => $_GET['password'],
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
@@ -116,7 +117,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
         $user = array('id' => $_GET['user_id']);
 
-        foreach (array('title', 'firstname', 'lastname', 'local_email', 'alt_email', 'su') as $field) {
+        foreach (array('title', 'firstname', 'lastname', 'local_email', 'alt_email', 'position_title', 'su') as $field) {
 
             if (!empty($_GET[$field])) {
                 $user[$field] = $_GET[$field];

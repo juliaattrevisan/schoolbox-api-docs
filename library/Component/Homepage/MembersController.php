@@ -22,14 +22,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const MAX_MEMBERS = 100;
 
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -133,15 +125,15 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             $name .= " (Group Admin)";
                         }
 
-                        $this->setVar(
-                            array(
-                                'PERSON_UID' => $user->getId(),
-                                'PERSON_NAME' => \Scrub::text($name),
-                                'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
-                                'PERSON_GROUP' => $user->getRole()->getName(),
-                                'LIST_STYLE' => $displayOptions[$display]['css'],
-                            )
-                        );
+                    $this->setVar(
+                        array(
+                            'PERSON_UID'         => $user->getId(),
+                            'PERSON_NAME'        => \Scrub::text($name),
+                            'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
+                            'PERSON_GROUP'       => \Scrub::text(empty($user->getPositionTitle()) ? $user->getRole()->getName() : $user->getPositionTitle()),
+                            'LIST_STYLE'         => $displayOptions[$display]['css'],
+                        )
+                    );
 
                         /* Don't display images in list view
                          */

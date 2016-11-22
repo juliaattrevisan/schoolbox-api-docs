@@ -67,9 +67,9 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         $user->setHideTimetable(!empty($_POST['hide_timetable']));
         $user->setLocalEmail(!empty($_POST['local_email']));
         $user->setUseInternalMail(!empty($_POST['mail_handler']));
-        $user->setWebmail(!empty($_POST['webmail']));
         $user->setSuperuser(isset($_POST['superuser']));
         $user->setEnabled(!empty($_POST['account_enabled']));
+        $user->setPositionTitle($_POST['position_title']);
 
         $userMapper->save($user);
         SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
@@ -91,6 +91,7 @@ elseif ($_POST['modusername']) {
     $user->setLastname($_POST['lastname']);
     $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
     $user->setAltEmail($_POST['alt_email']);
+    $user->setPositionTitle($_POST['position_title']);
     $user->getRole()->setId($_POST['group']);
     foreach ($_POST['campus'] as $campusId) {
         /** @var \Schoolbox\Campus $campus */
