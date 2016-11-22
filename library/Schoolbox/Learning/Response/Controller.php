@@ -73,6 +73,15 @@ class Controller extends Base
      */
     public function getParticularResponse(Submission $response)
     {
+        /* Module doesn't have access to $this->getUser()
+         *
+         * Superusers can see draft Responses in the inline grader
+         * Teachers cannot see draft Responses in the inline grader
+         */
+        if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         /* Factory to figure out which fragment is required
          */
         $file = null;
