@@ -26,6 +26,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
+use DueWork_ErrorMapper;
 
 class Controller extends Base
 {
@@ -119,6 +120,10 @@ class Controller extends Base
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+
+                /* For saving feedbacks
+                 */
+                'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
                 'participant' => (new Participant($response->getSubmittedOnBehalfOf(), $response->getAssessable())),
 
                 /* Rubrics data
