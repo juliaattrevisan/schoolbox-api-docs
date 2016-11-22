@@ -451,7 +451,9 @@ class MapperProxy
     public function delete(IAssessable $assessable)
     {
         // Delete assessment
-        $this->baseMapper->delete($this->translateToDataModel($assessable, 0));
+        $dataModel = $this->translateToDataModel($assessable, 0);
+        $this->baseMapper->delete($dataModel);
+        $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
     }
