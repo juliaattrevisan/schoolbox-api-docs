@@ -136,6 +136,18 @@ class Controller extends Base
 
         // Student's subjects and teachers
         $subjects = [];
+
+        // Student's work
+        // TODO add a findAllForStudentBetweenDates to findAllForStudentForTerm
+        $allWork = $this->assessmentDataSource
+            ->findAllForStudent($student, $term)
+            ->sortBy('dueAt', 'asc');
+
+        // TODO remove manual participant hydration when SA-977 is merged
+        foreach ($allWork as $assessment) {
+            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+        }
+
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
@@ -150,11 +162,11 @@ class Controller extends Base
             }
 
             // Student's grades
-            $assessments = $this->assessmentDataSource->findAllForFolderId($folder->getId(), ['term' => $term]);
-            // TODO remove manual participant hydration when SA-977 is merged
-            foreach ($assessments as $assessment) {
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-            }
+            // I can just get the assessments out of $allWork
+            $assessments = $allWork->filter(function (IAssessable $assessable) use ($folder) {
+                return $assessable->getBaseContext()->getFolder()->getId() == $folder->getId();
+            });
+
             // Markbook
             $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
@@ -166,14 +178,10 @@ class Controller extends Base
             ];
         }
 
-        // Student's upcoming work
-        // TODO add a findAllForStudentBetweenDates to findAllForStudentForTerm
-        $upcomingWork = $this->assessmentDataSource->findAllForStudent($student, $term)
-            ->sortBy('dueAt', 'asc')
-            ->filter(function (IAssessable $assessable) {
-                return ($assessable->getDueAt()->isFuture());
-            })
-        ;
+        // Only show work that isn't yet due
+        $upcomingWork = $allWork->filter(function (IAssessable $assessable) {
+            return ($assessable->getDueAt()->isFuture());
+        });
 
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
