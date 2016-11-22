@@ -151,6 +151,7 @@ class Controller extends Base
 
             // Student's grades
             $assessments = $this->assessmentDataSource->findAllForFolderId($folder->getId(), ['term' => $term]);
+            // TODO remove manual participant hydration when SA-977 is merged
             foreach ($assessments as $assessment) {
                 $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
@@ -172,12 +173,13 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
                 [
-                    'student'     => $student,
-                    'date'        => $date,
-                    'subjects'    => $subjects,
-                    'mailHandle'  => $this->getSession()->get('mailhandle'),
-                    'currentTerm' => $term,
-                    'children'    => $children,
+                    'student'      => $student,
+                    'currentUser'  => $this->getUser(),
+                    'date'         => $date,
+                    'subjects'     => $subjects,
+                    'mailHandle'   => $this->getSession()->get('mailhandle'),
+                    'currentTerm'  => $term,
+                    'children'     => $children,
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
