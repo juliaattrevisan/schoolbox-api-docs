@@ -473,13 +473,13 @@ class Controller extends Base
      */
     public function postImpersonate($user)
     {
-        $oldSession = $_SESSION;
+        $oldSession = $this->getSession();
 
         $sessionHandler = new Session();
 
         if ($sessionHandler->create($user->getUsername())) {
             $this->getSession()->set('previous', $oldSession);
-            $logger = new User_Logger_AssumeUser($oldSession['user'], $_SESSION['user']);
+            $logger = new User_Logger_AssumeUser($oldSession['user'], $this->getUser());
             $logger->notify();
             $this->getResponse()->redirect->afterPost("/");
         } else {
