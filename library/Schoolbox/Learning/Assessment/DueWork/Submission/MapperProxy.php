@@ -150,7 +150,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 $dataModelFile = (new StudentSubmissionFile())
                     ->setSubmission($dataModel)
                     ->setStorage($file->getStorage())
-                    ->setEditableInline($file->isOnlineSubmission())
+                    ->setEditableInline($file->getEditableInline())
                     ->setUuid($file->getCrocodocId())
                     ->setFilename($file->getFilename());
 

@@ -123,7 +123,7 @@ class Factory
 
             /* Ignore accumulation of wizzywig contents
              */
-            if (!$file->isOnlineSubmission()) {
+            if (!$file->getEditableInline()) {
                 $files[] = $file->getHash();
             }
         }

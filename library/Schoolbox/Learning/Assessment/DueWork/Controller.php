@@ -208,7 +208,7 @@ class Controller extends Assessment\Controller
                  * if the $file uses the wizzywig editor
                  */
                 foreach ($latestResponse->getAllFiles() as $file) {
-                    if ($file->isOnlineSubmission()) {
+                    if ($file->getEditableInline()) {
                         $editorContents = $file->read();
                     }
                 }

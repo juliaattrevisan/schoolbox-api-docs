@@ -127,7 +127,7 @@ class ResponseFile
                 ]
             ];
         }
-        elseif ($this->getFile()->isOnlineSubmission()) {
+        elseif ($this->getFile()->getEditableInline()) {
 
             /* Load purified html into a random div or suchlike
              */
