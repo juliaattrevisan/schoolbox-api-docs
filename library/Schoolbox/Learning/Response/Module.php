@@ -129,7 +129,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:ParticularResponse)', function ($params) {
+        $this->addRoutePreload($matcher, '(get|delete)ParticularResponse', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
             $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
