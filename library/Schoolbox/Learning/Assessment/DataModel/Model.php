@@ -189,6 +189,23 @@ class Model implements ISoftDeletable
         $this->deletedAt   = new Alaress_Date_NullDate();
     }
 
+    function __clone()
+    {
+        $this->id = null;
+        if($this->hasQuiz()){
+            $this->quiz = clone $this->quiz;
+        }
+        if($this->hasDueWork()){
+            $this->dueWork = clone $this->dueWork;
+        }
+        if($this->hasTask()){
+            $this->task = clone $this->task;
+        }
+        if($this->hasProject()){
+            $this->project = clone $this->project;
+        }
+    }
+
     /**
      * Helper method for getting this assessment data model's context.
      *
