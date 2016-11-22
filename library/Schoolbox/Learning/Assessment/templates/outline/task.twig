@@ -77,9 +77,7 @@
         {% endif %}
 
         <!-- BEGIN unit_task_delete_form -->
-        <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task" class="hide">
-            <input type="hidden" name="action"    value="delete" />
-            <input type="hidden" name="id"        value="{{ task.id }}" />
+        <form action="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" method="post" data-form_type="delete_task" class="hide">
             <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
             <input type="hidden" name="unit_id"   value="{{ unit.id }}"/>
         </form>
