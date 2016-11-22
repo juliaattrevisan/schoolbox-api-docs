@@ -83,51 +83,57 @@ class Controller extends Base
             $feedback->setComment($postComment);
         }
 
-        if ($postMark) {
-            // mark defined and non-empty
-            try {
-
-                $scheme = $participant->getAssessable()->getMarkScheme();
-
-                // verify normalisation, then sanitise the output
-                $norm = $scheme->getNormalisedMark($postMark);
-                $sane = $scheme->getHumanReadableMark($norm);
-
-                $feedback
-                    ->setNormalisedMark($norm)
-                    ->setHumanReadableMark($sane)
-                ;
-            } catch (InvalidArgumentException $e) {
-                // check for error code
+        try {
+            if ($postMark) {
+                // mark defined and non-empty
                 try {
-                    $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
+
+                    $scheme = $participant->getAssessable()->getMarkScheme();
+
+                    // verify normalisation, then sanitise the output
+                    $norm = $scheme->getNormalisedMark($postMark);
+                    $sane = $scheme->getHumanReadableMark($norm);
 
                     $feedback
-                        ->setNormalisedMark($code->getNormaliseAs())
-                        ->setHumanReadableMark($postMark)
+                        ->setNormalisedMark($norm)
+                        ->setHumanReadableMark($sane)
                     ;
+                } catch (InvalidArgumentException $e) {
+                    // check for error code
+                    try {
+                        $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
 
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // invalid input
-                    $this->sendError('Invalid mark given');
-                    return;
+                        $feedback
+                            ->setNormalisedMark($code->getNormaliseAs())
+                            ->setHumanReadableMark($postMark)
+                        ;
+
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // invalid input
+                        $this->sendError('Invalid mark given');
+                        return;
+                    }
                 }
             }
-        }
 
-        if ($postPublish == true) {
-            // received signal to publish this
-            if (!$feedback->isPublished()) {
-                $feedback->setPublishedAt(Alaress_Date_Format::now());
+            if ($postPublish == true) {
+                // received signal to publish this
+                if (!$feedback->isPublished()) {
+                    $feedback->setPublishedAt(Alaress_Date_Format::now());
+                }
             }
+
+            $this->getFeedbackDataSource()->save($feedback);
+
+            $template = '';
+            $data = [];
+
+            $this->respond($template, $data, $responseCode);
         }
-
-        $this->getFeedbackDataSource()->save($feedback);
-
-        $template = '';
-        $data = [];
-
-        $this->respond($template, $data, $responseCode);
+        catch (\RangeException $e) {
+            $this->sendError('Invalid mark given');
+            return;
+        }
     }
 
 
