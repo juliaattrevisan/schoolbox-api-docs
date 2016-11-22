@@ -57,7 +57,6 @@ class FileMapper extends Mapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
     }
 
     /**
@@ -139,55 +138,6 @@ class FileMapper extends Mapper
             $file->setSubmission($object);
         }
         $joinMapper->save($addedFiles);
-    }
-
-    /**
-     * Post-save callback.
-     *
-     * Attaches a default return to this submission for this student, if there
-     * is no return for them already.
-     *
-     * @param File $object
-     * @param File $previous
-     */
-    public function createDefaultReturn(File $object, $previous = null)
-    {
-        if (!($object->isDraft())) {
-            $boxId = $object->getSubmissionBox()->getId();
-            /** @var ReturnedWorkMapper $returnMapper */
-            $returnMapper = $this->getJoinMapper('box_id.return');
-            $returnCount  = $returnMapper->countByColumnList([
-                'box_id' => $boxId,
-                'owner'  => $object->getOwner()->getId()
-            ]);
-            if ($returnCount === 0) {
-                try {
-                    // Get default state
-                    $submissionStateMapper = new \DueWork_ErrorMapper();
-                    $defaultState          = $submissionStateMapper->findDefaultForNewSubmissions();
-                } catch (Mapper\Exception $e) {
-                    // No default state: do nothing
-                    return;
-                }
-
-                // eurgh... manual hydration
-                $box = $this->getJoinMapper('box_id')->findById($object->getSubmissionBox()->getId());
-
-                /** @var ReturnedWork $defaultReturn */
-                $defaultReturn = $returnMapper->createModel();
-                $defaultReturn
-                    ->setIsConfirmationOfSubmission(true)
-                    ->setSubmissionBox($object->getSubmissionBox())
-                    ->setOwner($object->getOwner())
-                    // No real marker
-                    ->setMarker($box->getOwner())
-                    ->setHumanReadableMark($defaultState->getDisplayAs())
-                    ->setCreatedAt($object->getCreatedAt())
-                    ->setNormalizedMark($defaultState->getNormaliseAs())
-                ;
-                $returnMapper->save($defaultReturn);
-            }
-        }
     }
 
     /**
