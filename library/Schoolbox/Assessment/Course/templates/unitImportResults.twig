@@ -153,6 +153,7 @@
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                     {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
+                                    {% set isChecked = assessmentImpl or 'import' == action %}
 
                                     <li data-type="unit_row">
                                         <input type="hidden" name="{{ inputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
@@ -162,7 +163,7 @@
                                             <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                             <input type="checkbox"
                                                    id="a_import-{{ assessment.id}}"
-                                                   {% if assessmentImpl or 'import' == action %} checked="checked"{% endif %}
+                                                   {% if isChecked %} checked="checked"{% endif %}
                                                    data-assessment="{{ assessment.id }}"
                                                    name="{{ inputPrefix }}[checked]"
                                                    value="1"
@@ -175,7 +176,7 @@
                                                 {% endif %}
                                             </label>
                                         </div>
-                                        <div data-assessment-dates="{{ assessment.id }}">
+                                        <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
                                                 assessmentDate: assessment.publishAt,
