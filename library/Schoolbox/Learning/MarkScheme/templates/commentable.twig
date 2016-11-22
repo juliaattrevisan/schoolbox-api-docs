@@ -1,5 +1,5 @@
 {# TODO create feedback routes #}
-{% set fbUrl %}/learning/assessments/{{ participant.assessable.id }}/{{ participant.user.id }}/feedback{% endset %}
+{% set fbUrl %}{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id }) }}{% endset %}
 {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
     {% set savedStatusText = 'Saved as Draft' %}
 {% else %}
