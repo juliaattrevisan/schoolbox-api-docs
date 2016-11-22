@@ -163,13 +163,20 @@ class Markbook
         // Render as whatever the default grade group is
         $overallMarkScheme = new LetterGrade($this->gradeGroup);
         $weightedSummator  = new WeightedAverage();
+
+        // Not all assessables are used in stats:
+        // only ones for which feedback is visible are usable.
+        $visibleAssessments = $this->getAssessments()->filter(function(IAssessable $assessable) {
+            return $assessable->isFeedbackVisibleToUser($_SESSION['user']);
+        });
+
         foreach ($this->getStudents() as $student) {
             $this->studentStatistics[$student->getId()]['weightedMean'] =
                 $overallMarkScheme->getHumanReadableMark(
-                    $weightedSummator->summateAllAssessablesForUser($this->getAssessments(), $student, true)
+                    $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
-                    $weightedSummator->summate($this->getAssessments(), $student, true);
+                    $weightedSummator->summate($visibleAssessments, $student, true);
         }
 
         // Summate overall statistics:
@@ -204,8 +211,12 @@ class Markbook
 
         // Just get marks for all students, and let the summators do the rest.
         $normMarks = [];
-        foreach ($assessment->getAllParticipants() as $participant) {
-            $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
+
+        // TODO inject $_SESSION['user']
+        if ($assessment->isFeedbackVisibleToUser($_SESSION['user'])) {
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
+            }
         }
 
         $statistics = [
