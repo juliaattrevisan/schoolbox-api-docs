@@ -1124,7 +1124,8 @@ class PendingFactory
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
-            $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted_at']));
+            $response->setSubmittedAt($this->getFastDateFromString($row['ss.submitted_at']));
+            $response->setUpdatedAt($this->getFastDateFromString($row['ss.updated_at']));
 
             $dueWork->getResponses()->add($response);
             $participants = $dueWork->getAllParticipants();
