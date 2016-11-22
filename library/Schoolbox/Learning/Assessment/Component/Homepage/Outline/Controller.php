@@ -102,7 +102,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $unitId = $unit->getSpecification()->getFolder()->getId();
                 $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
 
-                $assessables = $assessmentProxy->findAllForUnitImplementationId($unit->getId());
+                $assessables = $assessmentProxy->findAllByUnitImplementationId($unit->getId());
                 $unit->setAssessables($assessables);
             }
             foreach ($this->courseImplementation->getUnits() as $unit) {

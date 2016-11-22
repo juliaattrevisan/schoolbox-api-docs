@@ -6,9 +6,9 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use External_UserInterface;
 use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -53,29 +53,33 @@ class MapperProxy
     protected $translator;
 
     /**
-     * @var External_UserInterface
+     * Data source for participants in assessments.
+     *
+     * @var ParticipantDataSource
      */
-    protected $externalUser;
+    protected $particpantDataSource;
 
     /**
      * Constructor
      *
-     * @param Mapper                 $baseMapper
-     * @param Translator             $translator
-     * @param External_UserInterface $externalUser
+     * @param Mapper                $baseMapper
+     * @param Translator            $translator
+     * @param ParticipantDataSource $participantDataSource
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        External_UserInterface $externalUser
+        ParticipantDataSource $participantDataSource
     ) {
-        $this->baseMapper   = $baseMapper;
-        $this->translator   = $translator;
-        $this->externalUser = $externalUser;
+        $this->baseMapper            = $baseMapper;
+        $this->translator            = $translator;
+        $this->participantDataSource = $participantDataSource;
     }
 
     /**
-     * Finds an assessable by ID
+     * Finds an assessable by ID.
+     *
+     * This method does not load participants.
      *
      * @param int $id
      * @return IAssessable
@@ -94,14 +98,46 @@ class MapperProxy
     }
 
     /**
-     * Finds the specification assessment for a implementation assessment
+     * Find by ID for modification.
+     *
+     * This method does not load participants.
+     *
+     * @param int $id
+     * @return IAssessable
+     */
+    public function findByIdForModify($id)
+    {
+        return $this->findById($id);
+    }
+
+    /**
+     * Find by ID for review, either of a single student or all in the class.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $id
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     */
+    public function findByIdForReview($id, User $student = null)
+    {
+        $assessment = $this->findById($id);
+        $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+        return $assessment;
+    }
+
+    /**
+     * Finds the specification assessment for a implementation assessment.
+     *
+     * This method does not load participants, because assessments in a unit spec
+     * do not have participants.
      *
      * @param int $assessmentId
      * @return IAssessable
      * @throws MapperException\Deleted if the assessment was deleted
      * @throws MapperException         if the assessment doesn't exist at all
      */
-    public function findSpecificationForImplementationId($assessmentId)
+    public function findSpecificationByImplementationId($assessmentId)
     {
         // Find the assessable which this assessment implements
         // TODO figure out how to do this in one query
@@ -110,16 +146,21 @@ class MapperProxy
     }
 
     /**
-     * Finds the specification assessment for a implementation assessment
+     * Finds the specification assessment for a implementation assessment.
+     *
+     * Currently, this does not load participants - I am not yet sure which
+     * context this method will be used.
      *
      * @param int $assessmentId
      * @param array $options
      * @return IAssessable[]
      */
-    public function findAllImplementationsForSpecificationId($assessmentId, $options = [])
+    public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('spec.id', $assessmentId, $options));
+        $params            = $this->convertOptionsToColumnList($options);
+        $params['spec.id'] = $assessmentId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -128,49 +169,60 @@ class MapperProxy
      * If $context is a Folder, this method does not retrieve assessables that
      * are within a course implementation that has been created on that folder.
      *
+     * This method does not load participants.
+     *
      * @param AssessmentContext $context
      * @param array             $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForContext(AssessmentContext $context, $options = [])
+    public function findAllByContext(AssessmentContext $context, $options = [])
     {
         if ($context instanceof Folder) {
-            return $this->findAllForFolderIdExclusively($context->getId(), $options);
+            return $this->findAllByFolderIdExclusively($context->getId(), $options);
         }
         if ($context instanceof UnitSpecification) {
-            return $this->findAllForUnitSpecificationId($context->getId(), $options);
+            return $this->findAllByUnitSpecificationId($context->getId(), $options);
         }
         if ($context instanceof UnitImplementation) {
-            return $this->findAllForUnitImplementationId($context->getId(), $options);
+            return $this->findAllByUnitImplementationId($context->getId(), $options);
         }
         if ($context instanceof ProjectObject) {
-            return $this->findAllForProjectId($context->getId(), $options);
+            return $this->findAllByProjectId($context->getId(), $options);
         }
         return new Collection();
     }
 
     /**
-     * Finds all assessables for a unit specification
+     * Finds all assessables for a unit specification.
+     *
+     * This method does not load participants, because assessments in a unit spec
+     * do not have participants.
      *
      * @param int   $unitSpecId
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForUnitSpecificationId($unitSpecId, $options = [])
+    public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('us.id', $unitSpecId, $options));
+        $params          = $this->convertOptionsToColumnList($options);
+        $params['us.id'] = $unitSpecId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
-     * Finds all assessables for a unit implementation
+     * Finds all assessables for a unit implementation.
+     *
+     * This method does not currently load participants.
      *
      * @param int   $unitImplId
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForUnitImplementationId($unitImplId, $options = [])
+    public function findAllByUnitImplementationId($unitImplId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('ui.id', $unitImplId, $options));
+        $params          = $this->convertOptionsToColumnList($options);
+        $params['ui.id'] = $unitImplId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
     }
 
     /**
@@ -180,11 +232,13 @@ class MapperProxy
      * implementation of the given folder.
      * This is more likely to be the expected behavior of this method.
      *
+     * This method does not currently load participants.
+     *
      * @param int   $folderId A folder or list of folders
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForFolderId($folderId, $options = [])
+    public function findAllByFolderId($folderId, $options = [])
     {
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId(
@@ -196,14 +250,38 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for a folder for review.
+     *
+     * @param int   $folderId A folder or list of folders
+     * @param User  $student If provided, load only this student's participation
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByFolderIdForReview($folderId, User $student = null, $options = [])
+    {
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId(
+                    $folderId,
+                    $this->convertOptionsToColumnList($options),
+                    $options
+                )
+            ),
+            $student
+        );
+    }
+
+    /**
      * Finds all assessables for a folder, not including course implementation
      * assessables.
+     *
+     * This method does not currently load participants.
      *
      * @param int   $folderId
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForFolderIdExclusively($folderId, $options = [])
+    public function findAllByFolderIdExclusively($folderId, $options = [])
     {
         $params         = $this->convertOptionsToColumnList($options);
         $params['f.id'] = $folderId;
@@ -214,11 +292,16 @@ class MapperProxy
      * Finds all assessables that have been imported into a folder through a
      * course import.
      *
+     * This method does not currently load participants.
+     *
+     * @deprecated Use `findAllForFolderId` to find assessables in a folder,
+     *             along with any that are in a unit import on that folder.
+     *
      * @param int   $folderId
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllInCourseImplementationForFolderId($folderId, $options = [])
+    public function findAllByCourseImplementationFolderId($folderId, $options = [])
     {
         $params            = $this->convertOptionsToColumnList($options);
         // uicf.id = Unit Implementation Course Folder ID
@@ -227,25 +310,47 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables that are part of the given project
+     * Finds all assessables that are part of the given project.
+     *
+     * This method does not load participants - see `$this->findAllByProjectIdForReview`
+     * for a version which does.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
      * @return Collection|IAssessable[]
      */
-    public function findAllForProjectId($projectId, $options = [])
+    public function findAllByProjectId($projectId, $options = [])
     {
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('pa.assessment_id', $projectId, $options));
+        $params                     = $this->convertOptionsToColumnList($options);
+        $params['pa.assessment_id'] = $projectId;
+        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+    }
+
+    /**
+     * Finds all assessables that are part of the given project, along with
+     * all participation.
+     *
+     * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
+     * @param User  $student If provided, load only this student's participation
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByProjectIdForReview($projectId, User $student = null, $options = [])
+    {
+        $assessments = $this->findAllByProjectId($projectId, $options);
+        return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
     }
 
     /**
      * Finds all assessables that this student is participating in.
      *
+     * This method loads participation for $student only.
+     *
      * @param User $student
      * @param Term $term    Restrict results to this term
      * @return Collection|IAssessable[]
      */
-    public function findAllForStudent(User $student, Term $term)
+    public function findAllByStudent(User $student, Term $term)
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -266,8 +371,11 @@ class MapperProxy
         // but has created a response or feedback for.
         $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
-        return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            ),
+            $student
         );
     }
 
@@ -363,7 +471,7 @@ class MapperProxy
         // Retrieve sub-projects
         $assessable = $this->translator->translateToDomainModel($subModel);
         if ($assessable instanceof ProjectObject) {
-            $assessable->setAssessables($this->findAllForProjectId($assessable->getId()));
+            $assessable->setAssessables($this->findAllByProjectId($assessable->getId()));
         }
         return $assessable;
     }
@@ -430,5 +538,49 @@ class MapperProxy
             }
         }
         return $columnList;
+    }
+
+    /**
+     * Loads participants into the given assessable.
+     *
+     * @param IAssessable $assessable
+     * @param User        $user
+     * @param bool        $includeResponses
+     * @param bool        $includeFeedbacks
+     * @return IAssessable
+     */
+    public function loadParticipantsIntoAssessment(
+        IAssessable $assessable,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        $this->participantDataSource->loadParticipationIntoAssessment(
+            $assessable,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+        return $assessable;
+    }
+
+    /**
+     * Loads participants into a collection of assessables.
+     *
+     * @param Collection $collection
+     * @param User       $user
+     * @param bool       $includeResponses
+     * @param bool       $includeFeedbacks
+     * @return Collection
+     */
+    public function loadParticipantsIntoAssessmentCollection(
+        Collection $collection,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        return $collection->map(function(IAssessable $assessable) use ($user, $includeResponses, $includeFeedbacks) {
+            return $this->loadParticipantsIntoAssessment($assessable, $user, $includeResponses, $includeFeedbacks);
+        });
     }
 }

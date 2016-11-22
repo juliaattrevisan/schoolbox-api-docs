@@ -36,12 +36,6 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
  */
 class Controller extends Assessment\Controller
 {
-
-    /**
-     * @var Participant\DataSource
-     */
-    private $participantMapper;
-
     /**
      * @var QuizMapper
      */
@@ -67,7 +61,6 @@ class Controller extends Assessment\Controller
      * @param Access                 $access
      * @param Transactor             $transactor
      * @param BreadcrumbFactory      $bakery
-     * @param Participant\DataSource $participantMapper
      * @param QuizMapper             $quizMapper
      * @param QuizSectionMapper      $quizSectionMapper
      * @param QuizAttemptMapper      $quizAttemptMapper
@@ -79,13 +72,11 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
-        Participant\DataSource $participantMapper,
         QuizMapper $quizMapper,
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
-        $this->participantMapper = $participantMapper;
         $this->quizMapper = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
@@ -249,14 +240,6 @@ class Controller extends Assessment\Controller
     {
         $data['acceptingResponses']= true;
         return $data;
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantMapper()
-    {
-        return $this->participantMapper;
     }
 
     /**

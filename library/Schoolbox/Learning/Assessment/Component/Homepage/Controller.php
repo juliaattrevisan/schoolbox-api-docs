@@ -13,9 +13,7 @@ use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -33,9 +31,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     /** @var TermMapper $termMapper */
     private $termMapper;
 
-    /** @var  Participant\DataSource */
-    private $participantMapper;
-
     /**
      * Constructor
      *
@@ -52,7 +47,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
         $this->setAssessmentMapper($assMap);
         $this->setTermMapper(TermMapper::getInstance());
-        $this->participantMapper = $this->getSitePage()->getDi()->get('participantDataSource');
     }
 
     /**
@@ -69,8 +63,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
+            // Note: findAllByFolderIdForReview retrieves response+feedback for all
+            // assessment types, not just tasks (as it did previously).
             $this->assessments = $this->getAssessmentMapper()
-                ->findAllForFolderId($this->getSource()->getId())
+                ->findAllByFolderIdForReview($this->getSource()->getId(), $this->getUser())
                 ->filter(
                     function (IAssessable $assessment)
                     {
@@ -82,21 +78,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
             return false;
-        }
-
-        /* Only show participation for tasks, as those can be altered inline
-         * The current user's participation determines state of the task checkbox
-         *
-         * Don't need to load data for any other assessment type (due work, quiz, etc)
-         */
-        foreach($this->assessments as $assessment){
-            if ($assessment instanceof Task) {
-                try {
-                    $this->participantMapper->findForAssessment($assessment, $this->getUser());
-                } catch (\OutOfBoundsException $e) {
-                    // noop
-                }
-            }
         }
 
         return true;

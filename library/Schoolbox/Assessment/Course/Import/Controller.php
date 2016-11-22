@@ -274,7 +274,7 @@ class Controller extends Base\Base
                 // TODO in import-modify context, support overlay of implementation assessments over spec
                 $spec = $this->getUnitSpecificationMapperProxy()->findById($unit['unit_spec_id']);
 
-                $spec->setAssessables($this->getAssessmentMapper()->findAllForUnitSpecificationId($unit['unit_spec_id']));
+                $spec->setAssessables($this->getAssessmentMapper()->findAllByUnitSpecificationId($unit['unit_spec_id']));
 
                 $impl = new Unit\Implementation();
                 $impl->setOpenDate($openDate)

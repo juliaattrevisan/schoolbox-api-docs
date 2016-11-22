@@ -119,8 +119,7 @@ class Module extends BaseModule
                 $student = $this->getUserMapper()->createModel();
             }
 
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment, $student);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 
             $participant = $assessment->getParticipant($student);
 
@@ -130,8 +129,7 @@ class Module extends BaseModule
         });
 
         $this->addRoutePreload($matcher, '(get|delete)ParticularResponse', function ($params) {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 
             try {
                 /* TODO: Severe inefficiency here, it gets data twice.
@@ -152,8 +150,7 @@ class Module extends BaseModule
             /* TODO: Arbitrarily assume 326 for now
              * TODO: Generate a populated response for now
              */
-            $assessment = $this->getAssessmentMapperProxy()->findById(326);
-            $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview(326);
             $response = (new TemporaryResponse())->produceResponse($assessment);
 
             $feedback = null;
@@ -250,14 +247,6 @@ class Module extends BaseModule
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantMapperProxy()
-    {
-        return $this->injector->get('participantDataSource');
     }
 
     /**

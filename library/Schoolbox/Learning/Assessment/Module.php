@@ -14,7 +14,6 @@ use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -22,14 +21,12 @@ use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperPr
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -127,12 +124,8 @@ class Module extends BaseModule
     {
         try {
             // obtain the assessment from our other preload
-            $assessment  = $this->preloadAssessment($params)['assessment'];
             $student     = $this->getUserMapper()->findById($params['studentId']);
-
-            /* Load participant's Responses and Feedbacks
-             */
-            $this->getParticipantMapperProxy()->findForAssessment($assessment, $student);
+            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
 
             /** @var IAssessable $assessment */
             $participant = $assessment->getParticipant($student);
@@ -177,25 +170,24 @@ class Module extends BaseModule
      * Convert route params into an assessment object
      *
      * @param array $params
+     * @param User  $student If provided, only load this student's participation
      * @return array
      */
-    protected function preloadAssessment(array $params)
+    protected function preloadAssessment(array $params, User $student = null)
     {
         try {
-            $a = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e){
-            $a = $e->getDeletedObject();
+            $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($a);
-
         // set the controller
-        $this->setControllerFromAssessment($a);
+        $this->setControllerFromAssessment($assessment);
 
         return [
-            'assessment' => $a
+            'assessment' => $assessment
         ];
     }
 
@@ -256,7 +248,6 @@ class Module extends BaseModule
 
         // quiz specific
         $qc =& $injector->params[Assessment\Quiz\Controller::class];
-        $qc['participantMapper'] = $injector->lazyGet('participantDataSource');
         $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
         $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
         $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
@@ -361,14 +352,6 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
-    }
-
-    /**
-     * @return Participant\DataSource
-     */
-    protected function getParticipantMapperProxy()
-    {
-        return $this->injector->get('participantDataSource');
     }
 
 }

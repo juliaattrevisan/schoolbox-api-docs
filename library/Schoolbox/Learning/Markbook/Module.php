@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -48,7 +49,7 @@ class Module extends BaseModule
             try {
                 $extraParams['class'] = $this->getFolderMapper()->findById($params['classId']);
             } catch (MapperException $e) {
-                $extraParams['class'] = $this->getFolderMapper()->createModel();
+                throw new NotFound("Class does not exist");
             }
             if ($params['termCode']) {
                 $extraParams['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
@@ -79,7 +80,6 @@ class Module extends BaseModule
                 'errorMapper'                    => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'              => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
-                'participantDataSource'          => $injector->lazyGet('participantDataSource'),
                 'courseImplementationDataSource' => $injector->lazyGet('courseImplementationDataSource'),
                 'termMapper'                     => $this->getMapperFactory()->getLazy(TermMapper::class),
             ])
