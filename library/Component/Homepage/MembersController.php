@@ -22,14 +22,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const MAX_MEMBERS = 100;
 
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
 
     /**
      * Renders the data into the SitePage. Presentation logic.
