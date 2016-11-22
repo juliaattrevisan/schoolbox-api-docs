@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 
 class Controller extends Base
@@ -136,6 +137,11 @@ class Controller extends Base
         }
     }
 
+    public function postResponseFeedback(IResponse $response)
+    {
+        $this->sendError('');
+        return;
+    }
 
     /**
      * @api   DELETE /assessments/:assessmentId/feedback/:feedback

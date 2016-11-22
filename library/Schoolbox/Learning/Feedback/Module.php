@@ -45,12 +45,19 @@ class Module extends BaseModule
             ];
         };
 
+        $preloadResponse = function ($params) {
+            return [
+                'response' => ''
+            ];
+        };
+
         $assessmentRoute  = 'assessments/{assessmentId:\d+}';
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",        'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",   'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
+        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
+        $this->register('POST',   "/$participantRoute/{responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipant, $preloadResponse);
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
     }
 
 

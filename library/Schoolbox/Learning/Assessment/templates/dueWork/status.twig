@@ -66,7 +66,10 @@
 
 
 {% block grading %}
-    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+    {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+        markScheme: assessment.markScheme,
+        fbUrl: routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id })
+    } %}
 {% endblock %}
 
 {% block scripts %}
