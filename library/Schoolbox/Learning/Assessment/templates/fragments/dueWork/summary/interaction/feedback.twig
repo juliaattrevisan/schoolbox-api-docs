@@ -8,7 +8,7 @@
                 {% if currentFeedback.published %}
                     Published {{ currentFeedback.publishedAt.short }}
                 {% else %}
-                    (Draft &ndash; last updated {{ currentFeedback.updatedAt.short }})
+                    (Draft - last updated {{ currentFeedback.updatedAt.short }})
                 {% endif %}
                 </p>
             </a>
@@ -27,7 +27,7 @@
 
     {% if currentFeedback.comment|length %}
         <article>
-            {{ currentFeedback.comment|purify }}
+            {{ currentFeedback.comment|nl2br }}
         </article>
     {% endif %}
 
