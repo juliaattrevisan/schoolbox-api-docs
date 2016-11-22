@@ -315,6 +315,8 @@ class Controller extends Assessment\Controller
 
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
+
+        // Add the online submission to this response's list of files
         $response->attachOnlineSubmissionContent($body);
 
         // Make one of those factories that builds storages from hashes
@@ -322,36 +324,18 @@ class Controller extends Assessment\Controller
         if (!empty($rq->post['attachment'])) {
             foreach ($factory->build($rq->post['attachment'])->getAll() as $attachment) {
 
-                /* Content made with the wizzywig editor is also attached as a file
-                 *
-                 * This attachment is known as online-submission.html
-                 * This is actually treated the same as any other attached file
-                 *
-                 * Don't stack the online-submission.html file here, it should never
+                /* Don't stack the online-submission.html file here, it should never
                  * appear in the attached files list at all (it should always be
                  * loaded into the wizzywig)
-                 *
-                 * Since $attachment is a Storage model, it won't know about the
-                 * editableInline field - forcing us to infer wizzywig usage
-                 * from its filename
                  */
                 $attachedFile = (new DueWorkSubmissionFile())
                     ->setStorage($attachment)
-                    ->setFilename($attachment->getFilename());
+                    ->setFilename($attachment->getFilename())
+                    ->setEditableInline(false);
 
-                if (!$attachedFile->isOnlineSubmission()) {
-
-                    /* Not sure how useful this actually is, since you can't infer
-                     * the value of editableInline from a Storage model without
-                     * inspecting its corresponding editableInline field, which isn't
-                     * always available
-                     */
-                    $attachedFile->setEditableInline(false);
-
-                    /* Stack it up
-                     */
-                    $response->getAllFiles()->add($attachedFile);
-                }
+                /* Stack it up
+                 */
+                $response->getAllFiles()->add($attachedFile);
             }
         }
 
