@@ -115,7 +115,9 @@
                     confirmEvent: function(element) {
                         var unit_element = element.closest('[data-unit-task]');
                         var form         = unit_element.find('[data-form_type="delete_task"]');
+
                         $.post(form.attr('action'), form.serialize(), function(data) {
+                            unit_element.remove();
                             postCallback(form, data);
                         }, 'json');
                     }
