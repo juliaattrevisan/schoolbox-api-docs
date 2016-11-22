@@ -966,9 +966,27 @@ class Controller extends Base\Base
             ? $courseImpls->first()->getFolder()
             : $this->getFolderMapper()->findById($folderId);
 
+        $module = \Component_Definition::MODULE_HOMEPAGE;
+        $class = HomepageOutlineComponentController::class;
+        $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folder->getId(), $class);
+
+        // For each CourseImpl, determine how many components are displaying it on the homepage
+        $componentCounts = [];
+        foreach($courseImpls as $courseImpl){
+            $componentCounts[$courseImpl->getId()] = 0;
+        }
+
+        foreach($components as $component){
+            $courseImplId = $component->getConfigArray()['importedCourse']['value'];
+            if($courseImplId){
+                $componentCounts[$courseImplId]++;
+            }
+        }
+
         $this->tpl('management', [
-            'folder'      => $folder,
-            'courseImpls' => $courseImpls,
+            'folder'          => $folder,
+            'courseImpls'     => $courseImpls,
+            'componentCounts' => $componentCounts,
         ]);
     }
 
