@@ -202,17 +202,12 @@ class Controller extends Assessment\Controller
                  */
                 $dangerZone = (new Assessment\Attachzone\Factory())->buildForDueWorkResponse($latestResponse);
 
-                // Display the files that are a part of latest submission
+                /* Load in the wizzywig instead of a file attachment,
+                 * if the $file uses the wizzywig editor
+                 */
                 foreach ($latestResponse->getAllFiles() as $file) {
-
-                    /* Load in the wizzywig instead of a file attachment,
-                     * if the $file uses the wizzywig editor
-                     */
                     if ($file->getEditableInline()) {
                         $editorContents = $file->read();
-                    } else {
-                        // add it to the danger zone
-                        $dangerZone->attachFiles([$file->getHash()]);
                     }
                 }
             }
