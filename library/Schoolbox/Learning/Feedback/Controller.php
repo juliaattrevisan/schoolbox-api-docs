@@ -49,6 +49,43 @@ class Controller extends Base
     {
         $feedbacks = $this->getFloatingFeedback($participant);
 
+        try {
+            $this->processFeedback($participant, $feedbacks);
+        }
+        catch (\RangeException $e) {
+            $this->sendError('Invalid mark given');
+            return;
+        }
+    }
+
+    /**
+     * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
+     * @param Participant $participant
+     * @param IResponse $response
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postResponseFeedback(Participant $participant, IResponse $response)
+    {
+        $feedbacks = $response->getAllFeedback();
+
+        try {
+            $this->processFeedback($participant, $feedbacks);
+        }
+        catch (\RangeException $e) {
+            $this->sendError('Invalid mark given');
+            return;
+        }
+    }
+
+    /**
+     * Process feedbacks
+     *
+     * @param Participant $participant
+     * @param Collection $feedbacks
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    private function processFeedback(Participant $participant, Collection $feedbacks)
+    {
         if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
             // if none, or published: create new draft
             $feedback = $this->getFeedbackDataSource()->createModel($participant->getAssessable());
@@ -84,69 +121,52 @@ class Controller extends Base
             $feedback->setComment($postComment);
         }
 
-        try {
-            if ($postMark) {
-                // mark defined and non-empty
+
+        if ($postMark) {
+            // mark defined and non-empty
+            try {
+
+                $scheme = $participant->getAssessable()->getMarkScheme();
+
+                // verify normalisation, then sanitise the output
+                $norm = $scheme->getNormalisedMark($postMark);
+                $sane = $scheme->getHumanReadableMark($norm);
+
+                $feedback
+                    ->setNormalisedMark($norm)
+                    ->setHumanReadableMark($sane)
+                ;
+            } catch (InvalidArgumentException $e) {
+                // check for error code
                 try {
-
-                    $scheme = $participant->getAssessable()->getMarkScheme();
-
-                    // verify normalisation, then sanitise the output
-                    $norm = $scheme->getNormalisedMark($postMark);
-                    $sane = $scheme->getHumanReadableMark($norm);
+                    $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
 
                     $feedback
-                        ->setNormalisedMark($norm)
-                        ->setHumanReadableMark($sane)
+                        ->setNormalisedMark($code->getNormaliseAs())
+                        ->setHumanReadableMark($postMark)
                     ;
-                } catch (InvalidArgumentException $e) {
-                    // check for error code
-                    try {
-                        $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
 
-                        $feedback
-                            ->setNormalisedMark($code->getNormaliseAs())
-                            ->setHumanReadableMark($postMark)
-                        ;
-
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        // invalid input
-                        $this->sendError('Invalid mark given');
-                        return;
-                    }
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // invalid input
+                    $this->sendError('Invalid mark given');
+                    return;
                 }
             }
+        }
 
-            if ($postPublish == true) {
-                // received signal to publish this
-                if (!$feedback->isPublished()) {
-                    $feedback->setPublishedAt(Alaress_Date_Format::now());
-                }
+        if ($postPublish == true) {
+            // received signal to publish this
+            if (!$feedback->isPublished()) {
+                $feedback->setPublishedAt(Alaress_Date_Format::now());
             }
-
-            $this->getFeedbackDataSource()->save($feedback);
-
-            $template = '';
-            $data = [];
-
-            $this->respond($template, $data, $responseCode);
         }
-        catch (\RangeException $e) {
-            $this->sendError('Invalid mark given');
-            return;
-        }
-    }
 
-    /**
-     * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
-     * @param IResponse $response
-     * @throws \Alaress\Web\Controller\Exception
-     */
-    public function postResponseFeedback(IResponse $response)
-    {
-        new \Alaress_Probe($response);
-        $this->sendError($response);
-        return;
+        $this->getFeedbackDataSource()->save($feedback);
+
+        $template = '';
+        $data = [];
+
+        $this->respond($template, $data, $responseCode);
     }
 
     /**
