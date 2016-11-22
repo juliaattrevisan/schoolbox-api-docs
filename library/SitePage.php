@@ -1,5 +1,6 @@
 <?php
 
+use Aura\Router\Router;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -1367,5 +1368,21 @@ class SitePage extends Page
         $l10n = $this->getDi()->get('l10n');
 
         return $l10n->translate($term, $plural, $capital);
+    }
+
+
+    /**
+     * Convenience passthru
+     *
+     * @param string $name
+     * @param array  $params
+     * @return string
+     */
+    public function routeLookup($name, $params = [])
+    {
+        /** @var Router $router */
+        $router = $this->getDi()->get('router');
+
+        return $router->generate($name, $params);
     }
 }

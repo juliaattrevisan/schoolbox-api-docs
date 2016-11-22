@@ -3,12 +3,18 @@
         <a href="/search/user/{{ student.id }}" title="View Profile">
             <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
             <p>{{ student.fullname }}</p>
-
-            {% if currentInteraction.isSubmitted %}
-                <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
+            <p class="meta">
+            {% if currentInteraction.submitted %}
+                Submitted {{ currentInteraction.submittedAt.short }}
             {% else %}
-                <p class="meta">Draft last updated {{ currentInteraction.updatedAt.short }}</p>
+                (Draft &ndash; last updated {{ currentInteraction.updatedAt.short }})
             {% endif %}
+            </p>
         </a>
     </div>
 </div>
+{% if showLineActions %}
+<nav>
+    <a class="icon-delete" data-delete="{{ routeLookup('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: currentInteraction.id }) }}"></a>
+</nav>
+{% endif %}

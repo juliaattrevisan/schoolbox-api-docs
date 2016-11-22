@@ -1,0 +1,12 @@
+{% extends '@learningMarkScheme/commentable.twig' %}
+
+{% block grading %}
+
+    {% set inclusion = {
+        maxLength: 16,
+        inputTitle: 'Maximum Mark: ' ~ markScheme.totalMark,
+        placeholder: 'Mark out of ' ~ markScheme.totalMark
+    } %}
+
+    {% include '@learningMarkScheme/text-input.twig' with inclusion %}
+{% endblock %}

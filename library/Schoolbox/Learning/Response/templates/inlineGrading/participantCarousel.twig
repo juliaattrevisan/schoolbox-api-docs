@@ -68,7 +68,7 @@
 
             ize.refreshOptions(false);
 
-            $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: assessment.id }) }}', {
+            $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}', {
                 headers: {
                     'X-HTTP-Method-Override': 'PATCH'
                 },
@@ -112,10 +112,10 @@
         </div>
     </div>
     <div class="small-12 medium-4 columns">
-        <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: assessment.id }) }}" method="post">
+        <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if assessment.submittedOnly %}checked="checked"{% endif %} value='1' />
+            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.submittedOnly %}checked="checked"{% endif %} value='1' />
             <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
         </form>
     </div>

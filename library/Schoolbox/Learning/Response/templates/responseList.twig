@@ -26,27 +26,10 @@
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
-
-<div class="row">
+<div class="row" id="timeline">
     <div class="small-12 island">
         {% if timeline|length %}
-        <h2 class="subheader">Submission History</h2>
-
-        <section>
-            <ul id='history' class="information-list threaded">
-                {% for currentInteraction in timeline %}
-                    {% if currentInteraction is response %}
-                        {% include '@learningResponse/inlineGrading/interaction/response.twig' with {assessment: participant.assessable, response: currentInteraction, student: participant.user} %}
-
-                        {# I have the feeling people will want Feedbacks displayed here too
-                         #
-                         # This seems like a very convenient place to start editing any
-                         # Unpublished Feedbacks, per student
-                         #}
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </section>
+            {% include '@learningAssessment/fragments/dueWork/history.twig' with { showLineActions: true } %}
         {% else %}
             <div class="empty-state">
                 <i class="icon-due-work"></i>

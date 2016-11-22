@@ -1,0 +1,38 @@
+{# TODO create feedback routes #}
+{% set fbUrl %}{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id }) }}{% endset %}
+{% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
+    {% set savedStatusText = 'Saved as Draft' %}
+{% else %}
+    {% set actionStyle     = 'display:none;' %}
+    {% set publishDisabled = 'disabled="disabled"' %}
+{% endif %}
+
+{% set tabIndex = {
+    mark: (loop.index0 * 2) + 1,
+    comment: (loop.index0 * 2) + 2
+} %}
+
+<form method="post" action="{{ fbUrl }}" class="row">
+    <div class="small-12 medium-3 column">
+        {% block grading %}{% endblock %}
+    </div>
+    <div class="small-12 medium-9 column">
+        <label>Comment
+            <textarea tabindex="{{ tabIndex.comment }}" name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
+        </label>
+    </div>
+    <div class="row">
+        <div class="small-12 column">
+            <div class="component-action">
+                <section>
+                    <div style="{{ actionStyle }}" data-interaction-draft>
+                        {%- spaceless %}
+                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
+                            <a class="button" data-draft="publish" {{ publishDisabled }}>Publish</a>
+                        {% endspaceless -%}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</form>

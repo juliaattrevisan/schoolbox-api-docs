@@ -51,4 +51,5 @@ class Model extends AbstractFeedback
         $this->allFiles = $allFiles;
         return $this;
     }
+
 }

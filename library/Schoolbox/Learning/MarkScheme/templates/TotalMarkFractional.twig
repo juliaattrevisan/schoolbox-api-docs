@@ -1,0 +1,53 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+
+{% set attempt = participant.findMostRecentResponse %}
+{% set review  = attempt.findMostRecentFeedback %}
+
+{% set actionStyle = review.published or not attempt.submitted ? 'display:none;' : '' %}
+
+<div class="row">
+{% if participant.allResponses | length %}
+
+    <div class="small-12 large-4 column content">
+    {% set urgencyClass = review ? urgency.marks(review.normalisedMark) : '' %}
+
+    {% if attempt %}
+        {% if attempt.submitted %}
+            {% if review %}
+                <span class="grade {{ urgencyClass }}">
+                    <span>{{ review.humanReadableMark }}</span>
+                </span>
+            {% else %}
+                {#<a href="#" class="button expand">Review</a>#}
+                <h4>Awaiting Review</h4>
+            {% endif %}
+        {% else %}
+            <h4>In Progress</h4>
+        {% endif %}
+    {% else %}
+        &ndash;
+    {% endif %}
+    </div>
+    <div class="small-12 large-8 column content">
+        {% if attempt.submitted %}
+            Finished <time title="{{ attempt.submittedAt.local }}"><strong>{{ attempt.submittedAt.relativeTime }}</strong></time> in <strong>{{ attempt.duration.hms }}</strong>
+            {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+        {% endif %}
+    </div>
+{% endif %}
+    <div class="row">
+        <div class="small-12 column">
+            <div class="component-action">
+                <section>
+                    <div style="{{ actionStyle }}" data-interaction-draft>
+                        {%- spaceless %}
+                            <a class="button" href="#" data-interaction-delete="{{ attempt.id }}">Delete Attempt</a>
+                            <a class="button" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
+                        {% endspaceless -%}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,7 +11,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use \Schoolbox\Collection;
-use Schoolbox\Resource\Storage\IStorage;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
@@ -91,32 +90,6 @@ class Model extends AbstractResponse
     public function isDraft()
     {
         return !$this->isSubmitted();
-    }
-
-    /**
-     * This response is submitted (no longer a draft)
-     *
-     * @return bool
-     */
-    public function isSubmitted()
-    {
-        /* If it's a nulldate instance, it's not submitted
-         */
-        if ($this->getSubmittedAt() instanceof \Alaress_Date_NullDate) {
-            return false;
-        }
-
-        return $this->getSubmittedAt() !== null;
-    }
-
-    /**
-     * This response has been submitted on time
-     *
-     * @return mixed
-     */
-    public function isSubmittedOnTime()
-    {
-        return ($this->getSubmittedAt()->lt($this->getAssessable()->getDueAt()));
     }
 
     /**

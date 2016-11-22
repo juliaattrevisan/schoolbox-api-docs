@@ -18,6 +18,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -401,6 +402,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
         }
         return "/homepage/{$assessment->getContext()->getBaseContext()->getFolder()->getId()}";
+    }
+
+    /**
+     * @param IMarkScheme $scheme
+     * @return string
+     */
+    protected function deriveSchemeName(IMarkScheme $scheme)
+    {
+        $c = get_class($scheme);
+        return substr($c, strrpos($c, '\\')+1);
     }
 
     /**

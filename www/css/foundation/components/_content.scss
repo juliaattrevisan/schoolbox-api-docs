@@ -1388,36 +1388,63 @@ span.loader{
 	}
 }
 
+$progress-tick-size-regular: rem-calc($base-font-size * 2);
+$progress-tick-size-small:   rem-calc($base-font-size * 1.25);
+$progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
+
+@mixin progress-tick($progress-tick-size) {
+    width: $progress-tick-size;
+    height: $progress-tick-size;
+    min-width: $progress-tick-size;
+    min-height: $progress-tick-size;
+    &:before {
+        line-height: $progress-tick-size;
+    }
+    &.pending {
+        border-radius: $progress-tick-size / 4;
+    }
+}
+
 .progress-tick, .action-list nav a.progress-tick {
-    width: 2rem; // 2rem
-    height: 2rem; // 2rem
-    min-width: 2rem;
-    min-height: 2rem;
+    @include progress-tick($progress-tick-size-regular);
     display: block;
     background-color: $base;
     margin: 0.25rem;
     @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
 	@extend %iconify;
+	@extend .no-text;
 
     &:before{
         color: $white;
         text-align: center;
         width: 100%;
         height: 100%;
-        line-height: 2rem;
     }
 
     &:hover {
         @extend .icon-approve;
     }
 
+    &.small {
+        @include progress-tick($progress-tick-size-small);
+    }
+
+    &.tiny {
+        @include progress-tick($progress-tick-size-tiny);
+        display: inline-block;
+        margin: 0.5rem 0.25rem -1px 0.25rem;
+        &:before {
+            content: none;
+            display: none;
+        }
+    }
+
     &.pending {
         @extend .icon-approve;
         background-color: $warning-color;
-        // this needs to be a different shape somehow
-        border-radius: 8px;
         transform: rotate(135deg);
         &:before {
+            // counter-rotation
             transform: rotate(-135deg);
         }
     }
@@ -1425,7 +1452,7 @@ span.loader{
     &.complete {
         @extend .icon-approve;
         background-color: $success-color;
-        border-radius: 16px;
+        border-radius: $progress-tick-size-regular;
         transform: rotate(360deg);
     }
 }

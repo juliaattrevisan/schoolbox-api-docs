@@ -2,16 +2,52 @@
 
 <script type="text/javascript">
     $(function() {
+
+        var $history = $('#history');
+
         $('#view-history').on('click', function(event) {
             event.preventDefault();
 
             $(this).remove();
 
-            $('#history')
+            $history
                 .find('[data-history-row]:hidden')
                 .css({opacity:0})
                 .show()
                 .animate({opacity:1}, 2000);
+        });
+
+        $history.on('click', '[data-delete]', function (e) {
+            e.preventDefault();
+            var $a = $(this);
+
+            $a.confirmDialog({
+                header: 'Delete Interaction',
+                format: 'html',
+                text: 'Are you sure you want to delete this interaction? Anything attached to it will also be deleted.',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel',
+                confirmEvent: function () {
+                    $.ajax($a.data('delete'), {
+                        headers: {
+                            'X-HTTP-Method-Override': 'DELETE'
+                        },
+                        dataType: 'json',
+                        type: 'POST'
+                    })
+                    .done(function () {
+                        {# successful: reload the page to show the changed content -#}
+                        window.location.reload();
+                    })
+                    .fail(function () {
+                        {# i'll drink to that! -#}
+                        $history.find('[data-alert]').toastTimeout({
+                            text: 'Could not delete that',
+                            css: 'pop alert'
+                        });
+                    });
+                }
+            });
         });
     });
 </script>
@@ -21,7 +57,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Submission History</h2>
 
-        <section>
+        <section id='history'>
             {% set firstSubmissionIndex = 0 %}
             {% set isOlderInteraction = false %}
 
@@ -33,7 +69,7 @@
                 {% endif %}
             {% endfor %}
 
-            <ul id='history' class="information-list threaded">
+            <ul class="information-list threaded">
                 {% for currentInteraction in timeline %}
 
                     {# There is a submission somewhere in this history
@@ -52,6 +88,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            <div class="toast" data-alert></div>
         </section>
 
         {% if timeline|length > 1 %}

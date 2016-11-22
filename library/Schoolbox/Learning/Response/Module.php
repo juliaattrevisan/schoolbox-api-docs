@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \External_UserInterface;
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
@@ -35,6 +34,18 @@ class Module extends BaseModule
      * @inheritdoc
      */
     protected $basename = 'learningResponse';
+
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        $this->register('DELETE', '/assessments/{assessmentId}/responses/{responseId}', 'deleteParticularResponse');
+    }
+
 
     /**
      * @inheritdoc
@@ -78,7 +89,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getResponseList|getParticularResponse)';
+        $ruleRegexp = '(?:ResponseList|ParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
@@ -118,7 +129,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getParticularResponse)', function ($params) {
+        $this->addRoutePreload($matcher, '(?:ParticularResponse)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
             $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($assessment);
 
@@ -209,6 +220,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'responseDataSource' => $injector->lazyGet('responseDataSource'),
             ])
         );
     }

@@ -183,6 +183,27 @@ abstract class AbstractResponse implements IResponse
     }
 
     /**
+     * Was this response submitted on time?
+     * If the response is not submitted; this will always return false.
+     * Therefore:
+     *   - "is the response submitted": response.submitted
+     *   - "is the response late":      response.submitted AND NOT response.submittedOnTime
+     *   - "is the response on time":   response.submitted AND response.submittedOnTime
+     *
+     * You must not rely on this method without also checking the submission status.
+     *
+     * @return bool
+     */
+    public function isSubmittedOnTime()
+    {
+        if (!$this->isSubmitted()) {
+            return false;
+        }
+        // assessment.dueAt > response.submittedAt
+        return $this->getAssessable()->getDueAt()->gt($this->getSubmittedAt());
+    }
+
+    /**
      * @return IAssessable
      */
     public function getAssessable()

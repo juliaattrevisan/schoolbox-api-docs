@@ -7,152 +7,204 @@
 namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
-use Crocodoc\Renderer\Strategy\Crocodoc;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Alaress_Date_Format;
+use DueWork_ErrorMapper;
+use InvalidArgumentException;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\Participant;
 
 class Controller extends Base
 {
+
     /**
-     * @var ErrorMapper
+     * @var IFeedbackDataSource
      */
-    protected $errorMapper;
+    protected $feedbackDataSource;
+
 
     /**
      * Controller constructor.
-     * @param ErrorMapper $errorMapper
+     *
+     * @param IFeedbackDataSource $feedbackDataSource
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct(IFeedbackDataSource $feedbackDataSource)
     {
-        $this->setErrorMapper($errorMapper);
+        $this->feedbackDataSource = $feedbackDataSource;
     }
 
-
     /**
-     * Displays feedback for the specified assessment and student
+     * Post into the feedback collection for a participant. This will create "floating feedback"
      *
-     * @api   GET /learning/assessment/:id/feedback/:studentId
-     * @param IAssessable|int TODO - replace int with IAssessable in Module
-     * @param User $student
+     * TODO evaluate the applicability of this to Quiz and Task. It is not applicable to Project.
+     *
+     * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165
+     *
+     * @param Participant $participant
      */
-    public function getAssessmentFeedback($assessmentId, User $student)
+    public function postParticipantFeedback(Participant $participant)
     {
-        // TODO - generate data
-        // Replaces /submission/inlineGrading/view/:submissionId/:studentId
-        //       eg /submission/inlineGrading/view/56/219
-        // Replaces /assess/review/:assessId/:sectionId/:attemptId
-        //       eg /assess/review/9/8/7
+        $feedbacks = $this->getFloatingFeedback($participant);
 
+        if ($feedbacks->count() == 0 || $feedbacks->first()->isPublished()) {
+            // if none, or published: create new draft
+            $feedback = $this->getFeedbackDataSource()->createModel($participant->getAssessable());
 
-        // submission box object
-        // student object
-        // submission returns[]
-        // plagscan (summon a plag scan doc) search for 'plagscan_document' attached to a student submission
-        // needs to handle the inline grader (is an iFrame) needs to determine the URL for the iFrame
-        // runs the submission through a chain, and determines how to render it,
-        // the current code gets passed a student submission, and returns an 'inline-grade' object
-        // also needs to handle rubrics (rubrics is a meta object)
-        // just pass submission_collection through to twig
-        // just launch rubrics builder, it will return rubric (would prefer that twig interrogates and handles output, rather than simple string being inserted)
+            $feedback
+                ->setReviewee($participant->getUser())
+                ->setCreatedAt(Alaress_Date_Format::now())
+            ;
 
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'assessment'  => \Schoolbox\Learning\Assessment\Controller::getDummyAssessment($assessmentId),
-            'student'     => $student,
-            'term'        => TermMapper::getInstance()->findById(4),
-        ];
+            // on CREATE, return 201 Created
+            $responseCode = 201;
 
-        // Project || Due Work
-        if(in_array($assessmentId, [1,2])){
-            // Rubric
-            $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
-            $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $student)->toContext();
+        } else {
+            // most recent is draft, use that
+            $feedback = $feedbacks->first();
+
+            // on UPDATE, return 204 No Content
+            $responseCode = 204;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', $twigData));
-    }
+        // mutate model found, and save
+        $postMark    = trim($this->getRequest()->post['mark']);
+        $postComment = trim($this->getRequest()->post['comment']);
+        $postPublish = $this->getRequest()->post['publish'];
 
+        $feedback
+            ->setReviewer($this->getUser())
+            ->setUpdatedAt(Alaress_Date_Format::now())
+        ;
 
-    /**
-     * Displays crocodoc/inline grading iframe, may also download as PDF
-     *
-     * @api   GET /learning/feedback/:id
-     * @param IFeedback|int $feedback  TODO ensure param is IFeedback using Module
-     * @level 165
-     */
-    public function getFeedback($feedback)
-    {
-        // TODO - generate data
-        switch($feedback){
-            case 1:
-                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyDueWorkFeedback(1);
-                break;
-            case 2:
-                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyQuizAnswer(1,true);
-                break;
-            case 3:
-            default:
-                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyTaskFeedback(1);
-                break;
+        if ($postComment) {
+            // comment defined and non-empty
+            $feedback->setComment($postComment);
         }
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'feedback'    => $feedback,
-        ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', $twigData));
+        try {
+            if ($postMark) {
+                // mark defined and non-empty
+                try {
+
+                    $scheme = $participant->getAssessable()->getMarkScheme();
+
+                    // verify normalisation, then sanitise the output
+                    $norm = $scheme->getNormalisedMark($postMark);
+                    $sane = $scheme->getHumanReadableMark($norm);
+
+                    $feedback
+                        ->setNormalisedMark($norm)
+                        ->setHumanReadableMark($sane)
+                    ;
+                } catch (InvalidArgumentException $e) {
+                    // check for error code
+                    try {
+                        $code = DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
+
+                        $feedback
+                            ->setNormalisedMark($code->getNormaliseAs())
+                            ->setHumanReadableMark($postMark)
+                        ;
+
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // invalid input
+                        $this->sendError('Invalid mark given');
+                        return;
+                    }
+                }
+            }
+
+            if ($postPublish == true) {
+                // received signal to publish this
+                if (!$feedback->isPublished()) {
+                    $feedback->setPublishedAt(Alaress_Date_Format::now());
+                }
+            }
+
+            $this->getFeedbackDataSource()->save($feedback);
+
+            $template = '';
+            $data = [];
+
+            $this->respond($template, $data, $responseCode);
+        }
+        catch (\RangeException $e) {
+            $this->sendError('Invalid mark given');
+            return;
+        }
     }
 
 
-    /* Getters/Setters
-     */
-
     /**
-     * @return ErrorMapper
+     * @api   DELETE /assessments/:assessmentId/feedback/:feedback
+     * @level 165
+     * @param IFeedback $feedback
      */
-    protected function getErrorMapper()
+    public function deleteAssessmentFeedback(IFeedback $feedback)
     {
-        return $this->errorMapper;
+        $code = 204;
+        $data = null;
+
+        try {
+            $this->getFeedbackDataSource()->delete($feedback);
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $code = 400;
+            $data = $e->getMessage();
+        }
+
+        $this->respond('', $data, $code);
     }
 
     /**
-     * @param ErrorMapper $errorMapper
-     * @return static
-     */
-    protected function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-    // ================ DUMMY DATA GENERATION ===============================================
-
-    /**
-     * Temp method to generate dummy breadcrumbs
+     * Retrieve the floating feedback for this participant, IN REVERSE CHRONOLOGICAL ORDER
      *
-     * @todo remove this method when no longer required
-     * @return array
+     * @param Participant $participant
+     * @return Collection|IFeedback[]
      */
-    public static function getDummyBreadcrumbs(){
-        return [
-            [
-                'href'  => '/learning/assessment/1/feedback/230',
-                'label' => 'FirstCrumb',
-            ],
-            [
-                'href'  => '/learning/assessment/2/feedback/230',
-                'label' => 'SecondCrumb',
-            ],
-            [
-                'href'  => '/learning/assessment/3/feedback/230',
-                'label' => 'ActiveCrumb',
-            ],
-        ];
+    protected function getFloatingFeedback(Participant $participant)
+    {
+        // obtain a reference to the most recent floating feedback
+        // TODO it would be nice to do this via SQL rather than in here, but them's the breaks
+        return $this->getFeedbackDataSource()
+            ->findForAssessment($participant->getAssessable())
+            ->filter(
+                function (IFeedback $feedback) use ($participant)
+                {
+                    if ($feedback->getResponse()) {
+                        // floating feedback only
+                        return false;
+                    }
+
+                    // filter to current user only
+                    return $participant->getUser()->getId() == $feedback->getReviewee()->getId();
+                }
+            )
+            ->sortBy('updatedAt', 'desc')
+        ;
+
     }
+
+    /**
+     * @param string $template
+     * @param array  $data
+     * @param int    $responseCode
+     */
+    protected function respond($template, $data, $responseCode = 200)
+    {
+        $this->getResponse()->status->set($responseCode);
+        $this->getResponse()->content->set($this->buildContent($template, $data));
+    }
+
+
+    /**
+     * @return IFeedbackDataSource
+     */
+    protected function getFeedbackDataSource()
+    {
+        return $this->feedbackDataSource;
+    }
+
 }

@@ -189,6 +189,8 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        $this->getParticipantMapperProxy()->loadParticipationIntoAssessment($a);
+
         // set the controller
         $this->setControllerFromAssessment($a);
 
@@ -203,6 +205,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../MarkScheme/templates', 'learningMarkScheme');
     }
 
     /**

@@ -485,17 +485,20 @@ class Module {
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
 
+
     /**
      * Helper method for adding a template path for this component's basename.
      *
-     * @param  string            $dir            The directory to use as the template path
      * @param  Twig_Loader_Chain $templateLoader
+     * @param  string            $dir The directory to use as the template path
+     * @param  string            $basename
      * @return $this
+     * @throws \Twig_Error_Loader
      */
-    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir)
+    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir, $basename = '')
     {
         $loader = new Twig_Loader_Filesystem([]);
-        $loader->addPath($dir, $this->basename);
+        $loader->addPath($dir, $basename ?: $this->basename);
         $templateLoader->addLoader($loader);
         return $this;
     }

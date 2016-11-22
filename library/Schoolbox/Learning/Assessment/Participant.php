@@ -106,18 +106,27 @@ class Participant
      */
     public function isMarkingRequired()
     {
-        if (!count($this->allResponses)) {
+        $latestResponse = $this->findMostRecentSubmittedResponse();
+        $latestFeedback = $this->findMostRecentFeedback();
+
+        /* If there is a feedback sans response, is ok
+         * No marking is required
+         */
+        if (!$latestResponse) {
             return false;
         }
-        if (!count($this->allFeedbacks)) {
+
+        if (!$latestFeedback) {
             return true;
         }
-        $latestResponse = $this->findMostRecentResponse();
-        $latestFeedback = $this->findMostRecentFeedback();
+
+        /* Otherwise determine based on the timeline of events
+         */
         return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
     }
 
     /**
+     * @deprecated use isMarked()
      * This Participant received a Feedback for the $assessable
      *
      * @return bool
@@ -128,6 +137,27 @@ class Participant
     }
 
     /**
+     * Has this participant received ANY feedback for this assessment?
+     *
+     * @return bool
+     */
+    public function isMarked()
+    {
+        return $this->allFeedbacks->count() > 0;
+    }
+
+    /**
+     * Has this participant made ANY kind of response to this assessment?
+     *
+     * @return bool
+     */
+    public function isResponded()
+    {
+        return $this->allResponses->count() > 0;
+    }
+
+    /**
+     * @deprecated misnomer, use hasPublishedFeedback()
      * This Participant received a Published Feedback for the $assessable
      *
      * @return bool
@@ -137,6 +167,13 @@ class Participant
         return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasPublishedFeedback()
+    {
+        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
+    }
 
     /**
      * @return IResponse|null
@@ -151,6 +188,19 @@ class Participant
             }
         }
         return $mostRecentResponse;
+    }
+
+
+    /**
+     * @return IResponse|null
+     */
+    public function findMostRecentSubmittedResponse()
+    {
+        $filteredResponses = $this->allResponses->filter(function(IResponse $response) {
+            return $response->isSubmitted();
+        });
+
+        return $filteredResponses->sortBy('submittedAt', 'desc')->first();
     }
 
     /**

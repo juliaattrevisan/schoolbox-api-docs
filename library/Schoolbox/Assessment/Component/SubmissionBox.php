@@ -13,9 +13,9 @@ use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
@@ -184,6 +184,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         $this->setOpenDate(new \Alaress_Date_NullDate());
         $this->setDueDate(new \Alaress_Date_NullDate());
         $this->setLateDate(new \Alaress_Date_NullDate());
+        $this->setAssessmentModel(new Model());
     }
 
     /**

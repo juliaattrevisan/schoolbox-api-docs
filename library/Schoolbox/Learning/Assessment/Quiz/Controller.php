@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -102,17 +103,16 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        /* TODO: Quickmark screen
-         */
         $twigData = [
+            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
             'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/quiz/status/staff.twig",
-                $twigData
+                "@learningAssessment/quiz/status.twig",
+                $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
     }
@@ -144,39 +144,58 @@ class Controller extends Assessment\Controller
 
         // Has user not yet attempted the quiz
         if ($participant->getAllResponses()->count() == 0) {
+
+            $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
+            return;
+        }
+
+        // Get latest attempt's finish date.
+        $latestResponse = $participant->findMostRecentResponse();
+        $latestAttempt  = $this->quizAttemptMapper->findById($latestResponse->getId());
+        $finishDate     = $latestAttempt->getFinish();
+
+        // Is the attempt in progress ?
+        if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
+
+            $quiz     = $this->getQuizForAssessmentId($assessment->getId());
+            $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
+
+            /** @var QuizSection $firstSection */
+            $firstSection = null;
+
+            foreach ($sections as $section) {
+                if (is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()) {
+                    $firstSection = $section;
+                }
+            }
+
+            $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
+            return;
+        }
+
+        // Not in progress
+        $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
+    }
+
+
+    /**
+     * @param User        $sessionUser
+     * @param User        $participantUser
+     * @param IAssessable $assessment
+     */
+    protected function redirectToSummaryOrIntro(User $sessionUser, User $participantUser, IAssessable $assessment)
+    {
+        if ($sessionUser == $participantUser->getId()) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
             );
             return;
-        } else {
-            // Get latest attempt's finish date.
-            $latestResponse = $participant->findMostRecentResponse();
-            $latestAttempt = $this->quizAttemptMapper->findById($latestResponse->getId());
-            $finishDate = $latestAttempt->getFinish();
-
-            // Is the attempt in progress ?
-            if(is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate){
-                $quiz = $this->getQuizForAssessmentId($assessment->getId());
-                $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
-                /** @var QuizSection $firstSection */
-                $firstSection = null;
-                foreach($sections as $section){
-                    if(is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()){
-                        $firstSection = $section;
-                    }
-                }
-
-                $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
-                return;
-                // Not in progress
-            } else {
-                $this->getResponse()->redirect->afterPost(
-                    $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])
-                );
-                return;
-            }
         }
+
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        $this->getResponse()->redirect->to("/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}");
     }
 
 

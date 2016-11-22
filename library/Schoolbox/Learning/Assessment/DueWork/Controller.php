@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
 use DomainException;
+use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkRespo
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -88,17 +90,18 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
-        /* TODO: Quickmark screen
-         */
         $twigData = [
+            'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'type'        => Assessment\AssessmentType::objectToString($assessment),
+            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
-            'assessment' => $assessment,
+            'assessment'  => $assessment,
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/dueWork/status/staff.twig",
-                $twigData
+                "@learningAssessment/dueWork/status.twig",
+                $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
     }
@@ -144,7 +147,7 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 "@learningAssessment/fragments/dueWork/summary/student.twig",
-                $twigData
+                $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
     }

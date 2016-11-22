@@ -245,7 +245,8 @@ class Full
             }
         }
 
-        return $interaction->getUpdatedAt();
+        // still draft; sift to the top of any list
+        return Alaress_Date_Format::now();
     }
 
     /* Getters/Setters

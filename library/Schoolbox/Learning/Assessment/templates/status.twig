@@ -1,1 +1,166 @@
-<h1>TODO status.twig</h1>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+{% set statusIncomplete = 'incomplete' %}
+{% set statusPending    = 'pending'    %}
+{% set statusComplete   = 'complete'   %}
+
+{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) %}
+
+<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Status of {{ assessment.title }}</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+        {% if routeModify %}
+        <li>
+            <a class="icon-modify" href="{{ routeModify }}">Modify</a>
+        </li>
+        {% endif %}
+        {% block headerOptions %}{% endblock %}
+    </ul>
+</div>
+<div class="row">
+    <div class="small-12 large-4 columns">
+        <ul class="meta">
+            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
+            <li class="icon-calendar">Due {{ assessment.dueAt.relative }} on {{ assessment.dueAt.localShort }}</li>
+        </ul>
+    </div>
+    <div class="small-12 large-8 columns text-right">
+        <ul class="filters" id="filters">
+            <li>
+                <input type="checkbox" id="filter-incom" checked="checked" data-status="{{ statusIncomplete }}" />
+                <label for="filter-incom">
+                    <span class="progress-tick tiny"></span> Not Attempted
+                </label>
+            </li>
+            <li>
+                <input type="checkbox" id="filter-act" checked="checked" data-status="{{ statusPending }}" />
+                <label for="filter-act">
+                    <span class="progress-tick tiny pending"></span> Action Required
+                </label>
+            </li>
+            <li>
+                <input type="checkbox" id="filter-comp" checked="checked" data-status="{{ statusComplete }}" />
+                <label for="filter-comp">
+                    <span class="progress-tick tiny complete"></span> Complete
+                </label>
+            </li>
+        </ul>
+
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        {% if assessment.allParticipants | length %}
+        <section id="assessment-status">
+            <ul class="information-list">
+            {% for participant in assessment.allParticipants %}
+
+                {% set routeArgs = { assessmentId: assessment.id, studentId: participant.user.id } %}
+
+                {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+                {% set pActionResponses = '' %}
+                {% set pActionCount     = '' %}
+                {% set pStatusText      = '' %}
+                {% set pStatusClass     = '' %}
+                {% set pTooltip         = '' %}
+
+                {% block config %}
+                <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
+                    {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+                    <div class="small-12 column">
+                        <div class="row actions-small-{{ pActionCount }}">
+                            <div class="list-item">
+                                {% include '@learningAssessment/fragments/participantStatus.twig' with {
+                                    user: participant.user,
+                                    statusClass: pStatusClass,
+                                    statusText: pStatusText,
+                                    statusTip: pTooltip
+                                } only %}
+                            </div>
+                            {% if pActionCount %}
+                                <nav>
+                                    {%- spaceless %}
+                                        {% if pActionResponses %}
+                                            <a class="icon-task" href="{{ pActionResponses }}" title="View feedback overview for {{ participant.user.firstName }}"></a>
+                                        {% endif %}
+                                        {% if pActionSummary %}
+                                            <a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history"></a>
+                                        {% endif %}
+                                    {% endspaceless -%}
+                                </nav>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="small-12 column">
+                        {% block grading %}{% endblock %}
+                    </div>
+                </li>
+                {% endblock %}
+
+            {% endfor %}
+            </ul>
+        </section>
+        <div class="empty-state" style="display:none;" id="empty-filter">
+            <i class="icon-staff-students"></i>
+            <p>
+                No students match the current filters.
+                Add another filter or <a id="filter-show-all">show everything</a>.
+            </p>
+        </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="{{ icon.renderClass(assessment) }}"></i>
+                <p>This assessment has no students participating.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        var assessmentList = $('#assessment-status');
+        var filters        = $('#filters');
+        var emptyFilter    = $('#empty-filter');
+        var filterShowAll  = $('#filter-show-all');
+
+        filters.on('change', 'input', function () {
+            var $in = $(this);
+            var s   = $in.data('status');
+            var $li = assessmentList.find('[data-status="'+s+'"]');
+
+            if ($in.is(':checked')) {
+                $li.slideDown();
+                if ($li.length) {
+                    emptyFilter.slideUp();
+                }
+            } else {
+                $li.slideUp(function () {
+                    if (assessmentList.find('li[data-status]:visible').length == 0) {
+                        emptyFilter.slideDown();
+                    } else {
+                        emptyFilter.slideUp();
+                    }
+                })
+            }
+        });
+
+        filterShowAll.on('click', function (e) {
+            e.preventDefault();
+            filters.find('[type=checkbox]').prop('checked', true).trigger('change');
+        });
+    });
+</script>
+{% block scripts %}
+{% endblock %}

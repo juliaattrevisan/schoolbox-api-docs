@@ -114,6 +114,20 @@ interface IResponse
     public function isSubmitted();
 
     /**
+     * Was this response submitted on time?
+     * If the response is not submitted; this will always return false.
+     * Therefore:
+     *   - "is the response submitted": response.submitted
+     *   - "is the response late":      response.submitted AND NOT response.submittedOnTime
+     *   - "is the response on time":   response.submitted AND response.submittedOnTime
+     *
+     * You must not rely on this method without also checking the submission status.
+     *
+     * @return bool
+     */
+    public function isSubmittedOnTime();
+
+    /**
      * Get the IAssessable to which this IResponse belongs
      *
      * @return IAssessable

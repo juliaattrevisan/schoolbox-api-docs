@@ -15,11 +15,12 @@
                     </a>
                 </div>
             </div>
+            {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) %}
+            {% if viewRoute %}
             <nav>
-                {% if isRouteAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) %}
-                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) }}" class="icon-next" title="View in Inline Grader"></a>
-                {% endif %}
+                <a href="{{ viewRoute }}" class="icon-next" title="View in Inline Grader"></a>
             </nav>
+            {% endif %}
         </li>
     </ul>
 

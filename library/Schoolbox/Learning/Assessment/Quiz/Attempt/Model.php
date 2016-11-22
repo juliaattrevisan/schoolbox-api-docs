@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
+use Alaress\Date\Interval;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Model extends AbstractResponse
@@ -36,16 +37,40 @@ class Model extends AbstractResponse
      */
     private $firstSectionId;
 
+    /** @var \Alaress_Date_Format */
+    protected $submittedAt;
+
 
     /**
-     * Attempts are submitted at the updatedAt value
-     * in case the Attempt is modified by the Student
-     *
      * @return \Alaress_Date_Format
      */
     public function getSubmittedAt()
     {
-        return $this->getUpdatedAt();
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    {
+        $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return Interval
+     */
+    public function getDuration()
+    {
+        if (!$this->isSubmitted()) {
+            return null;
+        }
+        return new Interval(
+            $this->getSubmittedAt()->diffInSeconds($this->getCreatedAt())
+        );
     }
 
     /**

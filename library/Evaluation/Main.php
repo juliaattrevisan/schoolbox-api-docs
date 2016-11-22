@@ -234,6 +234,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     }
 
     /**
+     * @deprecated
      * Display seconds as hours, minutes and seconds. Yoinked from
      * http://www.laughing-buddha.net/php/lib/sec2hms/
      *

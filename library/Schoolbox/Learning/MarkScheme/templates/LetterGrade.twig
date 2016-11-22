@@ -1,0 +1,14 @@
+{% extends '@learningMarkScheme/commentable.twig' %}
+
+{% block grading %}
+    <label>Grade
+        <select name="mark" tabindex="{{ tabIndex.mark }}">
+        {% for level in markScheme.gradeGroup.gradeLevels %}
+            {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
+            {% set selected = isGt and not found ? 'selected="selected"' : '' %}
+            {% if isGt %}{% set found = true %}{% endif %}
+            <option {{ selected }} value="{{ level.rawGrade }}">{{ level.caption }}</option>
+        {% endfor %}
+        </select>
+    </label>
+{% endblock %}

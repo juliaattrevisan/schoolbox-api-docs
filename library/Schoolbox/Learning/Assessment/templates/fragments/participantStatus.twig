@@ -1,0 +1,14 @@
+{# usage:
+    - user:        (User)   object, typically derived from Participant
+    - statusClass: (string) one of [ incomplete, pending, complete ]
+    - statusText:  (string) caption to display next to status indicator
+    - statusTip:   (string) tooltip for status indicator
+ #}
+<div class="small-12 card">
+    <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
+    <h3>{{ user.fullName }}</h3>
+    <p class="meta">
+        <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
+        <span>{{ statusText }}</span>
+    </p>
+</div>

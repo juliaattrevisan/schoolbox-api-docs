@@ -1094,19 +1094,6 @@
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script>
     $(document).ready( function () {
-        $('#progress-icon').on('click', 'a', function (e) {
-            e.preventDefault();
-
-            var $a = $(this);
-
-            if ($a.hasClass('pending')) {
-                $a.removeClass('pending').addClass('complete');
-            } else if ($a.hasClass('complete')) {
-                $a.removeClass('complete');
-            } else {
-                $a.addClass('pending');
-            }
-        });
 
         $(function() {
             $(".datepicker").datepicker();

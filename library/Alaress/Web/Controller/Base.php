@@ -262,18 +262,32 @@ abstract class Base {
         return $output->setTemplate($template)->setData($data);
     }
 
+
     /**
      * Factory method for loading a chromed HTML output object.
      *
      * @param  string $template A Twig template
      * @param  mixed  $data
+     * @param string  $title
+     * @param string  $tab
      * @return Output\ThemedHtml
+     * @throws ServiceNotFound
      */
-    protected function buildHtmlOutput($template, $data)
+    protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
     {
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
-        return $output->setTemplate($template)->setData($data);
+        $tpl = $output->setTemplate($template)->setData($data);
+
+        if ($title) {
+            $tpl->setTitle($title);
+        }
+
+        if ($tab) {
+            $tpl->setTab($tab);
+        }
+
+        return $tpl;
     }
 
     /**
@@ -313,17 +327,38 @@ abstract class Base {
      */
     protected function tpl($namespace, $template, $data = [], $tab = '')
     {
-        $content = [
-            'template' => "@$namespace/$template.twig",
-            'data'     => array_merge($data, ['currentUser' => $this->getUser()]),
-            'tab'      => $tab ?: $namespace,
-        ];
+        $content = $this->buildContent(
+            "@$namespace/$template.twig",
+            array_merge($data, ['currentUser' => $this->getUser()])
+        );
 
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
+        if ($content instanceof Output\ThemedHtml) {
+            $content->setTab($tab);
         }
 
         $this->getResponse()->content->set($content);
+    }
+
+
+    /**
+     * @param string $template
+     * @param array  $data
+     * @return \Alaress\Web\Output\Base
+     */
+    protected function buildContent($template, array $data)
+    {
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+            // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
+            return $this->buildJsonOutput($data);
+
+        } elseif ($this->getRequest()->isXhr()) {
+            // if the request is AJAX, don't return the chrome
+            return $this->buildUnthemedHtmlOutput($template, $data);
+
+        } else {
+            // full synchronous page
+            return $this->buildHtmlOutput($template, $data);
+        }
     }
 
 

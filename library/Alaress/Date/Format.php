@@ -12,7 +12,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Alaress\Date\Clock;
 use Alaress\Date\IClock;
 use Jenssegers\Date\Date as LaravelDate;
 
@@ -891,10 +890,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this;
     }
 
+
     /**
      * Equivalent of `DateTime->modify()`.
      *
      * @see http://php.net/manual/en/datetime.modify.php
+     * @param string $modify
+     * @return $this
      */
     public function modify($modify)
     {
@@ -1107,10 +1109,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this->getUsingFormat($leadingZero ? 'H' : 'G');
     }
 
+
     /**
      * Alias of `$this->getHour()`.
      *
      * @see $this->getHour()
+     * @param bool $leadingZero
+     * @return int
      */
     public function get24Hour($leadingZero = false)
     {
@@ -1340,7 +1345,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $second
+     * @param Alaress_Date_Format $second
      * @return bool
      */
     public function lt($second)

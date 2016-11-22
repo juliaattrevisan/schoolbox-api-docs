@@ -6,19 +6,13 @@
  */
 namespace Schoolbox\Learning\Feedback;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Schoolbox\Role;
-use \Twig_Loader_Chain;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
+use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use \External_UserInterface;
+use \Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
@@ -27,85 +21,36 @@ class Module extends BaseModule
      */
     protected $basename = 'learningFeedback';
 
-    /**
-     * @inheritdoc
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $routes = [
-            'GET' => [
-                '/assessment/{assessmentId}/feedback/{studentId}' => 'getAssessmentFeedback',
-                '/feedback/{feedbackId}'                          => 'getFeedback',
-            ],
-            'POST' => []
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
 
     /**
-     * {@inheritdoc}
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
      */
-    public function initRoutePermissions(Authorizer $authorizer)
+    protected function registerRoutes()
     {
-        $ruleRegexp = '(?:getAssessmentFeedback)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
-                )
-            );
+        // rules
+        $canGiveFeedback = $this->getAuthRule('isLoggedIn');
 
-        $ruleRegexp = '(?:getFeedback)';
-        $this->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
-    }
+        // preloads
+        $preloadParticipant = function ($params) {
+            return [
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId'])
+            ];
+        };
 
+        $preloadFeedback = function ($params) {
+            return [
+                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
+            ];
+        };
 
-    /**
-     * @inheritdoc
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getAssessmentFeedback)',
-            function ($params) {
-                // TODO. Hydrate specified IAssessable
-                $assessment = [$params['assessmentId']];
-                try {
-                    $student = $this->getUserMapper()->findById($params['studentId']);
-                } catch (MapperException $e) {
-                    $student = $this->getUserMapper()->createModel();
-                }
-                return [
-                    'assessment' => $assessment,
-                    'student'    => $student,
-                ];
-            }
-        );
+        $assessmentRoute  = 'assessments/{assessmentId:\d+}';
+        $participantRoute = $assessmentRoute . '/{studentId:\d+}';
+        $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getFeedback)',
-            function ($params) {
-                // TODO. Hydrate specified Feedback object
-                $feedback = $params['feedbackId'];
-                return [
-                    'feedback' => $feedback,
-                ];
-            }
-        );
+        $this->register('POST',   "/$participantRoute/feedback",        'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",   'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
     }
 
 
@@ -117,35 +62,101 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        $injector->params[Controller::class] = [
+            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource')
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            ])
-        );
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
-    /* Getters / Setters
+
+    /**
+     * @param $assessmentId
+     * @param $studentId
+     * @return Participant
      */
+    protected function preloadParticipant($assessmentId, $studentId)
+    {
+        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+        $student    = $this->getUserDataSource()->findById($studentId);
+
+        $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment, $student);
+
+        return $assessment->getParticipant($student);
+    }
+
+
+    /**
+     * @param int $assessmentId
+     * @param int $feedbackId
+     * @return Assessment\IFeedback
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function preloadFeedback($assessmentId, $feedbackId)
+    {
+        $feedbacks = $this->getFeedbackDataSource()->findForAssessment(
+            $this->getAssessmentDataSource()->findById($assessmentId)
+        );
+
+        // TODO migrate this to DataSource
+        foreach ($feedbacks as $f) {
+            if ($f->getId() == $feedbackId) {
+                return $f;
+            }
+        }
+
+        throw new \Schoolbox\Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+    }
 
     /**
      * @return UserMapper
      */
-    protected function getUserMapper()
+    public function getUserDataSource()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @return ErrorMapper
+     * @return Assessment\DataModel\MapperProxy
      */
-    protected function getErrorMapper()
+    public function getAssessmentDataSource()
     {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        return $this->getInjector()->get('assessmentDataSource');
+    }
+
+    /**
+     * @return Participant\DataSource
+     */
+    public function getParticipantDataSource()
+    {
+        return $this->getInjector()->get('participantDataSource');
+    }
+
+
+    /**
+     * @return Assessment\Feedback\DataSource
+     */
+    public function getFeedbackDataSource()
+    {
+        return $this->getInjector()->get('feedbackDataSource');
     }
 }

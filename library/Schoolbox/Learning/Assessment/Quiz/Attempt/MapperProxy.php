@@ -107,6 +107,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedBy($attempt->getUser())
                 ->setSubmittedOnBehalfOf($attempt->getUser())
                 ->setCreatedAt($attempt->getStart())
+                ->setSubmittedAt($attempt->getFinish())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($updatedAt)
             ;
