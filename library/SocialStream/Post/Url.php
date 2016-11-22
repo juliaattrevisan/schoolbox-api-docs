@@ -17,11 +17,23 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	 * @return bool
 	 */
 	public function determineIcon() {
-		if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
-			return $matches;
-		}
 
-		return false;
+
+        try {
+            if (preg_match('#^icon:html.png#', $this->getThumbnail(), $matches)) {
+                return 'application-x-extension-html.svg';
+            }
+            else if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
+                $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle());
+                return $file->getIconFile();
+            }
+
+
+
+        } catch (Schoolbox\File\Exception $e) {
+            return false;
+        }
+        return false;
 	}
 
 	/**
@@ -51,7 +63,8 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		 * Otherwise display thumbnail via image transform
 		 */
 
-		$matches = $this->determineIcon();
+
+		$icon = $this->determineIcon();
 		if ($context == 'post') {
 			$page->setVar(array(
 				'SOCIALSTREAM_POST_URL' => $this->getUrl(),
@@ -67,9 +80,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 			/* Parse icon
  			 */
-			if ($matches) {
+			if ($icon) {
 				$page->setVar(array(
-					'SOCIALSTREAM_POST_ICON' => $matches[1],
+					'SOCIALSTREAM_POST_ICON' => $icon,
 				));
 				$page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
 			}
@@ -99,9 +112,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 			/* Parse icon
 			 */
-			if ($matches) {
+			if ($icon) {
 				$page->setVar(array(
-					'SOCIALSTREAM_COMMENT_ICON' => $matches[1],
+					'SOCIALSTREAM_COMMENT_ICON' => $icon,
 				));
 				$page->parse('socialstream_comment_has_icon_block', 'socialstream_comment_has_icon');
 			}
@@ -131,9 +144,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 			/* Parse icon
 			 */
-			if ($matches) {
+			if ($icon) {
 				$page->setVar(array(
-					'SOCIALSTREAM_REPLY_ICON' => $matches[1],
+					'SOCIALSTREAM_REPLY_ICON' => $icon,
 				));
 				$page->parse('socialstream_reply_has_icon_block', 'socialstream_reply_has_icon');
 			}
