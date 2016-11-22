@@ -3,44 +3,68 @@
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island">
-            <section>
-                <!-- BEGIN source_folder_deleted -->
-                {SOURCE_FOLDER_UNAVAILABLE}
-                <!-- END source_folder_deleted -->
+    <!-- BEGIN empty_state -->
 
-                <!-- BEGIN source_folder_exists -->
-                <ul class="action-list">
-                    <!-- BEGIN forum -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a href='/forum/thread/{THREAD_ID}' title="View Thread">
-                                    <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
-                                    <h3>{THREAD_TITLE}</h3>
-                                </a>
+        <div class="empty-state">
+            <i class="icon-forum"></i>
+            <p>No posts available!</p>
 
-                                <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
-                            </div>
-                        </div>
-                        <nav>
-                            <!-- BEGIN forum_reply -->
-                            <a class="icon-forum" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
-                            <!-- END forum_reply -->
-                        </nav>
-                    </li>
-                    <!-- END forum -->
-                </ul>
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post a thread</a>
+            </p>
+            <!-- END empty_modify -->
 
-                <div class="content">
-                    <!-- BEGIN forum_post -->
-                    <a class="button icon-add" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post Thread</a>
-                    <!-- END forum_post -->
-                    <a class="button icon-forum" href="/forum/{COMPONENT_CONFIG_SRC_ID}">Go to Forum</a>
-                </div>
-                <!-- END source_folder_exists -->
-            </section>
         </div>
-    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN posts -->
+
+        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+            <div class="small-12 island">
+                <section>
+                    <!-- BEGIN source_folder_deleted -->
+                    {SOURCE_FOLDER_UNAVAILABLE}
+                    <!-- END source_folder_deleted -->
+
+                    <!-- BEGIN source_folder_exists -->
+                    <ul class="action-list">
+                        <!-- BEGIN forum -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href='/forum/thread/{THREAD_ID}' title="View Thread">
+                                        <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
+                                        <h3>{THREAD_TITLE}</h3>
+                                    </a>
+
+                                    <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
+                                </div>
+                            </div>
+                            <nav>
+                                <!-- BEGIN forum_reply -->
+                                <a class="icon-forum" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
+                                <!-- END forum_reply -->
+                            </nav>
+                        </li>
+                        <!-- END forum -->
+                    </ul>
+
+                    <div class="component-action">
+                        <section>
+                            <!-- BEGIN forum_post -->
+                            <a class="button" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post Thread</a>
+                            <!-- END forum_post -->
+                            <a class="button" href="/forum/{COMPONENT_CONFIG_SRC_ID}">Go to Forum</a>
+                        </section>
+                    </div>
+
+                    <!-- END source_folder_exists -->
+                </section>
+            </div>
+        </div>
+
+    <!-- END posts -->
+
 </div>

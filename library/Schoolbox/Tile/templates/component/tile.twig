@@ -1,17 +1,32 @@
-{% include '@tile/sub/tileList.twig'
-    with {
-        layout:   component.layout,
-        tileList: component.layout.tileList,
-        editable: false
-    }
-%}
-{% if showButtons %}
-<div class="content">
-    <div class="row">
-        <div class="small-12 columns">
-            <a href="/tile/add/{{ tile_component_instance_id }}" class="button icon-add">Add Tile</a>
-            <a href="/tile/layout/{{ tile_component_instance_id }}" class="button icon-modify">Modify Layout</a>
-        </div>
+{% if component.layout.tileList is empty %}
+
+    <div class="empty-state">
+        <i class="icon-tiles"></i>
+        <p>No tiles available!</p>
+        <p>
+            {% if showButtons %}
+                <a href="/tile/add/{{ tile_component_instance_id }}">Add a tile</a> or <a href="/tile/layout/{{ tile_component_instance_id }}">modify layout</a>.
+            {% endif %}
+        </p>
     </div>
-</div>
+
+{% else %}
+
+    {% include '@tile/sub/tileList.twig'
+        with {
+            layout:   component.layout,
+            tileList: component.layout.tileList,
+            editable: false
+        }
+    %}
+    {% if showButtons %}
+
+    <div class="component-action">
+        <section>
+            <a href="/tile/add/{{ tile_component_instance_id }}" class="button">Add Tile</a>
+            <a href="/tile/layout/{{ tile_component_instance_id }}" class="button">Modify Layout</a>
+        </section>
+    </div>
+    {% endif %}
+
 {% endif %}

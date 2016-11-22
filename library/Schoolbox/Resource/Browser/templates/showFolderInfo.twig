@@ -25,16 +25,19 @@
         {% else %}
             <div class="icon-{{ icon }} icon-64" alt="{{ folder.name }}"></div>
         {% endif %}
+        {% if access > 1 %}
+        <div class="alert-box highlight no-pad">
+            <p>You can drag multiple files onto this location</p>
+        </div>
+        {% endif %}
     </div>
+
     <div class="small-8 column">
         <div class="actions-small-1">
             <div class="list-item">
                 {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
                     <h3>
-                        {{ folder.name }}
-                        {% if folder.codeString %}
-                            ({{ folder.codeString }})
-                        {% endif %}
+                        {{ folder.title }}
                     </h3>
                 {% if folder.hasHomepage %}</a>{% endif %}
 

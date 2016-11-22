@@ -31,35 +31,42 @@
                             </ul>
                         </div>
                     </div>
-
-                    <!-- BEGIN modify_button -->
-                    <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='button icon-upload'>Post Images</a>
-                    <a href='/my-files/' class='button icon-view'>Browse My Files</a>
-                    <script type="text/javascript">
-                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                            wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                            createImageThumbnails: true,
-                            dictDefaultMessage: 'You can drag images into this space',
-                            refreshUrl: '/eportfolio/configForm.php',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                            refreshData: {
-                                page_id: '{PAGE_ID}',
-                                reload: '{COMPONENT_INSTANCE_ID}'
-                            },
-                            sending: function (file, xhr, formData) {
-                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('parent', 0);
-                                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-                            },
-                            complete: function (file) {
-                                $(file.previewElement).find('img.dz-pending').remove();
-                            }
-                        });
-                    </script>
-                    <!-- END modify_button -->
                 </div>
+
+
+                <!-- BEGIN modify_button -->
+
+                <div class="component-action">
+                    <section>
+                        <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='button'>Post Images</a>
+                        <a href='/my-files/' class='button'>Browse My Files</a>
+                    </section>
+                </div>
+
+                <script type="text/javascript">
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        createImageThumbnails: true,
+                        dictDefaultMessage: 'You can drag images into this space',
+                        refreshUrl: '/eportfolio/configForm.php',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: {
+                            page_id: '{PAGE_ID}',
+                            reload: '{COMPONENT_INSTANCE_ID}'
+                        },
+                        sending: function (file, xhr, formData) {
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('parent', 0);
+                            formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+                        },
+                        complete: function (file) {
+                            $(file.previewElement).find('img.dz-pending').remove();
+                        }
+                    });
+                </script>
+                <!-- END modify_button -->
             </section>
         </div>
     </div>

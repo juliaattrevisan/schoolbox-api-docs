@@ -1,21 +1,179 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list" data-dz-container></ul>
+            </section>
+        </div>
+    </div>
+
+    <div data-dz-wrap class="dropzone-wrap">
+        <div data-dz-container="">
+        </div>
+        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+        <div class="hide" data-dz-template>
+            <li>
+                <div class="card small-12">
+                    <div class="icon-audio icon-32"></div>
+                    <h3 data-dz-name></h3>
+                    <p class="meta" data-dz-status>Uploading...</p>
+                    <div class="progress dz-progress">
+                        <span class="meter dz-upload" style="width:0;"></span>
+                    </div>
+                </div>
+            </li>
+        </div>
+
+        <div class="empty-state">
+            <i class="icon-image-slideshow"></i>
+            <p>No images available!</p>
+
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/cms/file/new/{ID}">Post Image</a> or drag one onto this component
+            </p>
+
+            <script type="text/javascript">
+                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                    wrapClass: 'dragging',
+                    wrap: '#content',
+                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                    createImageThumbnails: true,
+                    thumbnailHeight: 400,
+                    thumbnailWidth: null,
+                    dictDefaultMessage: 'You can drag an image into this space.',
+                    acceptedFiles: 'image/*',
+                    showIfEmpty: false,
+                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                    tplWrap: '<li class="dz-preview" />',
+                    addedfile: function (file) {
+                    },
+                    sending: function (file, xhr, formData) {
+                        $(file.previewElement)
+                                .addClass('category-{ID}')
+                                .data('node', {ID});
+
+                        $('#img{COMPONENT_INSTANCE_ID}').remove();
+
+                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                        formData.append('category', $(file.previewElement).data('node'));
+                        formData.append('comment', '');
+                        formData.append('hidden', 0);
+                    },
+                    error: function (file) {
+                        $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text('Error uploading file');
+                    },
+                    success: function (file, response) {
+                        var el = $(file.previewElement);
+
+                        el.attr('data-file', response.id)
+                                .removeClass('dz-processing')
+                                .find('span.dz-upload')
+                                .addClass('complete');
+
+                        el.find('img.dz-pending').detach();
+
+                        var frm = $('#component{COMPONENT_INSTANCE_ID}').find('form[action="/homepage/configForm.php"]');
+                        frm.find('select[name=image]').remove();
+                        frm.append($('<input/>').attr('name', 'image').val(file.name.substr(0, file.name.lastIndexOf('.'))));
+
+                        $.ajax({
+                            type: frm.attr('method'),
+                            url: frm.attr('action'),
+                            data: frm.serialize()
+                        });
+                    }
+                });
+            </script>
+
+            <!-- END empty_modify -->
+        </div>
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN image -->
+
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
             <section>
-                <!-- BEGIN previewimage -->
-                <div class="text-center">
-                    <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
+                <div class="dropzone-wrap">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
+
+                    <div class="hide" data-dz-template>
+                        <div style="text-align:{IMAGE_ALIGN};">
+                            <img class="th" src="/images/foundation/preloader.gif" data-dz-thumbnail border="0" style="position:static;height:{COMPONENT_CONFIG_PIXEL};opacity:0.5"/>
+                            <div class="progress dz-progress">
+                                <span class="meter dz-upload" style="width:0;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-dz-container>
+                        <!-- BEGIN previewimage -->
+                        <div class="text-center">
+                            <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
+                        </div>
+                        <!-- END previewimage -->
+                    </div>
                 </div>
-                <!-- END previewimage -->
 
                 <!-- BEGIN submit_image_randimage -->
-                <div class="content">
-                    <a href="/cms/file/new/{ID}" class="button icon-upload">Post Image</a>
+                <div class="component-action">
+                    <section>
+                        <p><a href="/cms/file/new/{ID}">Select an image</a> or drag them onto this component</a></p>
+                    </section>
                 </div>
+
+                <script type="text/javascript">
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        wrap: '#content',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        createImageThumbnails: true,
+                        thumbnailHeight: 400,
+                        thumbnailWidth: null,
+                        dictDefaultMessage: 'You can drag an image into this space.',
+                        acceptedFiles: 'image/*',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                        tplWrap: '<li class="dz-preview" />',
+                        addedfile: function (file) {
+                        },
+                        sending: function (file, xhr, formData) {
+                            $(file.previewElement)
+                                    .addClass('category-{ID}')
+                                    .data('node', {ID});
+
+                            $('#img{COMPONENT_INSTANCE_ID}').remove();
+
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('comment', '');
+                            formData.append('hidden', 0);
+                        },
+                        error: function (file) {
+                            $(file.previewElement)
+                                    .closest('[data-dz-container]')
+                                    .find('.dz-preview').remove();
+                        },
+                        success: function (file, response) {
+                            $(file.previewElement).find('img').remove();
+                        }
+                    });
+                </script>
                 <!-- END submit_image_randimage -->
             </section>
         </div>
     </div>
+
+    <!-- END image -->
 </div>

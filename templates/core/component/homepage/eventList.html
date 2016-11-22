@@ -19,6 +19,32 @@
 
     {CONFIGURATION}
 
+    <!-- BEGIN empty_state -->
+
+    <div class="empty-state">
+        <i class="icon-calendar"></i>
+        <p>No upcoming events!</p>
+
+        <!-- BEGIN empty_modify -->
+
+        <p>
+            <!-- BEGIN submit_event -->
+                <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage">Add an event</a>
+            <!-- END submit_event -->
+            or
+            <!-- BEGIN import_events -->
+                <a href="/calendar/import/{ID}">import events</a> to this page.
+            <!-- END import_events -->
+        </p>
+
+        <!-- END empty_modify -->
+
+    </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN event_list -->
+
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
@@ -37,16 +63,18 @@
                     <!-- END event_day -->
                 </ul>
 
-                <div class="content">
-                    <!-- BEGIN submit_event -->
-                    <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage" class="button icon-add">Add Event</a>
-                    <!-- END submit_event -->
+                <div class="component-action">
+                    <section>
+                        <!-- BEGIN submit_event -->
+                        <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage" class="button">Add Event</a>
+                        <!-- END submit_event -->
 
-                    <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button icon-export">Export Events</a>
+                        <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button">Export Events</a>
 
-                    <!-- BEGIN import_events -->
-                    <a href="/calendar/import/{ID}" class="button icon-upload">Import Events</a>
-                    <!-- END import_events -->
+                        <!-- BEGIN import_events -->
+                        <a href="/calendar/import/{ID}" class="button">Import Events</a>
+                        <!-- END import_events -->
+                    </section>
                 </div>
             </section>
         </div>
@@ -66,4 +94,6 @@
         <a class="button icon-copy" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</a>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
+
+    <!-- END event_list -->
 </div>

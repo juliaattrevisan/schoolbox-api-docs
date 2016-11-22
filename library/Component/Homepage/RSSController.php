@@ -20,67 +20,84 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             return false;
         }
 
-        $this->setBlock($templateHandle, 'rss_stories', 'rss_block');
-        $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
-        $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
+        /* Need rss name injected here
+         */
+        $this->parseConfig();
 
         // Initialise feed
         $rss = new Alaress_Rss_Stream($this->getConfig('url'));
         $rss->setLimit($this->getConfig('size'));
         $rss->stream();
 
-        $title = Scrub::text($rss->getTitle());
-
-        if (strlen($title)) {
-            $this->setComponentName($title);
-        }
-
-        // Set up feed info
-        $this->setVar(array(
-            'RSS_LINK' => $rss->getLink(),
-            'rss_block' => '',
-        ));
-
         // Process each item in feed
         $allRss      = $rss->getOutput();
-        $compactMode = $this->getConfig('compactMode');
-        if (count($allRss)) {
-            $j = 0;
 
-            foreach ($allRss as $currentRss) {
+        if (count($allRss) == 0) {
 
-                $this->setVar(
-                    array(
-                        'ON_OFF'                 => ++$j % 2 ? '' : 'dark',
-                        'RSS_TITLE'              => Scrub::text($currentRss['title']),
-                        'RSS_URL'                => urlencode(base64_encode($currentRss['link'])),
-                        'RSS_BRIEF'              => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
-                        'rss_brief_output_block' => '',
-                    )
-                );
-                if (!$compactMode) {
-                    $this->parse('rss_brief_output_block', 'rss_brief_output');
-                }
-                // If the item has a pubDate
-                if ($currentRss['pubDate'] instanceof DateTime) {
-                    $postedDate = new Alaress_Date_Format($currentRss['pubDate']);
+            $this->setBlock($templateHandle, 'rss', 'rss_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
-                    $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
-                    $this->parse('rss_date_block', 'rss_date');
-                } else {
-                    $this->setVar('rss_date_block', '');
-                }
-
-                // Parse the rss item row
-                $this->parse('rss_block', 'rss_stories', true);
-            }
-        } else {
             $this->setVar('rss_block', '');
-        }
 
-        /* Need rss name injected here
-         */
-        $this->parseConfig();
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock($templateHandle, 'rss_stories', 'rss_block');
+            $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
+            $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('empty_state_block', '');
+
+            $title = Scrub::text($rss->getTitle());
+
+            if (strlen($title)) {
+                $this->setComponentName($title);
+            }
+
+            // Set up feed info
+            $this->setVar(array(
+                'RSS_LINK' => $rss->getLink(),
+                'rss_block' => '',
+            ));
+
+            $compactMode = $this->getConfig('compactMode');
+            if (count($allRss)) {
+                $j = 0;
+
+                foreach ($allRss as $currentRss) {
+
+                    $this->setVar(
+                        array(
+                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                            'RSS_TITLE' => Scrub::text($currentRss['title']),
+                            'RSS_URL' => urlencode(base64_encode($currentRss['link'])),
+                            'RSS_BRIEF' => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
+                            'rss_brief_output_block' => '',
+                        )
+                    );
+                    if (!$compactMode) {
+                        $this->parse('rss_brief_output_block', 'rss_brief_output');
+                    }
+                    // If the item has a pubDate
+                    if ($currentRss['pubDate'] instanceof DateTime) {
+                        $postedDate = new Alaress_Date_Format($currentRss['pubDate']);
+
+                        $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
+                        $this->parse('rss_date_block', 'rss_date');
+                    } else {
+                        $this->setVar('rss_date_block', '');
+                    }
+
+                    // Parse the rss item row
+                    $this->parse('rss_block', 'rss_stories', true);
+                }
+            } else {
+                $this->setVar('rss_block', '');
+            }
+        }
 
         return true; // everything went according to plan
     }

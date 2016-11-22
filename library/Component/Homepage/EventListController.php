@@ -30,20 +30,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        //event output
-        $this->setBlock($templateHandle, 'event_day', 'event_day_block');
-        $this->setBlock('event_day', 'group_events', 'group_events_block');
-        $this->setBlock($templateHandle, 'import_events', 'import_events_block');
-
-        $this->setVar(
-            array(
-                'CALENDAR_PREFIX' => 'group',
-                'USER_TOKEN'      => $_SESSION['key'],
-                'LIST_DATE'       => '',
-                'group_events_block'=> '',
-            )
-        );
-
         // Filter to a given number of days.
         $eventLimit = intval($this->getConfig('size'));
         $dayLimit   = intval($this->getConfig('days'));
@@ -63,8 +49,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($this->getUser(), array());
         $calendarApi->setGroupId($this->getContext()->getId());
 
-        $eventCount = 0;
-
         // Render all events for group using html renderer
         $eventRenderer = new Lister(
             $calendarApi,
@@ -74,46 +58,90 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->getSitePage(),
             $this->getUser()
         );
-        foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
-            if($eventLimit > 0 && $eventCount++ >= $eventLimit) {
-                break;
+        if ($eventRenderer->getAllEvents()->count() == 0) {
+
+            // No events, show empty state
+
+            $this->setBlock($templateHandle, 'event_list', 'event_list_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+            $this->setVar('event_list_block', '');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_modify_block', '');
+            } else {
+                $this->parse('empty_modify_block', 'empty_modify');
             }
 
-            //
-            // Current day: will never be before the start time
-            $currentDay = $currentEvent->getStartTime();
-            if ($this->start->compare($currentDay) > 0) {
-                $currentDay = $this->start;
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            // List events
+
+            $this->setBlock($templateHandle, 'event_list', 'event_list_block');
+            $this->setBlock('event_list', 'event_day', 'event_day_block');
+            $this->setBlock('event_day', 'group_events', 'group_events_block');
+            $this->setBlock('event_list', 'import_events', 'import_events_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('empty_state_block', '');
+
+            $this->setVar(
+                array(
+                    'CALENDAR_PREFIX' => 'group',
+                    'USER_TOKEN'      => $_SESSION['key'],
+                    'LIST_DATE'       => '',
+                    'group_events_block'=> '',
+                    'empty_state_block' => ''
+                )
+            );
+
+            $eventCount = 0;
+
+            foreach ($eventRenderer->getAllEvents() as $currentEvent) {
+
+                if ($eventLimit > 0 && $eventCount++ >= $eventLimit) {
+                    break;
+                }
+
+                // Current day: will never be before the start time
+
+                $currentDay = $currentEvent->getStartTime();
+
+                if ($this->start->compare($currentDay) > 0) {
+                    $currentDay = $this->start;
+                }
+
+                if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
+                    $this->parse('event_day_block', 'event_day', true);
+                    $this->setVar('group_events_block', '');
+                }
+
+                $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
+                $this->setVar('group_events', $eventRenderer->renderEvent($currentEvent, 'html'));
+                $this->parse('group_events_block', 'group_events', true);
+
+                $prevDay = $currentDay;
             }
-            if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
-                $this->parse('event_day_block', 'event_day', true);
-                $this->setVar('group_events_block', '');
-            }
 
-            $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
+            $this->parse('event_day_block', 'event_day', true);
 
-            $this->setVar('group_events', $eventRenderer->renderEvent($currentEvent, 'html'));
+            $this->parse('event_list_block', 'event_list', true);
 
-            $this->parse('group_events_block', 'group_events', true);
-
-            $prevDay = $currentDay;
-        }
-
-
-        $this->parse('event_day_block', 'event_day', true);
-
-
-        //setup block for submission button
-        $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-            $this->setVar(array(
+            //setup block for submission button
+            $this->setBlock("event_list", "submit_event", "submit_event_block");
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar(array(
                     'submit_event_block' => '',
                     'import_events_block' => ''
                 ));
-        } else {
-            $this->parse("submit_event_block", "submit_event");
-            $this->parse('import_events_block', 'import_events');
+            } else {
+                $this->parse("submit_event_block", "submit_event");
+                $this->parse('import_events_block', 'import_events');
+            }
         }
 
         return true;

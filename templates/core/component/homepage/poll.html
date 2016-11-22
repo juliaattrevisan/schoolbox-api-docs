@@ -22,29 +22,45 @@
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island">
-            <section>
-                <ul class="action-list">
-                    <!-- BEGIN poll_question -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card wrap-down small-12">
-                                <a>
-                                    <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
-                                    <h3>{POLL_QUESTION}</h3>
-                                </a>
-                                <p class="meta">Posted by <a href="/search/user/{POLL_AUTHOR_ID}">{POLL_AUTHOR_NAME}</a> {POLL_CREATED}</p>
-                            </div>
-                        </div>
-                        <!-- BEGIN poll_vote -->
-                        <div class="row">
-                            <div class="small-12 column">
-                                <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php"
-                                      method="post">
+    <!-- BEGIN empty_state -->
 
-                                    <fieldset class="content">
-                                        <script type="text/javascript">
+        <div class="empty-state">
+            <i class="icon-poll"></i>
+            <p>No polls available!</p>
+
+            <!-- BEGIN empty_modify -->
+            <p>
+                <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}">Create a poll</a>.
+            </p>
+            <!-- END empty_modify -->
+
+        </div>
+
+    <!-- END empty_state -->
+
+    <!-- BEGIN poll -->
+
+        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+            <div class="small-12 island">
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN poll_question -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a>
+                                        <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
+                                        <h3>{POLL_QUESTION}</h3>
+                                    </a>
+                                    <p class="meta">Posted by <a href="/search/user/{POLL_AUTHOR_ID}">{POLL_AUTHOR_NAME}</a> {POLL_CREATED}</p>
+                                </div>
+                            </div>
+                            <!-- BEGIN poll_vote -->
+                            <div class="row content">
+                                <div class="small-12 column">
+                                    <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php"
+                                          method="post">
+                                         <script type="text/javascript">
                                             $(function () {
 
                                                 /* Vote validate on a per-poll basis
@@ -65,7 +81,7 @@
                                                     return valid;
                                                 });
                                             });
-                                        </script>
+                                         </script>
 
                                         <input type="hidden" name="pollID" value="{POLL_ID}"/>
                                         <input type="hidden" name="categoryID" value="{ID}"/>
@@ -79,73 +95,71 @@
                                         <!-- END poll_options -->
 
                                         <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}"/>
-                                    </fieldset>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
-                        <!-- END poll_vote -->
-                        <nav>
-                            <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false" title="Actions"></a>
-                        </nav>
+                            <!-- END poll_vote -->
+                            <nav>
+                                <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false" title="Actions"></a>
+                            </nav>
 
-                        <ul data-dropdown-content class="f-dropdown" id="poll-options{POLL_ID}">
-                            <!-- BEGIN show_results -->
-                            <li><a href="/homepage/{ID}/pollResults" class="icon-poll">Show Results</a></li>
-                            <!-- END show_results -->
-                            <!-- BEGIN modify_poll -->
-                            <li><a href="/poll/modify/{POLL_ID}" class="icon-modify">Modify</a></li>
-                            <li><a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
-                            <!-- END modify_poll -->
-                        </ul>
-                    </li>
-                    <!-- BEGIN poll_chart -->
-                    <li>
-                        <script type='text/javascript'>
-                            $(function() {
-                                $('#component-poll{POLL_ID}-graph').highcharts({
-                                    chart: {
-                                        height: 300,
-                                        type: 'column'
-                                    },
-                                    title: {
-                                        text: ''
-                                    },
-                                    xAxis: {
-                                        labels: {
-                                            enabled: false
-                                        }
-                                    },
-                                    yAxis: {
-                                        allowDecimals: false,
-                                        min: 0,
+                            <ul data-dropdown-content class="f-dropdown" id="poll-options{POLL_ID}">
+                                <!-- BEGIN show_results -->
+                                <li><a href="/homepage/{ID}/pollResults" class="icon-poll">Show Results</a></li>
+                                <!-- END show_results -->
+                                <!-- BEGIN modify_poll -->
+                                <li><a href="/poll/modify/{POLL_ID}" class="icon-modify">Modify</a></li>
+                                <li><a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
+                                <!-- END modify_poll -->
+                            </ul>
+                        </li>
+                        <!-- BEGIN poll_chart -->
+                        <li>
+                            <script type='text/javascript'>
+                                $(function() {
+                                    $('#component-poll{POLL_ID}-graph').highcharts({
+                                        chart: {
+                                            height: 300,
+                                            type: 'column'
+                                        },
                                         title: {
                                             text: ''
-                                        }
-                                    },
-                                    credits: {
-                                        enabled: false
-                                    },
-                                    series: {POLL_DATA}
+                                        },
+                                        xAxis: {
+                                            labels: {
+                                                enabled: false
+                                            }
+                                        },
+                                        yAxis: {
+                                            allowDecimals: false,
+                                            min: 0,
+                                            title: {
+                                                text: ''
+                                            }
+                                        },
+                                        credits: {
+                                            enabled: false
+                                        },
+                                        series: {POLL_DATA}
+                                    });
                                 });
-                            });
-                        </script>
-                        <div id='component-poll{POLL_ID}-graph'></div>
-                    </li>
-                    <!-- END poll_chart -->
-                    <!-- END poll_question -->
-                </ul>
-                <!-- BEGIN new_poll -->
-                <div class="content">
-                    <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create Poll</a>
-                </div>
-                <!-- END new_poll -->
-            </section>
+                            </script>
+                            <div id='component-poll{POLL_ID}-graph'></div>
+                        </li>
+                        <!-- END poll_chart -->
+                        <!-- END poll_question -->
+                    </ul>
+                    <!-- BEGIN new_poll -->
+                    <div class="component-action">
+                        <section>
+                            <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}" class="button">Create Poll</a>
+                        </section>
+                    </div>
+                    <!-- END new_poll -->
+                </section>
+            </div>
         </div>
-    </div>
+
+    <!-- END poll -->
+
 </div>
-
-
-
-
-
-

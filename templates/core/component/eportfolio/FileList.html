@@ -57,38 +57,39 @@
                     </ul>
                 </div>
 
-                <div class="content">
-                    <a href='/my-files/' class='button icon-view'>Browse My Files</a>
+                <div class="component-action">
+                    <section>
+                        <a href='/my-files/' class='button'>Browse My Files</a>
+                        <!-- BEGIN submit_file -->
+                            <!-- BEGIN modify_button -->
+                            <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='button'>Post Files</a>
+                            <!-- END modify_button -->
 
-                    <!-- BEGIN submit_file -->
-                    <!-- BEGIN modify_button -->
-                    <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='button icon-upload'>Post Files</a>
-                    <!-- END modify_button -->
-
-                    <script type="text/javascript">
-                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                            wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                            tplWrap: '<li class="dz-preview" />',
-                            dictDefaultMessage: 'You can drag files into this space',
-                            refreshUrl: '/eportfolio/configForm.php',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                            refreshData: {
-                                page_id: '{PAGE_ID}',
-                                reload: '{COMPONENT_INSTANCE_ID}'
-                            },
-                            sending: function (file, xhr, formData) {
-                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('parent', 0);
-                                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-                            },
-                            complete: function (file) {
-                                $(file.previewElement).find('img').remove();
-                            }
-                        });
-                    </script>
-                    <!-- END submit_file -->
+                            <script type="text/javascript">
+                                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                                    wrapClass: 'dragging',
+                                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                                    tplWrap: '<li class="dz-preview" />',
+                                    dictDefaultMessage: 'You can drag files into this space',
+                                    refreshUrl: '/eportfolio/configForm.php',
+                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                    refreshData: {
+                                        page_id: '{PAGE_ID}',
+                                        reload: '{COMPONENT_INSTANCE_ID}'
+                                    },
+                                    sending: function (file, xhr, formData) {
+                                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                        formData.append('parent', 0);
+                                        formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+                                    },
+                                    complete: function (file) {
+                                        $(file.previewElement).find('img').remove();
+                                    }
+                                });
+                            </script>
+                        <!-- END submit_file -->
+                    </section>
                 </div>
             </section>
         </div>

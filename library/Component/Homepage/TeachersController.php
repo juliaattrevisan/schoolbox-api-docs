@@ -21,84 +21,105 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
-        // gets teachers involved in subject, outputs links to their addressbook page
-        $this->setBlock($templateHandle, "person", "person_block");
-        $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-        $this->setBlock('person', 'has_icon', 'has_icon_block');
-
-        $this->setVar('has_thumbnail_block', '');
-        $this->setVar('has_icon_block', '');
-        $this->setVar('person_block', '');
-
-        $displayOptions = array(
-            'grid' => array(
-                'name'  => 'Grid',
-                'value' => 'grid',
-                'css'   => 'grid',
-            ),
-            'list' => array(
-                'name'  => 'List',
-                'value' => 'list',
-                'css'   => '',
-            ),
-        );
-        $display        = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-        $this->setVar(
-            array(
-                'LIST_STYLE' => $displayOptions[$display]['css'],
-            )
-        );
+        $listSyns = null;
 
         if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
             $externalClassHandler = new External_Class();
-            $userMapper           = \Schoolbox\UserMapper::getInstance();
+            $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
+        }
 
-            $listSyns    = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
+        if (!is_array($listSyns)) {
 
-            if (is_array($listSyns)) {
-                $j = 0;
-                foreach ($listSyns as $synid) {
+            $this->setBlock($templateHandle, 'teachers', 'teachers_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-                    try {
-                        $teacher = $userMapper->findByExternalId($synid);
+            $this->setVar('teachers_block', '');
 
-                        if($teacher->getRole()->isStaff()) {
-                            $this->setVar(
-                                array(
-                                    'PERSON_UID'         => $teacher->getId(),
-                                    'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
-                                    'PERSON_EXTERNAL_ID' => $synid,
-                                    'PERSON_GROUP'       => Scrub::text($teacher->getRole()->getName()),
-                                )
-                            );
+            $this->parse('empty_state_block', 'empty_state');
 
-                            /* Don't display images in list view
-                             */
-                            if ($this->getConfig('displayPortraits') == 'grid') {
-                                $this->setVar(array(
-                                    'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                                ));
+        } else {
 
-                                $this->parse('has_thumbnail_block', 'has_thumbnail');
-                                $this->setVar('has_icon_block', '');
-                            } else {
-                                $this->setVar(array(
-                                    'GRID_VIEW_CLASSES' => ''
-                                ));
+            // gets teachers involved in subject, outputs links to their addressbook page
+            $this->setBlock($templateHandle, "person", "person_block");
+            $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
+            $this->setBlock('person', 'has_icon', 'has_icon_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
+            $this->setVar('empty_state_block', '');
+            $this->setVar('has_thumbnail_block', '');
+            $this->setVar('has_icon_block', '');
+            $this->setVar('person_block', '');
+
+            $displayOptions = array(
+                'grid' => array(
+                    'name' => 'Grid',
+                    'value' => 'grid',
+                    'css' => 'grid',
+                ),
+                'list' => array(
+                    'name' => 'List',
+                    'value' => 'list',
+                    'css' => '',
+                ),
+            );
+            $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+            $this->setVar(
+                array(
+                    'LIST_STYLE' => $displayOptions[$display]['css'],
+                )
+            );
+
+            if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
+                $externalClassHandler = new External_Class();
+                $userMapper = \Schoolbox\UserMapper::getInstance();
+
+                $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
+
+                if (is_array($listSyns)) {
+                    $j = 0;
+                    foreach ($listSyns as $synid) {
+
+                        try {
+                            $teacher = $userMapper->findByExternalId($synid);
+
+                            if ($teacher->getRole()->isStaff()) {
+                                $this->setVar(
+                                    array(
+                                        'PERSON_UID' => $teacher->getId(),
+                                        'PERSON_NAME' => Scrub::text($teacher->getFullName()),
+                                        'PERSON_EXTERNAL_ID' => $synid,
+                                        'PERSON_GROUP' => Scrub::text($teacher->getRole()->getName()),
+                                    )
+                                );
+
+                                /* Don't display images in list view
+                                 */
+                                if ($this->getConfig('displayPortraits') == 'grid') {
+                                    $this->setVar(array(
+                                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                                    ));
+
+                                    $this->parse('has_thumbnail_block', 'has_thumbnail');
+                                    $this->setVar('has_icon_block', '');
+                                } else {
+                                    $this->setVar(array(
+                                        'GRID_VIEW_CLASSES' => ''
+                                    ));
+
+                                    $this->setVar('has_thumbnail_block', '');
+                                    $this->parse('has_icon_block', 'has_icon');
+                                }
+
+                                $this->parse('person_block', 'person', true);
+
+                                /* Clear children after parsing out the parent
+                                 */
                                 $this->setVar('has_thumbnail_block', '');
-                                $this->parse('has_icon_block', 'has_icon');
+                                $this->setVar('has_icon_block', '');
                             }
-
-                            $this->parse('person_block', 'person', true);
-
-                            /* Clear children after parsing out the parent
-                             */
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->setVar('has_icon_block', '');
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            //noop
                         }
-                    } catch  (\Schoolbox\Mapper\Exception $e) {
-                        //noop
                     }
                 }
             }

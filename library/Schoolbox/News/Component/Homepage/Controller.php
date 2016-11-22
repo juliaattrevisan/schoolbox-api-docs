@@ -90,8 +90,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         else
             $news = $this->newsHandler->getAllForCategory($this->source->getId(), array('size' => $this->getConfig('size')));
 
-        $modify =   $_SESSION['user']->isSuperuser() ||
-                    $news['owner'] == $_SESSION['user']->getId() ||
+        $modify =   $news['owner'] == $_SESSION['user']->getId() ||
                     $this->getContentPermission() >= FULL_ACCESS || ($this->getContentPermission() >= WRITE_ACCESS && $this->getConfig('news_edit_other'));
 
         if (is_array($news)) {

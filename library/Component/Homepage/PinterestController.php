@@ -23,17 +23,29 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'has_pinterest_user', 'has_pinterest_user_block');
-        $this->setBlock($templateHandle, 'has_pinterest_board', 'has_pinterest_board_block');
+        if (!strlen(trim($this->getConfig('url')))) {
 
-        $this->setVar(
-            array(
-                'has_pinterest_user_block'  => '',
-                'has_pinterest_board_block' => '',
-            )
-        );
+            $this->setBlock($templateHandle, 'pinterest', 'pinterest_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
-        if (strlen(trim($this->getConfig('url')))) {
+            $this->setVar('pinterest_block', '');
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock($templateHandle, 'has_pinterest_user', 'has_pinterest_user_block');
+            $this->setBlock($templateHandle, 'has_pinterest_board', 'has_pinterest_board_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar(
+                array(
+                    'empty_state_block' => '',
+                    'has_pinterest_user_block'  => '',
+                    'has_pinterest_board_block' => '',
+                )
+            );
             $this->setVar(
                 array(
                     'PINTEREST_URL' => $this->getConfig('url')

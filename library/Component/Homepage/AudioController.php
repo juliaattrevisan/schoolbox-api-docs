@@ -56,54 +56,76 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         if (!parent::loadTemplate($templateHandle, 'audio')) {
             return false;
         }
+
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-        $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
-        $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
-        $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
+        // There's not (yet) any default for the audio player.
+        // Just use the first in the list
+        $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-        if(!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
+        /* Sort order
+         */
+        $sortConfig = array(
+            'sort' => $this->getConfig('sort'),
+            'sortdir' => $this->getConfig('sortdir'),
+            'mime' => 'audio',
+        );
+
+        if ($this->getConfig('size') >= 1) {
+            $this->outputList = $videoResourceMapper->findByCategory(
+                $this->getSource()->getId(),
+                $sortConfig,
+                $this->getConfig('size')
+            );
+        } elseif ($this->getConfig('size') == 0) {
+            $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
         } else {
-            $this->setVar('source_folder_deleted_block', '');
+            $this->outputList = new \Schoolbox\Collection(array());
+        }
 
-            $this->setVar(
-                array(
-                    'default_audio_block' => '',
-                    'audio_list_block' => '',
-                    'audio_pending_list_block' => '',
-                )
-            );
+        if (!count($this->outputList)) {
 
-            $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+            $this->setBlock($templateHandle, 'audio', 'audio_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
-            // There's not (yet) any default for the audio player.
-            // Just use the first in the list
-            $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
+            $this->setVar('audio_block', '');
+            $this->setVar('SOURCE_ID', $this->getSource()->getId());
 
-            /* Sort order
-             */
-            $sortConfig = array(
-                'sort' => $this->getConfig('sort'),
-                'sortdir' => $this->getConfig('sortdir'),
-                'mime' => 'audio',
-            );
-
-            if ($this->getConfig('size') >= 1) {
-                $this->outputList = $videoResourceMapper->findByCategory(
-                    $this->getSource()->getId(),
-                    $sortConfig,
-                    $this->getConfig('size')
-                );
-            } elseif ($this->getConfig('size') == 0) {
-                $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("empty_modify_block", "");
             } else {
-                $this->outputList = new \Schoolbox\Collection(array());
+                $this->parse("empty_modify_block", "empty_modify");
             }
 
-            if (count($this->outputList)) {
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
+            $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
+            $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
+
+            $this->setVar('empty_state_block', '');
+
+            if(!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            } else {
+                $this->setVar('source_folder_deleted_block', '');
+
+                $this->setVar(
+                    array(
+                        'default_audio_block' => '',
+                        'audio_list_block' => '',
+                        'audio_pending_list_block' => '',
+                    )
+                );
+
+                $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+
                 $j = 0;
                 foreach ($this->outputList as $audio) {
 
@@ -156,20 +178,20 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         }
                     }
                 }
-            } else {
-                $this->setVar('audio_list_block', '');
+
+
+                //setup block for submission button
+                $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                    $this->setVar("submit_file_block", "");
+                } else {
+                    $this->setVar('SOURCE_ID', $this->getSource()->getId());
+                    $this->parse("submit_file_block", "submit_file");
+                }
+
+                $this->parse('source_folder_exists_block','source_folder_exists');
             }
 
-            //setup block for submission button
-            $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("submit_file_block", "");
-            } else {
-                $this->setVar('SOURCE_ID', $this->getSource()->getId());
-                $this->parse("submit_file_block", "submit_file");
-            }
-
-            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;

@@ -46,75 +46,97 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             return false;
         }
 
-
         $this->parseConfig();
 
-        /* Template rendering
-         */
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-        $this->setBlock('source_folder_exists', 'image_gallery', 'image_gallery_block');
-        $this->setBlock('source_folder_exists', 'submit_image_gallery', 'submit_image_gallery_block');
+        // Load images for the requested homepage
+        $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$this->getSource()->getId()],
+            [
+                'filter' => ['image'],
+                'size' => $this->getConfig('size')
+            ]
+        );
 
-        if(!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
-        } else {
-            $this->setVar('source_folder_deleted_block', '');
+        $this->setVar(
+            array(
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+                'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
+            )
+        );
 
-            /* Prevent multiple galleries from other categories stacking up in the wrong place
-             * and initialise empty gallery by default
-             */
-            $this->setVar(
-                array(
-                    'image_gallery_block' => ''
-                )
-            );
+        if ($allImages->count() == 0) {
 
-            /* Set up component name
-             *
-             * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
-             */
-            $this->setVar(
-                array(
-                    'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                    'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
-                )
-            );
+            $this->setBlock($templateHandle, 'gallery', 'gallery_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
-            // Controls such as Post News
+            $this->setVar('gallery_block', '');
+
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar(
-                    array(
-                        'submit_image_gallery_block' => ''
-                    )
-                );
+                $this->setVar("empty_modify_block", "");
             } else {
-                $this->parse('submit_image_gallery_block', 'submit_image_gallery');
+                $this->parse("empty_modify_block", "empty_modify");
             }
 
-            // Load images for the requested homepage
-            $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
-                [$this->getSource()->getId()],
-                [
-                    'filter' => ['image'],
-                    'size' => $this->getConfig('size')
-                ]
-            );
+            $this->parse('empty_state_block', 'empty_state');
 
-            // Iterate
-            foreach ($allImages as $currentImage) {
+        } else {
+
+            /* Template rendering
+             */
+            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock('source_folder_exists', 'image_gallery', 'image_gallery_block');
+            $this->setBlock('source_folder_exists', 'submit_image_gallery', 'submit_image_gallery_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('empty_state_block', '');
+
+            if (!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            } else {
+                $this->setVar('source_folder_deleted_block', '');
+
+                /* Prevent multiple galleries from other categories stacking up in the wrong place
+                 * and initialise empty gallery by default
+                 */
                 $this->setVar(
                     array(
-                        'THUMBNAIL_ID' => $currentImage->getId(),
-                        'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
-                        'THUMBNAIL_SIZE' => Cfg::get('thumbnail_size'),
-                        'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+                        'image_gallery_block' => ''
                     )
                 );
 
-                $this->parse('image_gallery_block', 'image_gallery', true);
+                /* Set up component name
+                 *
+                 * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
+                 */
+
+                // Controls such as Post News
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                    $this->setVar(
+                        array(
+                            'submit_image_gallery_block' => ''
+                        )
+                    );
+                } else {
+                    $this->parse('submit_image_gallery_block', 'submit_image_gallery');
+                }
+
+                // Iterate
+                foreach ($allImages as $currentImage) {
+                    $this->setVar(
+                        array(
+                            'THUMBNAIL_ID' => $currentImage->getId(),
+                            'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
+                            'THUMBNAIL_SIZE' => Cfg::get('thumbnail_size'),
+                            'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+                        )
+                    );
+
+                    $this->parse('image_gallery_block', 'image_gallery', true);
+                }
+                $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
-            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         // everything went according to plan
