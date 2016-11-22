@@ -137,9 +137,15 @@ class Controller extends Base
         }
     }
 
+    /**
+     * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
+     * @param IResponse $response
+     * @throws \Alaress\Web\Controller\Exception
+     */
     public function postResponseFeedback(IResponse $response)
     {
-        $this->sendError('');
+        new \Alaress_Probe($response);
+        $this->sendError($response);
         return;
     }
 
