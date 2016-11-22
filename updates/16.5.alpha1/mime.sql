@@ -1,3 +1,7 @@
+ALTER TABLE `allowedFileTypes`
+  CHANGE COLUMN `iconFile` `iconFile` VARCHAR(80) NOT NULL DEFAULT 'none.svg' ;
+
+
 UPDATE `allowedFileTypes` SET iconFile = 'application-image-gif.svg' WHERE mime = 'image/gif';
 UPDATE `allowedFileTypes` SET iconFile = 'application-xml.svg' WHERE mime = 'text/html';
 UPDATE `allowedFileTypes` SET iconFile = 'application-text.svg' WHERE mime = 'text/plain';
