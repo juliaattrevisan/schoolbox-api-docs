@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
@@ -113,6 +114,7 @@ class Controller extends Base
                 'response' => $response,
                 'attachzone' => (new Zone('feedbackFiles'))->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
+                'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
@@ -133,6 +135,15 @@ class Controller extends Base
         }
     }
 
+    /**
+     * @param IMarkScheme $scheme
+     * @return string
+     */
+    protected function deriveSchemeName(IMarkScheme $scheme)
+    {
+        $c = get_class($scheme);
+        return substr($c, strrpos($c, '\\')+1);
+    }
 
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId

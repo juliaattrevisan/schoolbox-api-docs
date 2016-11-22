@@ -79,34 +79,7 @@
 </div>
 <div class="row">
     <div class="small-12 columns">
-
-        {% if assessment.markType.id == constant('TYPE_PERCENT', assessment.markType) %}
-            {# Percentage #}
-            <input type="text" name="percentage" placeholder="%" />
-        {% elseif assessment.markType.id == constant('TYPE_LETTER', assessment.markType) %}
-            {# Letter Grade#}
-            {% if assessment.gradeGroup.gradeLevels|length %}
-                <select name="gradeGroup">
-                    {% for current in assessment.gradeGroup.gradeLevels %}
-                        <option value="{{ current.id }}">{{ current.caption }}</option>
-                    {% endfor %}
-
-                    {% if submissionStates|length %}
-                        <option value="" disabled></option>
-                        {% for current in submissionStates %}
-                            <option value="{{ current.id }}">{{ current.displayAs }}</option>
-                        {% endfor %}
-                    {% endif %}
-                </select>
-            {% endif %}
-        {% elseif assessment.markType.id == constant('TYPE_TOTAL', assessment.markType) %}
-            {# Total Mark#}
-            <input type="text" name="mark" placeholder="/ {{ assessment.maxMark }}" />
-        {% elseif assessment.markType.id == constant('TYPE_NONE', assessment.markType) %}
-            {# None #}
-        {% endif %}
-
-        <textarea cols="100" rows="5">Comments and stuff</textarea>
+        {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
     </div>
     <div class="small-12 columns">
         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
