@@ -174,8 +174,8 @@ class Controller extends Base
         }
 
         // Only show work that isn't yet due
-        $upcomingWork = $allWork->filter(function (IAssessable $assessable) {
-            return ($assessable->getDueAt()->isFuture());
+        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student) {
+            return ($assessable->getDueAt()->isFuture()) && (!$assessable->getParticipant($student)->isResponded());
         });
 
         // TODO Populate $_SESSION[children] properly
