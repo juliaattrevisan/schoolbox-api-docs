@@ -67,7 +67,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             $provider = $this->providerMapper->findById($this->getConfig('ltiprovider'));
 
 
-            // LearningField extraction from URL
+            // LearningField extraction from the custom field into the URL and parameters
 
             if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
                 $custom = $this->getConfig('description');
@@ -85,6 +85,9 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'resource_link_description' => '',
                 'user_id' => $this->getUser()->getId(),
                 'user_image' => urlencode("http://{$_SERVER['SERVER_NAME']}/portrait.php?userId={$this->getUser()->getExternalId()}&size=square80"),
+
+                // Students get a 'Student' role, staff get an 'Instructor' role, everyone else gets 'Guest' role
+
                 'roles' =>
                     $this->getUser()->getRole()->isStudent() ? 'Student' : (
                     $this->getUser()->getRole()->isStaff() ? 'Instructor' :
@@ -102,11 +105,15 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'launch_presentation_document_target' => 'iframe',
                 'launch_presentation_width' => '800',
                 'launch_presentation_height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
+
+                // This should be the URL that the result of a resource picker gets sent to- but it ain't working!
+
                 'launch_presentation_return_url' => urlencode('http://192.168.36.10/lti.php'),
-                'tool_consumer_instance_guid' => 'schoolbox.edu',
-                'tool_consumer_instance_name' => 'Schoolbox',
+
+                'tool_consumer_instance_guid' => $this->configLoader->get('site_location'),
+                'tool_consumer_instance_name' => $this->configLoader->get('school_name'),
                 'tool_consumer_instance_description' => 'Schoolbox LMS',
-                'tool_consumer_instance_contact_email' => 'support@alaress.com.au',
+                'tool_consumer_instance_contact_email' => $this->configLoader->get('mail_from_address'),
                 'tool_consumer_info_product_family_code' => 'schoolbox',
                 'tool_consumer_info_version' => $this->configLoader->get('site_version'),
                 'ext_lms' => 'schoolbox-' . $this->configLoader->get('site_version')
@@ -118,14 +125,10 @@ class Controller extends Component_Homepage_ControllerAbstract
             $consumer->enabled = true;
             $consumer->save();
 
-            $consumer->doServiceRequest(
-                $service = new LTI\Service\Service($consumer,
-                    $provider->getUrl(),
-                    'basic-lti-launch-request'
-                ),
-                'POST',
-                '',
-                $params
+            $service = new LTI\Service\Service(
+                $consumer,
+                $provider->getUrl(),
+                'basic-lti-launch-request'
             );
 
             if (!empty($provider->getSecret())) {
