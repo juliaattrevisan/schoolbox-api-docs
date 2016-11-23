@@ -48,7 +48,7 @@ class TaskMapper extends Schoolbox\Mapper
             'other_key' => 'task_id',
         ));
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions'])
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
     }
 
