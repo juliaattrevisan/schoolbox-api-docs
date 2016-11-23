@@ -149,51 +149,35 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, 'getCrocodocDownload', function ($params) {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+        $this->addRoutePreload($matcher, 'getCrocodoc(View|Download)', function ($params) {
 
-            $feedback = null;
-
-            /* Need this $feedback to determine whether the requested
-             * crocodoc annotation is part of a published feedback
+            /* Die early when requested Assessment doesn't exist
              */
-            foreach ($response->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->getId() == $params['feedbackId']) {
-                    $feedback = $currentFeedback;
-                    break;
-                }
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
-            /* Factory to figure out which fragment is required
+            /* Die early when requested Response doesn't exist in $assessment
              */
-            foreach ($response->getAllFiles() as $currentFile) {
-                if ($currentFile->getCrocodocId() == $params['crocodocId']) {
-                    return [
-                        'response' => $response,
-                        'feedback' => $feedback,
-                        'file' => $currentFile
-                    ];
-                }
+            try {
+                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+            }
+            catch (\OutOfBoundsException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
-            return [
-                'response' => $response,
-                'feedback' => $feedback,
-                'file' => null
-            ];
-        });
-
-        $this->addRoutePreload($matcher, 'getCrocodocView', function ($params) {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            /* Get all the feedbacks associated with $assessment, then find the requested Feedback
+             */
             $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
-            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
-
-            $feedback = null;
 
             /* Need this $feedback to determine whether the requested
              * crocodoc annotation is part of a published feedback
              */
+            $feedback = null;
+
             foreach ($feedbacks as $currentFeedback) {
                 if ($currentFeedback->getId() == $params['feedbackId']) {
                     $feedback = $currentFeedback;
@@ -201,22 +185,36 @@ class Module extends BaseModule
                 }
             }
 
+            /* Die early when requested Feedback doesn't exist
+             */
+            if (!$feedback) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
             /* Factory to figure out which fragment is required
              */
+            $file = null;
+
             foreach ($response->getAllFiles() as $currentFile) {
                 if ($currentFile->getCrocodocId() == $params['crocodocId']) {
-                    return [
-                        'response' => $response,
-                        'feedback' => $feedback,
-                        'file' => $currentFile
-                    ];
+                    $file = $currentFile;
+                    break;
                 }
             }
 
+            /* Die early when requested crocodocked File doesn't exist
+             */
+            if (!$file) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Otherwise you succeeded in running the gauntlet
+             * Shove all required ingredients into Controller at last
+             */
             return [
                 'response' => $response,
                 'feedback' => $feedback,
-                'file' => null
+                'file' => $file
             ];
         });
 
