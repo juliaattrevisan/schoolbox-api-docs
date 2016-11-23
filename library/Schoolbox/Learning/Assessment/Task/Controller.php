@@ -158,8 +158,29 @@ class Controller extends Assessment\Controller
         $response->assertSaveability();
 
         // And save
+        $this->taskResponseDataSource->save($response);
 
         // And redirect somewhere
+        if ($this->getRequest()->isXhr()) {
+            $result['success'] = true;
+            $result['message'] = 'OK';
+            $result['id']      = $response->getId();
+
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+
+        } else {
+            // redirect after saving to Due Work Summary For Particular Student
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $participant->getAssessable()->getId(),
+                        'studentId'    => $participant->getUser()->getId(),
+                    ]
+                )
+            );
+        }
     }
 
 
