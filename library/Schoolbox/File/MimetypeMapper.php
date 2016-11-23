@@ -123,10 +123,10 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	public function getUnknownMime() {
 		$mimeType = new Mimetype();
 		$mimeType->setDescription('Binary Data (Unknown)');
-		$mimeType->setMime('application/binary');
+		$mimeType->setMime('application/octet-stream');
 		$mimeType->setInline(false);
 		$mimeType->setEnable(true);
-		$mimeType->setIconFile('none.svg');
+		$mimeType->setIconFile('application-octet-stream.svg');
 		$mimeType->setMaxFileSize(0);
 
 		return $mimeType;
