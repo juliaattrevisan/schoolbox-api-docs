@@ -308,17 +308,48 @@ class Controller extends Base\Base
     /**
      * Search function. Retrieve a list of Folders that match the string in $_GET['query']
      *
+     * Searches by both name and class code
+     *
      * @api   GET /course/import/classes
      * @level 160
      */
     public function searchClasses()
     {
-        $importer = new Import();
+        $query = $this->getRequest()->query->get('query');
+        $userGroupsOnly = false;
+        $getCourse = true;
+        $getUnit = true;
+        $folders = $this->getFolderMapper()->searchByName($query, $userGroupsOnly, $getCourse, $getUnit);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => $importer->findMatchingClasses($this->getRequest()->query->get('query'))
-        ]);
+        /* Swap keys for selectize compatibility -_-
+         */
+        $data = [];
+
+        /** @var Folder[] $folders */
+        foreach ($folders as $folder) {
+
+            // Ignore folders with CourseSpecs
+            if($folder->getCourseSpecification() instanceof CourseSpecification){
+                continue;
+            }
+
+            // Ignore folders with UnitSpecs
+            if($folder->getUnitSpecification() instanceof UnitSpecification){
+                continue;
+            }
+
+            // Make sure the user has access to the folder before we return it
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) < UserAccess::ACCESS_WRITE) {
+                continue;
+            }
+
+            $data[] = [
+                'id'   => $folder->getId(),
+                'name' => $folder->getTitle(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
 
