@@ -37,7 +37,7 @@ INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, del
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (5, 5, 'School calendar events', 'Calendar', 'CALENDAR', 'calendar', '/calendar/week', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (6, 6, 'Current school news', 'News', 'NEWS', 'news', '/news', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at) VALUES  (7, 7, 'Access your messages here', 'Webmail', null, 'email', (SELECT `value` FROM `config` WHERE `name` = 'mail_webmail'), '_blank', 1, null);
-INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (8, 8, 'Grades', 'Grades', 'GRADE', 'approve', '/submission/allWork', null, null);
+INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (8, 8, 'Grades', 'Grades', 'GRADE', 'approve', '/learning/grades', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (9, 9, 'View and build new courses', 'Courses', 'COURSE', 'course', '/course/list', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (10, 10, 'Browse resources and homepage', 'Resources', 'RESOURCES', 'folder', '/resources/', null, null);
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, deleted_at) VALUES  (11, 11, 'Access your eportfolio area', 'ePortfolio', 'EPORTFOLIO', 'eportfolio', '/eportfolio/[ID]/profile', null, null);
