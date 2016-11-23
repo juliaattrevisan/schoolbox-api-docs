@@ -18,7 +18,7 @@
         {% if assessable.isParticipant(student) %}
             {% if (assessable.getParticipant(student).getAllResponses) | length %}
                 {# There has been no response, show blank icon that will allow submission of response #}
-                <a href="{{ routeLookup('learningAssessment.getSubmitForm', {assessmentId: assessable.id, studentId: currentUser.id}) }}"
+                <a href="{{ routeLookup('learningAssessment.getCreateResponseForm', {assessmentId: assessable.id, studentId: currentUser.id}) }}"
                    class="progress-tick no-text" title="Submit Response{% if type == 'staff' %} On Behalf Of Student{% endif %}"></a>
             {% else %}
                 {% if (assessable.getParticipant(student).getAllFeedbacks) | length %}
