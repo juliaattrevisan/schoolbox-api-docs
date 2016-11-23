@@ -60,14 +60,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $deletedAt;
 
     /**
-     * Unmapped field - this contains the number of tasks that are in this
-     * category's children.
-     *
-     * @var int
-     */
-    protected $taskCount;
-
-    /**
      * A group instance
      *
      * @var \Schoolbox\Resource\Group
