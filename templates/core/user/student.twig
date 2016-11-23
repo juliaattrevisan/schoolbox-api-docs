@@ -236,7 +236,7 @@
                         {% block buttons_dueWork %}
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
                                 <li class="no-pad">
-                                    <a href="/submission/dueWork/0/{{ user.getId() }}"
+                                    <a href="/learning/due/{{ user.getId() }}"
                                        class="no-margin button fat icon-fat icon-32 icon-due-work"
                                        data-equalizer-watch>Due Work</a>
                                 </li>

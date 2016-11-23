@@ -19,7 +19,7 @@
 {% block buttons_dueWork %}
     {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
         <li class="no-pad">
-            <a href="/submission/dueWork/0/{{ user.getId() }}"
+            <a href="/learning/due/{{ user.getId() }}"
                class="no-margin fat button icon-fat icon-32 icon-due-work"
             >Tasks/Assessments Due</a>
         </li>

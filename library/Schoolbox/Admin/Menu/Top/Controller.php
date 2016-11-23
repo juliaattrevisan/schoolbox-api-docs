@@ -212,7 +212,7 @@ class Controller extends Base
 
         if (stripos($post['url'], '/learning/classes') === 0) {
             $item->setToken('CLASSES');
-        } else if (stripos($post['url'], '/submission/dueWork') === 0) {
+        } else if (stripos($post['url'], '/learning/due') === 0) {
             $item->setToken('SUBMISSION');
         } else if (stripos($post['url'], '/timetable') === 0) {
             $item->setToken('TIMETABLE');
