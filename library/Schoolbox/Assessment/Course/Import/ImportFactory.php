@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Course\Task as Task;
 
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -97,11 +98,14 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ") AND sa.deleted_at IS NULL
         ";
 
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->anyOf('us.id', array_keys($unitSpecCache));
+        $pb->isNull('sa.deleted_at');
+        $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
 
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -197,10 +201,13 @@ class ImportFactory
                 FROM course_unit_implementation ui
                 JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
                 JOIN assessment ai ON ai.id = aui.assessment_id AND ai.deleted_at IS NULL
-                WHERE ui.course_implementation_id = $courseImplId
             ";
+            $pb = new PredicateBuilder($this->database, '');
+            $pb->equals('ui.course_implementation_id', $courseImplId);
+            $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
-            $statement->execute();
+            $statement->execute($pb->getParams());
+
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $assessmentImplToSpecMap[$row['ia.id']] = $row['sa.id'];
             }
