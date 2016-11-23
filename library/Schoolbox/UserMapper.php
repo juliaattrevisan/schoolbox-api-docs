@@ -133,25 +133,27 @@ class UserMapper extends Mapper
      */
     public function updateSynergeticPassword(User $model)
     {
-        /** @var User $model */
-        if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $communityPortalFactory = new CommunityPortalFactory();
-            $communityPortal = $communityPortalFactory->build();
-            try {
-                $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
-            } catch (\UnexpectedValueException $e) {
+        if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
+            /** @var User $model */
+            if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
+                $communityPortalFactory = new CommunityPortalFactory();
+                $communityPortal = $communityPortalFactory->build();
+                try {
+                    $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+                } catch (\UnexpectedValueException $e) {
+                }
             }
-        }
 
-        /** @var User $model */
+            /** @var User $model */
 
-        if (!$model->getKey()) {
-            // ensure a key is set when persisting users
-            $model->setKey(substr(md5(uniqid() . time()), 0, 25));
-        }
+            if (!$model->getKey()) {
+                // ensure a key is set when persisting users
+                $model->setKey(substr(md5(uniqid() . time()), 0, 25));
+            }
 
-        if ($model->getRetrievablePassword()) {
-            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
+            if ($model->getRetrievablePassword()) {
+                $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
+            }
         }
 
         return true;
