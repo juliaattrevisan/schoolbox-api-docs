@@ -71,7 +71,7 @@ class Mapper extends BaseMapper
             $resultSet->add(
                 $result
                     ->setStorage($this->hydrateJoin($row, 'storage', 'f'))
-                    ->setSubmission($this->hydrateJoin($row, 'return', 'r'))
+                    ->setReturn($this->hydrateJoin($row, 'return', 'r'))
             );
         }
         return $resultSet;
