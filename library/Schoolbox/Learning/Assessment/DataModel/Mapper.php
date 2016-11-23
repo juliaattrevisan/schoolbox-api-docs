@@ -213,7 +213,7 @@ class Mapper extends BaseMapper
      */
     public function restoreTask(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Task){
+        if($assessment->getTask() instanceof Task){
             $taskMapper = $this->getJoinMapper('task');
             $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $taskMapper->restoreSoftDeleted($task);
@@ -252,7 +252,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteProject(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof ProjectModel){
+        if($assessment->getProject() instanceof ProjectModel){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->delete($project);
@@ -264,7 +264,7 @@ class Mapper extends BaseMapper
      */
     public function restoreProject(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz){
+        if($assessment->getProject() instanceof ProjectModel){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->restoreSoftDeleted($project);
