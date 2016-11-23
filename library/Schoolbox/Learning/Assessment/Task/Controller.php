@@ -154,7 +154,7 @@ class Controller extends Assessment\Controller
             ->setSubmittedBy($this->getUser())
             // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
             ->setCreatedAt(\Alaress_Date_Format::now())
-            ->markAs($this->getRequest()->post->get('status'))
+            ->markAs($this->getRequest()->post->getInt('status'))
         ;
 
         $response->assertSaveability();
@@ -167,6 +167,7 @@ class Controller extends Assessment\Controller
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
+            $result['status']  = $response->getCompletionStatus();
 
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
