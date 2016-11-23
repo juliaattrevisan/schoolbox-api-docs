@@ -145,22 +145,28 @@
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}
                                     {# TODO abstract this out #}
-                                    {% if mostRecentFeedback.isMarkedAsCompleted %}
-                                        <a href="#"
-                                           class="no-text progress-tick complete"
-                                           title="Completed – click to mark as not attempted"
-                                           data-interaction="update_progress"></a>
-                                    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
-                                        <a href="#"
-                                           class="no-text progress-tick pending"
-                                           title="Self-assessed – click to mark as complete"
-                                           data-interaction="update_progress"></a>
-                                    {% else %}
-                                        <a href="#"
-                                           class="no-text progress-tick"
-                                           title="Not attempted – click to mark as complete"
-                                           data-interaction="update_progress"></a>
-                                    {% endif %}
+                                    <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                          method="POST">
+                                        {% if mostRecentFeedback.isMarkedAsCompleted %}
+                                            <input type="hidden" name="status" value="1" />
+                                            <button type="submit"
+                                                    class="no-text progress-tick complete"
+                                                    title="Completed – click to mark as not attempted"
+                                                    data-interaction="update_progress"></button>
+                                        {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
+                                            <input type="hidden" name="status" value="3" />
+                                            <button type="submit"
+                                                    class="no-text progress-tick pending"
+                                                    title="Self-assessed – click to mark as complete"
+                                                    data-interaction="update_progress"></button>
+                                        {% else %}
+                                            <input type="hidden" name="status" value="3" />
+                                            <button type="submit"
+                                                    class="no-text progress-tick"
+                                                    title="Not attempted – click to mark as complete"
+                                                    data-interaction="update_progress"></button>
+                                        {% endif %}
+                                    </form>
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
