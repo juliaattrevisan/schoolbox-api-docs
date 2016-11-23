@@ -66,7 +66,11 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, IResponse $response)
     {
-        $feedbacks = (new Collection())->add($participant->findMostRecentFeedback());
+        $feedbacks  = new Collection();
+        $mostRecent = $participant->findMostRecentFeedback();
+        if (isset($mostRecent)) {
+            $feedbacks->add($mostRecent);
+        }
 
         try {
             $this->processFeedback($participant, $feedbacks, $response);
