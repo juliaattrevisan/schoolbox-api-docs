@@ -1,10 +1,16 @@
-<h1>Annotations for {{ assessment.title }}</h1>
-<ul class="meta">
-    <li class="icon-staff-students">{{ response.submittedOnBehalfOf.fullname }}</li>
-</ul>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Annotations for {{ response.assessable.title }}</h1>
+        <ul class="meta">
+            <li class="icon-staff-students"><a href="/search/user/{{ response.submittedOnBehalfOf.id }}" title="View Profile">{{ response.submittedOnBehalfOf.fullname }}</a></li>
+        </ul>
+    </div>
+</div>
 
-<div class="small-12 island">
-    <section>
-        <iframe src="{{ url }}"></iframe>
-    </section>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <iframe src="{{ url }}"></iframe>
+        </section>
+    </div>
 </div>

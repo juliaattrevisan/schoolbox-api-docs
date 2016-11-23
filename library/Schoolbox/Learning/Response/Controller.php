@@ -237,7 +237,10 @@ class Controller extends Base
         }
 
         $data = [
-            'url' => $location
+            'url' => $location,
+            'response' => $response,
+            'feedback' => $feedback,
+            'file' => $file
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
