@@ -26,18 +26,18 @@
                 function(data) {
                     // Update something.
                     // I guess add the same class the update submission has.
-                    element.removeClass('progress-tick pending complete').addClass('ajax-updated');
+                    element.removeClass('pending complete').addClass('ajax-updated');
                     form.find('input[name="current_status"]').val(data.status);
                     // Update name and class as well
                     switch (data.status) {
                         case 1: // incomplete
-                            element.addClass('progress-tick').attr('title', 'Not attempted – click to mark as complete');
+                            element.attr('title', 'Not attempted – click to mark as complete');
                             break;
                         case 2: // pending
-                            element.addClass('progress-tick pending').attr('title', 'Self-assessed – click to mark as complete');
+                            element.addClass('pending').attr('title', 'Self-assessed – click to mark as complete');
                             break;
                         case 3: // complete
-                            element.addClass('progress-tick complete').attr('title', 'Completed – click to mark as not attempted');
+                            element.addClass('complete').attr('title', 'Completed – click to mark as not attempted');
                             break;
                     }
 
