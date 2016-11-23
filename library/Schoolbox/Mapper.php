@@ -2575,10 +2575,23 @@ abstract class Mapper implements IMapper, Serializable
     {
         $result = array();
         foreach ($this->map as $map) {
+
+            // If there's a join on this property, we need to know about it
+            $join = null;
+            if (isset($map['join'])) {
+                $join = $this->getJoinDefinition($map['join']);
+            }
+
+            // Reverse joins will never dehydrate to a value,
+            // because they always join onto the ID field of this mapper's table
+            // (which has already been mapped).
+            if (!empty($join['reverse'])) {
+                continue;
+            }
+
             if (empty($map['column'])) {
                 // if column is empty, ensure a join is specified, and that it is a multijoin
-                $join_name = isset($map['join']) ? $map['join'] : '';
-                if (isset($this->joins[$join_name]['multi'])) {
+                if (isset($join['multi'])) {
                     continue;
                 }
                 // if the join doesn't exist, or not multijoin, failhard
