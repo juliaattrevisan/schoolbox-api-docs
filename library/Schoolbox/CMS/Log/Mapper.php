@@ -7,6 +7,7 @@
 
 namespace Schoolbox\CMS\Log;
 
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -63,40 +64,42 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all CMS log entries for a user
-     * @param User $user
-     * @return Collection
+     * @return string
      */
-    public function findByUser($user, $limit=0)
+    protected function getSelectString()
     {
-        if ($limit != 0) {
-            $limitQuery = "LIMIT {$limit}";
-        } else {
-            $limitQuery = "";
-        }
-
-        $query = "
-            SELECT {$this->getColumnString('c')},
+        return "
+            SELECT {$this->getColumnString('')},
                 {$this->getJoinColumnString('folder', 'fo')},
                 {$this->getJoinColumnString('file', 'fi')},
                 {$this->getJoinColumnString('link', 'li')}
-            FROM {$this->getTable()} `c`
-            LEFT JOIN {$this->getJoinSql('folder', 'c', 'fo')}
-            LEFT JOIN {$this->getJoinSql('file', 'c', 'fi')}
-            LEFT JOIN {$this->getJoinSql('link', 'c', 'li')}
-            WHERE c.user = ?
-            ORDER BY c.time DESC
-            {$limitQuery}
         ";
+    }
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($user->getId()));
+    /**
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return parent::getFromString()."
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('folder', '', 'fo')}
+            LEFT JOIN {$this->getJoinSql('file', '', 'fi')}
+            LEFT JOIN {$this->getJoinSql('link', '', 'li')}
+        ";
+    }
 
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
         $records = new Collection();
 
         foreach ($statement as $row) {
             /** @var Model $record */
-            $record = $this->hydrate($row, 'c');
+            $record = $this->hydrate($row, '');
 
             // Hydrate everything on the record
 

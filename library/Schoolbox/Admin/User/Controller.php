@@ -167,7 +167,10 @@ class Controller extends Base
                 'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
                 'userPermissions' => $this->userAccessMapper->findAllForUser($user),
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
-                'cmsLog' => $this->cmsLogMapper->findByUser($user, 10)->sortBy('time', 'desc')
+                'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
+                    'order' => ['time' => 'desc'],
+                    'limit' => 10
+                ])
             ],
             'title' => 'Admin - Users'
         ]);
