@@ -16,8 +16,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
@@ -96,13 +95,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $courseSpecification;
 
     /**
-     * The Course Implementations that have been imported onto this folder.
-     *
-     * @var Collection|CourseImplementation[]
-     */
-    protected $courseImplementations;
-
-    /**
      * Constructor
      *
      */
@@ -110,7 +102,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
-        $this->setCourseImplementations(new Collection());
     }
 
     /**
@@ -283,7 +274,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getFolderType()
     {
         // I'd also like to say this is a course
-        if ($this->getTaskCount() > 0) {
+        if ($this->hasCourseSpecification()) {
             return 'course';
         }
         return $this->hasHomepage() ? 'home' : 'folder';
@@ -427,28 +418,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return $this->teacher_collection;
     }
 
-    /**
-     * Get task count
-     *
-     * @return int
-     */
-    public function getTaskCount()
-    {
-        return $this->taskCount;
-    }
-
-    /**
-     * Set task count
-     *
-     * @param  int $taskCount
-     *
-     * @return $this
-     */
-    public function setTaskCount($taskCount)
-    {
-        $this->taskCount = $taskCount;
-        return $this;
-    }
 
     /**
      * @return CourseSpecification
@@ -465,24 +434,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function setCourseSpecification(CourseSpecification $courseSpecification)
     {
         $this->courseSpecification = $courseSpecification;
-        return $this;
-    }
-
-    /**
-     * @return Collection|CourseImplementation[]
-     */
-    public function getCourseImplementations()
-    {
-        return $this->courseImplementations;
-    }
-
-    /**
-     * @param Collection|CourseImplementation[] $courseImplementations
-     * @return static
-     */
-    public function setCourseImplementations(Collection $courseImplementations)
-    {
-        $this->courseImplementations = $courseImplementations;
         return $this;
     }
 

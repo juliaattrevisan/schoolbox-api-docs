@@ -24,24 +24,18 @@ use Schoolbox\User;
 
 class TreeBuilder extends AbstractTreeBuilder
 {
-
-    /** @var UnitMapper */
-    protected $unitMapper;
-
     /** @var User */
     protected $user;
 
     /**
      * @param Folder\ILocator $locator
-     * @param UnitMapper $unitMapper
      * @param User $user
      * @param string $rootLabel
      */
-    public function __construct(Folder\ILocator $locator, UnitMapper $unitMapper, User $user, $rootLabel = 'Resources')
+    public function __construct(Folder\ILocator $locator, User $user, $rootLabel = 'Resources')
     {
         parent::__construct($locator, 'sbfsfile', $rootLabel);
 
-        $this->unitMapper = $unitMapper;
         $this->user = $user;
     }
 
@@ -54,14 +48,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     public function getFolderIcon(IFolder $folder)
     {
-        if ($this->unitMapper->countByCourseId($folder->getId()) > 0) {
-            $type = 'course';
-
-        } else {
-            $type = $folder->hasHomepage() ? 'home' : 'folder';
-        }
-
-        return $type;
+        return $folder->getFolderType();
     }
 
 
@@ -74,13 +61,7 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function getFolderName(IFolder $folder)
     {
         // Build the name of the category
-        $name = $folder->getName();
-        $codeString = $folder->getCodeString();
-        if ($codeString != '' && $codeString != $name) {
-            $name .= " ($codeString)";
-        }
-
-        return $name;
+        return $folder->getTitle();
     }
 
 

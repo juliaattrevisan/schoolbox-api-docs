@@ -97,16 +97,10 @@ class Node extends AbstractNode
      */
     protected function folderToArray(FolderInterface $folder)
     {
-        $name = $folder->getName();
-
-        if ($codes = $folder->getCodeString()) {
-            $name .= " ($codes)";
-        }
-
         return array(
             'type'       => 'category',
             'categoryId' => $folder->getId(),
-            'name'       => $name,
+            'name'       => $folder->getTitle(),
             'folderType' => $folder->getFolderType(),
         );
     }

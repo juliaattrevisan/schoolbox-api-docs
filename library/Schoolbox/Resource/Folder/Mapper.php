@@ -16,6 +16,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Course\Unit\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
@@ -23,6 +24,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as SpecificationMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
@@ -150,6 +152,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
+            )
+        );
+
+        $this->hasJoin(
+            'course_specification', array(
+                'multiple'  => false,
+                'mapper'    => SpecificationMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'folder_id',
             )
         );
 
@@ -388,7 +399,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Get a list of categorys which belong to a particular parent
      *
-     * TODO: This probably shouldn't get tasks and homepage configs
      * It should only get the children of $id and probably should be
      * established in Ancestry
      *
@@ -398,48 +408,31 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByParent($id)
     {
-
-
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+        $specification_mapper = $this->getJoinMapper('course_specification');
 
-        // Please forgive me, I added a subquery for getting if a category
-        // contains tasks
+
+
         $query = "
             SELECT
                 {$this->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')}
+                {$group_mapper->getColumnString('ug')},
+                {$specification_mapper->getColumnString('s')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
+            LEFT JOIN {$this->getJoinSql('course_specification', 'c', 's')}
             WHERE c.deleted_at IS NULL AND c.parent=?
             ORDER BY c.name
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
-
-        // Get task count as separate result set
-        $taskCountQuery = "
-            SELECT
-                c.id,
-                COUNT(t.id) AS taskCount
-            FROM {$this->getTable()} c
-            LEFT JOIN {$this->getTable()} subc ON subc.parent = c.id AND subc.deleted_at IS NULL
-            JOIN `task` t ON t.category_id = subc.id AND t.deleted_at IS NULL
-            WHERE c.deleted_at IS NULL AND c.parent=?
-            GROUP BY c.id
-        ";
-        $taskCountStatement = $this->database->prepare($taskCountQuery);
-        $taskCountStatement->execute([$id]);
-        $taskCounts = [];
-        foreach ($taskCountStatement as $row) {
-            $taskCounts[$row['id']] = $row['taskCount'];
-        }
 
         $collection = new Collection();
         $category = null;
@@ -454,9 +447,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 }
             } else {
                 $category = $this->hydrate($row, 'c');
-                if (isset($taskCounts[$row['c.id']])) {
-                    $category->setTaskCount($taskCounts[$row['c.id']]);
-                }
 
                 /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
@@ -472,6 +462,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                     $category->addCode($code);
                 }
                 $collection->add($category);
+
+                $specification = $specification_mapper->hydrate($row, 's');
+                $category->setCourseSpecification($specification);
             }
         }
 
@@ -569,6 +562,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+        $specification_mapper = $this->getJoinMapper('course_specification');
+
 
         return "
             SELECT
@@ -576,6 +571,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
+                {$specification_mapper->getColumnString('s')},
                 {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
                 {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
                 {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
@@ -597,6 +593,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
+            LEFT JOIN {$this->getJoinSql('course_specification', '', 's')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
@@ -677,6 +674,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var HomepageConfigMapper $homepageConfig_mapper */
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+        $specification_mapper = $this->getJoinMapper('course_specification');
+
+
 
         /** @var Model[] $categories */
         $categories = [];
@@ -702,9 +702,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setHomepage($homepageConfig);
                 $category->setGroup($group);
 
-                if (isset($row['taskCount'])) {
-                    $categories[$testId]->setTaskCount($row['taskCount']);
-                }
+                $specification = $specification_mapper->hydrate($row, 's');
+                $category->setCourseSpecification($specification);
             }
 
             // Hydrate class codes (avoiding duplicates) and cache
