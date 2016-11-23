@@ -48,8 +48,8 @@ class TaskMapper extends Schoolbox\Mapper
             'other_key' => 'task_id',
         ));
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCompletions'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreCompletions'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions'])
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
     }
 
     /**
@@ -59,7 +59,7 @@ class TaskMapper extends Schoolbox\Mapper
      */
     public function softDeleteCompletions(Task $task)
     {
-        $taskCompletionMapper = CompletionMapper::getInstance();
+        $taskCompletionMapper = $this->getJoinMapper('completions');
         $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->delete($completions);
     }
@@ -72,7 +72,7 @@ class TaskMapper extends Schoolbox\Mapper
      */
     public function restoreCompletions(Task $task)
     {
-        $taskCompletionMapper = CompletionMapper::getInstance();
+        $taskCompletionMapper = $this->getJoinMapper('completions');
         $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->restoreSoftDeleted($completions);
     }
