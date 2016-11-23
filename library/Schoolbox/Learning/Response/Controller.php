@@ -262,7 +262,13 @@ class Controller extends Base
      */
     private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file, $download = false)
     {
-        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
+        /* Staff can view their own annotations
+         * Students can view published feedback associated with their response
+         */
+        $isStaff = $this->getUser()->getRole()->isStaff();
+        $studentCanView = $this->getUser()->getRole()->isStudent() && $feedback->isPublished() && $feedback->getReviewee()->getId() == $this->getUser()->getId();
+
+        if ($isStaff || $studentCanView) {
             if (strlen($file->getCrocodocId())) {
 
                 /** @var InlineGraderFacade $location */
