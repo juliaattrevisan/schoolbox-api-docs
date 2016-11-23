@@ -191,6 +191,20 @@ INSERT INTO component_config_definition (
   null
 );
 
+INSERT INTO component_config_definition (
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT id from component_definition WHERE class = 'Schoolbox\\LTI\\Component\\Homepage\\Controller' LIMIT 1),
+  'description',
+  '',
+  'Custom Parameters',
+  null
+);
+
 CREATE TABLE lti_provider
 (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -200,6 +214,7 @@ CREATE TABLE lti_provider
   xml VARCHAR(2048),
   icon VARCHAR(255),
   url VARCHAR(255),
+  custom TEXT,
   created_at TIMESTAMP,
   updated_at DATETIME,
   deleted_at DATETIME
@@ -207,9 +222,12 @@ CREATE TABLE lti_provider
 
 -- Some providers for testing
 
+-- https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152
+-- ?custom_vbid=LF9781740813518&custom_book_location=pageid/152
+
 INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('ChemVantage', 'schoolbox.edu', '14e75b9de5f8981e3b63a493d4bd7608', 'https://www.chemvantage.org/lti_config.xml', 'https://www.chemvantage.org/lti/', '2016-11-16 13:42:33', null, null);
 INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Trello', null, null, 'http://www.eduappcenter.com/configurations/ko92jqbkfivydwl4.xml', 'https://www.edu-apps.org/tool_redirect?id=trello', '2016-11-16 13:50:48', null, null);
 INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Programr', null, null, 'https://www.edu-apps.org/tools/programr/config.xml', 'https://www.edu-apps.org/tool_redirect?id=programr', '2016-11-16 14:32:47', null, null);
 INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Internet Archive', null, null, 'http://www.eduappcenter.com/configurations/lyn1f978rtn9tm66.xml', 'https://www.edu-apps.org/tool_redirect?id=archive', '2016-11-16 14:01:13', null, null);
 INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Nearpad', '377350aa168a23bc20c98f15ab94ca09', 'ccfc8e5c8483a1dcabb6f4e00c0e5c57', 'http://www.eduappcenter.com/configurations/bbv9it2jmtdpjdpc.xml', 'https://np1.nearpod.com/lti.php', '2016-11-16 14:22:26', null, null);
-INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Learning Field', 'bb004160-ad94-11e6-9598-0800200c9a66', '263f623d593b65384d29594e22206c22', '', 'https://bc.vitalsource.com/books/book?custom_vbid=LF9781740813518&custom_book_location=pageid/152', '2016-11-16 14:22:26', null, null);
+INSERT INTO lti_provider (name, `key`, secret, xml, url, created_at, updated_at, deleted_at) VALUES ('Learning Field', 'bb004160-ad94-11e6-9598-0800200c9a66', '263f623d593b65384d29594e22206c22', '', 'https://bc.vitalsource.com/books/book', '2016-11-16 14:22:26', null, null);

@@ -59,6 +59,27 @@ class Model implements ISoftDeletable
     }
 
     /** @var string */
+    protected $custom;
+
+    /**
+     * @param string $custom
+     * @return self
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustom()
+    {
+        return $this->custom;
+    }    
+
+    /** @var string */
     protected $key;
 
     /**

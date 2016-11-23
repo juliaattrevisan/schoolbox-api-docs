@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
@@ -26,6 +27,9 @@ class Controller extends Component_Homepage_ControllerAbstract
     /** @var ProviderMapper */
     private $providerMapper;
 
+    /** @var IConfigLoader */
+    private $configLoader;
+
     /**
      * Injectable constructor
      *
@@ -36,6 +40,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
         $this->providerMapper = $sitepage->getDi()->get('providerMapper');
+        $this->configLoader = $sitepage->getDi()->get('config');
     }
 
     /**
@@ -66,7 +71,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'resource_link_title' => $this->getConfig('componentname'),
                 'resource_link_description' => '',
                 'user_id' => $this->getUser()->getId(),
-                'user_image' => "http://{$_SERVER['SERVER_NAME']}/portrait.php?userId={$this->getUser()->getExternalId()}&size=square80",
+                'user_image' => urlencode("http://{$_SERVER['SERVER_NAME']}/portrait.php?userId={$this->getUser()->getExternalId()}&size=square80"),
                 'roles' =>
                     $this->getUser()->getRole()->isStudent() ? 'Student' : (
                     $this->getUser()->getRole()->isStaff() ? 'Instructor' :
@@ -82,7 +87,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'context_label' => $this->getContext()->getFolder()->getCodeString(),
                 'launch_presentation_locale' => 'en-AU',
                 'launch_presentation_document_target' => 'iframe',
-                'launch_presentation_width' => 800,
+                'launch_presentation_width' => '800',
                 'launch_presentation_height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
                 'launch_presentation_return_url' => urlencode('http://192.168.36.10/lti.php'),
                 'tool_consumer_instance_guid' => 'schoolbox.edu',
@@ -90,8 +95,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'tool_consumer_instance_description' => 'Schoolbox LMS',
                 'tool_consumer_instance_contact_email' => 'support@alaress.com.au',
                 'tool_consumer_info_product_family_code' => 'schoolbox',
-                'tool_consumer_info_version' => '16.5',
-                'ext_lms' => 'schoolbox-16.5'
+                'tool_consumer_info_version' => $this->configLoader->get('site_version'),
+                'ext_lms' => 'schoolbox-' . $this->configLoader->get('site_version')
             ];
 
             $consumer = new LTI\ToolConsumer($provider->getKey());
@@ -99,6 +104,18 @@ class Controller extends Component_Homepage_ControllerAbstract
             $consumer->secret = $provider->getSecret();
             $consumer->enabled = true;
             $consumer->save();
+
+            // Add custom parameters for the various providers
+
+            // LearningField
+
+            if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
+                $custom = $provider->getCustom();
+                preg_match('/\/books\/(.*?)\//i', $custom, $matches);
+                $params['custom_vbid'] = $matches[1];
+                preg_match('/\/pageid\/(.*)/i', $custom, $matches);
+                $params['custom_book_location'] = 'pageid/' . $matches[1];
+            }
 
             $consumer->doServiceRequest(
                 $service = new LTI\Service\Service($consumer,
