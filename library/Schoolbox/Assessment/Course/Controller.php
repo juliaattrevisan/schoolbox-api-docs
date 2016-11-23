@@ -21,7 +21,6 @@ use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
-use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as CourseUnitMapper;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
