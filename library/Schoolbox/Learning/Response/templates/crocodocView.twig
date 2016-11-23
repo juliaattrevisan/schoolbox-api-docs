@@ -1,8 +1,20 @@
-<div class="row">
-    <div class="small-12 columns">
+<script src="/javascript/shared/jquery.responsive-iframe.js"></script>
+<script type="text/javascript">
+    $(function() {
 
-    </div>
-</div>
+        /**
+         * Resize iframe dynamically ("responsively")
+         */
+        $.fn.responsiveIframe({
+            onLoad: function() {
+                $('#crocodoc-viewport').height($(window).height() * 0.75);
+            },
+            onResize: function() {
+                $('#crocodoc-viewport').height($(window).height() * 0.75);
+            }
+        });
+    });
+</script>
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -26,7 +38,7 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <iframe src="{{ viewUrl }}"></iframe>
+            <iframe id="crocodoc-viewport" src="{{ viewUrl }}"></iframe>
         </section>
     </div>
 </div>
