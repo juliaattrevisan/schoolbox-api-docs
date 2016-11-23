@@ -16,11 +16,13 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
+use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -253,7 +255,11 @@ class Module extends BaseModule
         $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
 
         // task specific
-        // $tc =& $injector->params[Assessment\Task\Controller::class];
+        $tc =& $injector->params[Assessment\Task\Controller::class];
+        $tc['taskResponseDataSource'] = $injector->lazyNew(
+            TaskResponseDataSource::class,
+            ['mapper' => $this->getMapperFactory()->getLazy(TaskResponseMapper::class)]
+        );
 
     }
 

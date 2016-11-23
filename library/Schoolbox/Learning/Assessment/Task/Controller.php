@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -23,12 +24,20 @@ use Schoolbox\UserMapper;
 class Controller extends Assessment\Controller
 {
     /**
+     * @var TaskResponseDataSource
+     */
+    protected $taskResponseDataSource;
+
+    /**
+     * Constructor
+     *
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param MapperProxy                   $assessmentMapper
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
+     * @param TaskResponseDataSource        $taskResponseDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -36,9 +45,11 @@ class Controller extends Assessment\Controller
         MapperProxy $assessmentMapper,
         Access $access,
         Transactor $transactor,
-        Assessment\Breadcrumb\Factory $bakery
+        Assessment\Breadcrumb\Factory $bakery,
+        TaskResponseDataSource $taskResponseDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        $this->taskResponseDataSource = $taskResponseDataSource;
     }
 
     /**
