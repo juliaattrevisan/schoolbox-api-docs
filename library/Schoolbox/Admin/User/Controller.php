@@ -387,6 +387,7 @@ class Controller extends Base
         $user->setLastname($post['lastname']);
         $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
         $user->getRole()->setId($post['group']);
+        $user->setPositionTitle($post['position_title']);
         $user->setAltEmail($post['alt_email']);
         $user->setYear($post['year'] == '' ? null : $post['year']);
         $user->getSchoolHouse()->setId($post['house']);
