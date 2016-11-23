@@ -163,6 +163,7 @@ class Controller extends Base\Base
             }
         }
 
+        // If the URL specifies a CourseSpec and Import destination (ie a Folder), then skip to stage 2
         $initialStage = $courseSpec && $targetClass ? 2 : 1;
 
         $this->tpl('import', [
