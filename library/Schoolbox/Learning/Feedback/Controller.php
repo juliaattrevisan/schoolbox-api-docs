@@ -174,7 +174,11 @@ class Controller extends Base
         $this->getFeedbackDataSource()->save($feedback);
 
         $template = '';
-        $data = [];
+        $data = [
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+        ];
 
         $this->respond($template, $data, $responseCode);
     }
