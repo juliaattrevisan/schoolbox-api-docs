@@ -152,6 +152,8 @@ class Controller extends Assessment\Controller
             ->setAssessable($participant->getAssessable())
             ->setSubmittedOnBehalfOf($participant->getUser())
             ->setSubmittedBy($this->getUser())
+            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
+            ->setCreatedAt(\Alaress_Date_Format::now())
             ->markAs($this->getRequest()->post->get('status'))
         ;
 
