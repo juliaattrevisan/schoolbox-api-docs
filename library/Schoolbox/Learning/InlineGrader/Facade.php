@@ -110,6 +110,23 @@ class Facade
     }
 
     /**
+     * External third-party url containing the crocodoc document
+     */
+    public function getViewUrl()
+    {
+        /* Sequential dependency - crocodoc requires a crocodoc id to
+         * exist, otherwise it can't start, preventing us from initting
+         * Loader() in constructor
+         */
+        return (new Loader(
+            $this->getAuthenticator(),
+            $this->getFile()->getCrocodocId(),
+            $this->getUser(),
+            $this->getTerm()->getArchived())
+        )->annotate();
+    }
+
+    /**
      * Redirects to a PDF download link for this object.
      */
     public function getDownloadUrl()

@@ -208,9 +208,39 @@ class Controller extends Base
         return;
     }
 
+    /**
+     * View a particular annotated crocodoc
+     *
+     * @param Submission $response
+     * @param Feedback $feedback
+     * @param SubmissionFile $file
+     */
     public function getCrocodocView(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
+        /* If you are a student and the feedback is published
+         * and the requested file has a crocodocked url,
+         * attempt to view it
+         *
+         * Otherwise 404
+         */
+        try {
+            $location = $this->determineCrocodocUrl($response, $feedback, $file);
+        }
+        catch (\InvalidArgumentException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+        catch (\RangeException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
 
+        $data = [
+            'url' => $location
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
     }
 
     /**
@@ -220,24 +250,24 @@ class Controller extends Base
      * @param Submission $response
      * @param Feedback $feedback
      * @param SubmissionFile $file
+     * @param bool $download
      * @return string
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file)
+    private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file, $download = false)
     {
         if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
             if (strlen($file->getCrocodocId())) {
-                $location = (
-                new InlineGraderFacade(
-                    new InlineGraderAuthenticator(),
-                    $response,
-                    $file,
-                    $this->getUser()
-                )
-                )->getDownloadUrl();
 
-                return $location;
+                /** @var InlineGraderFacade $location */
+                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()));
+
+                if ($download) {
+                    return $location->getDownloadUrl();
+                }
+
+                return $location->getViewUrl();
             }
 
             throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
