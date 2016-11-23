@@ -477,14 +477,12 @@ class Controller extends Base\Base
      */
     public function postAssessments()
     {
-        // TODO -don't use any Proxies !!
-
         // Parse form data
         $post = $this->getRequest()->post;
         $action = trim($post['action']);
         $courseSpecId = trim($post['course_spec_id']);
         $courseImplId = trim($post['course_impl_id']);
-        $componentId = trim($post['component_id']);   // TODO - link to CourseOutline component
+        $componentId = trim($post['component_id']);
         $ownerships = trim($post['ownerships']);
         $unitImplData = $post['unit'];
 
@@ -505,7 +503,7 @@ class Controller extends Base\Base
         // 4. Traverse POST-graph
         //   4.1 if(entity not in DB-graph)
         //       4.1.1 create entity
-        //       4.1. 2 save entity
+        //       4.1.2 save entity
 
 
         // On new-import, we may be creating multiple courseImpls.
@@ -536,7 +534,7 @@ class Controller extends Base\Base
 
             // Load IAssessables
             foreach($courseImpl->getUnits() as $unitImpl){
-                $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllForUnitImplementationId($unitImpl->getId()));
+                $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
         }
 
@@ -913,7 +911,7 @@ class Controller extends Base\Base
         $owner = null;
         try{
             foreach($courseImpl->getUnits() as $unitImpl){
-                $assessables = $this->getAssessmentMapperProxy()->findAllForUnitImplementationId($unitImpl->getId());
+                $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
                 foreach($assessables as $assessable){
                     $owner = $this->getUserMapper()->findById($assessable->getCreator()->getId());
                     break 2;
