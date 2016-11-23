@@ -9,16 +9,13 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Web\Controller as Base;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Component_Instance;
 use Schoolbox\Collection;
-use Schoolbox\Error;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course;
-use Schoolbox\Learning\Course\Unit;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -27,8 +24,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Schoolbox\Config;
-use Schoolbox\Resource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -110,7 +105,7 @@ class Controller extends Base\Base
     public function getImportToComponentForm(CourseSpecification $courseSpec, Folder $targetClass, $componentId)
     {
         // Clean up URL if logical null $componentId supplied
-        if(!$componentId){
+        if (!$componentId) {
             $data = [
                 'courseSpecId' => $courseSpec->getId(),
                 'classCode'    => $targetClass->getId(),
@@ -150,15 +145,15 @@ class Controller extends Base\Base
     {
         // Ensure that if present, the component instance is an extant CourseOutline
         $courseOutlineComponent = null;
-        if($componentId){
-            try{
+        if ($componentId) {
+            try {
                 $courseOutlineComponent = $this->getComponentInstanceMapper()->findById($componentId);
                 $COURSE_OUTLINE_DEFINITION_ID = 66;
-                if($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID){
+                if ($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID) {
                     $msg = 'Not a Course-Outline component';
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
                 }
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
         }
@@ -167,12 +162,12 @@ class Controller extends Base\Base
         $initialStage = $courseSpec && $targetClass ? 2 : 1;
 
         $this->tpl('import', [
-            'action'       => 'import',
-            'initialStage' => $initialStage,
-            'courseSpec'   => $courseSpec,
-            'componentId'  => $courseOutlineComponent ? $courseOutlineComponent->getId() : null,
-            'folder'       => $targetClass,
-            'destinations' => $targetClass ?
+            'action'              => 'import',
+            'initialStage'        => $initialStage,
+            'courseSpec'          => $courseSpec,
+            'componentId'         => $courseOutlineComponent ? $courseOutlineComponent->getId() : null,
+            'folder'              => $targetClass,
+            'destinations'        => $targetClass ?
                 [
                     'id'   => $targetClass->getId(),
                     'name' => $targetClass->getTitle()
@@ -196,7 +191,6 @@ class Controller extends Base\Base
         $courseSpecId = trim($this->getRequest()->post['course_spec_id']);
         $targetFolderIds = explode(',', trim($this->getRequest()->post['import_folders']));
         $componentId = trim($this->getRequest()->post['component_id']);
-
 
         try {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
@@ -229,7 +223,6 @@ class Controller extends Base\Base
         $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
         $possibleOwnerships = $this->getPossibleOwnerships($folders);
-
 
 
         // Everything kosher, proceed with the mage
@@ -299,7 +292,9 @@ class Controller extends Base\Base
             'componentId'  => $componentId,
             'unitsImpls'   => $unitImpls,
             'ownerships'   => implode(',', array_map(
-                    function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
+                    function ($k, $v) {
+                        return "$k:$v";
+                    }, array_keys($ownerships), array_values($ownerships))
             )
         ]);
     }
@@ -329,12 +324,12 @@ class Controller extends Base\Base
         foreach ($folders as $folder) {
 
             // Ignore folders with CourseSpecs
-            if($folder->getCourseSpecification() instanceof CourseSpecification){
+            if ($folder->getCourseSpecification() instanceof CourseSpecification) {
                 continue;
             }
 
             // Ignore folders with UnitSpecs
-            if($folder->getUnitSpecification() instanceof UnitSpecification){
+            if ($folder->getUnitSpecification() instanceof UnitSpecification) {
                 continue;
             }
 
@@ -361,17 +356,17 @@ class Controller extends Base\Base
      * @api   POST /course/import/units
      * @level 160
      *
-     * @var $_POST $post
-     * @var string $post['action']   {'import'|'modify'}
-     * @var int $post['course_spec_id']
-     * @var int $post['course_impl_id']
-     * @var int $post['component_id']
-     * @var string $post['ownerships']
-     * @var array $post['unit']
-     * @var int $post['unit'][]['unit_spec_id']
+     * @var $_POST   $post
+     * @var string   $post['action']                {'import'|'modify'}
+     * @var int      $post['course_spec_id']
+     * @var int      $post['course_impl_id']
+     * @var int      $post['component_id']
+     * @var string   $post['ownerships']
+     * @var array    $post['unit']
+     * @var int      $post['unit'][]['unit_spec_id']
      * @var int|null $post['unit'][]['unit_impl_id']
-     * @var string $post['unit'][]['open_date']
-     * @var string $post['unit'][]['close_date']
+     * @var string   $post['unit'][]['open_date']
+     * @var string   $post['unit'][]['close_date']
      *
      * @throws Unauthorized
      **/
@@ -419,11 +414,11 @@ class Controller extends Base\Base
         // Hydrate + Validate dates
         try {
             $countImportedUnits = 0;
-            foreach($units as $idx => $unit){
-                if($unit['import']){
+            foreach ($units as $idx => $unit) {
+                if ($unit['import']) {
                     $countImportedUnits++;
                     $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                    $closeDate  = \Alaress_Date_Format::newLocalShort($unit['close_date']);
+                    $closeDate = \Alaress_Date_Format::newLocalShort($unit['close_date']);
                     if ($openDate->gt($closeDate)) {
                         $this->sendError('The open date must be before the close date');
                         return;
@@ -459,9 +454,9 @@ class Controller extends Base\Base
             }
         }
 
-        if('import' == $action) {
+        if ('import' == $action) {
             $dto = $importFactory->buildForNewImport($unitImpls);
-        } elseif('modify' == $action){
+        } elseif ('modify' == $action) {
             $dto = $importFactory->buildForImportModify($courseImplId, $unitImpls);
         } else {
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
@@ -480,8 +475,6 @@ class Controller extends Base\Base
 
 
     /**
-     * TODO refactor to new object graph
-     *
      * This POST is the result of import stage 4 (final). Do the actual import
      * and create all relevant database entries.
      *
@@ -544,18 +537,17 @@ class Controller extends Base\Base
         $courseImpls = [];
 
         // Are we creating a new import?
-        if('import' == $action){
+        if ('import' == $action) {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
             $ownerships = explode(',', $ownerships);
-            foreach($ownerships as $ownership){
+            foreach ($ownerships as $ownership) {
                 $courseImpl = $this->getCourseImplementationMapper()->createModel();
                 $courseImpl->setSpecification($courseSpec);
-                $classFolderId = explode(':',$ownership)[0];
+                $classFolderId = explode(':', $ownership)[0];
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
             }
-        }
-        // Else we are modifying an existing import
+        } // Else we are modifying an existing import
         else {
             // We can only modify a single Course Import at a time.
             $courseImpl = $this->getCourseImplementationMapper()->findById($courseImplId);
@@ -565,33 +557,31 @@ class Controller extends Base\Base
             $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
 
             // Load IAssessables
-            foreach($courseImpl->getUnits() as $unitImpl){
+            foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
         }
 
-
         // Traverse pre-existing course import, deleting any unitImpls not in POST
         // Will be skipped during new-import
-        foreach($courseImpls as $classFolderId => $courseImpl){
-            foreach($courseImpl->getUnits() as $unitImpl){
+        foreach ($courseImpls as $classFolderId => $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitSpec = $unitImpl->getSpecification();
 
                 // Did user de-select this unit?
-                if(!array_key_exists($unitSpec->getId(), $unitImplData)){
+                if (!array_key_exists($unitSpec->getId(), $unitImplData)) {
                     // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
                     $this->getUnitImplementationMapper()->delete($unitImpl);
-                }
-                // Else UnitImpl still selected
+                } // Else UnitImpl still selected
                 else {
                     // Delete any Assessments in the UnitImpl if de-selected by user
-                    foreach($unitImpl->getAssessables() as $assessableImpl){
+                    foreach ($unitImpl->getAssessables() as $assessableImpl) {
 
                         $assessmentImplData = $unitImplData[$unitSpec->getId()]['a'][$assessableImpl->getId()];
                         // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
-                        if($assessmentImplData['impl_id']){
+                        if ($assessmentImplData['impl_id']) {
                             // Did user de-select this Assessment ?
-                            if(!$assessmentImplData['checked']){
+                            if (!$assessmentImplData['checked']) {
                                 $this->getAssessmentMapperProxy()->delete($assessableImpl);
                             }
                         }
@@ -602,7 +592,7 @@ class Controller extends Base\Base
 
         // Create any un-imported UnitSpecs + AssessmentSpecs
         // Update any imported UnitImpls + AssessmentImpls
-        foreach($courseImpls as $classFolderId => $courseImpl) {
+        foreach ($courseImpls as $classFolderId => $courseImpl) {
             foreach ($unitImplData as $unitPair) {
                 try {
                     $unitSpec = $this->getUnitSpecificationMapper()->findById($unitPair['unit_spec_id']);
@@ -655,7 +645,7 @@ class Controller extends Base\Base
                         $unitImpl->getAssessables()->add($assessmentImplDomain);
                     } // Else we have been passed the Assessment Impl
                     else {
-                        $filter = function($impl) use ($aData){
+                        $filter = function ($impl) use ($aData) {
                             /** @var IAssessable $impl */
                             return $impl->getId() == $aData['impl_id'];
                         };
@@ -679,15 +669,15 @@ class Controller extends Base\Base
         }
 
         // Save each Course Import
-        try{
+        try {
             // Even if an import-modify, we need to explicitly save to update timestamps, and possibly the folderId
             $this->getCourseImplementationMapper()->save($courseImpls);
-            foreach($courseImpls as $classFolderId => $courseImpl) {
+            foreach ($courseImpls as $classFolderId => $courseImpl) {
                 // For each UnitImpl in the CourseImpl
                 foreach ($courseImpl->getUnits() as $unitImpl) {
 
                     // Don't save assessments in deleted unitImpl
-                    if($unitImpl->isDeleted()){
+                    if ($unitImpl->isDeleted()) {
                         continue;
                     }
                     $this->getUnitImplementationMapper()->save($unitImpl);
@@ -715,21 +705,21 @@ class Controller extends Base\Base
                  * else
                  *   create a new CourseOutline component (at top of the page)
                  */
-                if('import' == $action){
+                if ('import' == $action) {
                     $componentInstance = null;
-                    $componentInstanceMapper = $this->getComponentInstanceMapper();
+                    $compInstanceMapper = $this->getComponentInstanceMapper();
                     // Was a componentId supplied?
-                    if($componentId){
-                        $componentInstance = $componentInstanceMapper->findById($componentId);
+                    if ($componentId) {
+                        $componentInstance = $compInstanceMapper->findById($componentId);
                     } else {
                         $module = \Component_Definition::MODULE_HOMEPAGE;
                         $class = HomepageOutlineComponentController::class;
-                        $componentInstances = $componentInstanceMapper->findByContextAndClass($module, $classFolderId, $class);
-                        $componentInstances->sortBy('sequence', 'ASC');
-                        foreach($componentInstances as $component){
+                        $compInstances = $compInstanceMapper->findByContextAndClass($module, $classFolderId, $class);
+                        $compInstances->sortBy('sequence', 'ASC');
+                        foreach ($compInstances as $component) {
 
                             // If this component has no associated Course, or the course is not valid
-                            if( !$component->getConfigArray()['importedCourse'] ||
+                            if (!$component->getConfigArray()['importedCourse'] ||
                                 !$component->getConfigArray()['importedCourse']['value']
                             ) {
                                 // Conclude the Component is available, and use it
@@ -739,13 +729,13 @@ class Controller extends Base\Base
                         }
                     }
                     // Did we find a component?
-                    if($componentInstance){
+                    if ($componentInstance) {
                         $configMapper = \Component_ConfigMapper::getInstance();
                         $config = $configMapper->findByColumnList([
                             'component_config_definition_id' => 255,
-                            'component_instance_id' => $componentInstance->getId(),
+                            'component_instance_id'          => $componentInstance->getId(),
                         ])->first();
-                        if(!$config){
+                        if (!$config) {
                             $config = $configMapper->createModel();
                             $config
                                 ->setConfigDefinitionId(255)
@@ -753,13 +743,12 @@ class Controller extends Base\Base
                         }
                         $config->setValue($courseImpl->getId());
                         $configMapper->save($config);
-                    }
-                    // Else no available component, create one.
+                    } // Else no available component, create one.
                     else {
                         $folder = $courseImpl->getFolder();
-                        $config = [ 'importedCourse' => $courseImpl->getId() ];
+                        $config = ['importedCourse' => $courseImpl->getId()];
                         $controller = HomepageOutlineComponentController::class;
-                        $componentInstanceMapper->injectNewComponent($folder, $config, $controller);
+                        $compInstanceMapper->injectNewComponent($folder, $config, $controller);
                     }
                 }
             }
@@ -768,24 +757,29 @@ class Controller extends Base\Base
             return;
         }
 
-        // Now that all AssessmentImpls have been saved to DB and assigned an ID, we can dehydrate them to their IDs
-        // and update the Impl to Spec mapping in the DB
+        /* Now that all AssessmentImpls have been saved to DB and assigned an ID, we can dehydrate them to their IDs
+         * and update the Impl to Spec mapping in the DB
+         */
         $implIdsToSpecIds = [];
-        foreach($assessmentImplToSpecPairs as $pair){
+        foreach ($assessmentImplToSpecPairs as $pair) {
             /** @var IAssessable $impl */
             $impl = $pair[0];
-            if(!$impl->isDeleted()){
+            if (!$impl->isDeleted()) {
                 $implIdsToSpecIds[$impl->getId()] = $pair[1];
             }
         }
         AssessmentMapper::getInstance()->updateImplToSpecLinks($implIdsToSpecIds);
 
-
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
          */
-        $this->getResponse()->content->set($this->buildJsonOutput([ 'redirect' => $this->getSession()->getHistory(2) ]));
-        return;
+        $explicitReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        if($explicitReturnUrl){
+            $redirect = $explicitReturnUrl;
+        } else {
+            $redirect = $this->getSession()->getHistory(2);
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput(['redirect' => $redirect]));
     }
 
     /**
@@ -807,10 +801,10 @@ class Controller extends Base\Base
         $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
 
         // Add un-imported UnitSpecs to CourseImpl
-        foreach($courseSpec->getUnits() as $unitSpec){
+        foreach ($courseSpec->getUnits() as $unitSpec) {
             // Has this UnitSpec been imported?
-            foreach($courseImpl->getUnits() as $unitImpl){
-                if($unitImpl->getSpecification()->getId() == $unitSpec->getId()){
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                if ($unitImpl->getSpecification()->getId() == $unitSpec->getId()) {
                     // unitSpec already imported, do nothing
                     continue 2;
                 }
@@ -828,29 +822,29 @@ class Controller extends Base\Base
 
         // Find the owner of any Assessment so we can display, even though it is disabled
         $owner = null;
-        try{
-            foreach($courseImpl->getUnits() as $unitImpl){
+        try {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
                 $assessables = $this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId());
-                foreach($assessables as $assessable){
+                foreach ($assessables as $assessable) {
                     $owner = $this->getUserMapper()->findById($assessable->getCreator()->getId());
                     break 2;
                 }
             }
-        } catch (MapperException $e){
+        } catch (MapperException $e) {
             // noop
         }
-        if(!$owner) {
+        if (!$owner) {
             $owner = $this->getUser();
         }
 
         $this->tpl('import', [
-            'action'       => 'modify',
-            'initialStage' => 3,
-            'courseSpec'   => $courseSpec,
-            'courseSpecId' => $courseSpec->getId(),
-            'courseImpl'   => $courseImpl,
-            'folder'       => $courseImpl->getFolder(),
-            'destinations' => [
+            'action'              => 'modify',
+            'initialStage'        => 3,
+            'courseSpec'          => $courseSpec,
+            'courseSpecId'        => $courseSpec->getId(),
+            'courseImpl'          => $courseImpl,
+            'folder'              => $courseImpl->getFolder(),
+            'destinations'        => [
                 'id'   => $courseImpl->getFolder()->getId(),
                 'name' => $courseImpl->getFolder()->getTitle()
             ],
@@ -859,8 +853,8 @@ class Controller extends Base\Base
                     $owner,
                 ],
             ],
-            'unitsImpls'   => $courseImpl->getUnits(),
-            'ownerships'   => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}",
+            'unitsImpls'          => $courseImpl->getUnits(),
+            'ownerships'          => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}",
         ]);
     }
 
@@ -889,13 +883,13 @@ class Controller extends Base\Base
 
         // For each CourseImpl, determine how many components are displaying it on the homepage
         $componentCounts = [];
-        foreach($courseImpls as $courseImpl){
+        foreach ($courseImpls as $courseImpl) {
             $componentCounts[$courseImpl->getId()] = 0;
         }
 
-        foreach($components as $component){
+        foreach ($components as $component) {
             $courseImplId = $component->getConfigArray()['importedCourse']['value'];
-            if($courseImplId){
+            if ($courseImplId) {
                 $componentCounts[$courseImplId]++;
             }
         }
@@ -909,7 +903,7 @@ class Controller extends Base\Base
 
 
     /**
-     * Deletes an import, along with ALL of its associated data
+     * Deletes a Course import, along with ALL of its associated data
      *
      * @api   DELETE /course/import/{courseImplId}
      * @level 165
@@ -923,7 +917,7 @@ class Controller extends Base\Base
         }
 
         // Will delete subsidiary Units, Assessments, Responses + Feedbacks
-        if(!$this->getCourseImplementationMapper()->delete($courseImpl)){
+        if (!$this->getCourseImplementationMapper()->delete($courseImpl)) {
             $this->sendError('Unable to delete Course Import');
             return;
         }
@@ -934,7 +928,7 @@ class Controller extends Base\Base
             $folderId = $courseImpl->getFolder()->getId();
             $class = HomepageOutlineComponentController::class;
             $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
-            $componentsForCourse = $components->filter(function($componentInstance) use ($courseImpl){
+            $componentsForCourse = $components->filter(function ($componentInstance) use ($courseImpl) {
                 /** @var Component_Instance $componentInstance */
                 return $courseImpl->getId() == $componentInstance->getConfigArray()['importedCourse']['value'];
             });
@@ -946,16 +940,14 @@ class Controller extends Base\Base
             $this->sendError($e->getMessage(), [], 500);
             return;
         }
-
     }
 
 
     /**
      * Create a CourseOutline component for the specified CourseImpl.
      *
-     * This action is available from a homepage's course management page.
-     * If the courseImpl already has a CourseOutline component, send caller some helpful info
-     * and do not add another CourseOutline component.
+     * This action is available from a homepage's course management page if the CourseImport
+     * is not being displayed in a CourseOutline component.
      *
      * @api   POST /course/import/{courseImplId}/restore
      * @level 165
@@ -971,10 +963,10 @@ class Controller extends Base\Base
         $class = HomepageOutlineComponentController::class;
         $componentInstances = $componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
         $componentInstances->sortBy('sequence', 'ASC');
-        foreach($componentInstances as $component){
+        foreach ($componentInstances as $component) {
 
             // If this component has no associated Course, or the course is not valid
-            if( !$component->getConfigArray()['importedCourse'] ||
+            if (!$component->getConfigArray()['importedCourse'] ||
                 !$component->getConfigArray()['importedCourse']['value']
             ) {
                 // Conclude the Component is available, and use it
@@ -984,13 +976,13 @@ class Controller extends Base\Base
         }
 
         // Did we find a component?
-        if($componentInstance){
+        if ($componentInstance) {
             $configMapper = \Component_ConfigMapper::getInstance();
             $config = $configMapper->findByColumnList([
                 'component_config_definition_id' => 255,
-                'component_instance_id' => $componentInstance->getId(),
+                'component_instance_id'          => $componentInstance->getId(),
             ])->first();
-            if(!$config){
+            if (!$config) {
                 $config = $configMapper->createModel();
                 $config
                     ->setConfigDefinitionId(255)
@@ -998,11 +990,10 @@ class Controller extends Base\Base
             }
             $config->setValue($courseImpl->getId());
             $configMapper->save($config);
-        }
-        // Else no available component, create one.
+        } // Else no available component, create one.
         else {
             $folder = $courseImpl->getFolder();
-            $config = [ 'importedCourse' => $courseImpl->getId() ];
+            $config = ['importedCourse' => $courseImpl->getId()];
             $controller = HomepageOutlineComponentController::class;
             $componentInstanceMapper->injectNewComponent($folder, $config, $controller);
         }
