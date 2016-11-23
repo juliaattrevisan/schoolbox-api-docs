@@ -9,7 +9,6 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
@@ -23,6 +22,8 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
  * 2. Pass around an object that stores the pair, but provides a consistent interface via methods
  *
  * This class is the manifestation of the latter approach
+ *
+ * Objects of this class should be immutable after initial construction.
  */
 class DataTransferObject
 {
@@ -70,6 +71,18 @@ class DataTransferObject
      * @var int[]
      */
     private $assessmentSpecToImplMap;
+
+    /**
+     * Number of Assessments available for selection per UnitSpec, indexed by UnitSpec.id
+     * @var int[]
+     */
+    private $availableAssessmentCounts;
+
+    /**
+     * Number of Assessments selection per UnitSpec, indexed by UnitSpec.id
+     * @var int[]
+     */
+    private $selectedAssessmentCounts;
 
 
     /**
@@ -123,8 +136,10 @@ class DataTransferObject
                 $this->addAssessmentPair($unitSpecId, $assessmentPair);
             }
         }
-    }
 
+        $this->calculateAvailableAssessmentCounts();
+        $this->calculateSelectedAssessmentCounts();
+    }
     /**
      * Call from TWIG to get a list of UnitImpls to traverse
      *
@@ -136,39 +151,69 @@ class DataTransferObject
     }
 
     /**
-     * Call from TWIG to get a set of IAssessable pairs belonging to the specified UnitSpec
+     * Call from TWIG to get sets of IAssessable pairs, grouped by UnitSpec
      *
-     * @param UnitSpecification $unitSpec
-     * @return IAssessable[][]|AssessmentPair[]|GenericCollection<AssessmentPair> Set of IAssessable pairs
+     * Outer set indexed by UnitSpec.id
+     * Inner set unordered
+     *
+     * @return IAssessable[][][]|AssessmentPair[][]|GenericCollection[]|GenericCollection Sets of sets of IAssessable pairs
      */
-    public function getAssessmentPairs(UnitSpecification $unitSpec)
+    public function getAssessmentPairs()
     {
-        return $this->unitSpecAssessments->getOffset($unitSpec->getId());
+        return $this->unitSpecAssessments;
     }
 
     /**
-     * @param UnitSpecification $unitSpec
-     * @return int
+     * Call from TWIG to get counts of IAssessable pairs, grouped by UnitSpec
+     *
+     * @return int[]
      */
-    public function getCountAssessments(UnitSpecification $unitSpec)
+    public function getAvailableAssessmentCounts()
     {
-        return count($this->unitSpecAssessments->getOffset($unitSpec->getId()));
+        return $this->availableAssessmentCounts;
     }
 
     /**
-     * @param UnitSpecification $unitSpec
-     * @return int
+     * Call from TWIG to get counts of selected Assessments, grouped by UnitSpec
+     *
+     * @return int[]
      */
-    public function getCountSelectedAssessments(UnitSpecification $unitSpec)
+    public function getSelectedAssessmentCounts()
     {
-        $count = 0;
-        foreach($this->unitSpecAssessments->getOffset($unitSpec->getId()) as $pair){
-            /** @var AssessmentPair $pair */
-            if($pair->getImplementation() instanceof IAssessable){
-                $count++;
-            }
+        return $this->selectedAssessmentCounts;
+    }
+
+    /**
+     * Calculate how many Assessments are available for selection for each UnitSpec
+     * @return bool
+     */
+    protected function calculateAvailableAssessmentCounts()
+    {
+        $this->availableAssessmentCounts = [];
+        foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
+            $this->availableAssessmentCounts[$unitSpecId] = count($assessmentPairs);
         }
-        return $count;
+        return true;
+    }
+
+    /**
+     * Calculate how many Assessments are selected for each UnitSpec
+     * @return bool
+     */
+    protected function calculateSelectedAssessmentCounts()
+    {
+        $this->selectedAssessmentCounts = [];
+        /** @var AssessmentPair[] $assessmentPairs */
+        foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
+            $count = 0;
+            foreach($assessmentPairs as $pair){
+                if($pair->getImplementation() instanceof IAssessable){
+                    $count++;
+                }
+            }
+            $this->selectedAssessmentCounts[$unitSpecId] = $count;
+        }
+        return true;
     }
 
     /**

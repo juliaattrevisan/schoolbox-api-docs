@@ -113,9 +113,9 @@
 {% for unitImpl in dto.unitImplementations %}
 
     {% set unitSpec = unitImpl.specification %}
-    {% set assessmentPairs = dto.getAssessmentPairs(unitSpec) %}
-    {% set unitAssessmentCount = dto.getCountAssessments(unitSpec) %}
-    {% set unitAssessmentCountSelected = dto.getCountSelectedAssessments(unitSpec) %}
+    {% set assessmentPairs = dto.assessmentPairs[unitSpec.id] %}
+    {% set unitAssessmentCount = dto.availableAssessmentCounts[unitSpec.id] %}
+    {% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
 
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_impl_id]" value="{{ unitImpl.id }}" />
