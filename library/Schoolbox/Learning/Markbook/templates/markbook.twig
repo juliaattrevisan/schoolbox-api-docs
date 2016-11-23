@@ -149,22 +149,22 @@
                                           method="POST">
                                         {% if mostRecentFeedback.isMarkedAsCompleted %}
                                             <input type="hidden" name="status" value="1" />
-                                            <button type="submit"
-                                                    class="no-text progress-tick complete"
-                                                    title="Completed – click to mark as not attempted"
-                                                    data-interaction="update_progress"></button>
+                                            <a href="#"
+                                               class="no-text progress-tick complete"
+                                               title="Completed – click to mark as not attempted"
+                                               data-interaction="update_progress"></a>
                                         {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
                                             <input type="hidden" name="status" value="3" />
-                                            <button type="submit"
-                                                    class="no-text progress-tick pending"
-                                                    title="Self-assessed – click to mark as complete"
-                                                    data-interaction="update_progress"></button>
+                                            <a href="#"
+                                               class="no-text progress-tick pending"
+                                               title="Self-assessed – click to mark as complete"
+                                               data-interaction="update_progress"></a>
                                         {% else %}
                                             <input type="hidden" name="status" value="3" />
-                                            <button type="submit"
-                                                    class="no-text progress-tick"
-                                                    title="Not attempted – click to mark as complete"
-                                                    data-interaction="update_progress"></button>
+                                            <a href="#"
+                                               class="no-text progress-tick"
+                                               title="Not attempted – click to mark as complete"
+                                               data-interaction="update_progress"></a>
                                         {% endif %}
                                     </form>
                                 {% else %}
