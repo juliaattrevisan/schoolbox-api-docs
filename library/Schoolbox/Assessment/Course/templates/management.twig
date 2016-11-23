@@ -119,7 +119,7 @@
                     </div>
                     <nav>
                         {% if not componentCounts[currentCourse.id] %}
-                            <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
+                            <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% endif %}
 
                         <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import"></a>
