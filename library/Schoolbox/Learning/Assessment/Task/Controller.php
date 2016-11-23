@@ -130,8 +130,25 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(Participant $participant)
     {
-        // TODO redirect this to /task/start/:oldTaskId
-        throw new NotFound();
+        // Don't redirect to /task/start/:oldTaskId - students must mark tasks complete themselves
+
+        // Params:
+        // status: the status they want to set response to
+        // and that's it - an existing response will never be updated
+        $this->assertParticipantAccess($participant);
+
+        $response = (new Completion\Model())
+            ->setAssessable($participant->getAssessable())
+            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedBy($this->getUser())
+            ->markAs($this->getRequest()->post->get('status'))
+        ;
+
+        $response->assertSaveability();
+
+        // And save
+
+        // And redirect somewhere
     }
 
 
