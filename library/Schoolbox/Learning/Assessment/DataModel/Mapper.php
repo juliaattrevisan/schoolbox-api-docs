@@ -11,6 +11,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
@@ -155,10 +156,16 @@ class Mapper extends BaseMapper
             'specificationAssessment'
         );
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
-
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteProject'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreTask'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreDueWork'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreProject'));
+
+
+
     }
 
     /**
@@ -173,6 +180,7 @@ class Mapper extends BaseMapper
             $quizMapper->delete($quiz);
         }
     }
+
     /**
      * When restoring an Assessment that is a Quiz, we need to restore all sub-objects of the Quiz
      * @param Model $assessment
@@ -186,6 +194,31 @@ class Mapper extends BaseMapper
         }
     }
 
+    /**
+     * When deleting an Assessment that is a Task, we need to delete all sub-objects of the Task
+     * @param Model $assessment
+     */
+    public function softDeleteTask(Model $assessment)
+    {
+        if($assessment->getTask() instanceof Task){
+            $taskMapper = $this->getJoinMapper('task');
+            $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $taskMapper->delete($task);
+        }
+    }
+
+    /**
+     * When restoring an Assessment that is a Task, we need to restore all sub-objects of the Task
+     * @param Model $assessment
+     */
+    public function restoreTask(Model $assessment)
+    {
+        if($assessment->getQuiz() instanceof Task){
+            $taskMapper = $this->getJoinMapper('task');
+            $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $taskMapper->restoreSoftDeleted($task);
+        }
+    }
 
     /**
      * When deleting an Assessment that is a DueWork, we need to delete all sub-objects of the DueWork
@@ -209,6 +242,32 @@ class Mapper extends BaseMapper
             $dueWorkMapper = $this->getJoinMapper('duework');
             $dueWork = $dueWorkMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
             $dueWorkMapper->restoreSoftDeleted($dueWork);
+        }
+    }
+
+
+    /**
+     * When deleting an Assessment that is a Project, we need to delete all sub-objects of the Project
+     * @param Model $assessment
+     */
+    public function softDeleteProject(Model $assessment)
+    {
+        if($assessment->getQuiz() instanceof ProjectModel){
+            $projectMapper = $this->getJoinMapper('project');
+            $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $projectMapper->delete($project);
+        }
+    }
+    /**
+     * When restoring an Assessment that is a Project, we need to restore all sub-objects of the Project
+     * @param Model $assessment
+     */
+    public function restoreProject(Model $assessment)
+    {
+        if($assessment->getQuiz() instanceof Quiz){
+            $projectMapper = $this->getJoinMapper('project');
+            $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $projectMapper->restoreSoftDeleted($project);
         }
     }
 
