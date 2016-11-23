@@ -215,7 +215,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @return null|Submission\File
+     * @param Submission\File|null $submission
      * @return static
      */
     public function setSubmission(Submission\File $submission = null)
