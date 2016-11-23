@@ -38,7 +38,6 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
                 '/classes'                                => 'getClasses',
-                '/due/{userId}'                           => 'getDue',
                 '/grades/{userId}{/termCode}'             => 'getGrades',
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
@@ -75,7 +74,7 @@ class Module extends BaseModule
                 )
             );
 
-        $ruleRegexp = '(?:getDue|getGrades|getGradesForSubject)';
+        $ruleRegexp = '(?:getGrades|getGradesForSubject)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -97,7 +96,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|getDue)',
+            'getPendingAssessmentsForUser',
             function ($params) {
                     try {
                         $viewee = $this->getUserMapper()->findById($params['userId']);

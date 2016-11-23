@@ -233,20 +233,22 @@ class Controller extends Base\Base
             return;
         }
 
+        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['course_homepage']);
+
         $homepages = explode(",", $post["homepage"]);
 
         // Test permissions. Must have write permission on the destination page and read permission
         // on the course we are trying to import.
 
         // Test course page read access
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
-            throw new Unauthorized();
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$courseSpec->getFolder()->getId()]) < READ_ACCESS) {
+            $this->sendError('You do not have permission to import this course');
         }
 
         // Test each homepage for write access
         foreach ($homepages as $homepage) {
             if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                throw new Unauthorized();
+                $this->sendError('You do not have permission to import this unit');
             }
         }
 

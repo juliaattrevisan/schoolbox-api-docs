@@ -736,6 +736,17 @@ class Bootstrap implements BootstrapInterface {
         $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
         $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
 
+
+        // Calendar API factory - requires an assessment data source to build some types
+        $di->set(
+            'calendarApiFactory',
+            $di->lazyNew(
+                \Calendar_Api_Factory::class,
+                ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),]
+            )
+        );
+
+
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
         $this->kernel->setDebugMode($this->debugEnabled);

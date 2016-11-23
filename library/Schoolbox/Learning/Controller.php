@@ -92,8 +92,8 @@ class Controller extends Base
     {
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'userId' => $this->getUser()->getId()
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
+                'studentId' => $this->getUser()->getId()
             ]));
         }
 
@@ -122,8 +122,8 @@ class Controller extends Base
             // Is the Viewee as student or parent?
             if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
                 // Redirect to 'Due Assessments' page
-                $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                    'userId' => $viewee->getId()
+                $this->getResponse()->redirect->to($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', [
+                    'studentId' => $viewee->getId()
                 ]));
                 return;
             }
@@ -212,28 +212,6 @@ class Controller extends Base
             'classList'      => $folderList,
             'classTypes'     => $classTypes
 
-        ]));
-    }
-
-    /**
-     * Displays a list assessables that a student needs to complete
-     *
-     * @api   GET /due/{userId}
-     * @level 165
-     * @param User $viewee
-     */
-    public function getDue(User $viewee)
-    {
-        // TODO - generate data
-        $assessmentsDue = [
-            Assessment\Controller::getDummyAssessment(2),
-            Assessment\Controller::getDummyAssessment(3),
-            Assessment\Controller::getDummyAssessment(4),
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/dueWork.twig', [
-            'viewee'         => $viewee,
-            'assessmentsDue' => $assessmentsDue,
         ]));
     }
 

@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Response\Module as ResponseModule;
+use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 
 
 class Learning implements ModuleConfigInterface
@@ -46,5 +47,8 @@ class Learning implements ModuleConfigInterface
 
         $markbookModule = new MarkbookModule($di);
         $markbookModule ->init("/$namespace/markbook");
+
+        $upcomingModule = new UpcomingModule($di);
+        $upcomingModule->init("/$namespace/due");
     }
 }

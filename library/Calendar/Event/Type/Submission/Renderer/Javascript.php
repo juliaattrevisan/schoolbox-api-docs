@@ -13,6 +13,11 @@ namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Scrub;
 
+/**
+ * Class Javascript
+ *
+ * @method \Calendar\Event\Type\Submission\Event getEvent()
+ */
 class Javascript extends Base
 {
 
@@ -27,15 +32,10 @@ class Javascript extends Base
             return '';
         }
 
-        /* Show a homepage if appropriate
-         */
-        $categoryId   = $this->getEvent()->getCategory()->getId();
-        $categoryName = $this->getEvent()->getCategory()->getName();
-
         /* Congeal all that stuff
          */
         $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
-        $all_day = $this->getEvent()->getAllDay();
+        $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
             $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
         }
@@ -73,7 +73,7 @@ class Javascript extends Base
                     'level'     => $this->getEvent()->getEventClasses(),
                     'completed' => '',
                 ),
-                'links'      => array( ),
+                'links'      => array(),
                 'styles'     => array(
                     'visible' => true,
                 ),
@@ -84,12 +84,17 @@ class Javascript extends Base
                     'listButton'    => false,
                 ),
                 'custom' => array(
-                    'modifyLink' => $this->getEvent()->getIsAssessment()
-                        ? ('/assess/summary/' . $this->getEvent()->getEventId())
-                        : ('/submission/createSubmission/modify/' . $this->getEvent()->getEventId()),
-                    'moreDetailsLink' => $this->getEvent()->getIsAssessment()
-                        ? ($this->getUser()->getId() === $this->getViewer()->getId() ? '/assess/intro/'.$this->getEvent()->getEventId() : '')
-                        : '/submission/submissionHistory/'.$this->getEvent()->getEventId().'/'.$this->getUser()->getId(),
+                    'modifyLink' => $this->getRouteIfAuthorized(
+                        'learningAssessment.getUpdateAssessmentForm',
+                        ['assessmentId' => $this->getEvent()->getEventId(),]
+                    ),
+                    'moreDetailsLink' => $this->getRouteIfAuthorized(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $this->getEvent()->getEventId(),
+                            'studentId'    => $this->getUser()->getId(),
+                        ]
+                    ),
                 )
             )
         );

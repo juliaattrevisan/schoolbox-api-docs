@@ -9,6 +9,8 @@
  */
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -16,25 +18,32 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     private $calendarHandler = null;
 
     /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
      * Constructor
      *
-     * @param \Schoolbox\User $user
-     * @param                 $config
+     * @param \Schoolbox\User      $user
+     * @param                      $config
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
     {
         $this->setCalendarHandler(new Calendar());
         $this->setUser($user);
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
     /**
      * Gets the display color for an event.
      *
-     * @param  \Schoolbox\Assessment\Activity $activity
-     * @param  string                         $eventType
+     * @param  Folder $folder
+     * @param  string $eventType
      * @return string
      */
-    protected function getEventColor($activity, $eventType)
+    protected function getEventColor(Folder $folder, $eventType)
     {
         return $this->getCalendarHandler()->displayColour($eventType);
     }
@@ -52,66 +61,50 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     {
         $stack = new Collection();
         // Configuration may not have been set, take this into account.
-// TODO - this is wrong!
+        // TODO - this is wrong!
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
 
-        //
-        // Use the mapper classes to get events for this day.
-        // Also, need the folders to filter on.
-        // Don't like using session here but other event types use them, so meh.
-        $folderMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
-        $folderMapper->setExternalUser(new External_User());
-        $folder_id_list = array();
-        foreach ($folderMapper->findForUser($this->getUser()) as $folder) {
-            $folder_id_list[] = $folder->getId();
-        }
+        // Find for student currently hacks together a term
+        $term = (new Schoolbox\Assessment\Term\Model())
+            ->setStart(new Alaress_Date_Format($startTimestamp, Alaress_Date_Format::TIMESTAMP))
+            ->setActualFinish(new Alaress_Date_Format($endTimestamp, Alaress_Date_Format::TIMESTAMP));
 
-        $box_mapper    = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
-        $assess_mapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
-
-        /** @var \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[] $activities */
-        $activities    = $box_mapper->getDueActivities($folder_id_list, $startTimestamp, $endTimestamp);
-        $activities->merge($assess_mapper->getDueActivities($folder_id_list, $startTimestamp, $endTimestamp));
-
-        foreach ($activities as $activity) {
+        // Get a timeline of events
+        // Use the assessment data source to get everything for this user
+        foreach ($this->assessmentDataSource->findAllByStudent($this->getUser(), $term) as $assessment) {
             $event = new Event();
-            $event->setCategory($activity->getCategory());
-            $event->setType($eventType);
-            $event->setColour($this->getEventColor($activity, $eventType));
-            $event->setStartTime($activity->getDate());
-            $event->setEndTime($activity->getDate());
 
-            //
+            $event->setAssessment($assessment);
+            $event->setType($eventType);
+
+            // Use the folder's color if it has one
+            $folder = $assessment->getBaseContext()->getFolder();
+            $color  = $folder->getColour();
+            if ($color instanceof \Alaress\Color\Color) {
+                $event->setColour($color);
+            } else {
+                $event->setColour($this->getEventColor($folder, $eventType));
+            }
+            $event->setStartTime($assessment->getDueAt());
+            $event->setEndTime($assessment->getDueAt());
+
             // Will only be all day if the event's date is one second before
             // midnight.
-            $event->setAllDay($activity->getDate()->isAtEndOfDay());
+            $event->setAllday($assessment->getDueAt()->isAtEndOfDay());
 
-            //
-            // Populate differently based on whether an assessment or submission
-            if ($activity->isAssessment()) {
-                $assessment = $activity->getAssessment();
-                $owner      = $assessment->getUser();
-                $event->setIsAssessment(true);
-                $event->setEventId($assessment->getId());
-                $event->setTitle($assessment->getTitle());
-                $event->setDetail($assessment->getDescription());
-                $event->setPublishDate($assessment->getStart());
-            } else {
-                $submission_box = $activity->getSubmissionBox();
-                $owner          = $submission_box->getOwner();
-                $event->setIsAssessment(false);
-                $event->setEventId($submission_box->getId());
-                $event->setTitle($submission_box->getName());
-                $event->setDetail($submission_box->getDescription());
-                $event->setPublishDate($submission_box->getPublishDate());
-            }
+            // All assessment events can be populated identically now
+            $event->setEventId($assessment->getId());
+            $event->setTitle($assessment->getTitle());
+            $event->setDetail($assessment->getDescription());
+            $event->setPublishDate($assessment->getPublishAt());
 
-            $event->setAuthorId($owner->getId());
-            $event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
+            // TODO add an author field to assessment
+//            $event->setAuthorId($assessment->get->getId());
+//            $event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
             $event->setConnectorId($this->getConnectorId());
 
             $stack->add($event);

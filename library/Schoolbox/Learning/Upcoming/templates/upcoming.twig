@@ -1,0 +1,400 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+
+        var height = null;
+
+        if (isSmallDevice()) {
+            height = 'auto';
+        }
+
+        c = new Calendar('calendar', 'calendar-bubble', {
+            userId: '{{ student.id|escape('js') }}',
+            filter: {
+                ajax: '/calendar/ajax/filter',
+                btnSelector: false,
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
+            },
+            fullCalendar: {
+                defaultDate: moment('{{ date|escape('js') }}'),
+                columnFormat: {
+                    month:      'ddd',
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
+                },
+                height: height,
+                defaultView: anchor || 'month',
+                timeFormat: { month: 'h(:mm)a' },
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: Boolean('{{ config.calendar_collapse_events|escape('js') }}'),
+                firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 */
+                eventRender: function(calEvent) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
+
+                    // Don't render me if I'm marked as do not render
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+                    return true;
+                },
+
+                /**
+                 * Nothing's resizable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventResize: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * Nothing's movable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventDrop: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $(window).height();
+                    var calTop = c.dom.offset().top;
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         */
+                        $.magnificPopup.close();
+                        var d = c.dom.fullCalendar('getDate');
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
+                    }
+                },
+
+                // Stream location
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '/submission/ajax/events',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: Number('{{ student.id|escape('js') }}')
+                        },
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                }
+            },
+            x: false
+        }).init();
+    })
+</script>
+<!-- END custom_head -->
+
+{# Header #}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>Upcoming work for {{ student.formatName }}</h1>
+                </div>
+            </div>
+
+            {% if children|length > 0 %}
+            <nav>
+                <a class='icon-group' data-dropdown='header-options'></a>
+            </nav>
+
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                {% for child in children %}
+                <li>
+                    <div class="card small-12">
+                        <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id}) }}" title="View upcoming work">
+                            <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
+                            <p>{{ child.formatName }}</p>
+                            <p class="meta">{{ child.role.name }}</p>
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
+{% if subjects|length %}
+<div class="row">
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Upcoming Due Work</h2>
+        <section>
+            {% if upcomingWork|length %}
+            <ul class="action-list">
+                {% for upcoming in upcomingWork %}
+                <li>
+                    <div class="card small-12">
+                        <h3>
+                            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, studentId: student.id}) %}
+                            {% if route %}
+                                <a class="title" href="{{ route }}">{{ upcoming.title }}</a>
+                            {% else %}
+                                {{ upcoming.title }}
+                            {% endif %}
+                        </h3>
+
+                        <p class="meta">
+                            <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
+                            {{ upcoming.typeName }}
+                        </p>
+
+                        <p class="meta">
+                            <span class="{{ urgency.datetime(upcoming, student) }}">Due {{ upcoming.dueAt.relativeTime }}</span>
+                            on {{ upcoming.dueAt.isAtEndOfDay ? upcoming.dueAt.dateOnly : upcoming.dueAt.short }}
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="row">
+                <div class="small-12 island">
+                </div>
+            </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="icon-due-work"></i>
+                    <p>Currently no work has been set, nice one.</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+        <h2 class="subheader">Subjects</h2>
+        {% if subjects|length %}
+            <div class="row">
+                <div class="small-12 island">
+                    {% for subject in subjects %}
+                        <section>
+                            <ul class="information-list">
+                                <li>
+                                    <div class="list-item">
+                                        {% set gradePath = routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: currentTerm.code, subjectId: subject.folder.id}) %}
+                                        <div class="small-{{ subject.grade ? 8 : 12 }} card">
+                                            <a href="{{ gradePath }}" title="View Grades">
+                                                <span class="icon-home icon-32" title="{{ subject.folder.title }}"></span>
+                                                <p>{{ subject.folder.title }}</p>
+                                            </a>
+                                            <p class="meta">{{ subject.folder.codeString }}</p>
+                                        </div>
+
+                                        {% if subject.grade %}
+                                            <div class="small-4 columns no-pad">
+                                                <div class="grade content">
+                                                    <a href="{{ gradePath }}">
+                                            <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                {{ subject.grade.weightedMean }}
+                                            </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </li>
+
+                                {% for teacher in subject.teachers %}
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="small-12 card">
+                                                <a href="/search/user/{{ teacher.id }}" title="">
+                                                    <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
+                                                    <p>{{ teacher.formatName }}</p>
+                                                </a>
+                                                <p class="meta">{{ teacher.role.name }}</p>
+                                            </div>
+
+                                        </div>
+                                        <nav>
+                                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <section>
+                <div class="empty-state">
+                    <i class="icon-due-work"></i>
+                    <p>
+                        {% if currentUser.id == student.id %}
+                            You are not currently enrolled in any classes.
+                        {% else %}
+                            {{ student.formatName }} is not currently enrolled in any classes.
+                        {% endif %}
+                    </p>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble">
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
+                <div>
+                    <dl>
+                        <dd>
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="moreDetailsLink" data-is-html="1"></span>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>

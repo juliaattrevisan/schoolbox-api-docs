@@ -7,6 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
+/** @var SitePage $this */
 $user_mapper = new \Schoolbox\UserMapper();
 $user = $user_mapper->findById($_GET['userId']);
 $viewer = $_SESSION['user'];
@@ -22,7 +23,7 @@ try {
 
 // Render it
 $renderer = new \Calendar\Event\Collection\Renderer(
-    new \Calendar_Api_EventType_Submission_Schoolbox_ForDueWork($user, array()),
+    new \Calendar_Api_EventType_Submission_Schoolbox_ForDueWork($user, array(), $this->getDi()->get('assessmentDataSource')),
     $_GET['start'],
     $_GET['end'],
     $user,

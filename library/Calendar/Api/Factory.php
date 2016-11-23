@@ -14,9 +14,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+
 class Calendar_Api_Factory
 {
-
     /**
      * A list of all the possible event types to display
      *
@@ -25,19 +27,20 @@ class Calendar_Api_Factory
     protected $allTypes = array();
 
     /**
-     * An instance of Schoolbox\User
+     * A data source for assessments.
      *
-     * @var null
+     * @var AssessmentDataSource
      */
-    protected $user = null;
+    protected $assessmentDataSource;
 
     /**
      * Constructor
+     *
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function __construct($user)
+    public function __construct(AssessmentDataSource $assessmentDataSource)
     {
-        $this->setUser($user);
-
+        $this->assessmentDataSource = $assessmentDataSource;
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
         /* These configs are base64-encode()'d to get around a weird issue with unserialize
@@ -64,38 +67,21 @@ class Calendar_Api_Factory
     /**
      * Produce an API Composite
      *
+     * @param \Schoolbox\User $user
      * @return Calendar_Api_Composite
      */
-    public function produce()
+    public function produceForUser(\Schoolbox\User $user)
     {
         $compositeApi = new Calendar_Api_Composite();
 
         foreach ($this->getAllTypes() as $config) {
             try {
-                $defaultImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
-                $uniqueImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
-
-                /* Decide which to use (unique or default)
-                 *
-                 * Inject config settings, including the calendar_connector id
-                 * so it knows from whence it came
-                 */
-                if (class_exists($uniqueImplementation)) {
-                    $implementation = new $uniqueImplementation($this->getUser(), $config);
-                    $implementation->setConnectorId($config->getId());
-
-                    $compositeApi->add($implementation);
-                } else {
-                    if (class_exists($defaultImplementation)) {
-                        $implementation = new $defaultImplementation($this->getUser(), $config);
-                        $implementation->setConnectorId($config->getId());
-
-                        $compositeApi->add($implementation);
-                    }
-                }
+                $compositeApi->add($this->produceFromConfig($config, $user));
             } catch (DomainException $e) {
                 // Calendar API has an issue. Skip to next.
+                continue;
             }
+            // InvalidArgumentException or ReflectionException: NOT caught
         }
 
         /* Throw error if no APIs were determined and found
@@ -105,6 +91,48 @@ class Calendar_Api_Factory
          */
 
         return $compositeApi;
+    }
+
+    /**
+     * Handle unique construction logic for each variant of the calendar connector.
+     *
+     * @param Calendar_Api_Config_Record $config
+     * @param \Schoolbox\User            $user
+     * @return Calendar_Api_EventType_Abstract
+     * @throws InvalidArgumentException if the item can't be built
+     * @throws ReflectionException could be thrown by the Reflection API
+     */
+    public function produceFromConfig($config, \Schoolbox\User $user)
+    {
+        $base    = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass();
+        $default = $base . '_Default';
+        $unique  = $base . '_' . ucwords(Cfg::get('site_location'));
+
+        switch ($default) {
+            case 'Calendar_Api_EventType_Submission_Schoolbox_Default':
+                // Same as default constructor, but add the assessment data source
+                $params = [$user, $config, $this->assessmentDataSource,];
+                break;
+
+            default:
+                $params = [$user, $config,];
+                break;
+        }
+
+        foreach ([$unique, $default] as $className) {
+            if (class_exists($className)) {
+                $class          = new ReflectionClass($className);
+                $implementation = $class->newInstanceArgs($params);
+                break;
+            }
+        }
+
+        if (!(isset($implementation) && $implementation instanceof Calendar_Api_EventType_Abstract)) {
+            throw new InvalidArgumentException('No default or unique implementation found for '.$base);
+        }
+
+        $implementation->setConnectorId($config->getId());
+        return $implementation;
     }
 
     /**
@@ -142,25 +170,5 @@ class Calendar_Api_Factory
     protected function getAllTypes()
     {
         return $this->allTypes;
-    }
-
-    /**
-     * Set user
-     *
-     * @param null $user
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * Get user
-     *
-     * @return null
-     */
-    private function getUser()
-    {
-        return $this->user;
     }
 }

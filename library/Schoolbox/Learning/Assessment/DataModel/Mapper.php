@@ -288,7 +288,11 @@ class Mapper extends BaseMapper
     public function findAllForFolderId($folderId, $columnList, $options = [])
     {
         // Support stuff for query
-        $folderList   = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
+        if (count($folderList) === 0) {
+            // Exit early if empty
+            return new Collection();
+        }
         $params       = BaseMapper\PredicateBuilder::getArrayParameters($folderList, 'folder');
         $placeholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderList, 'folder');
 

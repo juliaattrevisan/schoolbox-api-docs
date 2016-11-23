@@ -19,6 +19,7 @@ $userMapper = new \Schoolbox\UserMapper();
 /* Viewing someone else's calendar:
  * Url format: /calendar/list/{userId}/{startDate}/{finishDate}
  */
+/** @var SitePage $this */
 if (count($this->arg) >= 2) {
     /* Check that the user exists
      */
@@ -79,9 +80,9 @@ $this->setVar(
     )
 );
 
-
-$factory = new Calendar_Api_Factory($user);
-$api     = $factory->produce();
+/** @var Calendar_Api_Factory $factory */
+$factory = $this->getDi()->get('calendarApiFactory');
+$api     = $factory->produceForUser($user);
 
 // Extend finish by one day for search
 $calendar = new Lister(

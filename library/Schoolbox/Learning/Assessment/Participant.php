@@ -137,23 +137,23 @@ class Participant
     }
 
     /**
-     * Has this participant received ANY feedback for this assessment?
+     * Has this participant received ANY (published) feedback for this assessment?
      *
      * @return bool
      */
     public function isMarked()
     {
-        return $this->allFeedbacks->count() > 0;
+        return $this->allFeedbacks->filter(function (IFeedback $feedback) { return $feedback->isPublished(); })->count() > 0;
     }
 
     /**
-     * Has this participant made ANY kind of response to this assessment?
+     * Has this participant made ANY kind of (submitted) response to this assessment?
      *
      * @return bool
      */
     public function isResponded()
     {
-        return $this->allResponses->count() > 0;
+        return $this->allResponses->filter(function (IResponse $response) { return $response->isSubmitted(); })->count() > 0;
     }
 
     /**

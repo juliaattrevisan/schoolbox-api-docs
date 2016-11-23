@@ -9,6 +9,9 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Resource\Folder\Model as Folder;
+
 class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Api_EventType_Submission_Schoolbox_Default
 {
     /**
@@ -19,9 +22,9 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
     {
-        parent::__construct($user, $config);
+        parent::__construct($user, $config, $assessmentDataSource);
         $this->colorManager = new Timetable_ColourManager(
             Timetable_ColourMapper::getInstance()->findAll()
         );
@@ -30,12 +33,12 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
     /**
      * Gets the display color for an event.
      *
-     * @param  \Schoolbox\Assessment\Activity $activity
-     * @param  string                         $eventType
+     * @param  Folder $folder
+     * @param  string $eventType
      * @return string
      */
-    protected function getEventColor($activity, $eventType)
+    protected function getEventColor(Folder $folder, $eventType)
     {
-        return $this->colorManager->getColour($activity->getCategory()->getId());
+        return $this->colorManager->getColour($folder->getId());
     }
 }
