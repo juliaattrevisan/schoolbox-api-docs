@@ -30,15 +30,16 @@ class Controller extends Assessment\Controller
             $selectedSummator = $summatorMapping->decompose($assessment->getSummator());
         } catch (\InvalidArgumentException $e) {
             //no selected summator if none exists
+            $selectedSummator = null;
         }
 
         $data = [
-            'types'            => new Assessment\AssessmentType(),
-            'selectedSummator' => $selectedSummator,
+            'types'             => new Assessment\AssessmentType(),
+            'selectedSummator'  => $selectedSummator,
             'acceptingResponses'=> false,
-            'allSummators'     => $summatorMapping,
-            'allMarkTypes'    => $this->getAllMarkTypes($assessment),
-            'allGradeSchemes' => $this->getAllGradeSchemes(),
+            'allSummators'      => $summatorMapping,
+            'allMarkTypes'      => $this->getAllMarkTypes($assessment),
+            'allGradeSchemes'   => $this->getAllGradeSchemes(),
         ];
 
         return $data;

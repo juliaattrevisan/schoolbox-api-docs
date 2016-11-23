@@ -13,6 +13,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
@@ -109,7 +110,9 @@ class Controller extends AbstractController
     public function getQuizSummary($assessmentId)
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/summary/$assessId");
+        $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $redirect = $returnUrl ? '?'.Redirect::RETURN_URL."=$returnUrl" : '';
+        $this->getResponse()->redirect->to("/assess/summary/$assessId{$redirect}");
     }
 
     /**

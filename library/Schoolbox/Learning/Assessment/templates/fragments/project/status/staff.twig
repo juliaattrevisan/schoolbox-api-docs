@@ -72,8 +72,14 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
-                                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
+                                    {% if assessable is quiz %}
+                                        {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+                                            <a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) %}
+                                            <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}{{ returnUrlSuffix }}" class="icon-modify no-text" title="Modify"></a>
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) %}
