@@ -12,8 +12,9 @@ namespace Schoolbox\Learning\Assessment\Task\Completion;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
+use Schoolbox\Learning\Assessment\Task\ICompletion;
 
-class Model extends AbstractResponse
+class Model extends AbstractResponse implements ICompletion
 {
     use CompletionStatusTrait;
 

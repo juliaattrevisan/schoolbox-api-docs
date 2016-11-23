@@ -12,9 +12,10 @@ namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
+use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
-class Model extends AbstractFeedback
+class Model extends AbstractFeedback implements ICompletion
 {
     use CompletionStatusTrait;
 
