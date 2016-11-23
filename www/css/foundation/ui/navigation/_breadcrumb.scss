@@ -106,7 +106,7 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 	list-style: none;
 	margin-left: 0;
 	li{
-		float: left;
-		margin: 0 0.375rem 0.375rem 0;
+		display: inline-block;
+		margin: 0 0.375rem 0 0;
 	}
 }

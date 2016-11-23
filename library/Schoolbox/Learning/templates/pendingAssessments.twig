@@ -20,15 +20,17 @@
             {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
             <section>
                 <div class="content collapsible">
-                    <div class="small-6 columns no-pad">
+                    <div class="card small-6 columns no-pad">
+                        {#- Dessicator -#}
+                        <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
+                        <i class="icon-32 icon-{{ icon }}"></i>
                         <h3>
                             {#- Dessicator -#}
-                            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
-                            {#- Dessicator -#}
-                            </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                            <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
                             {#- Dessicator -#}
                         </h3>
                         {{ assessmentContext.crumbs(assessment) }}
+                        <p class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</p>
                     </div>
                     <div class="small-4 columns hide-for-small-only">
 
@@ -50,7 +52,6 @@
                     </div>
                     <div class="small-6 medium-2 columns text-right">
                         <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
-                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% for participant in assessment.allParticipants %}
@@ -113,7 +114,7 @@
                     </div>
                     <div class="small-6 medium-2 columns text-right">
                         <p title="{{ assessment.numNoResponseOrFeedback }} of {{ assessment.numParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
-                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
+                        <p class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% set studentEmails = [] %}
