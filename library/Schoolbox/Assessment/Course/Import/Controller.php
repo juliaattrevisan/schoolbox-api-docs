@@ -829,7 +829,7 @@ class Controller extends Base\Base
                 ],
             ],
             'unitsImpls'   => $courseImpl->getUnits(),
-            'ownerships'   => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}", // TODO is this redundant for modify?
+            'ownerships'   => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}",
         ]);
     }
 
