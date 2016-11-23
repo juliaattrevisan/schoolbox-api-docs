@@ -63,31 +63,25 @@
         // CourseImpl's CourseOutlineComponent Restoration
         $courseList.on('click', '[data-restore-course]', function(event) {
             event.preventDefault();
+            var $restoreButton = $(this);
+            var $courseImpl = $restoreButton.closest('[data-course-impl]');
+            var name = $courseImpl.attr('data-course-name');
+            var $restoreFeedback = $('[data-relation="save-label"]');
 
-            var self = $(this);
-
-            $.post($(this).attr('href'), {
-                folderId: $(this).attr('data-restore-folder'),
-                componentId: $(this).attr('data-restore-component')
-            }, function(responseText) {
-                if (responseText.result == 'success') {
-                    window.location.href = window.location.href;
+            $restoreFeedback.toastActivate({text: 'Restoring Component...'});
+            $.post($restoreButton[0].href, function(responseText) {
+                if ('success' == responseText.result) {
+                    $restoreFeedback.toastTimeout({text: 'Component Restored!', css: 'success'});
+                    $restoreButton.remove();
                 }
                 else {
-                    $('#restoreCourseName').html(self.attr('data-restore-course'));
-
-                    $('#restore_course_modal').foundation('reveal', 'open');
+                    $restoreFeedback.toastTimeout({text: 'Restoration Failed!', css: 'alert'});
                 }
             });
         });
     });
 </script>
 
-<div id="restore_course_modal" class="reveal-modal" data-reveal>
-    <h2>Error restoring course</h2>
-    <p>Could not restore <span id="restore_course_name"></span>.</p>
-    <a class="close-reveal-modal">&#215;</a>
-</div>
 
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
@@ -149,4 +143,5 @@
     </div>
 </div>
 
+<div class="toast" data-alert data-relation="save-label"></div>
 <div id="course-selector-modal" class="reveal-modal" data-reveal></div>

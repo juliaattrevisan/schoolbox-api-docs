@@ -685,7 +685,7 @@ class Controller extends Base\Base
                  */
                 if('import' == $action){
                     $componentInstance = null;
-                    $componentInstanceMapper = \Component_InstanceMapper::getInstance();
+                    $componentInstanceMapper = $this->getComponentInstanceMapper();
                     // Was a componentId supplied?
                     if($componentId){
                         $componentInstance = $componentInstanceMapper->findById($componentId);
@@ -1045,46 +1045,55 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/{courseImplId}/restore
      * @level 165
+     * @param CourseImplementation $courseImpl
      */
-    public function restoreCourse()
+    public function restoreCourse(CourseImplementation $courseImpl)
     {
-        $folderId = $this->getRequest()->post->get('folderId');
-        $componentId = $this->getRequest()->post->get('componentId');
+        $componentInstance = null;
+        $componentInstanceMapper = $this->getComponentInstanceMapper();
 
-        $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
+        $module = \Component_Definition::MODULE_HOMEPAGE;
+        $folderId = $courseImpl->getFolder()->getId();
+        $class = HomepageOutlineComponentController::class;
+        $componentInstances = $componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
+        $componentInstances->sortBy('sequence', 'ASC');
+        foreach($componentInstances as $component){
 
-        /* Spawn a new Course Builder instance
-         */
-        $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-            'class',
-            'Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller'
-        );
-
-        $componentDefinitionId = $componentDefinition->first()->getId();
-
-        $component = new \Component_Instance();
-        $component
-            ->setDefinitionId($componentDefinitionId)
-            ->setModule('homepage')
-            ->setIdentifier($folderId)
-            ->setPosition('top')
-            ->setSequence(1);
-
-        $this->getComponentInstanceMapper()->save($component);
-
-        /* Reassign the new Course Builder instance id to each
-         * unit that previously used $componentId
-         */
-        foreach ($allUnits as $currentUnit) {
-            $currentUnit->setComponent($component->getId());
-
-            $this->getUnitInstanceMapper()->save($currentUnit);
+            // If this component has no associated Course, or the course is not valid
+            if( !$component->getConfigArray()['importedCourse'] ||
+                !$component->getConfigArray()['importedCourse']['value']
+            ) {
+                // Conclude the Component is available, and use it
+                $componentInstance = $component;
+                break;
+            }
         }
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => ['result' => 'success']
-        ]);
+        // Did we find a component?
+        if($componentInstance){
+            $configMapper = \Component_ConfigMapper::getInstance();
+            $config = $configMapper->findByColumnList([
+                'component_config_definition_id' => 255,
+                'component_instance_id' => $componentInstance->getId(),
+            ])->first();
+            if(!$config){
+                $config = $configMapper->createModel();
+                $config
+                    ->setConfigDefinitionId(255)
+                    ->setInstanceId($componentInstance->getId());
+            }
+            $config->setValue($courseImpl->getId());
+            $configMapper->save($config);
+        }
+        // Else no available component, create one.
+        else {
+            $folder = $courseImpl->getFolder();
+            $config = [ 'importedCourse' => $courseImpl->getId() ];
+            $controller = HomepageOutlineComponentController::class;
+            $componentInstanceMapper->injectNewComponent($folder, $config, $controller);
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'success']));
     }
 
 

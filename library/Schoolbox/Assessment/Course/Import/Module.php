@@ -72,7 +72,7 @@ class Module extends \Alaress\Module\Module
         $this->register('POST',   '/units',                                              'postUnits',                $staffOnly);
         $this->register('POST',   '/activities',                                         'postAssessments',          $staffOnly);
         $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',             $staffOnly, $preloadCourse);
-        $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',            $staffOnly);
+        $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',            $staffOnly, $preloadCourse);
     }
 
     /**
