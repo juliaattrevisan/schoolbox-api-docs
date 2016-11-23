@@ -66,7 +66,7 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, IResponse $response)
     {
-        $feedbacks = $response->getAllFeedback();
+        $feedbacks = (new Collection())->add($participant->findMostRecentFeedback());
 
         try {
             $this->processFeedback($participant, $feedbacks, $response);
@@ -121,7 +121,6 @@ class Controller extends Base
             // comment defined and non-empty
             $feedback->setComment($postComment);
         }
-
 
         if ($postMark) {
             // mark defined and non-empty
