@@ -60,7 +60,6 @@ class UserMapper extends Mapper
         $this->uses('hash', self::TYPE_STRING);
         $this->uses('position_title', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
-        $this->uses('staff_profile_comment', self::TYPE_STRING);
         $this->uses('synergy_id', self::TYPE_STRING, null, 'externalId');
         $this->uses('mail_handler', self::TYPE_BOOLEAN, null, 'useInternalMail');
         $this->uses('eportfolio_enabled', self::TYPE_BOOLEAN, null, 'eportfolioEnable');
@@ -133,7 +132,7 @@ class UserMapper extends Mapper
      */
     public function updateSynergeticPassword(User $model)
     {
-        if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
+        if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic') {
             /** @var User $model */
             if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
                 $communityPortalFactory = new CommunityPortalFactory();

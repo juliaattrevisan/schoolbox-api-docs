@@ -385,7 +385,6 @@ class Controller extends Base
         $user->setTitle($post['title']);
         $user->setFirstname($post['firstname']);
         $user->setLastname($post['lastname']);
-        $user->setStaffProfileComment($post['staff_profile_comment']);
         $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
         $user->getRole()->setId($post['group']);
         $user->setAltEmail($post['alt_email']);
