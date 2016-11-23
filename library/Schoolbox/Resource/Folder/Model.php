@@ -17,6 +17,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
@@ -82,9 +83,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * The Course Specification (if any!) that this folder has.
      *
-     * @var CourseSpecification
+     * @var CourseSpecification|null
      */
     protected $courseSpecification;
+
+    /**
+     * The Unit Specification (if any!) that this folder has.
+     *
+     * @var UnitSpecification|null
+     */
+    private $unitSpecification;
 
     /**
      * Constructor
@@ -482,6 +490,24 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getBaseContext()
     {
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecification
+     */
+    public function getUnitSpecification()
+    {
+        return $this->unitSpecification;
+    }
+
+    /**
+     * @param UnitSpecification|null $unitSpecification
+     * @return static
+     */
+    public function setUnitSpecification(UnitSpecification $unitSpecification = null)
+    {
+        $this->unitSpecification = $unitSpecification;
         return $this;
     }
 
