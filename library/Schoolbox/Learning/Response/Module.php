@@ -62,7 +62,7 @@ class Module extends BaseModule
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocDownload',
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocDownload',
 
                 /* View a Response in the Inline Grader
                  */
@@ -147,12 +147,8 @@ class Module extends BaseModule
         });
 
         $this->addRoutePreload($matcher, '(?:getCrocodocDownload)', function ($params) {
-
-            /* TODO: Arbitrarily assume 326 for now
-             * TODO: Generate a populated response for now
-             */
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview(326);
-            $response = (new TemporaryResponse())->produceResponse($assessment);
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
 
             $feedback = null;
 
