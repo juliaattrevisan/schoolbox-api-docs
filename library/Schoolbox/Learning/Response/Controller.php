@@ -78,11 +78,12 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
+     * @param Participant $participant
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getParticularResponse(Submission $response)
+    public function getParticularResponse(Participant $participant, Submission $response)
     {
         /* Module doesn't have access to $this->getUser()
          *
@@ -113,6 +114,7 @@ class Controller extends Base
             $data = [
                 'assessment' => $response->getAssessable(),
                 'response' => $response,
+                'latestFeedback' => $participant->findMostRecentFeedback(),
                 'attachzone' => (new Zone('feedbackFiles'))->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
                 'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
@@ -124,7 +126,7 @@ class Controller extends Base
                 /* For saving feedbacks
                  */
                 'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
-                'participant' => (new Participant($response->getSubmittedOnBehalfOf(), $response->getAssessable())),
+                'participant' => $participant,
 
                 /* Rubrics data
                  */
@@ -154,9 +156,10 @@ class Controller extends Base
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId
      * @level 165
+     * @param Participant $participant
      * @param Submission $response
      */
-    public function deleteParticularResponse(Submission $response)
+    public function deleteParticularResponse(Participant $participant, Submission $response)
     {
         $code = 204;
         $data = null;

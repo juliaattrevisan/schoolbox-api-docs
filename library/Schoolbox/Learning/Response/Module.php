@@ -141,6 +141,7 @@ class Module extends BaseModule
             }
 
             return [
+                'participant' =>  $assessment->getParticipant($response->getSubmittedOnBehalfOf()),
                 'response' => $response,
             ];
         });
