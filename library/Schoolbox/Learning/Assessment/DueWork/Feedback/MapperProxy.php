@@ -95,10 +95,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $feedback = (new DomainObject())
                 ->setId($submissionReturn->getId())
                 ->setAssessable((new DueWork())->setId($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId()))
-                ->setResponse(
-                    (new DueWorkResponse())
-                        ->setId($submissionReturn->getSubmission()->getId())
-                )
                 ->setReviewee($submissionReturn->getOwner())
                 ->setReviewer($submissionReturn->getMarker())
                 ->setComment($submissionReturn->getComment())
@@ -108,6 +104,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($submissionReturn->getUpdatedAt())
                 ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
+
+            /* Returns don't have to be associated with Submissions
+             * This relation is optional
+             */
+            if ($submissionReturn->getSubmission()) {
+                $feedback->setResponse(
+                    (new DueWorkResponse())
+                        ->setId($submissionReturn->getSubmission()->getId())
+                );
+            }
 
             // Add all files in return
             foreach ($submissionReturn->getFiles() as $file) {
