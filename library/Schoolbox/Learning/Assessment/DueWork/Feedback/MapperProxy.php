@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Mapper;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
@@ -146,9 +147,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     (new DueWorkDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
-                ->setSubmission(
-                    (new SubmissionFile())->setId($domainObject->getResponse()->getId())
-                )
                 ->setOwner($domainObject->getReviewee())
                 ->setMarker($domainObject->getReviewer())
                 ->setComment($domainObject->getComment())
@@ -158,6 +156,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($domainObject->getUpdatedAt())
                 ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
+
+            // This feedback doesn't have to be tied to a particular response.
+            if ($domainObject->getResponse() instanceof IResponse) {
+                $dataModel->setSubmission(
+                    (new SubmissionFile())->setId($domainObject->getResponse()->getId())
+                );
+            }
 
             // Add all files
             foreach ($domainObject->getAllFiles() as $file) {
