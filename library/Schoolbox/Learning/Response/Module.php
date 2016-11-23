@@ -24,6 +24,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
@@ -148,7 +149,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, 'getCrocodoc(Download|View)', function ($params) {
+        $this->addRoutePreload($matcher, 'getCrocodocDownload', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
 
@@ -183,6 +184,41 @@ class Module extends BaseModule
             ];
         });
 
+        $this->addRoutePreload($matcher, 'getCrocodocView', function ($params) {
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
+            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+
+            $feedback = null;
+
+            /* Need this $feedback to determine whether the requested
+             * crocodoc annotation is part of a published feedback
+             */
+            foreach ($feedbacks as $currentFeedback) {
+                if ($currentFeedback->getId() == $params['feedbackId']) {
+                    $feedback = $currentFeedback;
+                    break;
+                }
+            }
+
+            /* Factory to figure out which fragment is required
+             */
+            foreach ($response->getAllFiles() as $currentFile) {
+                if ($currentFile->getCrocodocId() == $params['crocodocId']) {
+                    return [
+                        'response' => $response,
+                        'feedback' => $feedback,
+                        'file' => $currentFile
+                    ];
+                }
+            }
+
+            return [
+                'response' => $response,
+                'feedback' => $feedback,
+                'file' => null
+            ];
+        });
 
         $this->addRoutePreload($matcher, '(?:getPlagscanReport)', function ($params) {
 
@@ -256,5 +292,13 @@ class Module extends BaseModule
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
+    }
+
+    /**
+     * @return FeedbackMapperProxy
+     */
+    protected function getFeedbackMapperProxy()
+    {
+        return $this->injector->get('feedbackDataSource');
     }
 }

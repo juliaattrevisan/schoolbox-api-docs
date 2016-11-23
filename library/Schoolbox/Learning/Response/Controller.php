@@ -192,7 +192,7 @@ class Controller extends Base
          * Otherwise 404
          */
         try {
-            $location = $this->determineCrocodocUrl($response, $feedback, $file);
+            $location = $this->determineCrocodocUrl($response, $feedback, $file, true);
         }
         catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -224,7 +224,8 @@ class Controller extends Base
          * Otherwise 404
          */
         try {
-            $location = $this->determineCrocodocUrl($response, $feedback, $file);
+            $viewUrl = $this->determineCrocodocUrl($response, $feedback, $file);
+            $downloadUrl = $this->determineCrocodocUrl($response, $feedback, $file, false);
         }
         catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -237,7 +238,8 @@ class Controller extends Base
         }
 
         $data = [
-            'url' => $location,
+            'viewUrl' => $viewUrl,
+            'downloadUrl' => $downloadUrl,
             'response' => $response,
             'feedback' => $feedback,
             'file' => $file

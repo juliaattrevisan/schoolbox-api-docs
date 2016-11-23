@@ -1,16 +1,32 @@
 <div class="row">
     <div class="small-12 columns">
-        <h1>Annotations for {{ response.assessable.title }}</h1>
-        <ul class="meta">
-            <li class="icon-staff-students"><a href="/search/user/{{ response.submittedOnBehalfOf.id }}" title="View Profile">{{ response.submittedOnBehalfOf.fullname }}</a></li>
-        </ul>
+
     </div>
+</div>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Annotations for {{ response.assessable.title }}</h1>
+            <ul class="meta">
+                <li class="icon-staff-students"><a href="/search/user/{{ response.submittedOnBehalfOf.id }}" title="View Profile">{{ response.submittedOnBehalfOf.fullname }}</a></li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {
+            assessmentId: response.assessable.id,
+            responseId: response.id,
+            feedbackId: feedback.id,
+            crocodocId: file.crocodocId}
+        ) }}" class="icon-download" title="Download"></a>
+    </nav>
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <section>
-            <iframe src="{{ url }}"></iframe>
+            <iframe src="{{ viewUrl }}"></iframe>
         </section>
     </div>
 </div>
