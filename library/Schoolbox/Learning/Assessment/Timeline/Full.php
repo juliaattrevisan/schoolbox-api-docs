@@ -179,6 +179,21 @@ class Full
                  */
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     $processedFeedback[] = $currentFeedback->getId();
+
+                    /* Every associated feedback has a set of attached files
+                     * that were added via the attachzone
+                     *
+                     * It also has a set of crocodocked files. These crocodocked
+                     * files don't get added via the attachzone; they won't appear
+                     * here normally. In the case of the Timeline, Feedback includes
+                     * both the set of attached files and any Submission Files that
+                     * were annotated via crocodoc.
+                     */
+                    foreach ($currentResponse->getAllFiles() as $currentFile) {
+                        if ($currentFile->getCrocodocId()) {
+                            $currentFeedback->getAllFiles()->add($currentFile);
+                        }
+                    }
                 }
             }
         }
