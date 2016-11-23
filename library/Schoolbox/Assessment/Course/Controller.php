@@ -1048,7 +1048,6 @@ class Controller extends Base\Base
 
         $treeBuilder = new TreeBuilder(
             Folder\Mapper::getInstance(),
-            CourseUnitMapper::getInstance(),
             $_SESSION['user'],
             'Courses'
         );

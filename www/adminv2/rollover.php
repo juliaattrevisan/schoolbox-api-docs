@@ -32,7 +32,6 @@ $openCategory = 0;
 // shamelessly copied from resources.php
 $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     Folder\Mapper::getInstance(),
-    Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
     $_SESSION['user'],
     $this->getLocalisedTerm('resource', true, true)
 );

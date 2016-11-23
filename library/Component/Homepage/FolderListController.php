@@ -44,7 +44,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
             Folder\Mapper::getInstance(),
-            Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
             $this->getUser(),
             $this->getSitePage()->getLocalisedTerm('resource', true, true)
         );
