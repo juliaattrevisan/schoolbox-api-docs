@@ -121,7 +121,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      */
     public function softDeleteSubmissions(SubmissionBox $dueWork)
     {
-        $submissionMapper = SubmissionMapper::getInstance();
+        $submissionMapper = $this->getJoinMapper('submission');
         $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
         $submissionMapper->delete($submissions);
     }
@@ -133,7 +133,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      */
     public function softDeleteReturns(SubmissionBox $dueWork)
     {
-        $returnMapper = ReturnedWorkMapper::getInstance();
+        $returnMapper = $this->getJoinMapper('return');
         $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
         $returnMapper->delete($returns);
     }
@@ -146,7 +146,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      */
     public function restoreSubmissions(SubmissionBox $dueWork)
     {
-        $submissionMapper = SubmissionMapper::getInstance();
+        $submissionMapper = $this->getJoinMapper('submission');
         $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
         $submissionMapper->restoreSoftDeleted($submissions);
     }
@@ -158,7 +158,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      */
     public function restoreReturns(SubmissionBox $dueWork)
     {
-        $returnMapper = ReturnedWorkMapper::getInstance();
+        $returnMapper = $this->getJoinMapper('return');
         $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
         $returnMapper->restoreSoftDeleted($returns);
     }

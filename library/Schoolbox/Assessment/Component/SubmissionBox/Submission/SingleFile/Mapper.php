@@ -53,7 +53,7 @@ class Mapper extends BaseMapper
      */
     public function softDeletePlagScan(Model $file)
     {
-        $plagScanMapper = \Plagscan_DocumentMapper::getInstance();
+        $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->delete($plagScans);
     }
@@ -66,7 +66,7 @@ class Mapper extends BaseMapper
      */
     public function restorePlagScan(Model $file)
     {
-        $plagScanMapper = \Plagscan_DocumentMapper::getInstance();
+        $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->restoreSoftDeleted($plagScans);
     }

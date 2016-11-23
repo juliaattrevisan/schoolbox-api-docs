@@ -147,7 +147,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function softDeleteSubmissionFiles(Submission $submission)
     {
-        $submissionFileMapper = SubmissionFileMapper::getInstance();
+        $submissionFileMapper = $this->getJoinMapper('file');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->delete($files);
     }
@@ -160,7 +160,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function restoreSubmissionFiles(Submission $submission)
     {
-        $submissionFileMapper = SubmissionFileMapper::getInstance();
+        $submissionFileMapper = $this->getJoinMapper('file');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->restoreSoftDeleted($files);
     }
