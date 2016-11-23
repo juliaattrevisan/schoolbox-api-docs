@@ -219,7 +219,7 @@ class Controller extends Base
             ->filter(
                 function (IFeedback $feedback) use ($participant)
                 {
-                    if ($feedback->getResponse()) {
+                    if (!empty($feedback->getResponse()->getId())) {
                         // floating feedback only
                         return false;
                     }
