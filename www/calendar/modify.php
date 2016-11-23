@@ -137,6 +137,7 @@ if (is_numeric($_GET['eventID'])) {
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
+            'PASS_REDIRECT' => $_GET['returnTo'],
         )
     );
 

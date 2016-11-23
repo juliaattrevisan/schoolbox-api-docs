@@ -235,11 +235,16 @@ switch ($_REQUEST['action']) {
         // GET: from full calendar
         // POST: from calendar event modify page
         // TODO figure out a global method for redirecting!
-        if (isset($_GET['id'])) {
-            $page->backToTheFuture(1);
-        } else {
-            $page->backToTheFuture(2);
-        }
+//        if (isset($_GET['id'])) {
+//            $page->backToTheFuture(1);
+//        } else {
+//            $page->backToTheFuture(2);
+//        }
+        SitePage::localRedir($event->setupRedirect(
+            $_GET['returnTo'],
+            $event->getStartDateTime()->getURLDate(),
+            $_GET['homepageId'],
+            $_GET['userId']));
         break;
 
     default:
