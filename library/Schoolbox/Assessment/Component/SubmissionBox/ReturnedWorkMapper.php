@@ -61,12 +61,14 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
     protected function getSelectString()
     {
         $markerMapper = $this->getJoinMapper('marker');
+        $submissionMapper = $this->getJoinMapper('submission');
 
         $select = "
             SELECT
                 {$this->getColumnString()},
                 {$markerMapper->getColumnString('m')},
-                {$this->getJoinColumnString('submission_box', 'b')}
+                {$this->getJoinColumnString('submission_box', 'b')},
+                {$submissionMapper->getColumnString('ss')}
         ";
 
         return $select;
@@ -85,6 +87,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
             INNER JOIN {$this->getJoinSql('submission_box', '', 'b')}
+            LEFT JOIN {$this->getJoinSql('submission', '', 'ss')}
         ";
 
         return $from;
@@ -98,12 +101,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $markerMapper = $this->getJoinMapper('marker');
+        $submissionMapper = $this->getJoinMapper('submission');
 
         $collection = new Collection();
 
         foreach ($statement as $row) {
             $return = $this->hydrate($row);
-
+            $return->setSubmission($submissionMapper->hydrate($row, 'ss'));
             $return->setMarker($markerMapper->hydrate($row, 'm'));
             $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
 
