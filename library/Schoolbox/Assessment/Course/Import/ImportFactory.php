@@ -7,6 +7,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\IDatabase;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -49,19 +50,29 @@ class ImportFactory
      * AssessmentImpls will have no id, but will have dates populated according to previous stage
      * All AssessmentImpls will link to an AssessmentSpec
      *
-     * @param UnitImplementation[] $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
      * @return DataTransferObject
      */
-    public function buildForNewImport($unitImpls)
+    public function buildForNewImport(GenericCollection $unitImpls)
     {
-        // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
-        $dto = new DataTransferObject([]);
-
         /**
          * Extract all UnitSpecs into a cache, indexed by unitSpec.id
          * @var UnitSpecification[] $unitSpecCache
          */
         $unitSpecCache = [];
+        $assessmentSpecs = new GenericCollection(GenericCollection::class);
+        $assessmentImpls = new GenericCollection(GenericCollection::class);
+        $assessmentPairs = new GenericCollection(GenericCollection::class);
+
+        // Instantiate empty sets for each UnitSpecId
+        foreach($unitImpls as $unitImpl){
+            $courseSpecId = $unitImpl->getSpecification()->getId();
+            $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
+            $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentPairs->setOffset($courseSpecId, new GenericCollection(AssessmentPair::class));
+        }
+
 
         /**
          * Maintains a list of UnitSpecs encountered while traversing DB query result set.
@@ -69,13 +80,6 @@ class ImportFactory
          * @var UnitSpecification[] $unitSpecCache
          */
         $unitSpecDBCache = [];
-
-        // Add our proposed UnitImpl objects, each linked to an UnitSpec (which may be deleted)
-        foreach ($unitImpls as $unitImpl) {
-            $dto->addUnitImplementation($unitImpl);
-            $unitSpecCache[$unitImpl->getSpecification()->getId()] = $unitImpl->getSpecification();
-        }
-
 
         $query = "
             SELECT 
@@ -101,31 +105,35 @@ class ImportFactory
 
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $unitSpecId = $row['us.id'];
 
             // Is is the first time this UnitSpec has been seen?
-            if(!$unitSpecDBCache[$row['us.id']] instanceof UnitSpecification){
+            if(!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification){
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
-                $unitSpecDBCache[$row['us.id']] = $unitSpecCache[$row['us.id']];
+                $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder = new Folder();
                 $folder->setName($row['usf.name']);
-                $unitSpecCache[$row['us.id']]->setFolder($folder);
+                $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
             if ($row['sdw.id']) {
-                $assessment = new DueWorkAssessment();
+                $assessmentSpec = new DueWorkAssessment();
             } elseif ($row['sqz.id']) {
-                $assessment = new QuizAssessment();
+                $assessmentSpec = new QuizAssessment();
             } elseif ($row['stk.id']) {
-                $assessment = new TaskAssessment();
+                $assessmentSpec = new TaskAssessment();
             } else {
                 throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
             }
-            $assessment->setId($row['sa.id']);
-            $assessment->setTitle($row['sa.title']);
-            $assessment->setDeletedAt(new \Alaress_Date_NullDate());
+            $assessmentSpec->setId($row['sa.id']);
+            $assessmentSpec->setTitle($row['sa.title']);
+            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
 
-            $dto->addAssessmentSpec($unitSpecCache[$row['us.id']], $assessment);
+            $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
         }
+
+        // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
+        $dto = new DataTransferObject([], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
 
         return $dto;
     }
@@ -136,27 +144,11 @@ class ImportFactory
      * UnitImpl + AssessmentImpl will be non-null if already imported.
      *
      * @param int $courseImplId
-     * @param UnitImplementation[] $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
      * @return DataTransferObject
      */
-    public function buildForImportModify($courseImplId, array $unitImpls)
+    public function buildForImportModify($courseImplId, GenericCollection $unitImpls)
     {
-        /**
-         * Extract all UnitSpecs into a cache, indexed by unitSpec.id, so we can use their IDs in queries
-         * @var UnitSpecification[] $unitSpecCache
-         */
-        $unitSpecCache = [];
-        foreach($unitImpls as $unitImpl){
-            $unitSpecCache[$unitImpl->getSpecification()->getId()] = $unitImpl->getSpecification();
-        }
-
-        /**
-         * Maintains a list of UnitSpecs encountered while traversing DB query result set.
-         * Required so we can set the UnitSpec name once only.
-         * @var UnitSpecification[] $unitSpecCache
-         */
-        $unitSpecDBCache = [];
-
         /**
          * Maps each AssessmentImplId to an AssessmentSpecId.
          * SpecId will be null if Impl was created in UnitImpl.
@@ -165,6 +157,32 @@ class ImportFactory
          * @var int[]
          */
         $assessmentImplToSpecMap = [];
+        $assessmentSpecs = new GenericCollection(GenericCollection::class);
+        $assessmentImpls = new GenericCollection(GenericCollection::class);
+        $assessmentPairs = new GenericCollection(GenericCollection::class);
+
+        /**
+         * Extract all UnitSpecs into a cache, indexed by unitSpec.id, so we can use their IDs in queries
+         * @var UnitSpecification[] $unitSpecCache
+         */
+        $unitSpecCache = [];
+
+        // Instantiate empty sets for each UnitSpecId
+        foreach($unitImpls as $unitImpl){
+            $courseSpecId = $unitImpl->getSpecification()->getId();
+            $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
+            $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentPairs->setOffset($courseSpecId, new GenericCollection(AssessmentPair::class));
+        }
+
+        /**
+         * Maintains a list of UnitSpecs encountered while traversing DB query result set.
+         * Required so we can populate the UnitSpec name once only.
+         * @var UnitSpecification[] $unitSpecCache
+         */
+        $unitSpecDBCache = [];
+
         if (count($unitImpls)) {
             /*
              * Get all AssessmentImpls that are in the CourseImpl we are modifying
@@ -188,10 +206,6 @@ class ImportFactory
             }
         }
 
-        $dto = new DataTransferObject($assessmentImplToSpecMap);
-        foreach($unitImpls as $unitImpl){
-            $dto->addUnitImplementation($unitImpl);
-        }
 
         // Get Assessment Spec with optional AssessmentImpl
         // 1. AssessmentSpec in UnitSpec where UnitSpec not imported to UnitImpl
@@ -306,13 +320,14 @@ class ImportFactory
         $statement = $this->database->prepare($query);
         $statement->execute();
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $unitSpecId = $row['us.id'];
             // Is is the first time this UnitSpec has been seen?
-            if(!$unitSpecDBCache[$row['us.id']] instanceof UnitSpecification){
+            if(!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification){
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
-                $unitSpecDBCache[$row['us.id']] = $unitSpecCache[$row['us.id']];
+                $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder = new Folder();
                 $folder->setName($row['usf.name']);
-                $unitSpecCache[$row['us.id']]->setFolder($folder);
+                $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
             // Create AssessmentSpec (if one exists)
@@ -360,17 +375,19 @@ class ImportFactory
             }
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
-                $dto->addAssessmentPair($unitSpecCache[$row['us.id']], $assessmentSpec, $assessmentImpl);
+                $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
             } else if($assessmentSpec instanceof IAssessable) {
                 // Don't add deleted AssessmentSpecs
                 if(!$assessmentSpec->isDeleted()){
-                    $dto->addAssessmentSpec($unitSpecCache[$row['us.id']], $assessmentSpec);
+                    $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
                 }
             } else {
-                $dto->addAssessmentImpl($unitSpecCache[$row['us.id']], $assessmentImpl);
+                $assessmentImpls->getOffset($unitSpecId)->add($assessmentImpl);
             }
 
         }
+
+        $dto = new DataTransferObject($assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
         return $dto;
     }
 

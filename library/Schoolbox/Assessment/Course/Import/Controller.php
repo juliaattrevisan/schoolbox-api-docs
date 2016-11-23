@@ -445,7 +445,7 @@ class Controller extends Base\Base
 
 
         $importFactory = $this->getImportFactory();
-        $unitImpls = [];
+        $unitImpls = new GenericCollection(UnitImplementation::class);
         foreach ($units as $unit) {
             if ($unit['import']) {
                 $unitImpl = new UnitImplementation();
@@ -455,7 +455,7 @@ class Controller extends Base\Base
                 $unitImpl->setSpecification($unitSpec);
                 $unitImpl->setOpenDate($unit['open_date']);
                 $unitImpl->setDueDate($unit['close_date']);
-                $unitImpls[] = $unitImpl;
+                $unitImpls->add($unitImpl);
             }
         }
 

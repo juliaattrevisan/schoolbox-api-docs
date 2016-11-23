@@ -113,7 +113,7 @@
 {% for unitImpl in dto.unitImplementations %}
 
     {% set unitSpec = unitImpl.specification %}
-    {% set assessmentPairs = dto.getUnitSpecAssessments(unitSpec) %}
+    {% set assessmentPairs = dto.getAssessmentPairs(unitSpec) %}
     {% set unitAssessmentCount = dto.getCountAssessments(unitSpec) %}
     {% set unitAssessmentCountSelected = dto.getCountSelectedAssessments(unitSpec) %}
 
