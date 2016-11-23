@@ -9,14 +9,37 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param MapperProxy                   $assessmentMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor,
+        Assessment\Breadcrumb\Factory $bakery
+    ) {
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+    }
 
     /**
      * This gives you a summary of progress made within an Assessment
