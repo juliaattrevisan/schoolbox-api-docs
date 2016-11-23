@@ -66,6 +66,19 @@ class Controller extends Component_Homepage_ControllerAbstract
             /** @var Provider $provider */
             $provider = $this->providerMapper->findById($this->getConfig('ltiprovider'));
 
+
+            // LearningField extraction from URL
+
+            if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
+                $custom = $this->getConfig('description');
+                preg_match('/\/books\/(.*?)\//i', $custom, $matches);
+                $params['custom_vbid'] = $matches[1];
+                preg_match('/\/pageid\/(.*)/i', $custom, $matches);
+                $params['custom_book_location'] = 'pageid/' . $matches[1];
+
+                $provider->setUrl($provider->getUrl() . "?custom_vbid={$params['custom_vbid']}&custom_book_location={$params['custom_book_location']}");
+            }
+
             $params = [
                 'resource_link_id' => $this->getContext()->getFolder()->getId() . "_" . $this->getInstance()->getId(),
                 'resource_link_title' => $this->getConfig('componentname'),
@@ -104,18 +117,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             $consumer->secret = $provider->getSecret();
             $consumer->enabled = true;
             $consumer->save();
-
-            // Add custom parameters for the various providers
-
-            // LearningField
-
-            if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-                $custom = $provider->getCustom();
-                preg_match('/\/books\/(.*?)\//i', $custom, $matches);
-                $params['custom_vbid'] = $matches[1];
-                preg_match('/\/pageid\/(.*)/i', $custom, $matches);
-                $params['custom_book_location'] = 'pageid/' . $matches[1];
-            }
 
             $consumer->doServiceRequest(
                 $service = new LTI\Service\Service($consumer,

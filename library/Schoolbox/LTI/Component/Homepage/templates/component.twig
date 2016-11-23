@@ -1,5 +1,14 @@
 {% if location is empty %}
-
+    <div class="row " data-collapsable="true" data-collapse-state="uncollapsed">
+        <div class="small-12 island">
+            <section>
+                <div class="empty-state">
+                    <i class="icon-settings"></i>
+                    <p>Component not configured correctly.</p>
+                </div>
+            </section>
+        </div>
+    </div>
 {% else %}
     <iframe style="height:{{ height }}px;" src="{{ location }}" frameborder="0"></iframe>
 {% endif %}
