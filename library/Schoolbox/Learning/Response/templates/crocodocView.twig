@@ -1,3 +1,5 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
 <script src="/javascript/shared/jquery.responsive-iframe.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -15,6 +17,25 @@
         });
     });
 </script>
+
+{# Conditional bread?? -_-
+ #}
+{% if response.assessable.context is project %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        [response.assessable.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: response.assessable.context.id, studentId: response.submittedOnBehalfOf.id}) ],
+        [response.assessable.title, routeLookup('learningAssessment.getSummary', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) ],
+        ['Annotations']
+    ] %}
+{% else %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        [response.assessable.title, routeLookup('learningAssessment.getSummary', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) ],
+        ['Annotations']
+    ] %}
+{% endif %}
+
+{{ bread.crumbsArray(nodes)}}
 
 <div class="actions-small-1 row">
     <div class="list-item">
