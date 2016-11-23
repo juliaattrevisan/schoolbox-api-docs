@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use PDOStatement;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -21,57 +22,16 @@ class CompletionMapper extends Mapper {
     protected function mapping() {
         $this->hasTable('task_completion');
         $this->hasModel(Completion::class);
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'task_id',
-            'property'   => 'task',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'task',
-        ));
-        $this->hasMap(array(
-            'column'     => 'student_id',
-            'property'   => 'student',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'student',
-        ));
-        $this->hasMap(array(
-            'column'     => 'marking_user_id',
-            'property'   => 'markingUser',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'marking_user',
-        ));
-        $this->hasMap(array(
-            'column'     => 'completion_date',
-            'property'   => 'completionDate',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'     => 'completion_status',
-            'property'   => 'completionStatus',
-            'type'       => self::TYPE_INTEGER,
-        ));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('task_id', TaskMapper::class, 'id',  null, null, 'task', 'task');
+        $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
+        $this->joins('marking_user_id', UserMapper::class, 'id', null, null, 'markingUser', 'marking_user');
+        $this->uses('completion_status', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasJoin('task', array(
-            'mapper'    => TaskMapper::class,
-            'this_key'  => 'task_id',
-            'other_key' => 'id',
-        ));
-        $this->hasJoin('student', array(
-            'mapper'    => UserMapper::class,
-            'this_key'  => 'student_id',
-            'other_key' => 'id',
-        ));
-        $this->hasJoin('marking_user', array(
-            'mapper'    => UserMapper::class,
-            'this_key'  => 'marking_user_id',
-            'other_key' => 'id',
-        ));
-        $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
     }
 
     /**
@@ -159,8 +119,8 @@ class CompletionMapper extends Mapper {
         try {
             $existing = $this->findOneByColumnList(
                 array(
-                    'task_id' => $task_id,
-                    'student_id'       => $student_id,
+                    'task_id'    => $task_id,
+                    'student_id' => $student_id,
                 ),
                 array('completion_date' => 'desc')
             );
@@ -171,11 +131,11 @@ class CompletionMapper extends Mapper {
             // no existing completion. Continue
         }
 
-        $model = new Completion();
-        $model
-            ->setTask($task_id)
-            ->setStudent($student_id)
-            ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
+        $model = (new Completion())
+            ->setTask((new Task())->setId($task_id))
+            ->setStudent((new User)->setId($student_id))
+            ->setCreatedAt(new \Alaress_Date_Format(new \DateTime('now')))
+            ->setUpdatedAt(new \Alaress_Date_Format(new \DateTime('now')))
             ->setCompletionStatus($status)
         ;
         return $this->save($model);
