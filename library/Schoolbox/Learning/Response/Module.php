@@ -62,7 +62,11 @@ class Module extends BaseModule
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocDownload',
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/download/{crocodocId}' => 'getCrocodocDownload',
+
+                /* View an annotated crocodoc
+                 */
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocView',
 
                 /* View a Response in the Inline Grader
                  */
@@ -132,8 +136,6 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 
             try {
-                /* TODO: Severe inefficiency here, it gets data twice.
-                 */
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
             }
             catch (\OutOfBoundsException $e) {
@@ -146,7 +148,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getCrocodocDownload)', function ($params) {
+        $this->addRoutePreload($matcher, 'getCrocodoc(Download|View)', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
 
@@ -180,6 +182,7 @@ class Module extends BaseModule
                 'file' => null
             ];
         });
+
 
         $this->addRoutePreload($matcher, '(?:getPlagscanReport)', function ($params) {
 

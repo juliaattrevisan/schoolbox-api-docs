@@ -182,8 +182,6 @@ class Controller extends Base
      * @param Submission $response
      * @param SubmissionFile $file
      * @param Feedback $feedback
-     * @throws \RangeException Cannot authenticate at crocodoc
-     * @throws \DomainException Some kind of curl error between us and crocodoc
      */
     public function getCrocodocDownload(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
@@ -193,39 +191,59 @@ class Controller extends Base
          *
          * Otherwise 404
          */
-        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
-            if (strlen($file->getCrocodocId())) {
-                try {
-                    $location = (
-                    new InlineGraderFacade(
-                        new InlineGraderAuthenticator(),
-                        $response,
-                        $file,
-                        $this->getUser()
-                    )
-                    )->getDownloadUrl();
-
-                    $this->getResponse()->redirect->to($location);
-                } catch (\RangeException $e) {
-                    throw $this->getErrorMapper()->generateException(
-                        ErrorMapper::ERROR_PROCESSING,
-                        null,
-                        $e->getMessage()
-                    );
-                } catch (\DomainException $e) {
-                    throw $this->getErrorMapper()->generateException(
-                        ErrorMapper::ERROR_PROCESSING,
-                        null,
-                        $e->getMessage()
-                    );
-                }
-            } else {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-            }
+        try {
+            $location = $this->determineCrocodocUrl($response, $feedback, $file);
         }
-        else {
+        catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
+        catch (\RangeException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+
+        $this->getResponse()->redirect->to($location);
+        return;
+    }
+
+    public function getCrocodocView(Submission $response, Feedback $feedback, SubmissionFile $file)
+    {
+
+    }
+
+    /**
+     * Figure out a Response File's crocodoc url
+     * This is a link to the third-party Crocodoc system
+     *
+     * @param Submission $response
+     * @param Feedback $feedback
+     * @param SubmissionFile $file
+     * @return string
+     * @throws \RangeException Cannot authenticate at crocodoc
+     * @throws \DomainException Some kind of curl error between us and crocodoc
+     */
+    private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file)
+    {
+        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
+            if (strlen($file->getCrocodocId())) {
+                $location = (
+                new InlineGraderFacade(
+                    new InlineGraderAuthenticator(),
+                    $response,
+                    $file,
+                    $this->getUser()
+                )
+                )->getDownloadUrl();
+
+                return $location;
+            }
+
+            throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
+        }
+
+        throw new \DomainException('You do not have permission to view this document.');
     }
 
     /**
