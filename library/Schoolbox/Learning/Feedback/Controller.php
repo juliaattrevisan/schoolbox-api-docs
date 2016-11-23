@@ -69,7 +69,7 @@ class Controller extends Base
         $feedbacks = $response->getAllFeedback();
 
         try {
-            $this->processFeedback($participant, $feedbacks);
+            $this->processFeedback($participant, $feedbacks, $response);
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');
@@ -165,6 +165,7 @@ class Controller extends Base
         /* Attach feedback to a particular Response instance
          */
         if ($response) {
+            $feedback->setResponse($response);
         }
 
         $this->getFeedbackDataSource()->save($feedback);
