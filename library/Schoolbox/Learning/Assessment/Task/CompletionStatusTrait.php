@@ -116,4 +116,16 @@ trait CompletionStatusTrait
     {
         return $this->markAs(ICompletion::STATUS_NOT_ATTEMPTED);
     }
+
+    /**
+     * Gets completion status
+     *
+     * Use `markAs()` methods in lieu of conventional setter
+     *
+     * @return int
+     */
+    public function getCompletionStatus()
+    {
+        return $this->completionStatus;
+    }
 }

@@ -91,4 +91,13 @@ interface ICompletion
      * @return static
      */
     public function markAsNotAttempted();
+
+    /**
+     * Gets completion status
+     *
+     * Use `markAs()` methods in lieu of conventional setter
+     *
+     * @return int
+     */
+    public function getCompletionStatus();
 }
