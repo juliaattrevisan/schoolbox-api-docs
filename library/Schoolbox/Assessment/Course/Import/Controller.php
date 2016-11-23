@@ -695,7 +695,12 @@ class Controller extends Base\Base
                         $componentInstances = $componentInstanceMapper->findByContextAndClass($module, $classFolderId, $class);
                         $componentInstances->sortBy('sequence', 'ASC');
                         foreach($componentInstances as $component){
-                            if(! $component->getConfig()['importedCourse']){
+
+                            // If this component has no associated Course, or the course is not valid
+                            if( !$component->getConfigArray()['importedCourse'] ||
+                                !$component->getConfigArray()['importedCourse']['value']
+                            ) {
+                                // Conclude the Component is available, and use it
                                 $componentInstance = $component;
                                 break;
                             }
