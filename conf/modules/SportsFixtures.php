@@ -10,21 +10,21 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\SportsFixtures\Landing\Module as LandingModule;
-use Schoolbox\SportsFixtures\Import\Module as ImportModule;
-use Schoolbox\SportsFixtures\Sport\Module as SportModule;
-use Schoolbox\SportsFixtures\Season\Module as SeasonModule;
-use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
-use Schoolbox\SportsFixtures\Team\Module as TeamModule;
-use Schoolbox\SportsFixtures\School\Module as SchoolModule;
-use Schoolbox\SportsFixtures\Position\Module as PositionModule;
-use Schoolbox\SportsFixtures\Venue\Module as VenueModule;
-use Schoolbox\SportsFixtures\Match\Module as MatchModule;
-use Schoolbox\SportsFixtures\ItineraryItem\Module as ItineraryItemModule;
-use Schoolbox\SportsFixtures\Component\Homepage\Module as HomepageModule;
-use Schoolbox\SportsFixtures\Component\Dashboard\Module as DashboardModule;
-use Schoolbox\SportsFixtures\Result\Module as ResultModule;
-use Schoolbox\SportsFixtures\Status\Module as StatusModule;
+use Schoolbox\Fixtures\Landing\Module as LandingModule;
+use Schoolbox\Fixtures\Import\Module as ImportModule;
+use Schoolbox\Fixtures\Sport\Module as SportModule;
+use Schoolbox\Fixtures\Season\Module as SeasonModule;
+use Schoolbox\Fixtures\Division\Module as DivisionModule;
+use Schoolbox\Fixtures\Team\Module as TeamModule;
+use Schoolbox\Fixtures\School\Module as SchoolModule;
+use Schoolbox\Fixtures\Position\Module as PositionModule;
+use Schoolbox\Fixtures\Venue\Module as VenueModule;
+use Schoolbox\Fixtures\Match\Module as MatchModule;
+use Schoolbox\Fixtures\ItineraryItem\Module as ItineraryItemModule;
+use Schoolbox\Fixtures\Component\Homepage\Module as HomepageModule;
+use Schoolbox\Fixtures\Component\Dashboard\Module as DashboardModule;
+use Schoolbox\Fixtures\Result\Module as ResultModule;
+use Schoolbox\Fixtures\Status\Module as StatusModule;
 
 class SportsFixtures implements ModuleConfigInterface
 {
@@ -37,7 +37,7 @@ class SportsFixtures implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $namespace = 'sportsfixtures';
+        $namespace = 'fixtures';
 
         $homepageModule = new HomepageModule($kernel->getDependencyInjector());
         $homepageModule->init("/$namespace");

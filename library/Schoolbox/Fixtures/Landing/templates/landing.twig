@@ -1,0 +1,97 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures' ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Fixtures</h1>
+    </div>
+</div>
+
+<div class="row sportsfixtures-landing">
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item">
+                <div class="card small-12 wrap-down sport">
+                    <a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">
+                        <div class="icon-sport icon-64"></div>
+                        <h3>Sports</h3>
+                        <p>Set up a list of all the sports that can be played.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item ">
+                <div class="card small-12 wrap-down venue">
+                    <a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">
+                        <div class="icon-venue icon-64"></div>
+                        <h3>Venues</h3>
+                        <p>Set up a list of locations at which sports are played. </p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item">
+                <div class="card small-12 wrap-down school">
+                    <a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">
+                        <div class="icon-home icon-64"></div>
+                        <h3>External Schools</h3>
+                        <p>Set up a list of opposing schools for inter-school sports events.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item ">
+                <div class="card small-12 wrap-down status">
+                    <a href="{{ routeLookup('sportsfixturesStatus.getList', {}) }}">
+                        <div class="icon-progress icon-64"></div>
+                        <h3>Match Status</h3>
+                        <p>Set up a list of possible outcomes for your sports events.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item ">
+                <div class="card small-12 wrap-down season">
+                    <a href="{{ routeLookup('sportsfixturesSeason.getList', {}) }}">
+                        <div class="icon-calendar icon-64"></div>
+                        <h3>Seasons</h3>
+                        <p>Set up a list of seasons during which sport is conducted.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item ">
+                <div class="card small-12 wrap-down sport">
+                    <a href="{{ routeLookup('sportsfixturesImport.getUpload', {}) }}">
+                        <div class="icon-upload icon-64"></div>
+                        <h3>CSV Import</h3>
+                        <p>Import fixture data from a CSV file.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

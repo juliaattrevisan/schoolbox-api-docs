@@ -1,0 +1,94 @@
+<script type="text/javascript">
+    $(function() {
+        $('#sportForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                url: {
+                    isURL: true
+                }
+            },
+            messages: {
+                'name': 'Please enter a Sport name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        });
+
+        /**
+         * Modal for URL homepage selection
+         */
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
+                }
+            });
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',      routeLookup('sportsfixturesSport.getList') ],
+    [ sport.name | default('New Sport') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ action }} Sport</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if sport %}
+            {% set formUrl = routeLookup('sportsfixturesSport.updateEntity', {entityId: sport.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesSport.createEntity') %}
+        {% endif %}
+
+        <form id="sportForm" action="{{ formUrl }}" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="id" value="{{ sport.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ sport.name }}"/>
+                        </label>
+                        <label>
+                            Homepage URL
+                            <div class="column no-pad">
+                                <div class="medium-8 large-9 columns no-pad">
+                                    <input type="text" name="url" value="{{ sport.url }}" placeholder="http://" />
+                                </div>
+                                <div class="medium-4 large-3 columns">
+                                    <a href="#" class="button" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
+                                    <div data-role="resourceBrowser" class="hide"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Positions</legend>
+                    <div class="small-12 column" id="positions">
+                        {% include '@sportsfixturesPosition/listContent.twig' with { positions: sport.positions } %}
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Sport" />
+        </form>
+    </div>
+</div>

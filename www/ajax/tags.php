@@ -9,8 +9,8 @@
  */
 
 use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
-use Schoolbox\SportsFixtures\Coach;
-use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
+use Schoolbox\Fixtures\Coach;
+use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 if(!isset($this)) {
     require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');

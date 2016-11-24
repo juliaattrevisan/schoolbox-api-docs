@@ -1,0 +1,556 @@
+<?php
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Fixtures\Team;
+
+use Alaress\Web\Controller\Exception;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use \Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\Fixtures\Coach;
+use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\Fixtures\Division\Model as Division;
+use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\Fixtures\Team\Model as Team;
+use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\Fixtures\Team\Player\Model as TeamUser;
+use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use \Schoolbox\Fixtures\Division\Helper\Collector;
+use \Schoolbox\Fixtures\Division\Helper\Translator;
+use Schoolbox\UserMapper;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+
+class Controller extends AbstractController
+{
+
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var TeamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
+     * @var TeamPositionMapper
+     */
+    protected $teamPositionMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
+    /**
+     * @var Coach\TagCloud
+     */
+    protected $coachCloud;
+
+    /**
+     * @var Helper\Translator
+     */
+    protected $teamTranslator;
+
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(TeamMapper::getInstance());
+        $this->setSportMapper(SportMapper::getInstance());
+        $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
+        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance(), $this->getUserMapper()));
+        $this->setTeamTranslator(new Helper\Translator());
+    }
+
+    /**
+     * Populate the Response object with a representation of the given entity:
+     *  - in the format provided in the request Accepts header
+     * If entity is deleted, respond with '210 Gone'
+     *
+     * @param Team $entity
+     * @throws Exception
+     * @return void
+     */
+    public function getEntity($entity)
+    {
+        $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+        $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
+            'sport'    => $sport,
+            'division' => $division,
+            'team'     => $entity
+        ]));
+    }
+
+    /**
+     * List of Teams and the Division they are in
+     * @param Division $context
+     */
+    public function getList($context = null)
+    {
+        /* ajax a list of Teams for a particular Division
+         */
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+            $query = $this->getRequest()->query->get('query');
+
+            /** @var TeamMapper $mapper */
+            $mapper   = $this->getMapper();
+
+            if ($context == null) {
+                $allTeams = $mapper->findByColumn('~name', "%{$query}%");
+            } else {
+                $allTeams = $mapper->findByName($context->getId(), $query);
+            }
+
+            $teams = [];
+
+            /** @var Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
+                $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+            }
+
+            // If the 'schools' parameter is set we also want to add schools from the tag cloud
+
+            if ($this->getRequest()->query->get('schools') == 1) {
+                // Add schools from the tag cloud
+                $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
+
+                foreach ($schools as $school) {
+                    // Prefix their ID with the external school token, we will parse it later when saving a match
+                    $school['id'] = TagCloudMapper::SCHOOL_PREFIX . $school['id'];
+                    $teams[] = $school;
+                }
+
+                // Sort return array by name
+                usort($teams, function ($a, $b) {
+                    return strcmp($a['name'], $b['name']);
+                });
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput($teams));
+        }
+        else {
+            try {
+                $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+            }
+
+            $allTeams = $this->getTeamMapper()->findByColumn(
+                'division_id',
+                $context->getId(),
+                [
+                    'order' => [
+                        'name' => 'asc'
+                    ]
+                ]
+            );
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesTeam/list.twig',
+                    [
+                        'sport'    => $sport,
+                        'division' => $context,
+                        'allTeams' => $allTeams
+                    ]
+                )
+            );
+        }
+    }
+
+    /**
+     * Create a Team in a particular Division id
+     *
+     * @param Team     $entity
+     * @param Division $context
+     * @return void
+     */
+    public function getForm($entity, $context = null)
+    {
+        if (empty($context)) {
+            try {
+                $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+            }
+            catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+            }
+        }
+
+        // Don't permit creation of modification of teams in archived divisions
+        if($context->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
+
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
+
+
+
+        try {
+            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
+            'sport'    => $sport,
+            'division' => $context,
+            'team'     => $entity,
+            'action'   => $entity->getId() ? 'Modify' : 'Create'
+        ]));
+    }
+
+    /**
+     * Modify a Team
+     *
+     * @param Team $entity
+     */
+    public function persistEntity($entity)
+    {
+        try {
+            $divisionId = $this->getRequest()->post['divisionId'];
+            $division   = $this->getDivisionMapper()->findById($divisionId);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
+
+        $this->saveTeam(
+            $division,
+            $this->getRequest()->post['name'],
+            $this->getRequest()->post['url'],
+            $this->getRequest()->post->get('coach', []),
+            $entity
+        );
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getLobby', [
+            'entityId' => $divisionId
+        ]));
+    }
+
+    /**
+     * Add players to a Team
+     *
+     * @param Team $team
+     */
+    public function postAddPlayers(Team $team)
+    {
+        $teamUsers = [];
+        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+            $teamUsers[] = $this->getTeamPlayerMapper()->createModel()
+                ->setTeam($team)
+                ->setUser($user)
+                ->setSequence(0);
+        }
+        $this->getTeamPlayerMapper()->save($teamUsers);
+        $this->renderPostAddPlayersResponse($team);
+    }
+
+    /**
+     * Remove players from a Team
+     *
+     * @param Team $team
+     */
+    public function postRemovePlayers(Team $team)
+    {
+        $this->getTeamPlayerMapper()->delete(
+            $this->getTeamPlayerMapper()->findByColumnList([
+                'user_id' => $this->getRequest()->post->get('userId'),
+                'team_id' => $team->getId(),
+            ])
+        );
+        $this->getTeamPositionMapper()->deleteByColumnList([
+            'user_id' => $this->getRequest()->post->get('userId'),
+            'team_id' => $team->getId(),
+        ]);
+        $this->renderPostAddPlayersResponse($team);
+    }
+
+    /**
+     * Reorder players within a Team
+     *
+     * @param Team $team
+     */
+    public function postReorderPlayers(Team $team)
+    {
+        $userIds    = $this->getRequest()->post->get('userId');
+        $teamUsers  = [];
+        $sequenceNo = count($userIds);
+        foreach ($userIds as $userId) {
+            try {
+                /** @var TeamUser $teamUser */
+                $teamUser = $this->getTeamPlayerMapper()->findOneByColumnList([
+                    'user_id' => $userId,
+                    'team_id' => $team->getId(),
+                ]);
+                $teamUsers[] = $teamUser->setSequence($sequenceNo--);
+            } catch (MapperException $e) {
+                // User isn't in team. Ignore
+                continue;
+            }
+        }
+        $this->getTeamPlayerMapper()->save($teamUsers);
+        $this->renderPostAddPlayersResponse($team);
+    }
+
+    /**
+     * Save Team data to db
+     *
+     * @param Division $division
+     * @param string $name
+     * @param string $url
+     * @param array $coaches
+     * @param Team $team
+     */
+    private function saveTeam(Division $division, $name, $url, $coaches, Team $team)
+    {
+        $team->setName($name);
+        $team->setUrl($url);
+        $team->setDivision($division);
+        $team->setUpdatedAt(\Alaress_Date_Format::now());
+
+        // Save each coach in the tag cloud too, and add to the team.
+        $team->setCoaches($this->getCoachCloud()->saveTagCloud($coaches));
+        $this->getTeamMapper()->save($team);
+    }
+
+    /**
+     * Outputs the response from an add player method.
+     *
+     * @param Team $team
+     */
+    protected function renderPostAddPlayersResponse(Team $team)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $this->getTeamTranslator()->collectPlayers($team);
+
+            // Output a XHR data model + HTML output
+            $dataModel = $this->getTeamTranslator()->translateTeam($team);
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getAsString();
+
+
+            /* this is stupid
+             */
+            $divisionCollector = new Collector();
+            $divisionTranslator = new Translator();
+
+            $divisionCollector->collectPlayers($team->getDivision());
+            $divisionCollector->collectTeams($team->getDivision());
+            $divisionLobby = $divisionTranslator->translateDivision($team->getDivision());
+            $dataModel['divisionLobby'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getAsString();
+
+
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Redirect back to lobby
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'sportsfixturesDivision.getLobby',
+                    ['entityId' => $team->getDivision()->getId()]
+                )
+            );
+        }
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
+    {
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+    }
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->mapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TeamPlayerMapper
+     */
+    protected function getTeamPlayerMapper()
+    {
+        return $this->teamPlayerMapper;
+    }
+
+    /**
+     * @param TeamPlayerMapper $teamPlayerMapper
+     * @return static
+     */
+    protected function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
+    {
+        $this->teamPlayerMapper = $teamPlayerMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamPositionMapper
+     */
+    protected function getTeamPositionMapper()
+    {
+        return $this->teamPositionMapper;
+    }
+
+    /**
+     * @param TeamPositionMapper $teamPositionMapper
+     * @return static
+     */
+    protected function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
+    {
+        $this->teamPositionMapper = $teamPositionMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return Coach\TagCloud
+     */
+    public function getCoachCloud()
+    {
+        return $this->coachCloud;
+    }
+
+    /**
+     * @param Coach\TagCloud $coachCloud
+     * @return static
+     */
+    public function setCoachCloud($coachCloud)
+    {
+        $this->coachCloud = $coachCloud;
+        return $this;
+    }
+
+    /**
+     * @return Helper\Translator
+     */
+    public function getTeamTranslator()
+    {
+        return $this->teamTranslator;
+    }
+
+    /**
+     * @param Helper\Translator $teamTranslator
+     * @return static
+     */
+    public function setTeamTranslator($teamTranslator)
+    {
+        $this->teamTranslator = $teamTranslator;
+        return $this;
+    }
+}
