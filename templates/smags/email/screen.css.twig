@@ -1,0 +1,139 @@
+/* This file is subject to Twig, beware the {{ vars }} */
+/* use classes, don't use id's */
+
+/* will be truncated by mail clients, but we use it for styling */
+body {
+    margin: 0;
+}
+
+table {
+    border-spacing: 0;
+    border-width: 0;
+    border-collapse: collapse;
+}
+td {
+    padding: 0;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+a {
+    text-decoration: none;
+}
+a[href] {
+    text-decoration: underline;
+}
+
+img {
+    display: block;
+}
+
+.wrap {
+    width: 100%;
+}
+
+.inner-wrap {
+    background-color: {{ config.skin_builder ? colours.skin_colour_body_bg : colours.body_background }};
+    width: 100%;
+}
+
+.header, .footer {
+    width: 100%;
+}
+
+.header {
+    background-color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.banner_background }};
+}
+
+.header img {
+    color: {{ config.skin_builder ? colours.skin_colour_offcanvas_background : colours.banner_color }}
+}
+
+.content {
+    background-color: {{ config.skin_builder ? 'white' : colours.content_background }};
+}
+
+.content a {
+    color: {{ config.skin_builder ? colours.skin_colour_content_ui_foreground : colours.link }};
+}
+.content p {
+    line-height: 20px;
+    font-size: 13px;
+    margin: 0;
+}
+
+{# no skin builder equivalent #}
+{% if not config.skin_builder %}
+tr.dark {
+    background-color: {{ colours.dark }};
+}
+{% endif %}
+
+.content .heading {
+    line-height: 36px;
+    font-weight: bold;
+    font-size: 18px;
+    color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.banner_background }};
+    {#background: {{ colours.module_background }};#}
+}
+
+.content a.cta {
+    background-color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.submit_btn }};
+    padding: 4px 8px 6px;
+    text-decoration: none;
+    color: white;
+}
+
+{# no skin builder equivalent #}
+{% if not config.skin_builder %}
+.content em {
+    color: {{ colours.dgrey }}
+}
+{% endif %}
+
+.content .title {
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.footer p {
+    color: {{ config.skin_builder ? 'black' : colours.footer_links }};
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: right;
+    margin: 0; {# ignored by 50% of mail clients #}
+}
+
+.footer a {
+    color: {{ config.skin_builder ? colours.skin_colour_content_ui_foreground : colours.footer_links }};
+    text-decoration: underline;
+}
+
+tr.underline td, td.underline {
+    border-bottom: solid 1px {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.border_color }};
+}
+
+
+{# module specifics #}
+.work-month, .work-day {
+    text-align: center;
+    border: solid 2px {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.banner_background }};
+}
+.work-month {
+    text-transform: uppercase;
+    font-size: 12px;
+    background-color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.banner_background }};
+    color: white;
+    border-bottom: solid 1px #fff;
+}
+
+.work-day {
+    font-size: 22px;
+    line-height: 35px;
+    color: white;
+    background-color: {{ config.skin_builder ? colours.skin_colour_offcanvas_background : colours.content_background }};
+}
+
