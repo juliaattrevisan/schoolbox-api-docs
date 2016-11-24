@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
-use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Model as TeamModel;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 
 class Component_Config_Team extends Component_Config_Abstract
 {

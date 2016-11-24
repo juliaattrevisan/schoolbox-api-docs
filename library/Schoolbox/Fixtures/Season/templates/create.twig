@@ -1,0 +1,93 @@
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('#seasonForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 1
+                },
+                start: {
+                    required: true,
+                    minlength: 2
+                },
+                end: {
+                    required: true,
+                    minlength: 2
+                }
+            },
+            messages: {
+                name:  'Please enter a Season name.',
+                start: 'Please select a season start date.',
+                end:   'Please select a season end date.'
+            }
+        });
+
+        // Create date-pickers
+        $('#seasonForm').find('[data-datepicker]').datepicker();
+
+        // Ensure season ends on or after it begins
+        $('#start').syncDates({
+            endDate: $('#end')
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Seasons',  routeLookup('sportsfixturesSeason.getList') ],
+    [ season.name | default('Create Season') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ action }} Season</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if season %}
+            {% set formUrl = routeLookup('sportsfixturesSeason.updateEntity', {entityId: season.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesSeason.createEntity') %}
+        {% endif %}
+
+        <form id='seasonForm' action="{{ formUrl }}" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="id" value="{{ season.id }}"/>
+
+                        <label>
+                            Name
+                            <span data-tooltip class="hint has-tip tip-top" title="Internally, what this season is known as.">?</span>
+                            <input type="text" name="name" value="{{ season.name }}"/>
+                        </label>
+
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Start Date
+                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker value="{{ season.start.getLocalShort }}">
+                        </label>
+                    </div>
+
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            End Date
+                            <input type="text" id="end" name="end" placeholder="End Date" data-datepicker value="{{ season.end.getLocalShort }}">
+                        </label>
+                    </div>
+
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Season" />
+        </form>
+    </div>
+</div>
