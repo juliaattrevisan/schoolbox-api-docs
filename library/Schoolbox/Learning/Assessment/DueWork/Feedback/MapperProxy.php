@@ -121,6 +121,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 $feedback->getAllFiles()->add(
                     (new DueWorkFeedbackFile())
                         ->setId($file->getId())
+                        ->setFilename($file->getFilename())
                         ->setStorage($file->getStorage())
                         ->setCrocodocId($file->getUuid())
                 );
