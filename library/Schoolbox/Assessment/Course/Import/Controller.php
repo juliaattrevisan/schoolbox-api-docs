@@ -40,6 +40,11 @@ use \Component_InstanceMapper;
 
 class Controller extends Base\Base
 {
+    const IMPORT_STAGE_COURSE_AND_CLASSES = 1;
+    const IMPORT_STAGE_OWNERSHIPS = 2;
+    const IMPORT_STAGE_UNITS = 3;
+    const IMPORT_STAGE_ASSESSMENTS = 4;
+
     /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
@@ -163,7 +168,9 @@ class Controller extends Base\Base
         }
 
         // If the URL specifies a CourseSpec and Import destination (ie a Folder), then skip to stage 2
-        $initialStage = $courseSpec && $targetClass ? 2 : 1;
+        $initialStage = $courseSpec && $targetClass
+            ? self::IMPORT_STAGE_COURSE_AND_CLASSES
+            : self::IMPORT_STAGE_OWNERSHIPS;
 
         $this->tpl('import', [
             'action'              => 'import',
@@ -176,7 +183,9 @@ class Controller extends Base\Base
                     'id'   => $targetClass->getId(),
                     'name' => $targetClass->getTitle()
                 ] : [],
-            'ownershipCandidates' => 2 == $initialStage ? $this->getPossibleOwnerships([$targetClass]) : [],
+            'ownershipCandidates' => self::IMPORT_STAGE_OWNERSHIPS == $initialStage
+                ? $this->getPossibleOwnerships([$targetClass]) :
+                [],
         ]);
     }
 
@@ -843,7 +852,7 @@ class Controller extends Base\Base
 
         $this->tpl('import', [
             'action'              => 'modify',
-            'initialStage'        => 3,
+            'initialStage'        => self::IMPORT_STAGE_UNITS,
             'courseSpec'          => $courseSpec,
             'courseSpecId'        => $courseSpec->getId(),
             'courseImpl'          => $courseImpl,
