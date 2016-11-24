@@ -242,7 +242,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             if (SitePage::detectAjax()) {
                 // Just rebuild and refetch the component
                 $sitepage = new SitePage(false);
-                $sitepage->setDi($page->getDi());
+                $sitepage->setDi($kernel->getDependencyInjector());
                 $factory       = new Component_Eportfolio_Factory(new \Schoolbox\User(), $sitepage);
                 $componentList = $componentInstanceMapper->findByInstanceId($instance->getId());
                 $cList         = array_values($componentList);
