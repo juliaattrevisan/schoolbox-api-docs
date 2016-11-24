@@ -11,10 +11,13 @@ use Alaress_Date_Format;
 use DueWork_ErrorMapper;
 use InvalidArgumentException;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Controller extends Base
 {
@@ -121,6 +124,7 @@ class Controller extends Base
         $postComment = trim($this->getRequest()->post['comment']);
         $postPublish = $this->getRequest()->post['publish'];
 
+        /** @var IFeedback $feedback */
         $feedback
             ->setReviewer($this->getUser())
             ->setUpdatedAt(Alaress_Date_Format::now())
@@ -159,6 +163,21 @@ class Controller extends Base
                     // invalid input
                     $this->sendError('Invalid mark given');
                     return;
+                }
+            }
+        }
+
+        // Attach any attached files (if this kind of attachment accepts them)
+        // TODO move all of this creational logic into another factory
+        if ($feedback instanceof DueWorkFeedback) {
+            $factory = new CollectorFactory();
+            if (!empty($this->getRequest()->post['attachment'])) {
+                foreach ($factory->build($this->getRequest()->post['attachment'])->getAll() as $attachment) {
+                    // TODO figure out if this file needs to be related to a crocodoc
+                    $feedback->getAllFiles()->add(
+                        (new DueWorkFeedbackFile())
+                            ->setStorage($attachment)
+                    );
                 }
             }
         }
