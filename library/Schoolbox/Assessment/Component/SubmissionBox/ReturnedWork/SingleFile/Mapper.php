@@ -8,9 +8,12 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile;
 
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
@@ -48,10 +51,12 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('return', 'r')},
-                {$this->getJoinColumnString('storage', 'f')}
+                {$this->getJoinColumnString('storage', 'f')},
+                {$this->getJoinColumnString('storage.allowedFileExtension', 'm')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('return', '', 'r')}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
+            LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
         ";
     }
 
@@ -68,10 +73,20 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
             $result = $this->hydrate($row);
+
+            /**
+             * @var Storage      $storage
+             * @var Mimetype     $mime
+             * @var ReturnedWork $return
+             */
+            $storage = $this->hydrateJoin($row, 'storage', 'f');
+            $mime    = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
+            $return  = $this->hydrateJoin($row, 'return', 'r');
+
             $resultSet->add(
                 $result
-                    ->setStorage($this->hydrateJoin($row, 'storage', 'f'))
-                    ->setReturn($this->hydrateJoin($row, 'return', 'r'))
+                    ->setStorage($storage->setMimetype($mime))
+                    ->setReturn($return)
             );
         }
         return $resultSet;
