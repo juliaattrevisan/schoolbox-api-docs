@@ -478,6 +478,29 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numPublished() / $numParticipants);
     }
 
+    /**
+     * Is feedback on this assessment visible to $viewingUser?
+     *
+     * @param User $viewingUser
+     * @return bool
+     */
+    public function isFeedbackVisibleToUser(User $viewingUser)
+    {
+        $role = $viewingUser->getRole();
+
+        switch ($this->getMarkVisibility()) {
+            case self::MARK_VISIBILITY_PARENT_STUDENT:
+                return $role->isStaff() || $role->isStudent() || $role->isParent();
+
+            case self::MARK_VISIBILITY_STUDENT:
+                return $role->isStaff() || $role->isStudent();
+
+            case self::MARK_VISIBILITY_PRIVATE:
+            default:
+                return $role->isStaff();
+        }
+    }
+
     /* Getters/Setters
      */
 
