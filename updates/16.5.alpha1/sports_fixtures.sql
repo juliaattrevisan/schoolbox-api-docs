@@ -367,24 +367,24 @@ JOIN groups g ON g.group_type = s.role_type
 WHERE s.namespace = @sportns;
 
 INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
-VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
+VALUES ('Sport Fixtures', 'Schoolbox\\Fixtures\\Component\\Homepage\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'collapse', '0', 'Collapse Content', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Homepage\\Controller'), 'collapse', '0', 'Collapse Content', null);
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'team', '0', 'Team To Display', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Homepage\\Controller'), 'team', '0', 'Team To Display', null);
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Homepage\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'showHistorical', '1', 'Show Historical', 'Whether the component should display matches played in the past');
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Homepage\\Controller'), 'showHistorical', '1', 'Show Historical', 'Whether the component should display matches played in the past');
 
 INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
-VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'false');
+VALUES ('Sport Fixtures', 'Schoolbox\\Fixtures\\Component\\Dashboard\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'false');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'collapse', '0', 'Collapse Content', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Dashboard\\Controller'), 'collapse', '0', 'Collapse Content', null);
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\Fixtures\\Component\\Dashboard\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
 
 CREATE TABLE sportsfixtures_import
 (
