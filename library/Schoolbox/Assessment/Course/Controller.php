@@ -29,14 +29,14 @@ use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
-use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -46,10 +46,10 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Controller as FolderController;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -62,6 +62,7 @@ use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Learning\Course;
+use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 
 class Controller extends Base\Base
 {
@@ -212,6 +213,134 @@ class Controller extends Base\Base
         $this->setErrorMapper(Error\Mapper::getInstance());
     }
 
+    /**
+     * Generates a Unit and Course for a pair of folders.
+     *
+     * A single call to this method may create a Unit, a Course or both. Note that we do NOT enforce a
+     * parent-child relationship between a Unit's folder and the Course's folder.
+     *
+     * While to the User it appears like folders have been converted, under the hood this is achieved
+     * by associating the specified folders with a Unit and/or Course respectively.
+     *
+     * Does not permit moving an existing Unit to a new Course.
+     *
+     * @api POST /course/convert/:courseFolderId/:unitFolderId
+     * @level 165
+     *
+     * @param Folder $courseFolder
+     * @param Folder $unitFolder
+     */
+    public function convertFolders(Folder $courseFolder, Folder $unitFolder)
+    {
+        $errors = [];
+
+        $course = $courseFolder->getCourseSpecification();
+        $unit = $unitFolder->getUnitSpecification();
+
+        $courseExists = $course instanceof CourseSpecification && $course->getId();
+        $unitExists = $unit instanceof UnitSpecification && $unit->getId();
+
+        // Do the folders already have a Unit and Course attached ?
+        if($courseExists && $unitExists){
+            $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
+            $this->returnJson($errors, 400);
+        }
+
+        // Does Unit already exist and belong to different Course?
+        if($unitExists && !$courseExists){
+            $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
+            $this->returnJson($errors, 400);
+        }
+
+        // Is the proposed unit folder the same as the course folder?
+        if($unitFolder->getId() == $courseFolder->getId()){
+            $errors[] = 'Cannot convert the same folder into both a Unit and a Course. FolderId: ' . $courseFolder->getId();
+        }
+
+        // Check proposed Course
+        if(!$courseExists){
+            // Does user have WRITE+ access to Course Folder?
+            $courseFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), [$courseFolder->getId()]);
+            if($courseFolderAccess < UserAccess::ACCESS_WRITE){
+                $errors[] = 'Course Folder permission error: '.$courseFolder->getId();
+            }
+
+            // Does the proposed Course Folder already have a Unit
+            $courseFolderUnit = $courseFolder->getUnitSpecification();
+            if($courseFolderUnit instanceof UnitSpecification && $courseFolderUnit->getId()){
+                $errors[] = 'Proposed Course folder already has a Unit: ' . $courseFolderUnit->getId();
+            }
+        }
+
+        // Check the proposed Unit
+        if(!$unitExists){
+            // Does user have WRITE+ access to the Unit folder?
+            $unitFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), [$unitFolder->getId()]);
+            if($unitFolderAccess < UserAccess::ACCESS_WRITE){
+                $errors[] = 'Unit Folder permission error: '.$unitFolder->getId();
+            }
+
+            // Does the proposed Unit Folder already have a Course ?
+            $unitFolderCourse = $unitFolder->getCourseSpecification();
+            if($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()){
+                $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
+            }
+        }
+
+        if(count($errors)){
+            $this->returnJson($errors, 400);
+        }
+
+        // No errors. Proceed.
+
+        // Create Course if required
+        if(!$courseExists){
+            $course = $this->getCourseSpecificationMapper()->createModel();
+            $course->setFolder($courseFolder);
+        }
+
+        // Create Unit if required
+        if(!$unitExists){
+            $unit = $this->getUnitSpecificationMapper()->createModel();
+            $unit->setFolder($unitFolder);
+        }
+
+        // Link Course and Unit
+        $unit->setCourse($course);
+        $course->getUnits()->add($unit);
+
+        // And save
+        $response = [];
+        if(!$courseExists){
+            $this->getCourseSpecificationMapper()->save($course);
+            $response['course'] = $course->getId();
+        }
+
+        // Create Unit if required
+        if(!$unitExists){
+            $this->getUnitSpecificationMapper()->save($unit);
+            $response['unit'] = $unit->getId();
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($response));
+    }
+
+    /**
+     * Convenience method for returning JSON output
+     *
+     * @param string|array $message
+     * @param int $code
+     */
+    protected function returnJson($message, $code = 200)
+    {
+        $this->getResponse()->status->set($code);
+        if($this->getRequest()->isXhr()){
+            $this->getResponse()->content->set($this->buildJsonOutput($message));
+        } else {
+            die(json_encode($message));
+        }
+    }
+
 
     /**
      * Just a raw template render
@@ -228,13 +357,13 @@ class Controller extends Base\Base
     /**
      * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
      *
-     * @param Folder\Model $unit
+     * @param Folder $unit
      * @return Component_Instance
      */
-    protected function getCourseBuilderInstance(Folder\Model $unit)
+    protected function getCourseBuilderInstance(Folder $unit)
     {
         // confirm that there's a Course Builder component
-        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller::class);
+        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), CourseBuilderController::class);
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
@@ -247,11 +376,11 @@ class Controller extends Base\Base
 
 
     /**
-     * @param Folder\Model $unit
+     * @param Folder $unit
      * @param string $controller
      * @return Component_Instance
      */
-    protected function injectNewComponent(Folder\Model $unit, $controller = \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller::class)
+    protected function injectNewComponent(Folder $unit, $controller = CourseBuilderController::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
         $instanceMapper = $this->getComponentInstanceMapper();
@@ -522,7 +651,7 @@ class Controller extends Base\Base
         }
 
         // if there were any validation problems, throw that back
-        if ($errors || !$parent instanceof FolderModel) {
+        if ($errors || !$parent instanceof Folder) {
             throw new Base\Exception("Could not save", $errors);
         }
 
@@ -611,7 +740,7 @@ class Controller extends Base\Base
                 ]);
             } else {
 
-                /** @var Folder\Model $folder */
+                /** @var Folder $folder */
                 $datums = array_merge($datums, [
                     // configurable things
                     'inherit' => $folder->getInherit()
@@ -735,11 +864,11 @@ class Controller extends Base\Base
      * Wrapper around Folder\Controller::persistFolder() and does some extra perms checking
      *
      * @param array $data
-     * @return Folder\Model
+     * @return Folder
      */
     protected function persistFolder(array $data)
     {
-        /** @var Folder\Controller $folderController */
+        /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
 
         $folder = $folderController->persistFolder($data, $this->getUser());
@@ -905,11 +1034,11 @@ class Controller extends Base\Base
     /**
      * Convenience method
      *
-     * @param Folder\Model $course
+     * @param Folder $course
      * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
-    protected function getLineage(Folder\Model $course)
+    protected function getLineage(Folder $course)
     {
         return $this->getAncestry()->findParentsCheaply($course, $this->getCourseSpecificationMapper()->getFacultyRootFolder());
     }
@@ -918,17 +1047,17 @@ class Controller extends Base\Base
     /**
      * Gets the suggested course links to A FULLY HYDRATED folder
      *
-     * @param Folder\Model $folder
+     * @param Folder $folder
      * @return Collection
      */
-    protected function getLinkSuggestions(Folder\Model $folder)
+    protected function getLinkSuggestions(Folder $folder)
     {
         // obtain curriculum codes...
         $codes = $folder->getCurriculumNodes()->getColumnValues('code');
 
         // find all the folders that match this code, then filter for coarseness
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
-            /** @var Folder\Model $result */
+            /** @var Folder $result */
             // TODO: test this with folders and courses which have curriculum codes
             try {
                 $this->getCourseSpecificationMapperProxy()->findByFolderId($result->getId());
@@ -983,7 +1112,7 @@ class Controller extends Base\Base
             $array['text'] = "Home";
         } else {
 
-            /** @var Folder\Model $folder */
+            /** @var Folder $folder */
             $folder = $node->getItem();
 
             $array['id'] = $folder->getId();
@@ -1044,7 +1173,7 @@ class Controller extends Base\Base
         }
 
         $treeBuilder = new TreeBuilder(
-            Folder\Mapper::getInstance(),
+            FolderMapper::getInstance(),
             $_SESSION['user'],
             'Courses'
         );
@@ -1063,10 +1192,10 @@ class Controller extends Base\Base
     /**
      * Save the given template for the given folder
      *
-     * @param Folder\Model $model
+     * @param Folder $model
      * @param int $template
      */
-    protected function saveHomepageConfig(Folder\Model $model, $template)
+    protected function saveHomepageConfig(Folder $model, $template)
     {
         $confMapper = $this->getHomepageConfigMapper();
         $tplMapper = $this->getHomepageTemplateMapper();
@@ -1155,7 +1284,7 @@ class Controller extends Base\Base
         // Delete course specs (this also deletes constituent units)
         $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
 
-        /** @var Folder\Controller $folderController */
+        /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
         $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
     }
@@ -1177,7 +1306,7 @@ class Controller extends Base\Base
         // Delete unit spec
         $this->getUnitSpecificationMapperProxy()->delete($unitSpec);
 
-        /** @var Folder\Controller $folderController */
+        /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
         $folderController->recursiveDelete($unitSpec->getFolder()->getId(), $this->getUser());
     }
@@ -1189,7 +1318,6 @@ class Controller extends Base\Base
      */
     protected function throwError($message)
     {
-        $this->getResponse()->status->set(500);
 
         $this->getResponse()->content->set([
             'format' => 'file',
@@ -1740,7 +1868,9 @@ class Controller extends Base\Base
 
         } catch (MapperExceptionDeleted $e) {
             // Deleted: load the parent (recursively)
-            return $this->findFolder($e->getDeletedObject()->getParent()->getId());
+            /** @var Folder $folder */
+            $folder = $e->getDeletedObject();
+            return $this->findFolder($folder->getId());
 
         } catch (MapperException $e) {
             return $this->folderMapper->createModel()->setId(0);

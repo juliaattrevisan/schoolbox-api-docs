@@ -15,10 +15,12 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Learning\Course;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends BaseModule
 {
@@ -68,6 +70,21 @@ class Module extends BaseModule
         }
     }
 
+    /**
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        $preloadFolders = function (array $params) {
+            $folderMapper = $this->getFolderMapper();
+            return [
+                'courseFolder' => $folderMapper->findById($params['courseFolderId']),
+                'unitFolder'   => $folderMapper->findById($params['unitFolderId']),
+            ];
+        };
+
+        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
+    }
 
     /**
      * {@inheritdoc}
@@ -110,5 +127,13 @@ class Module extends BaseModule
                 ]
             )
         );
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 }
