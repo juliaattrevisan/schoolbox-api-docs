@@ -7,12 +7,10 @@
  */
 namespace Schoolbox\Fixtures\ItineraryItem;
 
-use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Venue\Model as Venue;
-use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Mapper

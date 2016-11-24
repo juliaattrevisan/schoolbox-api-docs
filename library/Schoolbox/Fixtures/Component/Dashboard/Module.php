@@ -7,12 +7,9 @@
 
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule

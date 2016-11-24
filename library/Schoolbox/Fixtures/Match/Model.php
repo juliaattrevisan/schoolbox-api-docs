@@ -11,7 +11,6 @@
 namespace Schoolbox\Fixtures\Match;
 
 use \Alaress_Date_Format;
-use Sabre\DAV\Exception\NotImplemented;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;

@@ -313,6 +313,7 @@ class Controller extends AbstractController
      * Determine whether the logged-in user has write access
      * to this Match page
      *
+     * @param Collection $allCoaches
      * @return bool
      */
     private function hasMatchModify(Collection $allCoaches)

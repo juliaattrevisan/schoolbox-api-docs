@@ -29,8 +29,6 @@ use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
-use Schoolbox\Fixtures\Status\Model as Status;
-use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
 use Schoolbox\Fixtures\School\Model as School;
 use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Collection;

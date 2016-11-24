@@ -10,7 +10,6 @@ namespace Schoolbox\Fixtures\School;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable

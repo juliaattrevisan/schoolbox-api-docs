@@ -12,7 +12,6 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted as DeletedMapperException;
 use \Schoolbox\Fixtures\Season\Model as Season;
 use \Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;

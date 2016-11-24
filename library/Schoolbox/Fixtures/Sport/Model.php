@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Fixtures\Position\Model as Position;
-use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {

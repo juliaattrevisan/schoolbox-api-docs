@@ -11,9 +11,7 @@
 namespace Schoolbox\Fixtures\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use External_UserInterface;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use \Schoolbox\Fixtures\Coach\Model as Coach;
 use \Schoolbox\Fixtures\Match\Model as Match;

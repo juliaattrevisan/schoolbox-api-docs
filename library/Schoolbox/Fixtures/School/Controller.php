@@ -66,6 +66,7 @@ class Controller extends Base
 
     /**
      * Update name of school
+     * @param $entityId int
      */
     public function postEditSchool($entityId) {
 
@@ -95,6 +96,7 @@ class Controller extends Base
 
     /**
      * Delete external school from tag cloud
+     * @param $entityId int
      */
     public function postDeleteSchool($entityId) {
         /** @var TagCloud $tag */

@@ -21,6 +21,8 @@ use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\Fixtures\Team\Player\Model as TeamUser;
 use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use \Schoolbox\Fixtures\Division\Helper\Collector;
+use \Schoolbox\Fixtures\Division\Helper\Translator;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
@@ -364,8 +366,8 @@ class Controller extends AbstractController
 
             /* this is stupid
              */
-            $divisionCollector = new \Schoolbox\Fixtures\Division\Helper\Collector();
-            $divisionTranslator = new \Schoolbox\Fixtures\Division\Helper\Translator();
+            $divisionCollector = new Collector();
+            $divisionTranslator = new Translator();
 
             $divisionCollector->collectPlayers($team->getDivision());
             $divisionCollector->collectTeams($team->getDivision());

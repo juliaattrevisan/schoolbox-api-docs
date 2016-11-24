@@ -17,7 +17,6 @@
 namespace Schoolbox\Fixtures\Team\Metadata;
 
 use Schoolbox\Fixtures\Team\Metadata\Strategy\IMetadataStrategy;
-use \Schoolbox\User;
 use \Schoolbox\Collection;
 use \Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\Fixtures\Team\Model as Team;
