@@ -205,7 +205,7 @@ class Controller extends AbstractController
         } else {
             // Create file upload zone
             $zone = new Zone("uploadZone");
-            $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+            $zone->setAttachPrompt('upload a list of players');
             $dataModel['user']       = $this->getUser();
             $dataModel['uploadZone'] = $zone;
             $this->getResponse()->content->set(
