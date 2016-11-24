@@ -58,6 +58,7 @@ class Lookup implements HydratorInterface
     {
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {
+            $row[$this->fieldname] = trim($row[$this->fieldname]);
             // Is the field value in the list of lookup values?
             if (isset($this->lookupValues[$row[$this->fieldname]])) {
                 return call_user_func(
