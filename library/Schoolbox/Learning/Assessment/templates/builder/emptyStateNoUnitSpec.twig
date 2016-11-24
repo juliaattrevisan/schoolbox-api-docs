@@ -1,12 +1,44 @@
 {#
 Usage:
     {% include '@learningAssessment/builder/emptyStateNoUnitSpec.twig' with {
-        folder:          Folder  - The folder on which this Component resides
-        folderHasCourse: bool    - Whether this folder has a Course
-        parentHasCourse: bool    - Whether this folder's parent has a Course
-        parentHasUnit:   bool    - Whether this folder's parent has a Unit
+        componentInstance Component_Instance - The Component displaying this content
+        folder:           Folder             - The folder on which this Component resides
+        folderHasCourse:  bool               - Whether this folder has a Course
+        parentHasCourse:  bool               - Whether this folder's parent has a Course
+        parentHasUnit:    bool               - Whether this folder's parent has a Unit
     } only %}
 #}
+<script>
+    $(function() {
+
+        $('[data-convert-folders]').on('click', function(event){
+            event.preventDefault();
+            var $element = $(this);
+            var countFolders = $element.attr('data-convert-folders');
+            var $convertFeedback = $('[data-relation="save-label"]');
+            $convertFeedback.toastActivate({text: 'Converting Folder'+(countFolders > 1 ? 's' : '')+'...'});
+
+            $.post($element[0].href, function(){
+                $convertFeedback.toastTimeout({text: 'Conversion Complete', css: 'success'});
+                reloadComponent();
+            })
+            .fail(function(){
+                $convertFeedback.toastTimeout({text: 'Conversion Failed!', css: 'alert'});
+            });
+        });
+
+        /**
+         * Call after successful conversion to AJAX refresh the component
+         */
+        function reloadComponent()
+        {
+            var $component = $('#component{{ componentInstance.id }}');
+            var $updateForm = $component.find("[data-component-panel='settings'] form");
+            $updateForm.trigger('submit');
+        }
+    });
+
+</script>
 <div class="empty-state">
     <i class="icon-course"></i>
     {% if folderHasCourse %}
@@ -18,11 +50,12 @@ Usage:
     {% endif %}
 
     {% if not folderHasCourse and not parentHasCourse and not parentHasUnit %}
-        <p><a href="{{ routeLookup('course.courseList') }}" title="Convert folder and parent to Unit and Course">Convert this Folder</a> to a Unit, and parent Folder to a Course</p>
+        <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder and parent to Unit and Course">Convert this Folder</a> to a Unit, and parent Folder to a Course</p>
     {% elseif parentHasCourse and not folderHasCourse %}
-        <p><a href="{{ routeLookup('course.courseList') }}" title="Convert folder to Unit">Convert this Folder</a> to a Unit</p>
+        <p><a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder to Unit">Convert this Folder</a> to a Unit</p>
     {% else %}
         <p><a href="{{ routeLookup('course.courseList') }}" title="Manage Courses">Manage Courses</a></p>
     {% endif %}
 </div>
 
+<div class="toast" data-alert data-relation="save-label"></div>

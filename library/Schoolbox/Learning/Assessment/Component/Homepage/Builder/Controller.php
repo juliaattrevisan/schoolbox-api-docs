@@ -135,10 +135,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         $parentHasUnit = $parentUnit instanceof UnitSpecification && $parentUnit->getId();
 
         $data = [
-            'folder'          => $folder,
-            'folderHasCourse' => $folderHasCourse,
-            'parentHasCourse' => $parentHasCourse,
-            'parentHasUnit'   => $parentHasUnit,
+            'componentInstance' => $this->getInstance(),
+            'folder'            => $folder,
+            'folderHasCourse'   => $folderHasCourse,
+            'parentHasCourse'   => $parentHasCourse,
+            'parentHasUnit'     => $parentHasUnit,
         ];
 
         return $this->renderTwigTemplate(
