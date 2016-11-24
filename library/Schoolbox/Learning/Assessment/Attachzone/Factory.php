@@ -11,6 +11,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Resource\Attachment\Zone;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
@@ -130,6 +131,26 @@ class Factory
 
         $zone->attachFiles($files);
 
+        return $zone;
+    }
+
+    /**
+     * Build an attachzone with $feedback's attached files preloaded.
+     *
+     * @param Feedback $feedback
+     * @return Zone
+     */
+    public function buildForDueWorkFeedback(Feedback $feedback)
+    {
+        $zone = (new Zone('feedbackFiles'))
+            ->setMulti(true)
+            ->setAttachmentsLabel('');
+
+        $files = [];
+        foreach ($feedback->getAllFiles() as $file) {
+            $files[] = $file->getHash();
+        }
+        $zone->attachFiles($files);
         return $zone;
     }
 }
