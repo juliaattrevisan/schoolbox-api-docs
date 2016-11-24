@@ -23,6 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use \Component_DefinitionMapper;
 use \Component_InstanceMapper;
 
 class Module extends \Alaress\Module\Module
@@ -99,6 +100,7 @@ class Module extends \Alaress\Module\Module
                 'setFolderMapper'                   => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'setCourseSpecificationMapper'      => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
                 'setCourseImplementationMapper'     => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'setComponentDefinitionMapper'      => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
                 'setComponentInstanceMapper'        => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
                 'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
                 'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work

@@ -74,6 +74,9 @@ class Controller extends Base\Base
     /** @var Component_InstanceMapper */
     private $componentInstanceMapper;
 
+    /** @var \Component_DefinitionMapper */
+    private $componentDefinitionMapper;
+
     /**
      * @var ImportFactory
      */
@@ -144,12 +147,13 @@ class Controller extends Base\Base
     protected function getImportForm(CourseSpecification $courseSpec, Folder $targetClass = null, $componentId)
     {
         // Ensure that if present, the component instance is an extant CourseOutline
-        $courseOutlineComponent = null;
+        $componentInstance = null;
         if ($componentId) {
             try {
-                $courseOutlineComponent = $this->getComponentInstanceMapper()->findById($componentId);
-                $COURSE_OUTLINE_DEFINITION_ID = 66;
-                if ($courseOutlineComponent->getDefinitionId() != $COURSE_OUTLINE_DEFINITION_ID) {
+                $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
+                $definitionId = $componentInstance->getDefinitionId();
+                $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
+                if ($componentDefinition->getClass() != HomepageOutlineComponentController::class) {
                     $msg = 'Not a Course-Outline component';
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
                 }
@@ -165,7 +169,7 @@ class Controller extends Base\Base
             'action'              => 'import',
             'initialStage'        => $initialStage,
             'courseSpec'          => $courseSpec,
-            'componentId'         => $courseOutlineComponent ? $courseOutlineComponent->getId() : null,
+            'componentId'         => $componentInstance ? $componentInstance->getId() : null,
             'folder'              => $targetClass,
             'destinations'        => $targetClass ?
                 [
@@ -1192,6 +1196,26 @@ class Controller extends Base\Base
     {
         $this->courseImplementationMapper = $courseImplementationMapper;
         return $this;
+    }
+
+    /**
+     * Get component instance mapper
+     *
+     * @return \Component_DefinitionMapper
+     */
+    protected function getComponentDefinitionMapper()
+    {
+        return $this->componentDefinitionMapper;
+    }
+
+    /**
+     * Set component instance mapper
+     *
+     * @param \Component_DefinitionMapper $componentDefinitionMapper
+     */
+    public function setComponentDefinitionMapper($componentDefinitionMapper)
+    {
+        $this->componentDefinitionMapper = $componentDefinitionMapper;
     }
 
     /**
