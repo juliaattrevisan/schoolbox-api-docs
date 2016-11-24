@@ -59,6 +59,8 @@ class Controller extends Base
     }
 
     /**
+     * Create a Feedback that is associated with a particular Response
+     *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
      * @param Participant $participant
      * @param IResponse $response
@@ -83,6 +85,9 @@ class Controller extends Base
 
     /**
      * Process feedbacks
+     *
+     * This method is shared between the Quickmark (postParticipantFeedback) and the
+     * Inline Grader (postResponseFeedback) methods so they behave similarly
      *
      * @param Participant $participant
      * @param Collection $feedbacks
