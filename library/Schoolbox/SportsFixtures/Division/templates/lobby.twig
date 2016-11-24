@@ -145,20 +145,11 @@
         <p>
             You may upload a list of Schoobox usernames or external IDs into this division.
         </p>
-
-        {% if user.isSuperuser %}
-            {# Show only superusers the role report link, as only they can see it #}
-            <p>
-                You may also download a report from the
-                <a href="/adminv2/home" target="_blank">Role Statistics section in Administration</a>,
-                and use it to create a list of users to upload.
-            </p>
-        {% endif %}
-            <label for="addUsersByList">
-                User List
-                <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
-            </label>
-            <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
+        <label for="addUsersByList">
+            User List
+            <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+        </label>
+        <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
         <ul class="flex-list buttons">
             <li><input type="submit" class="full-width" value="Upload" /></li>
         </ul>
