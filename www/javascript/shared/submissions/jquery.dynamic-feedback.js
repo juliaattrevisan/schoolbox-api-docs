@@ -64,7 +64,11 @@
                  */
                 statusIncomplete: '',
                 statusPending: '',
-                statusComplete: ''
+                statusComplete: '',
+
+                /* A callback to execute upon successful completion of Publish action
+                 */
+                onPublishCallback: function() {}
             };
 
             var derived = {
@@ -121,6 +125,8 @@
                         $btnPublish.text('Publish');
                         $btnDrafted.text('');
                     });
+
+                    config.onPublishCallback();
 
                 }).fail(function (xhr) {
                     toast.call($form, xhr.responseText, false);
