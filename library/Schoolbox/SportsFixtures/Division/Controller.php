@@ -269,44 +269,54 @@ class Controller extends AbstractController
     {
         $divisionUsers = [];
 
-        // Do stuff with upload
-        $factory = new CollectorFactory();
-        $attach  = $this->getRequest()->post->get('attachment');
-        if (is_array($attach)) {
-            $upload = $factory->build($attach)->getFirst();
-        } else {
-            // error out
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
+        //get rid of newlines
+        $string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
+
+        //split the list into an array
+        $list = preg_split('/[,; ]/', $string);
 
         // What are the users in this upload?
-        $reader = new Reader($upload->readStream());
-        $reader->setLoadFromFirst(true);
-        foreach ($reader as $row) {
+        foreach ($list as $key) {
+            $key = trim($key);
             // Try ID, then username, then external ID
             $user = null;
-            try {
-                if (!empty($row['Schoolbox User ID'])) {
-                    $user = $this->getUserMapper()->findById($row['Schoolbox User ID']);
-                } elseif (!empty($row['Username'])) {
-                    $user = $this->getUserMapper()->findOneByColumn('username', $row['Username']);
-                } elseif (!empty($row['External ID'])) {
-                    $user = $this->getUserMapper()->findByExternalId($row['External ID']);
+
+            if(!empty($key)) {
+                try {
+                    if(is_numeric($key)) {
+                        $user = $this->getUserMapper()->findByExternalId($key);
+                    }
+                    elseif(is_string($key)) {
+                        // First assume it is non-numeric external id
+                        try {
+                            $user = $this->getUserMapper()->findByExternalId($key);
+                        }
+                        catch(\Schoolbox\Mapper\Exception $e){
+                            // Then assume it is a username
+                            $user = $this->getUserMapper()->findOneByColumn('username', $key);
+                        }
+                    }
+                    else {
+                        continue;
+                    }
                 }
-            } catch (MapperException $e) {
-                // noop
-            }
-            if ($user instanceof User) {
-                $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                    ->setDivision($division)
-                    ->setUser($user)
-                    ->setSequence(0);
+                catch(MapperException $e) {
+                    // noop
+                }
+
+                if ($user instanceof User) {
+                    $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
+                        ->setDivision($division)
+                        ->setUser($user)
+                        ->setSequence(0);
+                }
             }
         }
 
         // and save
         $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
+
     }
 
     /**
