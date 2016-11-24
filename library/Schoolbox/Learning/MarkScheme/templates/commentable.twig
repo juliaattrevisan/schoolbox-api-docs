@@ -35,5 +35,12 @@
                 </section>
             </div>
         </div>
+
+        {# Maybe files may be uploaded here? #}
+        {% if feedbackAttachzone %}
+            <div class="small-12 columns">
+                {% include 'sub/attachzone.twig' with {attachzone: feedbackAttachzone} %}
+            </div>
+        {% endif %}
     </div>
 </form>

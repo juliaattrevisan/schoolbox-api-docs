@@ -133,17 +133,13 @@
                                 assessmentId: assessment.id,
                                 studentId: response.submittedOnBehalfOf.id,
                                 responseId: response.id
-                            })
+                            }),
+                            feedbackAttachzone: attachzone
                         } %}
                     </div>
                 </li>
             </ul>
         </section>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 columns">
-        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     </div>
 </div>
 
