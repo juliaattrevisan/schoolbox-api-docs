@@ -94,7 +94,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Factory to figure out which fragment is required
+        /* ResponseFileFactory figures out which fragment is required
          */
         $file = null;
 
