@@ -1,3 +1,8 @@
+{# Inline Grader for a particular Response
+ #
+ # This lets you create Associated Feedback along with grade, comment and
+ # assorted feedback files etc.
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -8,6 +13,19 @@
     ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
     ['Inline Grader', null]
 ) }}
+
+<script type="text/javascript">
+    $(function() {
+
+        {# Special behaviour of the Publish button on this screen
+         # Publishing on this screen should be synonymous with the
+         # old "Save And Continue" behaviour
+         #}
+        $('#assessment-status').on('click', '[data-draft="publish"]', function(event) {
+
+        });
+    });
+</script>
 
 <div class="actions-small-1 row">
     <div class="list-item">
