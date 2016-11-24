@@ -144,15 +144,31 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $markerMapper = $this->getJoinMapper('marker');
         $submissionMapper = $this->getJoinMapper('submission');
 
+        /** @var ReturnedWork[] $collection */
         $collection = new Collection();
+        $ids        = [];
 
         foreach ($statement as $row) {
             $return = $this->hydrate($row);
+            $ids[]  = $return->getId();
             $return->setSubmission($submissionMapper->hydrate($row, 'ss'));
             $return->setMarker($markerMapper->hydrate($row, 'm'));
             $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
 
             $collection->add($return);
+        }
+
+        // Fetch and hydrate files
+        $files = $this->getJoinMapper('file')
+                      ->findByColumn('submission_return_id', $ids)
+                      ->groupByCallback(function($f) {
+                          /** @var ReturnedWork\SingleFile\Model $f */
+                          return $f->getReturn()->getId();
+                      });
+        foreach ($collection as $result) {
+            if (isset($files[$result->getId()])) {
+                $result->setFiles($files[$result->getId()]);
+            }
         }
 
         return $collection;
