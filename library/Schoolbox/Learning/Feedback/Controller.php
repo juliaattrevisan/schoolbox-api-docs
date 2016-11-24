@@ -177,6 +177,7 @@ class Controller extends Base
                     $feedback->getAllFiles()->add(
                         (new DueWorkFeedbackFile())
                             ->setStorage($attachment)
+                            ->setFilename($attachment->getFilename())
                     );
                 }
             }
