@@ -147,9 +147,9 @@ abstract class Component_ControllerAbstract
             ->setUser($user)
             ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
-            ->setFolderMapper(FolderMapper::getInstance())
-            ->setErrorMapper(ErrorMapper::getInstance())
-            ->setConfigMapper(ConfigMapper::getInstance());
+            ->setFolderMapper($this->getMapperFactory()->get(FolderMapper::class))
+            ->setErrorMapper($this->getMapperFactory()->get(ErrorMapper::class))
+            ->setConfigMapper($this->getMapperFactory()->get(ConfigMapper::class));
     }
 
     /**
