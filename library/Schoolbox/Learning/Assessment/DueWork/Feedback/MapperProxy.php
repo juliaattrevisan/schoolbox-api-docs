@@ -169,6 +169,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 $dataModel->getFiles()->add(
                     (new SubmissionReturnFile())
                         ->setId($file->getId())
+                        ->setFilename($file->getFilename())
                         ->setStorage($file->getStorage())
                         ->setUuid($file->getCrocodocId())
                 );
