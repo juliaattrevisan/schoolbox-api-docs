@@ -121,7 +121,7 @@ class Controller extends Base
                 'assessment' => $response->getAssessable(),
                 'response' => $response,
                 'latestFeedback' => $latestFeedback,
-                'attachzone' => $attachZone,
+                'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
                 'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
                 'file' => $file,
