@@ -1,6 +1,28 @@
+{#
+Usage:
+    {% include '@learningAssessment/builder/emptyStateNoUnitSpec.twig' with {
+        folder:          Folder  - The folder on which this Component resides
+        folderHasCourse: bool    - Whether this folder has a Course
+        parentHasCourse: bool    - Whether this folder's parent has a Course
+        parentHasUnit:   bool    - Whether this folder's parent has a Unit
+    } only %}
+#}
 <div class="empty-state">
     <i class="icon-course"></i>
-    <p>This Folder is not a Unit</p>
-    <p><a href="{{ routeLookup('course.courseList') }}" title="Manage Courses">Manage Courses</a></p>
+    {% if folderHasCourse %}
+        <p>This Folder is already a Course</p>
+    {% elseif parentHasUnit %}
+        <p>This Folder's parent is a Unit. You cannot create Units inside Units</p>
+    {% else %}
+        <p>This Folder is not a Unit</p>
+    {% endif %}
+
+    {% if not folderHasCourse and not parentHasCourse and not parentHasUnit %}
+        <p><a href="{{ routeLookup('course.courseList') }}" title="Convert folder and parent to Unit and Course">Convert this Folder</a> to a Unit, and parent Folder to a Course</p>
+    {% elseif parentHasCourse and not folderHasCourse %}
+        <p><a href="{{ routeLookup('course.courseList') }}" title="Convert folder to Unit">Convert this Folder</a> to a Unit</p>
+    {% else %}
+        <p><a href="{{ routeLookup('course.courseList') }}" title="Manage Courses">Manage Courses</a></p>
+    {% endif %}
 </div>
 

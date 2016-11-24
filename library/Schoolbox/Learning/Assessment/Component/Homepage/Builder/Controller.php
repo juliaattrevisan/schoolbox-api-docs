@@ -18,6 +18,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -82,7 +83,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             $data = [
                 'unit'      => $unit,
-                'tasks'     => $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()),
+                'tasks'     => $this->assessmentMapperProxy->findAllByUnitSpecificationId($unit->getId()),
                 'usages'    => new Collection(),
                 // TODO repair this. Provides 'export to class' functionality. see jquery.course-builder.js
 //                'usages'    => $this->getUnitImplementationMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
@@ -122,10 +123,28 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     protected function renderNotAUnitSpecification($templateHandle)
     {
+        $folder = $this->getSource();
+        $parent = $this->getFolderMapper()->findById($folder->getParent()->getId());
+
+        $folderCourse = $folder->getCourseSpecification();
+        $parentCourse = $parent->getCourseSpecification();
+        $parentUnit = $parent->getUnitSpecification();
+
+        $folderHasCourse = $folderCourse instanceof CourseSpecification && $folderCourse->getId();
+        $parentHasCourse = $parentCourse instanceof CourseSpecification && $parentCourse->getId();
+        $parentHasUnit = $parentUnit instanceof UnitSpecification && $parentUnit->getId();
+
+        $data = [
+            'folder'          => $folder,
+            'folderHasCourse' => $folderHasCourse,
+            'parentHasCourse' => $parentHasCourse,
+            'parentHasUnit'   => $parentHasUnit,
+        ];
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/builder/emptyStateNoUnitSpec.twig',
-            [],
+            $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
     }
