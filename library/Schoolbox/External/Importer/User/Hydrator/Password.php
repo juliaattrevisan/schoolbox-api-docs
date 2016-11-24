@@ -31,7 +31,7 @@ class Password extends Field
      */
     public function __construct($fieldname, $setMethod, PasswordService $passwordService)
     {
-        parent::__construct($fieldname, $setMethod);
+        parent::__construct($fieldname, $setMethod, false);
         $this->passwordService = $passwordService;
     }
 

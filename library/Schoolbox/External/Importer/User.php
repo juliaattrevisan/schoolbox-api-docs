@@ -12,7 +12,6 @@ use Alaress\Password\Service;
 use House as HouseModel;
 use HouseMapper;
 use HouseResidential as HouseResidentialModel;
-use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -232,11 +231,11 @@ class User extends AbstractImporter
         $this->userIdentifiers[]  = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
 
         // Hydrators
-        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
-        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername', true);
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId', false);
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
         $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->passwordService);
-        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword');
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword', false);
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Contact Details?', 'setHideContacts');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Timetable?', 'setHideTimetable');
@@ -248,12 +247,12 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Account Enabled?', 'setEnabled');
         $this->userHydrators[] = new User\Hydrator\Campus('Campus', $this->campusList);
-        $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle');
-        $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname');
-        $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname');
-        $this->userHydrators[] = new User\Hydrator\Field('Position Title', 'setPositionTitle');
-        $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail');
-        $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear');
+        $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle', true);
+        $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname', true);
+        $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname', true);
+        $this->userHydrators[] = new User\Hydrator\Field('Position Title', 'setPositionTitle', true);
+        $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);
+        $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear', true);
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
 

@@ -33,15 +33,24 @@ class Field implements HydratorInterface
     protected $setMethod;
 
     /**
+     * Whether to trim the string
+     *
+     * @var boolean
+     */
+    protected $trim = false;
+
+    /**
      * Constructor
      *
      * @param string $fieldname
      * @param string $setMethod
+     * @param boolean $trim
      */
-    public function __construct($fieldname, $setMethod)
+    public function __construct($fieldname, $setMethod, $trim)
     {
         $this->fieldname = $fieldname;
         $this->setMethod = $setMethod;
+        $this->trim = $trim;
     }
 
     /**
@@ -50,7 +59,10 @@ class Field implements HydratorInterface
     public function hydrate($row, UserModel $user)
     {
         if (isset($row[$this->fieldname])) {
-            return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
+            if ($this->trim) {
+                $row[$this->fieldname] = trim($row[$this->fieldname]);
+            }
+            return call_user_func([$user, $this->setMethod], ($row[$this->fieldname]));
         }
         return $user;
     }

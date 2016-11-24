@@ -23,6 +23,19 @@ use Schoolbox\UserMapper;
  */
 class ToggleField extends Field
 {
+
+    /**
+     * Constructor
+     *
+     * @param string          $fieldname
+     * @param string          $setMethod
+     */
+    public function __construct($fieldname, $setMethod)
+    {
+        parent::__construct($fieldname, $setMethod, true);
+    }
+
+
     /**
      * @inheritdoc
      */
