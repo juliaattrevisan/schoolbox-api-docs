@@ -200,6 +200,16 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Convenience method for Components to get the Injected MapperFactory
+     *
+     * @return \Schoolbox\MapperFactory
+     */
+    protected function getMapperFactory()
+    {
+        return $this->getSitePage()->getDi()->get('mapperFactory');
+    }
+
+    /**
      * @param $templateHandle
      * @param string $templateName
      * @param string $templatePath
