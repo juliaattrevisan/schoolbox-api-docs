@@ -110,12 +110,19 @@ class Controller extends Base
 
                 $xml = simplexml_load_string($xmlContent);
 
+
                 if ($xml !== false) {
 
                     $launchUrl = $xml->children('blti', true)->secure_launch_url;
 
                     if (!empty($launchUrl)) {
                         $provider->setUrl((string)$launchUrl);
+                    } else {
+                        $launchUrl = $xml->children('blti', true)->launch_url;
+
+                        if (!empty($launchUrl)) {
+                            $provider->setUrl((string)$launchUrl);
+                        }
                     }
 
                     $icon = $xml->children('blti', true)->secure_icon;

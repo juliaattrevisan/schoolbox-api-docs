@@ -80,7 +80,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
 
             $params = [
-                'resource_link_id' => $this->getContext()->getFolder()->getId() . "_" . $this->getInstance()->getId(),
+                'resource_link_id' => 'pleasework',
                 'resource_link_title' => $this->getConfig('componentname'),
                 'resource_link_description' => '',
                 'user_id' => $this->getUser()->getId(),
@@ -96,23 +96,20 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'lis_person_name_given' => $this->getUser()->getFirstname(),
                 'lis_person_name_family' => $this->getUser()->getLastname(),
                 'lis_person_name_full' => $this->getUser()->getFullName(),
-                'list_person_contact_email_primary' => $this->getUser()->getEmail(),
+                'lis_person_contact_email_primary' => $this->getUser()->getEmail(),
                 'context_id' => $this->getInstance()->getId(),
                 'context_type' => 'CourseSection',
                 'context_title' => $this->getContext()->getFolder()->getName(),
                 'context_label' => $this->getContext()->getFolder()->getCodeString(),
-                'launch_presentation_locale' => 'en-AU',
+                'launch_presentation_locale' => 'en-US',
                 'launch_presentation_document_target' => 'iframe',
                 'launch_presentation_width' => '800',
                 'launch_presentation_height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-
-                // This should be the URL that the result of a resource picker gets sent to- but it ain't working!
-
                 'launch_presentation_return_url' => urlencode('http://192.168.36.10/lti.php'),
-
                 'tool_consumer_instance_guid' => $this->configLoader->get('site_location'),
                 'tool_consumer_instance_name' => $this->configLoader->get('school_name'),
                 'tool_consumer_instance_description' => 'Schoolbox LMS',
+                'tool_consumer_instance_url' => urlencode("http://" . $_SERVER['SERVER_NAME']),
                 'tool_consumer_instance_contact_email' => $this->configLoader->get('mail_from_address'),
                 'tool_consumer_info_product_family_code' => 'schoolbox',
                 'tool_consumer_info_version' => $this->configLoader->get('site_version'),
@@ -146,12 +143,18 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $params
             );
 
-            if ($response->ok) {
+            if ($response->ok || $response->status == 301 || $response->status == 302 || $response->status == 303) {
                 preg_match("/Location: (.*)$/m", $response->responseHeaders, $matches);
                 $location = $matches[1];
+
+                if ($provider->getName() == 'OneNote Class Notebook') {
+                    $location = 'http://www.onenote.com' . $location;
+                }
+
             } else if ($response->status == 200) {
                 $location = $provider->getUrl();
             } else {
+                var_dump($response);
                 $location = "";
             }
 
