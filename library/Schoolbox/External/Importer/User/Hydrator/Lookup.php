@@ -9,7 +9,6 @@ namespace Schoolbox\External\Importer\User\Hydrator;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
-use Schoolbox\UserMapper;
 
 /**
  * Sets a field value based on a lookup.

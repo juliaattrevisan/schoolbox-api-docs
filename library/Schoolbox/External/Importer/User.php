@@ -12,7 +12,6 @@ use Alaress\Password\Service;
 use House as HouseModel;
 use HouseMapper;
 use HouseResidential as HouseResidentialModel;
-use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
