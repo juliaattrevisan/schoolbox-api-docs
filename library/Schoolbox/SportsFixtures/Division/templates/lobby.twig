@@ -77,7 +77,7 @@
                 <p>There are no Players in {{ division.name }}.</p>
                 <p>
                     You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
-                    or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
+                    or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">insert an entire list</a>.
                 </p>
             </div>
         {% endif %}
@@ -143,22 +143,14 @@
     <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
     <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {entityId: division.id}) }}" method="post">
         <p>
-            You may upload a list of Schoolbox User IDs, usernames or external IDs into this division.
-            Make sure that it conforms to the <a href="/sportsfixtures/import/userTemplate.csv">template</a> provided.
+            You may copy and paste a list of Schoobox usernames or external IDs into this division. Please make sure each person is on a new line.
         </p>
-
-        {% if user.isSuperuser %}
-            {# Show only superusers the role report link, as only they can see it #}
-            <p>
-                You may also download a report from the
-                <a href="/adminv2/home" target="_blank">Role Statistics section in Administration</a>,
-                and use it as the list of users to upload.
-            </p>
-        {% endif %}
-
-        {% include 'sub/attachzone.twig' with { attachzone: uploadZone.twigContext } %}
+        <label for="addUsersByList">
+            User List
+            <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+        </label>
+        <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
         <ul class="flex-list buttons">
-            <li><a href="/sportsfixtures/import/userTemplate.csv" class="button">Download Template</a></li>
             <li><input type="submit" class="full-width" value="Upload" /></li>
         </ul>
     </form>
