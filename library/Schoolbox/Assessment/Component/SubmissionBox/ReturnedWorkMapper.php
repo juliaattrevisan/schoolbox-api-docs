@@ -51,11 +51,21 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->uses('updated_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        // Unmapped join onto individual files
+        $this->hasJoin(
+            'file',
+            [
+                'mapper'    => ReturnedWork\SingleFile\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'submission_return_id',
+            ]
+        );
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturnedWorkFiles'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
     }
 
 
@@ -437,9 +447,35 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * @param ReturnedWork $object
      * @param ReturnedWork $previous
      */
-    public function postSave(ReturnedWork $object, $previous = null)
+    public function syncToMarkbook(ReturnedWork $object, $previous = null)
     {
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
+    }
+
+    /**
+     * Post-save callback.
+     *
+     * Saves all attached files in this returned work.
+     *
+     * @param ReturnedWork $object
+     * @param ReturnedWork $previous
+     */
+    public function persistFiles(ReturnedWork $object, ReturnedWork $previous = null)
+    {
+        $joinMapper = $this->getJoinMapper('file');
+
+        // Delete files that were attached but aren't now
+        $existingFiles = $joinMapper->findByColumn('submission_return_id', $object->getId());
+        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
+        $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
+        $joinMapper->hardDelete($removedFiles);
+
+        /* Save only files that are new
+         */
+        foreach ($addedFiles as $file) {
+            $file->setReturn($object);
+        }
+        $joinMapper->save($addedFiles);
     }
 }
