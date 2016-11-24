@@ -22,13 +22,15 @@
             statusIncomplete: '{{ statusIncomplete }}',
             statusPending: '{{ statusPending }}',
             statusComplete: '{{ statusComplete }}',
+
+            {# Special behaviour of the Publish button on this screen
+             # Publishing on this screen should be synonymous with the
+             # old "Save And Continue" behaviour
+             #}
+            publishText: 'Publish And Continue',
+
             onPublishCallback: function() {
-
-                {# Special behaviour of the Publish button on this screen
-                 # Publishing on this screen should be synonymous with the
-                 # old "Save And Continue" behaviour
-                 #}
-
+                console.log('foxy moxy');
             }
         });
     });
@@ -131,4 +133,3 @@
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 <div class="toast" data-alert data-save-draft></div>
 
-{% include '@learningFeedback/dynamicFeedback.twig' %}

@@ -66,6 +66,10 @@
                 statusPending: '',
                 statusComplete: '',
 
+                /* The text to display on the publish button
+                 */
+                publishText: 'Publish',
+
                 /* A callback to execute upon successful completion of Publish action
                  */
                 onPublishCallback: function() {}
@@ -88,7 +92,13 @@
                 $(this).data('preval', $(this).val());
             });
 
+            /* Feedback States
+             */
             $('[data-combobox]').combobox(config.errors);
+
+            /* Set initial state of the Publish button
+             */
+            $(config.assessmentList).find('[data-draft="publish"]').text(config.publishText);
         }
 
         /**
@@ -122,7 +132,7 @@
                     type: 'post'
                 }).done(function () {
                     $form.find('[data-interaction-draft]').slideUp(function () {
-                        $btnPublish.text('Publish');
+                        $btnPublish.text(config.publishText);
                         $btnDrafted.text('');
                     });
 
@@ -130,7 +140,7 @@
 
                 }).fail(function (xhr) {
                     toast.call($form, xhr.responseText, false);
-                    $btnPublish.removeAttr('disabled').text('Publish');
+                    $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
 
