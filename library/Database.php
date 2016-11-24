@@ -12,7 +12,6 @@
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
-use IMSGlobal\LTI\ToolProvider\DataConnector as LTI;
 
 class Database implements IDatabase, Serializable
 {
@@ -107,9 +106,6 @@ class Database implements IDatabase, Serializable
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Link LTI to the database
-            LTI\DataConnector::getDataConnector('', $this->connection);
         } catch (PDOException $exception) {
             if(isset($options['throw']) && $options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);

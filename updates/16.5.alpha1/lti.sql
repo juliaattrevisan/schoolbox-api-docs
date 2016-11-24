@@ -1,3 +1,4 @@
+/*
 CREATE TABLE lti2_consumer (
   consumer_pk int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50) NOT NULL,
@@ -130,6 +131,7 @@ REFERENCES lti2_resource_link (resource_link_pk);
 
 ALTER TABLE lti2_share_key
   ADD INDEX lti2_share_key_resource_link_pk_IDX (resource_link_pk ASC);
+*/
 
 INSERT INTO component_definition (
   name,
@@ -222,7 +224,7 @@ CREATE TABLE lti_provider
 
 -- Some providers for testing
 
-INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('ChemVantage', 'edu', '14e75b9de5f8981e3b63a493d4bd7608', 'https://www.chemvantage.org/lti_config.xml', null, 'https://www.chemvantage.org/lti/', null, '2016-11-16 13:42:33', null, null);
+INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('ChemVantage', 'schoolbox.edu', '14e75b9de5f8981e3b63a493d4bd7608', 'https://www.chemvantage.org/lti_config.xml', null, 'https://www.chemvantage.org/lti/', null, '2016-11-16 13:42:33', null, null);
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('Trello', null, null, 'http://www.eduappcenter.com/configurations/ko92jqbkfivydwl4.xml', null, 'https://www.edu-apps.org/tool_redirect?id=trello', null, '2016-11-24 11:20:08', null, '2016-11-24 11:20:08');
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('Programr', null, null, 'https://www.edu-apps.org/tools/programr/config.xml', null, 'https://www.edu-apps.org/tool_redirect?id=programr', null, '2016-11-24 11:20:04', null, '2016-11-24 11:20:04');
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('Internet Archive', null, null, 'http://www.eduappcenter.com/configurations/lyn1f978rtn9tm66.xml', null, 'https://www.edu-apps.org/tool_redirect?id=archive', null, '2016-11-24 11:20:11', null, '2016-11-24 11:20:11');
@@ -237,9 +239,4 @@ INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_a
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('LTI Maps', '', '', 'https://bltools.creighton.edu/lti/ltimaps/config.xml', '', 'https://bltools.creighton.edu/lti/ltimaps/ltimaps/map.php ', null, '2016-11-24 11:48:36', '2016-11-24 11:48:36', null);
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('TED Ed', '', '', 'https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube_ted_ed', '', 'https://www.edu-apps.org/lti_public_resources/?tool_id=youtube_ted_ed', null, '2016-11-24 11:50:37', '2016-11-24 11:50:37', null);
 INSERT INTO lti_provider (name, `key`, secret, xml, icon, url, custom, created_at, updated_at, deleted_at) VALUES ('Flinga', 'qE8fWSgRQmb2aX8PM', 'GHAFaqaSAGemMRiB4', 'https://www.eduappcenter.com/configurations/lvsk5fc25chdhbg.xml', '', 'http://demo.flinga.fi', null, '2016-11-24 11:54:33', '2016-11-24 11:52:47', null);
-
--- Learningfield Format
--- https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152
--- ?custom_vbid=LF9781740813518&custom_book_location=pageid/152
-
 

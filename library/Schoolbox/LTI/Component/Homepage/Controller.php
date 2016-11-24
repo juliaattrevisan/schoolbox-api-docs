@@ -80,7 +80,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
 
             $params = [
-                'resource_link_id' => 'pleasework',
+                'resource_link_id' => $this->getInstance()->getId(),
                 'resource_link_title' => $this->getConfig('componentname'),
                 'resource_link_description' => '',
                 'user_id' => $this->getUser()->getId(),
@@ -105,7 +105,10 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'launch_presentation_document_target' => 'iframe',
                 'launch_presentation_width' => '800',
                 'launch_presentation_height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-                'launch_presentation_return_url' => urlencode('http://192.168.36.10/lti.php'),
+
+                // TODO: Need to handle return GET request from tool providers
+                'launch_presentation_return_url' => urlencode('#'),
+
                 'tool_consumer_instance_guid' => $this->configLoader->get('site_location'),
                 'tool_consumer_instance_name' => $this->configLoader->get('school_name'),
                 'tool_consumer_instance_description' => 'Schoolbox LMS',
@@ -144,9 +147,11 @@ class Controller extends Component_Homepage_ControllerAbstract
             );
 
             if ($response->ok || $response->status == 301 || $response->status == 302 || $response->status == 303) {
+
                 preg_match("/Location: (.*)$/m", $response->responseHeaders, $matches);
                 $location = $matches[1];
 
+                // OneNote redirection does not have an absolute path
                 if ($provider->getName() == 'OneNote Class Notebook') {
                     $location = 'http://www.onenote.com' . $location;
                 }
@@ -154,7 +159,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             } else if ($response->status == 200) {
                 $location = $provider->getUrl();
             } else {
-                var_dump($response);
                 $location = "";
             }
 
