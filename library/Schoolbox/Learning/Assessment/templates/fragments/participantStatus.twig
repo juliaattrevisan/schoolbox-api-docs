@@ -3,8 +3,9 @@
     - statusClass: (string) one of [ incomplete, pending, complete ]
     - statusText:  (string) caption to display next to status indicator
     - statusTip:   (string) tooltip for status indicator
+    - cardSize:    (string) sizing for foundation
  #}
-<div class="small-12 card">
+<div class="{{ cardSize ?: 'small-12' }} card">
     <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
     <h3>{{ user.fullName }}</h3>
     <p class="meta">
