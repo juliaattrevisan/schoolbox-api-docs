@@ -137,18 +137,20 @@ class Factory
     /**
      * Build an attachzone with $feedback's attached files preloaded.
      *
-     * @param Feedback $feedback
+     * @param Feedback $feedback If null, build an empty attachzone
      * @return Zone
      */
-    public function buildForDueWorkFeedback(Feedback $feedback)
+    public function buildForDueWorkFeedback(Feedback $feedback = null)
     {
         $zone = (new Zone('feedbackFiles'))
             ->setMulti(true)
             ->setAttachmentsLabel('');
 
         $files = [];
-        foreach ($feedback->getAllFiles() as $file) {
-            $files[] = $file->getHash();
+        if ($feedback instanceof Feedback) {
+            foreach ($feedback->getAllFiles() as $file) {
+                $files[] = $file->getHash();
+            }
         }
         $zone->attachFiles($files);
         return $zone;
