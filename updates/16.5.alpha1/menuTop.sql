@@ -127,7 +127,7 @@ UPDATE menu_top SET url = 'http://www.google.com/a/student.moriah.nsw.edu.au/'
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') IN ('moriah') AND id = 6;
 
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
-  SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://mail.moriah.nsw.edu.au/owa', '_blank', 1, null
+  SELECT 14, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://mail.moriah.nsw.edu.au/owa', '_blank', 1, null
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'moriah';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 6 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'moriah';
@@ -140,7 +140,7 @@ UPDATE menu_top SET url = 'https://www.outlook.com/my.soc.tas.edu.au'
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') IN ('oakburn') AND id = 6;
 
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
-  SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://mail.soc.tas.edu.au/owa/', '_blank', 1, null
+  SELECT 14, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://mail.soc.tas.edu.au/owa/', '_blank', 1, null
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'oakburn';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'oakburn';
@@ -153,7 +153,7 @@ UPDATE menu_top SET url = 'https://mail.google.com/a/tigs.com.au'
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') IN ('tigs') AND id = 6;
 
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
-  SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://webmail.tigs.nsw.edu.au/owa', '_blank', 1, null
+  SELECT 14, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://webmail.tigs.nsw.edu.au/owa', '_blank', 1, null
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'tigs';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'tigs';
@@ -163,18 +163,13 @@ INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 14, id FROM groups WHERE
 -- Peninsula school student webmail
 
 INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
-  SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://outlook.com/owa/tps.vic.edu.au', '_blank', 1, null
+  SELECT 14, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://outlook.com/owa/tps.vic.edu.au', '_blank', 1, null
 WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 7, id FROM groups WHERE group_type = 'staff' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 14, id FROM groups WHERE group_type = 'student' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 
--- Demo webmail test
-
-INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
-  SELECT 13, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://outlook.com/owa/tps.vic.edu.au', '_blank', 1, null
-WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 7, id FROM groups WHERE group_type = 'staff' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
