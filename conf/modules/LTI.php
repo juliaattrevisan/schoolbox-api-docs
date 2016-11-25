@@ -24,6 +24,9 @@ class LTI implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
 
         $componentModule = new \Schoolbox\LTI\Component\Homepage\Module($di);
-        $componentModule->init('/blog');
+        $componentModule->init('/lti');
+
+        $consumerModule = new \Schoolbox\LTI\Consumer\Module($di);
+        $consumerModule->init('/lti-consumer');
     }
 }

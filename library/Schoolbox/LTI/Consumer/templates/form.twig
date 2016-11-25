@@ -1,0 +1,9 @@
+<form id="ltiLaunchForm" name="ltiLaunchForm" method="POST" action="{{ provider.url }}">
+    {% for key,value in params %}
+    <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    <input type="hidden" name="oauth_signature" value="{{ signature }}">
+</form>
+<script>
+    document.getElementById('ltiLaunchForm').submit();
+</script>

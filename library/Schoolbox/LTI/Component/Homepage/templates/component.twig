@@ -1,4 +1,4 @@
-{% if location is empty %}
+{% if providerId is empty %}
     <div class="row " data-collapsable="true" data-collapse-state="uncollapsed">
         <div class="small-12 island">
             <section>
@@ -10,5 +10,5 @@
         </div>
     </div>
 {% else %}
-    <iframe style="height:{{ height }}px;" src="{{ location }}" frameborder="0"></iframe>
+    <iframe style="height:{{ height }}px;" src="/lti-consumer/launch/{{ providerId }}/{{ componentInstanceId }}/{{ folderId }}" frameborder="0"></iframe>
 {% endif %}
