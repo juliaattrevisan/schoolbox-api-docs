@@ -168,8 +168,10 @@ class Model implements ISoftDeletable
     protected $contextProject;
 
     /**
-     * If this assessment is attached to a unit implementation, it will have
+     * If this assessment is attached to a unit implementation, it may have
      * been based off of a specification assessment.
+     *
+     * It will not have a Spec if it was created directly in the unit implementation.
      *
      * @var Model
      */
