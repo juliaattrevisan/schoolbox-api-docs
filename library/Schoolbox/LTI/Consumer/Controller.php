@@ -59,7 +59,7 @@ class Controller extends Base
         // Learning Field custom URL mangling
 
         if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-            $custom = 'https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152';
+            $custom = $component->getConfig('description');
             preg_match('/\/books\/(.*?)\//i', $custom, $matches);
             $launch_data['custom_vbid'] = $matches[1];
             preg_match('/\/pageid\/(.*)/i', $custom, $matches);
