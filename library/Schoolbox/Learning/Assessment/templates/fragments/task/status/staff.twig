@@ -1,0 +1,11 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="list-item small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify"></a>
+    </nav>
+</div>

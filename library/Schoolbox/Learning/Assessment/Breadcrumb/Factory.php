@@ -61,10 +61,10 @@ class Factory
             $path = $this->router->generate('learningAssessment.getAssessment', ['assessmentId' => $context->getId()]);
         }
         elseif ($context instanceof UnitSpecification) {
-             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
+            $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
         }
         else {
-            $path = "/homepage/{$context->getId()}";
+            $path = "/homepage/{$context->getFolder()->getId()}";
         }
         $trail->add([$context->getTitle(), $path]);
 

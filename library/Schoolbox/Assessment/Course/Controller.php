@@ -983,7 +983,7 @@ class Controller extends Base\Base
         // Special Case for SB Root
         if (0 === $node->getId()) {
             $array['id'] = 0;
-            $array['text'] = "Root";
+            $array['text'] = "Home";
         } else {
 
             /** @var Folder\Model $folder */
