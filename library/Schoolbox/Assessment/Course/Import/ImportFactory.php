@@ -142,25 +142,19 @@ class ImportFactory
         return $dto;
     }
 
+
+
     /**
      * Called during a modification of prior import
      *
-     * UnitImpl + AssessmentImpl will be non-null if already imported.
+     * UnitImpl IDs will be null if not yet imported from UnitSpec.
+     * UnitImpls will link to extant UnitSpecs
      *
-     * @param int $courseImplId
-     * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param UnitImplementation[]|GenericCollection $unitImpls
      * @return DataTransferObject
      */
-    public function buildForImportModify($courseImplId, GenericCollection $unitImpls)
+    public function buildForImportModify(GenericCollection $unitImpls)
     {
-        /**
-         * Maps each AssessmentImplId to an AssessmentSpecId.
-         * SpecId will be null if Impl was created in UnitImpl.
-         * Array will be empty if no UnitImps, or if no Assessments imported to UnitImps.
-         *
-         * @var int[]
-         */
-        $assessmentImplToSpecMap = [];
         $assessmentSpecs = new GenericCollection(GenericCollection::class);
         $assessmentImpls = new GenericCollection(GenericCollection::class);
         $assessmentPairs = new GenericCollection(GenericCollection::class);
@@ -171,15 +165,6 @@ class ImportFactory
          */
         $unitSpecCache = [];
 
-        // Instantiate empty sets for each UnitSpecId
-        foreach($unitImpls as $unitImpl){
-            $courseSpecId = $unitImpl->getSpecification()->getId();
-            $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
-            $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
-            $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
-            $assessmentPairs->setOffset($courseSpecId, new GenericCollection(AssessmentPair::class));
-        }
-
         /**
          * Maintains a list of UnitSpecs encountered while traversing DB query result set.
          * Required so we can populate the UnitSpec name once only.
@@ -187,51 +172,67 @@ class ImportFactory
          */
         $unitSpecDBCache = [];
 
-        if (count($unitImpls)) {
-            /*
-             * Get all AssessmentImpls that are in the CourseImpl we are modifying
-             *
-             * DO retrieve records for deleted Specs.
-             * DO NOT retrieve records for deleted Impls.
-             */
-            $query = "
-                SELECT 
-                    ia.id AS 'ia.id',
-                    sa.id AS 'sa.id'
-                FROM course_unit_implementation ui
-                JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
-                JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
-                LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
-                LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
-            ";
-            $pb = new PredicateBuilder($this->database, '');
-            $pb->equals('ui.course_implementation_id', $courseImplId);
-            $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
-            $statement = $this->database->prepare($query);
-            $statement->execute($pb->getParams());
+        /**
+         * IDs of existing UnitImpls. Indexed by UnitSpecId
+         *
+         * @var int[] $unitImplIds
+         */
+        $unitImplIds = [];
 
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $assessmentImplToSpecMap[$row['ia.id']] = $row['sa.id'];
+        // Instantiate empty sets for each UnitSpecId
+        foreach($unitImpls as $unitImpl){
+            $courseSpecId = $unitImpl->getSpecification()->getId();
+            $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
+            $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
+            $assessmentPairs->setOffset($courseSpecId, new GenericCollection(AssessmentPair::class));
+
+            // Is this UnitImpl already imported?
+            if($unitImpl->getId()){
+                $unitImplIds[$courseSpecId] = $unitImpl->getId();
             }
         }
 
+        // Get the IDs of all non-deleted AssessmentImpls in the specified UnitImpls
+        $innerQuery = "
+            SELECT
+              asi.specification_assessment_id AS 'sa.id',
+              asi.implementation_assessment_id AS 'ia.id'
+            FROM course_unit_implementation ui
+            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
+            JOIN assessment ia ON ia.id = aui.assessment_id
+            JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+            WHERE ui.id IN (" . implode(',', $unitImplIds) . ")
+            AND ia.deleted_at IS NULL
+        ";
 
-        // Get Assessment Spec with optional AssessmentImpl
-        // 1. AssessmentSpec in UnitSpec where UnitSpec not imported to UnitImpl
-        // 2. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, but AssessmentSpec not imported
-        // 3. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported
-        // 4. AssessmentSpec in UnitSpec, UnitSpec imported to UnitImpl, AssessmentSpec imported but deleted
+        //TODO sigh. Need to divide this into 3 Unions to distinguish AssessmentSpecs with or without a Impl
 
-        $query1a = "
+
+
+
+        // AssessmentSpecs in UnitSpecs, optionally with corresponding AssessmentImpl if it exists
+        $query1 = "
             SELECT 
                 us.id             AS 'us.id',
                 usf.name          AS 'usf.name',
                 sa.id             AS 'sa.id',
                 sa.title          AS 'sa.title',
                 sa.deleted_at     AS 'sa.deleted_at',
+                sa.sequence       AS 'sa.sequence',
                 sdw.assessment_id AS 'sdw.id',
                 sqz.assessment_id AS 'sqz.id',
-                stk.assessment_id AS 'stk.id'
+                stk.assessment_id AS 'stk.id',
+                ia.id             AS 'ia.id',
+                ia.title          AS 'ia.title',
+                ia.publish_date   AS 'ia.publish_date',
+                ia.open_date      AS 'ia.open_date',
+                ia.due_date       AS 'ia.due_date',
+                ia.close_date     AS 'ia.close_date',
+                ia.sequence       AS 'ia.sequence',
+                idw.assessment_id AS 'idw.id',
+                iqz.assessment_id AS 'iqz.id',
+                itk.assessment_id AS 'itk.id'
             FROM course_unit_specification us
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -239,56 +240,12 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
-        ";
-
-        $query1b = "
-            SELECT
-                ia.id                           AS 'ia.id',
-                ia.title                        AS 'ia.title',
-                ia.publish_date                 AS 'ia.publish_date',
-                ia.open_date                    AS 'ia.open_date',
-                ia.due_date                     AS 'ia.due_date',
-                ia.close_date                   AS 'ia.close_date',
-                ia.sequence                     AS 'ia.sequence',
-                idw.assessment_id               AS 'idw.id',
-                iqz.assessment_id               AS 'iqz.id',
-                itk.assessment_id               AS 'itk.id',
-                aui.assessment_specification_id AS 'sa.id'
-            FROM assessment ia
-            JOIN assessment_course_unit_implementation aui ON aui.assessment_id = ia.id AND ia.deleted_at IS NULL
-            JOIN course_unit_implementation ui ON ui.id = aui.course_unit_implementation_id
-            JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
-            JOIN course_implementation ci ON ci.id = ui.course_implementation_id
+            LEFT JOIN ($innerQuery) `t1` ON `t1`.`sa.id` = sa.id
+            LEFT JOIN assessment ia ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
-            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
-            AND ci.id = $courseImplId
-        ";
-
-        $query1 = "
-          SELECT
-            `us.id`,
-            `usf.name`,
-            t1b.`sa.id` AS `sa.id`,
-            `sa.title`,
-            `sa.deleted_at`,
-            `sdw.id`,
-            `sqz.id`,
-            `stk.id`,
-            `ia.id`,
-            `ia.title`,
-            `ia.publish_date`,
-            `ia.open_date`,
-            `ia.due_date`,
-            `ia.close_date`,
-            `ia.sequence`,
-            `idw.id`,
-            `iqz.id`,
-            `itk.id`
-          FROM (SELECT * FROM ($query1a) AS t1a) AS t1b
-          LEFT JOIN (SELECT * FROM ($query1b) AS t2a) AS t2b ON t1b.`sa.id` = t2b.`sa.id`
+            WHERE us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
         ";
 
         // Get the following Assessments:
@@ -300,6 +257,7 @@ class ImportFactory
                 null              AS 'sa.id',
                 null              AS 'sa.title',
                 null              AS 'sa.deleted_at',
+                null              AS 'sa.sequence',
                 null              AS 'sdw.id',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
@@ -313,18 +271,25 @@ class ImportFactory
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id'
-            FROM course_unit_specification us
+            FROM course_unit_implementation ui
+            JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
-            JOIN course_unit_implementation ui ON ui.course_unit_specification_id = us.id AND ui.course_implementation_id = $courseImplId
-            JOIN assessment_course_unit_implementation aui ON ui.id = aui.course_unit_implementation_id AND aui.assessment_specification_id IS NULL
-            JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
+            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
+            JOIN assessment ia ON ia.id = aui.assessment_id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
-            LEFT JOIN task itk ON itk.assessment_id = ia.id            
-            WHERE  us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
+            LEFT JOIN task itk ON itk.assessment_id = ia.id
+            LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+            WHERE ia.deleted_at IS NULL
+            AND asi.implementation_assessment_id IS NULL
+            AND ui.id IN (" . implode(',', $unitImplIds) . ")
         ";
 
-        $query = "SELECT * FROM ($query1) AS t1 UNION SELECT * FROM ($query2) AS t2 ORDER BY `us.id`, `ia.sequence`";
+        $query = "
+          SELECT * FROM ($query1) AS t1
+            UNION
+          SELECT * FROM ($query2) AS t2
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute();
@@ -396,10 +361,46 @@ class ImportFactory
 
         }
 
+        $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
         $dto = new DataTransferObject($assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
         return $dto;
     }
 
+    /**
+     * Get a map of AssessmentImplIds to AssessmentSpecIds for the specified UnitImpls.
+     *
+     * AssessmentSpecId will be null if AssessmentImpl was created directly in a UnitImpl
+     *
+     * DOES include records for deleted Specs.
+     * Does NOT include records for deleted Impls.
+     *
+     * @param int[] $unitImplIds
+     * @return int[]
+     */
+    protected function getAssessmentImplToSpecMap($unitImplIds)
+    {
+        $query = "
+            SELECT
+                ia.id AS 'ia.id',
+                sa.id AS 'sa.id'
+            FROM course_unit_implementation ui
+            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
+            JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
+            LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+            LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
+        ";
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->equals('ui.id', $unitImplIds);
+        $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+        $assessmentImplToSpecMap = [];
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $assessmentImplToSpecMap[$row['ia.id']] = $row['sa.id'];
+        }
+        return $assessmentImplToSpecMap;
+    }
 
     /**
      * @param string $dateString

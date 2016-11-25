@@ -23,6 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use \Component_DefinitionMapper;
 use \Component_InstanceMapper;
 
@@ -106,6 +107,7 @@ class Module extends \Alaress\Module\Module
                 'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
                 'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
                 'setImportFactory'                  => $injector->lazyNew(ImportFactory::class),
+                'setAssessmentMapper'               => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
                 'setAssessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
                 'setCourseImplementationFactory'    => $injector->lazyNew(Course\ImplementationFactory::class, [
                     'unitImplementationFactory' => $injector->lazyNew(Unit\ImplementationFactory::class)
