@@ -25,6 +25,25 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $routes = [
+            'GET' => [
+            ],
+            'POST' => [
+            ]
+        ];
+
+        foreach ($routes['GET'] as $path => $alias)
+            $this->addGetRoute($router, $alias, $basePath, $path);
+
+        foreach ($routes['POST'] as $path => $alias)
+            $this->addPostRoute($router, $alias, $basePath, $path);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());

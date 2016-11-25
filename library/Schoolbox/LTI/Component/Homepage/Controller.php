@@ -24,6 +24,21 @@ use Schoolbox\LTI\Provider\Model as Provider;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
+    /** @var ProviderMapper */
+    private $providerMapper;
+
+    /**
+     * Injectable constructor
+     *
+     * @param Component_Instance $instance
+     * @param User               $user
+     * @param SitePage           $sitepage
+     */
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+        parent::__construct($instance, $user, $sitepage);
+        $this->providerMapper = $sitepage->getDi()->get('providerMapper');
+    }
+
     /**
      * Loads the grid component into its set configuration.
      *
@@ -40,6 +55,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        $providers = $this->providerMapper->findAll([
+            'order' => ['name' => 'asc']
+        ]);
+
         // Render launcher form
 
         return $this->renderTwigTemplate(
@@ -50,6 +69,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'providerId'            => $this->getConfig('ltiprovider'),
+                'providers'             => $providers,
                 'folderId'              => $this->getcontext()->getId(),
                 'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel'))
             ),

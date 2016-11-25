@@ -59,7 +59,7 @@
         {
             "type": "vcs",
             "url":  "https://github.com/armatronic/Imagine"
-        },
+        }
     ],
     "require": {
         "gggeek/phpxmlrpc": "0.1.0",

@@ -1,14 +1,32 @@
 {% if providerId is empty %}
-    <div class="row " data-collapsable="true" data-collapse-state="uncollapsed">
+    <div id="lti-select-provider" class="row " data-collapsable="true" data-collapse-state="uncollapsed">
         <div class="small-12 island">
             <section>
                 <div class="empty-state">
                     <i class="icon-settings"></i>
-                    <p>To use LTI you must first select a provider from the list in the config settings for this component.</p>
+                    <p>To use LTI you must first select a provider.</p>
+                    <p>
+                        {% for provider in providers %}
+                            <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                        {% endfor %}
+                    </p>
                 </div>
             </section>
         </div>
     </div>
+    <script>
+        $('[data-provider]').click(function() {
+
+            var providerId = $(this).data('provider');
+            $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, providerId))
+            .success(function() {
+                $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
+                $('#lti-select-provider').remove();
+                $('#lti-frame').show();
+            });
+        });
+    </script>
+    <iframe id="lti-frame" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
 {% else %}
-    <iframe style="height:{{ height }}px;" src="/lti-consumer/launch/{{ providerId }}/{{ componentInstanceId }}/{{ folderId }}" frameborder="0"></iframe>
+    <iframe style="height:{{ height }}px;" src="{{ routeLookup('ltiConsumer.getLaunch', {providerId: providerId, componentId: componentInstanceId, folderId: folderId}) }}" frameborder="0"></iframe>
 {% endif %}

@@ -9,11 +9,46 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Base
 {
+    private $componentConfigDefinitionMapper;
+    private $componentConfigMapper;
+
     /**
      * Controller constructor.
      */
     public function __construct()
     {
+        $this->componentConfigMapper = \Component_ConfigMapper::getInstance();
+        $this->componentConfigDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();
+    }
+
+    /**
+     * Update component provider
+     * @param Provider $provider
+     * @param Component_ControllerAbstract $component
+     */
+    public function postComponentProvider($provider, $component) {
+        $configDefinition = $this->componentConfigDefinitionMapper->findByColumn('key', 'ltiprovider')->first();
+
+        $configInstance = $this->componentConfigMapper->findByColumnList(array(
+            'component_config_definition_id' => $configDefinition->getId(),
+            'component_instance_id' => $component->getInstance()->getId()
+        ))->first();
+
+        if (empty($configInstance)) {
+            $configInstance = new \Component_Config();
+            $configInstance->setConfigDefinitionId($configDefinition->getId());
+            $configInstance->setInstanceId($component->getInstance()->getId());
+        }
+
+        $configInstance->setValue($provider->getId());
+        $this->componentConfigMapper->save($configInstance);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => [
+                'result' => 'OK'
+            ]
+        ]);
     }
 
     /**

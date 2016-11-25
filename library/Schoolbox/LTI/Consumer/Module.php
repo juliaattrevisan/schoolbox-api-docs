@@ -53,6 +53,7 @@ class Module extends BaseModule
                 '/launch/{providerId}/{componentId}/{folderId}' => 'getLaunch'
             ],
             'POST' => [
+                '/component/{componentId}/provider/{providerId}' => 'postComponentProvider'
             ]
         ];
 
