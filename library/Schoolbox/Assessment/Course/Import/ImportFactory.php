@@ -196,11 +196,13 @@ class ImportFactory
              */
             $query = "
                 SELECT 
-                    aui.assessment_id               AS 'ia.id',
-                    aui.assessment_specification_id AS 'sa.id'
+                    ia.id AS 'ia.id',
+                    sa.id AS 'sa.id'
                 FROM course_unit_implementation ui
                 JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
-                JOIN assessment ai ON ai.id = aui.assessment_id AND ai.deleted_at IS NULL
+                JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
+                LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+                LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
             ";
             $pb = new PredicateBuilder($this->database, '');
             $pb->equals('ui.course_implementation_id', $courseImplId);
