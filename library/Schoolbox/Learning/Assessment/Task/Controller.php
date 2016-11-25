@@ -63,11 +63,17 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+        $twigData = [
+            'type'        => Assessment\AssessmentType::objectToString($assessment),
+            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
+            'assessment'  => $assessment,
+        ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/task/status/staff.twig",
-                $twigData
+                "@learningAssessment/task/status.twig",
+                $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
     }
