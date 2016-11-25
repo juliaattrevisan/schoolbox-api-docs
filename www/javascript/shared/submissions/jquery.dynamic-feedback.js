@@ -126,9 +126,12 @@
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
+                // Publish submits everything
+                var formData = $form.serializeArray();
+                formData.push({name: 'publish', value: 1});
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
-                    data:  { publish: 1 },
+                    data:  formData,
                     type: 'post'
                 }).done(function () {
                     $form.find('[data-interaction-draft]').slideUp(function () {
