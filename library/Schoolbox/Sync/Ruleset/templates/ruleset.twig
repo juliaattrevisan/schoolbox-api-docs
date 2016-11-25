@@ -297,6 +297,12 @@ set upsConfig = {
 
                         <dt class="small-6">num</dt>
                         <dd class="small-6">Strips all non-numeric characters</dd>
+
+                        <dt class="small-6">preat</dt>
+                        <dd class="small-6">Only characters before the first '@'</dd>
+
+                        <dt class="small-6">postslash</dt>
+                        <dd class="small-6">Only characters after the last '\'</dd>
                     </dl>
 
                     <p>
@@ -312,6 +318,12 @@ set upsConfig = {
                         <br />
                         {:id} = P1234<br />
                         {:id|num} = 1234<br />
+                        <br />
+                        {:email.address} = myusername@school.edu<br />
+                        {:email.address|preat} = myusername<br />
+                        <br />
+                        {:account.login} = DOMAIN\myusername<br />
+                        {:account.login|postslash} = myusername<br />
                     </p>
                 </div>
             </div>
