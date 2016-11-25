@@ -94,7 +94,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:ResponseList|ParticularResponse)';
+        $ruleRegexp = '(getResponseList|getParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
