@@ -62,7 +62,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             return false;
         }
 
-        if (count($threadList) != 0) {
+        if (empty($threadList)) {
 
             $this->setBlock($templateHandle, 'posts', 'posts_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
