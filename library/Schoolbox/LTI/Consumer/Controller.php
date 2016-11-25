@@ -27,7 +27,13 @@ class Controller extends Base
      * @param Component_ControllerAbstract $component
      */
     public function postComponentProvider($provider, $component) {
-        $configDefinition = $this->componentConfigDefinitionMapper->findByColumn('key', 'ltiprovider')->first();
+
+        $post = $this->getRequest()->post;
+
+        $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList([
+            'key' => 'ltiprovider',
+            'component_definition_id' => $component->getInstance()->getDefinitionId()
+        ])->first();
 
         $configInstance = $this->componentConfigMapper->findByColumnList(array(
             'component_config_definition_id' => $configDefinition->getId(),
@@ -42,6 +48,29 @@ class Controller extends Base
 
         $configInstance->setValue($provider->getId());
         $this->componentConfigMapper->save($configInstance);
+
+        // Learning Field URL
+
+        if (!empty($post['url'])) {
+            $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList([
+                'key' => 'description',
+                'component_definition_id' => $component->getInstance()->getDefinitionId()
+            ])->first();
+
+            $configInstance = $this->componentConfigMapper->findByColumnList(array(
+                'component_config_definition_id' => $configDefinition->getId(),
+                'component_instance_id' => $component->getInstance()->getId()
+            ))->first();
+
+            if (empty($configInstance)) {
+                $configInstance = new \Component_Config();
+                $configInstance->setConfigDefinitionId($configDefinition->getId());
+                $configInstance->setInstanceId($component->getInstance()->getId());
+            }
+
+            $configInstance->setValue($post['url']);
+            $this->componentConfigMapper->save($configInstance);
+        }
 
         $this->getResponse()->content->set([
             'format' => 'json',

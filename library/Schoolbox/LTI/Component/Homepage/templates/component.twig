@@ -1,3 +1,4 @@
+{% set learningfieldProviderId = '' %}
 {% if providerId is empty %}
     <div id="lti-select-provider" class="row " data-collapsable="true" data-collapse-state="uncollapsed">
         <div class="small-12 island">
@@ -7,7 +8,12 @@
                     <p>To use LTI you must first select a provider.</p>
                     <p>
                         {% for provider in providers %}
-                            <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                            {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
+                                {% set learningfieldProviderId = provider.id %}
+                                <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
+                            {% else %}
+                                <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                            {% endif %}
                         {% endfor %}
                     </p>
                 </div>
@@ -15,18 +21,45 @@
         </div>
     </div>
     <script>
-        $('[data-provider]').click(function() {
 
-            var providerId = $(this).data('provider');
-            $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, providerId))
-            .success(function() {
-                $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
-                $('#lti-select-provider').remove();
-                $('#lti-frame').show();
+        $(function() {
+
+            $('[data-provider-learningfield]').click(function() {
+
+                $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
+                    url: $('#learningfieldUrl').val()
+                }).success(function () {
+                    $('#modal-learningfield').foundation('reveal', 'close');
+                    $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, {{ learningfieldProviderId }}));
+                    $('#lti-select-provider').remove();
+                    $('#lti-frame').show();
+                });
             });
+
+            $('[data-provider]').click(function() {
+
+                var providerId = $(this).data('provider');
+                $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, providerId))
+                .success(function() {
+                    $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
+                    $('#lti-select-provider').remove();
+                    $('#lti-frame').show();
+                });
+            });
+
         });
     </script>
+
+    <div id="modal-learningfield" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <p class="lead">Book Source</p>
+        <p>Please copy/paste the URL of the resource you want to embed below.</p>
+        <input type="text" id="learningfieldUrl" placeholder="(e.g. https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152)">
+        <button data-provider-learningfield="learningfieldProviderId">Save</button>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
     <iframe id="lti-frame" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
+
 {% else %}
     <iframe style="height:{{ height }}px;" src="{{ routeLookup('ltiConsumer.getLaunch', {providerId: providerId, componentId: componentInstanceId, folderId: folderId}) }}" frameborder="0"></iframe>
 {% endif %}
