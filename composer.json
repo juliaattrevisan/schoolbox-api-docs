@@ -100,7 +100,7 @@
         "caxy/php-htmldiff": "dev-master",
         "imagine/imagine": "dev-0.6.2-patches",
         "jenssegers/date": "~2.0.22",
-        "mpratt/embera": "~1.8.6",
+        "mpratt/embera": "~1.8.6"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
