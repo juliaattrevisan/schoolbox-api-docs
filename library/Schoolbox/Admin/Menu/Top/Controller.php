@@ -220,7 +220,7 @@ class Controller extends Base
             $item->setToken('CALENDAR');
         } else if (stripos($post['url'], '/news') === 0) {
             $item->setToken('NEWS');
-        } else if (stripos($post['url'], '/submission/allWork') === 0) {
+        } else if (stripos($post['url'], '/learning/grades') === 0) {
             $item->setToken('GRADE');
         } else if (stripos($post['url'], '/course/list') === 0) {
             $item->setToken('COURSE');

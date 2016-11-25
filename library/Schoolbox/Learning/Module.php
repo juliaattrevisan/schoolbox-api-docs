@@ -131,13 +131,17 @@ class Module extends BaseModule
                 try {
                     $args['student'] = $this->getUserMapper()->findById($params['userId']);
                 } catch (MapperException $e) {
-
                     /* If nonexistent user is specified, 404
                      */
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
                 try {
-                    $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+                    if($params['termCode']) {
+                        $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+                    }
+                    else {
+                        $args['term'] = $this->getTermMapper()->findForToday();
+                    }
                 } catch (MapperException $e) {
 
                     /* If nonexistent term is specified, 404

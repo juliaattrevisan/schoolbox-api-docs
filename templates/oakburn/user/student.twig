@@ -29,7 +29,7 @@
 {% block buttons_grades %}
     {% if not (config.restrict_parent_grades and session.user.isParent()) %}
         <li class="no-pad">
-            <a href="/submission/allWork/{{ user.getId() }}"
+            <a href="/learning/grades/{{ user.getId() }}"
                class="no-margin fat button icon-fat icon-32 icon-tick"
             >Assessments</a>
         </li>

@@ -164,13 +164,13 @@ $term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
 );
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
-        'text'  => 'Work',
-        'href'  => '/submission/allWork/' . $_SESSION['id'],
+        'text'  => 'Learning',
+        'href'  => '/learning/classes',
         'class' => ''
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => sprintf('/submission/allWork/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId()),
+        'href'  => sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId()),
         'class' => ''
     ],
     [
