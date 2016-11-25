@@ -1,3 +1,5 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+
 <li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
     <div class="list-item">
         <div class="card small-12 medium-8">
@@ -35,17 +37,17 @@
         <ul class="information-list">
             {% for currentFile in currentFeedback.allFiles %}
 
-                {# Only show published feedback and therefore also
-                 # only list files that are involved with a Published Feedback
-                 #}
-                <li>
-                    <div class="card small-12 compact">
-
+            {# Only show published feedback and therefore also
+             # only list files that are involved with a Published Feedback
+             #}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 card compact">
                         {# Crocodoc annotations have their own special url.
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" rel="external" data-plugin="preview">
+                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: assessmentId, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>
@@ -56,7 +58,13 @@
                             </a>
                         {% endif %}
                     </div>
-                </li>
+                </div>
+                {% if currentFile.crocodocId|length %}
+                <nav>
+                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: assessmentId, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
+                </nav>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
     {% endif %}

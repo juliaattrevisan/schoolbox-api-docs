@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\InlineGrader;
 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use \Schoolbox\Resource\Storage\Model as Storage;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SwampMapper;
 
 class Document
 {
@@ -100,12 +101,28 @@ class Document
         $result = json_decode($curl->getResult());
 
         if (isset($result->uuid)) {
-            /* Save reference to uploaded file */
             $this->getFile()->setCrocodocId($result->uuid);
 
-            /* TODO: Save record to db
+            /* TODO Maybe one day there'll be a nicer way than this
+             *
+             * Save crocodocok uuid
+             *
+             * Quick "translation" into the swamp because there isn't a MapperProxy
+             * equivalent that saves individual Assessment/Duework/Submission/File/Models
              */
-            //Submission\FileMapper::getInstance()->save($this->getFile());
+            try {
+                $file = SwampMapper::getInstance()->findById($this->getFile()->getId());
+                $file->setUuid($result->uuid);
+
+                SwampMapper::getInstance()->save($file);
+            }
+            catch (\Exception $e) {
+                return [
+                    'result'       => $result,
+                    'errors'       => 'Submission file does not exist',
+                    'responseCode' => $curl->getResponseCode(),
+                ];
+            }
         }
 
         return [

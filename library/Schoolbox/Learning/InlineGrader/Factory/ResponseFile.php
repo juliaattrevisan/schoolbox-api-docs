@@ -76,7 +76,6 @@ class ResponseFile
          * If it doesn't exist, 404 File Not Found
          * If you're not allowed, 403 Forbidden
          */
-
         $mimetype = $this->getFile()->getStorage()->getMimetype();
 
         if ($mimetype->isImage()) {

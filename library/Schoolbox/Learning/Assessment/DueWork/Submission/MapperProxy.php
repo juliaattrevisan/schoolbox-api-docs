@@ -108,6 +108,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             foreach ($studentSubmission->getFiles() as $file) {
                 // Translate the file subobject
                 $responseFile = (new DueWorkSubmissionFile())
+                    ->setId($file->getId())
                     ->setStorage($file->getStorage())
                     ->setEditableInline($file->getEditableInline())
                     ->setCrocodocId($file->getUuid())
@@ -148,6 +149,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
                 $dataModelFile = (new StudentSubmissionFile())
+                    ->setId($file->getId())
                     ->setSubmission($dataModel)
                     ->setStorage($file->getStorage())
                     ->setEditableInline($file->getEditableInline())

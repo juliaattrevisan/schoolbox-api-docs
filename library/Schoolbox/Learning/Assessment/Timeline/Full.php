@@ -171,15 +171,56 @@ class Full
             /* Only show Submitted submissions (ignore drafts)
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
-                $this->getRecombined()->add($currentResponse);
+
+                /* If $includeUnpublishedFeedback is false,
+                 * Filter out unpublished Feedback from each $response
+                 *
+                 * Otherwise just use the stack that was given to us
+                 * which has the unpublished feedbacks in there already
+                 */
+                if ($includeUnpublishedFeedback) {
+                    $includedFeedback = $currentResponse->getAllFeedback();
+                }
+                else {
+                    $includedFeedback = new Collection();
+
+                    foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                        if ($currentFeedback->isPublished()) {
+                            $includedFeedback->add($currentFeedback);
+                        }
+                    }
+                }
 
                 /* Maintain a list of all the Feedbacks that were discovered
                  * as being part of Responses to ensure they don't get duped
                  * in the timeline
                  */
-                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                foreach ($includedFeedback as $currentFeedback) {
                     $processedFeedback[] = $currentFeedback->getId();
+
+                    /* Every associated feedback has a set of attached files
+                     * that were added via the attachzone
+                     *
+                     * It also has a set of crocodocked files. These crocodocked
+                     * files don't get added via the attachzone; they won't appear
+                     * here normally. In the case of the Timeline, Feedback includes
+                     * both the set of attached files and any Submission Files that
+                     * were annotated via crocodoc.
+                     */
+                    foreach ($currentResponse->getAllFiles() as $currentFile) {
+                        if ($currentFile->getCrocodocId()) {
+                            $currentFeedback->getAllFiles()->add($currentFile);
+                        }
+                    }
                 }
+
+                /* Mutate collection :/
+                 * This seems pretty deadly, but I kinda have to mutate it anyway
+                 * to display crocodocked files in the Feedback File list
+                 */
+                $currentResponse->setAllFeedback($includedFeedback);
+
+                $this->getRecombined()->add($currentResponse);
             }
         }
 

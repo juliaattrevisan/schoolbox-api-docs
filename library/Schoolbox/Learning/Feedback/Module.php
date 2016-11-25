@@ -45,12 +45,20 @@ class Module extends BaseModule
             ];
         };
 
+        $preloadParticipantAndResponse = function ($params) {
+            return [
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
+                'response' => $this->preloadResponse($params['assessmentId'], $params['responseId'])
+            ];
+        };
+
         $assessmentRoute  = 'assessments/{assessmentId:\d+}';
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",        'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",   'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
+        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
+        $this->register('POST',   "/$participantRoute/{responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipantAndResponse);
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
     }
 
 
@@ -104,6 +112,27 @@ class Module extends BaseModule
         return $assessment->getParticipant($student);
     }
 
+    /**
+     * @param $assessmentId
+     * @param int $responseId
+     * @return Assessment\IResponse
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function preloadResponse($assessmentId, $responseId)
+    {
+        $responses = $this->getResponseDataSource()->findForAssessment(
+            $this->getAssessmentDataSource()->findById($assessmentId)
+        );
+
+        // TODO migrate this to DataSource
+        foreach ($responses as $r) {
+            if ($r->getId() == $responseId) {
+                return $r;
+            }
+        }
+
+        throw new \Schoolbox\Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
+    }
 
     /**
      * @param int $assessmentId
@@ -151,6 +180,13 @@ class Module extends BaseModule
         return $this->getInjector()->get('participantDataSource');
     }
 
+    /**
+     * @return Assessment\Response\DataSource
+     */
+    public function getResponseDataSource()
+    {
+        return $this->getInjector()->get('responseDataSource');
+    }
 
     /**
      * @return Assessment\Feedback\DataSource

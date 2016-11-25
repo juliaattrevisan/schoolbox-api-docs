@@ -9,29 +9,62 @@
  #}
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
 <script type="text/javascript">
+
+    {# A global var because the Feedback form uses the carousel to determine
+     # the next person to continue towards, once Feedback is published
+     #
+     # Same with findNext() and findPrev()
+     #
+     # sorry
+     #}
+    var tgt;
+
+    /**
+     * Next person in the carousel
+     */
+    function findNext(tgt) {
+        var ize = tgt[0].selectize;
+        var val = ize.getOption(ize.getValue());
+
+        return ize.getAdjacentOption(val, 1);
+    }
+
+    /**
+     * Previous person in the carousel
+     *
+     * @param tgt
+     * @returns {*|Object}
+     */
+    function findPrev(tgt) {
+        var ize = tgt[0].selectize;
+        var val = ize.getOption(ize.getValue());
+
+        return ize.getAdjacentOption(val, -1);
+    }
+
     $(function() {
         var navNext = $('a[rel="next"]');
         var navPrev = $('a[rel="prev"]');
         var markInput = $('[name^="mark"]').not('[type=hidden]').eq(0);
 
-        var tgt = $('select[name=student-select]'),
-                ize,
-                showSubmittedOnly = $('#showSubmittedOnly'),
-                students = {{ carousel.allPeople|json_encode|raw }},
-                selectizeOptions = {
-                    preload: true,
-                    closeAfterSelect: false,
-                    options: students,
-                    render: {
-                        option: function (item) {
-                            item.disabled = showSubmittedOnly.is(':checked') && !item.submitted;
-                            return $('<div/>').html(item.html).html();
-                        },
-                        item: function (item) {
-                            return $('<div/>').html(item.html).html();
-                        }
+        tgt = $('select[name=student-select]');
+        var ize,
+            showSubmittedOnly = $('#showSubmittedOnly'),
+            students = {{ carousel.allPeople|json_encode|raw }},
+            selectizeOptions = {
+                preload: true,
+                closeAfterSelect: false,
+                options: students,
+                render: {
+                    option: function (item) {
+                        item.disabled = showSubmittedOnly.is(':checked') && !item.submitted;
+                        return $('<div/>').html(item.html).html();
+                    },
+                    item: function (item) {
+                        return $('<div/>').html(item.html).html();
                     }
-                };
+                }
+            };
 
         ize = tgt.selectize(selectizeOptions);
 
@@ -78,9 +111,8 @@
                 }
             });
 
-            var val = ize.getOption(ize.getValue());
-            var nextUrl = ize.getAdjacentOption(val, 1);
-            var prevUrl = ize.getAdjacentOption(val, -1);
+            var nextUrl = findNext(tgt);
+            var prevUrl = findPrev(tgt);
 
             refreshNav(navNext, nextUrl);
             refreshNav(navPrev, prevUrl);

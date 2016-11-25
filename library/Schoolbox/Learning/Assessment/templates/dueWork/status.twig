@@ -4,7 +4,7 @@
      - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
      - pTooltip:         a tooltip explaining the status marker
 
-    available varaibles:
+    available variables:
      - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
      - assessment:  the assessment we're looking at
      - participant: the current participant of the iteration
@@ -66,134 +66,40 @@
 
 
 {% block grading %}
-    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+    {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+        markScheme: assessment.markScheme,
+        fbUrl: routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id })
+    } %}
 {% endblock %}
 
 {% block scripts %}
 <div class="toast" data-alert data-save-draft></div>
-<script type="text/javascript">
-    $(function () {
 
-        var formSaveLabel  = $('[data-save-draft]');
-        var assessmentList = $('#assessment-status');
-        var filters        = $('#filters');
-        var tt;
+    {# Dynamic Feedback
+     #
+     # This is the javascript which powers the Quickmark and Inline Grader
+     # Feedback forms, giving them the async save/publish capabilities
+     #
+     # Originated in Quickmark, reused in Inline Grader
 
-        // setup pre-values
-        assessmentList.find(':input').each(function () {
-            // stash the current state, so we can compare on blur and prevent unnecessary firing
-            $(this).data('preval', $(this).val());
+        available variables:
+         - routeArgs:   an array that represents a participant, to be pushed into a routeLookup
+         - assessment:  the assessment we're looking at
+         - participant: the current participant of the iteration
+         - statusIncomplete: a string representing the 'incomplete' state
+         - statusPending: a string representing the 'pending' state
+         - statusComplete: a string representing the 'complete' state
+         - errors: An array of "Submission States" such as absent, et al.
+     #}
+    <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+    <script type="text/javascript">
+        $(function() {
+            $.fn.dynamicFeedback({
+                errors: {{ errors | json_encode | raw }},
+                statusIncomplete: '{{ statusIncomplete }}',
+                statusPending: '{{ statusPending }}',
+                statusComplete: '{{ statusComplete }}'
+            });
         });
-
-        $('[data-combobox]').combobox({{ errors | json_encode | raw }});
-
-        assessmentList
-            .on('keydown paste keypress', 'textarea', timeoutUpdate)
-            .on('change', ':input', timeoutUpdate)
-            .on('blur', ':input', doASaveActionNao);
-
-
-        function doASaveActionNao() {
-            // do a preval comparison to find out if we can skip AJAX
-            if ($(this).val() == $(this).data('preval')) {
-                return;
-            }
-
-            // update the pre-value
-            $(this).data('preval', $(this).val());
-
-            var $form = $(this).closest('form');
-
-            var data = {
-                type: $form.attr('method'),
-                dataType: 'json',
-                data: $form.serializeArray()
-            };
-
-            $form.find('[data-draft]').attr('disabled', 'disabled');
-            $form.find('[data-draft="drafted"]').text('Saving...');
-
-            formSaveLabel.toastActivate({
-                text: 'Autosaving'
-            });
-
-            $.ajax($form.attr('action'), data)
-                .done(function () {
-                    toast.apply($form);
-
-                    var $li = $form.closest('[data-status]');
-
-                    $li.attr('data-status', '{{ statusComplete }}');
-
-                    $li.find('[data-status]')
-                        .removeClass('{{ statusIncomplete }} {{ statusPending }}')
-                        .addClass('{{ statusComplete }}');
-
-                    filters.find('[data-status="complete"]').prop('checked', true);
-                    $form.find('[data-draft="drafted"]').text('Saved as Draft');
-                })
-                .fail(function (xhr) { toast.call($form, xhr.responseText, false); })
-                .always(function () {
-                    $form.find('[data-draft=publish]').removeAttr("disabled");
-                });
-        }
-
-        function timeoutUpdate() {
-            var input = this;
-            window.clearTimeout(tt);
-
-            tt = window.setTimeout(function () {
-                doASaveActionNao.apply(input);
-            }, 600);
-
-            if ($(this).val() == $(this).data('preval')) {
-                return;
-            }
-
-            var $form = $(this).closest('form');
-            $form.find('[data-interaction-draft]').slideDown();
-        }
-
-        function toast(text, success) {
-
-            formSaveLabel.toastTimeout({
-                text: text || 'Draft Saved',
-                css: (success == false) ? 'alert' : 'success'
-            });
-
-            this.find('[data-interaction-draft]').slideDown();
-        }
-
-        assessmentList.on('click', '[data-draft="publish"]', function (e) {
-            e.preventDefault();
-
-            var $form      = $(this).closest('form'),
-                $actionBar = $form.find('[data-interaction-draft]');
-
-            var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
-                $btnPublish = $actionBar.find('[data-draft=publish]');
-
-            $btnPublish.attr('disabled', 'disabled').text('Publishing...');
-
-            $.ajax($form.attr('action'), {
-                dataType: 'json',
-                data:  { publish: 1 },
-                type: 'post'
-            }).done(function () {
-                $form.find('[data-interaction-draft]').slideUp(function () {
-                    $btnPublish.text('Publish');
-                    $btnDrafted.text('');
-                });
-
-            }).fail(function (xhr) {
-                toast.call($form, xhr.responseText, false);
-                $btnPublish.removeAttr('disabled').text('Publish');
-
-            }).always(function () {
-
-            });
-        })
-
-    });
-</script>
+    </script>
 {% endblock %}

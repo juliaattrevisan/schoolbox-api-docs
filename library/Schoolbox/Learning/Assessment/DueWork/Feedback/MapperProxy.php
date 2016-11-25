@@ -7,16 +7,20 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
-use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Mapper;
+
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use Schoolbox\Mapper;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -92,11 +96,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $feedback = (new DomainObject())
                 ->setId($submissionReturn->getId())
                 ->setAssessable((new DueWork())->setId($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId()))
-                // TODO implement optional association due work feedback association with a response
-//                ->setResponse(
-//                    (new DueWorkResponse())
-//                        ->setId($submissionReturn->getResponse()->getId())
-//                )
                 ->setReviewee($submissionReturn->getOwner())
                 ->setReviewer($submissionReturn->getMarker())
                 ->setComment($submissionReturn->getComment())
@@ -106,6 +105,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($submissionReturn->getUpdatedAt())
                 ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
+
+            /* Returns don't have to be associated with Submissions
+             * This relation is optional
+             */
+            if ($submissionReturn->getSubmission()) {
+                $feedback->setResponse(
+                    (new DueWorkResponse())
+                        ->setId($submissionReturn->getSubmission()->getId())
+                );
+            }
 
             // Add all files in return
             foreach ($submissionReturn->getFiles() as $file) {
@@ -147,6 +156,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($domainObject->getUpdatedAt())
                 ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
+
+            // This feedback doesn't have to be tied to a particular response.
+            if ($domainObject->getResponse() instanceof IResponse) {
+                $dataModel->setSubmission(
+                    (new SubmissionFile())->setId($domainObject->getResponse()->getId())
+                );
+            }
 
             // Add all files
             foreach ($domainObject->getAllFiles() as $file) {

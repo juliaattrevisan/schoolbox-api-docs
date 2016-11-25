@@ -24,6 +24,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 
@@ -62,7 +63,11 @@ class Module extends BaseModule
 
                 /* Download an annotated crocodoc
                  */
-                '/responses/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocDownload',
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/download/{crocodocId}' => 'getCrocodocDownload',
+
+                /* View an annotated crocodoc
+                 */
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocView',
 
                 /* View a Response in the Inline Grader
                  */
@@ -89,7 +94,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:ResponseList|ParticularResponse)';
+        $ruleRegexp = '(getResponseList|getParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
@@ -132,8 +137,6 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 
             try {
-                /* TODO: Severe inefficiency here, it gets data twice.
-                 */
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
             }
             catch (\OutOfBoundsException $e) {
@@ -141,46 +144,77 @@ class Module extends BaseModule
             }
 
             return [
+                'participant' =>  $assessment->getParticipant($response->getSubmittedOnBehalfOf()),
                 'response' => $response,
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getCrocodocDownload)', function ($params) {
+        $this->addRoutePreload($matcher, 'getCrocodoc(View|Download)', function ($params) {
 
-            /* TODO: Arbitrarily assume 326 for now
-             * TODO: Generate a populated response for now
+            /* Die early when requested Assessment doesn't exist
              */
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview(326);
-            $response = (new TemporaryResponse())->produceResponse($assessment);
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
-            $feedback = null;
+            /* Die early when requested Response doesn't exist in $assessment
+             */
+            try {
+                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+            }
+            catch (\OutOfBoundsException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Get all the feedbacks associated with $assessment, then find the requested Feedback
+             */
+            $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
 
             /* Need this $feedback to determine whether the requested
              * crocodoc annotation is part of a published feedback
              */
-            foreach ($response->getAllFeedback() as $currentFeedback) {
+            $feedback = null;
+
+            foreach ($feedbacks as $currentFeedback) {
                 if ($currentFeedback->getId() == $params['feedbackId']) {
                     $feedback = $currentFeedback;
                     break;
                 }
             }
 
+            /* Die early when requested Feedback doesn't exist
+             */
+            if (!$feedback) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
             /* Factory to figure out which fragment is required
              */
+            $file = null;
+
             foreach ($response->getAllFiles() as $currentFile) {
                 if ($currentFile->getCrocodocId() == $params['crocodocId']) {
-                    return [
-                        'response' => $response,
-                        'feedback' => $feedback,
-                        'file' => $currentFile
-                    ];
+                    $file = $currentFile;
+                    break;
                 }
             }
 
+            /* Die early when requested crocodocked File doesn't exist
+             */
+            if (!$file) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Otherwise you succeeded in running the gauntlet
+             * Shove all required ingredients into Controller at last
+             */
             return [
                 'response' => $response,
                 'feedback' => $feedback,
-                'file' => null
+                'file' => $file
             ];
         });
 
@@ -206,6 +240,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../MarkScheme/templates', 'learningMarkScheme');
     }
 
     /**
@@ -255,5 +290,13 @@ class Module extends BaseModule
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
+    }
+
+    /**
+     * @return FeedbackMapperProxy
+     */
+    protected function getFeedbackMapperProxy()
+    {
+        return $this->injector->get('feedbackDataSource');
     }
 }

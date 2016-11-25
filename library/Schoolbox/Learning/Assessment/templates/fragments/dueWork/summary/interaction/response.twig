@@ -3,9 +3,9 @@
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="card small-12">
-                    <a href="/search/user/{{ student.id }}" title="View Profile">
-                        <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64" alt="{{ student.fullname }}" class="hide-for-small-only">
-                        <p>{{ student.fullname }}</p>
+                    <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}" class="hide-for-small-only">
+                        <p>{{ participant.user.fullname }}</p>
 
                         {% if currentInteraction.isSubmitted %}
                             <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
@@ -40,7 +40,11 @@
 
                 {# We pass the responseId as well, so that people can download annotated crocodocs
                  #}
-                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentFeedback, responseId: currentInteraction.id} only %}
+                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {
+                    currentFeedback: currentFeedback,
+                    assessmentId: currentInteraction.assessable.id,
+                    responseId: currentInteraction.id
+                } only %}
             {% endfor %}
         </ul>
     {% endif %}

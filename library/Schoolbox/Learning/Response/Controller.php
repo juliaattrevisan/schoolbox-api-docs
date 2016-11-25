@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
@@ -25,6 +26,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
+use DueWork_ErrorMapper;
 
 class Controller extends Base
 {
@@ -76,11 +78,12 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
+     * @param Participant $participant
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getParticularResponse(Submission $response)
+    public function getParticularResponse(Participant $participant, Submission $response)
     {
         /* Module doesn't have access to $this->getUser()
          *
@@ -91,7 +94,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Factory to figure out which fragment is required
+        /* ResponseFileFactory figures out which fragment is required
          */
         $file = null;
 
@@ -111,12 +114,19 @@ class Controller extends Base
             $data = [
                 'assessment' => $response->getAssessable(),
                 'response' => $response,
-                'attachzone' => (new Zone('feedbackFiles'))->getTwigContext(),
+                'latestFeedback' => $participant->findMostRecentFeedback(),
+                'attachzone' => (new Zone('feedbackFiles'))->setMulti(true)->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
+                'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
                 'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+
+                /* For saving feedbacks
+                 */
+                'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+                'participant' => $participant,
 
                 /* Rubrics data
                  */
@@ -133,13 +143,23 @@ class Controller extends Base
         }
     }
 
+    /**
+     * @param IMarkScheme $scheme
+     * @return string
+     */
+    protected function deriveSchemeName(IMarkScheme $scheme)
+    {
+        $c = get_class($scheme);
+        return substr($c, strrpos($c, '\\')+1);
+    }
 
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId
      * @level 165
+     * @param Participant $participant
      * @param Submission $response
      */
-    public function deleteParticularResponse(Submission $response)
+    public function deleteParticularResponse(Participant $participant, Submission $response)
     {
         $code = 204;
         $data = null;
@@ -162,8 +182,6 @@ class Controller extends Base
      * @param Submission $response
      * @param SubmissionFile $file
      * @param Feedback $feedback
-     * @throws \RangeException Cannot authenticate at crocodoc
-     * @throws \DomainException Some kind of curl error between us and crocodoc
      */
     public function getCrocodocDownload(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
@@ -173,39 +191,100 @@ class Controller extends Base
          *
          * Otherwise 404
          */
-        if ($this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $feedback->isPublished())) {
-            if (strlen($file->getCrocodocId())) {
-                try {
-                    $location = (
-                    new InlineGraderFacade(
-                        new InlineGraderAuthenticator(),
-                        $response,
-                        $file,
-                        $this->getUser()
-                    )
-                    )->getDownloadUrl();
-
-                    $this->getResponse()->redirect->to($location);
-                } catch (\RangeException $e) {
-                    throw $this->getErrorMapper()->generateException(
-                        ErrorMapper::ERROR_PROCESSING,
-                        null,
-                        $e->getMessage()
-                    );
-                } catch (\DomainException $e) {
-                    throw $this->getErrorMapper()->generateException(
-                        ErrorMapper::ERROR_PROCESSING,
-                        null,
-                        $e->getMessage()
-                    );
-                }
-            } else {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-            }
+        try {
+            $location = $this->determineCrocodocUrl($response, $feedback, $file, true);
         }
-        else {
+        catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
+        catch (\RangeException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+
+        $this->getResponse()->redirect->to($location);
+        return;
+    }
+
+    /**
+     * View a particular annotated crocodoc
+     *
+     * @param Submission $response
+     * @param Feedback $feedback
+     * @param SubmissionFile $file
+     */
+    public function getCrocodocView(Submission $response, Feedback $feedback, SubmissionFile $file)
+    {
+        /* If you are a student and the feedback is published
+         * and the requested file has a crocodocked url,
+         * attempt to view it
+         *
+         * Otherwise 404
+         */
+        try {
+            $viewUrl = $this->determineCrocodocUrl($response, $feedback, $file);
+            $downloadUrl = $this->determineCrocodocUrl($response, $feedback, $file, false);
+        }
+        catch (\InvalidArgumentException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+        catch (\RangeException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+        catch (\DomainException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
+
+        $data = [
+            'viewUrl' => $viewUrl,
+            'downloadUrl' => $downloadUrl,
+            'response' => $response,
+            'feedback' => $feedback,
+            'file' => $file
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
+    }
+
+    /**
+     * Figure out a Response File's crocodoc url
+     * This is a link to the third-party Crocodoc system
+     *
+     * @param Submission $response
+     * @param Feedback $feedback
+     * @param SubmissionFile $file
+     * @param bool $download
+     * @return string
+     * @throws \RangeException Cannot authenticate at crocodoc
+     * @throws \DomainException Some kind of curl error between us and crocodoc
+     */
+    private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file, $download = false)
+    {
+        /* Staff can view their own annotations
+         * Students can view published feedback associated with their response
+         */
+        $isStaff = $this->getUser()->getRole()->isStaff();
+        $studentCanView = $this->getUser()->getRole()->isStudent() && $feedback->isPublished() && $feedback->getReviewee()->getId() == $this->getUser()->getId();
+
+        if ($isStaff || $studentCanView) {
+            if (strlen($file->getCrocodocId())) {
+
+                /** @var InlineGraderFacade $location */
+                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()));
+
+                if ($download) {
+                    return $location->getDownloadUrl();
+                }
+
+                return $location->getViewUrl();
+            }
+
+            throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
+        }
+
+        throw new \DomainException('You do not have permission to view this document.');
     }
 
     /**

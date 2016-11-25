@@ -128,7 +128,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
             'currentUser' => $this->getUser(),
-            'student'     => $student,
             'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
 
             /* Rubrics data

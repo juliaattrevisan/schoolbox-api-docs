@@ -1,13 +1,33 @@
+{# Inline Grader for a particular Response
+ #
+ # This lets you create Associated Feedback along with grade, comment and
+ # assorted feedback files etc.
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-{{ bread.crumbs(
-    ['Learning', routeLookup('learning.getClasses')],
-    ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
-    [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-    ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
-    ['Inline Grader', null]
-) }}
+{# Conditional bread?? -_-
+ #}
+{% if assessment.context is project %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
+        [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
+        [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
+        ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+        ['Inline Grader', null]
+    ] %}
+{% else %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
+        [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
+        ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+        ['Inline Grader', null]
+    ] %}
+{% endif %}
+
+{{ bread.crumbsArray(nodes)}}
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -22,6 +42,30 @@
 </div>
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
+
+<script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+<script type="text/javascript">
+    $(function() {
+        var nextUrl = findNext(tgt);
+
+        $.fn.dynamicFeedback({
+            errors: {{ errors | json_encode | raw }},
+            statusIncomplete: '{{ statusIncomplete }}',
+            statusPending: '{{ statusPending }}',
+            statusComplete: '{{ statusComplete }}',
+
+            {# Special behaviour of the Publish button on this screen
+             # Publishing on this screen should be synonymous with the
+             # old "Save And Continue" behaviour
+             #}
+            publishText: 'Publish And Continue',
+
+            onPublishCallback: function() {
+                window.location.href = nextUrl.data('value')
+            }
+        });
+    });
+</script>
 
 {% include '@learningResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
 
@@ -77,38 +121,32 @@
         <h2 class="subheader">Feedback</h2>
     </div>
 </div>
-<div class="row">
-    <div class="small-12 columns">
-
-        {% if assessment.markType.id == constant('TYPE_PERCENT', assessment.markType) %}
-            {# Percentage #}
-            <input type="text" name="percentage" placeholder="%" />
-        {% elseif assessment.markType.id == constant('TYPE_LETTER', assessment.markType) %}
-            {# Letter Grade#}
-            {% if assessment.gradeGroup.gradeLevels|length %}
-                <select name="gradeGroup">
-                    {% for current in assessment.gradeGroup.gradeLevels %}
-                        <option value="{{ current.id }}">{{ current.caption }}</option>
-                    {% endfor %}
-
-                    {% if submissionStates|length %}
-                        <option value="" disabled></option>
-                        {% for current in submissionStates %}
-                            <option value="{{ current.id }}">{{ current.displayAs }}</option>
-                        {% endfor %}
-                    {% endif %}
-                </select>
-            {% endif %}
-        {% elseif assessment.markType.id == constant('TYPE_TOTAL', assessment.markType) %}
-            {# Total Mark#}
-            <input type="text" name="mark" placeholder="/ {{ assessment.maxMark }}" />
-        {% elseif assessment.markType.id == constant('TYPE_NONE', assessment.markType) %}
-            {# None #}
-        {% endif %}
-
-        <textarea cols="100" rows="5">Comments and stuff</textarea>
+<div class="row" id="assessment-status">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="small-12 columns">
+                        {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                            markScheme: assessment.markScheme,
+                            fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
+                                assessmentId: assessment.id,
+                                studentId: response.submittedOnBehalfOf.id,
+                                responseId: response.id
+                            })
+                        } %}
+                    </div>
+                </li>
+            </ul>
+        </section>
     </div>
+</div>
+<div class="row">
     <div class="small-12 columns">
         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     </div>
 </div>
+
+<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+<div class="toast" data-alert data-save-draft></div>
+
