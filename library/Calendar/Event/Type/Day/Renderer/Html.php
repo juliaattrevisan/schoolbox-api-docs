@@ -18,11 +18,12 @@ class Html extends Base {
      */
     public function render()
     {
-
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/day.twig',
                 array(  'event' => $this->getEvent(),
-                        'renderer' => $this)
+                        'renderer' => $this,
+                        'returnTo' => urlencode($_SERVER["REQUEST_URI"])
+                )
             );
         } else {
             return '';

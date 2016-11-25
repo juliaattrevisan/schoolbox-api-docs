@@ -323,7 +323,10 @@ class Event
                 return $return;
             }
         }
-
+        //Assuming the complete url has been passed over
+        if(strlen(urldecode($returnView)) > 0){
+            return urldecode($returnView);
+        }
         // Otherwise - guess using Back to the future!
         return '';
     }

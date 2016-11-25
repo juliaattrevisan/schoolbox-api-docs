@@ -130,14 +130,14 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => Scrub::text($event->getLocation()),
             'EVENT_DETAIL'         => Scrub::text($event->getDetail()),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
+                urldecode($_GET['returnTo']),
                 $event->getStartDateTime()->getURLDate(),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-            'PASS_REDIRECT' => $_GET['returnTo'],
+            'RETURN_TO' => urlencode($_GET['returnTo']),
         )
     );
 
