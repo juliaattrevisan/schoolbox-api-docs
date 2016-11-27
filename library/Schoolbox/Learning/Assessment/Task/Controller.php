@@ -9,14 +9,48 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * @var TaskResponseDataSource
+     */
+    protected $taskResponseDataSource;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param MapperProxy                   $assessmentMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     * @param TaskResponseDataSource        $taskResponseDataSource
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor,
+        Assessment\Breadcrumb\Factory $bakery,
+        TaskResponseDataSource $taskResponseDataSource
+    ) {
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $bakery);
+        $this->taskResponseDataSource = $taskResponseDataSource;
+    }
 
     /**
      * This gives you a summary of progress made within an Assessment
@@ -107,8 +141,49 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(Participant $participant)
     {
-        // TODO redirect this to /task/start/:oldTaskId
-        throw new NotFound();
+        // Don't redirect to /task/start/:oldTaskId - students must mark tasks complete themselves
+
+        // Params:
+        // status: the status they want to set response to
+        // and that's it - an existing response will never be updated
+        $this->assertParticipantAccess($participant);
+
+        $response = (new Completion\Model())
+            ->setAssessable($participant->getAssessable())
+            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedBy($this->getUser())
+            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
+            ->setCreatedAt(\Alaress_Date_Format::now())
+            ->markAs($this->getRequest()->post->getInt('status'))
+        ;
+
+        $response->assertSaveability();
+
+        // And save
+        $this->taskResponseDataSource->save($response);
+
+        // And redirect somewhere
+        if ($this->getRequest()->isXhr()) {
+            $result['success'] = true;
+            $result['message'] = 'OK';
+            $result['id']      = $response->getId();
+            $result['status']  = $response->getCompletionStatus();
+
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+
+        } else {
+            // redirect after saving to Due Work Summary For Particular Student
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $participant->getAssessable()->getId(),
+                        'studentId'    => $participant->getUser()->getId(),
+                    ]
+                )
+            );
+        }
     }
 
 

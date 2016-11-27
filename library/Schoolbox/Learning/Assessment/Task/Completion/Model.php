@@ -12,8 +12,15 @@ namespace Schoolbox\Learning\Assessment\Task\Completion;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\CompletionStatusTrait;
+use Schoolbox\Learning\Assessment\Task\ICompletion;
+use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 
-class Model extends AbstractResponse
+/**
+ * Class Model
+ *
+ * @method TaskModel getAssessable()
+ */
+class Model extends AbstractResponse implements ICompletion
 {
     use CompletionStatusTrait;
 
@@ -82,4 +89,54 @@ class Model extends AbstractResponse
         return true;
     }
 
+    /**
+     * Is this completion saveable in its current state?
+     *
+     * * Completions cannot be created for users not participating in the task.
+     * * Nobody may create a new completion that is the same status as the most
+     *   recent completion for this user.
+     * * Participants may not set their own work to completed.
+     * * Participants may not set their own work to self-assessed,
+     *   if the task is teacher-assessed only.
+     *
+     * This method assumes that the current user has permission to create
+     * completions for this task.
+     *
+     * @return bool
+     * @throws \UnexpectedValueException if the completion isn't saveable
+     */
+    public function assertSaveability()
+    {
+        $currentUser = $this->getSubmittedBy();
+        $taskUser    = $this->getSubmittedOnBehalfOf();
+
+        // Only participants in task
+        if (!$this->getAssessable()->isParticipant($taskUser)) {
+            throw new \UnexpectedValueException("User is not a participant in this task");
+        }
+
+        // Can't create a new completion with the same status as most recent
+        if (empty($this->getId())) {
+            $mostRecentResponse = $this->getAssessable()->getParticipant($taskUser);
+            if ($mostRecentResponse instanceof Model
+                && $mostRecentResponse->isMarkedAs($this->getCompletionStatus())
+            ) {
+                throw new \UnexpectedValueException("This user already has this status for this task");
+            }
+        }
+
+        // Can't set own work to completed, or self-assess if task doesn't allow it
+        if ($currentUser->getId() == $taskUser->getId()) {
+            if ($this->isMarkedAsCompleted()) {
+                throw new \UnexpectedValueException("Users may not complete a task themselves");
+            }
+
+            if ($this->isMarkedAsSelfAssessed() && $this->getAssessable()->isTeacherAssessed()) {
+                throw new \UnexpectedValueException("Users may not self-assess a task themselves, if the task is teacher-assessed only");
+            }
+        }
+
+        // Anything else is fine
+        return true;
+    }
 }

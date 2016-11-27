@@ -89,7 +89,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         foreach($mapperModels as $completion){
             $taskCompletion = (new DomainObject())
-                // TODO add completion status once markbook is merged
                 ->setId($completion->getId())
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($completion->getMarkingUser())
@@ -126,7 +125,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = new GenericCollection(DataObject::class);
 
         foreach ($domainObjects as $domainObject) {
-            // TODO add completion status once markbook is merged
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
                 ->setTask(
@@ -135,7 +133,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 )
                 ->setStudent($domainObject->getSubmittedOnBehalfOf())
                 ->setMarkingUser($domainObject->getSubmittedBy())
-                ->setCompletionDate($domainObject->getCreatedAt());
+                ->setCompletionDate($domainObject->getCreatedAt())
+                ->setCompletionStatus($domainObject->getCompletionStatus());
             $dataModels->add($dataModel);
         }
 

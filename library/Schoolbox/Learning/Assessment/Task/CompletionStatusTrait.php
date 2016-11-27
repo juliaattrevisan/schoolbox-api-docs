@@ -18,17 +18,44 @@ trait CompletionStatusTrait
      * @var array
      */
     protected $availableCompletionStatuses = [
-        'completed'    => 3,
-        'selfAssessed' => 2,
-        'notAttempted' => 1,
+        ICompletion::STATUS_COMPLETED,
+        ICompletion::STATUS_SELF_ASSESSED,
+        ICompletion::STATUS_NOT_ATTEMPTED,
     ];
 
     /**
-     * What is the status of this completion? By default, it's incomplete.
+     * What is the status of this completion? By default, it's not attempted.
      *
      * @var int
      */
-    protected $completionStatus = 1;
+    protected $completionStatus = ICompletion::STATUS_NOT_ATTEMPTED;
+
+    /**
+     * Compares this task's completion status against another input.
+     *
+     * @param int $completionStatus
+     * @return bool
+     */
+    public function isMarkedAs($completionStatus)
+    {
+        return $this->completionStatus == $completionStatus;
+    }
+
+    /**
+     * Set this task as this status.
+     *
+     * @param int $completionStatus
+     * @return static
+     * @throws \UnexpectedValueException if $completionStatus isn't a value in $availableCompletionStatuses
+     */
+    public function markAs($completionStatus)
+    {
+        if (!in_array($completionStatus, $this->availableCompletionStatuses)) {
+            throw new \UnexpectedValueException("$completionStatus is not a valid completion status");
+        }
+        $this->completionStatus = $completionStatus;
+        return $this;
+    }
 
     /**
      * Is this task marked as completed?
@@ -37,7 +64,7 @@ trait CompletionStatusTrait
      */
     public function isMarkedAsCompleted()
     {
-        return $this->completionStatus == $this->availableCompletionStatuses['completed'];
+        return $this->isMarkedAs(ICompletion::STATUS_COMPLETED);
     }
 
     /**
@@ -47,8 +74,7 @@ trait CompletionStatusTrait
      */
     public function markAsCompleted()
     {
-        $this->completionStatus = $this->availableCompletionStatuses['completed'];
-        return $this;
+        return $this->markAs(ICompletion::STATUS_COMPLETED);
     }
 
     /**
@@ -58,7 +84,7 @@ trait CompletionStatusTrait
      */
     public function isMarkedAsSelfAssessed()
     {
-        return $this->completionStatus == $this->availableCompletionStatuses['selfAssessed'];
+        return $this->isMarkedAs(ICompletion::STATUS_SELF_ASSESSED);
     }
 
     /**
@@ -68,8 +94,7 @@ trait CompletionStatusTrait
      */
     public function markAsSelfAssessed()
     {
-        $this->completionStatus = $this->availableCompletionStatuses['selfAssessed'];
-        return $this;
+        return $this->markAs(ICompletion::STATUS_SELF_ASSESSED);
     }
 
     /**
@@ -79,7 +104,7 @@ trait CompletionStatusTrait
      */
     public function isMarkedAsNotAttempted()
     {
-        return $this->completionStatus == $this->availableCompletionStatuses['notAttempted'];
+        return $this->isMarkedAs(ICompletion::STATUS_NOT_ATTEMPTED);
     }
 
     /**
@@ -89,9 +114,18 @@ trait CompletionStatusTrait
      */
     public function markAsNotAttempted()
     {
-        $this->completionStatus = $this->availableCompletionStatuses['notAttempted'];
-        return $this;
+        return $this->markAs(ICompletion::STATUS_NOT_ATTEMPTED);
     }
 
-
+    /**
+     * Gets completion status
+     *
+     * Use `markAs()` methods in lieu of conventional setter
+     *
+     * @return int
+     */
+    public function getCompletionStatus()
+    {
+        return $this->completionStatus;
+    }
 }
