@@ -744,7 +744,7 @@ class Controller extends Base\Base
                     if ($componentInstance) {
                         $configMapper = \Component_ConfigMapper::getInstance();
                         $config = $configMapper->findByColumnList([
-                            'component_config_definition_id' => 255,
+                            'component_config_definition_id' => 255,  //TODO replace magic number
                             'component_instance_id'          => $componentInstance->getId(),
                         ])->first();
                         if (!$config) {
