@@ -206,8 +206,14 @@ class ImportFactory
             AND ia.deleted_at IS NULL
         ";
 
-        //TODO sigh. Need to divide this into 3 Unions to distinguish AssessmentSpecs with or without a Impl
+        //TODO Replace all predicates with nested Predicate Builder
 
+//        $pbInner = new PredicateBuilder($this->database, '');
+//        $pbInner->anyOf('ui.id', $unitImplIds);
+//        $pbInner->isNull('ia.deleted_at');
+//        $innerQuery .= 'WHERE' . implode(' AND ', $pbInner->getWhere());
+        // How to bind args in nested?
+        // Need to use separate builders for each query, then merge their arg arrays (may need to alias args to avoid name collisions)
 
 
 
