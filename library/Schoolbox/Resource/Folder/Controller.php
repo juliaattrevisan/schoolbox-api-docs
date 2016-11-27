@@ -112,14 +112,14 @@ class Controller extends BaseController
     public function getFolderModify($id)
     {
         $access = $this->getAccess();
+        $userAccess = $access->getFolderAccess($this->getUser(), [$id]);
         $folderMapper = $this->getFolderMapper();
         $homepageConfigMapper = $this->getHomepageConfigMapper();
         $homepageTemplateMapper = $this->getHomepageTemplateMapper();
         $roleAccessMapper = $this->getRoleAccessMapper();
         $roleMapper = $this->getRoleMapper();
         $errorMapper = $this->getErrorMapper();
-
-        if ($access->getFolderAccess($this->getUser(), [$id]) < UserAccess::ACCESS_WRITE) {
+        if ($userAccess < UserAccess::ACCESS_WRITE) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
@@ -187,7 +187,11 @@ class Controller extends BaseController
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
-                    'writePermission'   => UserAccess::ACCESS_WRITE,
+                    'userAccess'        => $userAccess,
+                    'deny'              => UserAccess::ACCESS_DENY,
+                    'read'              => UserAccess::ACCESS_READ,
+                    'write'             => UserAccess::ACCESS_WRITE,
+                    'moderate'          => UserAccess::ACCESS_FULL,
                     'coverImageZone'    => $zone->getTwigContext(),
                 ),
             )

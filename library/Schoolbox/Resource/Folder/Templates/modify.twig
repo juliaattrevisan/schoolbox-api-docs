@@ -153,7 +153,7 @@
 
             {# Only show 'Modify Group' in the jelly-tot if we are actually editing a group #}
 
-            {% if folder.isGroup and user.isSuperuser %}
+            {% if folder.isGroup and userAccess == moderate %}
                 <li><a class="icon-group" href="/group/modify/{{ folder.getId }}" title="Manage individual user access to this folder">Modify Group</a></li>
             {% endif %}
 
@@ -264,15 +264,15 @@
                                 <tr>
                                     <td>{{ role.getName }}</td>
                                     <td>
-                                        <input type="radio" class="no_permission required" id="groupNone{{ role.getId }}" name="group[{{ role.getId }}]" value="0" {% if rolePermissions[role.getId] == 0 %}checked{% endif %} />
+                                        <input type="radio" class="no_permission required" id="groupNone{{ role.getId }}" name="group[{{ role.getId }}]" value="0" {% if rolePermissions[role.getId] == deny %}checked{% endif %} />
                                         <label class="radio-label" for="groupNone{{ role.getId }}"></label>
                                     </td>
                                     <td>
-                                        <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if rolePermissions[role.getId] == 1 %}checked{% endif %} />
+                                        <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if rolePermissions[role.getId] == read %}checked{% endif %} />
                                         <label class="radio-label" for="groupRead{{ role.getId }}"></label>
                                     </td>
                                     <td>
-                                        <input type="radio" name="group[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {% if rolePermissions[role.getId] == 2 %}checked{% endif %} />
+                                        <input type="radio" name="group[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {% if rolePermissions[role.getId] == write %}checked{% endif %} />
                                         <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
                                     </td>
                                 </tr>
