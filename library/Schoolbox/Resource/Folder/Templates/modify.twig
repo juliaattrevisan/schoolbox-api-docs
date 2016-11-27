@@ -153,7 +153,7 @@
 
             {# Only show 'Modify Group' in the jelly-tot if we are actually editing a group #}
 
-            {% if folder.isGroup %}
+            {% if folder.isGroup and user.isSuperuser %}
                 <li><a class="icon-group" href="/group/modify/{{ folder.getId }}" title="Manage individual user access to this folder">Modify Group</a></li>
             {% endif %}
 
