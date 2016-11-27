@@ -89,7 +89,7 @@ class Controller extends Base
     public function getLaunch($provider, $component, $folder) {
 
         $launch_data = [
-            'resource_link_id' => $component->getInstance()->getId(),
+            'resource_link_id' => $folder->getId() . '_' . $component->getInstance()->getId(),
             'resource_link_title' => $component->getConfig('componentname'),
             'resource_link_description' => '',
             'user_id' => $this->getUser()->getId(),
@@ -111,13 +111,13 @@ class Controller extends Base
             'launch_presentation_document_target' => 'iframe',
             'launch_presentation_return_url' => urlencode('#'),
             'tool_consumer_instance_guid' => $this->getDi()->get('config')->get('site_location'),
-            'tool_consumer_instance_name' => 'school_name',
+            'tool_consumer_instance_name' => $this->getDi()->get('config')->get('school_name'),
             'tool_consumer_instance_description' => 'Schoolbox LMS',
             'tool_consumer_instance_url' => urlencode("http://" . $_SERVER['SERVER_NAME']),
-            'tool_consumer_instance_contact_email' => 'mail_from_address',
+            'tool_consumer_instance_contact_email' => $this->getDi()->get('config')->get('mail_from_address'),
             'tool_consumer_info_product_family_code' => 'schoolbox',
-            'tool_consumer_info_version' => 'site_version',
-            'ext_lms' => 'schoolbox-' . 'site_version'
+            'tool_consumer_info_version' => $this->getDi()->get('config')->get('site_version'),
+            'ext_lms' => 'schoolbox-' . $this->getDi()->get('config')->get('site_version')
         ];
 
         // Learning Field custom URL mangling
