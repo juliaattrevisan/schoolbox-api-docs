@@ -18,6 +18,13 @@ INSERT INTO component_definition (
   'false'
 );
 
+# Copy due work config to tasks config
+INSERT INTO component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
+  SELECT (SELECT `id` FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Task\\Component\\Homepage\\Controller'),
+    `key`, `default_value`, `label`, component_config_definition.`description`
+  FROM component_config_definition JOIN component_definition ON component_definition.id = component_config_definition.component_definition_id
+  WHERE class = 'Schoolbox\\Learning\\Assessment\\DueWork\\Component\\Homepage\\Controller';
+
 UPDATE component_definition
 SET class = 'Schoolbox\\Learning\\Assessment\\Quiz\\Component\\Homepage\\Controller'
 WHERE class = 'Component_Homepage_AssessController';
