@@ -8,14 +8,15 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\Feedback;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 
-class FeedbackFileDecorator
+class FileDecorator
 {
 
     /**

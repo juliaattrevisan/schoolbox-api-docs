@@ -15,7 +15,6 @@ use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\IResponse;
 use \Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\FeedbackFileDecorator;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 
@@ -182,7 +181,7 @@ class Factory
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
-        $feedbackFileDecorator = new FeedbackFileDecorator($feedback, $this->getFiles());
+        $feedbackFileDecorator = new FileDecorator($feedback, $this->getFiles());
         $feedbackFileDecorator->decorate();
 
         if ($postPublish == true) {
