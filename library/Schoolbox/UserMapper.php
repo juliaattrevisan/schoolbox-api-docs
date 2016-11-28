@@ -637,6 +637,7 @@ class UserMapper extends Mapper
             INNER JOIN {$this->getJoinSql('role', 'u', 'r')}
             WHERE ua.service=:service
             AND ua.type >=:accessLevel
+            AND u.deleted_at is null
         ";
 
         $params = array(
