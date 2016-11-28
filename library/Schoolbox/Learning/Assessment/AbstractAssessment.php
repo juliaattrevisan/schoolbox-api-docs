@@ -112,6 +112,14 @@ abstract class AbstractAssessment implements IAssessable
     private $context;
 
     /**
+     * If this assessment's context is a UnitImpl, it may have been created from a UnitSpec.
+     * This is a reference back to the IAssessable from which this assessment was cloned.
+     *
+     * @var IAssessable|null
+     */
+    private $specification = null;
+
+    /**
      * If published, then who can see the feedback for this Assessment.
      *
      * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
@@ -823,5 +831,22 @@ abstract class AbstractAssessment implements IAssessable
         $this->markVisibility = $markVisibility;
         return $this;
     }
-}
 
+    /**
+     * @return null|IAssessable
+     */
+    public function getSpecification()
+    {
+        return $this->specification;
+    }
+
+    /**
+     * @param IAssessable|null $specification
+     * @return static
+     */
+    public function setSpecification(IAssessable $specification = null)
+    {
+        $this->specification = $specification;
+        return $this;
+    }
+}

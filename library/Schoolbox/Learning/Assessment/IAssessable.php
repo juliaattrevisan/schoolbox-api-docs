@@ -59,6 +59,24 @@ interface IAssessable extends ISoftDeletable
     public function setContext(AssessmentContext $assessmentContext);
 
     /**
+     * Retrieve the specification this assessment was created from, if any.
+     *
+     * When an assessment is created as part of creating a new unit implementation,
+     * it will contain a reference back to the specification it was cloned from.
+     *
+     * @return IAssessable|null
+     */
+    public function getSpecification();
+
+    /**
+     * Set the specification this assessment was created from, if any.
+     *
+     * @param IAssessable|null $specification
+     * @return static
+     */
+    public function setSpecification(IAssessable $specification = null);
+
+    /**
      * Return the name of the "type" of Assessable this is
      *
      * For Due Works, it'll be "Essay, Homework, etc"
