@@ -20,6 +20,9 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 
+/**
+ * @deprecated 165
+ */
 class Instance implements ISoftDeletable {
 
     /**

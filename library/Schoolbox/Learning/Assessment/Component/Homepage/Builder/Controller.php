@@ -11,24 +11,27 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Builder;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var UnitInstanceMapper */
-    protected $unitInstanceMapper;
+    /** @var UnitImplementationMapper */
+    protected $unitImplementationMapper;
 
-    /** @var UnitSpecificationMapperProxy */
-    protected $unitSpecificationMapperProxy;
+    /** @var UnitSpecificationMapper */
+    protected $unitSpecificationMapper;
 
     /** @var AssessmentMapperProxy */
     protected $assessmentMapperProxy;
@@ -40,18 +43,24 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @param User $user
      * @param SitePage $sitepage
      */
-    public function __construct(
-        Component_Instance $instance,
-        User $user,
-        SitePage $sitepage
-    ) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
+        $this->unitSpecificationMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        $this->unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        $this->assessmentMapperProxy = $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
+    }
 
-        $this->setUnitSpecificationMapperProxy($this->getSitePage()->getDi()->get('unitSpecificationDataSource'));
-        $this->setAssessmentMapperProxy($assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource'));
-
+    /**
+     * @inheritdoc
+     */
+    public function execute()
+    {
+        if(!parent::execute()){
+            return false;
+        }
+        return $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -63,19 +72,22 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Get the current folder and hydrate its parent
         $folder = $this->getSource();
 
-        if($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-            return false;
+        // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
+        if(!$folder->getUnitSpecification() instanceof UnitSpecification || !$folder->getUnitSpecification()->getId()){
+            return $this->renderNotAUnitSpecification($templateHandle);
         }
 
         // Get the units details
         try {
-            $unit = $this->getUnitSpecificationMapperProxy()->findByFolderId($this->getSource()->getId());
+            $unit = $this->getUnitSpecificationMapper()->findByFolderId($folder->getId());
 
             $data = [
-                'unit'   => $unit,
-                'tasks'  => $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()),
-                'usages' => $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
-                'returnUrl'  => $_GET["page"],
+                'unit'      => $unit,
+                'tasks'     => $this->assessmentMapperProxy->findAllByUnitSpecificationId($unit->getId()),
+                'usages'    => new Collection(),
+                // TODO repair this. Provides 'export to class' functionality. see jquery.course-builder.js
+//                'usages'    => $this->getUnitImplementationMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
+                'returnUrl' => $_GET["page"],
             ];
         } catch (MapperException $e) {
 
@@ -85,7 +97,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
 
         // Retrieve all of the parents for use as breadcrumbs
-        if ($this->getContext() instanceof FolderModel) {
+        if ($this->getContext() instanceof Folder) {
             foreach (FolderMapper::getInstance()->findParents($folder, null, true) as $parent) {
                 $data['breadcrumbs'][] = $parent;
             }
@@ -97,43 +109,86 @@ class Controller extends Component_Homepage_ControllerAbstract
             $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
+
     }
+
+    /**
+     * Renders a component-specific empty state to indicate that the folder on which
+     * this CourseBuilder component is placed is not linked to a UnitSpecification.
+     *
+     * Prompts the user to manage Courses and Units via the CourseBuilder workflow
+     *
+     * @param string $templateHandle
+     * @return bool
+     */
+    protected function renderNotAUnitSpecification($templateHandle)
+    {
+        $folder = $this->getSource();
+        $parent = $this->getFolderMapper()->findById($folder->getParent()->getId());
+
+        $folderCourse = $folder->getCourseSpecification();
+        $parentCourse = $parent->getCourseSpecification();
+        $parentUnit = $parent->getUnitSpecification();
+
+        $folderHasClass = $folder->getCodes()->count() > 0;
+        $folderHasCourse = $folderCourse instanceof CourseSpecification && $folderCourse->getId();
+        $parentHasCourse = $parentCourse instanceof CourseSpecification && $parentCourse->getId();
+        $parentHasUnit = $parentUnit instanceof UnitSpecification && $parentUnit->getId();
+
+        $data = [
+            'componentInstance' => $this->getInstance(),
+            'folder'            => $folder,
+            'folderHasClass'    => $folderHasClass,
+            'folderHasCourse'   => $folderHasCourse,
+            'parentHasCourse'   => $parentHasCourse,
+            'parentHasUnit'     => $parentHasUnit,
+        ];
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learningAssessment/builder/emptyStateNoUnitSpec.twig',
+            $data,
+            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+        );
+    }
+
+
 
     /* Getters/Setters
      */
 
     /**
-     * @return UnitInstanceMapper
+     * @return UnitImplementationMapper
      */
-    protected function getUnitInstanceMapper()
+    protected function getUnitImplementationMapper()
     {
-        return $this->unitInstanceMapper;
+        return $this->unitImplementationMapper;
     }
 
     /**
-     * @param UnitInstanceMapper $unitInstanceMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
-    public function setUnitInstanceMapper($unitInstanceMapper)
+    public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
     {
-        $this->unitInstanceMapper = $unitInstanceMapper;
+        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
 
     /**
-     * @return UnitSpecificationMapperProxy
+     * @return UnitSpecificationMapper
      */
-    public function getUnitSpecificationMapperProxy()
+    public function getUnitSpecificationMapper()
     {
-        return $this->unitSpecificationMapperProxy;
+        return $this->unitSpecificationMapper;
     }
 
     /**
-     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      * @return static
      */
-    public function setUnitSpecificationMapperProxy(UnitSpecificationMapperProxy $unitSpecificationMapperProxy)
+    public function setUnitSpecificationMapper(UnitSpecificationMapper $unitSpecificationMapper)
     {
-        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
         return $this;
     }
 

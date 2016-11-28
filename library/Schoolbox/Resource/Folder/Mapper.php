@@ -757,10 +757,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setGroup($group);
 
                 $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                $category->setCourseSpecification($courseSpec);
+                if($courseSpec->getId()){
+                    $category->setCourseSpecification($courseSpec);
+                }
 
                 $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                $category->setUnitSpecification($unitSpec);
+                if($unitSpec->getId()){
+                    $category->setUnitSpecification($unitSpec);
+                }
             }
 
             // Hydrate class codes (avoiding duplicates) and cache

@@ -1,0 +1,65 @@
+{#
+Usage:
+    {% include '@learningAssessment/builder/emptyStateNoUnitSpec.twig' with {
+        componentInstance Component_Instance - The Component displaying this content
+        folder:           Folder             - The folder on which this Component resides
+        folderHasCourse:  bool               - Whether this folder has a Course
+        parentHasCourse:  bool               - Whether this folder's parent has a Course
+        parentHasUnit:    bool               - Whether this folder's parent has a Unit
+    } only %}
+#}
+<script>
+    $(function() {
+
+        $('[data-convert-folders]').on('click', function(event){
+            event.preventDefault();
+            var $element = $(this);
+            var countFolders = $element.attr('data-convert-folders');
+            var $convertFeedback = $('[data-relation="save-label"]');
+            $convertFeedback.toastActivate({text: 'Converting Folder'+(countFolders > 1 ? 's' : '')+'...'});
+
+            $.post($element[0].href, function(){
+                $convertFeedback.toastTimeout({text: 'Conversion Complete', css: 'success'});
+                reloadComponent();
+            })
+            .fail(function(){
+                $convertFeedback.toastTimeout({text: 'Conversion Failed!', css: 'alert'});
+            });
+        });
+
+        /**
+         * Call after successful conversion to AJAX refresh the component
+         */
+        function reloadComponent()
+        {
+            var $component = $('#component{{ componentInstance.id }}');
+            var $updateForm = $component.find("[data-component-panel='settings'] form");
+            $updateForm.trigger('submit');
+        }
+    });
+
+</script>
+<div class="empty-state">
+    <i class="icon-course"></i>
+    {% if folderHasCourse %}
+        <p>This page is a course and cannot have a course builder</p>
+        <p>Please create a unit on a folder under this page.</p>
+    {% elseif parentHasUnit %}
+        <p>The folder above this page is a unit<p>
+        <p>You are a unable to create additional units underneath existing units. Instead you should create a project in the existing unit.</p>
+    {% elseif folderHasClass %}
+    <p>You are not able to build a course on an existing class. You should use the course outline component to import your course to this class.<p>
+    {% endif %}
+
+    {% if not folderHasClass and not folderHasCourse and not parentHasCourse and not parentHasUnit %}
+        <p>This page is not part of a course.<p>
+        <p>You can <a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder and parent to Unit and Course">convert this page</a> to a new unit and create a course out of the folder above. Once converted you will be able to add activities to this unit.</p>
+    {% elseif not folderHasClass and parentHasCourse and not folderHasCourse %}
+        <p>This page is not currently a unit.</p>
+        <p>You must first <a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder to Unit">convert this page</a> to a unit before you can add activities.</p>
+    {% else %}
+        <p><a href="{{ routeLookup('course.courseList') }}" title="Manage Courses">Manage Courses</a></p>
+    {% endif %}
+</div>
+
+<div class="toast" data-alert data-relation="save-label"></div>

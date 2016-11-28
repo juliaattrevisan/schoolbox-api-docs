@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
 <ul class="information-list sortable-card ui-sortable" data-sortable data-task_list data-unit="{{ unit.id }}" id="{{ reveals.id }}">
     {% for task in tasks %}
         {% include '@learningAssessment/builder/task.twig' with { '_writable': true } %}
@@ -11,7 +12,7 @@
     {% endfor %}
 </ul>
 
-<form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
+<form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks" class="no-margin">
     <input type="hidden" name="action"    value="reorder"/>
     <input type="hidden" name="category"  value="{{ unit.id }}"/>
     <input type="hidden" name="component" value="{{ reveals.component.id }}"/>
@@ -28,9 +29,10 @@
     <a href="#" class="button" data-action="cancel">Don't create task</a>
 </div>
 
+
 <script type="text/javascript">
     $(function () {
-        $('#{{ componentInstance.id }}').setupCourseBuilder({% if usages | length %}
+        $('#component{{ componentInstance.id }}').setupCourseBuilder({% if usages | length %}
                 {
                     units: {{ usages | json_encode }}
                 }

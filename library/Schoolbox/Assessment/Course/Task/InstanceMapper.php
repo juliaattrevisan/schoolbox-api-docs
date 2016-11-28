@@ -15,14 +15,18 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * @deprecated 165
+ */
 class InstanceMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('task_instance');
-        $this->hasModel('\\Schoolbox\\Assessment\\Course\\Task\\Instance');
+        $this->hasModel(TaskInstance::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',
