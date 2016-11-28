@@ -120,7 +120,7 @@ class Translator
         ;
 
         // Translate specification assessment if there is one
-        $specification = $assessment->getSpecification();
+        $specification = $assessment->getSpecificationAssessment();
         if ($specification instanceof IAssessable) {
             // Go to no great lengths here, as I need only an ID
             $assessmentModel->setSpecificationAssessment(
@@ -222,7 +222,7 @@ class Translator
             $model->setAssessmentModel($specification);
 
             // Holy recursion batman
-            $assessable->setSpecification($this->translateToDomainModel($model));
+            $assessable->setSpecificationAssessment($this->translateToDomainModel($model));
         }
 
         // Translate assessment context

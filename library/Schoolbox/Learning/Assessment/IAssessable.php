@@ -66,7 +66,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @return IAssessable|null
      */
-    public function getSpecification();
+    public function getSpecificationAssessment();
 
     /**
      * Set the specification this assessment was created from, if any.
@@ -74,7 +74,7 @@ interface IAssessable extends ISoftDeletable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecification(IAssessable $specification = null);
+    public function setSpecificationAssessment(IAssessable $specification = null);
 
     /**
      * Return the name of the "type" of Assessable this is

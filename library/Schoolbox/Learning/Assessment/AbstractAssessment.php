@@ -835,7 +835,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @return null|IAssessable
      */
-    public function getSpecification()
+    public function getSpecificationAssessment()
     {
         return $this->specification;
     }
@@ -844,7 +844,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecification(IAssessable $specification = null)
+    public function setSpecificationAssessment(IAssessable $specification = null)
     {
         $this->specification = $specification;
         return $this;
