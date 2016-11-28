@@ -79,15 +79,40 @@
             $('#assessment-status').on('click', '[data-completion]', function (e) {
                 e.preventDefault();
 
-                var $a = $(this);
+                var $a = $(this),
+                    $form = $a.closest('form'),
+                    map = {
+                        1: 'incomplete',
+                        2: 'pending',
+                        3: 'complete'
+                    },
+                    newStatusCode;
+
+                if ($form.attr('disabled')) {
+                    return;
+                }
 
                 if ($a.hasClass('pending')) {
-                    $a.removeClass('pending').addClass('complete');
+                    newStatusCode  = 3;
                 } else if ($a.hasClass('complete')) {
-                    $a.removeClass('complete');
+                    newStatusCode  = 1;
                 } else {
-                    $a.addClass('pending');
+                    newStatusCode  = 2;
                 }
+
+                $.ajax($form.attr('action'), {
+                    type: $form.attr('method') || 'post',
+                    dataType: 'json',
+                    data: { status: newStatusCode }
+                })
+                .done(function (rs) {
+                    $a.removeClass('incomplete pending complete').addClass(map[rs.status]);
+                })
+                .always(function () {
+                    $form.removeAttr('disabled')
+                });
+
+                $form.attr('disabled', 'disabled');
             });
         });
     </script>
