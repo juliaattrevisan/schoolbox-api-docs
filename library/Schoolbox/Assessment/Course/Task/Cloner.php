@@ -32,6 +32,9 @@ use Assess_Section;
 use Assess_Export_Xml;
 use Assess_Import_Xml;
 
+/**
+ * @deprecated 165
+ */
 class Cloner
 {
     /**

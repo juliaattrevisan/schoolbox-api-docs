@@ -10,5 +10,8 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+/**
+ * @deprecated 165
+ */
 class ClonerException extends \Exception {
 }
