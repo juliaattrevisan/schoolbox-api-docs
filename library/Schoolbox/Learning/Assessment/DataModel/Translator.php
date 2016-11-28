@@ -204,6 +204,17 @@ class Translator
             ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
         ;
 
+        // Translate specification assessment if there is one
+        $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();
+        if ($specification instanceof Model) {
+            // Turn it inside out, because that's the way I got it
+            $model = $specification->getSubObject();
+            $model->setAssessmentModel($specification);
+
+            // Holy recursion batman
+            $assessable->setSpecification($this->translateToDomainModel($model));
+        }
+
         // Translate assessment context
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
