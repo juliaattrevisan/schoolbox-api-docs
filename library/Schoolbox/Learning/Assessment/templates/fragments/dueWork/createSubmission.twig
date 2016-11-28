@@ -39,6 +39,11 @@
         // The autosave submit method
 
         var autosaveAjaxSubmit = function () {
+
+            /* Disable actual submit button
+             */
+            $("[data-action-save]").prop('disabled', true);
+
             var form = $('#editor-form');
 
             // Change button's text, but keep its width the same.
@@ -61,6 +66,10 @@
                 complete: function () {
                     // Re-init the autosave
                     initAutosave();
+
+                    /* Re-enable submit
+                     */
+                    $("[data-action-save]").prop('disabled', false);
                 },
                 success: function (responseText) {
 
@@ -136,6 +145,11 @@
             else {
                 // checks pass: go for broke
                 submit.prop('disabled', true);
+
+                /* Disable draft autosaving while actually submitting
+                 */
+                clearTimeout(autosaveTimeout);
+
                 form.submit();
             }
         });
