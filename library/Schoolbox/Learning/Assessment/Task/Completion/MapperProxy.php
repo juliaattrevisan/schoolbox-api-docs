@@ -134,7 +134,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setStudent($domainObject->getSubmittedOnBehalfOf())
                 ->setMarkingUser($domainObject->getSubmittedBy())
                 ->setCompletionStatus($domainObject->getCompletionStatus())
-                ->setCreatedAt($domainObject->getCreatedAt());
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setDeletedAt($domainObject->getDeletedAt());
             $dataModels->add($dataModel);
         }
 
