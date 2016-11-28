@@ -84,4 +84,9 @@ class Model implements ISoftDeletable
         $this->units = $units;
         return $this;
     }
+
+    public function getTitle()
+    {
+        return $this->getFolder()->getName();
+    }
 }

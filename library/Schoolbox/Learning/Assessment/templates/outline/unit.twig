@@ -10,7 +10,7 @@
         <div class="list-item">
             <div class="card small-12">
                 <h3>
-                    {% if unit.isBeforeOpenDate==false or readOnly == false %}
+                    {% if  readOnly == false %}
                     <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
                     <a href="/homepage/{{ unit.specification.folder.id }}">{{ unit.title }}</a>
                     {% else %}

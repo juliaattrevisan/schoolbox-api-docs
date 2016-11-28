@@ -203,4 +203,60 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
         $this->assessables = $assessables;
         return $this;
     }
+
+    /**
+     * This unit is open if the current date is after the open date, and before
+     * the due date.
+     *
+     * @return bool
+     */
+    public function isOpen() {
+        return !($this->isBeforeOpenDate() || $this->isAfterDueDate());
+    }
+
+    /**
+     * Is this unit open for submissions?
+     *
+     * @return bool
+     */
+    public function isBeforeOpenDate() {
+        $date = new Alaress_Date_Format(new \DateTime());
+        return $date->compareDateOnly($this->getOpenDate()) < 0;
+    }
+
+    /**
+     * Is this unit open for submissions?
+     *
+     * @return bool
+     */
+    public function isAfterDueDate() {
+        $date = new Alaress_Date_Format(new \DateTime());
+        return $date->compareDateOnly($this->getDueDate()) > 0;
+    }
+
+    /**
+     * Retrieves a time relative to whenever the course unit opens.
+     *
+     * It opens on 12am of the open date.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getRelativeOpenDate() {
+        $date = clone $this->getOpenDate()->getDateTimeObject();
+        $date->modify('00:00:00');
+        return new Alaress_Date_Format($date);
+    }
+
+    /**
+     * Retrieves a time relative to whenever the course unit closes.
+     *
+     * It closes on the last second of the due date.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getRelativeDueDate() {
+        $date = clone $this->getDueDate()->getDateTimeObject();
+        $date->modify('23:59:59');
+        return new Alaress_Date_Format($date);
+    }
 }

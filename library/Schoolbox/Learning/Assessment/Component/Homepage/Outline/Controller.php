@@ -13,60 +13,93 @@
 
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
-
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Learning\Course\Implementation;
-use Schoolbox\Learning\Course\ImplementationMapperProxy;
+use Component_Instance;
+use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Learning\Assessment\Redirect;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\User;
+use SitePage;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * A list of units within this course.
      *
-     * @var Implementation
+     * @var CourseImplementation
      */
-    protected $courseImplementation;
+    private $courseImplementation;
 
     /** @var int[] */
-    protected $accessList = [];
-
-    /** @var Folder\Model */
-    protected $originalCourse;
+    private $accessList = [];
 
     /**
-     * @var Collection|User
+     * @var Collection|User[]
      */
-    protected $userCollection;
+    private $userCollection;
 
     /**
      * A list of students who have completed the tasks within the course.
      *
-     * @var Collection|Task\Completion[]
+     * @var Collection|TaskCompletion[]
      */
-    protected $completion_list;
+    private $completionList;
 
     /**
      * A list of students for this category.
      *
-     * @var array
+     * @var User[]
      */
-    protected $student_list = array();
+    private $studentList = array();
 
     /**
      * @var bool
      */
-    protected $readOnly;
+    private $readOnly;
 
+    /**
+     * @var CourseImplementationMapper
+     */
+    private $courseImplementationMapper;
+
+    /**
+     * @var UnitImplementationMapper
+     */
+    private $unitImplementationMapper;
+
+    /**
+     * @var AssessmentMapperProxy
+     */
+    private $assessmentMapperProxy;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * Controller constructor.
+     *
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
+        parent::__construct($instance, $user, $sitepage);
+        $this
+            ->setCourseImplementationMapper($this->getMapperFactory()->get(CourseImplementationMapper::class))
+            ->setUnitImplementationMapper($this->getMapperFactory()->get(UnitImplementationMapper::class))
+            ->setAssessmentMapperProxy($this->getSitePage()->getDi()->get('assessmentDataSource'))
+            ->setUserAccessMapper($this->getMapperFactory()->get(UserAccessMapper::class));
+    }
 
     /**
      * Prepares data for the render function. Business logic.
@@ -77,56 +110,34 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
-        $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
+        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
 
-        /** @var ImplementationMapperProxy $implementationProxy */
-        $implementationProxy = $this->getSitePage()->getDi()->get('courseImplementationDataSource');
-        /** @var AssessmentMapperProxy $assessmentProxy */
-        $assessmentProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
+        $courseImplId = $this->getConfig('importedCourse');
 
-        $implementationId = $this->getConfig('importedCourse');
+        $this->courseImplementation = null;
+        try {
+            $this->courseImplementation = $this->courseImplementationMapper->findById($courseImplId);
+            $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
-        try{
-            $this->courseImplementation = $implementationProxy->findById($implementationId);
-
-
-            // Try to get original course folder from each unit in course.
-            foreach ($this->courseImplementation->getUnits() as $unit) {
-
-                $unitId = $unit->getSpecification()->getFolder()->getId();
-                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
-
-                $assessables = $assessmentProxy->findAllByUnitImplementationId($unit->getId());
-                $unit->setAssessables($assessables);
-            }
-            foreach ($this->courseImplementation->getUnits() as $unit) {
-                try {
-                    $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
-                        Folder\Mapper::getInstance()->findCheaplyById($unit->getSpecification()->getFolder()->getId())->getParent()->getId()
-                    );
-                    // I have a course folder, so:
-                    break;
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // I don't have a course folder, so:
-                    continue;
-                }
-
-
+            foreach ($this->courseImplementation->getUnits() as $unitImpl) {
+                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationId($unitImpl->getId()));
+//                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
+//                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
             }
 
-            $this->userCollection = \Schoolbox\Permission\Access\UserAccessMapper::getInstance()->findStudentsInCategory($this->getContext());
+            $this->userCollection = $this->userAccessMapper->findStudentsInCategory($this->getContext());
 
-
-            $this_student_id = null;
-            if ($this->readOnly) {
-                $this_student_id = $this->getUser()->getId();
-            }
+            // TODO get permissions working, I guess
+//            $this_student_id = null;
+//            if ($this->readOnly) {
+//                $this_student_id = $this->getUser()->getId();
+//            }
             /*$this->completion_list = Task\CompletionMapper::getInstance()->findLatestForList(
               $task_list, $this_student_id
             );*/
@@ -145,20 +156,15 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-
-        //$this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? trim($this->getConfig('componentname')) : $this->getComponentName());
-
-
         $data = [
-            'readOnly'  => $this->readOnly,
-            'context'   => $this->getContext(),
-            'course'    => $this->originalCourse,
-            'courseImplementation'     => $this->courseImplementation,
-            'studentCount' => count($this->userCollection),
-            'componentInstance' => $this->getInstance(),
-            'returnUrl' => Redirect::encode('/homepage/'.$this->getContext()->getId().'#component'.$this->getInstance()->getId())
-            ];
-
+            'readOnly'             => $this->readOnly,
+            'context'              => $this->getContext(),
+            'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
+            'courseImplementation' => $this->courseImplementation,
+            'studentCount'         => count($this->userCollection),
+            'componentInstance'    => $this->getInstance(),
+            'returnUrl'            => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
+        ];
 
 
         return $this->renderTwigTemplate(
@@ -167,5 +173,80 @@ class Controller extends Component_Homepage_ControllerAbstract
             $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return CourseImplementationMapper
+     */
+    public function getCourseImplementationMapper()
+    {
+        return $this->courseImplementationMapper;
+    }
+
+    /**
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @return static
+     */
+    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
+    {
+        $this->courseImplementationMapper = $courseImplementationMapper;
+        return $this;
+    }
+
+    /**
+     * @return UnitImplementationMapper
+     */
+    public function getUnitImplementationMapper()
+    {
+        return $this->unitImplementationMapper;
+    }
+
+    /**
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @return static
+     */
+    public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
+    {
+        $this->unitImplementationMapper = $unitImplementationMapper;
+        return $this;
+    }
+
+    /**
+     * @return AssessmentMapperProxy
+     */
+    public function getAssessmentMapperProxy()
+    {
+        return $this->assessmentMapperProxy;
+    }
+
+    /**
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @return static
+     */
+    public function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
+    {
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper()
+    {
+        return $this->userAccessMapper;
+    }
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    public function setUserAccessMapper(UserAccessMapper $userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
     }
 }
