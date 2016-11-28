@@ -636,7 +636,7 @@ class Mapper extends BaseMapper
 
         // Pass 1: load spec IDs
         foreach ($modelList as $model) {
-            if ($model->getSpecificationAssessment() instanceof IAssessableDataModel) {
+            if ($model->getSpecificationAssessment() instanceof Model) {
                 $specificationIds[] = $model->getSpecificationAssessment()->getId();
             }
         }
@@ -646,7 +646,7 @@ class Mapper extends BaseMapper
 
         // Pass 2: hydrate
         foreach ($modelList as $model) {
-            if ($model->getSpecificationAssessment() instanceof IAssessableDataModel) {
+            if ($model->getSpecificationAssessment() instanceof Model) {
                 $specificationId = $model->getSpecificationAssessment()->getId();
                 if (isset($specifications[$specificationId])) {
                     $model->setSpecificationAssessment($specifications[$specificationId]);
