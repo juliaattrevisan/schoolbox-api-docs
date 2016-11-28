@@ -1,0 +1,5 @@
+{% if _writable %}
+    {% include '@course/assessment/writable.twig' %}
+{% else %}
+    {% include '@course/assessment/readonly.twig' %}
+{% endif %}

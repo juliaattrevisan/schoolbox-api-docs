@@ -21,17 +21,18 @@
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unit.id}) }}" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
-        <ul class="information-list sortable" data-sortable data-task_list>
-            {% for task in tasks[unit.id] %}
-                {% include '@course/task.twig' with { '_writable': true } %}
-            {% else %}
-                <li>
-                    <div class="empty-state">
-                        <i class="icon-course"></i>
-                        <p>No coursework in this unit yet.</p>
-                    </div>
-                </li>
+        <ul class="information-list sortable" data-sortable data-assessment_list>
+            {% for assessment in unit.assessables %}
+                {% include '@course/assessment.twig' with { '_writable': true } %}
             {% endfor %}
+
+            <li>
+                <div class="empty-state{% if unit.assessables|length %} hide{% endif %}" data-empty-state>
+                    <i class="icon-course"></i>
+                    <p>No coursework in this unit yet.</p>
+                </div>
+            </li>
+
         </ul>
         <ul class="flex-list buttons">
             <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}?type=project"
@@ -52,7 +53,7 @@
                 >New Quiz</a></li>
         </ul>
     </div>
-    <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
+    <form action="/task/saveForm.php" method="post" data-interaction="reorder-assessments">
         <input type="hidden" name="action"    value="reorder"/>
         <input type="hidden" name="category"   value="{{ unit.id }}"/>
         <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>

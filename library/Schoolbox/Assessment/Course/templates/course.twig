@@ -1,5 +1,3 @@
-{% set icons = ['task', 'due work', 'quiz'] %}
-
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
@@ -137,6 +135,8 @@
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
+
+        $('#main-course').setupCourseBuilder();
 
         $('#unit-info').on('click', '[data-delete]', function (e) {
             e.preventDefault();

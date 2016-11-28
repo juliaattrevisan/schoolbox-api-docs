@@ -151,24 +151,30 @@
             });
 
         // Delete task: "are you sure?"
-        component.on(
-            'click.courseTaskList',
-            'a[data-interaction="open_delete_task_form"], a[data-interaction="delete_reject"]',
-            function(event) {
-                event.preventDefault();
-                var element = $(this);
-                element.confirmDialog({
-                    text: 'Are you sure you wish to delete this task?',
-                    confirmEvent: function(element) {
-                        var unit_element = element.closest('[data-task_id]');
-                        var form         = unit_element.find('[data-form_type="delete_task"]');
-                        $.post(form.attr('action'), form.serialize(), function(data) {
-                            postCallback(form, data);
-                        }, 'json');
-                    }
-                });
-            }
-        );
+        component.on('click.courseAssessmentList', '[data-action=delete]', function(event) {
+            event.preventDefault();
+            var $element = $(this);
+            var $assessmentRow = $element.closest('[data-assessment_id]');
+            $element.confirmDialog({
+                text: 'Are you sure you wish to delete this activity? Any student responses or feedback will also be deleted.',
+                confirmEvent: function () {
+                    $.post($element.attr('href'), {}, function () {
+                        $assessmentRow.fadeOut({
+                            done: function(){
+                                // If no Assessments remaining, display empty-state
+                                var $unit = $assessmentRow.closest('[data-unit]');
+
+                                $assessmentRow.remove();
+
+                                if(0 == $unit.find('[data-assessment_id]').length){
+                                    $unit.find('[data-empty-state]').removeClass('hide');
+                                }
+                            }
+                        });
+                    });
+                }
+            })
+        });
 
         // Event - save new item, no copy
         $(document).on(

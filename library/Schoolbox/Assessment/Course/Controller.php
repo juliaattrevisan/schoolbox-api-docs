@@ -420,7 +420,12 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $course = $this->getCourseSpecificationMapperProxy()->findById($id);
+                $course = $this->getCourseSpecificationMapper()->findById($id);
+                $course->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($course->getId()));
+
+                foreach($course->getUnits() as $unit){
+                    $unit->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()));
+                }
 
                 // Rehydrate course folder so that curriculum codes exist
                 $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
@@ -442,7 +447,6 @@ class Controller extends Base\Base
                 /** @var UnitSpecification $unit */
                 $unitFolder = $unit->getFolder();
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
-                $data['tasks'][$unit->getId()] = $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId());
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
                 $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
