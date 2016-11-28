@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 /**
  * Mapper for the data model for Course Specifications.
@@ -42,6 +43,34 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // SoftDelete/Restore UnitSpecifications in CourseSpecification
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreUnits'));
+    }
+
+    /**
+     * Soft deletes all Units for the specified CourseSpecification
+     *
+     * @param Model $courseSpec
+     */
+    public function softDeleteUnits(Model $courseSpec)
+    {
+        $unitMapper = UnitSpecificationMapper::getInstance();
+        $units = $unitMapper->findByColumn('course_specification_id', $courseSpec->getId(), ['deleted' => true]);
+        $unitMapper->delete($units);
+    }
+
+    /**
+     * Restores all soft-deleted Units for the specified CourseSpecification
+     *
+     * @param Model $courseSpec
+     */
+    public function restoreUnits(Model $courseSpec)
+    {
+        $unitMapper = UnitSpecificationMapper::getInstance();
+        $units = $unitMapper->findByColumn('course_specification_id', $courseSpec->getId(), ['deleted' => true]);
+        $unitMapper->restoreSoftDeleted($units);
     }
 
     /**

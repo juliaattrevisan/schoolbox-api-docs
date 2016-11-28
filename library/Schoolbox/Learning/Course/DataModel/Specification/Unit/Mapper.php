@@ -44,26 +44,26 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Soft deletes all Assessments for the specified UnitSpecification
+     * Soft deletes all Assessments in the specified UnitSpecification
      *
-     * @param Model $unitImpl
+     * @param Model $unitSpec
      */
-    public function softDeleteAssessments(Model $unitImpl)
+    public function softDeleteAssessments(Model $unitSpec)
     {
         $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitSpec->getId(), ['deleted' => true]);
         $assessmentMapper->delete($assessments);
     }
 
     /**
-     * Soft deletes all Assessments for the specified UnitSpecification
+     * Restores all soft-deleted Assessments in the specified UnitSpecification
      *
-     * @param Model $unitImpl
+     * @param Model $unitSpec
      */
-    public function restoreAssessments(Model $unitImpl)
+    public function restoreAssessments(Model $unitSpec)
     {
         $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitSpec->getId(), ['deleted' => true]);
         $assessmentMapper->restoreSoftDeleted($assessments);
     }
 
