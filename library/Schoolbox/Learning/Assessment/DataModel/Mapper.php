@@ -163,9 +163,6 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreTask'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreDueWork'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreProject'));
-
-
-
     }
 
     /**
