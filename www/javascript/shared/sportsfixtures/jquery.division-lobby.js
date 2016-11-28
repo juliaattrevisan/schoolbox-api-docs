@@ -173,7 +173,7 @@
                                 /* Activate indicators
                                  */
                                 fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
-                                toFeedback.toastTimeout({text: 'Added from team' , css: 'success'});
+                                toFeedback.toastTimeout({text: 'Added to team' , css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
