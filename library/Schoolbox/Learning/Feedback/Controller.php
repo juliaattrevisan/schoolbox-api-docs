@@ -168,26 +168,8 @@ class Controller extends Base
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
-        // TODO move all of this creational logic into another factory
-        if ($feedback instanceof DueWorkFeedback) {
-            $factory = new CollectorFactory();
-            if (!empty($this->getRequest()->post['attachment'])) {
-
-                // Replace files with what was actually submitted
-                // (Only if something was actually submitted)
-                $feedback->setAllFiles(new Collection());
-
-                // And repopulate
-                foreach ($factory->build($this->getRequest()->post['attachment'])->getAll() as $attachment) {
-                    // TODO figure out if this file needs to be related to a crocodoc
-                    $feedback->getAllFiles()->add(
-                        (new DueWorkFeedbackFile())
-                            ->setStorage($attachment)
-                            ->setFilename($attachment->getFilename())
-                    );
-                }
-            }
-        }
+        $feedbackFileDecorator = new \Schoolbox\Learning\Assessment\FeedbackFileDecorator($feedback, $this->getRequest()->post['attachment']);
+        $feedbackFileDecorator->decorate();
 
         if ($postPublish == true) {
             // received signal to publish this
