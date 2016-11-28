@@ -70,29 +70,6 @@ Usages:
         var initStage1 = function() {
             {# Init stage 1 mage #}
             var stageOne = $('input[data-mage-next="part-ownership"]');
-            stageOne.bind('validate', function () {
-                {# Stage 1 validation #}
-                if ($('#course_spec_id').val()) {
-                    if ($('#import_folders').val()) {
-                        {# Everything okay #}
-                        return {'result': true};
-                    }
-                    else {
-                        {# Class was missing #}
-                        return {
-                            'result': false,
-                            'message': 'You must specify at least one class before you can proceed.'
-                        };
-                    }
-                }
-                else {
-                    {# Course was missing #}
-                    return {
-                        'result': false,
-                        'message': 'You must select a course to import before you can proceed.'
-                    };
-                }
-            });
 
             stageOne.mage({
                 onXhrDone: function (data) {
@@ -135,61 +112,6 @@ Usages:
                     $('#import_assessments').html(data);
                     initStage4();
                 }
-            })
-            .bind('validate', function() {
-
-                {# Stage 3 validation #}
-                var $importUnits = $('#import_units');
-                if ($importUnits.find('input[type=checkbox]').filter(':checked').length > 0)
-                {
-                    {# Check both dates are entered for each checked unit #}
-
-                    var dateFields = $importUnits
-                            .find('input[type=checkbox]')
-                            .filter(':checked')
-                            .closest('li')
-                            .find('input[type=text]');
-
-                    var blankFound = false;
-
-                    $.each(dateFields, function(index, field) {
-                        if (!$(field).val()) {
-
-                            {# Date field was blank #}
-
-                            blankFound = true;
-                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                            $(field).addClass('error');
-                        } else {
-                            $(field).removeClass('error');
-                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                        }
-                    });
-
-                    if (blankFound) {
-                        return {
-                            'result': false,
-                            'message': 'You must specify a valid open and close date for each unit you are importing.'
-                        };
-                    }
-
-                    {# All dates were specified #}
-
-                    return {
-                        'result': true
-                    };
-
-                }
-                else
-                {
-                    {# No units were ticked #}
-
-                    return {
-                        'result': false,
-                        'message': 'You must select at least one unit before you can proceed.'
-                    };
-                }
-
             });
         };
 
@@ -208,45 +130,6 @@ Usages:
                     }
                     // If something goes wrong, DO NOT redirect. Stay here to enable debugging.
                     // TODO this should display an error message in mage, but there's no documentation on how to do that.
-                }
-            }).bind('validate', function() {
-
-                {# Stage 4 validation #}
-
-                if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
-
-                    {# Make sure every date has been entered #}
-
-                    var dateFields = $('input[data-mage-next="part-results-select"]')
-                            .closest('fieldset')
-                            .find('input[type=text]');
-
-                    var blankFound = false;
-
-                    $.each(dateFields, function (index, field) {
-                        if (!$(field).val()) {
-
-                            {# Date field was blank #}
-
-                            blankFound = true;
-                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                            $(field).addClass('error');
-                        } else {
-                            $(field).removeClass('error');
-                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                        }
-                    });
-
-                    if (blankFound) {
-                        return {
-                            'result': false,
-                            'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
-                        };
-                    }
-
-                    {# Everything okay #}
-
-                    return { 'result': true };
                 }
             });
         };
