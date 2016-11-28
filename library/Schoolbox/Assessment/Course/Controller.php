@@ -21,7 +21,6 @@ use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
-use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as CourseUnitMapper;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
@@ -794,10 +793,9 @@ class Controller extends Base\Base
      */
     protected function displayCourseList($template)
     {
-
         $query = $this->getRequest()->query;
 
-        $component = $query->get('component');
+        $componentId = $query->get('component');
         $folder = $query->get('folder');
         $search = $query->get('query');
 
@@ -820,6 +818,7 @@ class Controller extends Base\Base
                 'hasTot' => false,
                 'linkToUnits' => false,
                 'hasClose' => true,
+                'componentId' => $componentId,
             ];
         } else {
             $options = [
@@ -833,9 +832,7 @@ class Controller extends Base\Base
 
         if ($folder) {
             $options['folder']['id'] = $folder;
-            $options['component']['id'] = $component ?: "0.0"; // TODO replace: this is a hack to make the old import page work without an explicit component instance ID
         }
-
         $this->tpl($template, array_merge($data, $options));
     }
 
@@ -1140,79 +1137,6 @@ class Controller extends Base\Base
         ]);
     }
 
-    /**
-     * View a list of courses associated with a homepage
-     *
-     * @api   GET /course/management/{folderId}
-     * @level 160
-     *
-     * @param int $folderId
-     */
-    public function management($folderId)
-    {
-        /* TODO: Exception falls directly on to carpet
-         */
-        $folder = $this->getFolderMapper()->findCheaplyById($folderId);
-
-        /* Find all the Courses associated with this Folder, via imported Units
-         */
-        $allCourses = $this->getCourseImplementationMapper()->findByFolderId($folderId);
-
-        $this->tpl('management', [
-            'folder' => $folder,
-            'allCourses' => $allCourses,
-        ]);
-    }
-
-    /**
-     * Restore a Course instance via rebuilding its component
-     *
-     * @deprecated Course (implementation) existence is not tied to the existence of its component anymore.
-     *
-     * @api   POST /course/import/restore
-     * @level 160
-     *
-     */
-    public function restoreCourse()
-    {
-        $folderId = $this->getRequest()->post->get('folderId');
-        $componentId = $this->getRequest()->post->get('componentId');
-
-        $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
-
-        /* Spawn a new Course Builder instance
-         */
-        $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-            'class',
-            'Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller'
-        );
-
-        $componentDefinitionId = $componentDefinition->first()->getId();
-
-        $component = new \Component_Instance();
-        $component
-            ->setDefinitionId($componentDefinitionId)
-            ->setModule('homepage')
-            ->setIdentifier($folderId)
-            ->setPosition('top')
-            ->setSequence(1);
-
-        $this->getComponentInstanceMapper()->save($component);
-
-        /* Reassign the new Course Builder instance id to each
-         * unit that previously used $componentId
-         */
-        foreach ($allUnits as $currentUnit) {
-            $currentUnit->setComponent($component->getId());
-
-            $this->getUnitInstanceMapper()->save($currentUnit);
-        }
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => ['result' => 'success']
-        ]);
-    }
 
     /**
      * Delete a course specification

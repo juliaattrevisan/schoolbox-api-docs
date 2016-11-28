@@ -46,10 +46,6 @@ class Module extends BaseModule
                 '/new/{name}'                          => 'newCourseFromSearch',
                 '/modify/{id}'                         => 'modifyCourse',
                 '/parent{/folderId}'                   => 'parentList',
-
-                /* Course Management for a particular Homepage
-                 */
-                '/management/{folderId}'               => 'management',
             ],
             'POST' => [
                 '/unit/new'         => 'newUnit',

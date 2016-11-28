@@ -15,6 +15,7 @@ use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Model as QuizQuestionT
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use \DomainException;
 
 class Model implements ISoftDeletable
@@ -58,11 +59,32 @@ class Model implements ISoftDeletable
     private $answers;
 
     /**
+     * @var QuizSolution
+     */
+    private $solution;
+
+    /**
      * Model constructor.
      */
     public function __construct()
     {
         $this->answers = new GenericCollection(QuizAnswer::class);
+    }
+
+    /**
+     * Clears any Answers from the clone, and clones this Question's Solution
+     * @return void
+     */
+    function __clone()
+    {
+        // clear ID
+        $this->id = null;
+
+        // Clear answers
+        $this->setAnswers(new GenericCollection(QuizAnswer::class));
+
+        // Clone Solution to clear its IDs, so subsequent save is INSERT instead of UPDATE
+        $this->setSolution(clone $this->solution);
     }
 
     /* Getters / Setters
@@ -193,6 +215,24 @@ class Model implements ISoftDeletable
     {
         $this->answers->assertSameItemClass($answers);
         $this->answers = $answers;
+        return $this;
+    }
+
+    /**
+     * @return QuizSolution
+     */
+    public function getSolution()
+    {
+        return $this->solution;
+    }
+
+    /**
+     * @param QuizSolution $solution
+     * @return static
+     */
+    public function setSolution(QuizSolution $solution)
+    {
+        $this->solution = $solution;
         return $this;
     }
 }

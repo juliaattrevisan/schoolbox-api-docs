@@ -14,6 +14,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
+use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 /**
  * Mapper for the data model for Unit Implementations.
@@ -51,7 +52,37 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // SoftDelete/Restore Assessments in UnitImplementation
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAssessments'));
     }
+
+    /**
+     * Soft deletes all Assessments for the specified UnitImplementation
+     *
+     * @param Model $unitImpl
+     */
+    public function softDeleteAssessments(Model $unitImpl)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_ui.course_unit_implementation_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessmentMapper->delete($assessments);
+    }
+
+    /**
+     * Soft deletes all Assessments for the specified UnitImplementation
+     *
+     * @param Model $unitImpl
+     */
+    public function restoreAssessments(Model $unitImpl)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_ui.course_unit_implementation_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessmentMapper->restoreSoftDeleted($assessments);
+    }
+
+
 
     /**
      * Finds all unit implementations for this course implementation.

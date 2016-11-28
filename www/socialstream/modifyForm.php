@@ -109,11 +109,7 @@ else {
      * Put your permissions and stuff in here, just like ePortfolio v2
      */
     $instanceMapper = \Component_InstanceMapper::getInstance();
-
-    /* Seriously?
-     */
-    $instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
-    $instance = $instanceArray[$_POST['instanceId']];
+    $instance = $instanceMapper->findByInstanceId($_POST['instanceId']);
 
     /* Authenticate!
      */

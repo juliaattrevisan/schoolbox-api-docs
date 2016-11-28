@@ -47,8 +47,7 @@ $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInsta
 // * Ensure that user is in this class
 /** @var Component_Instance $component */
 $component_id   = $unit_instance->getComponent()->getId();
-$component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-$component      = $component_list[$component_id];
+$component      = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
 
 $group_handler = new Group();
 if (($permission = $group_handler->getPermission($component->getIdentifier())) < READ_ACCESS) {

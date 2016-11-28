@@ -1,3 +1,20 @@
+{#
+Display a 4-stage mage form to either
+    * import a CourseSpec to 1 or more classes, or
+    * modify a CourseImpl (implies a single class)
+
+Importing a CourseSpec to mulitple classes generates multiple CourseImpls.
+
+Usages:
+    action:                 string {'import' | 'modify'}
+    initialStage:           int {1,2,3}
+    courseSpec:             CourseSpecification | null
+    courseImpl:             CourseImplementation | null - null if an 'import'
+    destinations:           array
+    destinations[]['id']:   int
+    destinations[]['name']: string
+#}
+
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
@@ -13,40 +30,31 @@
             }
         };
 
+        {# Global mage init #}
+        $('input[data-mage-next]').mage({
+            // all use the same reversion test
+            confirmRevert: confirmRevert
+        });
+
+
         {# Attach Course Selector Modal listeners #}
-        
         $.fn.courseSelectorModal({
-            {% if sources.id %}
-            courseSelector: {
-                query: {
-                    folder: {{sources.id}}
-                }
-            },
-            {% endif %}
 
             {# Callbacks #}
-            
             onCourseSelect: function() {
                 $('body').on('click', '#course-selector-results [data-course-id]', function(event)
                 {
                     event.preventDefault();
-
                     {# Have to manually call the change event as it doesn't trigger on scripted value updates #}
-
-                    $('#importCourse').val($(this).attr('data-course-id')).change();
-
+                    $('#course_spec_id').val($(this).attr('data-course-id')).change();
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
-
-                    {# Shut it, I guess #}
-
                     $('#course-selector-modal').foundation('reveal', 'close');
                 });
             }
         });
 
         {# Setup class selectize #}
-
-        $('#import-folders').selectizeSelector({
+        $('#import_folders').selectizeSelector({
             ajax: {
                 url:      '/course/import/classes',
                 type:     'GET',
@@ -56,148 +64,84 @@
             value: {{ destinations|json_encode|raw }}
         });
 
-        {# Global mage init #}
-        $('input[data-mage-next]').mage({
-            // all use the same reversion test
-            confirmRevert: confirmRevert
-        });
-
-{# If modifying an existing course, skip straight to stage 3 #}
-{% if not _part3 %}
-
-        {# Init stage 1 mage #}
-
-        var stageOne = $('input[data-mage-next="part-ownership"]');
-
-        stageOne.bind('validate', function()
-        {
-            {# Stage 1 validation #}
-
-            if ($('#importCourse').val())
-            {
-                if ($('#import-folders').val())
-                {
-                    {# Everything okay #}
-
-                    return {'result': true};
+        var initStage1 = function() {
+            {# Init stage 1 mage #}
+            var stageOne = $('input[data-mage-next="part-ownership"]');
+            stageOne.bind('validate', function () {
+                {# Stage 1 validation #}
+                if ($('#course_spec_id').val()) {
+                    if ($('#import_folders').val()) {
+                        {# Everything okay #}
+                        return {'result': true};
+                    }
+                    else {
+                        {# Class was missing #}
+                        return {
+                            'result': false,
+                            'message': 'You must specify at least one class before you can proceed.'
+                        };
+                    }
                 }
-                else
-                {
-                    {# Class was missing #}
-
+                else {
+                    {# Course was missing #}
                     return {
                         'result': false,
-                        'message': 'You must specify at least one class before you can proceed.'
+                        'message': 'You must select a course to import before you can proceed.'
                     };
                 }
-            }
-            else
-            {
-                {# Course was missing #}
+            });
 
-                return {
-                    'result': false,
-                    'message': 'You must select a course to import before you can proceed.'
-                };
-            }
-        });
+            stageOne.mage({
+                onXhrDone: function (data) {
+                    $('#ownership_assignment').html(data);
+                    initStage2();
+                }
+            });
+        };
 
-        stageOne.mage({onXhrDone: function (data) {
-            $('#ownershipAssignment').html(data);
-        }});
 
-        var stageTwo = $('input[data-mage-next="part-unit-select"]');
+        var initStage2 = function() {
 
-        stageTwo.mage({onXhrDone: function (data) {
-            $('#importUnits').html(data);
-{% endif %}
+            var stageTwo = $('input[data-mage-next="part-unit-select"]');
 
-            {# Init stage 3 mage #}
+            stageTwo.mage({
+                onXhrDone: function (data) {
+                    $('#import_units').html(data);
+                    initStage3();
+                }
+            });
+        };
 
-            var stageThree = $('input[data-mage-next="part-tasks-select"]');
+        {# Init stage 3 mage #}
+        var initStage3 = function() {
+
+            var stageThree = $('input[data-mage-next="part-assessments-select"]');
 
             stageThree.mage({
                 confirmRevert: confirmRevert,
                 onRevert: function () {
-                    $('#importUnits').find(':checkbox').closest('li').slideDown();
+                    $('#import_units').find(':checkbox').closest('li').slideDown();
                 },
                 onXhrDone: function (data) {
-                {# Slide away the things we're not using #}
+                    {# Slide away the things we're not using #}
 
-                $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
+                    $('#import_units').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
 
-                {# Set content #}
+                    {# Set content #}
 
-                $('#importTasks').html(data);
-
-                {# Init stage 4 mage #}
-
-                var stageFour = $('input[data-mage-next="part-results-select"]');
-
-                stageFour.mage({
-                    onXhrDone: function(data) {
-
-                        try {
-                            if (typeof data == 'object' && 'redirect' in data && data.redirect) {
-                                {# Go back to wherever you came from (hopefully) -#}
-                                window.location.href = data.redirect;
-                            } else {
-                                window.history.back();
-                            }
-                        } catch (e) {
-                            window.history.back();
-                        }
-
-                    }
-                }).bind('validate', function() {
-
-                    {# Stage 4 validation #}
-
-                    if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0) {
-
-                        {# Make sure every date has been entered #}
-
-                        var dateFields = $('input[data-mage-next="part-results-select"]')
-                                .closest('fieldset')
-                                .find('input[type=text]');
-
-                        var blankFound = false;
-
-                        $.each(dateFields, function (index, field) {
-                            if (!$(field).val()) {
-
-                                {# Date field was blank #}
-
-                                blankFound = true;
-                                $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                                $(field).addClass('error');
-                            } else {
-                                $(field).removeClass('error');
-                                $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                            }
-                        });
-
-                        if (blankFound) {
-                            return {
-                                'result': false,
-                                'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
-                            };
-                        }
-
-                        {# Everything okay #}
-
-                        return { 'result': true };
-                    }
-                });
-            }}).bind('validate', function() {
+                    $('#import_assessments').html(data);
+                    initStage4();
+                }
+            })
+            .bind('validate', function() {
 
                 {# Stage 3 validation #}
-
-                if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0)
+                var $importUnits = $('#import_units');
+                if ($importUnits.find('input[type=checkbox]').filter(':checked').length > 0)
                 {
                     {# Check both dates are entered for each checked unit #}
 
-                    var dateFields = $('#importUnits')
+                    var dateFields = $importUnits
                             .find('input[type=checkbox]')
                             .filter(':checked')
                             .closest('li')
@@ -244,15 +188,78 @@
                 }
 
             });
-{% if not _part3 %}
-        }});
-{% endif %}
+        };
+
+        var initStage4 = function(){
+
+            {# Init stage 4 mage #}
+
+            var stageFour = $('input[data-mage-next="part-results-select"]');
+
+            stageFour.mage({
+                onXhrDone: function(data) {
+
+                    try {
+                        if (typeof data == 'object' && 'redirect' in data && data.redirect) {
+                            {# Go back to wherever you came from (hopefully) -#}
+                            window.location.href = data.redirect;
+                        } else {
+                                window.history.back();
+                        }
+                    } catch (e) {
+                            window.history.back();
+                    }
+                }
+            }).bind('validate', function() {
+
+                {# Stage 4 validation #}
+
+                if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
+
+                    {# Make sure every date has been entered #}
+
+                    var dateFields = $('input[data-mage-next="part-results-select"]')
+                            .closest('fieldset')
+                            .find('input[type=text]');
+
+                    var blankFound = false;
+
+                    $.each(dateFields, function (index, field) {
+                        if (!$(field).val()) {
+
+                            {# Date field was blank #}
+
+                            blankFound = true;
+                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
+                            $(field).addClass('error');
+                        } else {
+                            $(field).removeClass('error');
+                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
+                        }
+                    });
+
+                    if (blankFound) {
+                        return {
+                            'result': false,
+                            'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
+                        };
+                    }
+
+                    {# Everything okay #}
+
+                    return { 'result': true };
+                }
+            });
+        };
+
+        // Initialise JS at correct stage
+        eval('initStage' + {{ initialStage }})();
     });
 </script>
 <div class="row">
     <div class="small-12 island">
 
-        {% if _part3 %}
+        {% if 'modify' == action %}
             <h1>Modify Course</h1>
         {% else %}
             <h1>Import Course into Class</h1>
@@ -261,20 +268,19 @@
         <div class="row">
             <div class="small-12 column">
                 <ul class="train-line">
-                    <li data-mage-trainstop="part-course-select" class="current-stop"><a><span class="icon-course-builder"></span>Course</a></li>
-                    <li data-mage-trainstop="part-ownership"><a><span class="icon-teacher"></span>Ownership</a></li>
-                    <li data-mage-trainstop="part-unit-select"><a><span class="icon-unit"></span>Units</a></li>
-                    <li data-mage-trainstop="part-tasks-select"><a><span class="icon-curriculum"></span>Coursework</a></li>
+                    <li data-mage-trainstop="part-course-select"{% if 1 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-course-builder"></span>Course</a></li>
+                    <li data-mage-trainstop="part-ownership"{% if 2 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-teacher"></span>Ownership</a></li>
+                    <li data-mage-trainstop="part-unit-select"{% if 3 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-unit"></span>Units</a></li>
+                    <li data-mage-trainstop="part-assessments-select"><a><span class="icon-curriculum"></span>Coursework</a></li>
                 </ul>
             </div>
         </div>
 
         <form method="post">
             <section>
-                <fieldset class="content" data-mage="part-course-select" {% if _part3 %}disabled{% endif %}>
+                <fieldset class="content" data-mage="part-course-select" {% if 1 != initialStage %}disabled="disabled"{% endif %}>
                     <legend>1. Course</legend>
-                    <input type="hidden" name="componentId" value="{{ componentId }}">
-                    {% if not _part3 %}
+                    {% if 1 == initialStage %}
                     <div class="meta small-12 column" data-mage-helptext>
                         <p>Select the course that is to be imported, and one or more classes as the target destination.</p>
                     </div>
@@ -282,7 +288,9 @@
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputName': 'importCourse',
+                                'formInputName': 'course_spec_id',
+                                'formInputValue': courseSpec.id,
+                                'formInputLabel': courseSpec.folder.name,
                                 'folder': folder,
                                 'activator': 'data-course-selector',
                                 'title': 'Select Course to import'
@@ -294,58 +302,83 @@
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
                         <label>Class(es)
-                            <input id="import-folders" type="text" name="importFolders" />
+                            <input id="import_folders" type="text" name="import_folders" />
                         </label>
                     </div>
-{% if not _part3 %}
-                    <div class="small-12 column">
-                        <div class="row" data-mage-submitrow>
-                            <div class="small-12 medium-8 column">
-                                <p class="alert alert-box icon-alert" data-mage-error></p>
-                            </div>
-                            <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postClasses') }}" />
+                    {% if 1 == initialStage %}
+                        <div class="small-12 column">
+                            <div class="row" data-mage-submitrow>
+                                <div class="small-12 medium-8 column">
+                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                </div>
+                                <div class="small-12 medium-4 column">
+                                    <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postClasses') }}" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-{% endif %}
+                    {% endif %}
+                    <input type="hidden" name="component_id" value="{{ componentId }}">
                 </fieldset>
-                <fieldset class="content" data-mage="part-ownership" {% if _part3 %}disabled{% endif %}>
+                <fieldset class="content" data-mage="part-ownership" {% if initialStage > 2 %}disabled{% endif %}>
                     <legend>2. Ownership</legend>
-                    <div class="small-12 column {% if not _part3 %}hide{% endif %}" data-mage-collapsed>
-{% if _part3 %}
-                        <div id="ownershipAssignment">
-                            {% include '@course/import/ownership.twig' with { targetFolders: [ folder ], ownershipCandidates: { (folder.id): [owner] }, _disabled: true } %}
+                    <div class="small-12 column {% if initialStage < 2 %}hide{% endif %}" data-mage-collapsed>
+                        <div id="ownership_assignment">
+                        {% if 2 == initialStage %}
+                            {% include '@course/import/ownership.twig' with {
+                                courseSpec:                    courseSpec,
+                                componentId:                   componentId,
+                                targetFolders:                 [ folder ],
+                                ownershipCandidates:           ownershipCandidates,
+                                _disabled:                     false
+                            } only %}
+                        {% elseif 3 == initialStage %}
+                            {% include '@course/import/ownership.twig' with {
+                                courseSpec:                    courseSpec,
+                                componentId:                   componentId,
+                                targetFolders:                 [ folder ],
+                                ownershipCandidates:           ownershipCandidates,
+                                _disabled:                     true
+                            } only %}
+                        {% else %}
+                            {# will be populated by ajax #}
+                        {% endif %}
                         </div>
-{% else %}
-                        <div id="ownershipAssignment">{# will be populated by ajax #}</div>
-                        <div class="row" data-mage-submitrow>
-                            <div class="small-12 medium-8 column">
-                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                        {% if initialStage < 3 %}
+                            <div class="row" data-mage-submitrow>
+                                <div class="small-12 medium-8 column">
+                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                </div>
+                                <div class="small-12 medium-4 column">
+                                    <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postOwnership') }}" />
+                                </div>
                             </div>
-                            <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postOwnership') }}" />
-                            </div>
-                        </div>
-{% endif %}
+                        {% endif %}
                     </div>
                 </fieldset>
                 <fieldset class='content' data-mage="part-unit-select">
                     <legend>3. Units</legend>
-                    <div class="small-12 column{% if not _part3 %} hide" data-mage-collapsed{% else %}"{% endif %} >
-                        <div id="importUnits">
-{% if _part3 %}
-                                {% include '@course/unitImportForm.twig' %}
-{% endif %}
+                    <div class="small-12 column{% if 3 != initialStage %} hide{% endif %}" data-mage-collapsed >
+                        <div id="import_units">
+                            {% if 3 == initialStage %}
+                                {% include '@course/unitImportForm.twig' with {
+                                    action:       action,
+                                    courseSpecId: courseSpecId,
+                                    courseImplId: courseImpl.id,
+                                    componentId:  componentId,
+                                    unitsImpls:   unitsImpls,
+                                    componentId:  componentId,
+                                    ownerships:   ownerships
+                                } only %}
+                            {% endif %}
                         </div>
                     </div>
                 </fieldset>
-                <fieldset class='content' data-mage="part-tasks-select">
+                <fieldset class='content' data-mage="part-assessments-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importTasks">{# will be populated by ajax #}</div>
+                        <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                        <input type="hidden" data-mage-next="none" name="part-tasks-select" value="1" />
+                        <input type="hidden" data-mage-next="none" name="part-assessments-select" value="1" />
                     </div>
                 </fieldset>
             </section>

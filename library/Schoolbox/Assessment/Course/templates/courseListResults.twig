@@ -1,3 +1,16 @@
+{# Usage:
+    {% include '@course/courseListResults.twig' with {
+         suggestions:    CourseSpecification[],
+         courses:        CourseSpecification[],
+         folder:         Folder,
+         component:      ComponentInstance | null,
+         lineage:        Folder[courseSpec.id][]
+         hasTot:         bool,
+         currentUser:    User,
+         query:          string | null
+    } only %}
+#}
+
 <div class="small-12 island">
 
     {% if suggestions|length %}
@@ -5,7 +18,15 @@
             <h3>Suggested Courses</h3>
             <ul class="information-list">
                 {% for course in suggestions %}
-                    {% include '@course/courseListResult.twig' with { collapsePrefix: 'suggest' } %}
+                    {% include '@course/courseListResult.twig' with {
+                        courseSpec:     course,
+                        folder:         folder,
+                        componentId:    componentId,
+                        cparents:       lineage[course.id],
+                        hasTot:         hasTot,
+                        currentUser:    currentUser,
+                        collapsePrefix: 'suggest'
+                    } only %}
                 {% endfor %}
             </ul>
         </section>
@@ -18,7 +39,14 @@
             {% endif %}
             <ul class="information-list">
                 {% for course in courses %}
-                    {% include '@course/courseListResult.twig' %}
+                    {% include '@course/courseListResult.twig' with {
+                        courseSpec:  course,
+                        folder:      folder,
+                        componentId: componentId,
+                        cparents:    lineage[course.id],
+                        hasTot:      hasTot,
+                        currentUser: currentUser
+                    } only %}
                 {% endfor %}
             </ul>
         </section>
@@ -27,7 +55,8 @@
             <p class="content">No results found.</p>
         </section>
 
-        <a class='button submit expand' href="/course/new/{{ query | url_encode }}">Create a Course called {{ query }}</a>
+        {% set label = query ? "Create a Course called "~query : "Create a new Course" %}
+        <a class='button submit expand' href="/course/new/{{ query | url_encode }}">{{ label }}</a>
     {% endif %}
 </div>
 <script type="text/javascript">

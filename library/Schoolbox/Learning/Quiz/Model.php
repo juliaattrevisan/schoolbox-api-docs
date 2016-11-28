@@ -214,6 +214,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
         return max(0, min(10, $urgency));
     }
 
+    /**
+     * Clears any attempts from the clone, and clones each Section in the Quiz
+     * @return void
+     */
+    function __clone()
+    {
+        // Mark this object as a clone
+        $this->id = null;
+
+        // Clear Attempts
+        $this->attempts = new GenericCollection(QuizAttempt::class);
+
+        // Clone Sections to clear their IDs, so subsequent save is INSERT instead of UPDATE
+        $clonedSections = new GenericCollection(QuizSection::class);
+        foreach($this->sections as $section){
+            $clonedSections->add(clone $section);
+        }
+        $this->setSections($clonedSections);
+    }
+
     /* Getters/Setters
 	 */
 

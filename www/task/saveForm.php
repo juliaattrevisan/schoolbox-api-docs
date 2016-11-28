@@ -147,15 +147,13 @@ if ($page->detectAjax()) {
     } else {
         // Load the component that this task was added to.
         /** @var Component_Instance[] $component_list */
-        $component_id   = $_POST['component'];
-        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-        $component      = $component_list[$component_id];
+        $component      = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component']);
 
         if ($component instanceof Component_Instance) {
             // Dump out template contents
             $chf = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
-            /** @var Component_Homepage_CourseBuilderController $controller */
+            /** @var Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller $controller */
             $controller = $chf->buildComponent($component);
             $controller->setup($category);
 

@@ -6,7 +6,7 @@
 
             component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
-                import_base_url: '{{ routeLookup('courseImport.getImportForm', { courseSpecId: course.id, classCode: folder.id }) }}',
+                import_base_url: '{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: course.id, classCode: folder.id }) }}',
                 readonly:        {{ readOnly ? 'true':'false' }},
                 previewSelector: '[data-plugin=preview]'
             });
@@ -33,7 +33,7 @@
         {% include '@learningAssessment/outline/unit.twig' %}
         <div class="component-action">
             <section>
-                <a href="/course/import/modify/{{ componentInstance.id }}" class="button">Modify</a>
+                <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}" class="button">Modify</a>
             </section>
         </div>
     {% else %}
@@ -41,7 +41,7 @@
             <p>To get started with courses you need to first import an existing course to display</p>
 
             <a href="#" class="button icon-course" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import New Course</a>
-            <a href="/course/management/{{ context.id }}" class="button icon-export">Manage Courses</a>
+            <a href="{{ routeLookup('courseImport.getManagement', { folderId: context.id }) }}" class="button icon-export">Manage Courses</a>
         </div>
     {% endif %}
 </section>

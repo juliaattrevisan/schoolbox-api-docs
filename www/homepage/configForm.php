@@ -89,12 +89,9 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $factory = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
-        // $component instanceof Component_ControllerAbstract
-        $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-        $cList         = array_values($componentList);
-
+        $instance = $componentInstanceMapper->findByInstanceId($instanceID);
         /** @var Component_Homepage_ControllerAbstract $component */
-        $component = $factory->buildComponent($cList[0]);
+        $component = $factory->buildComponent($instance);
 
         if (!($component instanceof Component_ControllerAbstract)) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
@@ -120,7 +117,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $config = $_GET;
 
         /** @var Component_Instance $instance */
-        $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
+        $instance = $componentInstanceMapper->findByInstanceId($config['component']);
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -174,7 +171,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
-                $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
+                $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);

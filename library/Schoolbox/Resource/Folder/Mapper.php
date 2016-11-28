@@ -16,7 +16,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Learning\Course\Unit\Specification;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
@@ -24,7 +24,8 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as SpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
@@ -158,7 +159,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'course_specification', array(
                 'multiple'  => false,
-                'mapper'    => SpecificationMapper::class,
+                'mapper'    => CourseSpecificationMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'folder_id',
+            )
+        );
+
+        $this->hasJoin(
+            'unit_specification', array(
+                'multiple'  => false,
+                'mapper'    => UnitSpecificationMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
@@ -215,7 +225,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Find all images for a category
      *
      * @deprecated use File\Mapper::findForFolders() directly
-     * @param Model $category
+     * @param Model $folder
      * @param int $limit
      * @param bool $excludeWork
      * @return File\Model[]|Collection
@@ -411,7 +421,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
-        $specification_mapper = $this->getJoinMapper('course_specification');
+        $courseSpecMapper = $this->getJoinMapper('course_specification');
+        $unitSpecMapper = $this->getJoinMapper('unit_specification');
 
 
 
@@ -421,12 +432,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
-                {$specification_mapper->getColumnString('s')}
+                {$courseSpecMapper->getColumnString('cs')},
+                {$unitSpecMapper->getColumnString('us')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-            LEFT JOIN {$this->getJoinSql('course_specification', 'c', 's')}
+            LEFT JOIN {$this->getJoinSql('course_specification', 'c', 'cs')}
+            LEFT JOIN {$this->getJoinSql('unit_specification', 'c', 'us')}
             WHERE c.deleted_at IS NULL AND c.parent=?
             ORDER BY c.name
         ";
@@ -463,8 +476,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 }
                 $collection->add($category);
 
-                $specification = $specification_mapper->hydrate($row, 's');
-                $category->setCourseSpecification($specification);
+                $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
+                $category->setCourseSpecification($courseSpec);
+
+                $unitSpec = $unitSpecMapper->hydrate($row, 'us');
+                $category->setUnitSpecification($unitSpec);
             }
         }
 
@@ -562,7 +578,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
-        $specification_mapper = $this->getJoinMapper('course_specification');
+        $courseSpecMapper = $this->getJoinMapper('course_specification');
+        $unitSpecMapper = $this->getJoinMapper('unit_specification');
 
 
         return "
@@ -571,7 +588,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
-                {$specification_mapper->getColumnString('s')},
+                {$courseSpecMapper->getColumnString('cs')},
+                {$unitSpecMapper->getColumnString('us')},
                 {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
                 {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
                 {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
@@ -593,7 +611,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
-            LEFT JOIN {$this->getJoinSql('course_specification', '', 's')}
+            LEFT JOIN {$this->getJoinSql('course_specification', '', 'cs')}
+            LEFT JOIN {$this->getJoinSql('unit_specification', '', 'us')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
@@ -606,30 +625,45 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Search by name
      *
-     * @param $keyword
+     * @param string $keyword
      * @param bool $userGroupsOnly
+     * @param bool $getCourseSpec   Whether to hydrate and attach any associated CourseSpec
+     * @param bool $getUnitSpec     Whether to hydrate and attach any associated UnitSpec
      * @return Collection|Model[]
      */
-    public function searchByName($keyword, $userGroupsOnly = false)
+    public function searchByName($keyword, $userGroupsOnly = false, $getCourseSpec = false, $getUnitSpec = false)
     {
-        $code_mapper  = $this->getJoinMapper('codes');
-        $group_mapper = $this->getJoinMapper('groups');
+        $code_mapper      = $this->getJoinMapper('codes');
+        $group_mapper     = $this->getJoinMapper('groups');
+        $courseSpecMapper = $this->getJoinMapper('course_specification');
+        $unitSpecMapper   = $this->getJoinMapper('unit_specification');
 
-        $groupSelect  = $userGroupsOnly ? ", {$group_mapper->getColumnString('ug')}" : '';
+        $selectClause = "
+            {$this->getColumnString('c')},
+            {$code_mapper->getColumnString('cc')}";
+        $joinClause = "
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}";
 
         /* Filter result set further by only returning records that are also
          * in the userGroups table
          */
-        $groupJoin    = $userGroupsOnly ? "RIGHT JOIN {$this->getJoinSql('groups', 'c', 'ug')}" : '';
+        if($userGroupsOnly){
+            $selectClause .= ",\n{$group_mapper->getColumnString('ug')} ";
+            $joinClause .= "\nRIGHT JOIN {$this->getJoinSql('groups', 'c', 'ug')} ";
+        }
+        if($getCourseSpec){
+            $selectClause .= ",\n{$courseSpecMapper->getColumnString('cs')} ";
+            $joinClause .= "\nLEFT JOIN {$this->getJoinSql('course_specification', 'c', 'cs')} ";
+        }
+        if($getUnitSpec){
+            $selectClause .= ",\n{$unitSpecMapper->getColumnString('us')} ";
+            $joinClause .= "\nLEFT JOIN {$this->getJoinSql('unit_specification', 'c', 'us')} ";
+        }
 
         $query = "
-            SELECT
-                {$this->getColumnString('c')},
-                {$code_mapper->getColumnString('cc')}
-                $groupSelect
+            SELECT $selectClause
             FROM {$this->getTable()} c
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-            $groupJoin
+            $joinClause
 			WHERE (
 			    c.name LIKE :nameLike
 			    OR cc.code LIKE :codeLike
@@ -646,18 +680,38 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $hashtable = array();
+        /** @var Model[] $folderCache */
+        $folderCache = new GenericCollection(Model::class);
 
-        /* Only need to return category records
-         */
+        // No need to hydrate groups
         foreach ($statement as $row) {
-            $category = $this->hydrate($row, 'c');
-            $category->setCodes(new Collection([ $code_mapper->hydrate($row, 'cc')->setFolder($category) ]));
+            $folderId = $row['c.id'];
+            if(!$folderCache[$folderId] instanceof Model){
+                $folder = $this->hydrate($row, 'c');
 
-            $hashtable[$category->getId()] = $category;
+                if($getCourseSpec){
+                    $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
+                    if($courseSpec->getId()){
+                        $folder->setCourseSpecification($courseSpec);
+                    }
+                }
+
+                if($getUnitSpec){
+                    $unitSpec = $unitSpecMapper->hydrate($row, 'us');
+                    if($unitSpec->getId()){
+                        $folder->setUnitSpecification($unitSpec);
+                    }
+                }
+                $folderCache[$folderId] = $folder;
+            }
+            $folder = $folderCache[$folderId];
+
+            $folderCode = $code_mapper->hydrate($row, 'cc');
+            $folderCode->setFolder($folder);
+            $folder->getCodes()->add($folderCode);
         }
 
-        return new Collection(array_values($hashtable));
+        return $folderCache->sortBy('name', 'ASC');
     }
 
     /**
@@ -674,8 +728,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var HomepageConfigMapper $homepageConfig_mapper */
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
-        $specification_mapper = $this->getJoinMapper('course_specification');
-
+        $courseSpecMapper = $this->getJoinMapper('course_specification');
+        $unitSpecMapper = $this->getJoinMapper('unit_specification');
 
 
         /** @var Model[] $categories */
@@ -702,8 +756,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setHomepage($homepageConfig);
                 $category->setGroup($group);
 
-                $specification = $specification_mapper->hydrate($row, 's');
-                $category->setCourseSpecification($specification);
+                $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
+                $category->setCourseSpecification($courseSpec);
+
+                $unitSpec = $unitSpecMapper->hydrate($row, 'us');
+                $category->setUnitSpecification($unitSpec);
             }
 
             // Hydrate class codes (avoiding duplicates) and cache

@@ -1,3 +1,14 @@
+{# Usage:
+    {% include '@course/unitImportForm.twig' with {
+        action:       string {'import'|'modify'},
+        courseSpecId: int,
+        courseImplId: int|null,
+        unitsImpls:   UnitImplementation[],
+        componentId:  int|null,
+        ownerships:   string
+    } only %}
+#}
+
 <!-- BEGIN custom_head -->
 
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
@@ -34,9 +45,10 @@
 
     {# There were units in the selected course, create import form #}
 
-    <input type="hidden" name="homepage" value="{{ homepage }}"/>
-    <input type="hidden" name="course_homepage" value="{{ courseHomepage }}"/>
-    <input type="hidden" name="componentId" value="{{ componentId }}"/>
+    <input type="hidden" name="action" value="{{ action|e }}"/>
+    <input type="hidden" name="course_spec_id" value="{{ courseSpecId }}"/>
+    <input type="hidden" name="course_impl_id" value="{{ courseImplId }}"/>
+    <input type="hidden" name="component_id" value="{{ componentId }}"/>
     <input type="hidden" name="ownerships" value="{{ ownerships }}" />
 
         <p data-mage-helptext class="meta">Select the units to be imported, and their open and close dates.</p>
@@ -44,32 +56,25 @@
 
             {# Iterate each unit and create checkbox and dates #}
 
-            {% for unit in units %}
+            {% for unitImpl in unitsImpls %}
                 <li>
-                    <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unit.specification.id }}" />
-                    <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unit.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unitImpl.specification.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unitImpl.id }}" />
 
                     <div class="list-item" data-type="unit_row">
 
                         {# Checkbox & Unit Name #}
 
                         <div class="card small-12 medium-6">
-                            {% set isUnitCheckable = (unit.checkable is null or unit.checkable) %}
-                            {% if isUnitCheckable %}
-                                <input name="unit[{{ loop.index }}][import]" type="hidden" value="0" />
-                            {% endif %}
+                            <input name="unit[{{ loop.index }}][import]" type="hidden" value="0" />
                             <input id="import-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][import]"
-                                   {% if unit.checked %}checked="checked" data-warn-removal {% endif %}
-                                   {% if not isUnitCheckable %}disabled="disabled"{% endif %}
+                                   {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
                                    type="checkbox"
                                    value="1"
                                    data-interaction="enable" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">
-                                {{ unit.title }}<span class="icon-unit"></span>
-                                {% if not isUnitCheckable %}
-                                    <span data-tooltip class="has-tip hint" title="This unit's course builder component has been deleted - its tasks may not be modified here.">?</span>
-                                {% endif %}
+                                {{ unitImpl.title }}<span class="icon-unit"></span>
                             </label>
                         </div>
 
@@ -80,9 +85,8 @@
                             <input id="open_date-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][open_date]"
                                    type="text"
-                                   value="{{ unit.openDate.localShort }}"
+                                   value="{{ unitImpl.openDate.localShort }}"
                                    data-role="open_date"
-                                   {% if not isUnitCheckable %}disabled="disabled"{% endif %}
                                    data-datepicker
                                    data-datepicker-sync
                                    data-datepicker-sync-enddate="#due_date-{{ loop.index }}" />
@@ -95,11 +99,10 @@
                         <div class="small-12 medium-3 columns" data-hide-watch="#import-{{ loop.index }}">
                             <label for="due_date-{{ loop.index }}">Close</label>
                             <input id="due_date-{{ loop.index }}"
-                                   name="unit[{{ loop.index }}][due_date]"
+                                   name="unit[{{ loop.index }}][close_date]"
                                    type="text"
-                                   value="{{ unit.dueDate.localShort }}"
+                                   value="{{ unitImpl.dueDate.localShort }}"
                                    data-role="due_date"
-                                   {% if not isUnitCheckable %}disabled="disabled"{% endif %}
                                    data-datepicker />
                             <label for="due_date-{{ loop.index }}" class="hide error">This field is required.</label>
                         </div>
@@ -114,10 +117,10 @@
         <div class="row" data-mage-submitrow>
             <div class="small-12 medium-8 column">
                 <p class="alert alert-box icon-alert" data-mage-error></p>
-                <p class="warning alert-box icon-alert hide" id="unit-warn-removal">Warning! Removal of existing units will also remove all associated tasks.</p>
+                <p class="warning alert-box icon-alert hide" id="unit-warn-removal">Warning! Removal of existing units will also remove all associated Activities.</p>
             </div>
             <div class="small-12 medium-4 column">
-                <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-tasks-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postUnits') }}" />
+                <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-assessments-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postUnits') }}" />
             </div>
         </div>
     </div>

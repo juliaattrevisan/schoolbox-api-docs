@@ -48,9 +48,8 @@ class TileControllerDelegate
         $layoutId  = $controller->getConfig('layoutId');
         if ($altSource) {
             // Get this component, and get its layout ID
-            $altComponents = \Component_InstanceMapper::getInstance()->findByInstanceId($altSource);
-            if (isset($altComponents[$altSource])) {
-                $altComponent = $altComponents[$altSource];
+            $altComponent = \Component_InstanceMapper::getInstance()->findByInstanceId($altSource);
+            if ($altComponent) {
                 $altConfig    = $altComponent->getConfigArray();
                 $layoutId     = $altConfig['layoutId']['value'];
             }

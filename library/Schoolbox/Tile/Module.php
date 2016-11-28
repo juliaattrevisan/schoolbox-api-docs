@@ -82,7 +82,7 @@ class Module extends BaseModule
             $matcher,
             '(?:add|create|layout|layoutForm)',
             function ($params) {
-                $component = array_pop($this->getComponentInstanceMapper()->findByInstanceId($params['componentId']));
+                $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
 
                 // Component must actually exist.
                 // This should cause an error that is recorded, but doesn't

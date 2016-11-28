@@ -168,8 +168,10 @@ class Model implements ISoftDeletable
     protected $contextProject;
 
     /**
-     * If this assessment is attached to a unit implementation, it will have
+     * If this assessment is attached to a unit implementation, it may have
      * been based off of a specification assessment.
+     *
+     * It will not have a Spec if it was created directly in the unit implementation.
      *
      * @var Model
      */
@@ -187,6 +189,23 @@ class Model implements ISoftDeletable
         $this->createdAt   = new Alaress_Date_NullDate();
         $this->updatedAt   = new Alaress_Date_NullDate();
         $this->deletedAt   = new Alaress_Date_NullDate();
+    }
+
+    function __clone()
+    {
+        $this->id = null;
+        if($this->hasQuiz()){
+            $this->quiz = clone $this->quiz;
+        }
+        if($this->hasDueWork()){
+            $this->dueWork = clone $this->dueWork;
+        }
+        if($this->hasTask()){
+            $this->task = clone $this->task;
+        }
+        if($this->hasProject()){
+            $this->project = clone $this->project;
+        }
     }
 
     /**

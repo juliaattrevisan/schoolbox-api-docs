@@ -1,31 +1,28 @@
 {#
-    inputPrefix:      a prefix to include on each input
-    assessmentId:     the ID of the assessment in question
-    assessmentDate:   assessment date object to work with
-    unitDate:         unit date object to fall back to
-    dateProperty:     the name of the property on the object
-    dateLabel:        the human-readable label to use
-    dateSyncProperty: the end-date to sync to
+    inputPrefix:      string - (optional) a prefix to include on each input
+    assessmentId:     int    - the ID of the assessment in question
+    assessmentDate:   ADF    - (optional) assessment date object to work with
+    unitDate:         ADF    - unit date object to fall back to. Required if 'assessmentDate' not set
+    dateProperty:     string - the name of the property on the object, eg 'publish'
+    dateLabel:        string - (optional) the human-readable label to use
+    dateSyncProperty: string - the end-date to sync to
 #}
 
-{% if not inputPrefix %}{% set inputPrefix = 'a' %}{% endif %}
-{% if not assessmentId %}{% set assessmentId = assessment.id %}{% endif %}
-{% if not assessmentDate %}{% set assessmentDate = assessment[dateProperty ~ 'date'] %}{% endif %}
-{% if not unitDate %}{% set unitDate = dateProperty in [ 'publish', 'open' ] ? unit.openDate : unit.dueDate %}{% endif %}
+{% if not inputPrefix %}{% set inputPrefix = 'a['~assessmentId~']' %}{% endif %}
 {% if not dateLabel %}{% set dateLabel = dateProperty | capitalize %}{% endif %}
 
 <div class="small-12 medium-3 large-2 columns">
-    <label for="{{ inputPrefix }}_{{ dateProperty }}_date-{{ assessmentId }}">{{ dateLabel }} Date</label>
-    <input id="{{ inputPrefix }}_{{ dateProperty }}_date-{{ assessmentId }}"
-           name="{{ inputPrefix }}[{{ assessmentId }}][{{ dateProperty }}]"
+    <label for="{{ inputPrefix }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
+    <input id="{{ inputPrefix }}_{{ dateProperty }}_date"
+           name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
            value="{% if assessmentDate.valid %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
             {% if dateSyncProperty %}
            data-datepicker-sync
-           data-datepicker-sync-enddate="#{{ inputPrefix }}_{{ dateSyncProperty }}_date-{{ assessmentId }}"
+           data-datepicker-sync-enddate="#{{ inputPrefix }}_{{ dateSyncProperty }}_date"
            {% endif %}
     />
-    <label for="{{ inputPrefix }}_{{ dateProperty }}_date-{{ assessmentId }}" class="hide error">This field is required.</label>
+    <label for="{{ inputPrefix }}_{{ dateProperty }}_date" class="hide error">This field is required.</label>
 </div>

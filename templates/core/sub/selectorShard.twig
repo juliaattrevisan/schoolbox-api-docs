@@ -3,6 +3,17 @@
  # Originally:
  # This lets you spawn a Course Selector modal, whose
  # onCourseSelect() callback deals with selection
+ #
+ # Usage:
+    {% include 'sub/selectorShard.twig' with {
+            'formLabel':      string,
+            'formInputName':  string,
+            'formInputValue': mixed,
+            'formInputLabel': string,
+            'activator':      string,
+            'title':          string
+        } only
+    %}
  #}
 
 {# Manufacture form label
@@ -35,11 +46,11 @@
 
 <label>
     {{ formLabel }}
-    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ course.id }}" />
+    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ formInputValue }}" />
     <a {{ activator }}
        data-source="{{ formInputName }}"
        href="#"
-       class="source-select {{ course.id ? 'icon-folder' : '' }}"
-       title="{{ title }}">{{ course.id ? course.folder.name : '(Click to select)' }}
+       class="source-select {{ formInputValue ? 'icon-folder' : '' }}"
+       title="{{ title }}">{{ formInputValue ? formInputLabel : '(Click to select)' }}
     </a>
 </label>
