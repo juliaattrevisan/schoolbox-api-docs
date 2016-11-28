@@ -23,7 +23,6 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as CourseUnitMapper;
-use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -75,9 +74,6 @@ class Controller extends Base\Base
 
     /** @var TaskMapper */
     protected $taskMapper;
-
-    /** @var TaskInstanceMapper */
-    protected $taskInstanceMapper = null;
 
     /**
      * @var CourseSpecificationMapper
@@ -203,7 +199,6 @@ class Controller extends Base\Base
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
         $this->setTaskMapper(TaskMapper::getInstance());
-        $this->setTaskInstanceMapper(TaskInstanceMapper::getInstance());
         $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
@@ -1585,22 +1580,6 @@ class Controller extends Base\Base
     {
         $this->access = $access;
         return $this;
-    }
-
-    /**
-     * @return TaskInstanceMapper
-     */
-    protected function getTaskInstanceMapper()
-    {
-        return $this->taskInstanceMapper;
-    }
-
-    /**
-     * @param TaskInstanceMapper $taskInstanceMapper
-     */
-    public function setTaskInstanceMapper($taskInstanceMapper)
-    {
-        $this->taskInstanceMapper = $taskInstanceMapper;
     }
 
     /**
