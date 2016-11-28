@@ -42,17 +42,19 @@ Usage:
 <div class="empty-state">
     <i class="icon-course"></i>
     {% if folderHasCourse %}
-        <p>This Folder is already a Course</p>
+        <p>This page is a course and cannot have a course builder</p>
+        <p>Please create a unit on a folder under this page.</p>
     {% elseif parentHasUnit %}
-        <p>This Folder's parent is a Unit. You cannot create Units inside Units</p>
-    {% else %}
-        <p>This Folder is not a Unit</p>
+        <p>The folder above this page is a unit<p>
+        <p>You are a unable to create additional units underneath existing units. Instead you should create a project in the existing unit.</p>
     {% endif %}
 
     {% if not folderHasCourse and not parentHasCourse and not parentHasUnit %}
-        <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder and parent to Unit and Course">Convert this Folder</a> to a Unit, and parent Folder to a Course</p>
+        <p>This page is not part of a course.<p>
+        <p>If you wish you can <a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder and parent to Unit and Course">convert this page</a> to a new unit and create a course out of the folder above. Once converted you will be able to add activities to this unit.</p>
     {% elseif parentHasCourse and not folderHasCourse %}
-        <p><a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder to Unit">Convert this Folder</a> to a Unit</p>
+        <p>This page is not currently a unit.</p>
+        <p>You must first <a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}" title="Convert folder to Unit">convert this page</a> to a unit before you can add activities.</p>
     {% else %}
         <p><a href="{{ routeLookup('course.courseList') }}" title="Manage Courses">Manage Courses</a></p>
     {% endif %}
