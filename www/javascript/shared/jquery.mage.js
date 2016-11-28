@@ -137,6 +137,11 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
 
+        /*$t.find(':input').each(function() {
+            console.log('disabled');
+            $(this).show();
+            $(this).attr('disabled', 'disabled');
+        });*/
         $t.attr('disabled', 'disabled');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
@@ -155,8 +160,9 @@
     Mage.prototype.enableSection = function () {
 
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
 
-        $e.closest(this.options.submittable).removeAttr('disabled');
+        $t.removeAttr('disabled');
 
         if ($e.data('mage-reset')) {
             // reset the submit button text and re-enable it
@@ -178,15 +184,21 @@
      */
     Mage.prototype.closeSection = function () {
 
-        this.disableSection();
-
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        this.disableSection();
 
         // slide away the submit for this section
         $e.closest('[data-mage-submitrow]').slideUp(slideSlow);
 
         // also slide away this section's helptext
-        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow, function() {
+            // disable all inputs in the closed section
+            $t.find(':input').attr('disabled', 'disabled');
+        });
+
+
     };
 
     /**
@@ -198,6 +210,10 @@
     Mage.prototype.openSection = function () {
 
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        // enable all inputs in the section
+        $t.find(':input').removeAttr('disabled');
 
         // slide out the main content wrapper
         var $content = $e.closest('[data-mage-collapsed]');
