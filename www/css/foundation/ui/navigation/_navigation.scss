@@ -253,7 +253,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
 				color: $navigation-foreground;
 				font-weight: $font-weight-normal;
-				line-height: rem-calc($base-font-size);
+				line-height: rem-calc($base-font-size * 1.5);
 				display: block;
 			}
 		}
