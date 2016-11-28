@@ -141,6 +141,7 @@ class Renderer
         // Render this thing out
 
         return $twig->render('@menuSide/renderer.twig', array(
+            'isStaff' => $user->getRole()->isStaff(),
             'nodes' => $nodes,
             'subjects' => $subjects,
             'sections' => $sections,

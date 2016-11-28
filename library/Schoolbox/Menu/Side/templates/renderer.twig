@@ -79,7 +79,11 @@
                                             {% endif %}
                                             {% for subject in subjectTypes %}
                                                 <li>
-                                                    <a href="/homepage/code/{{ subject.code }}">{{ subject.name }}</a>
+                                                    {% if isStaff %}
+                                                        <a href="/homepage/code/{{ subject.code }}">{{ subject.name }} ({{ subject.code }})</a>
+                                                    {% else %}
+                                                        <a href="/homepage/code/{{ subject.code }}">{{ subject.name }}</a>
+                                                    {% endif %}
                                                 </li>
                                             {% endfor %}
                                         {% endfor %}
