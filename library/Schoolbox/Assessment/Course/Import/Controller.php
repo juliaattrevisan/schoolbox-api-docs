@@ -426,7 +426,12 @@ class Controller extends Base\Base
         // on the course we are trying to import.
 
         // Test course page read access
-        $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
+        try{
+            $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
+        } catch (MapperException\Deleted $e){
+            $courseSpec = $e->getDeletedObject();
+        }
+
         if ($this->getAccess()->getFolderAccess($this->getUser(), [$courseSpec->getFolder()->getId()]) < READ_ACCESS) {
             $this->sendError('You do not have permission to import this course');
         }
@@ -849,7 +854,12 @@ class Controller extends Base\Base
      */
     public function importModify(CourseImplementation $courseImpl)
     {
-        $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
+        try{
+            $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
+        } catch (MapperException\Deleted $e){
+            $courseSpec = $e->getDeletedObject();
+        }
+
         $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
 
         // Load UnitImpls
