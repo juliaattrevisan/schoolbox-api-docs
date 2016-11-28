@@ -158,13 +158,11 @@
                                         <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                         <div class="compact card small-12 large-4">
-                                            <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                             <input type="checkbox"
                                                    id="a_import-{{ assessment.id}}"
                                                    {% if isChecked %} checked="checked"{% endif %}
                                                    data-assessment="{{ assessment.id }}"
                                                    name="{{ inputPrefix }}[checked]"
-                                                   value="1"
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment) }}"></span>

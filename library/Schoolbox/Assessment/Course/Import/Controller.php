@@ -636,7 +636,7 @@ class Controller extends Base\Base
                         // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
                         if ($assessmentImplData['impl_id']) {
                             // Did user de-select this Assessment ?
-                            if (!$assessmentImplData['checked']) {
+                            if (!isset($assessmentImplData['checked'])) {
                                 $this->getAssessmentMapperProxy()->delete($assessableImpl);
                             }
                         }
@@ -696,7 +696,7 @@ class Controller extends Base\Base
                     // Create/Update AssessmentImpls
                     foreach ($unitPair['a'] as $assessmentId => $aData) {
                         // Ignore unchecked items. ( If they were already imported, they were deleted above.)
-                        if (!$aData['checked']) {
+                        if (!isset($aData['checked'])) {
                             continue;
                         }
 
