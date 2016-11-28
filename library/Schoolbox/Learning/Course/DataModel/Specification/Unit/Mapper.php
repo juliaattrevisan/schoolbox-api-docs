@@ -53,7 +53,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('course', 'c')},
                 {$this->getJoinColumnString('course.folder', 'cf')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
             INNER JOIN {$this->getJoinSql('course', '', 'c')}
             INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
