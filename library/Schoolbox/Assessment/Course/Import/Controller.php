@@ -677,7 +677,11 @@ class Controller extends Base\Base
                         $assessmentMapperProxy = $this->getAssessmentMapperProxy();
 
                         // Get Spec if cloned, or null if AssessmentImpl created in UnitImpl
-                        $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
+                        try{
+                            $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
+                        } catch (MapperException\Deleted $e){
+                            $assessmentSpec = $e->getDeletedObject();
+                        }
 
                         // Is this a creation from the spec ?
                         if (!$aData['impl_id']) {
