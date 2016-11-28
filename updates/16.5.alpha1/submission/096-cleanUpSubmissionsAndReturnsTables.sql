@@ -15,6 +15,11 @@ ALTER TABLE `submission_return`
   DROP COLUMN `submitted`
 ;
 
+/* Cleanup plagscans that do not link to any file */
+DELETE plagscan_document
+FROM plagscan_document LEFT JOIN student_submission_file ON plagscan_document.student_submission_file_id = student_submission_file.id
+WHERE student_submission_file.id is null;
+
 
 -- Add a foreign key between the Plagscan table and the Submission File table
 ALTER TABLE `plagscan_document`
