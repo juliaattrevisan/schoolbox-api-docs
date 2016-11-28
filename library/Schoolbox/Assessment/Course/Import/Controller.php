@@ -677,17 +677,17 @@ class Controller extends Base\Base
                         $assessmentMapperProxy = $this->getAssessmentMapperProxy();
 
                         // Get Spec if cloned, or null if AssessmentImpl created in UnitImpl
-                        $assessmentSpecData = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
+                        $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
 
                         // Is this a creation from the spec ?
                         if (!$aData['impl_id']) {
-                            $assessmentImplDomain = $assessmentSpecData->cloneForCopy();
+                            $assessmentImpl = $assessmentSpec->cloneForCopy();
                             // TODO need to implement __clone() on DueWork to clone Rubric correctly
                             // TODO unify unit implementation data and domain model so this shenanigan isn't required
-                            $assessmentImplDomain->setContext(
+                            $assessmentImpl->setContext(
                                 (new Course\Unit\Implementation())->setId($unitImpl->getId())
                             );
-                            $unitImpl->getAssessables()->add($assessmentImplDomain);
+                            $unitImpl->getAssessables()->add($assessmentImpl);
                         } // Else we have been passed the Assessment Impl
                         else {
                             // Retrieve AssessmentImpl from UnitImpl
@@ -695,20 +695,20 @@ class Controller extends Base\Base
                                 /** @var IAssessable $impl */
                                 return $impl->getId() == $assessmentId;
                             };
-                            $assessmentImplDomain = $unitImpl->getAssessables()->filter($filter)->first();
+                            $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
 
                         }
                         // Set/Update Dates
                         foreach ($aData['dates'] as $property => $localShort) {
                             $method = "set{$property}At";
-                            if (!method_exists($assessmentImplDomain, $method)) {
+                            if (!method_exists($assessmentImpl, $method)) {
                                 $this->sendError("Invalid date property: $property");
                                 return;
                             }
-                            $assessmentImplDomain->$method(\Alaress_Date_Format::newLocalShort($localShort));
+                            $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
                         }
                         // Save Dates and SubObject (but this blows away Impl to Spec link!!)
-                        $assessmentMapperProxy->save($assessmentImplDomain, $sequence++);
+                        $assessmentMapperProxy->save($assessmentImpl, $sequence++);
                     }
                 }
 
