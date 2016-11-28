@@ -108,7 +108,9 @@
             $(config.assessmentList)
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
-                .on('blur', ':input', doASaveActionNao);
+                .on('blur', ':input', doASaveActionNao)
+                .on('addedfile.attachzone', '.attachzone', timeoutUpdate)
+                .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
 
         /**
@@ -126,9 +128,12 @@
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
+                // Publish submits everything
+                var formData = $form.serializeArray();
+                formData.push({name: 'publish', value: 1});
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
-                    data:  { publish: 1 },
+                    data:  formData,
                     type: 'post'
                 }).done(function () {
                     $form.find('[data-interaction-draft]').slideUp(function () {
@@ -172,14 +177,16 @@
          */
         function doASaveActionNao() {
             // do a preval comparison to find out if we can skip AJAX
-            if ($(this).val() == $(this).data('preval')) {
+            // (Do not skip attachzones)
+            var $this = $(this);
+            if (!$this.is('.attachzone') && $this.val() == $this.data('preval')) {
                 return;
             }
 
             // update the pre-value
-            $(this).data('preval', $(this).val());
+            $this.data('preval', $this.val());
 
-            var $form = $(this).closest('form');
+            var $form = $this.closest('form');
 
             var data = {
                 type: $form.attr('method'),

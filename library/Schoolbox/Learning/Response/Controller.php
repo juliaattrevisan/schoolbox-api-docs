@@ -18,6 +18,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
+use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
@@ -107,6 +108,11 @@ class Controller extends Base
             }
         }
 
+        // The zone which contains the files
+        $latestFeedback    = $participant->findMostRecentFeedback();
+        $attachZoneFactory = new Attachzone\Factory();
+        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
+
         /* ResponseFile Factory might throw exceptions if you're viewing
          * crocodocable files that somehow die
          */
@@ -114,8 +120,8 @@ class Controller extends Base
             $data = [
                 'assessment' => $response->getAssessable(),
                 'response' => $response,
-                'latestFeedback' => $participant->findMostRecentFeedback(),
-                'attachzone' => (new Zone('feedbackFiles'))->setMulti(true)->getTwigContext(),
+                'latestFeedback' => $latestFeedback,
+                'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
                 'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
                 'file' => $file,

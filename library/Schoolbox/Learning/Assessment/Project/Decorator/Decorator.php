@@ -115,9 +115,11 @@ class Decorator implements DecoratorInterface
 
     /**
      * @param string $summator
+     * @return $this
      */
     protected function setSummator($summator)
     {
         $this->summator = $summator;
+        return $this;
     }
 }

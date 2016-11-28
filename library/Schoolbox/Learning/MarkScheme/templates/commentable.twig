@@ -12,18 +12,18 @@
     comment: (loop.index0 * 2) + 2
 } %}
 
-<form method="post" action="{{ fbUrl }}" class="row">
+<form method="post" action="{{ fbUrl }}">
     <input type="hidden" name="responseId" value="{{ response.id }}" />
-    <div class="small-12 medium-3 column">
-        {% block grading %}{% endblock %}
-    </div>
-    <div class="small-12 medium-9 column">
-        <label>Comment
-            <textarea tabindex="{{ tabIndex.comment }}" name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
-        </label>
-    </div>
     <div class="row">
-        <div class="small-12 column">
+        <div class="small-12 medium-3 column">
+            {% block grading %}{% endblock %}
+        </div>
+        <div class="small-12 medium-9 column">
+            <label>Comment
+                <textarea tabindex="{{ tabIndex.comment }}" name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
+            </label>
+        </div>
+        <div class="small-12 column no-pad">
             <div class="component-action">
                 <section>
                     <div style="{{ actionStyle }}" data-interaction-draft>
@@ -35,5 +35,12 @@
                 </section>
             </div>
         </div>
+
+        {# Maybe files may be uploaded here? #}
+        {% if feedbackAttachzone %}
+        <div class="small-12 columns no-pad">
+            {% include 'sub/attachzone.twig' with {attachzone: feedbackAttachzone} %}
+        </div>
+        {% endif %}
     </div>
 </form>

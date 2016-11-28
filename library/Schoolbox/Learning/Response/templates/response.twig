@@ -123,27 +123,17 @@
 </div>
 <div class="row" id="assessment-status">
     <div class="small-12 island">
-        <section>
-            <ul class="information-list">
-                <li>
-                    <div class="small-12 columns">
-                        {% include '@learningMarkScheme/'~markScheme~'.twig' with {
-                            markScheme: assessment.markScheme,
-                            fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
-                                assessmentId: assessment.id,
-                                studentId: response.submittedOnBehalfOf.id,
-                                responseId: response.id
-                            })
-                        } %}
-                    </div>
-                </li>
-            </ul>
+        <section class="content">
+            {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                markScheme: assessment.markScheme,
+                fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
+                    assessmentId: assessment.id,
+                    studentId: response.submittedOnBehalfOf.id,
+                    responseId: response.id
+                }),
+                feedbackAttachzone: attachzone
+            } %}
         </section>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 columns">
-        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     </div>
 </div>
 

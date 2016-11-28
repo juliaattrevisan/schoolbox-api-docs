@@ -184,8 +184,12 @@ if(typeof window.location.origin == 'undefined') {
             },
 
             removedfile: function (file) {
-                self.detach(file.previewElement);
-                azone.trigger('removedfile.attachzone', [ file ]);
+                self.detach(
+                    file.previewElement,
+                    function() {
+                        azone.trigger('removedfile.attachzone', [ file ]);
+                    }
+                );
             },
 
             maxfilesexceeded: function (file) {
@@ -503,7 +507,7 @@ if(typeof window.location.origin == 'undefined') {
     };
 
 
-    ResourceAttach.prototype.detach = function (elem) {
+    ResourceAttach.prototype.detach = function (elem, then) {
         //noinspection AssignmentToFunctionParameterJS
         elem = $(elem);
         elem.addClass(this.options.detachClass);
@@ -516,6 +520,9 @@ if(typeof window.location.origin == 'undefined') {
 
         setTimeout(function () {
             elem.remove();
+            if ($.isFunction(then)) {
+                then();
+            }
         }, this.options.detachDelay);
     };
 
