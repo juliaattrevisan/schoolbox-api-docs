@@ -127,7 +127,7 @@ class Link implements ISoftDeletable
      */
     public function getLinkTarget()
     {
-        if ($this->isLocalUrl() || $this->getTarget() != '_blank' ) {
+        if ($this->getTarget() != '_blank' ) {
             return '';
         }
         else {
