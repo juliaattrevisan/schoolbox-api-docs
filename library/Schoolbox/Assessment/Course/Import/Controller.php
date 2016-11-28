@@ -681,7 +681,7 @@ class Controller extends Base\Base
 
                         // Is this a creation from the spec ?
                         if (!$aData['impl_id']) {
-                            $assessmentImplDomain = clone $assessmentSpecData;
+                            $assessmentImplDomain = $assessmentSpecData->cloneForCopy();
                             // TODO need to implement __clone() on DueWork to clone Rubric correctly
                             // TODO unify unit implementation data and domain model so this shenanigan isn't required
                             $assessmentImplDomain->setContext(

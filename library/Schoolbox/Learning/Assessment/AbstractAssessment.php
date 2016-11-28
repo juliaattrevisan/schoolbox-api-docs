@@ -166,6 +166,18 @@ abstract class AbstractAssessment implements IAssessable
         $this->setDeletedAt($this->getDeletedAt() instanceof \Alaress_Date_Format ? clone $this->getDeletedAt() : null);
     }
 
+    /**
+     * Clones this object in preparation for persisting as a copy of this object.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        $clone = clone $this;
+        $clone->setId(null);
+        return $clone;
+    }
+
     /* Delegation Methods
      */
 

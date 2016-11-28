@@ -24,6 +24,15 @@ interface IAssessable extends ISoftDeletable
     const MARK_VISIBILITY_PARENT_STUDENT = 2;
     const MARK_VISIBILITY_STUDENT = 1;
 
+    /**
+     * Creates a clone of this assessment.
+     *
+     * This clone must be able to be persisted to create a copy of this assessment,
+     * without further modification.
+     *
+     * @return static
+     */
+    public function cloneForCopy();
 
     /**
      * Return the context within which this assessment belongs.
