@@ -15,14 +15,6 @@
 #}
 {% extends '@learningAssessment/status.twig' %}
 
-{% block headerOptions %}
-    <li class="separator">Bulk Actions</li>
-    <li>
-        <a class="icon-approve" data-mass="publish">Publish visible drafts&hellip;</a>
-    </li>
-{% endblock %}
-
-
 {% block config %}
 
     {% set latestFeedback    = participant.findMostRecentFeedback %}
