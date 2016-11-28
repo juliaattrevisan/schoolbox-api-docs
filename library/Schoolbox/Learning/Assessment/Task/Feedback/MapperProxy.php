@@ -100,9 +100,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 )
                 ->setReviewee($completion->getStudent())
                 ->setReviewer($completion->getMarkingUser())
-                ->setCreatedAt($completion->getCreatedAt())
-                ->setUpdatedAt($completion->getUpdatedAt())
-                ->setPublishedAt($completion->getCreatedAt())
+                ->setCreatedAt($completion->getCompletionDate())
+                ->setUpdatedAt($completion->getCompletionDate())
+                ->setPublishedAt($completion->getCompletionDate())
                 ->setDeletedAt($completion->getDeletedAt());
 
             // Set completion of this feedback
@@ -141,9 +141,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 )
                 ->setStudent($domainObject->getReviewee())
                 ->setMarkingUser($domainObject->getReviewer())
+                ->setCompletionDate($domainObject->getCreatedAt())
                 ->setCompletionStatus($domainObject->getCompletionStatus())
-                ->setCreatedAt($domainObject->getCreatedAt())
-                ->setUpdatedAt($domainObject->getUpdatedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
             $dataModels->add($dataModel);
         }

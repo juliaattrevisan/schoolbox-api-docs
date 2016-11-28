@@ -48,9 +48,8 @@ if (!$permissionDenied) {
     $completion
         ->setTask($task)
         ->setStudent($student)
+        ->setCompletionDate(new Alaress_Date_Format(new DateTime('now')))
         ->setCompletionStatus($_POST['status'])
-        ->setCreatedAt(new Alaress_Date_Format(new DateTime('now')))
-        ->setUpdatedAt(new Alaress_Date_Format(new DateTime('now')))
     ;
 
     // Set status, either explicitly or based on what the current status of this task is.

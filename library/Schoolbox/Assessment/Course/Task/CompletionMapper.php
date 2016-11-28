@@ -26,9 +26,8 @@ class CompletionMapper extends Mapper {
         $this->joins('task_id', TaskMapper::class, 'id',  null, null, 'task', 'task');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
         $this->joins('marking_user_id', UserMapper::class, 'id', null, null, 'markingUser', 'marking_user');
+        $this->uses('completion_date', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('completion_status', self::TYPE_INTEGER);
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
@@ -134,8 +133,7 @@ class CompletionMapper extends Mapper {
         $model = (new Completion())
             ->setTask((new Task())->setId($task_id))
             ->setStudent((new User)->setId($student_id))
-            ->setCreatedAt(new \Alaress_Date_Format(new \DateTime('now')))
-            ->setUpdatedAt(new \Alaress_Date_Format(new \DateTime('now')))
+            ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
             ->setCompletionStatus($status)
         ;
         return $this->save($model);
