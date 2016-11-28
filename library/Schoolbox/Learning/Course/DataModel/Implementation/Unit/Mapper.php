@@ -114,8 +114,8 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('course', '', 'c')}
             LEFT  JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
-            INNER JOIN {$this->getJoinSql('specification', '', 's')}
-            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf')}
+            INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
+            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
         ";
     }
 
