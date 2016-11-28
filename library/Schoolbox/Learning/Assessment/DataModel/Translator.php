@@ -119,6 +119,16 @@ class Translator
             ->setDeletedAt($assessment->getDeletedAt())
         ;
 
+        // Translate specification assessment if there is one
+        $specification = $assessment->getSpecification();
+        if ($specification instanceof IAssessable) {
+            // Go to no great lengths here, as I need only an ID
+            $assessmentModel->setSpecificationAssessment(
+                (new Model())
+                    ->setId($specification->getId())
+            );
+        }
+
         // Translate assessment context
         // TODO consider moving this to a translator
         // TODO add project context
