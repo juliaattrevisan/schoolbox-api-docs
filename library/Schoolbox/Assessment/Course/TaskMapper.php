@@ -11,11 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
 
@@ -26,7 +22,6 @@ use Schoolbox\Assessment\Course\Task\CompletionMapper;
  */
 class TaskMapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      * @return void
@@ -129,39 +124,4 @@ class TaskMapper extends Schoolbox\Mapper
             throw new MapperException('Instance of object not found');
         }
     }
-
-
-    /**
-     * Count the number of tasks in the given unit
-     *
-     * @param Folder $unit
-     * @return int
-     */
-    public function countByUnit(Folder $unit)
-    {
-        return $this->countByColumn('category_id', $unit->getId());
-    }
-
-
-    /**
-     * Count the number of tasks in the given units and return as an associative array
-     *
-     * @param Collection|Folder[] $units
-     * @return array
-     */
-    public function countForEachUnit(Collection $units)
-    {
-        $unitIds = $units->getColumnValues('id');
-
-        // preset everything to zero: we still want the keys populated even if the query somehow returns nothing
-        $taskCounts = array_combine($unitIds, array_fill(0, count($unitIds), 0));
-
-        foreach ($units as $unit) {
-            // iterate and find the task count for each unit
-            $taskCounts[$unit->getId()] = $this->countByUnit($unit);
-        }
-
-        return $taskCounts;
-    }
-
 }
