@@ -13,10 +13,10 @@
     var pluginName = 'mage';
 
     var defaults = {
-
         submittable: 'fieldset',
         currentStopClass: 'current-stop',
         reenablePrevious: false,
+        beforeSubmit: $.noop,
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
@@ -298,6 +298,9 @@
         if (self.options.validateOptions !== false) {
             form.alaressValidate(self.options.validateOptions);
         }
+
+        // call beforeSubmit
+        self.options.beforeSubmit.call();
 
         /**
          * Validate the form
