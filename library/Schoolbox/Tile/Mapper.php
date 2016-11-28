@@ -213,9 +213,8 @@ class Mapper extends BaseMapper
         if ($row = $statement->fetch()) {
             /** @var Model $model */
             $model = $this->hydrate($row, 't');
-            $model->setBackgroundImage($this->hydrateJoin($row, 'backgroundImage', 'bi'));
-            if (empty($model->getBackgroundImage()->getFilename())) {
-                $model->setBackgroundImage(null);
+            if (!empty($row['background_image_hash'])) {
+                $model->setBackgroundImage($this->hydrateJoin($row, 'backgroundImage', 'bi'));
             }
             $this->throwIfDeleted($model);
             return $model;
@@ -241,9 +240,8 @@ class Mapper extends BaseMapper
             $statement,
             't',
             function ($mapper, $model, $row) {
-                $model->setBackgroundImage($mapper->hydrateJoin($row, 'backgroundImage', 'bi'));
-                if (empty($model->getBackgroundImage()->getFilename())) {
-                    $model->setBackgroundImage(null);
+                if (!empty($row['background_image_hash'])) {
+                    $model->setBackgroundImage($mapper->hydrateJoin($row, 'backgroundImage', 'bi'));
                 }
                 return $model;
             }
