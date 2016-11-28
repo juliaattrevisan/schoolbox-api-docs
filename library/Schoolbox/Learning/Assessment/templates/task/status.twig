@@ -84,12 +84,10 @@
                     return;
                 }
 
-                if ($a.hasClass('pending')) {
-                    newStatusCode  = 3;
-                } else if ($a.hasClass('complete')) {
+                if ($a.hasClass('complete')) {
                     newStatusCode  = 1;
                 } else {
-                    newStatusCode  = 2;
+                    newStatusCode  = 3;
                 }
 
                 $.ajax($form.attr('action'), {
