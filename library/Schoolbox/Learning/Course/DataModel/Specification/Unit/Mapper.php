@@ -14,6 +14,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 /**
  * Mapper for the data model for Unit Specifications.
@@ -36,6 +37,34 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // SoftDelete/Restore Assessments in UnitSpecification
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAssessments'));
+    }
+
+    /**
+     * Soft deletes all Assessments for the specified UnitSpecification
+     *
+     * @param Model $unitImpl
+     */
+    public function softDeleteAssessments(Model $unitImpl)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessmentMapper->delete($assessments);
+    }
+
+    /**
+     * Soft deletes all Assessments for the specified UnitSpecification
+     *
+     * @param Model $unitImpl
+     */
+    public function restoreAssessments(Model $unitImpl)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitImpl->getId(), ['deleted' => true]);
+        $assessmentMapper->restoreSoftDeleted($assessments);
     }
 
     /**
