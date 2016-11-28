@@ -177,15 +177,110 @@ class Leave_Controller extends Controller
         $this->setHostTypes(\Leave\HostTypeMapper::getInstance()->findAll());
     }
 
-    /**
-     * Test email deployments
-     */
-    public function executeEmailTest()
-    {
-        $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
 
-        $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
-        $email->send();
+    public function renderSummary()
+    {
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
+
+        $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewSummary.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'summary_house', 'summary_house_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'reports_menu', 'reports_menu_block');
+
+        $today = Alaress_Date_Format::now();
+
+        $allHouses = $this->getRequestMapper()->getCateringReport($today);
+
+        $leavingToday = 0;
+        $returningToday = 0;
+
+        foreach ($allHouses as $house) {
+
+            //Getting a number of absent student from whatever is available
+            $absentToday = 0;
+            if ($house['absent_morning'] > 0 || $house['absent_day'] > 0 || $house['absent_night'] > 0) {
+                $absentToday = max(Array($house['absent_morning'], $house['absent_day'], $house['absent_night']));
+            }
+
+            $requestList = $this->getRequestMapper()->findAllByHouseId($house['houseId']);
+            $totalApproved = 0;
+            $totalRejected = 0;
+            $totalPending = 0;
+
+            foreach ($requestList as $request) {
+
+                if ($request->isApproved()) {
+                    $totalApproved++;
+                } elseif ($request->isRejected()) {
+                    $totalRejected++;
+                } else {
+                    $totalPending++;
+                }
+                if ($request->getStart()->getDatabaseDate() == $today->getDatabaseDate()) {
+                    $leavingToday++;
+                }
+                if ($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()) {
+                    $returningToday++;
+                }
+            }
+
+            $this->getPage()->setVar(
+                array(
+                    'SUMMARY_HOUSE_ID' => $house['houseId'],
+                    'SUMMARY_HOUSE_NAME' => $house['name'],
+                    'SUMMARY_HOUSE_PENDING' => $totalPending,
+                )
+            );
+            $this->getPage()->parse('reports_menu_block', 'reports_menu', true);
+
+
+            $this->getPage()->setVar(
+                array(
+                    'SUMMARY_HOUSE_ID' => $house['houseId'],
+                    'SUMMARY_HOUSE_NAME' => $house['name'],
+                    'SUMMARY_HOUSE_TOTAL' => $house['absent_morning'] + $house['present_morning'],
+                    'SUMMARY_HOUSE_ONLEAVE' => $absentToday,
+                    'SUMMARY_HOUSE_APPROVED' => $totalApproved,
+                    'SUMMARY_HOUSE_PENDING' => $totalPending,
+                    'SUMMARY_HOUSE_REJECTED' => $totalRejected,
+                )
+            );
+
+            $this->getPage()->parse('summary_house_block', 'summary_house', true);
+        }
+
+        $this->getPage()->setVar(Array(
+            'SUMMARY_TODAY' => $today->getURLDate(),
+            'SUMMARY_WEEK' => $today->addDays(7)->getURLDate(),
+            'SUMMARY_DEPARTING' => $leavingToday,
+            'SUMMARY_RETURNING' => $returningToday,
+        ));
+
+        $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 5));
+
+        $colourArray = Array();
+        if($colourList->count() > 0){
+            foreach ($colourList as $i=>$colour){
+                $colourArray[$i] = $colour->getHexColour();
+            }
+        }
+        //if no timetable colours are available - use white, or we can use Primary BG colour (together with Body Text colour).
+        else {
+            $colourArray[0] = '#ffffff';
+        }
+        //Rotating available colours to set 5 different styles
+        $k=0;
+        for ($i=0; $i<5; $i++) {
+            if(!($colourArray[$k])){
+                $k=0;
+            }
+            $this->getPage()->setVar(
+                array(
+                    'SUMMARY_COLOR_' . $i => $colourArray[$k],
+                ));
+            $k++;
+        }
     }
 
     /**
@@ -980,6 +1075,7 @@ class Leave_Controller extends Controller
     public function renderHouseRequestList($data)
     {
         /** @var \HouseResidential $house */
+
         $house = $data['house'];
         $requestList = $data['requestList'];
 
@@ -1584,6 +1680,17 @@ class Leave_Controller extends Controller
     {
         $leaveFactory = new Leave_Notice_Factory($request);
         $leaveFactory->produceAdminFactory()->produce()->send();
+    }
+
+    /**
+     * Test email deployments
+     */
+    public function executeEmailTest()
+    {
+        $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
+
+        $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
+        $email->send();
     }
 
     /* Getters/Setters
