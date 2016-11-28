@@ -383,11 +383,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment)
     {
-        // create an empty Rubric with appropriate Indicators
-        $rubric = $this->getRubricMapper()->createForContext($assessment->getContext());
-        $rubric->setSubmissionBox(new SubmissionBox()); // TODO fix this with...something
-        $assessment->setRubric($rubric);
-
         $zoneFactory = new Assessment\Attachzone\Factory();
 
         // setup some data...

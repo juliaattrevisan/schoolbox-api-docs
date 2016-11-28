@@ -17,7 +17,7 @@
                         {{ unit.title }}
                     {% endif %}
                 </h3>
-                <span class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</span>
+                <p class="{{ status.unitUrgency(unit) }}">{{ status.unitCompletion(unit) }}</p>
             </div>
         </div>
         {% if readOnly == false %}
