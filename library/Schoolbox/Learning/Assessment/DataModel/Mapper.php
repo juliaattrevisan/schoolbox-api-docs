@@ -455,6 +455,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         // Folder codes for all contexts
         $modelList = $this->augmentListWithFolderCodes($modelList);
+        // Specification assessments
+        $modelList = $this->augmentListWithSpecifications($modelList);
         return $modelList;
     }
     /**
@@ -619,6 +621,39 @@ class Mapper extends BaseMapper
                 }
             }
         }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with their specification assessments.
+     *
+     * @param Collection|Model[] $modelList
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithSpecifications($modelList)
+    {
+        $specificationIds = [];
+
+        // Pass 1: load spec IDs
+        foreach ($modelList as $model) {
+            if ($model->getSpecificationAssessment() instanceof IAssessableDataModel) {
+                $specificationIds[] = $model->getSpecificationAssessment()->getId();
+            }
+        }
+
+        // Fetch
+        $specifications = $this->findByColumn('id', $specificationIds)->indexBy('id');
+
+        // Pass 2: hydrate
+        foreach ($modelList as $model) {
+            if ($model->getSpecificationAssessment() instanceof IAssessableDataModel) {
+                $specificationId = $model->getSpecificationAssessment()->getId();
+                if (isset($specifications[$specificationId])) {
+                    $model->setSpecificationAssessment($specifications[$specificationId]);
+                }
+            }
+        }
+
         return $modelList;
     }
 }
