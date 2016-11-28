@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
 
                     // jQuery Validation
-                    'www/javascript/components/jquery-validation/jquery.validate.js',
+                    'www/javascript/components/jquery-validation/dist/jquery.validate.js',
                     'www/javascript/shared/jquery.validate.extensions.js',
                     'www/javascript/jquery.alaressValidate.js',
 
