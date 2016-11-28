@@ -156,65 +156,48 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
 .leave-summary {
     p {
         text-align: center;
-        font-size: large;
+        font-size: $base-font-size;
+        line-height: 3.5rem;
+        margin: 0;
     }
     a {
         color: inherit;
     }
-    section {
-        &.summary-tile {
-            min-height: 220px;
-            span {
+    .summary-tile span,
+    .summary-house-tile span{
+        border-bottom: 1px solid $body-bg;
+        font-size: rem-calc(($base-font-size * 4));
+        line-height: rem-calc(($base-font-size * 6));
+        display: block;
+        width: 100%;
 
-                font-size: 1000%;
-                line-height: 100%;
-                display: block;
-                width: 100%;
-
-                &.icon-progress:before {
-                    font-size: 100%;
-
-                }
-            }
+        &.icon-progress:before {
+            font-size: 100%;
         }
-        &.summary-house-tile {
-            min-height: 150px;
-
-            span {
-                width: 100%;
-                display: block;
-                font-size: 600%;
-                line-height: 100%;
-            }
+    }
+    .summary-line {
+        p {
+            line-height: 2.5rem;
         }
-        &.summary-line {
-            min-hight: 50px;
-
-            p {
-                margin: 0px;
-                line-height: 40px;
-            }
-            span{
-                &.icon-progress:before {
-                    display: inline !important;
-                    font-size: 100%;
-                }
-            }
-
-            &.approved {
-                background-color: #c3e2c3;
-                color: #1a901a;
-            }
-            &.rejected {
-                background-color: #ffc1c0;
-                color: #ff1310;
-            }
-            &.pending {
-                background-color: #fff1e3;
-                color: #ff7d00;
+        span{
+            &.icon-progress:before {
+                display: inline !important;
+                font-size: 100%;
             }
         }
 
+        &.approved {
+            background-color: #c3e2c3;
+            color: #1a901a;
+        }
+        &.rejected {
+            background-color: #ffc1c0;
+            color: #ff1310;
+        }
+        &.pending {
+            background-color: #fff1e3;
+            color: #ff7d00;
+        }
     }
 
     /* Pending/Approved decorations
