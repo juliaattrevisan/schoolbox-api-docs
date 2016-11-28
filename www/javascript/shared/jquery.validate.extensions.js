@@ -178,4 +178,13 @@
     $.validator.addMethod('equalsOtherField', function(value, element, otherElement) {
         return $(element).val() == $(otherElement).val();
     }, 'Values do not match');
+
+    /**
+     * oneCheckbox extension - checks that at least one checkbox has been selected in a group
+     * Set a checkbox as in a group with data-checkbox-group="GROUPNAME"
+     */
+    $.validator.addMethod('oneCheckbox', function(value, element, checkboxGroup) {
+        return $('input[data-checkbox-group="' + checkboxGroup + '"]:checked').length > 0;
+    }, 'You must select at least one option below');
+
 }(jQuery));
