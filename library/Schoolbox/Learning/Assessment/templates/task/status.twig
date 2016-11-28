@@ -34,12 +34,12 @@
         {% set pStatusText %}
             {%- spaceless %}
                 {% if not latestResponse %}
-                    Not completed
+                    Incomplete
                 {% else %}
                     {% if multipleResponses %}
                         Completed multiple times
                     {% else %}
-                        Completed
+                        Complete
                     {% endif %}
                     {% if latestResponse.submittedOnTime %}
                         on time
@@ -72,6 +72,7 @@
                 e.preventDefault();
 
                 var $a = $(this),
+                    $row  = $a.closest('[data-status]'),
                     $form = $a.closest('form'),
                     map = {
                         1: 'incomplete',
@@ -96,7 +97,16 @@
                     data: { status: newStatusCode }
                 })
                 .done(function (rs) {
-                    $a.removeClass('incomplete pending complete').addClass(map[rs.status]);
+                    var newClass = map[rs.status],
+                        $light   = $row.find('[data-status]'),
+                        newLabel = function (string) { return string && (string.charAt(0).toUpperCase() + string.slice(1)); }(newClass);
+
+                    $row.attr('data-status', newClass);
+
+                    $a.removeClass('incomplete pending complete').addClass(newClass);
+                    $light.removeClass('incomplete pending complete').addClass(newClass);
+
+                    $light.siblings('span').html(newLabel);
                 })
                 .always(function () {
                     $form.removeAttr('disabled')
