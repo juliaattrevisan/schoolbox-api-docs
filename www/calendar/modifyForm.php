@@ -234,7 +234,7 @@ switch ($_REQUEST['action']) {
         }
         SitePage::localRedir($event->setupRedirect(
             urldecode($_GET['returnTo']),
-            $event->getStartDateTime()->getURLDate(),
+            ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
             $_GET['homepageId'],
             $_GET['userId']));
         break;

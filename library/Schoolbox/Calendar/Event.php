@@ -319,7 +319,16 @@ class Event
                 if ($userId) {
                     $return .= '/' . $userId;
                 }
-
+                return $return;
+            }
+            elseif ($returnView === 'list') {
+                $return = "/calendar/list";
+                if ($userId) {
+                    $return .= '/'.$userId;
+                }
+                if ($returnDate) {
+                    $return .= '/'.$returnDate;
+                }
                 return $return;
             }
         }

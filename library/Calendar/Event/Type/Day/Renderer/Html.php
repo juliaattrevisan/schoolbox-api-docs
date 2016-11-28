@@ -18,16 +18,37 @@ class Html extends Base {
      */
     public function render()
     {
+
+        $returnUrl = $_SERVER["REQUEST_URI"];
+        $path = explode('/', $returnUrl);
+        $returnStr = "&returnTo=";
+        if ($returnUrl == "/") {
+            $returnStr .= 'dashboard';
+        }
+        elseif ($path[1] == 'homepage' && intval($path[2]) > 0){
+            $returnStr .= "homepage&homepageId=".$path[2];
+        }
+        elseif ($path[1] == "calendar") {
+            if($path[2] == "full") {
+                $returnStr .= "calendar";
+            }
+            elseif($path[2] == "list") {
+                $returnStr .= "list&userId=".$path[3]."&returnDate=".$path[4];
+            }
+        }
+        //Return the URL as is
+        else {
+            $returnStr .= urlencode($returnUrl);
+        }
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/day.twig',
                 array(  'event' => $this->getEvent(),
                         'renderer' => $this,
-                        'returnTo' => urlencode($_SERVER["REQUEST_URI"])
+                        'returnStr' => $returnStr,
                 )
             );
         } else {
             return '';
         }
-
     }
 }

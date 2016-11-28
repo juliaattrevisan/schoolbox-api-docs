@@ -137,7 +137,10 @@ if (is_numeric($_GET['eventID'])) {
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-            'RETURN_TO' => urlencode($_GET['returnTo']),
+            'RETURN_STR' => '&returnTo='.$_GET['returnTo'].
+                ($_GET['userId']?"&userId=".$_GET['userId']:"").
+                ($_GET['homepageId']?"&homepageId=".$_GET['homepageId']:"").
+                ($_GET['returnDate']?"&returnDate=".$_GET['returnDate']:"")
         )
     );
 
@@ -230,7 +233,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
-                $event->getStartDateTime()->getURLDate(),
+                ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
