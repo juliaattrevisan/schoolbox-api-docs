@@ -22,7 +22,8 @@
         onXhrAlways: $.noop,
         onRevert: $.noop,
         confirmRevert: $.noop,
-        setFormData: $.noop
+        setFormData: $.noop,
+        validateOptions: false
     };
 
     function Mage(element, options) {
@@ -287,33 +288,28 @@
      * @param {jQuery} elem
      * @param {jQuery} [form] optional
      */
-    function clickIntercept (e, self, elem, form) {
+    function clickIntercept(e, self, elem, form) {
         e.preventDefault();
 
+        // destroy any existing alaressValidate options
+        $(form).removeData('validator');
 
-        // Perform validation if required
+        // set alaressValidate with new options
+        if (self.options.validateOptions !== false) {
+            form.alaressValidate(self.options.validateOptions);
+        }
 
-        // We cannot use a simple triggerHandler('validate') as that
-        // only returns the value of the last handler to execute.
-        // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
+        /**
+         * Validate the form
+         * Will use alaressValidate if set on the form or any required attributes on fields
+         * If the form has neither - it will pass through without any validation
+         */
+        if (form.valid() == false) {
 
-        var allValid = true;
+            // focus user to first invalid field
+            $(form).find('input.error').first().focus();
 
-        $.each(getEventHandlers(e.target, 'validate'), function (idx, obj) {
-            // Quit as soon as we know data is invalid (don't merge errors)
-            if (allValid && undefined !== obj['type'] && 'validate' === obj['type']) {
-                var validator = obj.handler.call(e.target);
-                if (validator !== undefined) {
-                    if (!validator['result']) {
-                        // Validation failed, show message and bomb out
-                        form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
-                        allValid = false;
-                    }
-                }
-            }
-        });
-
-        if (!allValid) {
+            // prevent submit
             return;
         }
 
@@ -331,7 +327,7 @@
         xhrBefore.call(self);
 
         // send it off
-        xhrSend.call(self, method, action, target)
+        xhrSend.call(self, method, action, target);
     }
 
 
