@@ -172,6 +172,12 @@ class Controller extends Base
         if ($feedback instanceof DueWorkFeedback) {
             $factory = new CollectorFactory();
             if (!empty($this->getRequest()->post['attachment'])) {
+
+                // Replace files with what was actually submitted
+                // (Only if something was actually submitted)
+                $feedback->setAllFiles(new Collection());
+
+                // And repopulate
                 foreach ($factory->build($this->getRequest()->post['attachment'])->getAll() as $attachment) {
                     // TODO figure out if this file needs to be related to a crocodoc
                     $feedback->getAllFiles()->add(
