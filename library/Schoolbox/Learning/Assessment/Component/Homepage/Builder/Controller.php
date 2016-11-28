@@ -130,6 +130,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $parentCourse = $parent->getCourseSpecification();
         $parentUnit = $parent->getUnitSpecification();
 
+        $folderHasClass = $folder->getCodes()->count() > 0;
         $folderHasCourse = $folderCourse instanceof CourseSpecification && $folderCourse->getId();
         $parentHasCourse = $parentCourse instanceof CourseSpecification && $parentCourse->getId();
         $parentHasUnit = $parentUnit instanceof UnitSpecification && $parentUnit->getId();
@@ -137,6 +138,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $data = [
             'componentInstance' => $this->getInstance(),
             'folder'            => $folder,
+            'folderHasClass'    => $folderHasClass,
             'folderHasCourse'   => $folderHasCourse,
             'parentHasCourse'   => $parentHasCourse,
             'parentHasUnit'     => $parentHasUnit,
