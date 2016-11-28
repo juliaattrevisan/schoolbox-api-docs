@@ -117,7 +117,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @var IAssessable|null
      */
-    private $specification = null;
+    private $specificationAssessment = null;
 
     /**
      * If published, then who can see the feedback for this Assessment.
@@ -837,7 +837,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getSpecificationAssessment()
     {
-        return $this->specification;
+        return $this->specificationAssessment;
     }
 
     /**
@@ -846,7 +846,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function setSpecificationAssessment(IAssessable $specification = null)
     {
-        $this->specification = $specification;
+        $this->specificationAssessment = $specification;
         return $this;
     }
 }
