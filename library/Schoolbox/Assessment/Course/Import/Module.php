@@ -26,6 +26,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use \Component_DefinitionMapper;
 use \Component_InstanceMapper;
+use \Component_ConfigDefinitionMapper;
+use \Component_ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Module extends \Alaress\Module\Module
 {
@@ -96,20 +99,23 @@ class Module extends \Alaress\Module\Module
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class, [], [
-                'setUnitSpecificationMapper'        => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-                'setUnitImplementationMapper'       => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                'setFolderMapper'                   => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'setCourseSpecificationMapper'      => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-                'setCourseImplementationMapper'     => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'setComponentDefinitionMapper'      => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
-                'setComponentInstanceMapper'        => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'setUserAccessMapper'               => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
-                'setAccess'                         => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
-                'setUserMapper'                     => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'setImportFactory'                  => $injector->lazyNew(ImportFactory::class),
-                'setAssessmentMapper'               => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
-                'setAssessmentMapperProxy'          => $injector->lazyGet('assessmentDataSource'),
-                'setCourseImplementationFactory'    => $injector->lazyNew(Course\ImplementationFactory::class, [
+                'setUnitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
+                'setUnitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                'setFolderMapper'                    => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'setCourseSpecificationMapper'       => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+                'setCourseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'setComponentDefinitionMapper'       => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
+                'setComponentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
+                'setComponentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
+                'setComponentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
+                'setErrorMapper'                     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'setUserAccessMapper'                => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
+                'setAccess'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
+                'setUserMapper'                      => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'setImportFactory'                   => $injector->lazyNew(ImportFactory::class),
+                'setAssessmentMapper'                => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
+                'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                'setCourseImplementationFactory'     => $injector->lazyNew(Course\ImplementationFactory::class, [
                     'unitImplementationFactory' => $injector->lazyNew(Unit\ImplementationFactory::class)
                 ])
             ])

@@ -19,7 +19,7 @@ class Component_ConfigDefinitionMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('component_config_definition');
-		$this->hasModel('Component_ConfigDefinition');
+		$this->hasModel(Component_ConfigDefinition::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

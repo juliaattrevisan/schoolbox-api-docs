@@ -37,6 +37,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use \Component_InstanceMapper;
+use \Component_ConfigDefinition;
+use \Component_ConfigDefinitionMapper;
+use \Component_ConfigMapper;
 
 class Controller extends Base\Base
 {
@@ -84,6 +87,15 @@ class Controller extends Base\Base
 
     /** @var \Component_DefinitionMapper */
     private $componentDefinitionMapper;
+
+    /** @var Component_ConfigDefinitionMapper */
+    private $componentConfigDefinitionMapper;
+
+    /** @var Component_ConfigMapper */
+    private $componentConfigInstanceMapper;
+
+    /** @var ErrorMapper */
+    private $errorMapper;
 
     /**
      * @var ImportFactory
@@ -163,10 +175,10 @@ class Controller extends Base\Base
                 $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
                 if ($componentDefinition->getClass() != HomepageOutlineComponentController::class) {
                     $msg = 'Not a Course-Outline component';
-                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
                 }
             } catch (MapperException $e) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
         }
 
@@ -724,44 +736,9 @@ class Controller extends Base\Base
                     if ($componentId) {
                         $componentInstance = $compInstanceMapper->findById($componentId);
                     } else {
-                        $module = \Component_Definition::MODULE_HOMEPAGE;
-                        $class = HomepageOutlineComponentController::class;
-                        $compInstances = $compInstanceMapper->findByContextAndClass($module, $classFolderId, $class);
-                        $compInstances->sortBy('sequence', 'ASC');
-                        foreach ($compInstances as $component) {
-
-                            // If this component has no associated Course, or the course is not valid
-                            if (!$component->getConfigArray()['importedCourse'] ||
-                                !$component->getConfigArray()['importedCourse']['value']
-                            ) {
-                                // Conclude the Component is available, and use it
-                                $componentInstance = $component;
-                                break;
-                            }
-                        }
+                        $componentInstance= $this->findAvailableCourseOutlineComponent($classFolderId);
                     }
-                    // Did we find a component?
-                    if ($componentInstance) {
-                        $configMapper = \Component_ConfigMapper::getInstance();
-                        $config = $configMapper->findByColumnList([
-                            'component_config_definition_id' => 255,  //TODO replace magic number
-                            'component_instance_id'          => $componentInstance->getId(),
-                        ])->first();
-                        if (!$config) {
-                            $config = $configMapper->createModel();
-                            $config
-                                ->setConfigDefinitionId(255)
-                                ->setInstanceId($componentInstance->getId());
-                        }
-                        $config->setValue($courseImpl->getId());
-                        $configMapper->save($config);
-                    } // Else no available component, create one.
-                    else {
-                        $folder = $courseImpl->getFolder();
-                        $config = ['importedCourse' => $courseImpl->getId()];
-                        $controller = HomepageOutlineComponentController::class;
-                        $compInstanceMapper->injectNewComponent($folder, $config, $controller);
-                    }
+                    $this->injectImportIntoComponent($courseImpl, $componentInstance);
                 }
             }
         } catch (\PDOException $e) {
@@ -781,6 +758,83 @@ class Controller extends Base\Base
             $redirect = $this->getSession()->getHistory(2);
         }
         $this->getResponse()->content->set($this->buildJsonOutput(['redirect' => $redirect]));
+    }
+
+    /**
+     * Attempts to find a Course Outline ComponentInstance on the specifed page
+     * that is not currently linked to a CourseImport.
+     *
+     * @param int $folderId
+     * @return Component_Instance|null
+     */
+    protected function findAvailableCourseOutlineComponent($folderId)
+    {
+        $module = \Component_Definition::MODULE_HOMEPAGE;
+        $class = HomepageOutlineComponentController::class;
+        $compInstances = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folderId, $class);
+        $compInstances->sortBy('sequence', 'ASC');
+        foreach ($compInstances as $component) {
+
+            // If this component has no associated Course, or the course is not valid
+            if (!$component->getConfigArray()['importedCourse'] ||
+                !$component->getConfigArray()['importedCourse']['value']
+            ) {
+                // Conclude the Component is available, and use it
+                return $component;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Configures the specified component to display the specified course.
+     *
+     * Creates the component if none specified.
+     *
+     * @param CourseImplementation $courseImpl
+     * @param Component_Instance|null $compInstance
+     * @return bool
+     */
+    protected function injectImportIntoComponent(CourseImplementation $courseImpl, Component_Instance $compInstance = null)
+    {
+        // Did we find an available component?
+        if ($compInstance) {
+            // Find its 'importedCourse' config
+            /** @var Component_ConfigDefinition $configDefinition */
+            $configDefinition = null;
+            foreach($compInstance->getConfig() as $configItem){
+                if('importedCourse' == $configItem->getKey()){
+                    $configDefinition = $configItem;
+                    break;
+                }
+            }
+            if(!$configDefinition){
+                $configDefinition = $this->getComponentConfigDefinitionMapper()->findByColumnList([
+                    'component_definition_id' => $compInstance->getDefinitionId(),
+                    'key'                     => 'importedCourse',
+                ])->first();
+                $configDefinition->setKey('importedCourse');
+            }
+            $configInstance = $this->getComponentConfigInstanceMapper()->findByColumnList([
+                'component_config_definition_id' => $configDefinition->getId(),
+                'component_instance_id'          => $compInstance->getId(),
+            ])->first();
+            if(!$configInstance){
+                /** @var \Component_Config $configInstance */
+                $configInstance = $this->getComponentConfigInstanceMapper()->createModel();
+                $configInstance->setConfigDefinitionId($configDefinition->getId());
+                $configInstance->setInstanceId($compInstance->getId());
+            }
+            $configInstance->setValue($courseImpl->getId());
+            $this->getComponentConfigInstanceMapper()->save($configInstance);
+        } // Else no available component, create one.
+        else {
+            $folder = $courseImpl->getFolder();
+            $configDefinition = ['importedCourse' => $courseImpl->getId()];
+            $courseOutlineClass = HomepageOutlineComponentController::class;
+            $this->getComponentInstanceMapper()->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+        }
+        return true;
     }
 
     /**
@@ -956,49 +1010,8 @@ class Controller extends Base\Base
      */
     public function restoreCourse(CourseImplementation $courseImpl)
     {
-        $componentInstance = null;
-        $componentInstanceMapper = $this->getComponentInstanceMapper();
-
-        $module = \Component_Definition::MODULE_HOMEPAGE;
-        $folderId = $courseImpl->getFolder()->getId();
-        $class = HomepageOutlineComponentController::class;
-        $componentInstances = $componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
-        $componentInstances->sortBy('sequence', 'ASC');
-        foreach ($componentInstances as $component) {
-
-            // If this component has no associated Course, or the course is not valid
-            if (!$component->getConfigArray()['importedCourse'] ||
-                !$component->getConfigArray()['importedCourse']['value']
-            ) {
-                // Conclude the Component is available, and use it
-                $componentInstance = $component;
-                break;
-            }
-        }
-
-        // Did we find a component?
-        if ($componentInstance) {
-            $configMapper = \Component_ConfigMapper::getInstance();
-            $config = $configMapper->findByColumnList([
-                'component_config_definition_id' => 255,
-                'component_instance_id'          => $componentInstance->getId(),
-            ])->first();
-            if (!$config) {
-                $config = $configMapper->createModel();
-                $config
-                    ->setConfigDefinitionId(255)
-                    ->setInstanceId($componentInstance->getId());
-            }
-            $config->setValue($courseImpl->getId());
-            $configMapper->save($config);
-        } // Else no available component, create one.
-        else {
-            $folder = $courseImpl->getFolder();
-            $config = ['importedCourse' => $courseImpl->getId()];
-            $controller = HomepageOutlineComponentController::class;
-            $componentInstanceMapper->injectNewComponent($folder, $config, $controller);
-        }
-
+        $componentInstance = $this->findAvailableCourseOutlineComponent($courseImpl->getFolder()->getId());
+        $this->injectImportIntoComponent($courseImpl, $componentInstance);
         $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'success']));
     }
 
@@ -1272,4 +1285,57 @@ class Controller extends Base\Base
         return $this;
     }
 
+    /**
+     * @return Component_ConfigDefinitionMapper
+     */
+    public function getComponentConfigDefinitionMapper()
+    {
+        return $this->componentConfigDefinitionMapper;
+    }
+
+    /**
+     * @param Component_ConfigDefinitionMapper $componentConfigDefinitionMapper
+     * @return static
+     */
+    public function setComponentConfigDefinitionMapper(Component_ConfigDefinitionMapper $componentConfigDefinitionMapper)
+    {
+        $this->componentConfigDefinitionMapper = $componentConfigDefinitionMapper;
+        return $this;
+    }
+
+    /**
+     * @return Component_ConfigMapper
+     */
+    public function getComponentConfigInstanceMapper()
+    {
+        return $this->componentConfigInstanceMapper;
+    }
+
+    /**
+     * @param Component_ConfigMapper $componentConfigInstanceMapper
+     * @return static
+     */
+    public function setComponentConfigInstanceMapper(Component_ConfigMapper $componentConfigInstanceMapper)
+    {
+        $this->componentConfigInstanceMapper = $componentConfigInstanceMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return static
+     */
+    public function setErrorMapper(ErrorMapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
 }
