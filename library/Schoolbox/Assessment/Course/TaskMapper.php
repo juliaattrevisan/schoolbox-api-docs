@@ -36,7 +36,7 @@ class TaskMapper extends Schoolbox\Mapper
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel');
         $this->joins('user_id', Schoolbox\UserMapper::class, 'id', null, null, 'owner');
 
-        $this->hasJoin('completions', array(
+        $this->hasJoin('completion', array(
             'multiple'  => true,
             'mapper'    => Task\CompletionMapper::class,
             'this_key'  => 'id',
@@ -57,7 +57,7 @@ class TaskMapper extends Schoolbox\Mapper
      */
     public function softDeleteCompletions(Task $task)
     {
-        $taskCompletionMapper = $this->getJoinMapper('completions');
+        $taskCompletionMapper = $this->getJoinMapper('completion');
         $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->delete($completions);
     }
@@ -70,7 +70,7 @@ class TaskMapper extends Schoolbox\Mapper
      */
     public function restoreCompletions(Task $task)
     {
-        $taskCompletionMapper = $this->getJoinMapper('completions');
+        $taskCompletionMapper = $this->getJoinMapper('completion');
         $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->restoreSoftDeleted($completions);
     }
