@@ -28,7 +28,7 @@ class Download
 	/**
 	 * An instance of SubmissionBox\Submission
 	 *
-	 * @var Submission\File
+	 * @var Submission\Submission
 	 */
 	private $submission = null;
 
@@ -42,10 +42,10 @@ class Download
 	/**
 	 * Constructor
 	 *
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 * @param SubmissionBox\ReturnedWork $returnedWork
 	 */
-	public function __construct(Submission\File $submission, ReturnedWork $returnedWork) {
+	public function __construct(Submission\Submission $submission, ReturnedWork $returnedWork) {
 		$this->setAuthenticator(new Authenticator());
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
@@ -109,9 +109,9 @@ class Download
     /**
      * Set submission
      *
-     * @param Submission\File $submission
+     * @param Submission\Submission $submission
      */
-    private function setSubmission(Submission\File $submission)
+    private function setSubmission(Submission\Submission $submission)
     {
         $this->submission = $submission;
     }

@@ -8,7 +8,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\File\Mimetype as Mimetype;
@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('student_submission_id', FileMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->joins('student_submission_id', SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('editable_inline', self::TYPE_BOOLEAN);
@@ -41,6 +41,34 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverse('student_submission_file_id', \Plagscan_DocumentMapper::class, 'id', null, null, 'plagscan', 'plagscan');
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
+    }
+
+    /**
+     * Soft deletes any PlagScan for the specified File
+     *
+     * @param Model $file
+     */
+    public function softDeletePlagScan(Model $file)
+    {
+        $plagScanMapper = $this->getJoinMapper('plagscan');
+        $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $plagScanMapper->delete($plagScans);
+    }
+
+
+    /**
+     * Restores any PlagScan for the specified File
+     *
+     * @param Model $file
+     */
+    public function restorePlagScan(Model $file)
+    {
+        $plagScanMapper = $this->getJoinMapper('plagscan');
+        $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $plagScanMapper->restoreSoftDeleted($plagScans);
     }
 
     /**

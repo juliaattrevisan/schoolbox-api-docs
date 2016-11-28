@@ -56,7 +56,7 @@ class Internal extends Base {
             }
         } elseif ($id = $this->isSubmission($uriObject)) {
             try {
-                $item = SubmissionBox\Submission\FileMapper::getInstance()->findById($id);
+                $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
                 $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
                 if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
@@ -196,11 +196,11 @@ class Internal extends Base {
      * * The current user is a parent of the owner
      * * The current user is a staff member
      *
-     * @param  SubmissionBox\Submission\File $file
+     * @param  SubmissionBox\Submission\Submission $file
      * @param  User                          $user
      * @return bool
      */
-    private function checkReturnPermissions(SubmissionBox\Submission\File $file, User $user)
+    private function checkReturnPermissions(SubmissionBox\Submission\Submission $file, User $user)
     {
         if ($file->getOwner()->getId() == $user->getId()) {
             return true;

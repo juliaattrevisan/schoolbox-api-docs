@@ -17,7 +17,7 @@ use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 
 abstract class Base {
 

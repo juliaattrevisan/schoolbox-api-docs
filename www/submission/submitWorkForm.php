@@ -24,10 +24,10 @@ if (!strlen(trim($_POST['body'])) && !count($_POST['attachment'])) {
     error(2);
 }
 
-$subMap = Submission\FileMapper::getInstance();
+$subMap = Submission\SubmissionMapper::getInstance();
 $boxMap = SubmissionBoxMapper::getInstance();
 
-/** @var Collection|Submission\File[] $submissions */
+/** @var Collection|Submission\Submission[] $submissions */
 $submissions = new Collection();
 
 // Allow teachers to impersonate students

@@ -1,22 +1,21 @@
 <?php
-
 /**
- * 
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  * 
  */
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+
 /**
- * Class Plagscan_DocumentMapper
- * @method Plagscan_Document createModel()
+ * @method Plagscan createModel()
  */
 class Plagscan_DocumentMapper extends Schoolbox\Mapper
 {
-    /** @var Submission\FileMapper */
+    /** @var SubmissionMapper */
     protected $submissionMapper;
 
 	/**
@@ -27,64 +26,29 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	protected function setup()
     {
 		parent::setup();
-
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
-
-        $this->submissionMapper = new Submission\FileMapper();
-
+        $this->submissionMapper = SubmissionMapper::getInstance();
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}
 
 	protected function mapping () {
 		$this->hasTable('plagscan_document');
 		$this->hasModel(Plagscan::class);
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'plagscan_id',
-			'property'   => 'plagscanId',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'status',
-			'property'   => 'status',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'score',
-			'property'   => 'score',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'html',
-			'property'   => 'html',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasSoftDeleteDateField('deleted');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('plagscan_id', self::TYPE_INTEGER);
+        $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('score', self::TYPE_STRING);
+        $this->uses('html', self::TYPE_STRING);
+        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
 	}
 
 	/**
 	 * Saves a Plagscan document.
 	 *
-	 * @param Plagscan_Document $dirtyDocument
+	 * @param Plagscan $dirtyDocument
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function save($dirtyDocument)
 	{
@@ -149,10 +113,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
      *
      * TODO make this work with multiple files
      *
-     * @param  Submission\File $submission
-     * @return Plagscan_Document
+     * @param  Submission $submission
+     * @return Plagscan
      */
-    public function createFromSubmission(Submission\File $submission)
+    public function createFromSubmission(Submission $submission)
     {
         $plagMap = Plagscan_DocumentMapper::getInstance();
         return $plagMap->createModel()->setFile($submission);

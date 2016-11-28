@@ -139,7 +139,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                     foreach ($currentSubject['items'] as $currentItem) {
                         /** @var Eportfolio\Showcase $showcase */
                         /** @var Schoolbox\Assessment\Component\SubmissionBox $box */
-                        /** @var Schoolbox\Assessment\Component\SubmissionBox\Submission\File $submission */
+                        /** @var Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission $submission */
                         /** @var Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $return */
                         $showcase   = $currentItem['currentShowcasedItem'];
                         $box        = $currentItem['currentBox'];

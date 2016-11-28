@@ -139,7 +139,7 @@ $removeUnsetAttachments = !empty($_POST['clearAttachments']);
 $crocodoc = null;
 if (isset($_POST['crocodoc'])) {
     try {
-        $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+        $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
         $studentSubmission = $submissionMapper->findById($_POST['crocodoc']);
         $crocodoc = $studentSubmission->getUuid();
     } catch(\Schoolbox\Mapper\Exception $e) {

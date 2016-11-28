@@ -20,14 +20,14 @@ if (is_numeric($_GET['id'])) {
     }
 
     $boxMapper        = new SubmissionBoxMapper();
-    $submissionMapper = new SubmissionBox\Submission\FileMapper();
+    $submissionMapper = new SubmissionBox\Submission\SubmissionMapper();
 
     $submissionBox = $boxMapper->findById($box_id);
     $zipName = Scrub::text($submissionBox->getName());
 
     $group = new Group();
     if ($group->getPermission($submissionBox->getCategory()->getId()) >= WRITE_ACCESS) {
-        /** @var SubmissionBox\Submission\File[] $submissionList */
+        /** @var SubmissionBox\Submission\Submission[] $submissionList */
         $submissionList = $submissionMapper->findByColumnList(
             ['box_id' => $box_id, 'draft' => false,],
             ['order' => ['submitted' => 'desc']]

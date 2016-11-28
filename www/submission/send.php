@@ -7,7 +7,7 @@
 //this script opens files for download and send them to the user with correct filename
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 //includes
@@ -55,7 +55,7 @@ if (is_numeric($_GET['return'])) {
     $filename = $return->getBasename();
     $mime     = $return->getMime();
 } else {
-    $mapper = new FileMapper();
+    $mapper = new SubmissionMapper();
 
     try {
         $studentSub = $mapper->findById($_GET['id']);

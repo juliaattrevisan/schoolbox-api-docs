@@ -10,10 +10,11 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
 
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Plagscan
 {
-    use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+    use DeletedAtDate;
 
     /**
      * Plagscan queued for processing

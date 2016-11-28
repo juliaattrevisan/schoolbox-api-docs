@@ -15,7 +15,7 @@ use Schoolbox\Resource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 class Activity {
@@ -41,7 +41,7 @@ class Activity {
 	protected $assessment;
 
 	/**
-	 * @var File
+	 * @var Submission
 	 */
 	protected $submission;
 
@@ -116,7 +116,7 @@ class Activity {
 	}
 
 	/**
-	 * @param File $submission
+	 * @param Submission $submission
 	 *
 	 * @return $this
 	 */
@@ -126,7 +126,7 @@ class Activity {
 	}
 
 	/**
-	 * @return File
+	 * @return Submission
 	 */
 	public function getSubmission() {
 		return $this->submission;

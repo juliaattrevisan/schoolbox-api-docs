@@ -14,16 +14,16 @@ use Schoolbox;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use External_Markbook;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 /**
  * Class SubmissionBoxMapper
@@ -67,8 +67,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->joins('category', Folder\Mapper::class);
         $this->joins('type', SubmissionBox\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
         $this->joins('owner', Schoolbox\UserMapper::class);
-        $this->joins('task_id', Schoolbox\Assessment\Course\TaskMapper::class, 'id', null, null, 'task', 'task');
-        $this->joins('task_instance_id', Task\InstanceMapper::class, 'id', null, null, 'taskInstance', 'task_instance');
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
@@ -78,7 +76,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // joins that have no column definition
         $this->hasJoin('submission', array(
             'multiple'  => true,
-            'mapper'    => SubmissionBox\Submission\FileMapper::class,
+            'mapper'    => SubmissionBox\Submission\SubmissionMapper::class,
             'this_key'  => 'id',
             'other_key' => 'box_id',
         ));
@@ -103,14 +101,66 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $this->hasSoftDeleteBooleanField('deleted');
 
-        $this
-            ->registerCallback('preSave', array($this, 'preSave'))
-        ;
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+
+
+        // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
+    }
+
+
+    /**
+     * Soft deletes all Student Submissions for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function softDeleteSubmissions(SubmissionBox $dueWork)
+    {
+        $submissionMapper = $this->getJoinMapper('submission');
+        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $submissionMapper->delete($submissions);
+    }
+
+    /**
+     * Soft deletes all Teacher Returns for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function softDeleteReturns(SubmissionBox $dueWork)
+    {
+        $returnMapper = $this->getJoinMapper('return');
+        $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $returnMapper->delete($returns);
+    }
+
+
+    /**
+     * Restores all deleted Student Submissions for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function restoreSubmissions(SubmissionBox $dueWork)
+    {
+        $submissionMapper = $this->getJoinMapper('submission');
+        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $submissionMapper->restoreSoftDeleted($submissions);
+    }
+
+    /**
+     * Restores all deleted Teacher Returns for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function restoreReturns(SubmissionBox $dueWork)
+    {
+        $returnMapper = $this->getJoinMapper('return');
+        $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $returnMapper->restoreSoftDeleted($returns);
     }
 
     /**
@@ -217,29 +267,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         return $submission_box;
     }
 
-    /**
-    * Pre-save method for submission boxes.
-    * * Sets start, end and due time to now if this is a task
-    *
-    * @param SubmissionBox $object
-    *
-    * @return bool
-    */
-    public function preSave(SubmissionBox $object)
-    {
-        if (!$object->getId()) {
-            $task    = $object->getTask();
-            $task_id = ($task instanceof Task) ? $task->getId() : $task;
-            if ($task_id) {
-                $time = new \Alaress_Date_Format(time(), 'U');
-                $object->setPublishDate($time);
-                $object->setOpenDate($time);
-                $object->setDueDate($time);
-                $object->setLateDate($time);
-            }
-        }
-        return true;
-    }
 
     /**
     * Post-save method for submission boxes - saves new submission box files
@@ -264,63 +291,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
     }
 
-    /**
-     * Post-softdelete hook.
-     *
-     * * If this work belongs to a task in a course instance, delete that task
-     * * Otherwise if it belongs to a task in a course builder, delete that task
-     *
-     * @param SubmissionBox $object
-     */
-    public function softDeleteTask(SubmissionBox $object)
-    {
-        $taskInstanceId = null;
-        if ($object->getTaskInstance()) {
-            $taskInstanceId = $object->getTaskInstance()->getId();
-            if ($taskInstanceId) {
-                $this->getJoinMapper('task_instance')->softDelete(
-                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-                );
-            }
-        }
-        if (!$taskInstanceId && $object->getTask()) {
-            $taskId = $object->getTask()->getId();
-            if ($taskId) {
-                $this->getJoinMapper('task')->softDelete(
-                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
-                );
-            }
-        }
-    }
 
-    /**
-     * Post-delete hook.
-     *
-     * * If this work belongs to a task in a course instance, delete that task
-     * * Otherwise if it belongs to a task in a course builder, delete that task
-     *
-     * @param SubmissionBox $object
-     */
-    public function hardDeleteTask(SubmissionBox $object)
-    {
-        $taskInstanceId = null;
-        if ($object->getTaskInstance()) {
-            $taskInstanceId = $object->getTaskInstance()->getId();
-            if ($taskInstanceId) {
-                $this->getJoinMapper('task_instance')->hardDelete(
-                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-                );
-            }
-        }
-        if (!$taskInstanceId && $object->getTask()) {
-            $taskId = $object->getTask()->getId();
-            if ($taskId) {
-                $this->getJoinMapper('task')->hardDelete(
-                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
-                );
-            }
-        }
-    }
 
     /**
      * Removes this box from the markbook.
@@ -382,7 +353,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $parts = [
             '(ss.owner = :user_id OR sr.owner = :user_id)',
             'sb.deleted IS FALSE',
-            'sb.task_id IS NULL',
         ];
         $params['user_id'] = $user_id;
         if (!$from->isNull()) {
@@ -432,7 +402,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $parts = [
             'b.deleted = 0',
             "b.category IN {$this->getArrayPlaceholders($categories, 'category')}",
-            'b.task_id IS NULL',
         ];
         $params = $this->getArrayParameters($categories, 'category');
         $params['user_id'] = $user_id;
@@ -510,7 +479,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
 					AND sb.deleted IS FALSE
-					AND sb.task_id IS NULL
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
@@ -532,7 +500,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sm.id IS NULL
 					AND sb.deleted IS FALSE
-					AND sb.task_id IS NULL
 					AND sb.accept_submission = 1
 					AND sb.date < NOW()
 					ORDER BY sb.date DESC
@@ -552,7 +519,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.deleted IS FALSE
-					AND sb.task_id IS NULL
 					AND sb.accept_submission = 1
 					AND sb.late_date < NOW()
 					ORDER BY sb.late_date DESC
@@ -636,7 +602,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.late_date > NOW()
 			AND sb.deleted IS FALSE
-			AND sb.task_id IS NULL
 			$having
 			ORDER BY sb.date ASC
 			$lim
@@ -710,7 +675,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'sb.late_date > NOW()',
             'sb.accept_submission IS TRUE',
             'sb.deleted IS FALSE',
-            'sb.task_id IS NULL',
         );
         if ($cat_ids) {
             $params        = $this->getArrayParameters($cat_ids, 'cat');
@@ -778,7 +742,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
 			AND sb.deleted IS FALSE
-			AND sb.task_id IS NULL
 			ORDER BY sb.date ASC
 		";
 

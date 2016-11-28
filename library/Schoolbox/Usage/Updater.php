@@ -18,7 +18,7 @@ class Updater {
 	public function updateSubmissions() {
 		$dirhandle = opendir(\Cfg::get('submission_dir'));
 
-		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper();
+		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper();
 		$mimeMapper = new \Schoolbox\File\MimetypeMapper();
 
 		while ($filepointer = readdir($dirhandle)) {

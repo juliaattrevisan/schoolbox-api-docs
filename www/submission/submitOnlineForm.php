@@ -10,7 +10,7 @@ use Schoolbox\Config\ConfigMapper;
 $page = new SitePage();
 $conf = ConfigMapper::getInstance();
 $box_mapper        = new SubmissionBoxMapper();
-$submission_mapper = new Submission\FileMapper();
+$submission_mapper = new Submission\SubmissionMapper();
 
 $boxId = $_POST['box_id'];
 

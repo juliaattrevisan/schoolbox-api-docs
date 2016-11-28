@@ -20,7 +20,7 @@ class Factory
 	/**
 	 * An instance of Submission
 	 *
-	 * @var Submission\File
+	 * @var Submission\Submission
 	 */
 	private $submission = null;
 
@@ -73,14 +73,14 @@ class Factory
 	 * (some submissions don't use crocodoc)
 	 *
 	 * @param $page
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
 	 * @param Term\Model $term
 	 */
 	public function __construct(
 		$page,
-		Submission\File $submission = null,
+		Submission\Submission $submission = null,
 		$returnedWorkCollection = null,
 		$navigationElements = [],
 		Term\Model $term = null
@@ -111,7 +111,7 @@ class Factory
                 $this->getTerm()
             );
 
-        } elseif ($work instanceof Submission\File) {
+        } elseif ($work instanceof Submission\Submission) {
             if ($this->crocodocable($work)) {
                 // Crocodoc-friendly file types (only if Crocodoc is active with an api token)
                 return new Strategy\Crocodoc(
@@ -172,10 +172,10 @@ class Factory
     }
 
     /**
-     * @param Submission\File $submission
+     * @param Submission\Submission $submission
      * @return bool
      */
-    private function crocodocable(Submission\File $submission)
+    private function crocodocable(Submission\Submission $submission)
     {
         $ext = $submission->getStorage()->getExtension();
 
@@ -188,7 +188,7 @@ class Factory
 	/**
 	 * Set submission
 	 *
-	 * @param Submission\File $submission
+	 * @param Submission\Submission $submission
 	 */
 	private function setSubmission($submission) 
     {
@@ -198,7 +198,7 @@ class Factory
 	/**
 	 * Get submission
 	 *
-	 * @return Submission\File
+	 * @return Submission\Submission
 	 */
 	private function getSubmission() 
     {

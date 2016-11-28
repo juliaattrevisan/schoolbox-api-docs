@@ -64,7 +64,7 @@ if ($this->arg[0] == false) {
 }
 
 $boxMapper = new Component\SubmissionBoxMapper();
-$submissionMapper = new Component\SubmissionBox\Submission\FileMapper();
+$submissionMapper = new Component\SubmissionBox\Submission\SubmissionMapper();
 $work_mapper = new Component\SubmissionBox\WorkTypeMapper();
 $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
@@ -363,7 +363,7 @@ if (count($submission_history)) {
             $submission = $activity_item->getSubmission();
 
             // submission file ID, submission file name
-            if ($submission instanceof Component\SubmissionBox\Submission\File) {
+            if ($submission instanceof Component\SubmissionBox\Submission\Submission) {
                 $history['HISTORY_SUBMISSION_FILE_ID'] = $submission->getId();
                 $history['HISTORY_SUBMISSION_FILE_NAME'] = $submission->getFilename();
             }
@@ -447,7 +447,7 @@ if (count($submission_history)) {
 
 
             // populate details into page
-            if ($student_submission instanceof Component\SubmissionBox\Submission\File) {
+            if ($student_submission instanceof Component\SubmissionBox\Submission\Submission) {
                 $output = array(
                     'MOST_RECENT_SUBMISSION_FILE_NAME' => $student_submission->getFilename(),
                     'MOST_RECENT_SUBMISSION_FILE_SIZE' => Alaress_Byte_Format::bytesToString($student_submission->getSize()),

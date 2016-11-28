@@ -648,7 +648,7 @@ function getActivities($user, $limit, $categories, $visibilities, $is_restricted
 {
     $box_mapper    = new SubmissionBoxMapper();
     $assess_mapper = new QuizMapper();
-    $submit_mapper = new SubmissionBox\Submission\FileMapper();
+    $submit_mapper = new SubmissionBox\Submission\SubmissionMapper();
     $return_mapper = new SubmissionBox\ReturnedWorkMapper();
     $activities    = $box_mapper
         ->getActivities($user, $limit, $categories)

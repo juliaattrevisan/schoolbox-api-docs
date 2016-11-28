@@ -15,6 +15,7 @@ use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as ReturnedWorkFileMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use PDOStatement;
@@ -40,7 +41,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
         $this->joins('owner', Schoolbox\UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->joins('marker', Schoolbox\UserMapper::class, 'id', null, null, 'marker', 'marker');
-        $this->joins('student_submission_id', SubmissionBox\Submission\FileMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->joins('student_submission_id', SubmissionBox\Submission\SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->uses('comment', Schoolbox\Mapper::TYPE_STRING);
         $this->uses('mark', Schoolbox\Mapper::TYPE_STRING, null, 'humanReadableMark');
         $this->uses('norm_mark', Schoolbox\Mapper::TYPE_STRING, null, 'normalizedMark');
@@ -50,7 +51,37 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->uses('updated_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
 
-        $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+
+        // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturnedWorkFiles'));
+    }
+
+
+    /**
+     * Soft deletes all Files for the specified Return
+     *
+     * @param ReturnedWork $return
+     */
+    public function softDeleteReturnedWorkFiles(ReturnedWork $return)
+    {
+        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
+        $returnedWorkFileMapper->delete($files);
+    }
+
+
+    /**
+     * Restores all soft-deleted Files for the specified Return
+     *
+     * @param ReturnedWork $return
+     */
+    public function restoreReturnedWorkFiles(ReturnedWork $return)
+    {
+        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
+        $returnedWorkFileMapper->restoreSoftDeleted($files);
     }
 
     /**
@@ -86,7 +117,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $from = "
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
-            INNER JOIN {$this->getJoinSql('submission_box', '', 'b')}
+            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b')}
             LEFT JOIN {$this->getJoinSql('submission', '', 'ss')}
         ";
 

@@ -9,7 +9,7 @@
  *
  */
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -35,7 +35,7 @@ $gateway      = new Plagscan_Gateway($username, $key);
 foreach ($docs as $doc) {
 
     try{
-        $submission = FileMapper::getInstance()->findById($doc->getFile()->getId());
+        $submission = SubmissionMapper::getInstance()->findById($doc->getFile()->getId());
 
         // TODO fix this to work with multiple files
         $documentId = $gateway->submit($submission);

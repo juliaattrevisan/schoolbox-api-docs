@@ -20,7 +20,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     protected $user;
 
     /**
-     * @var Submission\File
+     * @var Submission\Submission
      */
     protected $submission;
 
@@ -44,7 +44,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @param Submission\File $submission
+     * @param Submission\Submission $submission
      *
      * @return $this
      */
@@ -55,7 +55,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @return Submission\File
+     * @return Submission\Submission
      */
     public function getSubmission()
     {
@@ -97,7 +97,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     public function getLastModified()
     {
         $submission = $this->getSubmission();
-        if ($submission instanceof Submission\File) {
+        if ($submission instanceof Submission\Submission) {
             $date = $submission->getCreatedAt();
             if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
                 return $date->getUnixTimestamp();
@@ -144,7 +144,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 
         //
         // And put it in the submission object.
-        $mapper = new Submission\FileMapper();
+        $mapper = new Submission\SubmissionMapper();
         $mapper->save($this->getSubmission()->setStorage($storage));
         return null;
     }

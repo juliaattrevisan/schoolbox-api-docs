@@ -6,7 +6,7 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Crocodoc\Document;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -16,7 +16,7 @@ $logger = $kernel->logger();
 
 if(Config::get('crocodoc_api_token')) {
 
-    $pendingUpload = FileMapper::getInstance()->getCrocodoc();
+    $pendingUpload = SubmissionMapper::getInstance()->getCrocodoc();
 
     foreach($pendingUpload as $submission) {
         $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");

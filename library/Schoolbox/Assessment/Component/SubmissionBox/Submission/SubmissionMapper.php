@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -14,22 +14,19 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 
 /**
  * A mapper for a student's submission to a due work.
  *
- * The name FileMapper is a misnomer, as student submissions may now contain multiple files.
- *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
- * @method File findById($id)
- * @method File hydrate(array $row, $alias = '', $callback = null)
+ * @method Submission findById($id)
+ * @method Submission hydrate(array $row, $alias = '', $callback = null)
  */
-class FileMapper extends Mapper
+class SubmissionMapper extends BaseMapper
 {
     /**
      * @return void
@@ -37,7 +34,7 @@ class FileMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('student_submission');
-        $this->hasModel(File::class);
+        $this->hasModel(Submission::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('owner', UserMapper::class);
@@ -50,13 +47,15 @@ class FileMapper extends Mapper
         $this->hasJoin(
             'file',
             [
-                'mapper'    => SingleFile\Mapper::class,
+                'mapper'    => SubmissionFileMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'student_submission_id',
             ]
         );
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
     }
 
     /**
@@ -84,7 +83,7 @@ class FileMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|File[] $resultSet */
+        /** @var Collection|Submission[] $resultSet */
         $resultSet = $this->createCollection();
         $ids       = [];
 
@@ -119,10 +118,10 @@ class FileMapper extends Mapper
      *
      * Persists all files that have been attached to this submission.
      *
-     * @param File $object
-     * @param File $previous
+     * @param Submission $object
+     * @param Submission $previous
      */
-    public function persistFiles(File $object, File $previous = null)
+    public function persistFiles(Submission $object, Submission $previous = null)
     {
         $joinMapper = $this->getJoinMapper('file');
 
@@ -138,6 +137,32 @@ class FileMapper extends Mapper
             $file->setSubmission($object);
         }
         $joinMapper->save($addedFiles);
+    }
+
+
+    /**
+     * Soft deletes all Files for the specified Submission
+     *
+     * @param Submission $submission
+     */
+    public function softDeleteSubmissionFiles(Submission $submission)
+    {
+        $submissionFileMapper = $this->getJoinMapper('file');
+        $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
+        $submissionFileMapper->delete($files);
+    }
+
+
+    /**
+     * Restores all soft-deleted Files for the specified Submission
+     *
+     * @param Submission $submission
+     */
+    public function restoreSubmissionFiles(Submission $submission)
+    {
+        $submissionFileMapper = $this->getJoinMapper('file');
+        $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
+        $submissionFileMapper->restoreSoftDeleted($files);
     }
 
     /**
@@ -254,7 +279,7 @@ class FileMapper extends Mapper
      *
      * @param array $row
      *
-     * @return File
+     * @return Submission
      */
     protected function hydrateForActivityList($row) {
         $boxJoin = $this->getJoinMapper('box_id');
@@ -277,7 +302,7 @@ class FileMapper extends Mapper
      * @param int $box_id
      * @param int $limit
      *
-     * @return Collection|File[]
+     * @return Collection|Submission[]
      */
     public function getDrafts($user_id, $box_id, $limit = null)
     {
@@ -295,7 +320,7 @@ class FileMapper extends Mapper
     /**
      * Get list of submissions that should be submitted to crocodoc
      *
-     * @return Collection|File[]
+     * @return Collection|Submission[]
      */
     public function getCrocodoc() {
 

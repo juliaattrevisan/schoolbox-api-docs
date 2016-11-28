@@ -19,7 +19,7 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;

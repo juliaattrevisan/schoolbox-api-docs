@@ -13,8 +13,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as DataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as StudentSubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;

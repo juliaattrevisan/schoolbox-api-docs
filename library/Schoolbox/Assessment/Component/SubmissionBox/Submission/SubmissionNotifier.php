@@ -37,7 +37,7 @@ use Schoolbox\UserMapper;
  * Class SubmissionNotifier
  * @package Schoolbox\Assessment\Component\SubmissionBox
  */
-class FileNotifier extends AbstractModuleNotifier
+class SubmissionNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_SUBMITTED   = 'submitted';
@@ -76,7 +76,7 @@ class FileNotifier extends AbstractModuleNotifier
         $dependencies['submissionBoxMapper'] = isset($dependencies['submissionBoxMapper']) ? $dependencies['submissionBoxMapper'] : SubmissionBoxMapper::getInstance();
         $dependencies['userMapper']          = isset($dependencies['userMapper']) ? $dependencies['userMapper'] : UserMapper::getInstance();
         $dependencies['folderMapper']        = isset($dependencies['folderMapper']) ? $dependencies['folderMapper'] : Folder\Mapper::getInstance();
-        $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : FileMapper::getInstance();
+        $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : SubmissionMapper::getInstance();
         $dependencies['userAccessMapper']    = isset($dependencies['userAccessMapper']) ? $dependencies['userAccessMapper'] : UserAccessMapper::getInstance();
 
         parent::loadDependencies($dependencies);
@@ -140,14 +140,14 @@ class FileNotifier extends AbstractModuleNotifier
         $submission = $bundle->getEvent()->getObject();
         $diff       = $bundle->getEvent()->getDiff();
 
-        if (!$submission instanceof SubmissionBox\Submission\File) {
+        if (!$submission instanceof SubmissionBox\Submission\Submission) {
             return;
         }
 
         $studentId = $submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        /** @var FileMapper $mapper */
+        /** @var SubmissionMapper $mapper */
         $mapper = $this->mapper;
 
         switch ($method) {
@@ -206,7 +206,7 @@ class FileNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $type
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -254,7 +254,7 @@ class FileNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that students have submitted to their submission box
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -268,7 +268,7 @@ class FileNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that a student has submitted to their submission box...again
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -282,7 +282,7 @@ class FileNotifier extends AbstractModuleNotifier
     /**
      * Notify a student that their (only) submission has been deleted, so they can resubmit.
      *
-     * @param File $submission
+     * @param Submission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
