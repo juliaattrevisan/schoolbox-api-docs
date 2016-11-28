@@ -449,7 +449,7 @@ class Mapper extends BaseMapper
         // Due work grade levels
         $modelList = $this->augmentListWithDueWorkGradeLevels($modelList, $dueWorkIds);
         // Due work rubric grids
-        $modelList = $this->augmentListWithDueWorkRubrics($modelList, $dueWorkIds);
+        $modelList = $this->augmentListWithDueWorkRubrics($modelList);
         // Project contexts
         $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         // Folder codes for all contexts

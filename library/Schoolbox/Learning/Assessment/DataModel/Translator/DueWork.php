@@ -121,6 +121,8 @@ class DueWork implements IAssessmentTypeTranslator
                 if ($model->isMarkedPerRubricGroup()) {
                     $assessable->setMarkPerCapability(true);
                 }
+
+                $assessable->setRubric($model->getRubric());
             } else {
                 $assessable->setUseRubric(false);
                 $assessable->setMarkPerCapability(false);
