@@ -169,7 +169,6 @@ dl { @extend %sm; }
 
 // Heading 1
 h1{
-	font-weight: $font-weight-bold; // override
     @include contrast-bg(0.855, $body-bg, 0%, $white, $black); // 0.855 = $jet
 }
 
