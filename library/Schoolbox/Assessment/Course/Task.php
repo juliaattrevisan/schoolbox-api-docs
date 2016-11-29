@@ -7,8 +7,11 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
@@ -16,6 +19,7 @@ class Task implements IAssessableDataModel
 {
     use AssessmentModelTrait;
     use Id;
+    use DeletedAtDate;
 
     /**
      * @var string
@@ -32,6 +36,18 @@ class Task implements IAssessableDataModel
      */
     protected $owner;
 
+    /**
+     * @var GenericCollection
+     */
+    private $completions;
+
+    /**
+     * Task constructor.
+     */
+    public function __construct()
+    {
+        $this->completions = new GenericCollection(Completion::class);
+    }
 
     /**
      * Clears any attempts from the clone, and clones each Section in the Quiz
@@ -99,5 +115,24 @@ class Task implements IAssessableDataModel
     public function getRequiresConfirmation()
     {
         return $this->requires_confirmation;
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getCompletions()
+    {
+        return $this->completions;
+    }
+
+    /**
+     * @param GenericCollection $completions
+     * @return static
+     */
+    public function setCompletions(GenericCollection $completions)
+    {
+        $this->completions->assertSameItemClass($completions);
+        $this->completions = $completions;
+        return $this;
     }
 }

@@ -11,9 +11,9 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper;
 
 /**
  * Task mapper
@@ -22,7 +22,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
  */
 class TaskMapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      * @return void
@@ -38,10 +37,42 @@ class TaskMapper extends Schoolbox\Mapper
         $this->joins('user_id', Schoolbox\UserMapper::class, 'id', null, null, 'owner');
 
         $this->hasJoin('completion', array(
+            'multiple'  => true,
             'mapper'    => Task\CompletionMapper::class,
             'this_key'  => 'id',
             'other_key' => 'task_id',
         ));
+
+        // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
+        $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
+    }
+
+    /**
+     * Soft deletes all Completions for the specified Task
+     *
+     * @param Task $task
+     */
+    public function softDeleteCompletions(Task $task)
+    {
+        $taskCompletionMapper = $this->getJoinMapper('completion');
+        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $taskCompletionMapper->delete($completions);
+    }
+
+
+    /**
+     * Restores all soft-deleted Completions for the specified Task
+     *
+     * @param Task $task
+     */
+    public function restoreCompletions(Task $task)
+    {
+        $taskCompletionMapper = $this->getJoinMapper('completion');
+        $completions = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
+        $taskCompletionMapper->restoreSoftDeleted($completions);
     }
 
     /**
@@ -96,39 +127,4 @@ class TaskMapper extends Schoolbox\Mapper
             throw new MapperException('Instance of object not found');
         }
     }
-
-
-    /**
-     * Count the number of tasks in the given unit
-     *
-     * @param Folder $unit
-     * @return int
-     */
-    public function countByUnit(Folder $unit)
-    {
-        return $this->countByColumn('category_id', $unit->getId());
-    }
-
-
-    /**
-     * Count the number of tasks in the given units and return as an associative array
-     *
-     * @param Collection|Folder[] $units
-     * @return array
-     */
-    public function countForEachUnit(Collection $units)
-    {
-        $unitIds = $units->getColumnValues('id');
-
-        // preset everything to zero: we still want the keys populated even if the query somehow returns nothing
-        $taskCounts = array_combine($unitIds, array_fill(0, count($unitIds), 0));
-
-        foreach ($units as $unit) {
-            // iterate and find the task count for each unit
-            $taskCounts[$unit->getId()] = $this->countByUnit($unit);
-        }
-
-        return $taskCounts;
-    }
-
 }

@@ -113,7 +113,7 @@ if (!empty($_POST)) {
     // new item.
     if ($is_task) {
         $task = $assessment->getTask();
-        $task->setAssessment($assessment);
+        $task->setQuiz($assessment);
         TaskMapper::getInstance()->save($task);
     }
     if ($is_unit) {

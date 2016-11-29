@@ -32,6 +32,9 @@ use Assess_Section;
 use Assess_Export_Xml;
 use Assess_Import_Xml;
 
+/**
+ * @deprecated 165
+ */
 class Cloner
 {
     /**
@@ -92,7 +95,7 @@ class Cloner
      */
     public function cloneAssessment()
     {
-        $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
+        $assess_id = $this->task_instance->getTask()->getQuiz()->getId();
         if ($assess_id) {
 
             $mapper   = QuizMapper::getInstance();

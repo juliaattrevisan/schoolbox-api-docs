@@ -103,7 +103,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($completion->getCompletionDate())
                 ->setUpdatedAt($completion->getCompletionDate())
                 ->setPublishedAt($completion->getCompletionDate())
-                ->setDeletedAt(new \Alaress_Date_NullDate());
+                ->setDeletedAt($completion->getDeletedAt());
 
             // Set completion of this feedback
             $status = $completion->getCompletionStatus();
@@ -142,7 +142,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setStudent($domainObject->getReviewee())
                 ->setMarkingUser($domainObject->getReviewer())
                 ->setCompletionDate($domainObject->getCreatedAt())
-                ->setCompletionStatus($domainObject->getCompletionStatus());
+                ->setCompletionStatus($domainObject->getCompletionStatus())
+                ->setDeletedAt($domainObject->getDeletedAt());
             $dataModels->add($dataModel);
         }
 
