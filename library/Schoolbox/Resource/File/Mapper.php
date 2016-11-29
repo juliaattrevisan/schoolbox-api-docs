@@ -90,8 +90,6 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $fileTypes     = !empty($options['filter']) ? $options['filter'] : array();
         $sortColumn    = !empty($options['sort']) ? $options['sort'] : 'name';
         $sortDirection = !empty($options['sortdir']) ? $options['sortdir'] : 'asc';
-        //False > don't return empty/unknown extension files
-        $getAnyExtension = !empty($options['getAnyExtension']) ? $options['getAnyExtension'] : false;
         if (empty($folderIds)) {
             return new Collection();
         }
@@ -160,9 +158,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                         }
                     }
                     //Return all files regardless their extension
-                    if($getAnyExtension === true) {
-                        $mimeParts[] = "h.ext = '' OR m.fileTypeId IS NULL";
-                    }
+                    $mimeParts[] = "h.ext = '' OR m.fileTypeId IS NULL";
                 }
             }
             if (!empty($otherMimeParts)) {
@@ -173,10 +169,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             }
         }
         $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
-        //Don't return files with empty of unknown extension
-        if($getAnyExtension === false) {
-            $baseQuery .= " AND NOT (h.ext = '' OR m.fileTypeId IS NULL)";
-        }
+
         // Put together sort parts
         $sortFields = array(
             'name'   => "$table.description",
