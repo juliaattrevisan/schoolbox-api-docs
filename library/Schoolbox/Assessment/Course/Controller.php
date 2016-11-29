@@ -403,42 +403,35 @@ class Controller extends Base\Base
 
 
     /**
-     * Form to modify a course specification
+     * Form to create/modify a course specification
+     *
+     * Course.id will be null if it is a create.
      *
      * @api   GET /course/modify/{id}
      * @level 160
      *
-     * @param int    $id   The ID of the course specification that is being modified
-     * @param string $name
+     * @param CourseSpecification $course The course being created/modified
      */
-    public function modifyCourse($id = null, $name = null)
+    public function modifyCourse(CourseSpecification $course)
     {
         $data = [];
 
-        if ($id) {
+        // Is this a modification of existing Course?
+        if ($course->getId()) {
+            $course->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($course->getId()));
 
-            try {
-                // First, check whether or not this is already a course. We don't want to barr access to courses that
-                // are already courses.
-                $course = $this->getCourseSpecificationMapper()->findById($id);
-                $course->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($course->getId()));
-
-                foreach($course->getUnits() as $unit){
-                    $unit->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()));
-                }
-
-                // Rehydrate course folder so that curriculum codes exist
-                $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
-                $folder = $course->getFolder();
-
-            } catch (MapperException $e) {
-                // It should no longer be possible for a folder to exist without a course spec.
-                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_COURSE_FOLDER_INVALID);
+            foreach($course->getUnits() as $unit){
+                $unit->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()));
             }
 
+            // Rehydrate course folder so that curriculum codes exist
+            $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
+            $folder = $course->getFolder();
+
+            // Need to hydrate this to populate the 'Faculty/Subject' selector
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
-            $instances = [];
+//            $instances = [];
 
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
             $data['course'] = $course;
@@ -447,7 +440,7 @@ class Controller extends Base\Base
                 /** @var UnitSpecification $unit */
                 $unitFolder = $unit->getFolder();
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
-                $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
+                $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($course->getId(), $unit->getId());
                 $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
 //                // obtain the Course Builder Component Instance from the homepage.
@@ -467,10 +460,10 @@ class Controller extends Base\Base
          */
         $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
-        /* Search query
-         * Optional name passed in url
-         */
-        $data['query'] = $name;
+//        /* Search query
+//         * Optional name passed in url
+//         */
+//        $data['query'] = $name;
 
         $this->tpl('course', $data);
     }
@@ -481,23 +474,16 @@ class Controller extends Base\Base
      *
      * @api   GET /course/new
      * @level 160
+     * @param string|null $name
      */
-    public function newCourse()
+    public function newCourse($name = null)
     {
-        $this->modifyCourse(null, null);
-    }
-
-    /**
-     * Form to create a new course, but also include search param
-     *
-     * @api   GET /course/new/{name}
-     * @level 160
-     *
-     * @param string $name
-     */
-    public function newCourseFromSearch($name)
-    {
-        $this->modifyCourse(null, $name);
+        $course = $this->getCourseSpecificationMapper()->createModel();
+        $folder = $this->getFolderMapper()->createModel();
+        $folder->setCourseSpecification($course);
+        $course->setFolder($folder);
+        $folder->setName($name);
+        $this->modifyCourse($course);
     }
 
     /**

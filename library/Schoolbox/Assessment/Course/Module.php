@@ -21,6 +21,7 @@ use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 
 class Module extends BaseModule
 {
@@ -44,9 +45,7 @@ class Module extends BaseModule
             'GET' => [
                 '/list'                                => 'courseList',
                 '/list/ajax'                           => 'courseListAjax',
-                '/new'                                 => 'newCourse',
-                '/new/{name}'                          => 'newCourseFromSearch',
-                '/modify/{id}'                         => 'modifyCourse',
+                '/new{/name}'                          => 'newCourse',
                 '/parent{/folderId}'                   => 'parentList',
             ],
             'POST' => [
@@ -83,7 +82,16 @@ class Module extends BaseModule
             ];
         };
 
+        $preloadCourse = function (array $params) {
+            try{
+                return ['course' => $this->getCourseSpecificationMapper()->findById($params['id'])];
+            } catch (MapperException $e){
+                return ['course' => $this->getCourseSpecificationMapper()->createModel()];
+            }
+        };
+
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
+        $this->register('GET',  '/modify/{id}',                                     'modifyCourse',   null, $preloadCourse);
     }
 
     /**
@@ -135,5 +143,13 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+    /**
+     * @return CourseSpecificationMapper
+     */
+    protected function getCourseSpecificationMapper()
+    {
+        return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
 }
