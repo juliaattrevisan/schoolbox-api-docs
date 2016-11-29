@@ -6,14 +6,18 @@
     /**
      * Default error placement method.
      *
-     * If a checkbox, insert error before the checkbox, otherwise place after.
-     * This prevents interference with checkbox/radio button stylage.
+     * First check for button block radios, in which case insert into an .error-placeholder div
+     * Then check for standard checkbox or radio, in which case insert error before the set of checkboxes/radios
+     * In all other situations place the error after the element.
      *
      * @param error
      * @param element
      */
     $.alaressValidate.defaultErrorPlacement = function(error, element) {
-        if (element.is('[type="checkbox"], [type="radio"]')) {
+
+        if (element.is('[data-radio-block]')) {
+            element.parents('fieldset').find('div.error-placeholder').html(error);
+        } else if (element.is('[type="checkbox"], [type="radio"]')) {
             error.insertBefore(element);
         } else {
             error.insertAfter(element);
