@@ -147,7 +147,7 @@
         <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.submittedOnly %}checked="checked"{% endif %} value='1' />
+            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.showSubmittedOnly %}checked="checked"{% endif %} value='1' />
             <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
         </form>
     </div>
