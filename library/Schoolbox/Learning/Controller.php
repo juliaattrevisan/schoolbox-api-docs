@@ -402,8 +402,62 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student)
         ]));
     }
+
+
+    /**
+     * @param Folder $subject
+     * @param User   $student
+     * @return array
+     */
+    protected function getLongitudinalRubricData(Folder $subject, User $student)
+    {
+        if (!$this->getConfigLoader()->get('enable_grades_criteria')) {
+            // only populate this if we're actually allowed to see it
+            return [];
+        }
+
+        $stmt = \Database::getInstance()->prepare("
+            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
+            FROM rubric_criterion rc
+            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
+            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id
+            INNER JOIN assessment a ON sb.assessment_id = a.id
+            LEFT JOIN rubric_mark rm ON rm.submission_box_id = sb.id AND rm.criterion_id = rc.id AND rm.valid IS TRUE
+            INNER JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+            WHERE rc.parent_type = 'category'
+            AND rc.parent_id = :folder_id
+            AND rc.`deleted_at` IS NULL
+            AND rm.student_id = :student_id
+            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC
+        ");
+
+        $stmt->execute([
+            'folder_id'  => $subject->getId(),
+            'student_id' => $student->getId()
+        ]);
+
+        $longitude = [];
+
+        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
+
+            list ($capability, $indicator, $assessmentId, $assessmentTitle, $descriptor) = $r;
+
+            $longitude[$capability]['name'] = $capability;
+            $longitude[$capability]['indicators'][$indicator]['name'] = $indicator;
+            $longitude[$capability]['indicators'][$indicator]['activities'][$assessmentId] = [
+                'id'         => $assessmentId,
+                'name'       => $assessmentTitle,
+                'descriptor' => $descriptor,
+            ];
+
+        }
+
+        return $longitude;
+    }
+
 
     /* Getters/Setters
      */
