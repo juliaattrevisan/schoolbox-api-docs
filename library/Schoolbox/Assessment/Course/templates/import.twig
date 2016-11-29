@@ -72,6 +72,12 @@ Usages:
             var stageOne = $('input[data-mage-next="part-ownership"]');
 
             stageOne.mage({
+                validateOptions: {
+                    rules: {
+                        importCourse: {required: true},
+                        importFolders: {required: true}
+                    }
+                },
                 onXhrDone: function (data) {
                     $('#ownership_assignment').html(data);
                     initStage2();
@@ -99,6 +105,31 @@ Usages:
 
             stageThree.mage({
                 confirmRevert: confirmRevert,
+                validateOptions: {
+                    ignore: ':disabled'
+                },
+                beforeSubmit: function() {
+                    // make sure at least one unit is selected
+                    $('input[data-checkbox-group="unit"]').rules('add', {
+                        oneCheckbox: 'unit'
+                    });
+                    // check any visible open date fields
+                    $('input[data-role="open_date"]:visible').each(function() {
+                        $(this).rules('add', {
+                            datepickerDate: true,
+                            required: true
+                        });
+                    });
+                    // check any due date fields
+                    $('input[data-role="due_date"]:visible').each(function() {
+                        var index = $(this).data('index');
+                        var openDate = $('input[data-role="open_date"][data-index="' + index + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: openDate
+                        });
+                    });
+                },
                 onRevert: function () {
                     $('#import_units').find(':checkbox').closest('li').slideDown();
                 },
@@ -122,6 +153,53 @@ Usages:
             var stageFour = $('input[data-mage-next="part-results-select"]');
 
             stageFour.mage({
+                validateOptions: {},
+                beforeSubmit: function() {
+                    // check at least one lesson has been selected
+                    $('input[data-checkbox-group="lesson"]').rules('add', {
+                        oneCheckbox: 'lesson'
+                    });
+                    // check every visible publish date field
+                    $('input[data-role="publish_date"]:visible:enabled').each(function() {
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDate: true
+                        });
+                    });
+                    // check every visible open date field
+                    $('input[data-role="open_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        var publishDate = $('input[data-role="publish_date"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: publishDate
+                        });
+                    });
+                    // check every visible due date field
+                    $('input[data-role="due_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        // if an open date exists then it needs to be before then, otherwise before publish date
+                        if ($('input[data-role="open_date"][data-assessment-id="' + lessonId + '"]').length > 0) {
+                            var dateRole = 'open_date';
+                        } else {
+                            var dateRole = 'publish_date';
+                        }
+                        var otherDate = $('input[data-role="' + dateRole + '"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: otherDate
+                        });
+                    });
+                    // check every visible close date field
+                    $('input[data-role="close_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        var dueDate = $('input[data-role="due_date"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: dueDate
+                        });
+                    });
+                },
                 onXhrDone: function(data) {
 
                     if (typeof data == 'object' && 'redirect' in data && data.redirect) {

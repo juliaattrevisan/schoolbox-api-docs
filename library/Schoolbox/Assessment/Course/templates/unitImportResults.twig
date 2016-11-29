@@ -162,15 +162,17 @@
                                                    id="a_import-{{ assessment.id}}"
                                                    {% if isChecked %} checked="checked"{% endif %}
                                                    data-assessment="{{ assessment.id }}"
+                                                   data-checkbox-group="lesson"
                                                    name="{{ inputPrefix }}[checked]"
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment) }}"></span>
-                                                <span>{{ assessment.title }}</span>
+                                                <span>{{ assessment.title }}</span> {{ assessment }}
                                                 {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                 <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                 {% endif %}
                                             </label>
+
                                         </div>
                                         <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
                                             {# publish date is always relevant #}
@@ -179,7 +181,8 @@
                                                 unitDate: unitImpl.openDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'publish',
-                                                dateSyncProperty: publishDateSync
+                                                dateSyncProperty: publishDateSync,
+                                                assessmentId: assessmentSpec.id
                                             } only %}
 
                                             {# open date is relevant when accepting responses #}
@@ -189,7 +192,8 @@
                                                     unitDate: unitImpl.openDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'open',
-                                                    dateSyncProperty: 'due'
+                                                    dateSyncProperty: 'due',
+                                                    assessmentId: assessmentSpec.id
                                                 } only %}
                                             {% else %}
                                                 <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -201,7 +205,8 @@
                                                 unitDate: unitImpl.dueDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'due',
-                                                dateSyncProperty: 'late'
+                                                dateSyncProperty: 'late',
+                                                assessmentId: assessmentSpec.id
                                             } only %}
 
                                             {# close (late) date is relevant when accepting responses #}
@@ -211,7 +216,8 @@
                                                 unitDate: unitImpl.dueDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'close',
-                                                dateLabel: 'Late'
+                                                dateLabel: 'Late',
+                                                assessmentId: assessmentSpec.id
                                                 } only %}
                                             {% else %}
                                                 <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>

@@ -326,7 +326,7 @@
         if (form.valid() == false) {
 
             // focus user to first invalid field
-            $(form).find('input.error').first().focus();
+            $(form).find(':input.error').first().focus();
 
             // prevent submit
             return;

@@ -70,8 +70,8 @@
                                    name="unit[{{ loop.index }}][import]"
                                    {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
                                    type="checkbox"
-                                   value="1"
-                                   data-interaction="enable" />
+                                   data-interaction="enable"
+                                   data-checkbox-group="unit" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">
                                 {{ unitImpl.title }}<span class="icon-unit"></span>
                             </label>
@@ -86,11 +86,10 @@
                                    type="text"
                                    value="{{ unitImpl.openDate.localShort }}"
                                    data-role="open_date"
+                                   data-index="{{ loop.index }}"
                                    data-datepicker
                                    data-datepicker-sync
                                    data-datepicker-sync-enddate="#due_date-{{ loop.index }}" />
-                            <label for="open_date-{{ loop.index }}" class="hide error">This field is required.</label>
-
                         </div>
 
                         {# Close Date #}
@@ -102,8 +101,8 @@
                                    type="text"
                                    value="{{ unitImpl.dueDate.localShort }}"
                                    data-role="due_date"
+                                   data-index="{{ loop.index }}"
                                    data-datepicker />
-                            <label for="due_date-{{ loop.index }}" class="hide error">This field is required.</label>
                         </div>
                     </div>
                 </li>
