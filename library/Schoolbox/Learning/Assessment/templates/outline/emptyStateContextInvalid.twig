@@ -1,0 +1,33 @@
+{#
+Displayed inside a CourseOutline component when the page on which the component is placed
+is not a valid context for the component.
+
+Usage:
+    {% include '@learningAssessment/builder/emptyStateNoUnitSpec.twig' with {
+        componentInstance: Component_Instance - The Component displaying this content
+        hasUnitSpec:       bool               - Whether this folder is linked to a UnitSpec,
+        hasCourseSpec:     bool               - Whether this folder is linked to a CourseSpec,
+    } only %}
+#}
+
+<script>
+    $(function() {
+
+        var $component = $('#component{{ componentInstance.id }}');
+        var $deleteIcon = $component.find('[data-target=delete]');
+
+        $component.on('click', '[data-action="delete-component"]', function(event){
+            event.preventDefault();
+            if('closed' == $deleteIcon.attr('data-state')){
+                $deleteIcon.trigger('click');
+            }
+        });
+    });
+</script>
+
+<div class="empty-state" data-empty-state>
+    <i class="icon-course"></i>
+    {% set entity = hasUnitSpec ? 'a unit' : (hasCourseSpec ? 'a course' : 'an invalid context') %}
+    <p>This page is {{ entity }} and cannot have a course outline.</p>
+    <p><a href="#" data-action="delete-component">Remove</a> this component.</p>
+</div>

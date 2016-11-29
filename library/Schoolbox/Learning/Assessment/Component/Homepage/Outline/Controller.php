@@ -2,7 +2,7 @@
 /**
  * Course component for a class.
  * Before a course is selected, it contains a selector for the course - after
- * this, it contains a list of units and tasks within the course.
+ * this, it contains a list of units and assessments within the course.
  *
  * This is the Course Outline component.
  *
@@ -19,6 +19,8 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementa
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -31,9 +33,9 @@ use \Schoolbox\Permission\Access\UserAccessMapper;
 class Controller extends Component_Homepage_ControllerAbstract
 {
     /**
-     * A list of units within this course.
+     * The CourseImport currently associated with this Component
      *
-     * @var CourseImplementation
+     * @var CourseImplementation|null
      */
     private $courseImplementation;
 
@@ -41,12 +43,13 @@ class Controller extends Component_Homepage_ControllerAbstract
     private $accessList = [];
 
     /**
+     *
      * @var Collection|User[]
      */
     private $userCollection;
 
     /**
-     * A list of students who have completed the tasks within the course.
+     * A list of students who have completed the assessments within the courseImpl.
      *
      * @var Collection|TaskCompletion[]
      */
@@ -156,6 +159,15 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        $folder = $this->getSource();
+
+        // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
+        $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
+        $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
+        if($hasUnitSpec || $hasCourseSpec){
+            return $this->renderContextInvalidEmptyState($templateHandle, $hasUnitSpec, $hasCourseSpec);
+        }
+
         $data = [
             'readOnly'             => $this->readOnly,
             'context'              => $this->getContext(),
@@ -170,6 +182,35 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/component.twig',
+            $data,
+            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+        );
+    }
+
+    /**
+     * Renders a component-specific empty state to indicate that the folder on which
+     * this CourseOutline component is placed is not a valid context.
+     *
+     * Not valid if this folder is:
+     * * linked to a CourseSpec
+     * * linked to a UnitSpec
+     *
+     * @param string $templateHandle
+     * @param bool $hasUnitSpec
+     * @param bool $hasCourseSpec
+     * @return bool
+     */
+    protected function renderContextInvalidEmptyState($templateHandle, $hasUnitSpec, $hasCourseSpec)
+    {
+        $data = [
+            'componentInstance' => $this->getInstance(),
+            'hasUnitSpec'       => $hasUnitSpec,
+            'hasCourseSpec'     => $hasCourseSpec,
+        ];
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learningAssessment/outline/emptyStateContextInvalid.twig',
             $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
