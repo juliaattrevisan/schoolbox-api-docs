@@ -194,8 +194,44 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseSpecification']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
 
         $this->ancestry = new Ancestry($this);
+    }
+
+    /**
+     * Post soft-delete callback to soft-delete the CourseSpec linked to this Folder if one exists
+     *
+     * Intentionally no corresponding 'postRestore' callback.
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function softDeleteCourseSpecification(Model $folder)
+    {
+        /** @var CourseSpecificationMapper $courseSpecMapper */
+        $courseSpecMapper = $this->getJoinMapper('course_specification');
+        $courseSpec = $courseSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
+        $courseSpecMapper->delete($courseSpec);
+        return true;
+    }
+
+    /**
+     * Post soft-delete callback to soft-delete the UnitSpec linked to this Folder if one exists
+     *
+     * Intentionally no corresponding 'postRestore' callback.
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function softDeleteUnitSpecification(Model $folder)
+    {
+        /** @var UnitSpecificationMapper $unitSpecMapper */
+        $unitSpecMapper = $this->getJoinMapper('unit_specification');
+        $unitSpec = $unitSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
+        $unitSpecMapper->delete($unitSpec);
+        return true;
     }
 
     /**
