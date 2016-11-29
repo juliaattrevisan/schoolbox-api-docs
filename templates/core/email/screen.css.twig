@@ -78,10 +78,10 @@ tr.dark {
 }
 
 .content a.cta {
-    background-color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.submit_btn }};
+    background-color: {{ config.skin_builder ? colours.skin_colour_content_ui_submit_background : colours.submit_btn }};
     padding: 4px 8px 6px;
     text-decoration: none;
-    color: {{ config.skin_builder ? colours.skin_colour_offcanvas_background : colours.white }};
+    color: {{ config.skin_builder ? colours.skin_colour_content_ui_submit_foreground : colours.white }};
 }
 
 {# no skin builder equivalent #}
@@ -134,6 +134,6 @@ tr.underline td, td.underline {
     font-size: 22px;
     line-height: 35px;
     color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.banner_background }};
-    background-color: {{ config.skin_builder ? colours.skin_colour_offcanvas_background : colours.content_background }};
+    background-color: {{ config.skin_builder ? colours.skin_colour_body_bg : colours.content_background }};
 }
 
