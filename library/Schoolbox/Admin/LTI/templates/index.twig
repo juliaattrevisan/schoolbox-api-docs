@@ -29,76 +29,29 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
-
-    var initForm = function(form) {
-        form.find(':submit').mage({
-            submittable: '[data-mage-wrapper]',
-            reenablePrevious: true,
-            onXhrDone: function(data) {
-                if (form.data('providerForm') == 'create') {
-                    // New provider? reload whole page for now, as I don't know where to put it.
-                    // I also want to clear the form's contents.
-                    window.location.reload();
-                } else {
-                    var newDom  = $(data),
-                            oldDom  = $(this).closest('[data-provider]'),
-                            butonye = oldDom.find('[data-provider-form] :submit');
-                    // Replace infocard
-                    oldDom.find('[data-provider-infocard]').replaceWith(newDom.find('[data-provider-infocard]'));
-                    // Restore butonye
-                    butonye.val(butonye.data('mage-reset')).removeAttr('readonly');
-                    $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
-                }
-            }
-        });
-        form.alaressValidate({
-            rules: {
-                code: {
-                    pattern: /^[a-z0-9-_]+$/i
-                }
-            },
-            messages: {
-                code: {
-                    pattern: 'A code may only contain alphanumeric, hyphen and underscore characters.'
-                }
-            }
-        });
-    };
-
     $(function(){
+
         $('[data-collapser]').collapsable();
-        $('form[data-provider-form]').each(function() {
-            initForm($(this));
-        });
 
         // Jellytot actions
         $('#content').on('click', 'a[data-provider-action]', function(event) {
+
             event.preventDefault();
+
             var button = $(this),
-                    action = button.data('providerAction'),
-                    provider   = button.closest('[data-provider]');
+                action = button.data('providerAction'),
+                provider   = button.closest('[data-provider]');
+
             button.confirmDialog({
                 confirmEvent: function(el) {
                     // AJAX, then update DOM
-                    // Archive/restore: refresh
                     // Delete: remove completely
                     $.post(el.data('postAction'))
                             .done(function(data) {
                                 switch (action) {
                                     case 'delete':
                                         provider.fadeOut({ done: provider.remove });
-                                        break;
-                                    case 'archive':
-                                    case 'restore':
-                                    default:
-                                        var newDom  = $(data);
-                                        // Replace infocard and jellytot
-                                        provider.find('[data-provider-infocard]').replaceWith(newDom.find('[data-provider-infocard]'));
-                                        provider.find('[data-provider-dropdown]').replaceWith(newDom.find('[data-provider-dropdown]'));
                                         break;
                                 }
                             })
