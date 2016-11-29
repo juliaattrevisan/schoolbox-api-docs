@@ -8,18 +8,12 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\IDatabase;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
-
-use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Assessment\Course\Task as Task;
-
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Model as Folder;
 
@@ -194,28 +188,20 @@ class ImportFactory
         }
 
         // Get the IDs of all non-deleted AssessmentImpls in the specified UnitImpls
-        $innerQuery = "
+        $innerQuery1 = "
             SELECT
               asi.specification_assessment_id AS 'sa.id',
               asi.implementation_assessment_id AS 'ia.id'
-            FROM course_unit_implementation ui
-            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
+            FROM course_unit_implementation `ui_inner`
+            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = `ui_inner`.id
             JOIN assessment ia ON ia.id = aui.assessment_id
             JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
-            WHERE ui.id IN (" . implode(',', $unitImplIds) . ")
-            AND ia.deleted_at IS NULL
         ";
 
-        //TODO Replace all predicates with nested Predicate Builder
-
-//        $pbInner = new PredicateBuilder($this->database, '');
-//        $pbInner->anyOf('ui.id', $unitImplIds);
-//        $pbInner->isNull('ia.deleted_at');
-//        $innerQuery .= 'WHERE' . implode(' AND ', $pbInner->getWhere());
-        // How to bind args in nested?
-        // Need to use separate builders for each query, then merge their arg arrays (may need to alias args to avoid name collisions)
-
-
+        $pbInner1 = new PredicateBuilder($this->database, '');
+        $pbInner1->anyOf('ui_inner.id', $unitImplIds);
+        $pbInner1->isNull('ia.deleted_at');
+        $innerQuery1 .= 'WHERE ' . implode(' AND ', $pbInner1->getWhere());
 
         // AssessmentSpecs in UnitSpecs, optionally with corresponding AssessmentImpl if it exists
         $query1 = "
@@ -246,13 +232,15 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
-            LEFT JOIN ($innerQuery) `t1` ON `t1`.`sa.id` = sa.id
+            LEFT JOIN ($innerQuery1) `t1` ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
-            WHERE us.id IN (" . implode(',', array_keys($unitSpecCache)) . ")
         ";
+        $pbOuter1 = new PredicateBuilder($this->database, '');
+        $pbOuter1->anyOf('us.id', array_keys($unitSpecCache));
+        $query1 .= ' WHERE ' . implode(' AND ', $pbOuter1->getWhere());
 
         // Get the following Assessments:
         // 5. AssessmentImpls created directly in UnitImpl, no corresponding AssessmentSpec
@@ -286,19 +274,17 @@ class ImportFactory
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
-            WHERE ia.deleted_at IS NULL
-            AND asi.implementation_assessment_id IS NULL
-            AND ui.id IN (" . implode(',', $unitImplIds) . ")
         ";
+        $pbOuter2 = new PredicateBuilder($this->database, '');
+        $pbOuter2->isNull('ia.deleted_at');
+        $pbOuter2->isNull('asi.implementation_assessment_id');
+        $pbOuter2->anyOf('ui.id', $unitImplIds);
+        $query2 .= ' WHERE ' . implode(' AND ', $pbOuter2->getWhere());
 
-        $query = "
-          SELECT * FROM ($query1) AS t1
-            UNION
-          SELECT * FROM ($query2) AS t2
-        ";
+        $query = "$query1 UNION $query2 ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute(array_merge($pbInner1->getParams(), $pbOuter1->getParams(), $pbOuter2->getParams()));
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $unitSpecId = $row['us.id'];
             // Is is the first time this UnitSpec has been seen?
@@ -364,7 +350,6 @@ class ImportFactory
             } else {
                 $assessmentImpls->getOffset($unitSpecId)->add($assessmentImpl);
             }
-
         }
 
         $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
@@ -397,7 +382,7 @@ class ImportFactory
         ";
         $pb = new PredicateBuilder($this->database, '');
         $pb->equals('ui.id', $unitImplIds);
-        $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
 
