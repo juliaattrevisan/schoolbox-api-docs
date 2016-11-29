@@ -48,7 +48,7 @@ class Exporter
             LEFT JOIN       assessment_course_unit_implementation AS acui ON 
                             acui.assessment_id = sb.assessment_id
             LEFT JOIN       course_unit_implementation AS cui ON 
-                            cui.course_implementation_id = acui.course_unit_implementation_id
+                            cui.id = acui.course_unit_implementation_id
             LEFT JOIN       course_implementation AS ci ON 
                             ci.id = cui.course_implementation_id
             INNER JOIN      folder AS c ON 
