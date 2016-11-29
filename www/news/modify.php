@@ -71,7 +71,7 @@ if (is_numeric($this->arg[0])) {
 
 	$roleCollection = $roleMapper->findAll();
 	foreach($roleCollection as $role){
-		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>$role->getName()];
+		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>Scrub::text($role->getName())];
 	}
 
 	$campusList = $newsHandler->getCampusList();
@@ -145,7 +145,7 @@ else {
 
 	$roleCollection = $roleMapper->findAll();
 	foreach($roleCollection as $role){
-		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>$role->getName()];
+		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>Scrub::text($role->getName())];
 	}
 
 	$campusList = $newsHandler->getCampusList();

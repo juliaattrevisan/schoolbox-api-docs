@@ -1140,7 +1140,7 @@ class SitePage extends Page
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
-                        $mapping[$key] ? $key = $mapping[$key] : $key = '';
+                        $mapping[$key] ? $key = $mapping[$key] : '';
                         $this->setVar($key, Scrub::text($value));
                         if (in_array($value, $selected)) {
                             $this->setVar($key . '_SELECTED', 'checked="checked"');
@@ -1189,7 +1189,7 @@ class SitePage extends Page
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
-                        $mapping[$key] ? $key = $mapping[$key] : $key = '';
+                        $mapping[$key] ? $key = $mapping[$key] : '';
                         if (is_scalar($value) || is_null($value)) {
                             $this->setVar($key, Scrub::text($value));
                             if (in_array($value, $selected)) {
