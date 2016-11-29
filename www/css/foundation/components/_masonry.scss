@@ -78,7 +78,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-breadcrumbs;
   color: $icon-color-breadcrumbs;
 }
-.icon-masonry-Component_Homepage_NewsController:before {
+.icon-masonry-Schoolbox_News_Component_Homepage_Controller:before {
   @extend .icon-news;
   color: $icon-color-news;
 }
@@ -256,6 +256,10 @@ $masonry-drop-background: $input-focus-bg-color;
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
   @extend .icon-curriculum;
   color: $icon-color-curriculum-overview;
+}
+.icon-masonry-Schoolbox_LTI_Component_Homepage_Controller:before {
+  @extend .icon-lti;
+  color: $icon-color-lti;
 }
 
 // Eportfolio masonry icons
