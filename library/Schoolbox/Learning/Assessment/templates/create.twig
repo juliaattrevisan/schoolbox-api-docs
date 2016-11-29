@@ -9,7 +9,6 @@
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
 
-
         /**
          * alaressValidate options for each assessment type form
          * Set a default set of rules because everything except for quiz requires the same rules
@@ -24,12 +23,19 @@
                 required: true,
                 datepickerDate: true
             },
-            publishTime: {required: true},
+            publishTime: {
+                required: true,
+                timepickerTime: true
+            },
             dueDate: {
                 required: true
             },
-            dueTime: {required: true}
+            dueTime: {
+                required: true,
+                timepickerTime: true
+            }
         };
+
         var validationRules = {
             project: defaultRules,
             dueWork: defaultRules,
@@ -44,47 +50,119 @@
                     required: true,
                     datepickerDate: true
                 },
-                publishTime: {required: true},
+                publishTime: {
+                    required: true,
+                    timepickerTime: true
+                },
                 openDate: {
                     required: true,
                     datepickerDate: true
                 },
-                openTime: {required: true},
+                openTime: {
+                    required: true,
+                    timepickerTime: true
+                },
                 dueDate: {
                     required: true,
                     datepickerDate: true
                 },
-                dueTime: {required: true},
+                dueTime: {
+                    required: true,
+                    timepickerTime: true
+                },
                 closeDate: {
                     required: true,
                     datepickerDate: true
                 },
-                closeTime: {required: true}
+                closeTime: {
+                    required: true,
+                    timepickerTime: true
+                }
             }
         };
+
         /**
          * These rules can't go in above because they have selectors that need to be
          * run on the content that's ajax'd in.
          */
         var defaultBeforeSubmit = function() {
-            $('input[name="dueDate"]').rules('add', {
-                datepickerDateNotBefore: $('input[name="publishDate"]')
+            var dueDate = $('input[name="dueDate"]');
+            var dueTime = $('input[name="dueTime"]');
+            var publishDate = $('input[name="publishDate"]');
+            var publishTime = $('input[name="publishTime"]');
+            dueDate.rules('add', {
+                datepickerDateNotBefore: publishDate,
+                messages: {
+                    timepickerNotBefore: 'This should not be before the publish date above'
+                }
             });
+            // if the dates are the same - need to check due time isn't before publish time
+            if (dueDate.val() == publishDate.val()) {
+                dueTime.rules('add', {
+                    timepickerNotBefore: publishTime,
+                    messages: {
+                        timepickerNotBefore: 'This should not be before the publish time above'
+                    }
+                });
+            }
         };
+
         var beforeSubmit = {
             project: defaultBeforeSubmit,
             duework: defaultBeforeSubmit,
             task: defaultBeforeSubmit,
             quiz: function() {
-                $('input[name="openDate"]').rules('add', {
-                    datepickerDateNotBefore: $('input[name="publishDate"]')
+                var publishDate = $('input[name="publishDate"]');
+                var publishTime = $('input[name="publishTime"]');
+                var openDate = $('input[name="openDate"]');
+                var openTime = $('input[name="openTime"]');
+                var dueDate = $('input[name="dueDate"]');
+                var dueTime = $('input[name="dueTime"]');
+                var closeDate = $('input[name="closeDate"]');
+                var closeTime = $('input[name="closeTime"]');
+                openDate.rules('add', {
+                    datepickerDateNotBefore: publishDate,
+                    messages: {
+                        timepickerNotBefore: 'This should not be before the publish date above'
+                    }
                 });
-                $('input[name="dueDate"]').rules('add', {
-                    datepickerDateNotBefore: $('input[name="openDate"]')
+                dueDate.rules('add', {
+                    datepickerDateNotBefore: openDate,
+                    messages: {
+                        timepickerNotBefore: 'This should not be before the open date above'
+                    }
                 });
-                $('input[name="closeDate"]').rules('add', {
-                    datepickerDateNotBefore: $('input[name="dueDate"]')
+                closeDate.rules('add', {
+                    datepickerDateNotBefore: dueDate,
+                    messages: {
+                        timepickerNotBefore: 'This should not be before the due date above'
+                    }
                 });
+                // check the times aren't earlier than the one above (if the dates are the same)
+                if (openDate.val() == publishDate.val()) {
+                    openTime.rules('add', {
+                        timepickerNotBefore: publishTime,
+                        messages: {
+                            timepickerNotBefore: 'This should not be before the publish time above'
+                        }
+                    });
+                }
+                if (dueDate.val() == openDate.val()) {
+                    dueTime.rules('add', {
+                        timepickerNotBefore: openTime,
+                        messages: {
+                            timepickerNotBefore: 'This should not be before the open time above'
+                        }
+                    });
+                }
+                if (closeDate.val() == dueDate.val()) {
+                    closeTime.rules('add', {
+                        timepickerNotBefore: dueTime,
+                        messages: {
+                            timepickerNotBefore: 'This should not be before the due time above'
+                        }
+                    });
+                }
             }
         };
 
