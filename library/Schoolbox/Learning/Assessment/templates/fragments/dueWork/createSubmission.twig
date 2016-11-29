@@ -116,7 +116,7 @@
                     dialog = confirmDialog,
                     submit = form.find(':submit'),
                     inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                    filesLen = $('#attachment-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+                    filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
             if (!inlineLen && !filesLen) {
                 // prevent submission without SOMETHING to submit
@@ -247,5 +247,14 @@
             <a class="button full-width" data-interaction="close">OK</a>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
+
+        {% if policy|length %}
+        <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
+            <p>{{ policy }}</p>
+
+            <a class="button submit" data-accept>Yes, I agree</a>
+            <a class="button" data-reject>Cancel</a>
+        </div>
+        {% endif %}
     </div>
 </div>

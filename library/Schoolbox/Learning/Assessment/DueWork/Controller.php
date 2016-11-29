@@ -242,6 +242,7 @@ class Controller extends Assessment\Controller
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
+            'policy'         => $this->getConfigLoader()->get('lms_student_policy')
         ]));
     }
 
