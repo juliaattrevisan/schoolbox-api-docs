@@ -41,9 +41,6 @@
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete" class="icon-delete">Delete</a></li>
     </ul>
-    {% if assessment is task %}
-        {% include '@course/task/reveal-modal.twig' with { reveal: taskReveals[task.id] } %}
-    {% endif %}
     <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
     <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
         <input type="hidden" name="action"     value="delete" />

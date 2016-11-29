@@ -420,10 +420,6 @@ class Controller extends Base\Base
         if ($course->getId()) {
             $course->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($course->getId()));
 
-            foreach($course->getUnits() as $unit){
-                $unit->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()));
-            }
-
             // Rehydrate course folder so that curriculum codes exist
             $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
             $folder = $course->getFolder();
@@ -431,39 +427,31 @@ class Controller extends Base\Base
             // Need to hydrate this to populate the 'Faculty/Subject' selector
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
-//            $instances = [];
+            // Indexed by folder.id in all cases
+            $data['access']= [];
+
+            // Indexed by unit.id
+            $data['returnUrl']= [];
+
+            // Indexed by unit.id
+            $data['usages']= [];
 
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
-            $data['course'] = $course;
 
-            foreach ($course->getUnits() as $unit) {
-                /** @var UnitSpecification $unit */
+            foreach($course->getUnits() as $unit){
+                $unit->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unit->getId()));
+
                 $unitFolder = $unit->getFolder();
-                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
+                $data['access'][$unitFolder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($course->getId(), $unit->getId());
                 $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
-
-//                // obtain the Course Builder Component Instance from the homepage.
-//                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
-//
-//                foreach ($data['tasks'][$unit->getId()] as $task) {
-//                    /** @var Task $task */
-//                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
-//                }
-//
-//                // set reference to this reveal instance
-//                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
             }
         }
 
-        /* Optionally display Curriculum Tagging
-         */
-        $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
+        $data['course'] = $course;
 
-//        /* Search query
-//         * Optional name passed in url
-//         */
-//        $data['query'] = $name;
+        // Optionally display Curriculum Tagging
+        $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
         $this->tpl('course', $data);
     }

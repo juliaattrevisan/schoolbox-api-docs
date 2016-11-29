@@ -59,7 +59,6 @@
         <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>
         <input type="hidden" name="returnUrl" value="{{ returnUrl[unit.id] }}"/>
     </form>
-    {% include '@course/task/reveal-modal.twig' with { reveal: reveals[unit.id] } %}
     {#
     Dialog for asking:
     When adding a new task - does it get copied into classes that use this unit?
