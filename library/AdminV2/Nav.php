@@ -27,6 +27,7 @@ class AdminV2_Nav
         'course-builder'   => 'Course Builder',
         'messages'         => 'Messages',
         'lists'            => 'Lists',
+        'lti'              => 'LTI Providers',
         'cleanup'          => 'Cleanup',
         'usage'            => 'Usage',
         'engagement'       => 'Engagement',

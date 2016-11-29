@@ -1,0 +1,24 @@
+<li class="actions-small-2" data-provider>
+    <div class="list-item">
+        <div class="card small-12" data-provider-infocard>
+            <h3>
+                {{ provider.name }}
+            </h3>
+            <p class="meta">
+                {{ provider.xml }}
+            </p>
+            {% if provider.url is empty %}
+            <p class="meta">
+                <span class="gradient-0">Provider Disabled - Invalid XML Configuration</span>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ provider.id }}">
+        {% include '@adminLti/form.twig' with {provider: provider} %}
+    </div>
+    <nav>
+        <a href="#" class="icon-down-arrow" data-collapser="provider-{{ provider.id }}"></a>
+        <a href="#" class="icon-delete" data-provider-action="delete" data-post-action="{{ routeLookup('adminLti.postDelete', {providerId: provider.id}) }}"></a>
+    </nav>
+</li>
