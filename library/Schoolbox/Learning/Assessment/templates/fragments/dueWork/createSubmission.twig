@@ -175,51 +175,13 @@
             {{ assessment.description|purify }}
         </section>
         {% endif %}
-
-        {#{% if responses | length %}#}
-            {#<h2 class="subheader">Responses</h2>#}
-            {#{% for response in responses %}#}
-                {#{% if response.getAllFiles | length %}#}
-                    {#<section>#}
-                        {#<ul data-dz-previews="" class="az-list">#}
-                            {#{% for file in response.getAllFiles %}#}
-                                {#<li class="dz-success actions-small-1">#}
-                                    {#<div class="list-item">#}
-                                        {#<div class="card small-12">#}
-                                            {#<img class="mime" src="/images/mime/60x60/{{ file.mimeType.getIconFile }}">#}
-                                            {#<p class="filename" data-dz-name="">#}
-                                                {#<a href="/storage/fetch.php?save=1&hash={{ file.hash }}">{{ file.filename }}</a>#}
-                                            {#</p>#}
-                                            {#<p class="meta">#}
-                                                {#{{ file.mimeType.description }}<br>#}
-                                                {#Submitted {{ file.createdAt.getRelativeTime }}#}
-                                            {#</p>#}
-                                        {#</div>#}
-                                    {#</div>#}
-                                    {#<nav>#}
-                                        {#{% if response.allFeedback | length %}#}
-                                            {#<a href="/learning/assessment/feedback/{{ response.id }}" data-dz-remove="" title="View Feedback"#}
-                                               {#class="icon-view"></a>#}
-                                        {#{% endif %}#}
-                                        {#<a href="#" data-dz-remove="" title="Delete Response" class="icon-delete"></a>#}
-                                        {#<input type="hidden" name="attachment[]" value="store:{{ file.hash }}" data-az-attachment="">#}
-                                    {#</nav>#}
-                                {#</li>#}
-                            {#{% endfor %}#}
-                        {#</ul>#}
-                    {#</section>#}
-                {#{% endif %}#}
-            {#{% endfor %}#}
-        {#{% endif %}#}
-
         <h2 class="subheader">Submit Response</h2>
 
         <div class="row">
             <div class="small-12 columns">
                 <div class="alert-box">
-                    You can attach files and/or edit online for your submission.
-                    Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for
-                    Assessment.
+                    To submit your work you may upload files or optionally use the editor to type directly.
+                    Content you create will automatically save to draft, but will <strong>not be submitted</strong> until you press the submit button and confirm on the following screen.
                 </div>
             </div>
         </div>
@@ -250,7 +212,7 @@
 
         {% if policy|length %}
         <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
-            <p>{{ policy }}</p>
+            <p>{{ policy | purify }}</p>
 
             <a class="button submit" data-accept>Yes, I agree</a>
             <a class="button" data-reject>Cancel</a>
