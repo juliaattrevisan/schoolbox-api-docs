@@ -421,7 +421,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Assert specification
         $specificationAssessmentModel = $assessmentModel->getSpecificationAssessment();
-        $this->assertInstanceOf($specificationClass, $specificationAssessmentModel);
+        $this->assertInstanceOf($specificationClass, $specificationAssessmentModel->getSubObject());
         $this->assertEquals($specificationId, $specificationAssessmentModel->getId());
 
         // Assert specification context

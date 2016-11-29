@@ -123,10 +123,11 @@ class Translator
         $specification = $assessment->getSpecificationAssessment();
         if ($specification instanceof IAssessable) {
             // Go to no great lengths here, as I need only an ID
-            $assessmentModel->setSpecificationAssessment(
-                (new Model())
-                    ->setId($specification->getId())
-            );
+            $specModel = $this->translateToDataModel($specification, 0);
+            // Turn inside out again
+            $specAssessment = $specModel->getAssessmentModel();
+            $specAssessment->setSubObject($specModel);
+            $assessmentModel->setSpecificationAssessment($specAssessment);
         }
 
         // Translate assessment context
