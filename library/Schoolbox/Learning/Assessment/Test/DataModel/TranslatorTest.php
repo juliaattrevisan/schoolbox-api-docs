@@ -230,7 +230,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array [class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
+     * @return array [assessmentModel, class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
      */
     public function getTranslateSpecificationAssessmentToDomainModelData()
     {
@@ -343,7 +343,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      * @param int                  $specificationContextId
      */
     public function testTranslateSpecificationAssessmentToDomainModel(
-        $assessmentModel,
+        IAssessableDataModel $assessmentModel,
         $class,
         $id,
         $specificationClass,
@@ -364,5 +364,68 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Assert specification context
         $this->assertInstanceOf($specificationContextClass, $assessment->getSpecificationAssessment()->getContext());
         $this->assertEquals($specificationContextId, $assessment->getSpecificationAssessment()->getContext()->getId());
+    }
+
+    /**
+     * @return array [assessment, class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
+     */
+    public function getTranslateSpecificationAssessmentToDataModelData()
+    {
+        return [
+            [
+                // Basic assessment with a specification
+                (new Task())
+                    ->setId(3)
+                    ->setContext((new UnitImplementation())->setId(12345))
+                    ->setCreator($this->teacher1)
+                    ->setSpecificationAssessment(
+                        (new Task())
+                            ->setId(2)
+                            ->setContext((new UnitSpecification())->setId(54321))
+                            ->setCreator($this->teacher1)
+                    ),
+                3,
+                TaskModel::class,
+                2,
+                UnitSpecificationModel::class,
+                54321,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of specification assessment to data model.
+     *
+     * @dataProvider getTranslateSpecificationAssessmentToDataModelData
+     *
+     * @param IAssessable $assessment
+     * @param int         $id
+     * @param string      $specificationClass
+     * @param int         $specificationId
+     * @param string      $specificationContextClass
+     * @param int         $specificationContextId
+     */
+    public function testTranslateSpecificationAssessmentToDataModel(
+        IAssessable $assessment,
+        $id,
+        $specificationClass,
+        $specificationId,
+        $specificationContextClass,
+        $specificationContextId
+    ) {
+        $assessmentModel = $this->translator->translateToDataModel($assessment, 0)->getAssessmentModel();
+
+        // Assert assessment
+        $this->assertInstanceOf(AssessmentModel::class, $assessmentModel);
+        $this->assertEquals($id, $assessmentModel->getId());
+
+        // Assert specification
+        $specificationAssessmentModel = $assessmentModel->getSpecificationAssessment();
+        $this->assertInstanceOf($specificationClass, $specificationAssessmentModel);
+        $this->assertEquals($specificationId, $specificationAssessmentModel->getId());
+
+        // Assert specification context
+        $this->assertInstanceOf($specificationContextClass, $specificationAssessmentModel->getAssessmentContext());
+        $this->assertEquals($specificationContextId, $specificationAssessmentModel->getAssessmentContext()->getId());
     }
 }
