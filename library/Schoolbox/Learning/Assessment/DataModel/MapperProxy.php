@@ -415,7 +415,26 @@ class MapperProxy
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
             $subObject->setRubricResultSet(0);
+
+            /* At this point, $assessable has no idea about the SubmissionBox
+             * that DueWorkMapper secretly requires. $subObject is actually the
+             * SubmissionBox. Sadly $subOject has no value for its primary key
+             * and we need to get it again T_T otherwise the attached Due Work Files
+             * won't save to the submission_box_file table (needs $submissionBox's
+             * id as well as the file hash)
+             */
+            try {
+                $swampBox = DueWorkMapper::getInstance()->findOneByColumn('assessment_id', $dataModel->getId());
+                $subObject->setId($swampBox->getId());
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+
+                /* Do nothing with the blank primary key, I guess
+                 */
+            }
+
             DueWorkMapper::getInstance()->save($subObject);
+
             // Save the Rubric
             /** @var DueWorkModel $dueWork */
             $dueWork = $assessable;
