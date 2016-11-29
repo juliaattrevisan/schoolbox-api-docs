@@ -281,18 +281,17 @@
                     .stop()
                     .slideDown()
                     .one('click', opt.component.removeActionSelector, function (event) {
-                        var btn = $(this);
+                        var removeBtn = $(this);
 
                         event.preventDefault();
 
                         // do different things depending on which action was clicked
-                        if (btn.data('remove')) {
-
+                        if (removeBtn.data('remove')) {
                             // send deletion request to server
-                            $.post(opt.component.url, btn.closest('form').serialize());
+                            $.post(opt.component.url, removeBtn.closest('form').serialize());
 
                             // animate a disappearance (P.S. this is revolting)
-                            btn.closest(opt.component.selector).animate({ opacity: 0 }, 300, function () {
+                            removeBtn.closest(opt.component.selector).animate({ opacity: 0 }, 300, function () {
                                 $(this).slideUp(200, function () {
                                     $(this).remove();
                                     // if it was the last component in a column, reshow the placeholder
@@ -303,6 +302,7 @@
 
                         } else {
                             target.off('click', opt.component.removeActionSelector).slideUp();
+                            btn.attr('data-state', 'closed');
                         }
                     });
             }
