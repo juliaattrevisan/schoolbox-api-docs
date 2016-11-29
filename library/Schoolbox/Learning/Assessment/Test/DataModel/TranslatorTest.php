@@ -12,12 +12,14 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -225,5 +227,142 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $assessmentModel = $this->translator->translateToDomainModel($assessmentModel);
         $this->assertInstanceOf($contextClass, $assessmentModel->getContext());
         $this->assertEquals($contextId, $assessmentModel->getContext()->getId());
+    }
+
+    /**
+     * @return array [class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
+     */
+    public function getTranslateSpecificationAssessmentToDomainModelData()
+    {
+        return [
+            [
+                // Basic assessment with a specification
+                (new TaskModel())
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setId(2)
+                            ->setAssessmentContext((new UnitImplementationModel())->setId(12345))
+                            ->setSpecificationAssessment(
+                                (new AssessmentModel())
+                                    ->setId(1)
+                                    ->setAssessmentContext(
+                                        (new UnitSpecificationModel())
+                                            ->setId(67890)
+                                            ->setCourse(
+                                                (new CourseSpecificationModel())
+                                                    ->setId(123)
+                                            )
+                                    )
+                                    ->setSubObject(
+                                        (new TaskModel())
+                                            ->setId(1)
+                                    )
+                            )
+                    ),
+                Task::class,
+                2,
+                Task::class,
+                1,
+                UnitSpecification::class,
+                67890
+            ],
+            [
+                // Assessment whose specification's type differs from its own.
+                // should still be translated without question
+                (new TaskModel())
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setId(2)
+                            ->setAssessmentContext((new UnitImplementationModel())->setId(12345))
+                            ->setSpecificationAssessment(
+                                (new AssessmentModel())
+                                    ->setId(1)
+                                    ->setAssessmentContext(
+                                        (new UnitSpecificationModel())
+                                            ->setId(6666)
+                                            ->setCourse(
+                                                (new CourseSpecificationModel())
+                                                    ->setId(123)
+                                            )
+                                    )
+                                    ->setSubObject(
+                                        (new QuizModel())
+                                            ->setId(1)
+                                    )
+                            )
+                    ),
+                Task::class,
+                2,
+                Quiz::class,
+                1,
+                UnitSpecification::class,
+                6666
+            ],
+            [
+                // Usually only assessments within a unit implementation context will have a specification.
+                // However, that isn't a hard and fast rule.
+                (new TaskModel())
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setId(2)
+                            ->setAssessmentContext((new Folder())->setId(12345))
+                            ->setSpecificationAssessment(
+                                (new AssessmentModel())
+                                    ->setId(1)
+                                    ->setAssessmentContext(
+                                        (new Folder())
+                                            ->setId(3333)
+                                    )
+                                    ->setSubObject(
+                                        (new TaskModel())
+                                            ->setId(1)
+                                    )
+                            )
+                    ),
+                Task::class,
+                2,
+                Task::class,
+                1,
+                Folder::class,
+                3333
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of specification assessment to domain model.
+     *
+     * @dataProvider getTranslateSpecificationAssessmentToDomainModelData
+     *
+     * @param IAssessableDataModel $assessmentModel
+     * @param string               $class
+     * @param int                  $id
+     * @param string               $specificationClass
+     * @param int                  $specificationId
+     * @param string               $specificationContextClass
+     * @param int                  $specificationContextId
+     */
+    public function testTranslateSpecificationAssessmentToDomainModel(
+        $assessmentModel,
+        $class,
+        $id,
+        $specificationClass,
+        $specificationId,
+        $specificationContextClass,
+        $specificationContextId
+    ) {
+        $assessment = $this->translator->translateToDomainModel($assessmentModel);
+
+        // Assert assessment
+        $this->assertInstanceOf($class, $assessment);
+        $this->assertEquals($id, $assessment->getId());
+
+        // Assert specification
+        $this->assertInstanceOf($specificationClass, $assessment->getSpecificationAssessment());
+        $this->assertEquals($specificationId, $assessment->getSpecificationAssessment()->getId());
+
+        // Assert specification context
+        $this->assertInstanceOf($specificationContextClass, $assessment->getSpecificationAssessment()->getContext());
+        $this->assertEquals($specificationContextId, $assessment->getSpecificationAssessment()->getContext()->getId());
     }
 }
