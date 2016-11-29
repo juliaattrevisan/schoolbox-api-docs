@@ -467,16 +467,30 @@ class Controller extends Assessment\Controller
     public function patchUpdateAssessment(IAssessable $assessment)
     {
         /* TODO: Make this more generalised
-         * TODO: Save this setting lol
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-
         /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
         if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
+            $skipUnsubmitted = true;
         }
         else {
             $assessment->showAllSubmissibleStudents();
+            $skipUnsubmitted = false;
+        }
+
+        /* Persist checkbox setting
+         */
+        try {
+            /** @var SubmissionBox $submitBox */
+            $submitBox = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+            $submitBox->setSkipUnsubmitted($skipUnsubmitted);
+            \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->save($submitBox);
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+
+            /* noop - submission box doesn't exist
+             */
         }
 
         return;
