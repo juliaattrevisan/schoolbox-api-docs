@@ -9,6 +9,7 @@ namespace Schoolbox\Learning;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -184,6 +185,7 @@ class Module extends BaseModule
                 'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class)
             ])
         );
     }

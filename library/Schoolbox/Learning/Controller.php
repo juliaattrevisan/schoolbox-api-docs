@@ -8,6 +8,8 @@ namespace Schoolbox\Learning;
 
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -55,16 +57,22 @@ class Controller extends Base
      * @var AssessmentMapperProxy
      */
     protected $assessmentMapperProxy;
+    /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper            $errorMapper
-     * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param TermMapper             $termMapper
-     * @param FolderMapper           $folderMapper
-     * @param GradeGroup             $defaultGradeGroup
-     * @param ShowcaseMapper         $showcaseMapper
+     * @param ErrorMapper           $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param FolderMapper          $folderMapper
+     * @param TermMapper            $termMapper
+     * @param GradeGroup            $defaultGradeGroup
+     * @param ShowcaseMapper        $showcaseMapper
+     * @param RubricMapper          $rubricMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -72,7 +80,8 @@ class Controller extends Base
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
-        ShowcaseMapper $showcaseMapper
+        ShowcaseMapper $showcaseMapper,
+        RubricMapper $rubricMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -80,6 +89,7 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
+        $this->setRubricMapper($rubricMapper);
     }
 
     /**
@@ -419,43 +429,7 @@ class Controller extends Base
             return [];
         }
 
-        $stmt = \Database::getInstance()->prepare("
-            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
-            FROM rubric_criterion rc
-            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id
-            INNER JOIN assessment a ON sb.assessment_id = a.id
-            LEFT JOIN rubric_mark rm ON rm.submission_box_id = sb.id AND rm.criterion_id = rc.id AND rm.valid IS TRUE
-            INNER JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-            WHERE rc.parent_type = 'category'
-            AND rc.parent_id = :folder_id
-            AND rc.`deleted_at` IS NULL
-            AND rm.student_id = :student_id
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC
-        ");
-
-        $stmt->execute([
-            'folder_id'  => $subject->getId(),
-            'student_id' => $student->getId()
-        ]);
-
-        $longitude = [];
-
-        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
-
-            list ($capability, $indicator, $assessmentId, $assessmentTitle, $descriptor) = $r;
-
-            $longitude[$capability]['name'] = $capability;
-            $longitude[$capability]['indicators'][$indicator]['name'] = $indicator;
-            $longitude[$capability]['indicators'][$indicator]['activities'][$assessmentId] = [
-                'id'         => $assessmentId,
-                'name'       => $assessmentTitle,
-                'descriptor' => $descriptor,
-            ];
-
-        }
-
-        return $longitude;
+        return $this->getRubricMapper()->getLongitudinal($subject, $student);
     }
 
 
@@ -559,6 +533,27 @@ class Controller extends Base
     {
         return $this->showcaseMapper;
     }
+
+
+    /**
+     * @return RubricMapper
+     */
+    public function getRubricMapper()
+    {
+        return $this->rubricMapper;
+    }
+
+
+    /**
+     * @param RubricMapper $rubricMapper
+     * @return static
+     */
+    public function setRubricMapper($rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
+        return $this;
+    }
+
 
     /**
      * @param ShowcaseMapper $showcaseMapper
