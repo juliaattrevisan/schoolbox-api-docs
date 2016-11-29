@@ -24,31 +24,14 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
+
     {% if assessment.acceptsNone %}
         {% set pStatusClass = '' %}
         {% set pTooltip     = '' %}
     {% else %}
-        {% set pStatusClass = participant.markingRequired ? statusPending : (latestResponse or latestFeedback ? statusComplete : statusIncomplete) %}
-        {% set pTooltip     = participant.markingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'Not completed') %}
-
-        {% set pStatusText %}
-            {%- spaceless %}
-                {% if not latestResponse %}
-                    Incomplete
-                {% else %}
-                    {% if multipleResponses %}
-                        Completed multiple times
-                    {% else %}
-                        Complete
-                    {% endif %}
-                    {% if latestResponse.submittedOnTime %}
-                        on time
-                    {% else %}
-                        late
-                    {% endif %}
-                {% endif %}
-            {% endspaceless -%}
-        {% endset %}
+        {% set pStatusClass = latestFeedback.isMarkedAsCompleted ? statusComplete : (latestFeedback.isMarkedAsSelfAssessed ? statusPending : statusIncomplete ) %}
+        {% set pTooltip     = latestFeedback.isMarkedAsCompleted ? 'Completed' : (latestFeedback.isMarkedAsSelfAssessed ? 'Self-Assessed' : 'Not Attempted') %}
+        {% set pStatusText = pTooltip %}
     {% endif %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
