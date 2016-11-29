@@ -1587,11 +1587,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               SELECT DISTINCT 
                 CASE 
                   WHEN `d`.`category` IS NOT NULL THEN `d`.`category`
+                  WHEN `q`.`category_id` IS NOT NULL THEN `q`.`category_id`
                   ELSE `af`.`folder_id` 
                 END AS `folder_id`
               FROM `assessment` AS `a`
-              LEFT JOIN `assessment_folder` AS `af` ON `af`.`assessment_id` = `a`.id
+              LEFT JOIN `assessment_folder` AS `af` ON `af`.`assessment_id` = `a`.`id`
               LEFT JOIN `task` AS `t` ON `a`.`id` = `t`.`assessment_id`
+              LEFT JOIN `assess` AS `q` ON `q`.`assessment_id` = `a`.`id`              
               LEFT JOIN `submission_box` AS `d` ON `a`.`id` = `d`.`assessment_id`
               LEFT JOIN `task_completion` AS `tc` ON `t`.`id` = `tc`.`task_id`
               LEFT JOIN `submission_return` AS `sr` ON `sr`.`box_id` = `d`.id
