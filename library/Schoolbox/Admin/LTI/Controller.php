@@ -108,27 +108,35 @@ class Controller extends Base
             try {
                 $xmlContent = @file_get_contents($post['xml']);
 
-                $xml = simplexml_load_string($xmlContent);
+                if($xmlContent) {
+
+                    libxml_use_internal_errors(true);
+
+                    $xml = simplexml_load_string($xmlContent);
 
 
-                if ($xml !== false) {
+                    if ($xml !== false) {
 
-                    $launchUrl = $xml->children('blti', true)->secure_launch_url;
-
-                    if (!empty($launchUrl)) {
-                        $provider->setUrl((string)$launchUrl);
-                    } else {
-                        $launchUrl = $xml->children('blti', true)->launch_url;
+                        $launchUrl = $xml->children('blti', true)->secure_launch_url;
 
                         if (!empty($launchUrl)) {
                             $provider->setUrl((string)$launchUrl);
+                        } else {
+                            $launchUrl = $xml->children('blti', true)->launch_url;
+
+                            if (!empty($launchUrl)) {
+                                $provider->setUrl((string)$launchUrl);
+                            }
+                        }
+
+                        $icon = $xml->children('blti', true)->secure_icon;
+
+                        if (!empty($launchUrl)) {
+                            $provider->setIcon((string)$icon);
                         }
                     }
-
-                    $icon = $xml->children('blti', true)->secure_icon;
-
-                    if (!empty($launchUrl)) {
-                        $provider->setIcon((string)$icon);
+                    else {
+                        $provider->setUrl($post['xml']);
                     }
                 }
             } catch (\Exception $e) {
