@@ -60,6 +60,7 @@ class Exporter
             WHERE           YEAR(sr.created_at) = :currentYear
                             AND sb.name LIKE '%[%]%'
                             AND sr.mark != ''
+                            AND sr.published_at IS NOT NULL
             ORDER BY        cc.code
         ";
 
