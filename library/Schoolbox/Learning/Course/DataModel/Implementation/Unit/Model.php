@@ -220,7 +220,7 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * @return bool
      */
     public function isBeforeOpenDate() {
-        $date = new Alaress_Date_Format(new \DateTime());
+        $date = Alaress_Date_Format::now();
         return $date->compareDateOnly($this->getOpenDate()) < 0;
     }
 
@@ -230,7 +230,7 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * @return bool
      */
     public function isAfterDueDate() {
-        $date = new Alaress_Date_Format(new \DateTime());
+        $date = Alaress_Date_Format::now();
         return $date->compareDateOnly($this->getDueDate()) > 0;
     }
 
