@@ -390,6 +390,44 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 UnitSpecificationModel::class,
                 54321,
             ],
+            [
+                // Assessment whose specification's type differs from its own.
+                // should still be translated without question
+                (new Task())
+                    ->setId(33)
+                    ->setContext((new UnitImplementation())->setId(12345))
+                    ->setCreator($this->teacher1)
+                    ->setSpecificationAssessment(
+                        (new Quiz())
+                            ->setId(22)
+                            ->setContext((new UnitSpecification())->setId(6666))
+                            ->setCreator($this->teacher1)
+                    ),
+                33,
+                QuizModel::class,
+                22,
+                UnitSpecificationModel::class,
+                6666
+            ],
+            [
+                // Usually only assessments within a unit implementation context will have a specification.
+                // However, that isn't a hard and fast rule.
+                (new Task())
+                    ->setId(3)
+                    ->setContext((new Folder())->setId(12345))
+                    ->setCreator($this->teacher1)
+                    ->setSpecificationAssessment(
+                        (new Task())
+                            ->setId(2)
+                            ->setContext((new Folder())->setId(54321))
+                            ->setCreator($this->teacher1)
+                    ),
+                3,
+                TaskModel::class,
+                2,
+                Folder::class,
+                54321,
+            ],
         ];
     }
 
