@@ -46,7 +46,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  * SBFS Folder Mapper. Maps category table to SBFS folder objects.
  *
  * @package Schoolbox\Resource\Folder
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
@@ -97,7 +97,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Mapper constructor.
      */
     public function __construct() {
-        $this->setGroupMapper(GroupMapper::getInstance());
         parent::__construct();
     }
 
@@ -186,11 +185,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             'curriculumNodes'
         );
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
 
         $this->ancestry = new Ancestry($this);
     }
@@ -247,19 +250,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
+     * Pre-save callback to ensure a folder's codes are valid
      * @param Model $model
      * @return bool
      */
-    public function preSave($model)
+    public function validateFolderCodes($model)
     {
         // iterate codes given; if any already exist, error 136
         $codeList = $model->getCodes()->getColumnValues('code');
 
-        $collisions = Code\Mapper::getInstance()->findByColumn('code', $codeList);
+        $collisions = $this->getJoinMapper('codes')->findByColumn('code', $codeList);
 
         // retain any codes that do NOT match the given model
         $id = $model->getId();
-        $collisions = $collisions->filterByCallback(
+        $collisions = $collisions->filter(
             function ($code) use ($id) {
                 /** @var Code\Model $code */
                 return $code->getFolder()->getId() != $id;
@@ -322,26 +326,39 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
+     * PostSave callback to clear permissions if they are now being inherited
+     *
      * @param Model $model
      * @param Model $previous
      * @return bool
      */
-    public function postSave($model, $previous = null)
+    public function updateInheritedPermissions($model, $previous = null)
     {
         // If we are inheriting permissions delete any previously created group perms
         if ($model->getInherit()) {
-            $this->getGroupMapper()->deleteByColumn('cid', $model->getId());
+            $this->getJoinMapper('groups')->deleteByColumn('cid', $model->getId());
+        }
+        return true;
+    }
+
+
+    /**
+     * PostSave callback to save the folder's folderCodes
+     *
+     * @param Model $model
+     * @param Model $previous
+     * @return bool
+     */
+    public function updateFolderCodes($model, $previous = null)
+    {
+        $folderCodeMapper = $this->getJoinMapper('codes');
+        // first drop the previous code(s) connected to this folder
+        $folderCodes = $folderCodeMapper->findByColumn('folder_id', $model->getId());
+        if($folderCodes->count()){
+            $folderCodeMapper->delete($folderCodes);
         }
 
-        // first drop the previous code(s) connected to this category
-        try {
-            Code\Mapper::getInstance()->delete(
-                Code\Mapper::getInstance()->findByColumn('folder_id', $model->getId())
-            );
-        } catch (\Exception $e) {
-        }
-
-        // if no codes populated or inheriting, no need to do anything
+        // only execute if folder has codes and not inheriting permissions
         if ($model->getCodes()->count() && !$model->getInherit()) {
             // bind the given codes to this category
             foreach ($model->getCodes() as $code) {
@@ -349,7 +366,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             // persist the Code objects
-            Code\Mapper::getInstance()->save($model->getCodes());
+            $folderCodeMapper->save($model->getCodes());
+        }
+        return true;
+    }
+
+    /**
+     * Post-save callback to ensure that if this folder is a class, that its notifications are not muted
+     *
+     * @param Model $model
+     * @param Model $previous
+     * @return bool
+     */
+    public function unMuteClassNotifications($model, $previous = null)
+    {
+        // only execute if folder has codes and not inheriting permissions
+        if ($model->getCodes()->count() && !$model->getInherit()) {
 
             // remove any mutes that might exist on this subject (classes are not allowed to be muted)
             RerouteOverrideMapper::getInstance()->deleteByColumnList([
@@ -1654,27 +1686,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $this->save($folder);
             $this->recurseInheritance($folder);
         }
-    }
-
-    /**
-     * @var GroupMapper
-     */
-    protected $groupMapper;
-
-    /**
-     * @return GroupMapper
-     */
-    public function getGroupMapper() {
-        return $this->groupMapper;
-    }
-
-    /**
-     * @param $groupMapper
-     * @return $this
-     */
-    public function setGroupMapper($groupMapper) {
-        $this->groupMapper = $groupMapper;
-        return $this;
     }
 
     /**
