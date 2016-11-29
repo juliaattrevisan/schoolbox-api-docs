@@ -119,6 +119,17 @@ class Translator
             ->setDeletedAt($assessment->getDeletedAt())
         ;
 
+        // Translate specification assessment if there is one
+        $specification = $assessment->getSpecificationAssessment();
+        if ($specification instanceof IAssessable) {
+            // Go to no great lengths here, as I need only an ID
+            $specModel = $this->translateToDataModel($specification, 0);
+            // Turn inside out again
+            $specAssessment = $specModel->getAssessmentModel();
+            $specAssessment->setSubObject($specModel);
+            $assessmentModel->setSpecificationAssessment($specAssessment);
+        }
+
         // Translate assessment context
         // TODO consider moving this to a translator
         // TODO add project context
@@ -203,6 +214,17 @@ class Translator
             ->setUpdatedAt($dataModel->getAssessmentModel()->getUpdatedAt())
             ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
         ;
+
+        // Translate specification assessment if there is one
+        $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();
+        if ($specification instanceof Model) {
+            // Turn it inside out, because that's the way I got it
+            $model = $specification->getSubObject();
+            $model->setAssessmentModel($specification);
+
+            // Holy recursion batman
+            $assessable->setSpecificationAssessment($this->translateToDomainModel($model));
+        }
 
         // Translate assessment context
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();

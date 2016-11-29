@@ -112,6 +112,14 @@ abstract class AbstractAssessment implements IAssessable
     private $context;
 
     /**
+     * If this assessment's context is a UnitImpl, it may have been created from a UnitSpec.
+     * This is a reference back to the IAssessable from which this assessment was cloned.
+     *
+     * @var IAssessable|null
+     */
+    private $specificationAssessment = null;
+
+    /**
      * If published, then who can see the feedback for this Assessment.
      *
      * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
@@ -156,6 +164,18 @@ abstract class AbstractAssessment implements IAssessable
         $this->setCreatedAt($this->getCreatedAt() instanceof \Alaress_Date_Format ? clone $this->getCreatedAt() : null);
         $this->setUpdatedAt($this->getUpdatedAt() instanceof \Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
         $this->setDeletedAt($this->getDeletedAt() instanceof \Alaress_Date_Format ? clone $this->getDeletedAt() : null);
+    }
+
+    /**
+     * Clones this object in preparation for persisting as a copy of this object.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        $clone = clone $this;
+        $clone->setId(null);
+        return $clone;
     }
 
     /* Delegation Methods
@@ -823,5 +843,22 @@ abstract class AbstractAssessment implements IAssessable
         $this->markVisibility = $markVisibility;
         return $this;
     }
-}
 
+    /**
+     * @return null|IAssessable
+     */
+    public function getSpecificationAssessment()
+    {
+        return $this->specificationAssessment;
+    }
+
+    /**
+     * @param IAssessable|null $specification
+     * @return static
+     */
+    public function setSpecificationAssessment(IAssessable $specification = null)
+    {
+        $this->specificationAssessment = $specification;
+        return $this;
+    }
+}

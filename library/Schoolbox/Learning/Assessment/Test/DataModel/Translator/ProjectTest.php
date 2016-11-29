@@ -23,6 +23,12 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -414,5 +420,195 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         if ($scheme instanceof LetterGrade) {
             $this->assertEquals($gradeGroupId, $scheme->getGradeGroup()->getId());
         }
+    }
+
+    /**
+     * Test translation of a project's activity's specification assessments to a domain model.
+     */
+    public function testTranslateSpecificationAssessmentToDomainModel()
+    {
+        // The project is within a unit implementation
+        // It also has unit specifications
+        $unitSpecModel = (new UnitSpecificationModel())
+            ->setId(2)
+            ->setCourse((new CourseSpecificationModel())->setId(3));
+        $projectModel  = (new ProjectModel())
+            ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(104)
+                    ->setAssessmentContext((new UnitImplementationModel())->setId(1))
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(4)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject(
+                                (new ProjectModel())
+                                    ->setId(4)
+                                    ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+                                    ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE))
+                            )
+                    )
+            )
+            ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
+
+        // Project activities may have a specification, even though they're in the context of a project
+        $projectModel->getAssessments()
+                     ->add(
+                         (new TaskModel())
+                             ->setOwner($this->teacher1)
+                             ->setAssessmentModel(
+                                 (new AssessmentModel())
+                                     ->setId(101)
+                                     ->setSpecificationAssessment(
+                                         (new AssessmentModel())
+                                             ->setId(1)
+                                             ->setAssessmentContext($unitSpecModel)
+                                             ->setSubObject((new TaskModel())->setId(1))
+                                     )
+                             )
+                     )
+                     ->add(
+                         (new QuizModel())
+                             ->setUser($this->teacher2)
+                             ->setAssessmentModel(
+                                 (new AssessmentModel())
+                                     ->setId(102)
+                                     ->setSpecificationAssessment(
+                                         (new AssessmentModel())
+                                             ->setId(2)
+                                             ->setAssessmentContext($unitSpecModel)
+                                             ->setSubObject((new QuizModel())->setId(2))
+                                     )
+                             )
+                     )
+                     ->add(
+                         (new DueWorkModel())
+                             ->setOwner($this->teacher2)
+                             ->setAssessmentModel(
+                                 (new AssessmentModel())
+                                     ->setId(103)
+                                     ->setSpecificationAssessment(
+                                         (new AssessmentModel())
+                                             ->setId(3)
+                                             ->setAssessmentContext($unitSpecModel)
+                                             ->setSubObject(
+                                                 (new DueWorkModel())
+                                                     ->setId(3)
+                                                     ->setMarkType($this->buildMarkType())
+                                             )
+                                     )
+                             )
+                             ->setMarkType($this->buildMarkType())
+                     );
+
+        /** @var Project $project */
+        $project = $this->translator->translateToDomainModel($projectModel);
+
+        // Test project-specific fields
+        $this->assertInstanceOf(Project::class, $project);
+        $this->assertEquals(104, $project->getId());
+
+        // Test activities
+        // Activities remain within the context of their project, and have a specification
+        $this->assertCount(3, $project->getAssessables());
+
+        $this->assertInstanceOf(Task::class, $project->getAssessables()[0]);
+        $this->assertEquals(101, $project->getAssessables()[0]->getId());
+        $this->assertEquals(1, $project->getAssessables()[0]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[0]->getContext());
+
+        $this->assertInstanceOf(Quiz::class, $project->getAssessables()[1]);
+        $this->assertEquals(102, $project->getAssessables()[1]->getId());
+        $this->assertEquals(2, $project->getAssessables()[1]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[1]->getContext());
+
+        $this->assertInstanceOf(DueWork::class, $project->getAssessables()[2]);
+        $this->assertEquals(103, $project->getAssessables()[2]->getId());
+        $this->assertEquals(3, $project->getAssessables()[2]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[2]->getContext());
+    }
+
+    /**
+     * Test translation of a project's activity's specification assessments to a data model.
+     */
+    public function testTranslateSpecificationAssessmentToDataModel()
+    {
+        $unitSpec = (new UnitSpecification())->setId(2);
+        $project  = (new Project(new WeightedAverage()))
+            // Generic fields
+            ->setContext((new UnitImplementation())->setId(1))
+            ->setId(104)
+            ->setCreator($this->teacher1)
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('Mr Test Project ништа')
+            ->setDescription('A description сплат')
+            ->setWeight(13)
+            ->setSpecificationAssessment(
+                (new Project(new WeightedAverage()))
+                    ->setContext($unitSpec)
+                    ->setId(4)
+                    ->setCreator($this->teacher1)
+            );
+
+        // Add sub-assessables
+        $project->getAssessables()
+                ->add(
+                    (new Task())
+                        ->setId(101)
+                        ->setTitle('Sub-task')
+                        ->setSpecificationAssessment(
+                            (new Task())
+                                ->setContext($unitSpec)
+                                ->setId(1)
+                                ->setTitle('Sub-task')
+                        )
+                )
+                ->add(
+                    (new Quiz())
+                        ->setId(102)
+                        ->setTitle('Sub-quiz')
+                        ->setSpecificationAssessment(
+                            (new Quiz())
+                                ->setContext($unitSpec)
+                                ->setId(2)
+                                ->setTitle('Sub-quiz')
+                        )
+                )
+                ->add(
+                    (new DueWork())
+                        ->setId(103)
+                        ->setTitle('Sub-work')
+                        ->setSpecificationAssessment(
+                            (new DueWork())
+                                ->setContext($unitSpec)
+                                ->setId(3)
+                                ->setTitle('Sub-work')
+                        )
+                );
+
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($project, 1);
+
+        // Test sub-assessables
+        $this->assertCount(3, $projectModel->getAssessments());
+
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
+        $this->assertEquals(0, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
+        $this->assertEquals(101, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSpecificationAssessment()->getId());
+
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
+        $this->assertEquals(1, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
+        $this->assertEquals(102, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSpecificationAssessment()->getId());
+
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
+        $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
+        $this->assertEquals(103, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSpecificationAssessment()->getId());
     }
 }

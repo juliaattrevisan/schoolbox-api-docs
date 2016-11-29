@@ -24,6 +24,15 @@ interface IAssessable extends ISoftDeletable
     const MARK_VISIBILITY_PARENT_STUDENT = 2;
     const MARK_VISIBILITY_STUDENT = 1;
 
+    /**
+     * Creates a clone of this assessment.
+     *
+     * This clone must be able to be persisted to create a copy of this assessment,
+     * without further modification.
+     *
+     * @return static
+     */
+    public function cloneForCopy();
 
     /**
      * Return the context within which this assessment belongs.
@@ -57,6 +66,24 @@ interface IAssessable extends ISoftDeletable
      * @return static
      */
     public function setContext(AssessmentContext $assessmentContext);
+
+    /**
+     * Retrieve the specification this assessment was created from, if any.
+     *
+     * When an assessment is created as part of creating a new unit implementation,
+     * it will contain a reference back to the specification it was cloned from.
+     *
+     * @return IAssessable|null
+     */
+    public function getSpecificationAssessment();
+
+    /**
+     * Set the specification this assessment was created from, if any.
+     *
+     * @param IAssessable|null $specification
+     * @return static
+     */
+    public function setSpecificationAssessment(IAssessable $specification = null);
 
     /**
      * Return the name of the "type" of Assessable this is
