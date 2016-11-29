@@ -7,9 +7,9 @@ INSERT INTO component_definition (
   visible,
   multiple
 ) VALUES (
-  'LTI',
+  'Embed LTI',
   'Schoolbox\\LTI\\Component\\Homepage\\Controller',
-  'Learning Tools Interoperability',
+  'Add 3rd party tools to your page via the Learning Tools Interoperability (LTI) protocol. Providers must be first installed by your system administrator.',
   'homepage',
   4,
   'true',
