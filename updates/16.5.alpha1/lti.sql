@@ -11,7 +11,7 @@ INSERT INTO component_definition (
   'Schoolbox\\LTI\\Component\\Homepage\\Controller',
   'Learning Tools Interoperability',
   'homepage',
-  3,
+  4,
   'true',
   'true'
 );
