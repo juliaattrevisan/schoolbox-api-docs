@@ -1,42 +1,52 @@
-<div class="row">
+<div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="small-12 columns">
         <h1>My Classes</h1>
     </div>
 </div>
 
 <div class="row">
-    {% for class in classList %}
-    <div class="small-6 medium-6 large-4 island">
-        <section>
-            <div class="card-new small-12">
-                <a href="/homepage/{{ class.id }}">
-                    <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
-                </a>
-                <div class="card-content actions-small-1">
-                    <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
-                    <p class="meta">{{ classTypes[class.id] }}</p>
-                    {% if currentUser.getRole.isStaff == true %}
-                    <nav>
-                        <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                    </nav>
-                    <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                        <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
-                        <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
-                        <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
-                    </ul>
-                    {% endif %}
-                    {%  if currentUser.getRole.isStudent == true %}
-                    <nav>
-                        <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
-                    </nav>
-                    <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                        <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: currentSemester.id, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
-                    </ul>
-                    {% endif %}
-                </div>
+    {% if classList is empty  %}
+        <div class="small-12 island">
+            <div class = "empty-state">
+                <i class="icon-class-list"></i>
+                <p>You are currently not enrolled in any class.<br />If you expect to have classes please contact your system administrator.</p>
             </div>
-        </section>
-    </div>
+        </div>
+    {% else %}
+        {% for class in classList %}
+            <div class="small-6 medium-6 large-4 island">
+                <section>
+                    <div class="card-new small-12">
+                        <a href="/homepage/{{ class.id }}">
+                            <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                        </a>
+                        <div class="card-content actions-small-1">
+                            <h3><a href="/homepage/{{ class.id }}">{{ class.title }}</a></h3>
+                            <p class="meta">{{ classTypes[class.id] }}</p>
+                            {% if currentUser.getRole.isStaff == true %}
+                            <nav>
+                                <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                                <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
+                                <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
+                                <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
+                                <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                            </ul>
+                            {% endif %}
+                            {%  if currentUser.getRole.isStudent == true %}
+                            <nav>
+                                <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                                <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: currentSemester.id, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </div>
     {% endfor %}
+
+    {% endif %}
 </div>

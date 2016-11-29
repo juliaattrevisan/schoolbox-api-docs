@@ -24,35 +24,44 @@
     </nav>
 </div>
 <div class="row">
-    {% for group in groupList %}
-    <div class="small-6 medium-6 large-4 island">
-        <section>
-            <div class="card-new small-12">
-            <a href="/homepage/{{ group.id }}">
-                        <div class="card-feature-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage.hash %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
-                    </a>
-                    <div class="card-content actions-small-1">
-                        <div class="list-item">
-                            <h3><a href="/homepage/{{ group.id }}">{{ group.name }}</a></h3>
-                        </div>
-                        <nav>
-                            <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
-                        </nav>
-                        <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
-                            {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
-                                <li><a href="/resource/folder/modify/{{ group.id }} " class="icon-modify">Modify Folder</a></li>
-                            {% endif %}
-                            {% if userAccess[group.id].admin %}
-                                <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
-                                <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
-                            {% endif %}
-                            {% if (userAccess[group.id].write or userAccess[group.id].read)%}
-                                <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave  class="icon-logout">Leave Group</a></li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </section>
+    {% if groupList is empty %}
+        <div class="small-12 island">
+            <div class = "empty-state">
+                <i class="icon-group"></i>
+                <p>You are not a member of any group.<br /> You can join <a href="/group/join">new groups</a> now to get started.</p>
+            </div>
         </div>
-    {% endfor %}
+    {% else %}
+        {% for group in groupList %}
+        <div class="small-6 medium-6 large-4 island">
+            <section>
+                <div class="card-new small-12">
+                <a href="/homepage/{{ group.id }}">
+                            <div class="card-feature-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage.hash %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                        </a>
+                        <div class="card-content actions-small-1">
+                            <div class="list-item">
+                                <h3><a href="/homepage/{{ group.id }}">{{ group.name }}</a></h3>
+                            </div>
+                            <nav>
+                                <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
+                                {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
+                                    <li><a href="/resource/folder/modify/{{ group.id }} " class="icon-modify">Modify Folder</a></li>
+                                {% endif %}
+                                {% if userAccess[group.id].admin %}
+                                    <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
+                                    <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
+                                {% endif %}
+                                {% if (userAccess[group.id].write or userAccess[group.id].read)%}
+                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave  class="icon-logout">Leave Group</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        {% endfor %}
+    {% endif %}
 </div>
