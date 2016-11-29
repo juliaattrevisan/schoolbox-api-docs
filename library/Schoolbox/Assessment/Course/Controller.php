@@ -352,17 +352,17 @@ class Controller extends Base\Base
     /**
      * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
      *
-     * @param Folder $unit
+     * @param Folder $unitFolder
      * @return Component_Instance
      */
-    protected function getCourseBuilderInstance(Folder $unit)
+    protected function getCourseBuilderInstance(Folder $unitFolder)
     {
         // confirm that there's a Course Builder component
-        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), CourseBuilderController::class);
+        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unitFolder->getId(), CourseBuilderController::class);
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
-            return $this->injectNewComponent($unit);
+            return $this->injectNewComponent($unitFolder);
         }
 
         // instance found - use that
@@ -760,13 +760,23 @@ class Controller extends Base\Base
     /**
      * Post request to spawn a new unit
      *
-     * @api   POST /course/unit/new
+     * Creates:
+     * * UnitSpec
+     * * Folder
+     * * CourseBuilder Component on the Folder
+     *
+     * @api   POST /course/{courseSpecId}/units/new
      * @level 160
+     * @param CourseSpecification $course
+     * @var string $_POST['name'] What to name the new unit
      */
-    public function newUnit()
+    public function newUnit(CourseSpecification $course)
     {
+        if(!$course->getId()){
+            $this->sendError("Could not save. Course not found.");
+            return;
+        }
         $post = $this->getRequest()->post;
-
         $name = trim($post->get('name'));
 
         if (!$name) {
@@ -780,36 +790,33 @@ class Controller extends Base\Base
             // course config
             $rolePermissions = [];
             foreach ($this->getCourseConfigMapper()->findByColumn('page', 'unit') as $courseConfig) {
-                /** @var CourseConfigModel $courseConfig */
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
-            // Get the course I'm saving into
-            $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
-
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
-                'name'            => $name,
-                'parent'          => $courseSpec->getFolder()->getId(),
+                'name'     => $name,
+                'parent'   => $course->getFolder()->getId(),
 
                 // configurable things
-                'inherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                'inherit'  => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
                 'template' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
-                'group' => $rolePermissions,
+                'group'    => $rolePermissions,
 
                 // leave these always off
                 'recursive' => false, // LEAVE THIS
-                'code' => null,  // LEAVE THIS
+                'code'      => null,  // LEAVE THIS
             ]);
 
             // Persist the unit too
             $unitSpec = new UnitSpecification();
             $unitSpec->setFolder($folder);
-            $this->getUnitSpecificationMapperProxy()->save($unitSpec, $courseSpec);
+            $unitSpec->setCourse($course);
+            $this->getUnitSpecificationMapper()->save($unitSpec);
 
             $instance  = $this->getCourseBuilderInstance($folder);
             $folderId  = $folder->getId();
-            $returnUrl = $this->getReturnUrl($post['id'], $folderId);
+            $returnUrl = $this->getReturnUrl($course->getId(), $folderId);
 
             $data = [
                 'unit'      => $unitSpec,
@@ -836,7 +843,15 @@ class Controller extends Base\Base
     /**
      * Wrapper around Folder\Controller::persistFolder() and does some extra perms checking
      *
-     * @param array $data
+     * @param array    $data
+     * @var   int|null $data['categoryID'] If absent, this is an INSERT, if present, an UPDATE
+     * @var   string   $data['name']
+     * @var   int      $data['parent']
+     * @var   bool     $data['inherit']    Whether to inherit permissions
+     * @var   int      $data['template']
+     * @var   int[]    $data['group']      Maps role to permission level
+     * @var   bool     $data['recursive']  If true && user is SU, applies $data['inherit'] to entire subtree
+     * @var   string   $data['code']       Comma-separated codes
      * @return Folder
      */
     protected function persistFolder(array $data)

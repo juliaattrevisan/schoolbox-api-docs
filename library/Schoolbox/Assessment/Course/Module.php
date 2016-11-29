@@ -49,7 +49,6 @@ class Module extends BaseModule
                 '/parent{/folderId}'                   => 'parentList',
             ],
             'POST' => [
-                '/unit/new'         => 'newUnit',
                 // AFAICT this was never used - I'm re-purposing it
                 '/unit/delete/{id}' => 'deleteUnitSpecification',
                 '/new'              => 'createCourse',
@@ -90,8 +89,9 @@ class Module extends BaseModule
             }
         };
 
-        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
         $this->register('GET',  '/modify/{id}',                                     'modifyCourse',   null, $preloadCourse);
+        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
+        $this->register('POST', '/{id}/units/new',                                  'newUnit',        null, $preloadCourse);
     }
 
     /**
