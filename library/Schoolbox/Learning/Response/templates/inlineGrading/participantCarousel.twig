@@ -49,7 +49,7 @@
 
         tgt = $('select[name=student-select]');
         var ize,
-            showUnmarkedSubmissions = $('#showUnmarkedSubmissions'),
+            showSubmittedOnly = $('#showSubmittedOnly'),
             students = {{ carousel.allPeople|json_encode|raw }},
             selectizeOptions = {
                 preload: true,
@@ -57,7 +57,7 @@
                 options: students,
                 render: {
                     option: function (item) {
-                        item.disabled = showUnmarkedSubmissions.is(':checked') && !item.submitted;
+                        item.disabled = showSubmittedOnly.is(':checked') && !item.submitted;
                         return $('<div/>').html(item.html).html();
                     },
                     item: function (item) {
@@ -91,7 +91,7 @@
             }
         }
 
-        showUnmarkedSubmissions.change(function (event) {
+        showSubmittedOnly.change(function (event) {
             var ize = tgt[0].selectize,
                     skip = $(this).is(':checked') ? 1 : 0,
                     form = $(this).closest('form');
@@ -107,7 +107,7 @@
                 },
                 type: 'POST',
                 data: {
-                    showUnmarkedSubmissions: skip
+                    showSubmittedOnly: skip
                 }
             });
 
@@ -147,8 +147,8 @@
         <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="showUnmarkedSubmissions" id="showUnmarkedSubmissions" {% if participant.assessable.submittedOnly %}checked="checked"{% endif %} value='1' />
-            <label for="showUnmarkedSubmissions" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
+            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.submittedOnly %}checked="checked"{% endif %} value='1' />
+            <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
         </form>
     </div>
 </div>

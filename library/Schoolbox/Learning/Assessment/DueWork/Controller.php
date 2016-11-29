@@ -469,7 +469,7 @@ class Controller extends Assessment\Controller
          * For now the only utility here is to update Skip Unsubmitted setting
          */
         /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
-        if ((int)$this->getRequest()->post['showUnmarkedSubmissions']) {
+        if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
         }
