@@ -350,8 +350,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
