@@ -507,16 +507,23 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Project::class, $project);
         $this->assertEquals(104, $project->getId());
 
-        // Test sub-assessables
+        // Test activities
+        // Activities remain within the context of their project, and have a specification
         $this->assertCount(3, $project->getAssessables());
 
         $this->assertInstanceOf(Task::class, $project->getAssessables()[0]);
         $this->assertEquals(101, $project->getAssessables()[0]->getId());
+        $this->assertEquals(1, $project->getAssessables()[0]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[0]->getContext());
 
         $this->assertInstanceOf(Quiz::class, $project->getAssessables()[1]);
         $this->assertEquals(102, $project->getAssessables()[1]->getId());
+        $this->assertEquals(2, $project->getAssessables()[1]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[1]->getContext());
 
         $this->assertInstanceOf(DueWork::class, $project->getAssessables()[2]);
         $this->assertEquals(103, $project->getAssessables()[2]->getId());
+        $this->assertEquals(3, $project->getAssessables()[2]->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(Project::class, $project->getAssessables()[2]->getContext());
     }
 }
