@@ -481,10 +481,10 @@ class Controller extends Assessment\Controller
         /* Persist checkbox setting
          */
         try {
-            /** @var SubmissionBox $swampBox */
-            $swampBox = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
-            $swampBox->setSkipUnsubmitted($skipUnsubmitted);
-            \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->save($swampBox);
+            /** @var SubmissionBox $submitBox */
+            $submitBox = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+            $submitBox->setSkipUnsubmitted($skipUnsubmitted);
+            \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->save($submitBox);
         }
         catch (\Schoolbox\Mapper\Exception $e) {
 
