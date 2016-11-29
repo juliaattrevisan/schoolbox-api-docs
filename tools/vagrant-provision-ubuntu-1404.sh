@@ -230,7 +230,91 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
-/vagrant/tools/pkg-build-npm.sh;
+cd $cachedir;
+npmfile='';
+npmlocksha=`sha1sum ../node_modules/npm.shrinkwrap.checksum 2>/dev/null | awk '{print $1}'`;
+echo "[DEBUG] $npmlocksha";
+if [ -f /vagrant/node_modules/npm.shrinkwrap.checksum ];
+then
+        currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
+echo "[DEBUG] $currentnpmsha";
+        if [ "$currentnpmsha" == "$npmlocksha" ];
+        then
+                echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change";
+                npmfile='ignore';
+        fi
+fi
+
+if [ "$npmfile" != 'ignore' ];
+then
+        check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
+        if [ $check -gt 0 ];
+        then
+                # Woo - we've located a matching cache file
+                npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+        else
+                # No cache files match - boo hoo - check to see if there are new versions
+                for branch in develop master;
+                do
+                        # Check if we've already found a matching file
+                        if [ "$npmfile" == '' ];
+                        then
+                                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                                if [ $? -eq 0 ];
+                                then
+                                        checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
+                                        if [ $checketag -eq 0 ];
+                                        then
+                                                # New/updated version available - download it
+                                                echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
+                                                curl https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz > $branch-npm.tar.gz;
+                                                if [ $? -eq 0 ];
+                                                then
+                                                        # This is a new file, so remove old references
+                                                        sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
+                                                        sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
+                                                        # Add new file to etag cache
+                                                        echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
+                                                        # Cleanup for purity
+                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                                                        # Extract checksum
+                                                        tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
+                                                        npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
+                                                        rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                                                        # Add new file to NPM cache
+                                                        echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
+                                                        # Check if this is file we need
+                                                        if [ "$npmchecksum" == "$npmlocksha" ];
+                                                        then
+                                                                npmfile="$branch-npm.tar.gz";
+                                                        fi
+                                                fi
+                                        fi
+                                fi
+                        fi
+                done
+        fi
+	cd /vagrant;
+        if [ "$npmfile" != '' ];
+        then
+                if [ -f /vagrant/vagrantcache/$npmfile ];
+                then
+                        # Extract content
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file '$npmfile', now extracting";
+                        rm -fR /vagrant/node_modules 2>/dev/null;
+                        tar xzf /vagrant/vagrantcache/$npmfile;
+                else
+                        # Still no luck, build from scratch with npm
+                        echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+                        /vagrant/tools/pkg-build-npm.sh 2>&1;
+                fi
+        else
+                # Still no luck, build from scratch with npm
+                echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+                /vagrant/tools/pkg-build-npm.sh 2>&1;
+        fi
+fi
+cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building Javascript";
 /vagrant/tools/pkg-build-bower.sh;
