@@ -7,6 +7,9 @@
  * @version     SVN: $Id$
  *
  */
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $folder = null;
 
@@ -158,7 +161,15 @@ if ($virtualPermission >= WRITE_ACCESS) {
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
-    $this->parse('course_actions_block', 'course_actions');
+
+    $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
+    $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
+    if(!$hasCourseSpec && !$hasUnitSpec){
+        $this->parse('course_actions_block', 'course_actions');
+    } else {
+        $this->setVar('course_actions_block', '');
+    }
+
 
     if (Cfg::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
