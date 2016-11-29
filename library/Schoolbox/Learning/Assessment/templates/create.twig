@@ -9,11 +9,96 @@
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
 
+
+        /**
+         * alaressValidate options for each assessment type form
+         * Set a default set of rules because everything except for quiz requires the same rules
+         */
+        var defaultRules = {
+            title: {required: true},
+            weight: {
+                required: true,
+                number: true
+            },
+            publishDate: {
+                required: true,
+                datepickerDate: true
+            },
+            publishTime: {required: true},
+            dueDate: {
+                required: true
+            },
+            dueTime: {required: true}
+        };
+        var validationRules = {
+            project: defaultRules,
+            dueWork: defaultRules,
+            task: defaultRules,
+            quiz: {
+                title: {required: true},
+                weight: {
+                    required: true,
+                    number: true
+                },
+                publishDate: {
+                    required: true,
+                    datepickerDate: true
+                },
+                publishTime: {required: true},
+                openDate: {
+                    required: true,
+                    datepickerDate: true
+                },
+                openTime: {required: true},
+                dueDate: {
+                    required: true,
+                    datepickerDate: true
+                },
+                dueTime: {required: true},
+                closeDate: {
+                    required: true,
+                    datepickerDate: true
+                },
+                closeTime: {required: true}
+            }
+        };
+        /**
+         * These rules can't go in above because they have selectors that need to be
+         * run on the content that's ajax'd in.
+         */
+        var defaultBeforeSubmit = function() {
+            $('input[name="dueDate"]').rules('add', {
+                datepickerDateNotBefore: $('input[name="publishDate"]')
+            });
+        };
+        var beforeSubmit = {
+            project: defaultBeforeSubmit,
+            duework: defaultBeforeSubmit,
+            task: defaultBeforeSubmit,
+            quiz: function() {
+                $('input[name="openDate"]').rules('add', {
+                    datepickerDateNotBefore: $('input[name="publishDate"]')
+                });
+                $('input[name="dueDate"]').rules('add', {
+                    datepickerDateNotBefore: $('input[name="openDate"]')
+                });
+                $('input[name="closeDate"]').rules('add', {
+                    datepickerDateNotBefore: $('input[name="dueDate"]')
+                });
+            }
+        };
+
+
         /**
          * When you finish configuring a non-project assessment
          */
-        function setupAssessmentEnd() {
+        function setupAssessmentEnd(assessmentType) {
+
             $('input[data-mage-next="end"]').mage({
+                validateOptions: {
+                    rules: validationRules[assessmentType]
+                },
+                beforeSubmit: beforeSubmit[assessmentType],
                 setFormData: function(data) {
                     if (CKEDITOR.instances['description'] != undefined) {
                         data.push({
@@ -27,37 +112,42 @@
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;
                     }
-
                 }
             });
         }
 
         {% if assessmentType|length %}
 
-        /* Save everything when Part 1 was already chosen in route
-         */
-        setupAssessmentEnd();
+            /* Save everything when Part 1 was already chosen in route
+             */
+            setupAssessmentEnd('{{ assessmentType }}');
 
-        {% else %}
+            {% else %}
 
-        /**
-         * Update new form action url
-         *
-         * Inject common details
-         * Inject assessmentType-specific details
-         */
-        $('input[data-mage-next="part-2"]').mage({
-            onXhrDone: function(data) {
-                $('#assessmentForm')
-                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
-                    .find('[data-assessment-details]')
-                    .html(data);
+            /**
+             * Update new form action url
+             *
+             * Inject common details
+             * Inject assessmentType-specific details
+             */
+            $('input[data-mage-next="part-2"]').mage({
+                validateOptions: {
+                    rules: {
+                        type: {required: true}
+                    }
+                },
+                onXhrDone: function(data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
+                        .find('[data-assessment-details]')
+                        .html(data);
 
-                /* Save everything when creating with Part 1
-                 */
-                setupAssessmentEnd();
-            }
-        });
+                    /* Save everything when creating with Part 1
+                     */
+                    var assessmentType = $('input[name="type"]:checked').val();
+                    setupAssessmentEnd(assessmentType);
+                }
+            });
         {% endif %}
     });
 </script>
