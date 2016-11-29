@@ -366,7 +366,7 @@ class Controller extends Base\Base
         }
 
         // instance found - use that
-        return reset($instances);
+        return $instances->first();
     }
 
 
