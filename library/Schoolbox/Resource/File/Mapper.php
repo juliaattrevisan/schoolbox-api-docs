@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -90,6 +90,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $fileTypes     = !empty($options['filter']) ? $options['filter'] : array();
         $sortColumn    = !empty($options['sort']) ? $options['sort'] : 'name';
         $sortDirection = !empty($options['sortdir']) ? $options['sortdir'] : 'asc';
+        //True > don't return empty/unknown extension files
+        $strict        = !empty($options['strict']) ? $options['strict'] : true;
         if (empty($folderIds)) {
             return new Collection();
         }
@@ -157,6 +159,10 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                             $otherMimeParts[] = "m.mime LIKE '$mime'";
                         }
                     }
+                    //Return all files regardless their extension
+                    if($strict === false) {
+                        $mimeParts[] = "h.ext = '' OR m.fileTypeId IS NULL";
+                    }
                 }
             }
             if (!empty($otherMimeParts)) {
@@ -167,14 +173,16 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             }
         }
         $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
-
+        //Don't return files with empty of unknown extension
+        if($strict === true) {
+            $baseQuery .= " AND NOT (h.ext = '' OR m.fileTypeId IS NULL)";
+        }
         // Put together sort parts
         $sortFields = array(
             'name'   => "$table.description",
             'date'   => "$table.submitted",
             'random' => "RAND()",
         );
-
         $sortColumn    = isset($sortFields[$sortColumn]) ? $sortColumn : 'name';
         $sortDirection = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
         $baseQuery    .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
