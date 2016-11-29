@@ -124,7 +124,7 @@ class Controller extends Base
 
         if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
             $custom = $component->getConfig('description');
-            preg_match('/\/books\/(.*?)\//i', $custom, $matches);
+            preg_match('/\/books\/([A-Z0-9]+)\//i', $custom, $matches);
             $launch_data['custom_vbid'] = $matches[1];
             preg_match('/\/pageid\/(.*)/i', $custom, $matches);
             $launch_data['custom_book_location'] = 'pageid/' . $matches[1];
