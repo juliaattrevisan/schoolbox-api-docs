@@ -97,6 +97,18 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Finds all unit implementations for the specified Unit Specification[s].
+     *
+     * @param int|array $unitSpecId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByUnitSpecId($unitSpecId, $options = [])
+    {
+        return $this->findByColumn('course_unit_specification_id', $unitSpecId, $options);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getSelectString()
