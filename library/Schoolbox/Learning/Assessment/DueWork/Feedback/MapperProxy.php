@@ -13,7 +13,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Mapper;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
@@ -161,7 +161,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             // This feedback doesn't have to be tied to a particular response.
             if ($domainObject->getResponse() instanceof IResponse) {
                 $dataModel->setSubmission(
-                    (new SubmissionFile())->setId($domainObject->getResponse()->getId())
+                    (new Submission())->setId($domainObject->getResponse()->getId())
                 );
             }
 
