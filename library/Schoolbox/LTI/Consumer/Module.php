@@ -98,10 +98,9 @@ class Module extends BaseModule
                     $page->setDi($this->getInjector());
 
                     $factory       = new \Component_Homepage_Factory(new User(), $page);
-                    $componentList = $componentInstanceMapper->findByInstanceId($params['componentId']);
-                    $cList         = array_values($componentList);
+                    $component = $componentInstanceMapper->findByInstanceId($params['componentId']);
 
-                    $returnArray['component'] = $factory->buildComponent($cList[0]);
+                    $returnArray['component'] = $factory->buildComponent($component);
                 }
 
                 if (array_key_exists('folderId', $params)) {
