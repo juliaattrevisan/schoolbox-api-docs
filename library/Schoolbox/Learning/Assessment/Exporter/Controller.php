@@ -81,13 +81,35 @@ class Controller extends BaseController
             'assessment'      => $assessment,
             'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
             'returnUrlName'   => Redirect::RETURN_URL,
-            'implementations' => [],
+            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessment),
         ];
 
-        // Data required:
-        // implementations, and their permissions
-        // units which use this specification
-        $context = $assessment->getContext();
+        $template = "@learningAssessmentExporter/export.twig";
+        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+    }
+
+    /**
+     * Processes the export assessment request.
+     *
+     * @param IAssessable $assessment
+     */
+    public function postExport(IAssessable $assessment)
+    {
+        // do stuff
+    }
+
+    /**
+     * Helper method: retrieves unit implementations for a spec assessment
+     *
+     * @param IAssessable $assessment
+     * @return array[] unit:     The unit implementation that this assessment's spec uses
+     *                 allowed:  Is the current user allowed to import this?
+     *                 imported: Is this assessment already imported?
+     */
+    protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment)
+    {
+        $implementations = [];
+        $context         = $assessment->getContext();
         if ($context instanceof UnitSpecification) {
             $unitImplementations = $this->unitImplementationDataSource->findAllByUnitSpecificationId(
                 $context->getId()
@@ -124,7 +146,7 @@ class Controller extends BaseController
                     }
                 }
 
-                $data['implementations'][] = [
+                $implementations[] = [
                     'unit'     => $unitImplementation,
                     'allowed'  => $isAllowed && !$isAlreadyImported,
                     'imported' => $isAlreadyImported,
@@ -134,12 +156,6 @@ class Controller extends BaseController
             // error out - if we haven't already
         }
 
-        $template = "@learningAssessmentExporter/export.twig";
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
-    }
-
-    public function postExport(IAssessable $assessment)
-    {
-        // do stuff
+        return $implementations;
     }
 }
