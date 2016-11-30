@@ -111,6 +111,21 @@ class ImplementationMapperProxy
     }
 
     /**
+     * Find all course implementations that are imported from the given specification.
+     *
+     * @param int   $courseSpecificationId
+     * @param array $options
+     * @return Collection|Implementation[]
+     */
+    public function findAllByCourseSpecificationId($courseSpecificationId, $options = [])
+    {
+        return $this->loadUnitsForCollection(
+            $this->mapper->findByColumn('course_specification_id', $courseSpecificationId, $options)
+                         ->map([$this->translator, 'translateToDomainModel'])
+        );
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Implementation $implementation
