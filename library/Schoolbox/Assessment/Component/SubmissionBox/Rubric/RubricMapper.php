@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Alaress_Date_Format;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -752,7 +753,8 @@ class RubricMapper
 
     /**
      * Specialised query for returning the longitudinal cross-section of rubric data for a
-     * student in a subject. Data is returned in a primitive hierarchy of:
+     * student in a subject, optionally date-restricted according to the DUE date of the
+     * assessment. Data is returned in a primitive hierarchy of:
      *   - capability
      *   - indicator
      *   - assessment
@@ -760,9 +762,11 @@ class RubricMapper
      *
      * @param Folder\Model        $subject
      * @param User                $student
+     * @param Alaress_Date_Format $noEarlierThan
+     * @param Alaress_Date_Format $noLaterThan
      * @return array
      */
-    public function getLongitudinal(Folder\Model $subject, User $student)
+    public function getLongitudinal(Folder\Model $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
     {
         $pb = new PredicateBuilder($this->database, '');
 
@@ -770,6 +774,14 @@ class RubricMapper
            ->equals('rc.parent_id', $subject->getId())
            ->equals('rm.student_id', $student->getId())
            ->isNull('rc.deleted_at');
+
+        if ($noEarlierThan) {
+            $pb->notLessThan('a.due_date', $noEarlierThan->getDatabase());
+        }
+
+        if ($noLaterThan) {
+            $pb->notGreaterThan('a.due_date', $noLaterThan->getDatabase());
+        }
 
         $where = implode(' AND ', $pb->getWhere());
 
