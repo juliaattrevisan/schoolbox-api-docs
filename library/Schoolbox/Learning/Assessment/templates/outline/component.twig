@@ -31,11 +31,13 @@
             <a class="icon-course" href="/homepage/{{ course.folder.id }}" title="Visit course page">{{ course.title }}</a>
         </p>
         {% include '@learningAssessment/outline/unit.twig' %}
+        {% if not readOnly %}
         <div class="component-action">
             <section>
                 <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}" class="button">Modify</a>
             </section>
         </div>
+        {% endif %}
     {% else %}
         <div class="content">
             <p>To get started with courses you need to first import an existing course to display</p>
