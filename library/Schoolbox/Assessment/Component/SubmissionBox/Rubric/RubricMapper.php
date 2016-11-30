@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
@@ -763,6 +764,15 @@ class RubricMapper
      */
     public function getLongitudinal(Folder\Model $subject, User $student)
     {
+        $pb = new PredicateBuilder($this->database, '');
+
+        $pb->equals('rc.parent_type', 'category')
+           ->equals('rc.parent_id', $subject->getId())
+           ->equals('rm.student_id', $student->getId())
+           ->isNull('rc.deleted_at');
+
+        $where = implode(' AND ', $pb->getWhere());
+
         $stmt = $this->database->prepare("
             SELECT rc.grouping, rc.name, a.id, a.title, rd.description
             FROM rubric_criterion rc
@@ -771,17 +781,11 @@ class RubricMapper
             INNER JOIN assessment a ON sb.assessment_id = a.id
             LEFT JOIN rubric_mark rm ON rm.submission_box_id = sb.id AND rm.criterion_id = rc.id AND rm.valid IS TRUE
             INNER JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-            WHERE rc.parent_type = 'category'
-            AND rc.parent_id = :folder_id
-            AND rc.`deleted_at` IS NULL
-            AND rm.student_id = :student_id
+            WHERE {$where}
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC
         ");
 
-        $stmt->execute([
-            'folder_id'  => $subject->getId(),
-            'student_id' => $student->getId()
-        ]);
+        $stmt->execute($pb->getParams());
 
         $longitude = [];
 
