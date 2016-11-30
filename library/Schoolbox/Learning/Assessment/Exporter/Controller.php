@@ -36,7 +36,7 @@ class Controller extends BaseController
 //        $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         $data     = ['assessment' => $assessment,];
-        $template = "@learningAssessmentExport/export.twig";
+        $template = "@learningAssessmentExporter/export.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
