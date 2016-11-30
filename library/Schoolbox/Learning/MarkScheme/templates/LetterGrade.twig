@@ -7,7 +7,7 @@
             {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
             {% set selected = isGt and not found ? 'selected="selected"' : '' %}
             {% if isGt %}{% set found = true %}{% endif %}
-            <option {{ selected }} value="{{ level.rawGrade }}">{{ level.caption }}</option>
+            <option {{ selected }} value="{{ level.caption }}">{{ level.caption }}</option>
         {% endfor %}
         </select>
     </label>
