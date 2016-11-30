@@ -1,0 +1,232 @@
+{BREADCRUMB}
+
+<!-- BEGIN standalone_header -->
+<div class="row">
+    <div class="small-12 island">
+        <h1>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h1>
+    </div>
+</div>
+<!-- END standalone_header -->
+
+<!-- BEGIN modal_header -->
+<div class="row">
+    <div class="small-12 columns">
+        <h2>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h2>
+    </div>
+</div>
+<!-- END modal_header -->
+
+<div class="row">
+    <div class="small-12 island">
+        <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+        <form method="post" action="" id="importForm">
+            <input type="hidden" name="task" value="{TASK_ID}" />
+            <section>
+                <fieldset class="content">
+                    <legend>
+                        Classes
+                        <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
+                    </legend>
+
+                    <div class="small-12 columns no-pad">
+                        <!-- BEGIN exportable -->
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all
+                                               data-select-all-for-group="unit-instance" />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- BEGIN class -->
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <!-- BEGIN class_import_checkbox -->
+                                        <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                        <input type="checkbox"
+                                               id="import-{UNIT_INSTANCE_ID}"
+                                               name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                               value="1"
+                                               data-select-all-group="unit-instance" />
+                                        <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                        <!-- END class_import_checkbox -->
+                                    </div>
+                                    <div class="card small-11">
+                                        <a href="/homepage/{UNIT_CATEGORY_ID}">
+                                            <span class="icon-32 icon-home"></span>
+                                            <h3>{UNIT_CATEGORY_NAME}</h3>
+                                        </a>
+                                        <p class="meta">
+                                            <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time>
+                                            &ndash;
+                                            <time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time>
+                                        </p>
+                                        <p class="meta">
+                                            <!-- BEGIN class_import_allowed -->
+                                            This task does not exist in this class.
+                                            <!-- END class_import_allowed -->
+
+                                            <!-- BEGIN class_import_forbidden -->
+                                            You don't have write permission for this class.
+                                            <!-- END class_import_forbidden -->
+
+                                            <!-- BEGIN class_import_exists -->
+                                            This task already exists in this class.
+                                            <!-- END class_import_exists -->
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                            <!-- END class -->
+                        </ul>
+                        <!-- END exportable -->
+
+                        <!-- BEGIN unexportable -->
+                        <div class="alert-box">
+                            There are no open classes that currently use this unit.
+                        </div>
+                        <!-- END unexportable -->
+                    </div>
+                </fieldset>
+            </section>
+
+            <!-- BEGIN submit -->
+            <input type="submit" class='expand' value="Export to selected classes" />
+            <!-- END submit -->
+        </form>
+    </div>
+</div>
+<!-- BEGIN modal_close -->
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+<!-- END modal_close -->
+
+
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage();
+
+        /**
+         * When you finish configuring a non-project assessment
+         */
+        function setupAssessmentEnd() {
+            $('input[data-mage-next="end"]').mage({
+                setFormData: function(data) {
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        data.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+                },
+
+                onXhrDone: function (data) {
+                    if('string' == typeof data.returnUrl){
+                        window.location.href = data.returnUrl;
+                    }
+
+                }
+            });
+        }
+
+        {% if assessmentType|length %}
+
+        /* Save everything when Part 1 was already chosen in route
+         */
+        setupAssessmentEnd();
+
+        {% else %}
+
+        /**
+         * Update new form action url
+         *
+         * Inject common details
+         * Inject assessmentType-specific details
+         */
+        $('input[data-mage-next="part-2"]').mage({
+            onXhrDone: function(data) {
+                $('#assessmentForm')
+                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
+                    .find('[data-assessment-details]')
+                    .html(data);
+
+                /* Save everything when creating with Part 1
+                 */
+                setupAssessmentEnd();
+            }
+        });
+        {% endif %}
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1></div>
+</div>
+
+{% if assessmentType|length %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) %}
+{% else %}
+    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id }) %}
+{% endif %}
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="{{ formAction }}" id="assessmentForm" method="post">
+            <section>
+                {% if not assessmentType|length %}
+                <fieldset class="content" data-mage="part-1">
+                    <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
+                    <legend>Choose activity type</legend>
+
+                    <fieldset>
+                        {% for type in types %}
+                        <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
+                            <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}">
+                            <label title="{{ type.title }}" for="{{ type.id }}" class="block"><i class="icon-{{ type.label|replace(' ', '-')|lower }}"></i>{{ type.label }}</label>
+                        </div>
+                        {% endfor %}
+                    </fieldset>
+
+                    <div class="small-12 column">
+                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'GET') }}
+                    </div>
+                </fieldset>
+                {% endif %}
+
+                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
+                    {% if returnUrl|length %}
+                        <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+                    {% endif %}
+                    <input type="hidden" name="contextType" value="{{ contextType }}" />
+                    <input type="hidden" name="contextId" value="{{ context.id }}" />
+
+                    {% if assessmentType|length %}
+                    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+                    {% endif %}
+
+                    <legend>Assessment Details</legend>
+                    <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
+                        {% if assessmentType|length %}
+                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
