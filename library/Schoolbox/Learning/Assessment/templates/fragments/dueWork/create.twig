@@ -113,20 +113,21 @@
 
         var $maxMarkInput = $('#maxMark');
         var $useRubricSwitch = $('#useRubric');
+        var $grid = $('#rb-{{ rubric.id }}');
 
         /**
          * Disable the field, but allow us to show its value
          * which will be programmatically generated
          */
         function disableMaxMark() {
-            $maxMarkInput.prop('disabled', true);
+            $maxMarkInput.prop('readonly', true);
         }
 
         /**
          * Enable the field for humans to change its value
          */
         function enableMaxMark() {
-            $maxMarkInput.prop('disabled', false);
+            $maxMarkInput.prop('readonly', false);
         }
 
         /**
@@ -136,9 +137,39 @@
         {
             if ($element.is(':checked')) {
                 disableMaxMark();
+                calculateGridTotal();
             } else {
                 enableMaxMark();
             }
+        }
+
+        function calculateGridTotal() {
+            var max = 0;
+
+            // iterate the grid, and sum the max of each row
+            $grid.find('tr[data-sequencer-group]').each(function () {
+                var $row = $(this),
+                    rowMax = 0;
+
+                if ($row.find('[data-criterion-name]:checked').length == 0) {
+                    return true; // jq.continue
+                }
+
+                $row.find('[data-descriptor="value"]').each(function () {
+                    var i = parseInt($(this).val());
+
+                    if (!isNaN(i)) {
+                        rowMax = Math.max(rowMax, i);
+                    }
+
+                });
+
+                max += rowMax;
+            });
+
+            var $maxMark = $('#maxMark');
+
+            $maxMark.val(max);
         }
 
         /* Rubrics switcher
@@ -147,6 +178,12 @@
             processUseRubricClick($(this));
         });
 
+        // configure callbacks into the grid
+        $grid
+            .on('change', '[data-descriptor="value"],[data-criterion-name]', calculateGridTotal)
+            .rubricEditable({
+                afterApplyResultSet: calculateGridTotal
+            });
 
         // Initiate
         processUseRubricClick($useRubricSwitch);

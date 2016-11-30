@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
+use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -255,6 +256,10 @@ class ListController extends Web\Controller\Base
             $assessment = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
+        }
+        catch (RangeException $e ) {
+            // cast
+            throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
         catch (InvalidArgumentException $e) {
             // cast
