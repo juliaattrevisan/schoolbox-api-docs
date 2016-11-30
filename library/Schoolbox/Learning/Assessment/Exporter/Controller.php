@@ -109,7 +109,10 @@ class Controller extends BaseController
                 // Is $assessable imported into this unit yet?
                 $isAlreadyImported = false;
                 foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
-                    if ($implementationAssessment->getSpecificationAssessment()->getId() == $assessment->getId()) {
+                    // It's not guaranteed that an assessment in a implementation will have a spec.
+                    // An assessment added to an implementation post-spec won't have one.
+                    $spec = $implementationAssessment->getSpecificationAssessment();
+                    if ($spec instanceof IAssessable && $spec->getId() == $assessment->getId()) {
                         $isAlreadyImported = true;
                         break;
                     }
