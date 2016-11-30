@@ -106,16 +106,6 @@
     </div>
 </div>
 
-{% if assessment.useRubric %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Marking Guide</h2>
-
-        {% include '@rubric/grid-markable.twig' with {rubric: rubricContext.rubric, markType: rubricContext.markType} only %}
-    </div>
-</div>
-{% endif %}
-
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Feedback</h2>

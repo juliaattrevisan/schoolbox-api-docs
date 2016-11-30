@@ -1,5 +1,15 @@
 {# TODO create feedback routes #}
 
+{##
+ # assessment           An IAssessable instance
+ # fbUrl                A url to a place which saves the values of this form
+ # feedbackAttachzone   An attachzone for uploading files
+ # latestFeedback       An IFeedback instance for most recent Feedback for response
+ # participant          A Participant instance
+ # response             An IResponse instance
+ # rubricContext        A RubricContext instance
+ #}
+
 {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
     {% set savedStatusText = 'Saved as Draft' %}
 {% else %}
@@ -14,7 +24,15 @@
 
 <form method="post" action="{{ fbUrl }}">
     <input type="hidden" name="responseId" value="{{ response.id }}" />
+
     <div class="row">
+
+        {% if assessment.useRubric and rubricContext %}
+        <div class="small-12 island">
+            {% include '@rubric/grid-markable.twig' with {rubric: rubricContext.rubric, markType: rubricContext.markType} only %}
+        </div>
+        {% endif %}
+
         <div class="small-12 medium-3 column">
             {% block grading %}{% endblock %}
         </div>
