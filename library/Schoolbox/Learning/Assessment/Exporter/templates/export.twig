@@ -49,36 +49,39 @@
                                     <li>
                                         <div class="list-item">
                                             <div class="small-1 columns">
-                                                {% if implementation.importable %}
-                                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                                {% if implementation.allowed %}
+                                                    <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
                                                     <input type="checkbox"
-                                                           id="import-{UNIT_INSTANCE_ID}"
-                                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                                           id="import-{{ implementation.unit.id }}"
+                                                           name="unit_instance[{{ implementation.unit.id }}]"
                                                            value="1"
                                                            data-select-all-group="unit-instance" />
-                                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                                    <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
                                                 {% endif %}
                                             </div>
                                             <div class="card small-11">
-                                                <a href="/homepage/{{ implementation.context.folder.id }}">
+                                                <a href="/homepage/{{ implementation.unit.context.folder.id }}">
                                                     <span class="icon-32 icon-home"></span>
-                                                    <h3>{{ implementation.context.folder.title }}</h3>
+                                                    <h3>{{ implementation.unit.context.folder.title }}</h3>
                                                 </a>
                                                 <p class="meta">
-                                                    <time title="{{ implementation.openDate.short }}" datetime="{{ implementation.openDate.databaseDate }}">{{ implementation.openDate.relative }}</time>
+                                                    <time title="{{ implementation.unit.openDate.short }}"
+                                                          datetime="{{ implementation.unit.openDate.databaseDate }}"
+                                                    >{{ implementation.unit.openDate.relative }}</time>
                                                     &ndash;
-                                                    <time title="{{ implementation.dueDate.short }}" datetime="{{ implementation.dueDate.databaseDate }}">{{ implementation.dueDate.relative }}</time>
+                                                    <time title="{{ implementation.unit.dueDate.short }}"
+                                                          datetime="{{ implementation.unit.dueDate.databaseDate }}"
+                                                    >{{ implementation.unit.dueDate.relative }}</time>
                                                 </p>
                                                 <p class="meta">
-                                                    {% if implementation.importable %}
+                                                    {% if implementation.allowed %}
                                                         This task does not exist in this class.
                                                     {% else %}
                                                         {# why not? #}
-                                                        {% if implementation.forbidden %}
-                                                            You don't have write permission for this class.
-                                                        {% else %}
-                                                            {# by process of elimination #}
+                                                        {% if implementation.imported %}
                                                             This task already exists in this class.
+                                                        {% else %}
+                                                            You don't have write permission for this class.
                                                         {% endif %}
                                                     {% endif %}
                                                 </p>

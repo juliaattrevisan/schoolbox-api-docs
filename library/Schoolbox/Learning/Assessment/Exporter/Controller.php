@@ -14,12 +14,19 @@ use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationD
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Controller for assessment export actions.
  */
 class Controller extends BaseController
 {
+    /**
+     * @var Access
+     */
+    protected $access;
+
     /**
      * @var AssessmentDataSource
      */
@@ -38,15 +45,18 @@ class Controller extends BaseController
     /**
      * Constructor
      *
+     * @param Access                         $access
      * @param AssessmentDataSource           $assessmentDataSource
      * @param CourseImplementationDataSource $courseImplementationDataSource
      * @param UnitImplementationDataSource   $unitImplementationDataSource
      */
     public function __construct(
+        Access $access,
         AssessmentDataSource $assessmentDataSource,
         CourseImplementationDataSource $courseImplementationDataSource,
         UnitImplementationDataSource $unitImplementationDataSource
     ) {
+        $this->access                         = $access;
         $this->assessmentDataSource           = $assessmentDataSource;
         $this->courseImplementationDataSource = $courseImplementationDataSource;
         $this->unitImplementationDataSource   = $unitImplementationDataSource;
@@ -68,9 +78,10 @@ class Controller extends BaseController
     public function getExportForm(IAssessable $assessment)
     {
         $data = [
-            'assessment'    => $assessment,
-            'returnUrl'     => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-            'returnUrlName' => Redirect::RETURN_URL,
+            'assessment'      => $assessment,
+            'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'   => Redirect::RETURN_URL,
+            'implementations' => [],
         ];
 
         // Data required:
@@ -88,8 +99,30 @@ class Controller extends BaseController
                     $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
                 );
 
-                // Is this assessable within the ID or not?
+                // Can I even import into $unitImplementation's folder?
+                $accessLevel = $this->access->getFolderAccess(
+                    $this->getUser(),
+                    [$unitImplementation->getCourse()->getFolder()->getId()]
+                );
+                $isAllowed = $accessLevel >= UserAccess::ACCESS_WRITE;
+
+                // Is $assessable imported into this unit yet?
+                $isAlreadyImported = false;
+                foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
+                    if ($implementationAssessment->getSpecificationAssessment()->getId() == $assessment->getId()) {
+                        $isAlreadyImported = true;
+                        break;
+                    }
+                }
+
+                $data['implementations'][] = [
+                    'unit'     => $unitImplementation,
+                    'allowed'  => $isAllowed && !$isAlreadyImported,
+                    'imported' => $isAlreadyImported,
+                ];
             }
+        } else {
+            // error out - if we haven't already
         }
 
         $template = "@learningAssessmentExporter/export.twig";

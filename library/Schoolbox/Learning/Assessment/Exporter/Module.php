@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -89,6 +90,7 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
+                    'access'                         => Access::getInstance(),
                     'assessmentDataSource'           => $this->getAssessmentMapperProxy(),
                     'unitImplementationDataSource'   => $this->injector->get('unitImplementationDataSource'),
                     'courseImplementationDataSource' => $this->injector->get('courseImplementationDataSource'),
