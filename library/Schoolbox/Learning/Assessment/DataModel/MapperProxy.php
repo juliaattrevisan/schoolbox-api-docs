@@ -408,30 +408,16 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
+        $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
+
         } elseif ($subObject instanceof DueWork) {
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
             $subObject->setRubricResultSet(0);
-
-            /* At this point, $assessable has no idea about the SubmissionBox
-             * that DueWorkMapper secretly requires. $subObject is actually the
-             * SubmissionBox. Sadly $subOject has no value for its primary key
-             * and we need to get it again T_T otherwise the attached Due Work Files
-             * won't save to the submission_box_file table (needs $submissionBox's
-             * id as well as the file hash)
-             */
-            try {
-                $swampBox = DueWorkMapper::getInstance()->findOneByColumn('assessment_id', $dataModel->getId());
-                $subObject->setId($swampBox->getId());
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
-
-                /* Do nothing with the blank primary key, I guess
-                 */
-            }
 
             DueWorkMapper::getInstance()->save($subObject);
 
@@ -442,10 +428,12 @@ class MapperProxy
                 $dueWork->getRubric()->setSubmissionBox($subObject);
                 DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
             }
+
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
             QuizMapper::getInstance()->save($subObject);
+
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
@@ -460,6 +448,40 @@ class MapperProxy
                 }
             }
         }
+    }
+
+    /**
+     * Helper method for retrieving an assessable data model's primary key value
+     * (as distinct from its assessment ID).
+     *
+     * The primary key needs to be set on a sub-object when saving it.
+     *
+     * @param IAssessableDataModel $subObject
+     * @return int
+     */
+    protected function getSubObjectPrimaryKeyValue(IAssessableDataModel $subObject)
+    {
+        $assessmentId = $subObject->getAssessmentModel()->getId();
+        if ($assessmentId) {
+            if ($subObject instanceof Task) {
+                $mapper = TaskMapper::getInstance();
+
+            } elseif ($subObject instanceof DueWork) {
+                $mapper = DueWorkMapper::getInstance();
+
+            } elseif ($subObject instanceof Quiz) {
+                $mapper = QuizMapper::getInstance();
+
+            } elseif ($subObject instanceof Project) {
+                $mapper = ProjectMapper::getInstance();
+            } else {
+                return null;
+            }
+
+            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId);
+            return isset($ids[0]) ? $ids[0] : null;
+        }
+        return null;
     }
 
     /**
