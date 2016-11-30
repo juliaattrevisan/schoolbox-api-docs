@@ -45,7 +45,7 @@ $subheader-bottom-margin: .5rem;
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 2));
-$paragraph-line-height: 1.5;
+$paragraph-line-height: 1.6;
 $paragraph-margin-bottom: rem-calc(($base-font-size - 2));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
@@ -169,7 +169,6 @@ dl { @extend %sm; }
 
 // Heading 1
 h1{
-	font-weight: $font-weight-bold; // override
     @include contrast-bg(0.855, $body-bg, 0%, $white, $black); // 0.855 = $jet
 }
 
