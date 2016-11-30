@@ -720,8 +720,7 @@ class Controller extends Base\Base
                             }
                             $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
                         }
-                        // Save Dates and SubObject (but this blows away Impl to Spec link!!)
-                        $assessmentMapperProxy->save($assessmentImpl, $sequence++);
+                        $assessmentMapperProxy->save($assessmentImpl);
                     }
                 }
 

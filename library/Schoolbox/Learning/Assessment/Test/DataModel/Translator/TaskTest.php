@@ -47,7 +47,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         ;
 
         /** @var TaskModel $taskModel */
-        $taskModel = $this->translator->translateToDataModel($task, 3);
+        $taskModel = $this->translator->translateToDataModel($task);
 
         // Test type
         $this->assertInstanceOf(TaskModel::class, $taskModel);

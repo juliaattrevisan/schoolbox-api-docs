@@ -91,7 +91,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         ;
 
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
+        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -186,7 +186,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
     public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, $markTypeId, $totalMark, $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
+        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -240,7 +240,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
     public function testTranslateResponseAcceptanceToDataModel(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
+        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);

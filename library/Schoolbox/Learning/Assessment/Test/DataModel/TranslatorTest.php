@@ -36,6 +36,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $assessment = (new Task())
             ->setId(32)
+            ->setSequence(3)
             ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -49,7 +50,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setDescription('Blaargh ничего')
             ->setWeight(1000);
 
-        $assessmentModel = $this->translator->translateToDataModel($assessment, 3)->getAssessmentModel();
+        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
 
         $this->assertEquals(32, $assessmentModel->getId());
         $this->assertEquals(3, $assessmentModel->getSequence());
@@ -163,7 +164,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateAssessmentContextToDataModel(IAssessable $assessment, $contextClass, $contextId)
     {
-        $assessmentModel = $this->translator->translateToDataModel($assessment, 1)->getAssessmentModel();
+        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
         $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
         $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
     }
@@ -451,7 +452,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $specificationContextClass,
         $specificationContextId
     ) {
-        $assessmentModel = $this->translator->translateToDataModel($assessment, 0)->getAssessmentModel();
+        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
 
         // Assert assessment
         $this->assertInstanceOf(AssessmentModel::class, $assessmentModel);

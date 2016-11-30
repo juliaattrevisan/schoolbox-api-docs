@@ -880,9 +880,11 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param int $sequence
+     * @return static
      */
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
     }
 }

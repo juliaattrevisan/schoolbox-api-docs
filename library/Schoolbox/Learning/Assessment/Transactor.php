@@ -120,8 +120,7 @@ class Transactor
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $sequence = $this->deriveSaveSequence($assessmentContext);
-            $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
+            $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
             $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->getAssessment()->getId()]);
         }
@@ -147,8 +146,7 @@ class Transactor
          * You only get contextId when you're Creating, not updating
          */
         $context   = $this->getFolderMapper()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($context);
-        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         $returnUrl = "/homepage/{$context->getId()}";
 
@@ -164,8 +162,7 @@ class Transactor
     private function transactUnitImplementationContext()
     {
         $context   = $this->getUnitImplementationMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($context);
-        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return "/homepage/{$context->getId()}";
     }
@@ -181,8 +178,7 @@ class Transactor
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
         $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($context);
-        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
@@ -202,32 +198,12 @@ class Transactor
 
         // TODO figure out what to do about this
         $context   = $this->getAssessmentMapperProxy()->findById($this->getContextId());
-        $sequence = $this->deriveSaveSequence($context);
-        $this->getAssessmentMapperProxy()->save($this->getAssessment(), $sequence);
+        $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return "/homepage/{$context->getId()}";
     }
 
-    /**
-     * Figure out a sequence
-     *
-     * @param $context
-     * @return int
-     */
-    protected function deriveSaveSequence($context)
-    {
-        $sequence = 1;
-        foreach ($this->getAssessmentMapperProxy()->findAllByContext($context, ['order' => ['sequence' => 'asc']]) as $otherAssessment) {
-            if ($otherAssessment->getId() == $this->getAssessment()->getId()) {
-                break;
-            }
-            $sequence++;
-        }
-
-        return $sequence;
-    }
-
-    /* Getters/Setters
+     /* Getters/Setters
      */
 
     /**

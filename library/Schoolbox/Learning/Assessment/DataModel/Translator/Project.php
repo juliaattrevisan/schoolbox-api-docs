@@ -60,7 +60,6 @@ class Project implements IAssessmentTypeTranslator
                 ->setOwner($assessment->getCreator())
             ;
             $subModels = new Collection();
-            $i         = 0;
             foreach ($assessment->getAssessables() as $subAssessment) {
                 // You can't have projects within projects
                 if ($subAssessment instanceof ProjectObject) {
@@ -69,7 +68,7 @@ class Project implements IAssessmentTypeTranslator
 
                 // The sub-assessment's context is the project
                 $subAssessment->setContext($assessment);
-                $subModel = $this->baseTranslator->translateToDataModel($subAssessment, $i++);
+                $subModel = $this->baseTranslator->translateToDataModel($subAssessment);
                 $subModels->add($subModel);
             }
             $model->setAssessments($subModels);

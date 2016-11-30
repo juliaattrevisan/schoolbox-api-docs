@@ -85,7 +85,8 @@ class Model implements ISoftDeletable
      * The sort order of this assessment within its container
      * (a class page, course specification or implementation or project).
      *
-     * Assessments are sorted by sequence in ascending order.
+     * Assessments are sorted by sequence in ascending order, starting from 1.
+     * A value of 0 will trigger the mapper to auto-assign the next available integer.
      *
      * @var int
      */

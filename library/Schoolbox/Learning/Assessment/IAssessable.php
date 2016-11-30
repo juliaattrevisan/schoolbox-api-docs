@@ -407,6 +407,17 @@ interface IAssessable extends ISoftDeletable
     public function setMarkType(MarkType $markType);
 
     /**
+     * @return int
+     */
+    public function getSequence();
+
+    /**
+     * @param int $sequence
+     * @return static
+     */
+    public function setSequence($sequence);
+
+    /**
      * @return GradeGroup|null
      */
     public function getGradeGroup();
