@@ -749,10 +749,16 @@ class RubricMapper
     }
 
 
-
     /**
-     * @param Folder\Model $subject
-     * @param User         $student
+     * Specialised query for returning the longitudinal cross-section of rubric data for a
+     * student in a subject. Data is returned in a primitive hierarchy of:
+     *   - capability
+     *   - indicator
+     *   - assessment
+     *   - descriptor (student result)
+     *
+     * @param Folder\Model        $subject
+     * @param User                $student
      * @return array
      */
     public function getLongitudinal(Folder\Model $subject, User $student)
