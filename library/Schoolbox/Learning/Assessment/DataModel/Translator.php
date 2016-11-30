@@ -202,6 +202,7 @@ class Translator
         $assessable
             ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
+            ->setSequence($dataModel->getAssessmentModel()->getSequence())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
             ->setWeight($dataModel->getAssessmentModel()->getWeight())
