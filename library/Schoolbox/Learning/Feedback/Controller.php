@@ -130,47 +130,11 @@ class Controller extends Base
         // then rubrics get clobbered. We don't want that.
         if (is_array($postVars['rubric'])) {
 
-            /* Find the submission box instance
+            /* Something is remembering descriptor values somewhere
+             * so we use new RubricMapper instead of getInstance()
              */
-            try {
-                /** @var SubmissionBox $submissionBox */
-                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $response->getAssessable()->getId());
-
-                $desMap = DescriptorMapper::getInstance();
-
-                /* Something is remembering descriptor values somewhere
-                 * so we use new RubricMapper instead of getInstance()
-                 */
-                $rubMap = new RubricMapper();
-
-                $descriptorIds = [];
-
-                foreach ($postVars['rubric'] as $criterionId => $levelId) {
-                    // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-                    $descriptorIds[] = $desMap->findIdsByColumnList(
-                        [
-                            'submission_box_id' => $submissionBox->getId(),
-                            'criterion_id'      => $criterionId,
-                            'level_id'          => $levelId
-                        ]
-                    )[0];
-                }
-
-                $grid = $rubMap->findBySubmissionBox($submissionBox);
-                $rubMap->applyMark($grid, $descriptorIds);
-
-
-
-
-
-                $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
-                SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
-
-                /* noop (submission box not found)
-                 */
-            }
+            $rubMap = new RubricMapper();
+            $rubMap->saveForParticipant($participant, $postVars['rubric']);
         }
 
         $template = '';
