@@ -712,4 +712,32 @@ class Mapper extends BaseMapper
 
         return $modelList;
     }
+
+    /**
+     * Re-sequences specified Assessments
+     *
+     * @param array $assessmentIds
+     * @return bool whether any change was made
+     */
+    public function sequenceAssessments(array $assessmentIds)
+    {
+        if(!count($assessmentIds)){
+            return false;
+        }
+        $sequence = 1;
+        foreach ($assessmentIds as $assessmentId){
+            $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+            $query = "
+                UPDATE {$this->getTable()}
+                SET `sequence` = $sequence
+            ";
+            $pb->equals('id', $assessmentId);
+            $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+
+            $statement = $this->database->prepare($query);
+            $statement->execute($pb->getParams());
+            $sequence++;
+        }
+        return true;
+    }
 }
