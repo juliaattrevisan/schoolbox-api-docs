@@ -342,7 +342,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		color: $off-canvas-foreground;
 		background-color: transparent;
 		padding: 0;
-		font-weight: $font-weight-bold;
+		font-weight: $font-weight-semibold;
 		width: 100%;
 		text-align: left;
 		@include single-transition(all, 0.15s, linear);
