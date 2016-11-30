@@ -35,6 +35,24 @@
 
         <div class="small-12 medium-3 column">
             {% block grading %}{% endblock %}
+
+            {% if assessment.useRubric and rubricContext %}
+            <script type="text/javascript">
+                $(function () {
+
+                    /**
+                     * Use the rubric value in the mark input field
+                     */
+                    $('#use-rubric-value').on('click', function(event) {
+                        $('#assessment-status')
+                            .find('[data-mark-input]')
+                            .val($.trim($('[data-final-summary]').text()))
+                            .change();
+                    });
+                });
+            </script>
+            <a id="use-rubric-value">Use Rubric Value</a>
+            {% endif %}
         </div>
         <div class="small-12 medium-9 column">
             <label>Comment
