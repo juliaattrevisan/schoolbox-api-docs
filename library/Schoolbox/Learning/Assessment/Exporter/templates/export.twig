@@ -1,94 +1,99 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{{ bread.crumbsArray(breadcrumbs) }}
+{#{{ bread.crumbsArray(breadcrumbs) }}#}
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-        <form method="post" action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}" id="importForm">
-            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-            <section>
-                <fieldset class="content">
-                    <legend>
-                        Classes
-                        <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
-                    </legend>
+    {% if implementations|length == 0 %}
+        <div class="small-12 island">
+            <div class = "empty-state">
+                <i class="icon-class-list"></i>
+                <p>There are no open classes that currently use this unit.</p>
+            </div>
+        </div>
 
-                    <div class="small-12 columns no-pad">
+    {% else %}
+        <div class="small-12 island">
+            <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-                        {% if implementations|length == 0 %}
-                        <div class="alert-box">
-                            There are no open classes that currently use this unit.
-                        </div>
-                        {% else %}
-                        <ul class="information-list">
-                            <li>
-                                <div class="list-item">
-                                    <div class="small-1 columns">
-                                        <input id="checkAll"
-                                               type="checkbox"
-                                               data-select-all
-                                               data-select-all-for-group="unit-instance" />
-                                        <label for="checkAll" class="checkbox-label"></label>
-                                    </div>
-                                </div>
-                            </li>
-                            {% for implementation in implementations %}
+            <form method="post" action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}" id="importForm">
+                <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            Classes
+                            <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
+                        </legend>
+
+                        <div class="small-12 columns no-pad">
+                            <ul class="information-list">
                                 <li>
                                     <div class="list-item">
                                         <div class="small-1 columns">
-                                            {% if implementation.importable %}
-                                            <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                                            <input type="checkbox"
-                                                   id="import-{UNIT_INSTANCE_ID}"
-                                                   name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                                   value="1"
-                                                   data-select-all-group="unit-instance" />
-                                            <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
-                                            {% endif %}
-                                        </div>
-                                        <div class="card small-11">
-                                            <a href="/homepage/{{ implementation.context.folder.id }}">
-                                                <span class="icon-32 icon-home"></span>
-                                                <h3>{{ implementation.context.folder.title }}</h3>
-                                            </a>
-                                            <p class="meta">
-                                                <time title="{{ implementation.openDate.short }}" datetime="{{ implementation.openDate.databaseDate }}">{{ implementation.openDate.relative }}</time>
-                                                &ndash;
-                                                <time title="{{ implementation.dueDate.short }}" datetime="{{ implementation.dueDate.databaseDate }}">{{ implementation.dueDate.relative }}</time>
-                                            </p>
-                                            <p class="meta">
-                                                {% if implementation.importable %}
-                                                    This task does not exist in this class.
-                                                {% else %}
-                                                    {# why not? #}
-                                                    {% if implementation.forbidden %}
-                                                        You don't have write permission for this class.
-                                                    {% else %}
-                                                        {# by process of elimination #}
-                                                        This task already exists in this class.
-                                                    {% endif %}
-                                                {% endif %}
-                                            </p>
+                                            <input id="checkAll"
+                                                   type="checkbox"
+                                                   data-select-all
+                                                   data-select-all-for-group="unit-instance" />
+                                            <label for="checkAll" class="checkbox-label"></label>
                                         </div>
                                     </div>
                                 </li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                    </div>
-                </fieldset>
-            </section>
+                                {% for implementation in implementations %}
+                                    <li>
+                                        <div class="list-item">
+                                            <div class="small-1 columns">
+                                                {% if implementation.importable %}
+                                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                                    <input type="checkbox"
+                                                           id="import-{UNIT_INSTANCE_ID}"
+                                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                                           value="1"
+                                                           data-select-all-group="unit-instance" />
+                                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                                {% endif %}
+                                            </div>
+                                            <div class="card small-11">
+                                                <a href="/homepage/{{ implementation.context.folder.id }}">
+                                                    <span class="icon-32 icon-home"></span>
+                                                    <h3>{{ implementation.context.folder.title }}</h3>
+                                                </a>
+                                                <p class="meta">
+                                                    <time title="{{ implementation.openDate.short }}" datetime="{{ implementation.openDate.databaseDate }}">{{ implementation.openDate.relative }}</time>
+                                                    &ndash;
+                                                    <time title="{{ implementation.dueDate.short }}" datetime="{{ implementation.dueDate.databaseDate }}">{{ implementation.dueDate.relative }}</time>
+                                                </p>
+                                                <p class="meta">
+                                                    {% if implementation.importable %}
+                                                        This task does not exist in this class.
+                                                    {% else %}
+                                                        {# why not? #}
+                                                        {% if implementation.forbidden %}
+                                                            You don't have write permission for this class.
+                                                        {% else %}
+                                                            {# by process of elimination #}
+                                                            This task already exists in this class.
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </fieldset>
+                </section>
 
-            <input type="submit" class='expand' value="Export to selected classes" />
-        </form>
-    </div>
+                <input type="submit" class='expand' value="Export to selected classes" />
+            </form>
+        </div>
+
+    {% endif %}
 </div>
