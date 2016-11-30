@@ -39,7 +39,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 */
 	public function mapping() {
 		$this->hasTable('eotc_status');
-		$this->hasModel('\\EOTC\\EventStatus');
+		$this->hasModel(EventStatus::class);
 		$this->hasMap(array(
 			'column' => 'id',
 			'property' => 'id',

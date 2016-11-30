@@ -21,7 +21,7 @@ class PageMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_page');
-		$this->hasModel('\\Eportfolio\\Page');
+		$this->hasModel(Page::class);
 
 		$this->hasMap(array(
 			'column'     => 'page_id',

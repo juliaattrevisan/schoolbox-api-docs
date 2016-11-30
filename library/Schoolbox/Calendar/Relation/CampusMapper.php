@@ -26,7 +26,7 @@ class CampusMapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('event_campus');
-        $this->hasModel('\\Schoolbox\\Calendar\\Relation\\Campus');
+        $this->hasModel(Campus::class);
 
         $this->hasMap(
             array(

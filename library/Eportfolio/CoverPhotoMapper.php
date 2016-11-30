@@ -21,7 +21,7 @@ class CoverPhotoMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_coverphoto');
-		$this->hasModel('\\Eportfolio\\CoverPhoto');
+		$this->hasModel(CoverPhoto::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

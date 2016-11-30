@@ -20,7 +20,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_permission');
-		$this->hasModel('\\Eportfolio\\Permission');
+		$this->hasModel(Permission::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

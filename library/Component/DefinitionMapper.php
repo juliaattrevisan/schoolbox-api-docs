@@ -18,7 +18,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('component_definition');
-		$this->hasModel('Component_Definition');
+		$this->hasModel(Component_Definition::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

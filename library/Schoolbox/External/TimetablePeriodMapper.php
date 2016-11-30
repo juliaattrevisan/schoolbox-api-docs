@@ -19,7 +19,7 @@ class TimetablePeriodMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('timetable_period');
-        $this->hasModel('\\Schoolbox\\External\\TimetablePeriod');
+        $this->hasModel(TimetablePeriod::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

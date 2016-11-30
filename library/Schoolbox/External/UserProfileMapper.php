@@ -19,7 +19,7 @@ class UserProfileMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('user_profile');
-        $this->hasModel('\\Schoolbox\\External\\UserProfile');
+        $this->hasModel(UserProfile::class);
         $this->hasMap(array(
             'column'     => 'user_id',
             'property'   => 'userId',

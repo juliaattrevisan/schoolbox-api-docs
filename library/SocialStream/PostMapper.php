@@ -28,6 +28,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
     protected function mapping()
     {
         $this->hasTable('socialstream_post');
+        $this->hasModel(SocialStream_Post_Abstract::class);
         $this->hasModuleNotifier('\\SocialStream\\PostNotifier');
 
         $this->hasMap(array(

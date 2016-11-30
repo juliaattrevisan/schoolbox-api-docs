@@ -14,7 +14,7 @@ class MarkTypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('submission_mark_type');
-		$this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkType');
+		$this->hasModel(MarkType::class);
 		$this->hasMap(array(
 			'column'     => 'mark_type_id',
 			'property'   => 'id',

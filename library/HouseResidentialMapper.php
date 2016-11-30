@@ -5,7 +5,7 @@ class HouseResidentialMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('luResidentialHouse');
-		$this->hasModel('HouseResidential');
+		$this->hasModel(HouseResidential::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

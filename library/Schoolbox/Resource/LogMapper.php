@@ -35,7 +35,7 @@ class LogMapper extends Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('cmsLog');
-		$this->hasModel('\\Schoolbox\Resource\\Log');
+		$this->hasModel(Log::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

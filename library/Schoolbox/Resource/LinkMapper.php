@@ -32,7 +32,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     protected function mapping()
     {
         $this->hasTable('link');
-        $this->hasModel('\\Schoolbox\\Resource\\Link');
+        $this->hasModel(Link::class);
         $this->hasMap(
             array(
                 'column'     => 'id',

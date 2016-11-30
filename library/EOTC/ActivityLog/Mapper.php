@@ -15,7 +15,7 @@ class Mapper extends \Schoolbox\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('eotc_activitylog');
-		$this->hasModel('\\EOTC\\ActivityLog\\Log');
+		$this->hasModel(Log::class);
 
 		$this->hasMap(array(
 			'column' => 'id',

@@ -18,7 +18,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('component_config_instance');
-        $this->hasModel('Component_Config');
+        $this->hasModel(Component_Config::class);
         $this->hasMap(
             array(
                 'column'     => 'id',

@@ -18,7 +18,7 @@ class SourceMapper extends Mapper {
 
 	protected function mapping() {
 		$this->hasTable('msg_source');
-		$this->hasModel('\\Schoolbox\\Realtime\\Message\\Source');
+		$this->hasModel(Source::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

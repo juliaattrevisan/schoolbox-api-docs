@@ -24,7 +24,7 @@ use \Schoolbox\User;
 class GroupMapper extends Mapper {
 
     protected function mapping() {
-        $this->hasModel('\\Schoolbox\\Resource\\Group');
+        $this->hasModel(Group::class);
         $this->hasTable('userGroups');
         $this->hasMap(array(
                 'column'     => 'cid',

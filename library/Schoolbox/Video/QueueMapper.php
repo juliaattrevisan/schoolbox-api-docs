@@ -28,7 +28,7 @@ class QueueMapper extends Mapper {
 
     protected function mapping () {
         $this->hasTable('video_queue');
-        $this->hasModel('\\Schoolbox\\Video\\Queue');
+        $this->hasModel(Queue::class);
         $this->hasMap(array(
                 'column'     => 'video_queue_id',
                 'property'   => 'id',

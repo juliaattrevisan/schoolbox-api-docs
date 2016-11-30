@@ -19,8 +19,8 @@ class ConfigMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasModel('\\DailyQuote\\Config');
-		$this->hasTable('dailyquote_config');
+        $this->hasTable('dailyquote_config');
+        $this->hasModel(Config::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

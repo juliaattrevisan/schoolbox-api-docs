@@ -42,7 +42,7 @@ class EventMapper extends Schoolbox\Mapper
         $this->coreMapping();
 
         $this->hasTable('event');
-        $this->hasModel('\\Schoolbox\\Calendar\\Event');
+        $this->hasModel(Event::class);
 
         $this->hasMap(array(
             'column' => 'owner',

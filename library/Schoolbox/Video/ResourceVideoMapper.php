@@ -24,7 +24,7 @@ class ResourceVideoMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('video_queue');
-        $this->hasModel('\\Schoolbox\\Video\\ResourceVideo');
+        $this->hasModel(ResourceVideo::class);
 
         $this->hasMap(
             array(

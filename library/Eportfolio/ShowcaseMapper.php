@@ -18,7 +18,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('eportfolio_showcase_item');
-		$this->hasModel('\\Eportfolio\\Showcase');
+		$this->hasModel(Showcase::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

@@ -17,7 +17,7 @@ class RerouteMapper extends Mapper {
 
 	protected function mapping() {
 		$this->hasTable('msg_reroute');
-		$this->hasModel('\\Schoolbox\\Realtime\\Message\\Reroute');
+		$this->hasModel(Reroute::class);
 
 		$this->hasMap(array(
 			'column'     => 'user_id',

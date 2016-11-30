@@ -19,7 +19,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('submission_grade');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Model');
+        $this->hasModel(Model::class);
         $this->hasMap(
             array(
                 'column'     => 'grade_id',

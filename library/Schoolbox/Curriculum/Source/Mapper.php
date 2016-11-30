@@ -16,7 +16,7 @@ class Mapper extends BaseMapper
     public function mapping()
     {
         $this->hasTable('curriculum_source');
-        $this->hasModel('\\Schoolbox\\Curriculum\\Source\\Model');
+        $this->hasModel(Model::class);
         $this->hasMap(
             array(
                 'column'     => 'id',

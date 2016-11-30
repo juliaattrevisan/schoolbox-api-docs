@@ -28,7 +28,7 @@ class HomepageConfigMapper extends Mapper
 {
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\HomepageConfig');
+        $this->hasModel(HomepageConfig::class);
         $this->hasTable('homepage_config');
         $this->hasMap(
             array(

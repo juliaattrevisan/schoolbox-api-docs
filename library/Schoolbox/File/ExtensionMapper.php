@@ -27,7 +27,7 @@ class ExtensionMapper extends \Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('allowedFileExtension');
-		$this->hasModel('\\Schoolbox\\File\\Extension');
+		$this->hasModel(Extension::class);
 
 		$this->hasMap(array(
 			'column'     => 'fileTypeId',

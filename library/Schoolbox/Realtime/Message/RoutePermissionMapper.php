@@ -33,7 +33,7 @@ class RoutePermissionMapper extends Mapper {
 
 	protected function mapping() {
 		$this->hasTable('msg_route_perm');
-		$this->hasModel('\\Schoolbox\\Realtime\\Message\\RoutePermission');
+		$this->hasModel(RoutePermission::class);
 
 		$this->hasMap(array(
 			'column'     => 'msg_source_id',

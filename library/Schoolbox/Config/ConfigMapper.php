@@ -49,7 +49,7 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 	 */
 	protected function mapping() {
 		$this->hasTable('config');
-		$this->hasModel('\\Schoolbox\\Config\\Config');
+		$this->hasModel(Config::class);
 
 		$this->hasMap(array(
 			'column'     => 'configID',

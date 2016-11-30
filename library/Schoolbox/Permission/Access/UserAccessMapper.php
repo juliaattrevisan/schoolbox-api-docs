@@ -45,7 +45,7 @@ class UserAccessMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('userAccess');
-        $this->hasModel('\\Schoolbox\\Permission\\Access\\UserAccess');
+        $this->hasModel(UserAccess::class);
 
         $this->hasMap(array(
             'column'     => 'uid',

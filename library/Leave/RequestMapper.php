@@ -15,8 +15,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	protected function mapping() {
-		$this->hasModel('Leave_Request');
 		$this->hasTable('leave_request');
+        $this->hasModel(Leave_Request::class);
 		$this->hasMap(
 			array(
 				'column' => 'id',

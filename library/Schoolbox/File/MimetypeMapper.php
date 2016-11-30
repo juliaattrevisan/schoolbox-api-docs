@@ -22,7 +22,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('allowedFileTypes');
-		$this->hasModel('\\Schoolbox\\File\\Mimetype');
+		$this->hasModel(Mimetype::class);
 
 		$this->hasMap(array(
 			'column'     => 'fileTypeId',
