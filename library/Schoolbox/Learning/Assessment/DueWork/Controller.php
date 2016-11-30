@@ -319,8 +319,14 @@ class Controller extends Assessment\Controller
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
 
-        // Add the online submission to this response's list of files
-        $response->attachOnlineSubmissionContent($body);
+        /* Add the online submission to this response's list of files
+         * only if there is content in it. I deliberately don't trim()
+         * here - does spaces and newlines count as a valid online submission
+         * content? I assume it should/does, basically a donkey vote
+         */
+        if (strlen($body)) {
+            $response->attachOnlineSubmissionContent($body);
+        }
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();

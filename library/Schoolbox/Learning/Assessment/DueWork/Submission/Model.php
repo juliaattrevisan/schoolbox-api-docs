@@ -65,6 +65,10 @@ class Model extends AbstractResponse
         return $this;
     }
 
+    public function detachOnlineSubmissionContent()
+    {
+    }
+
     /**
      * Find a file called 'online-submission' or 'Online Submission'
      * and get its content so you can pop it straight into an editor
