@@ -27,16 +27,21 @@
                 <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
 
                 <table>
+                    <colgroup>
+                        <col />
+                        <col class="full-width" />
+                    </colgroup>
+
                     <thead>
                     <tr>
                         <th>
                             <input id="checkAll"
                                    type="checkbox"
                                    data-select-all
-                                   data-select-all-for-group="unit-instance" />
+                                   data-select-all-for-group="unit-implementation" />
                             <label for="checkAll" class="checkbox-label"></label>
                         </th>
-                        <th class="fullwidth">Class</th>
+                        <th>Class</th>
                     </tr>
                     </thead>
 
@@ -44,13 +49,13 @@
                     {% for implementation in implementations %}
                         <tr>
                             <td>
-                                <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
+                                <input name="unitImplementation[{{ implementation.unit.id }}]" type="hidden" value="0" />
                                 <input type="checkbox"
                                        id="import-{{ implementation.unit.id }}"
-                                       name="unit_instance[{{ implementation.unit.id }}]"
+                                       name="unitImplementation[{{ implementation.unit.id }}]"
                                        value="1"
                                        {% if not implementation.allowed %}disabled{% endif %}
-                                       data-select-all-group="unit-instance" />
+                                       data-select-all-group="unit-implementation" />
                                 <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
                             </td>
                             <td>
