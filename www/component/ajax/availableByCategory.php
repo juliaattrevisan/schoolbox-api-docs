@@ -41,11 +41,11 @@ if (is_numeric($_GET['categoryId'])) {
                 break;
             case 'tileSource':
                 // Get all components that are a part of this page.
-                /** @var Component_Instance[] $components */
+                /** @var Component_Instance[]|\Schoolbox\GenericCollection $components */
                 $components = Component_InstanceMapper::getInstance()->findByContextAndClass(
                     'homepage',
                     $_GET['categoryId'],
-                    'Schoolbox\\Tile\\Component\\HomepageTileController'
+                    \Schoolbox\Tile\Component\HomepageTileController::class
                 );
                 foreach ($components as $component) {
                     $config        = $component->getConfigArray();

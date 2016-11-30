@@ -11,10 +11,11 @@
 
 use Schoolbox\Resource\Folder;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderHomepageComponentController;
 
 /**
  * Class Component_InstanceMapper
- * @method Component_Instance createModel()
+ * @method Component_Instance createModel($idValue = null)
  * @method Component_Instance findById($id)
  * @method Component_Instance hydrate(array $row, $alias = '', $callback = null)
  */
@@ -150,9 +151,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
      */
     public function findCourseBuilder($folderId)
     {
-        $c = $this->createCollection(array_values(
-            $this->findByContextAndClass('homepage', $folderId, Component_Homepage_CourseBuilderController::class)
-        ));
+        $c = $this->findByContextAndClass('homepage', $folderId, CourseBuilderHomepageComponentController::class);
 
         if ($c->count()) {
             return $c->first();

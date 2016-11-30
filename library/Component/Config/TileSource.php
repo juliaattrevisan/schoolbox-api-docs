@@ -8,6 +8,8 @@
  */
 
 use \Schoolbox\Resource\Folder\Model as FolderModel;
+use \Schoolbox\GenericCollection;
+use \Schoolbox\Tile\Component\HomepageTileController;
 
 class Component_Config_TileSource extends Component_Config_Abstract
 {
@@ -24,11 +26,11 @@ class Component_Config_TileSource extends Component_Config_Abstract
                 ? $component->getSource()->getId()
                 : $component->getInstance()->getId();
 
-            /** @var Component_Instance[] $components */
+            /** @var Component_Instance[]|GenericCollection $components */
             $components = Component_InstanceMapper::getInstance()->findByContextAndClass(
                 'homepage',
                 $source,
-                'Schoolbox\\Tile\\Component\\HomepageTileController'
+                HomepageTileController::class
             );
             $page->setVar('tile_option_block', '');
             foreach ($components as $component) {
