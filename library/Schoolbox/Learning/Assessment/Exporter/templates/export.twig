@@ -1,20 +1,13 @@
-{BREADCRUMB}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<!-- BEGIN standalone_header -->
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <div class="row">
     <div class="small-12 island">
-        <h1>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h1>
+        <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
     </div>
 </div>
-<!-- END standalone_header -->
-
-<!-- BEGIN modal_header -->
-<div class="row">
-    <div class="small-12 columns">
-        <h2>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h2>
-    </div>
-</div>
-<!-- END modal_header -->
 
 <div class="row">
     <div class="small-12 island">
@@ -97,136 +90,7 @@
                 </fieldset>
             </section>
 
-            <!-- BEGIN submit -->
             <input type="submit" class='expand' value="Export to selected classes" />
-            <!-- END submit -->
-        </form>
-    </div>
-</div>
-<!-- BEGIN modal_close -->
-<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-<!-- END modal_close -->
-
-
-
-{% import 'sub/breadcrumbs.twig' as bread %}
-{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
-
-{{ bread.crumbsArray(breadcrumbs) }}
-
-<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
-<script type="text/javascript">
-    $(function () {
-        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        $('input[data-mage-next]').mage();
-
-        /**
-         * When you finish configuring a non-project assessment
-         */
-        function setupAssessmentEnd() {
-            $('input[data-mage-next="end"]').mage({
-                setFormData: function(data) {
-                    if (CKEDITOR.instances['description'] != undefined) {
-                        data.push({
-                            name: 'description',
-                            value: CKEDITOR.instances['description'].getData()
-                        });
-                    }
-                },
-
-                onXhrDone: function (data) {
-                    if('string' == typeof data.returnUrl){
-                        window.location.href = data.returnUrl;
-                    }
-
-                }
-            });
-        }
-
-        {% if assessmentType|length %}
-
-        /* Save everything when Part 1 was already chosen in route
-         */
-        setupAssessmentEnd();
-
-        {% else %}
-
-        /**
-         * Update new form action url
-         *
-         * Inject common details
-         * Inject assessmentType-specific details
-         */
-        $('input[data-mage-next="part-2"]').mage({
-            onXhrDone: function(data) {
-                $('#assessmentForm')
-                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) }}')
-                    .find('[data-assessment-details]')
-                    .html(data);
-
-                /* Save everything when creating with Part 1
-                 */
-                setupAssessmentEnd();
-            }
-        });
-        {% endif %}
-    });
-</script>
-
-<div class="row">
-    <div class="small-12 columns"><h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1></div>
-</div>
-
-{% if assessmentType|length %}
-    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id }) %}
-{% else %}
-    {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id }) %}
-{% endif %}
-
-<div class="row">
-    <div class="small-12 columns island">
-        <form action="{{ formAction }}" id="assessmentForm" method="post">
-            <section>
-                {% if not assessmentType|length %}
-                <fieldset class="content" data-mage="part-1">
-                    <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-
-                    <legend>Choose activity type</legend>
-
-                    <fieldset>
-                        {% for type in types %}
-                        <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
-                            <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}">
-                            <label title="{{ type.title }}" for="{{ type.id }}" class="block"><i class="icon-{{ type.label|replace(' ', '-')|lower }}"></i>{{ type.label }}</label>
-                        </div>
-                        {% endfor %}
-                    </fieldset>
-
-                    <div class="small-12 column">
-                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'GET') }}
-                    </div>
-                </fieldset>
-                {% endif %}
-
-                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
-                    {% if returnUrl|length %}
-                        <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-                    {% endif %}
-                    <input type="hidden" name="contextType" value="{{ contextType }}" />
-                    <input type="hidden" name="contextId" value="{{ context.id }}" />
-
-                    {% if assessmentType|length %}
-                    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-                    {% endif %}
-
-                    <legend>Assessment Details</legend>
-                    <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
-                        {% if assessmentType|length %}
-                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' %}
-                        {% endif %}
-                    </div>
-                </fieldset>
-            </section>
         </form>
     </div>
 </div>
