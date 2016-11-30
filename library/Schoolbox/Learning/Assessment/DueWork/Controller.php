@@ -320,11 +320,9 @@ class Controller extends Assessment\Controller
         $response->setAllFiles(new Collection());
 
         /* Add the online submission to this response's list of files
-         * only if there is content in it. I deliberately don't trim()
-         * here - does spaces and newlines count as a valid online submission
-         * content? I assume it should/does, basically a donkey vote
+         * only if there is content in it.
          */
-        if (strlen($body)) {
+        if (strlen(trim(strip_tags($body)))) {
             $response->attachOnlineSubmissionContent($body);
         }
 
