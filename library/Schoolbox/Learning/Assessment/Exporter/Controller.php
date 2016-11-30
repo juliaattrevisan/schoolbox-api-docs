@@ -7,10 +7,12 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -70,7 +72,10 @@ class Controller extends BaseController
      * ** not closed yet
      * ** not already containing a copy of this assessment
      *
-     * @api /learning/assessments/:assessmentId/export
+     * GET vars:
+     * * returnUrl: a URL to return to once done
+     *
+     * @api GET /learning/export/assessment/:assessmentId
      * @level 165
      * @param IAssessable $assessment
      */
@@ -90,11 +95,59 @@ class Controller extends BaseController
     /**
      * Processes the export assessment request.
      *
+     * GET vars:
+     * * returnUrl: a URL to return to once done
+     *
+     * POST vars:
+     * * unitImplementation: unit implementations to push this into.
+     *                       key:   unit implementation id
+     *                       value: true/false
+     *
+     *
+     * @api POST /learning/export/assessment/:assessmentId
+     * @level 165
      * @param IAssessable $assessment
      */
     public function postExport(IAssessable $assessment)
     {
-        // do stuff
+        $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
+        $newImplementations      = new GenericCollection(IAssessable::class);
+        $sequences               = [];
+
+        foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $implementation) {
+            /** @var UnitImplementation $unit */
+            $unit = $implementation['unit'];
+
+            if (!empty($importedImplementations[$unit->getId()])) {
+                // This is being imported, so do stuff
+                $sequences[$unit->getId()] = $unit->getAssessables()->count() + 1;
+
+                if (!$implementation['allowed']) {
+                    // banhammer
+                    break;
+                }
+
+                // clone $assessment for this implementation
+                $newImplementation = $assessment->cloneForCopy();
+                $newImplementation
+                    ->setContext($unit)
+                    ->setSpecificationAssessment($assessment)
+                    // Set sensible defaults for dates
+                    ->setPublishAt($unit->getOpenDate())
+                    ->setOpenAt($unit->getOpenDate())
+                    ->setDueAt($unit->getDueDate())
+                    ->setCloseAt($unit->getDueDate())
+                ;
+                $newImplementations->setOffset($unit->getId(), $newImplementation);
+            }
+        }
+
+        // Save the newly created implementations (at the end of the unit)
+        foreach ($newImplementations as $unitId => $newImplementation) {
+            $this->assessmentDataSource->save($newImplementation, $sequences[$unitId]);
+        }
+
+        // Redir back to the return URL (if set) or the course page
     }
 
     /**
