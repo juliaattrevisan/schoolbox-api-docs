@@ -127,7 +127,7 @@ class DeprecatedMapper extends FolderMapper
         }
         // set n:1 and n:n objects
         foreach ($courses as $course) {
-            $course->setUnits($this->createCollection());
+            $course->setUnits(Unit\DeprecatedMapper::getInstance()->createCollection());
             if(!empty($units[$course->getId()])) {
                 foreach ($units[$course->getId()] as $unit) {
                     $course->getUnits()->add($unit);

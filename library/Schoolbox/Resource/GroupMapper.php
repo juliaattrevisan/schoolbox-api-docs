@@ -46,7 +46,7 @@ class GroupMapper extends Mapper {
         $this->hasJoin(
             'folder',
             array(
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper'    => FolderMapper::class,
                 'this_key'  => 'cid',
                 'other_key' => 'id',
             )
@@ -61,7 +61,7 @@ class GroupMapper extends Mapper {
      * @return \Schoolbox\Collection
      */
     public function findFolders($name = '') {
-        $allFolders = $this->createCollection();
+        $allFolders = $this->getJoinMapper('folder')->createCollection();
         $folderMapper = new FolderMapper();
 
         /* if $name is empty, the LIKE returns everything anyway
@@ -98,7 +98,7 @@ class GroupMapper extends Mapper {
      * @return \Schoolbox\Collection
      */
     public function findUnjoinedFolders(User $user) {
-        $allFolders = $this->createCollection();
+        $allFolders = $this->getJoinMapper('folder')->createCollection();
         $folderMapper = new FolderMapper();
 
         $query = "
