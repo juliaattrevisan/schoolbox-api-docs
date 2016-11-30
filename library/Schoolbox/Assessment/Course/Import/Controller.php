@@ -698,6 +698,10 @@ class Controller extends Base\Base
                             $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
 
                         }
+
+                        // Don't forget to set the spec assessment on the impl
+                        $assessmentImpl->setSpecificationAssessment($assessmentSpec);
+
                         // Set/Update Dates
                         foreach ($aData['dates'] as $property => $localShort) {
                             $method = "set{$property}At";
