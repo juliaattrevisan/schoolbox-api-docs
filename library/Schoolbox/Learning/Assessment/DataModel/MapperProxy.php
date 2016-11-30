@@ -408,14 +408,19 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
+        $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
+
         } elseif ($subObject instanceof DueWork) {
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
             $subObject->setRubricResultSet(0);
+
             DueWorkMapper::getInstance()->save($subObject);
+
             // Save the Rubric
             /** @var DueWorkModel $dueWork */
             $dueWork = $assessable;
@@ -423,10 +428,12 @@ class MapperProxy
                 $dueWork->getRubric()->setSubmissionBox($subObject);
                 DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
             }
+
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
             QuizMapper::getInstance()->save($subObject);
+
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
@@ -441,6 +448,40 @@ class MapperProxy
                 }
             }
         }
+    }
+
+    /**
+     * Helper method for retrieving an assessable data model's primary key value
+     * (as distinct from its assessment ID).
+     *
+     * The primary key needs to be set on a sub-object when saving it.
+     *
+     * @param IAssessableDataModel $subObject
+     * @return int
+     */
+    protected function getSubObjectPrimaryKeyValue(IAssessableDataModel $subObject)
+    {
+        $assessmentId = $subObject->getAssessmentModel()->getId();
+        if ($assessmentId) {
+            if ($subObject instanceof Task) {
+                $mapper = TaskMapper::getInstance();
+
+            } elseif ($subObject instanceof DueWork) {
+                $mapper = DueWorkMapper::getInstance();
+
+            } elseif ($subObject instanceof Quiz) {
+                $mapper = QuizMapper::getInstance();
+
+            } elseif ($subObject instanceof Project) {
+                $mapper = ProjectMapper::getInstance();
+            } else {
+                return null;
+            }
+
+            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId);
+            return isset($ids[0]) ? $ids[0] : null;
+        }
+        return null;
     }
 
     /**
