@@ -13,8 +13,8 @@
     <div class="small-12 island">
         <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-        <form method="post" action="" id="importForm">
-            <input type="hidden" name="task" value="{TASK_ID}" />
+        <form method="post" action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}" id="importForm">
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
             <section>
                 <fieldset class="content">
                     <legend>
@@ -23,7 +23,12 @@
                     </legend>
 
                     <div class="small-12 columns no-pad">
-                        <!-- BEGIN exportable -->
+
+                        {% if implementations|length == 0 %}
+                        <div class="alert-box">
+                            There are no open classes that currently use this unit.
+                        </div>
+                        {% else %}
                         <ul class="information-list">
                             <li>
                                 <div class="list-item">
@@ -36,56 +41,49 @@
                                     </div>
                                 </div>
                             </li>
-
-                            <!-- BEGIN class -->
-                            <li>
-                                <div class="list-item">
-                                    <div class="small-1 columns">
-                                        <!-- BEGIN class_import_checkbox -->
-                                        <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                                        <input type="checkbox"
-                                               id="import-{UNIT_INSTANCE_ID}"
-                                               name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                               value="1"
-                                               data-select-all-group="unit-instance" />
-                                        <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
-                                        <!-- END class_import_checkbox -->
+                            {% for implementation in implementations %}
+                                <li>
+                                    <div class="list-item">
+                                        <div class="small-1 columns">
+                                            {% if implementation.importable %}
+                                            <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                            <input type="checkbox"
+                                                   id="import-{UNIT_INSTANCE_ID}"
+                                                   name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                                   value="1"
+                                                   data-select-all-group="unit-instance" />
+                                            <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                            {% endif %}
+                                        </div>
+                                        <div class="card small-11">
+                                            <a href="/homepage/{{ implementation.context.folder.id }}">
+                                                <span class="icon-32 icon-home"></span>
+                                                <h3>{{ implementation.context.folder.title }}</h3>
+                                            </a>
+                                            <p class="meta">
+                                                <time title="{{ implementation.openDate.short }}" datetime="{{ implementation.openDate.databaseDate }}">{{ implementation.openDate.relative }}</time>
+                                                &ndash;
+                                                <time title="{{ implementation.dueDate.short }}" datetime="{{ implementation.dueDate.databaseDate }}">{{ implementation.dueDate.relative }}</time>
+                                            </p>
+                                            <p class="meta">
+                                                {% if implementation.importable %}
+                                                    This task does not exist in this class.
+                                                {% else %}
+                                                    {# why not? #}
+                                                    {% if implementation.forbidden %}
+                                                        You don't have write permission for this class.
+                                                    {% else %}
+                                                        {# by process of elimination #}
+                                                        This task already exists in this class.
+                                                    {% endif %}
+                                                {% endif %}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="card small-11">
-                                        <a href="/homepage/{UNIT_CATEGORY_ID}">
-                                            <span class="icon-32 icon-home"></span>
-                                            <h3>{UNIT_CATEGORY_NAME}</h3>
-                                        </a>
-                                        <p class="meta">
-                                            <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time>
-                                            &ndash;
-                                            <time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time>
-                                        </p>
-                                        <p class="meta">
-                                            <!-- BEGIN class_import_allowed -->
-                                            This task does not exist in this class.
-                                            <!-- END class_import_allowed -->
-
-                                            <!-- BEGIN class_import_forbidden -->
-                                            You don't have write permission for this class.
-                                            <!-- END class_import_forbidden -->
-
-                                            <!-- BEGIN class_import_exists -->
-                                            This task already exists in this class.
-                                            <!-- END class_import_exists -->
-                                        </p>
-                                    </div>
-                                </div>
-                            </li>
-                            <!-- END class -->
+                                </li>
+                            {% endfor %}
                         </ul>
-                        <!-- END exportable -->
-
-                        <!-- BEGIN unexportable -->
-                        <div class="alert-box">
-                            There are no open classes that currently use this unit.
-                        </div>
-                        <!-- END unexportable -->
+                        {% endif %}
                     </div>
                 </fieldset>
             </section>
