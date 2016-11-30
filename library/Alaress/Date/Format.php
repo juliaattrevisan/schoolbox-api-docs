@@ -1429,12 +1429,38 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Is this date object's date component in the future?
+     *
+     * @return bool
+     */
+    public function isFutureDate()
+    {
+        if ($this->isToday()) {
+            return false;
+        }
+        return $this->isFuture();
+    }
+
+    /**
      * @return bool
      */
     public function isPast()
     {
         return $this->getDateTimeObject()->isPast();
 
+    }
+
+    /**
+     * Is this date object's date component in the past?
+     *
+     * @return bool
+     */
+    public function isPastDate()
+    {
+        if ($this->isToday()) {
+            return false;
+        }
+        return $this->isPast();
     }
 
     /**
