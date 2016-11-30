@@ -40,6 +40,20 @@
             <script type="text/javascript">
                 $(function () {
 
+                    var $rb = $('#rb-{{ rubricContext.rubric.id }}');
+
+                    $rb.on('change', '[data-rubric], [data-rubric-group]', function(e) {
+                        var currentRubricValue = $.trim($rb.find('[data-final-summary]').text());
+                        var currentMarkInput = $('#assessment-status').find('[data-mark-input]').val();
+
+                        if (currentRubricValue === currentMarkInput) {
+                            $('#use-rubric-value').prop('disabled', true);
+                        }
+                        else {
+                            $('#use-rubric-value').prop('disabled', false);
+                        }
+                    });
+
                     /**
                      * Use the rubric value in the mark input field
                      */
@@ -51,7 +65,7 @@
                     });
                 });
             </script>
-            <p><a id="use-rubric-value">Assign Grade From Rubric</a></p>
+            <p><button id="use-rubric-value">Assign Grade From Rubric</button></p>
             {% endif %}
         </div>
         <div class="small-12 medium-9 column">
