@@ -690,7 +690,6 @@ class Controller extends Base\Base
             $data = [
                 'unitSpec'         => $unitSpec,
                 'encodedReturnUrl' => $encodedReturnUrl,
-//                'reveals'          => [$folderId => new TaskBuilder($instance, null, $returnUrl)],
                 '_writable'        => true,
                 '_expanded'        => true,
             ];
