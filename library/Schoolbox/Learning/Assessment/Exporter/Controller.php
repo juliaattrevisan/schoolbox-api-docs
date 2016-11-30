@@ -12,7 +12,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -108,54 +107,49 @@ class Controller extends BaseController
      */
     protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment)
     {
-        $implementations = [];
-        $context         = $assessment->getContext();
-        if ($context instanceof UnitSpecification) {
-            $unitImplementations = $this->unitImplementationDataSource->findAllByUnitSpecificationId(
-                $context->getId()
+        $result              = [];
+        $unitImplementations = $this->unitImplementationDataSource->findAllByUnitSpecificationId(
+            $assessment->getContext()->getId()
+        );
+
+        foreach ($unitImplementations as $unitImplementation) {
+
+            // Closed already? don't allow export
+            if ($unitImplementation->getDueDate()->isPastDate()) {
+                continue;
+            }
+
+            // Load assessments into unit implementation
+            $unitImplementation->setAssessables(
+                $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
             );
 
-            foreach ($unitImplementations as $unitImplementation) {
+            // Can I even import into $unitImplementation's folder?
+            $accessLevel = $this->access->getFolderAccess(
+                $this->getUser(),
+                [$unitImplementation->getCourse()->getFolder()->getId()]
+            );
+            $isAllowed = $accessLevel >= UserAccess::ACCESS_WRITE;
 
-                // Closed already? don't allow export
-                if ($unitImplementation->getDueDate()->isPastDate()) {
-                    continue;
+            // Is $assessable imported into this unit yet?
+            $isAlreadyImported = false;
+            foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
+                // It's not guaranteed that an assessment in a implementation will have a spec.
+                // An assessment added to an implementation post-spec won't have one.
+                $spec = $implementationAssessment->getSpecificationAssessment();
+                if ($spec instanceof IAssessable && $spec->getId() == $assessment->getId()) {
+                    $isAlreadyImported = true;
+                    break;
                 }
-
-                // Load assessments into unit implementation
-                $unitImplementation->setAssessables(
-                    $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
-                );
-
-                // Can I even import into $unitImplementation's folder?
-                $accessLevel = $this->access->getFolderAccess(
-                    $this->getUser(),
-                    [$unitImplementation->getCourse()->getFolder()->getId()]
-                );
-                $isAllowed = $accessLevel >= UserAccess::ACCESS_WRITE;
-
-                // Is $assessable imported into this unit yet?
-                $isAlreadyImported = false;
-                foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
-                    // It's not guaranteed that an assessment in a implementation will have a spec.
-                    // An assessment added to an implementation post-spec won't have one.
-                    $spec = $implementationAssessment->getSpecificationAssessment();
-                    if ($spec instanceof IAssessable && $spec->getId() == $assessment->getId()) {
-                        $isAlreadyImported = true;
-                        break;
-                    }
-                }
-
-                $implementations[] = [
-                    'unit'     => $unitImplementation,
-                    'allowed'  => $isAllowed && !$isAlreadyImported,
-                    'imported' => $isAlreadyImported,
-                ];
             }
-        } else {
-            // error out - if we haven't already
+
+            $result[] = [
+                'unit'     => $unitImplementation,
+                'allowed'  => $isAllowed && !$isAlreadyImported,
+                'imported' => $isAlreadyImported,
+            ];
         }
 
-        return $implementations;
+        return $result;
     }
 }
