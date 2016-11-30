@@ -28,7 +28,7 @@
     </div>
     <nav>
         <span class="show-for-large-up">
-            <a href="/task/export/{{ task.id }}?returnUrl={{ returnUrl[unit.id] }}" data-reveal-id="export-modal-{{ task.id }}" data-reveal-ajax="true" class="icon-export" title="Copy this task into classes"></a>
+            <a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes"></a>
             <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl[unit.id]  }}" {{ doReveal }} class="icon-modify" title="Modify"></a>
             <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete" title="Delete"></a>
         </span>
@@ -37,7 +37,7 @@
         </span>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
-        <li><a href="/task/export/{{ task.id }}?returnUrl={{ returnUrl[unit.id] }}" data-reveal-id="export-modal-{{ task.id }}" data-reveal-ajax="true" class="icon-export" title="Copy this task into classes">Copy to classes</a></li>
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes">Copy to classes</a></li>
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: task.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
     </ul>
