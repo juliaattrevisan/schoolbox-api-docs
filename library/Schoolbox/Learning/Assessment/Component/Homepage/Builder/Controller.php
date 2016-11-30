@@ -82,6 +82,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         try {
             $unitSpec = $this->getUnitSpecificationMapper()->findByFolderId($folder->getId());
             $unitSpec->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpec->getId()));
+            $unitSpec->getAssessables()->sortBy('sequence','ASC');
             $unitImpls = $this->getUnitImplementationMapper()->findAllByUnitSpecId($unitSpec->getId());
 
             $data = [

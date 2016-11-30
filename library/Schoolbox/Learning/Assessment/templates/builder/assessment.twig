@@ -5,9 +5,8 @@ Usage:
             assessment:  IAssessable
     } only %}
 #}
-{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-<li class="actions-small-1" data-task_id="{{ assessment.id }}">
+<li class="actions-small-1" data-assessment="{{ assessment.id }}">
     <div class="grip compact"></div>
     <div class="list-item">
         <div class="card small-12 compact wrap-down">
@@ -27,14 +26,7 @@ Usage:
         {% else %}
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
         {% endif %}
-        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
+        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
     </ul>
     <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
-    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
-        <input type="hidden" name="action"    value="delete" />
-        <input type="hidden" name="id"        value="{{ assessment.id }}" />
-        <input type="hidden" name="category"  value="{{ unit.id }}"/>
-        <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
-        <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
-    </form>
 </li>

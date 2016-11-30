@@ -7,10 +7,12 @@ $data = [
     encodedReturnUrl:  string               - encoded address of this page to return to after creating new assessments
 ];
 #}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('#component{{ componentInstance.id }}').setupCourseBuilder({
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({
             {% if unitImpls | length %}
             unitsImplementationsIds: [
                 {% for unitImpl in unitImpls %}
@@ -32,21 +34,23 @@ $data = [
 </ul>
 {% endif %}
 
-<ul class="information-list sortable-card ui-sortable" data-sortable data-unit-spec="{{ unitSpec.id }}">
-    {% for assessment in unitSpec.assessables %}
-        {% include '@learningAssessment/builder/unitAssessment.twig' with {
-            '_writable': true,
-            assessment:  assessment
-        } only %}
-    {% else %}
-        <li>
-            <div class="empty-state">
-                <i class="icon-course"></i>
-                <p>No coursework in this unit yet.</p>
-            </div>
-        </li>
-    {% endfor %}
-</ul>
+<div data-unit-spec="{{ unitSpec.id }}">
+    <ul class="information-list sortable" data-sortable data-assessment-list data-action="{{ routeLookup('course.saveAssessmentSequence', {id: unitSpec.id}) }}">
+        {% for assessment in unitSpec.assessables %}
+            {% include '@learningAssessment/builder/assessment.twig' with {
+                '_writable': true,
+                assessment:  assessment
+            } only %}
+        {% else %}
+            <li>
+                <div class="empty-state">
+                    <i class="icon-course"></i>
+                    <p>No coursework in this unit yet.</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 
 <div class="component-action">
     <section>

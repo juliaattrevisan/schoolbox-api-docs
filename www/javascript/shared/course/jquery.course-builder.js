@@ -16,8 +16,6 @@
         var settings       = $.extend({}, defaults, options);
         var unitSpec       = $(this);
         var unitSpecId     = unitSpec.attr('data-unit-spec');
-        var copyTaskDialog = unitSpec.find('[data-interaction="copy_task_dialog"]');
-
 
         // Initialises the task list, setting up drag/drop as well.
         var initTaskList = function() {
@@ -96,7 +94,7 @@
             });
 
         // Delete task: "are you sure?"
-        unitSpec.on('click.courseAssessmentList', '[data-action=delete]', function(event) {
+        unitSpec.on('click.courseAssessmentList', '[data-action=delete-assessment]', function(event) {
             event.preventDefault();
             var $element = $(this);
             var $assessmentRow = $element.closest('[data-assessment]');
