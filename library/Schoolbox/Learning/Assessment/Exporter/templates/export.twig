@@ -24,7 +24,7 @@
             <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
             <form method="post" action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}" id="importForm">
-                <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+                <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
                 <section>
                     <fieldset class="content">
                         <legend>

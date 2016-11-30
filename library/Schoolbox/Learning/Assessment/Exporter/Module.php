@@ -84,7 +84,17 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'assessmentDataSource'           => $this->getAssessmentMapperProxy(),
+                    'unitImplementationDataSource'   => $this->injector->get('unitImplementationDataSource'),
+                    'courseImplementationDataSource' => $this->injector->get('courseImplementationDataSource'),
+                ]
+            )
+        );
     }
 
     /* Getters / Setters

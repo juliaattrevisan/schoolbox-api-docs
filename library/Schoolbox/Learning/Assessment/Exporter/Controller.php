@@ -8,6 +8,11 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -15,6 +20,38 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends BaseController
 {
+    /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
+     * @var CourseImplementationDataSource
+     */
+    protected $courseImplementationDataSource;
+
+    /**
+     * @var UnitImplementationDataSource
+     */
+    protected $unitImplementationDataSource;
+
+    /**
+     * Constructor
+     *
+     * @param AssessmentDataSource           $assessmentDataSource
+     * @param CourseImplementationDataSource $courseImplementationDataSource
+     * @param UnitImplementationDataSource   $unitImplementationDataSource
+     */
+    public function __construct(
+        AssessmentDataSource $assessmentDataSource,
+        CourseImplementationDataSource $courseImplementationDataSource,
+        UnitImplementationDataSource $unitImplementationDataSource
+    ) {
+        $this->assessmentDataSource           = $assessmentDataSource;
+        $this->courseImplementationDataSource = $courseImplementationDataSource;
+        $this->unitImplementationDataSource   = $unitImplementationDataSource;
+    }
+
     /**
      * Get the form for exporting a single assessment.
      *
@@ -30,12 +67,31 @@ class Controller extends BaseController
      */
     public function getExportForm(IAssessable $assessment)
     {
-//        $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data = [
+            'assessment'    => $assessment,
+            'returnUrl'     => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName' => Redirect::RETURN_URL,
+        ];
 
-//        $data['returnUrlName'] = Redirect::RETURN_URL;
-//        $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        // Data required:
+        // implementations, and their permissions
+        // units which use this specification
+        $context = $assessment->getContext();
+        if ($context instanceof UnitSpecification) {
+            $unitImplementations = $this->unitImplementationDataSource->findAllByUnitSpecificationId(
+                $context->getId()
+            );
 
-        $data     = ['assessment' => $assessment,];
+            // Load assessments
+            foreach ($unitImplementations as $unitImplementation) {
+                $unitImplementation->setAssessables(
+                    $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
+                );
+
+                // Is this assessable within the ID or not?
+            }
+        }
+
         $template = "@learningAssessmentExporter/export.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
