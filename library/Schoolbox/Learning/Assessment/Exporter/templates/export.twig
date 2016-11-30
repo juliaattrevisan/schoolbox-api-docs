@@ -25,73 +25,67 @@
 
             <form method="post" action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}" id="importForm">
                 <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
-                <section>
-                    <fieldset class="content">
-                        <legend>
-                            Classes
-                            <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
-                        </legend>
 
-                        <div class="small-12 columns no-pad">
-                            <ul class="information-list">
-                                <li>
-                                    <div class="list-item">
-                                        <div class="small-1 columns">
-                                            <input id="checkAll"
-                                                   type="checkbox"
-                                                   data-select-all
-                                                   data-select-all-for-group="unit-instance" />
-                                            <label for="checkAll" class="checkbox-label"></label>
-                                        </div>
-                                    </div>
-                                </li>
-                                {% for implementation in implementations %}
-                                    <li>
-                                        <div class="list-item">
-                                            <div class="small-1 columns">
-                                                <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
-                                                <input type="checkbox"
-                                                       id="import-{{ implementation.unit.id }}"
-                                                       name="unit_instance[{{ implementation.unit.id }}]"
-                                                       value="1"
-                                                        {% if not implementation.allowed %}disabled{% endif %}
-                                                       data-select-all-group="unit-instance" />
-                                                <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
-                                            </div>
-                                            <div class="card small-11">
-                                                <a href="/homepage/{{ implementation.unit.course.folder.id }}">
-                                                    <span class="icon-32 icon-home"></span>
-                                                    <h3>{{ implementation.unit.course.folder.title }}</h3>
-                                                </a>
-                                                <p class="meta">
-                                                    <time title="{{ implementation.unit.openDate.short }}"
-                                                          datetime="{{ implementation.unit.openDate.databaseDate }}"
-                                                    >{{ implementation.unit.openDate.relativeTime }}</time>
-                                                    &ndash;
-                                                    <time title="{{ implementation.unit.dueDate.short }}"
-                                                          datetime="{{ implementation.unit.dueDate.databaseDate }}"
-                                                    >{{ implementation.unit.dueDate.relativeTime }}</time>
-                                                </p>
-                                                <p class="meta">
-                                                    {% if implementation.allowed %}
-                                                        This task does not exist in this class.
-                                                    {% else %}
-                                                        {# why not? #}
-                                                        {% if implementation.imported %}
-                                                            This task already exists in this class.
-                                                        {% else %}
-                                                            You don't have write permission for this class.
-                                                        {% endif %}
-                                                    {% endif %}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </fieldset>
-                </section>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>
+                            <input id="checkAll"
+                                   type="checkbox"
+                                   data-select-all
+                                   data-select-all-for-group="unit-instance" />
+                            <label for="checkAll" class="checkbox-label"></label>
+                        </th>
+                        <th class="fullwidth">Class</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for implementation in implementations %}
+                        <tr>
+                            <td>
+                                <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
+                                <input type="checkbox"
+                                       id="import-{{ implementation.unit.id }}"
+                                       name="unit_instance[{{ implementation.unit.id }}]"
+                                       value="1"
+                                       {% if not implementation.allowed %}disabled{% endif %}
+                                       data-select-all-group="unit-instance" />
+                                <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
+                            </td>
+                            <td>
+                                <div class="card">
+                                    <a href="/homepage/{{ implementation.unit.course.folder.id }}">
+                                        <span class="icon-32 icon-home"></span>
+                                        <h3>{{ implementation.unit.course.folder.title }}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        <time title="{{ implementation.unit.openDate.short }}"
+                                              datetime="{{ implementation.unit.openDate.databaseDate }}"
+                                        >{{ implementation.unit.openDate.relativeTime }}</time>
+                                        &ndash;
+                                        <time title="{{ implementation.unit.dueDate.short }}"
+                                              datetime="{{ implementation.unit.dueDate.databaseDate }}"
+                                        >{{ implementation.unit.dueDate.relativeTime }}</time>
+                                    </p>
+                                    <p class="meta">
+                                        {% if implementation.allowed %}
+                                            This task does not exist in this class.
+                                        {% else %}
+                                            {# why not? #}
+                                            {% if implementation.imported %}
+                                                This task already exists in this class.
+                                            {% else %}
+                                                You don't have write permission for this class.
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
 
                 <input type="submit" class='expand' value="Export to selected classes" />
             </form>
