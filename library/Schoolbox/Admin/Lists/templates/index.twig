@@ -161,7 +161,7 @@
                                                 {# Radio field, shared between all rows #}
 
                                                 <div class="radiolist">
-                                                    <input type="radio" name="radio-{{ field_key }}" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" checked="{{ record[field_key] == 1 }}">
+                                                    <input type="radio" name="radio-{{ field_key }}" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" {% if (record[field_key] == 1) %} checked {% endif %}">
                                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                                 </div>
 
