@@ -49,15 +49,14 @@
                                     <li>
                                         <div class="list-item">
                                             <div class="small-1 columns">
-                                                {% if implementation.allowed %}
-                                                    <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
-                                                    <input type="checkbox"
-                                                           id="import-{{ implementation.unit.id }}"
-                                                           name="unit_instance[{{ implementation.unit.id }}]"
-                                                           value="1"
-                                                           data-select-all-group="unit-instance" />
-                                                    <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
-                                                {% endif %}
+                                                <input name="unit_instance[{{ implementation.unit.id }}]" type="hidden" value="0" />
+                                                <input type="checkbox"
+                                                       id="import-{{ implementation.unit.id }}"
+                                                       name="unit_instance[{{ implementation.unit.id }}]"
+                                                       value="1"
+                                                        {% if not implementation.allowed %}disabled{% endif %}
+                                                       data-select-all-group="unit-instance" />
+                                                <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
                                             </div>
                                             <div class="card small-11">
                                                 <a href="/homepage/{{ implementation.unit.course.folder.id }}">
