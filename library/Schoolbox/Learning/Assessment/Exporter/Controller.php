@@ -93,8 +93,14 @@ class Controller extends BaseController
                 $context->getId()
             );
 
-            // Load assessments
             foreach ($unitImplementations as $unitImplementation) {
+
+                // Closed already? don't allow export
+                if ($unitImplementation->getDueDate()->isPastDate()) {
+                    continue;
+                }
+
+                // Load assessments into unit implementation
                 $unitImplementation->setAssessables(
                     $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
                 );
