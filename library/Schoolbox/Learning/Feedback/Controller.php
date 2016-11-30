@@ -12,7 +12,11 @@ use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
+use Schoolbox\Learning\Assessment\Feedback\Factory as FeedbackFactory;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
 
 class Controller extends Base
 {
@@ -48,7 +52,7 @@ class Controller extends Base
         $feedbacks = $this->getFloatingFeedback($participant);
 
         try {
-            $this->processFeedback($participant, $feedbacks);
+            $this->processFeedback($participant, $feedbacks, $this->getRequest()->post);
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');
@@ -78,7 +82,7 @@ class Controller extends Base
         }
 
         try {
-            $this->processFeedback($participant, $feedbacks, $response);
+            $this->processFeedback($participant, $feedbacks, $this->getRequest()->post, $response);
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark given');
@@ -98,26 +102,76 @@ class Controller extends Base
      *
      * @param Participant $participant
      * @param Collection $feedbacks
+     * @param $postVars
      * @param IResponse $response
      * @throws \Alaress\Web\Controller\Exception
      */
-    private function processFeedback(Participant $participant, Collection $feedbacks, IResponse $response = null)
+    private function processFeedback(Participant $participant, Collection $feedbacks, $postVars, IResponse $response = null)
     {
         $feedbackFactory = new FeedbackFactory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
             $feedbacks,
-            $this->getRequest()->post['mark'],
-            $this->getRequest()->post['comment'],
-            $this->getRequest()->post['publish'],
-            $this->getRequest()->post['attachment'],
+            $postVars['mark'],
+            $postVars['comment'],
+            $postVars['publish'],
+            $postVars['attachment'],
             $response
         );
 
         $feedback = $feedbackFactory->produce();
 
         $this->getFeedbackDataSource()->save($feedback);
+
+        /* Optional rubric
+         */
+        // If the mark gets passed at the same time as rubrics,
+        // then rubrics get clobbered. We don't want that.
+        if (is_array($postVars['rubric'])) {
+
+            /* Find the submission box instance
+             */
+            try {
+                /** @var SubmissionBox $submissionBox */
+                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $response->getAssessable()->getId());
+
+                $desMap = DescriptorMapper::getInstance();
+
+                /* Something is remembering descriptor values somewhere
+                 * so we use new RubricMapper instead of getInstance()
+                 */
+                $rubMap = new RubricMapper();
+
+                $descriptorIds = [];
+
+                foreach ($postVars['rubric'] as $criterionId => $levelId) {
+                    // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
+                    $descriptorIds[] = $desMap->findIdsByColumnList(
+                        [
+                            'submission_box_id' => $submissionBox->getId(),
+                            'criterion_id'      => $criterionId,
+                            'level_id'          => $levelId
+                        ]
+                    )[0];
+                }
+
+                $grid = $rubMap->findBySubmissionBox($submissionBox);
+                $rubMap->applyMark($grid, $descriptorIds);
+
+
+
+
+
+                $marks = $grid->getORMMarks($participant->getUser(), \Alaress_Date_Format::now());
+                SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+
+                /* noop (submission box not found)
+                 */
+            }
+        }
 
         $template = '';
         $data = [
