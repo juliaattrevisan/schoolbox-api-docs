@@ -319,8 +319,12 @@ class Controller extends Assessment\Controller
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
 
-        // Add the online submission to this response's list of files
-        $response->attachOnlineSubmissionContent($body);
+        /* Add the online submission to this response's list of files
+         * only if there is content in it.
+         */
+        if (strlen(trim(strip_tags($body)))) {
+            $response->attachOnlineSubmissionContent($body);
+        }
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
