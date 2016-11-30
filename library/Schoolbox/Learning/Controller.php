@@ -412,7 +412,7 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
-            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student)
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student, $term)
         ]));
     }
 
@@ -420,16 +420,17 @@ class Controller extends Base
     /**
      * @param Folder $subject
      * @param User   $student
+     * @param Term   $term
      * @return array
      */
-    protected function getLongitudinalRubricData(Folder $subject, User $student)
+    protected function getLongitudinalRubricData(Folder $subject, User $student, Term $term)
     {
         if (!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
             return [];
         }
 
-        return $this->getRubricMapper()->getLongitudinal($subject, $student);
+        return $this->getRubricMapper()->getLongitudinal($subject, $student, $term->getStart(), $term->getActualFinish());
     }
 
 
