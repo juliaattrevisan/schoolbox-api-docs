@@ -899,11 +899,11 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param array $contents
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function createCollection($contents = array())
     {
-        return new Collection($contents);
+        return new GenericCollection($this->getModel(), $contents);
     }
 
     /**
