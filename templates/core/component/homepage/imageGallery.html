@@ -6,29 +6,23 @@
     <div class="row">
         <div class="small-12 island">
             <section>
-                <ul class="information-list" data-dz-container></ul>
+                <ul class="inline-list img-gallery information-list" data-dz-container></ul>
             </section>
         </div>
     </div>
 
     <div data-dz-wrap class="dropzone-wrap">
-        <div data-dz-container="">
-        </div>
         <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
         <div class="hide" data-dz-template>
             <li>
-                <div class="card small-12">
-                    <div class="icon-audio icon-32"></div>
-                    <h3 data-dz-name></h3>
-                    <p class="meta" data-dz-status>Uploading...</p>
-                    <div class="progress dz-progress">
-                        <span class="meter dz-upload" style="width:0;"></span>
-                    </div>
+                <img data-dz-thumbnail src="/images/foundation/preloader.gif"/>
+                <div class="progress dz-progress">
+                    <span class="meter dz-upload" style="width:0;"></span>
                 </div>
             </li>
         </div>
 
-        <div class="empty-state">
+        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
             <i class="icon-image-gallery"></i>
             <p>No images in this gallery</p>
 
@@ -53,6 +47,10 @@
                         $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
                     },
                     sending: function (file, xhr, formData) {
+
+                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
+
+
                         formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
                         formData.append('category', $(file.previewElement).data('node'));
                         formData.append('comment', '');
@@ -92,9 +90,7 @@
                               data-accepts="image"></form>
                         <ul class="hide" data-dz-template>
                             <li>
-                                <span class="th">
-                                    <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif"/>
-                                </span>
+                                <img data-dz-thumbnail src="/images/foundation/preloader.gif"/>
                                 <div class="progress dz-progress">
                                     <span class="meter dz-upload" style="width:0;"></span>
                                 </div>

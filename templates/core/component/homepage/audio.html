@@ -35,7 +35,7 @@
             </li>
         </div>
 
-        <div class="empty-state">
+        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
             <i class="icon-audio"></i>
             <p>No audio files available.</p>
 
@@ -63,6 +63,8 @@
                         formData.append('category', $(file.previewElement).data('node'));
                         formData.append('comment', '');
                         formData.append('hidden', 0);
+                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
+
                     },
                     complete: function (file) {
                         $(file.previewElement).find('img').remove();

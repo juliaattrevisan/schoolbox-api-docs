@@ -51,7 +51,7 @@
         <div class="hide" data-dz-template>
             <li>
                 <div class="card small-12">
-                    <div class="icon-audio icon-32"></div>
+                    <div class="icon-video icon-32"></div>
                     <h3 data-dz-name></h3>
                     <p class="meta" data-dz-status>Uploading...</p>
                     <div class="progress dz-progress">
@@ -61,7 +61,7 @@
             </li>
         </div>
 
-        <div class="empty-state">
+        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
             <i class="icon-video"></i>
             <p>No video files available!</p>
 
@@ -87,6 +87,8 @@
                         formData.append('category', $(file.previewElement).data('node'));
                         formData.append('comment', '');
                         formData.append('hidden', 0);
+                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
+
                     },
                     complete: function (file) {
                         $(file.previewElement).find('img').remove();
@@ -126,7 +128,7 @@
                         <ul class="hide" data-dz-template>
                             <li>
                                 <div class="card small-12">
-                                    <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif" />
+                                    <img data-dz-thumbnail src="/images/foundation/preloader.gif" />
                                     <h3 data-dz-name></h3>
                                     <p class="meta">Uploading...</p>
                                 </div>
