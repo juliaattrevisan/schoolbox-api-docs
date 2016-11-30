@@ -7,6 +7,8 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -155,6 +157,9 @@ class Mapper extends BaseMapper
             null,
             'specificationAssessment'
         );
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
@@ -739,5 +744,62 @@ class Mapper extends BaseMapper
             $sequence++;
         }
         return true;
+    }
+
+    /**
+     * Pre-save callback.
+     *
+     * If the model's sequence is 0 (either because new model, or explicitly cleared),
+     * the system will allocate the next available integer in the series.
+     *
+     * @param Model $assessment
+     */
+    protected function setSequence(Model $assessment)
+    {
+        // Ignore if this Assessment already had a sequence
+        if(!$assessment->getSequence()){
+
+            $contextClass = get_class($assessment->getAssessmentContext());
+            switch($contextClass){
+                case FolderModel::class:
+                    $joinTable = 'assessment_folder';
+                    $otherField = 'folder_id';
+                    break;
+                case Project::class:
+                    $joinTable = 'project_assessment';
+                    $otherField = 'project_id';
+                    break;
+                case UnitImplementationModel::class:
+                    $joinTable = 'assessment_course_unit_implementation';
+                    $otherField = 'course_unit_implementation_id';
+                    break;
+                case UnitSpecificationModel::class:
+                    $joinTable = 'assessment_course_unit_specification';
+                    $otherField = 'course_unit_specification_id';
+                    break;
+                default:
+                    throw new \InvalidArgumentException('Unknown AssessmentContext: '.$contextClass);
+            }
+
+            $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+            $query = "
+                SELECT max(`a`.`sequence`)
+                FROM `{$this->getTable()}` `a`
+                JOIN `{$joinTable}` `o` ON `o`.`assessment_id` = `a`.`id`
+            ";
+
+            // Ignore this model's db sequence if it exists.
+            // This enables us to clear a model's sequence, and save it again to place it at the end
+            if($assessment->getId()){
+                $pb->notEquals('a.id', $assessment->getId());
+            }
+            $pb->equals("o.{$otherField}", $assessment->getAssessmentContext()->getId());
+            $pb->isNull('a.deleted_at');
+            $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            $statement->execute($pb->getParams());
+            $row = $statement->fetch(\PDO::FETCH_NUM);
+            $assessment->setSequence(++$row[0]);
+        }
     }
 }
