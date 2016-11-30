@@ -11,8 +11,8 @@ class Leave_Request_TravelTypeMapper extends Schoolbox\Mapper {
      * {@inheritdoc}
      */
     protected function mapping() {
-        $this->hasModel('Leave_Request_TravelType');
         $this->hasTable('lu_leave_request_travel_type');
+        $this->hasModel(Leave_Request_TravelType::class);
         $this->hasMap(
             array(
                 'column'     => 'id',

@@ -26,7 +26,7 @@ class HomepageTemplateMapper extends Mapper
 
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\HomepageTemplate');
+        $this->hasModel(HomepageTemplate::class);
         $this->hasTable('homepageTemplate');
         $this->hasMap(
             array(

@@ -17,7 +17,7 @@ class ResultMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_result');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Result');
+        $this->hasModel(Result::class);
         $this->hasMap(array(
                 'column'     => 'resultset_id',
                 'property'   => 'resultSetId',

@@ -24,7 +24,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 */
 	public function mapping() {
 		$this->hasTable('eotc_metadata');
-		$this->hasModel('\\EOTC\\EventMetadata');
+		$this->hasModel(EventMetadata::class);
 		$this->hasMap(array(
 			'column' => 'id',
 			'property' => 'id',

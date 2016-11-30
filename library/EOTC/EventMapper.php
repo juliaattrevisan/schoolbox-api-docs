@@ -44,7 +44,7 @@ class EventMapper extends Calendar\EventMapper {
 		$this->coreMapping();
 
 		$this->hasTable('eotc_event');
-		$this->hasModel('\\EOTC\\Event');
+		$this->hasModel(Event::class);
 
 		$this->hasMap(array(
 			'column' => 'teacher_in_charge_id',

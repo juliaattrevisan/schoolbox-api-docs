@@ -19,7 +19,7 @@ class AdvancedListMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_advancedlist_item');
-		$this->hasModel('\\Component\\Eportfolio\\AdvancedList');
+		$this->hasModel(AdvancedList::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

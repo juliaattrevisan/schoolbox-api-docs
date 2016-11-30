@@ -15,7 +15,7 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('submission_errors');
-		$this->hasModel('DueWork_Error');
+		$this->hasModel(DueWork_Error::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

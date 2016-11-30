@@ -19,7 +19,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
 
     protected function mapping() {
         $this->hasTable('forumPost');
-        $this->hasModel('\\Schoolbox\\Forum\\Post');
+        $this->hasModel(Post::class);
         $this->hasMap(array(
                 'column'     => 'postID',
                 'property'   => 'id',

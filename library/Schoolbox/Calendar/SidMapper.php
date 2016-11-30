@@ -23,7 +23,7 @@ class SidMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('event_sid');
-		$this->hasModel('\\Schoolbox\\Calendar\\Sid');
+		$this->hasModel(Sid::class);
 
 		$this->hasMap(array(
 			'column' => 'event_id',

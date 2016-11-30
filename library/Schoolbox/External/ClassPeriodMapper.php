@@ -19,7 +19,7 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('class_period');
-        $this->hasModel('\\Schoolbox\\External\\ClassPeriod');
+        $this->hasModel(ClassPeriod::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

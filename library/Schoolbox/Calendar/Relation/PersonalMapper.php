@@ -26,7 +26,7 @@ class PersonalMapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('event_user');
-        $this->hasModel('\\Schoolbox\\Calendar\\Relation\\Personal');
+        $this->hasModel(Personal::class);
 
         $this->hasMap(
             array(

@@ -22,7 +22,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('calendar_connector');
-        $this->hasModel('Calendar_Api_Config_Record');
+        $this->hasModel(Calendar_Api_Config_Record::class);
 
         $this->hasMap(
             array(

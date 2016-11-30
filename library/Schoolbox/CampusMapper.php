@@ -16,7 +16,7 @@ class CampusMapper extends Mapper {
     protected function mapping () {
 
         $this->hasTable('luCampus');
-        $this->hasModel('\Schoolbox\Campus');
+        $this->hasModel(Campus::class);
 
 		$this->hasMap(array(
 			'column' => 'id',

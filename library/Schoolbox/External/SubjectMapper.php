@@ -27,7 +27,7 @@ class SubjectMapper extends Schoolbox\External\Mapper
         //
         // has an external table, not a Schoolbox one.
         // Field mappings may not be completely appropriate.
-        $this->hasModel('\Schoolbox\External\Subject');
+        $this->hasModel(Subject::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

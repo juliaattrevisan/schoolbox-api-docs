@@ -19,7 +19,7 @@ class LinkListMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_linklist_item');
-		$this->hasModel('\\Component\\Eportfolio\\LinkList');
+		$this->hasModel(LinkList::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

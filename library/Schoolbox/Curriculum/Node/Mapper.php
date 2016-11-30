@@ -17,7 +17,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     public function mapping()
     {
         $this->hasTable('curriculum_node');
-        $this->hasModel('\\Schoolbox\\Curriculum\\Node\\Model');
+        $this->hasModel(Model::class);
         $this->hasMap(
             array(
                 'column'     => 'id',

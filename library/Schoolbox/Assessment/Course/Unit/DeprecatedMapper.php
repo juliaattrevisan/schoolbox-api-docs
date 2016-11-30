@@ -122,7 +122,7 @@ class DeprecatedMapper extends Folder\Mapper
 
             if (empty($cache[$unitId])) {
                 $cache[$unitId] = $this->hydrate($row);
-                $cache[$unitId]->setTasks($this->createCollection());
+                $cache[$unitId]->setTasks(TaskMapper::getInstance()->createCollection());
             }
 
             $tasks = $cache[$unitId]->getTasks();

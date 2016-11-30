@@ -45,7 +45,7 @@ class UserAccessMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('userAccess');
-        $this->hasModel('\\Schoolbox\\Permission\\Access\\UserAccess');
+        $this->hasModel(UserAccess::class);
 
         $this->hasMap(array(
             'column'     => 'uid',
@@ -76,7 +76,7 @@ class UserAccessMapper extends Mapper
         ));
 
         $this->hasJoin('user', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'uid',
             'other_key' => 'id'
         ));
@@ -317,7 +317,7 @@ class UserAccessMapper extends Mapper
         }
         $stmt = $this->database->prepare($query);
         $stmt->execute($params);
-        $userCollection = $this->createCollection();
+        $userCollection = $this->getJoinMapper('user')->createCollection();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             // add the user represented by this row to the collection
@@ -401,7 +401,7 @@ class UserAccessMapper extends Mapper
                 'minAccess' => $accessType,
             )
         );
-        $userCollection = $this->createCollection();
+        $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
             $userCollection->add(
                 $this->hydrateJoin($row, 'user', 'u')

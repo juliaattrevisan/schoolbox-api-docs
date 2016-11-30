@@ -12,7 +12,7 @@ use Schoolbox\Mapper;
 
 class SoftDeleteTestMapper extends Mapper {
 	protected function mapping() {
-		$this->hasModel('\\Schoolbox\\Test\\SoftDeleteTestModel');
+		$this->hasModel(SoftDeleteTestModel::class);
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

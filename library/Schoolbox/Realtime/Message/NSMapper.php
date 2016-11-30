@@ -37,7 +37,7 @@ class NSMapper extends Mapper {
 
 	protected function mapping() {
 		$this->hasTable('msg_namespace');
-		$this->hasModel('\\Schoolbox\\Realtime\\Message\\NS');
+		$this->hasModel(NS::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

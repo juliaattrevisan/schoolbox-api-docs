@@ -19,7 +19,7 @@ class BasicListMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_basiclist_item');
-		$this->hasModel('\\Component\\Eportfolio\\BasicList');
+		$this->hasModel(BasicList::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

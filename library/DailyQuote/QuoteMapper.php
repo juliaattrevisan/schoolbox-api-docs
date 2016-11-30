@@ -17,8 +17,8 @@ class QuoteMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasModel('\\DailyQuote\\Quote');
 		$this->hasTable('dailyquote_data');
+        $this->hasModel(Quote::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

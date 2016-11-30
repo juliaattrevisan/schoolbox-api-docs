@@ -19,7 +19,7 @@ class ClassEntryMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('class');
-        $this->hasModel('\\Schoolbox\\External\\ClassEntry');
+        $this->hasModel(ClassEntry::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

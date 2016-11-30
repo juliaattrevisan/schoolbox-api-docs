@@ -20,7 +20,7 @@ class CommentMapper extends Mapper {
 
 		// register table and model
 		$this->hasTable('reportcard_comment');
-		$this->hasModel('\\Schoolbox\\Assessment\\StudentReportCard\\Comment');
+		$this->hasModel(Comment::class);
 
 		// register mapping
 		$this->hasMap(array(

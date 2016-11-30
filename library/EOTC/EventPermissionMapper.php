@@ -18,7 +18,7 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 	 */
 	public function mapping() {
 		$this->hasTable('eotc_permission');
-		$this->hasModel('\\EOTC\\EventPermission');
+		$this->hasModel(EventPermission::class);
 		$this->hasMap(array(
 			'column' => 'id',
 			'property' => 'id',

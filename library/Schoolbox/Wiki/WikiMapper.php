@@ -28,7 +28,7 @@ class WikiMapper extends Mapper implements FeedableMapperInterface {
 	 */
 	protected function mapping() {
 		$this->hasTable('wiki');
-		$this->hasModel('\\Schoolbox\\Wiki\\Wiki');
+		$this->hasModel(Wiki::class);
 
 		$this->hasMap(array(
 			'column'     => 'wikiID',

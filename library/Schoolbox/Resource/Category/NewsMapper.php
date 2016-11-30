@@ -25,7 +25,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 	 */
 	protected function mapping() {
 		$this->hasTable('subject_news');
-		$this->hasModel('\\Schoolbox\\Resource\\Category\\News');
+		$this->hasModel(News::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

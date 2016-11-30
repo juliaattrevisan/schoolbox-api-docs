@@ -20,7 +20,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
 
     protected function mapping() {
         $this->hasTable('forumThread');
-        $this->hasModel('\\Schoolbox\\Forum\\Thread');
+        $this->hasModel(Thread::class);
         $this->hasMap(array(
                 'column'     => 'threadID',
                 'property'   => 'id',

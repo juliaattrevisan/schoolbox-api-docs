@@ -15,7 +15,7 @@ class QueueItemMapper extends Mapper {
 
 	protected function mapping () {
 		$this->hasTable('scheduleq');
-		$this->hasModel('\\Schoolbox\\Realtime\\Schedule\\Persistence\\QueueItem');
+		$this->hasModel(QueueItem::class);
 
 		// note that this is a dynamic property that does not exist in the model (but it does in the DB)
 		$this->hasMap(array(

@@ -21,7 +21,7 @@ class CriterionMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_criterion');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Criterion');
+        $this->hasModel(Criterion::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

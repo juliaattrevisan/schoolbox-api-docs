@@ -23,7 +23,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('component_instance');
-        $this->hasModel('Component_Instance');
+        $this->hasModel(Component_Instance::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

@@ -32,7 +32,7 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
     protected function mapping()
     {
         $this->hasTable('wikiRevision');
-        $this->hasModel('\\Schoolbox\\Wiki\\Revision');
+        $this->hasModel(Revision::class);
         $this->hasMap(
             array(
                 'column'     => 'revisionID',

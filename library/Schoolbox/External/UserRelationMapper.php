@@ -21,7 +21,7 @@ class UserRelationMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('user_relation');
-        $this->hasModel('\\Schoolbox\\External\\UserRelation');
+        $this->hasModel(UserRelation::class);
         $this->hasMap(array(
             'column'   => 'user_id',
             'property' => 'user',

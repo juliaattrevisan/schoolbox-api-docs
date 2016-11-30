@@ -27,7 +27,7 @@ class UnitInstanceMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('course_unit_implementation');
-        $this->hasModel('\\Schoolbox\\Assessment\\Course\\UnitInstance');
+        $this->hasModel(UnitInstance::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

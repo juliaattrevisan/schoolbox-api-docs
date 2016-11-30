@@ -34,7 +34,7 @@ class RoleAccessMapper extends Mapper
     {
 
         $this->hasTable('perms');
-        $this->hasModel('\\Schoolbox\\Permission\\Access\\RoleAccess');
+        $this->hasModel(RoleAccess::class);
 
         $this->hasMap(array(
             'column'     => 'cid',

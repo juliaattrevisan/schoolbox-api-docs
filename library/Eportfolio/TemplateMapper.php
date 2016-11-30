@@ -21,7 +21,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolioTemplate');
-		$this->hasModel('\\Eportfolio\\Template');
+		$this->hasModel(Template::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

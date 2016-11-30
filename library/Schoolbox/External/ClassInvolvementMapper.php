@@ -19,7 +19,7 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
      */
     protected function mapping() {
         $this->hasTable('class_user');
-        $this->hasModel('\\Schoolbox\\External\\ClassInvolvement');
+        $this->hasModel(ClassInvolvement::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

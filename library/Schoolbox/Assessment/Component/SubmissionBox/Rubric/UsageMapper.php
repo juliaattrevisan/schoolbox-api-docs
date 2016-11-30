@@ -22,7 +22,7 @@ class UsageMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_usage');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Usage');
+        $this->hasModel(Usage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->hasMap(array(
             'column'     => 'criterion_id',

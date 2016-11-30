@@ -19,8 +19,8 @@ class PadMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasModel('\\Etherpad\\Pad');
 		$this->hasTable('etherpad_pad');
+        $this->hasModel(Pad::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',

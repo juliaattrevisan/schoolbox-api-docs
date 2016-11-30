@@ -149,7 +149,7 @@ class Mapper extends BaseMapper
      */
     public function findSupplementaryInformation($attemptIds)
     {
-        $result = $this->createCollection();
+        $result = new Collection();
         if (empty($attemptIds)) {
             return $result;
         }

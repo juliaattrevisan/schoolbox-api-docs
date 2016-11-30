@@ -24,7 +24,7 @@ class EventTypeMapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('luEventType');
-        $this->hasModel('\\Schoolbox\\Calendar\EventType');
+        $this->hasModel(EventType::class);
         $this->hasMap(
             array(
                 'column'     => 'eventTypeID',

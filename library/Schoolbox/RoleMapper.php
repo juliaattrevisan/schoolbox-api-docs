@@ -22,7 +22,7 @@ class RoleMapper extends Mapper {
     protected function mapping () {
 
         $this->hasTable('groups');
-        $this->hasModel('\Schoolbox\Role');
+        $this->hasModel(Role::class);
 
         $this->hasMap(array(
                 'column'     => 'id',

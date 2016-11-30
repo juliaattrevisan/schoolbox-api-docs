@@ -17,8 +17,8 @@ class HostTypeMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasModel('\\Leave\\HostType');
 		$this->hasTable('lu_leave_request_host_type');
+        $this->hasModel(HostType::class);
 
 		$this->hasMap(array(
 			'column' => 'id',

@@ -33,7 +33,7 @@ class FileListMapper extends Schoolbox\Mapper
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_filelist_item');
-		$this->hasModel('\\Component\\Eportfolio\\FileList');
+		$this->hasModel(FileList::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',
