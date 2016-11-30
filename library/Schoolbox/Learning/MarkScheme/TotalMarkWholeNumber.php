@@ -48,7 +48,10 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
 
         $totalMarkMin = $this->getTotalMarkMin();
         if($intVal < $totalMarkMin){
-            throw new RangeException("Total mark must be greater than or equal to $totalMarkMin: $totalMark");
+            if (!strlen($totalMark)) {
+                $totalMark = 'none';
+            }
+            throw new RangeException("Total mark must be greater than or equal to $totalMarkMin: $totalMark given.");
         }
     }
 
