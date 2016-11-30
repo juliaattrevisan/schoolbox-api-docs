@@ -19,7 +19,7 @@ class Component_Config_LTIProvider extends Component_Config_Abstract
 
         try {
             $provider = $providerMapper->findById($configValue);
-            $page->setVar('COMPONENT_LTI_PROVIDER_NAME', $provider->getName());
+            $page->setVar('COMPONENT_LTI_PROVIDER_NAME', Scrub::text($provider->getName()));
             $page->setVar('COMPONENT_LTI_PROVIDER_ID', $configValue);
         } catch (MapperException $e) {
             $page->setVar('COMPONENT_LTI_PROVIDER_NAME', 'None Selected');
