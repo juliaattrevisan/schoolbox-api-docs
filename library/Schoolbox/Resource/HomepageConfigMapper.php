@@ -22,7 +22,7 @@ use Schoolbox\Mapper;
  * Class HomepageConfigMapper
  *
  * @package Schoolbox\Resource
- * @method HomepageConfig createModel()
+ * @method HomepageConfig createModel($idValue = null)
  */
 class HomepageConfigMapper extends Mapper
 {
@@ -234,7 +234,7 @@ class HomepageConfigMapper extends Mapper
         }
         foreach ($instances as $inst) {
             // preserve the config
-            /** @var Component_Config[] $configs */
+            /** @var \Component_ConfigDefinition[] $configs */
             $configs = $inst->getConfig();
             $inst
                 ->setId(null)

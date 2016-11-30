@@ -9,6 +9,8 @@
  * 
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\GenericCollection;
+
 abstract class Component_FactoryAbstract {
     /**
      * @var String
@@ -103,7 +105,7 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return array
+     * @return Component_Instance[]|GenericCollection
      */
     public function getInstanceList ($identifier) {
         return Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
