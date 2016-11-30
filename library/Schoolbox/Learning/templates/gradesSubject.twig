@@ -7,6 +7,13 @@
 <script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
 <script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser="true"]').collapsable({
+            container: '[data-collapse-container]'
+        });
+    });
+</script>
 
 <div class="row">
     <div class="small-12 columns">
@@ -169,6 +176,54 @@
             </section>
         </div>
     </div>
+    {% if longitudinalRubric %}
+    <div class="row">
+        <div class="small-12 column">
+            <h2 class="subheader">{{ locale.translate('rubricGroup', true, true) }}</h2>
+            <section>
+                <div class="row" id="rubric-table">
+                {% for capability in longitudinalRubric %}
+                    <div class="small-12 island">
+                        <section data-interaction="collapse" data-collapse-container>
+                            <ul class="information-list">
+                                <li class="list-item">
+                                    <div class="card small small-12">
+                                        <h3>
+                                        <span data-collapser="true" class="icon-down-arrow" title="{{ capability.name }}">
+                                            <a href="#">{{ capability.name }}</a>
+                                        </span>
+                                        </h3>
+                                    </div>
+                                </li>
+                                {% for indicator in capability.indicators %}
+                                <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
+                                    <div class="content">
+                                        <h4>{{ indicator.name }}</h4>
+                                        <ul class="information-list">
+                                            {% for activity in indicator.activities %}
+                                            <li>
+                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id }) -%}
+                                                {%- if activityHref -%}
+                                                <a href="{{ activityHref }}">{{ activity.name }}</a>
+                                                {%- else -%}
+                                                    {{ activity.name }}
+                                                {%- endif -%}
+                                                : <em>{{ activity.descriptor }}</em>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    </div>
+                {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Assessments</h2>

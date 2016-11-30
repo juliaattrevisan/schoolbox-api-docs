@@ -8,6 +8,8 @@ namespace Schoolbox\Learning;
 
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -55,16 +57,22 @@ class Controller extends Base
      * @var AssessmentMapperProxy
      */
     protected $assessmentMapperProxy;
+    /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper            $errorMapper
-     * @param AssessmentMapperProxy  $assessmentMapperProxy
-     * @param TermMapper             $termMapper
-     * @param FolderMapper           $folderMapper
-     * @param GradeGroup             $defaultGradeGroup
-     * @param ShowcaseMapper         $showcaseMapper
+     * @param ErrorMapper           $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param FolderMapper          $folderMapper
+     * @param TermMapper            $termMapper
+     * @param GradeGroup            $defaultGradeGroup
+     * @param ShowcaseMapper        $showcaseMapper
+     * @param RubricMapper          $rubricMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -72,7 +80,8 @@ class Controller extends Base
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
-        ShowcaseMapper $showcaseMapper
+        ShowcaseMapper $showcaseMapper,
+        RubricMapper $rubricMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -80,6 +89,7 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
+        $this->setRubricMapper($rubricMapper);
     }
 
     /**
@@ -402,8 +412,27 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student, $term)
         ]));
     }
+
+
+    /**
+     * @param Folder $subject
+     * @param User   $student
+     * @param Term   $term
+     * @return array
+     */
+    protected function getLongitudinalRubricData(Folder $subject, User $student, Term $term)
+    {
+        if (!$this->getConfigLoader()->get('enable_grades_criteria')) {
+            // only populate this if we're actually allowed to see it
+            return [];
+        }
+
+        return $this->getRubricMapper()->getLongitudinal($subject, $student, $term->getStart(), $term->getActualFinish());
+    }
+
 
     /* Getters/Setters
      */
@@ -505,6 +534,27 @@ class Controller extends Base
     {
         return $this->showcaseMapper;
     }
+
+
+    /**
+     * @return RubricMapper
+     */
+    public function getRubricMapper()
+    {
+        return $this->rubricMapper;
+    }
+
+
+    /**
+     * @param RubricMapper $rubricMapper
+     * @return static
+     */
+    public function setRubricMapper($rubricMapper)
+    {
+        $this->rubricMapper = $rubricMapper;
+        return $this;
+    }
+
 
     /**
      * @param ShowcaseMapper $showcaseMapper

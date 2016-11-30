@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Alaress_Date_Format;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -18,11 +19,12 @@ use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -746,6 +748,74 @@ class RubricMapper
                 }
             )
         );
+    }
+
+
+    /**
+     * Specialised query for returning the longitudinal cross-section of rubric data for a
+     * student in a subject, optionally date-restricted according to the DUE date of the
+     * assessment. Data is returned in a primitive hierarchy of:
+     *   - capability
+     *   - indicator
+     *   - assessment
+     *   - descriptor (student result)
+     *
+     * @param Folder\Model        $subject
+     * @param User                $student
+     * @param Alaress_Date_Format $noEarlierThan
+     * @param Alaress_Date_Format $noLaterThan
+     * @return array
+     */
+    public function getLongitudinal(Folder\Model $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
+    {
+        $pb = new PredicateBuilder($this->database, '');
+
+        $pb->equals('rc.parent_type', 'category')
+           ->equals('rc.parent_id', $subject->getId())
+           ->equals('rm.student_id', $student->getId())
+           ->isNull('rc.deleted_at');
+
+        if ($noEarlierThan) {
+            $pb->notLessThan('a.due_date', $noEarlierThan->getDatabase());
+        }
+
+        if ($noLaterThan) {
+            $pb->notGreaterThan('a.due_date', $noLaterThan->getDatabase());
+        }
+
+        $where = implode(' AND ', $pb->getWhere());
+
+        $stmt = $this->database->prepare("
+            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
+            FROM rubric_criterion rc
+            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
+            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id
+            INNER JOIN assessment a ON sb.assessment_id = a.id
+            LEFT JOIN rubric_mark rm ON rm.submission_box_id = sb.id AND rm.criterion_id = rc.id AND rm.valid IS TRUE
+            INNER JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+            WHERE {$where}
+            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC
+        ");
+
+        $stmt->execute($pb->getParams());
+
+        $longitude = [];
+
+        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
+
+            list ($capability, $indicator, $assessmentId, $assessmentTitle, $descriptor) = $r;
+
+            $longitude[$capability]['name'] = $capability;
+            $longitude[$capability]['indicators'][$indicator]['name'] = $indicator;
+            $longitude[$capability]['indicators'][$indicator]['activities'][$assessmentId] = [
+                'id'         => $assessmentId,
+                'name'       => $assessmentTitle,
+                'descriptor' => $descriptor,
+            ];
+
+        }
+
+        return $longitude;
     }
 
 
