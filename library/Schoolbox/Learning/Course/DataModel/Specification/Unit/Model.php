@@ -18,6 +18,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
  * Data domain model for Unit Specifications.
@@ -32,21 +33,25 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     /**
      * @var CourseSpecificationModel
      */
-    protected $course;
+    private $course;
 
     /**
      * @var FolderModel
      */
-    protected $folder;
+    private $folder;
 
     /**
      * The assessables that are a part of this unit spec.
      *
-     * TODO figure out whether they need to be translated or not
-     *
      * @var IAssessable[]|Collection
      */
-    protected $assessables;
+    private $assessables;
+
+
+    /**
+     * @var UnitImplementation[]|Collection
+     */
+    private $unitImplementations;
 
     /**
      * Constructor
@@ -110,6 +115,24 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     public function setAssessables(Collection $assessables)
     {
         $this->assessables = $assessables;
+        return $this;
+    }
+
+    /**
+     * @return Collection|UnitImplementation[]
+     */
+    public function getUnitImplementations()
+    {
+        return $this->unitImplementations;
+    }
+
+    /**
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @return static
+     */
+    public function setUnitImplementations($unitImplementations)
+    {
+        $this->unitImplementations = $unitImplementations;
         return $this;
     }
 }

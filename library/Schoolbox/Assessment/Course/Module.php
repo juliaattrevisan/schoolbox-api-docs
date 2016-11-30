@@ -11,17 +11,28 @@ namespace Schoolbox\Assessment\Course;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Learning\Course;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use \Component_InstanceMapper;
+use \Component_DefinitionMapper;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 class Module extends BaseModule
 {
@@ -49,10 +60,6 @@ class Module extends BaseModule
                 '/parent{/folderId}'                   => 'parentList',
             ],
             'POST' => [
-                // AFAICT this was never used - I'm re-purposing it
-                '/unit/delete/{id}' => 'deleteUnitSpecification',
-                '/new'              => 'createCourse',
-                '/modify/{id}'      => 'updateCourse',
                 '/finalise'         => 'persistCourse',
                 // AFAICT this was never used - I'm re-purposing it
                 '/delete/{id}'      => 'deleteCourseSpecification',
@@ -83,15 +90,31 @@ class Module extends BaseModule
 
         $preloadCourse = function (array $params) {
             try{
-                return ['course' => $this->getCourseSpecificationMapper()->findById($params['id'])];
+                return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
+            } catch (MapperException\Deleted $e) {
+                return ['courseSpec' => $e->getDeletedObject()];
             } catch (MapperException $e){
-                return ['course' => $this->getCourseSpecificationMapper()->createModel()];
+                return ['courseSpec' => $this->getCourseSpecificationMapper()->createModel()];
+            }
+        };
+
+        $preloadUnit = function (array $params) {
+            try{
+                return ['unitSpec' => $this->getUnitSpecificationMapper()->findById($params['id'])];
+            } catch (MapperException\Deleted $e) {
+                return ['unitSpec' => $e->getDeletedObject()];
+            } catch (MapperException $e){
+                return ['unitSpec' => $this->getUnitSpecificationMapper()->createModel()];
             }
         };
 
         $this->register('GET',  '/modify/{id}',                                     'modifyCourse',   null, $preloadCourse);
+        $this->register('POST', '/new',                                             'createCourse');
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
         $this->register('POST', '/{id}/units/new',                                  'newUnit',        null, $preloadCourse);
+        $this->register('POST', '/modify/{id}',                                       'updateCourse', null, $preloadCourse);
+        $this->register('POST', '/units/{id}/delete',                      'deleteUnitSpecification', null, $preloadUnit);
+        $this->register('POST', '/units/{id}/sequence',                     'saveAssessmentSequence', null, $preloadUnit);
     }
 
     /**
@@ -126,14 +149,26 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'assessmentDataSource'          => $injector->lazyGet('assessmentDataSource'),
-                    'courseSpecificationDataSource' => $injector->lazyGet('courseSpecificationDataSource'),
-                    'unitSpecificationDataSource'   => $injector->lazyGet('unitSpecificationDataSource'),
-                ]
-            )
+            $injector->lazyNew(Controller::class, [], [
+                'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                'setCourseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+                'setCourseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'setUnitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
+                'setUnitImplementationMapper'   => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                'setSubmissionBoxMapper'        => $this->getMapperFactory()->getLazy(SubmissionBoxMapper::class),
+                'setFolderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'setComponentDefinitionMapper'  => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
+                'setComponentInstanceMapper'    => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
+                'setTaskMapper'                 => $this->getMapperFactory()->getLazy(TaskMapper::class),
+                'setHomepageConfigMapper'       => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
+                'setHomepageTemplateMapper'     => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
+                'setAccess'                     => $this->getMapperFactory()->getLazy(Access::class),
+                'setCourseConfigMapper'         => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
+                'setUserAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'setUserMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'setErrorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'setAssessmentMapper'           => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
+            ])
         );
     }
 
@@ -151,5 +186,13 @@ class Module extends BaseModule
     protected function getCourseSpecificationMapper()
     {
         return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+    }
+
+    /**
+     * @return UnitSpecificationMapper
+     */
+    protected function getUnitSpecificationMapper()
+    {
+        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
 }

@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,36 +7,34 @@
 
 namespace Schoolbox\Assessment\Course;
 
-
 use Component_Instance;
 use Schoolbox\Resource\Attachment\Zone;
 
 class TaskBuilder
 {
-
     /** @var string  */
-    protected $id;
+    private $id;
 
     /** @var string */
-    protected $method;
+    private $method;
 
     /** @var bool  */
-    protected $selfAssessed;
+    private $selfAssessed;
 
     /** @var Component_Instance  */
-    protected $component;
+    private $component;
 
     /** @var string */
-    protected $title;
+    private $title;
 
     /** @var string  */
-    protected $returnUrl;
+    private $returnUrl;
 
     /** @var string */
-    protected $url;
+    private $url;
 
     /** @var Zone  */
-    protected $zone;
+    private $zone;
 
 
     /**

@@ -1,3 +1,27 @@
+{#
+$data = [
+    componentInstance: Component_Instance   - the component showing hosting this content
+    unitSpec:          UnitSpecification    - never null (if null, component displays empty-state template)
+    unitImpls:         UnitImplementation[] - Imports of this UnitSpec
+    returnUrlName:     string               - key value of returnUrl key-value pair to insert in URL
+    encodedReturnUrl:  string               - encoded address of this page to return to after creating new assessments
+];
+#}
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#component{{ componentInstance.id }}').setupCourseBuilder({
+            {% if unitImpls | length %}
+            unitsImplementationsIds: [
+                {% for unitImpl in unitImpls %}
+                    {{ unitImpl.id }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+            {% endif %}
+        });
+    });
+</script>
+
 {% if breadcrumbs | length %}
 <ul class="breadcrumb">
     <li>
@@ -8,12 +32,25 @@
 </ul>
 {% endif %}
 
-{% include '@learningAssessment/builder/unit.twig' with { unit: unit } %}
+<ul class="information-list sortable-card ui-sortable" data-sortable data-unit-spec="{{ unitSpec.id }}">
+    {% for assessment in unitSpec.assessables %}
+        {% include '@learningAssessment/builder/unitAssessment.twig' with {
+            '_writable': true,
+            assessment:  assessment
+        } only %}
+    {% else %}
+        <li>
+            <div class="empty-state">
+                <i class="icon-course"></i>
+                <p>No coursework in this unit yet.</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
 
 <div class="component-action">
     <section>
-        <a class="button" href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}" title="Create a new activity">
-            Create Activity
-        </a>
+        {% set url = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) %}
+        <a class="button" href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Create a new activity">Create Activity</a>
     </section>
 </div>

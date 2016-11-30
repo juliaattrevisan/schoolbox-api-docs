@@ -128,4 +128,16 @@ class Mapper extends BaseMapper
         // TODO: consider whether units should be populated here
         return $modelList;
     }
+
+    /**
+     * Finds all course impls for this course spec.
+     *
+     * @param int|array $courseSpecId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByCourseSpecificationId($courseSpecId, $options = [])
+    {
+        return $this->findByColumn('course_specification_id', $courseSpecId, $options);
+    }
 }

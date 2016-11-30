@@ -1,15 +1,26 @@
+{#
+Usage:
+    $data = [
+        unitSpec:         UnitSpecification,
+        _expanded:        bool               - whether to initially display expanded or collapsed,
+        encodedReturnUrl: string             - URL to return to to focus on this UnitSpec in current CourseSpec
+    ]
+#}
 <li class="actions-small-1 content">
-    <h3>{{ unit.folder.name }}</h3>
-        {% if assessments[unit.id] | length %}
-    <ul class="information-list no-pad">
-        {% for assessment in assessments[unit.id] %}
-            {% include '@course/assessments.twig' with { '_writable': false } %}
-        {% endfor %}
-    </ul>
-        {% else %}
-    <div class="empty-state">
-        <i class="icon-course"></i>
-        <p>No coursework in this unit.</p>
-    </div>
-        {% endif %}
+    <h3>{{ unitSpec.folder.name }}</h3>
+    {% if unitSpec.assessments | length %}
+        <ul class="information-list no-pad">
+            {% for assessment in unitSpec.assessments %}
+                {% include '@course/assessments.twig' with {
+                    assessment: assessment,
+                    _writable:  false
+                } only %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <i class="icon-course"></i>
+            <p>No activities in this unit.</p>
+        </div>
+    {% endif %}
 </li>

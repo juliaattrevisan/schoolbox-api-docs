@@ -400,19 +400,20 @@ class Controller extends BaseController
     /**
      * This is public for now because /cms/categoryForm.php needs to reference it
      *
-     * @param  ArrayAccess|array $postData      the array structure we'll use to construct this folder
-     * @var    int|null $postData['categoryID'] If absent, this is an INSERT, if present, an UPDATE
-     * @var    string   $postData['name']
-     * @var    int      $postData['parent']
-     * @var    bool     $postData['inherit']    Whether to inherit permissions
-     * @var    int      $postData['template']
-     * @var    int[]    $postData['group']      Maps role to permission level
-     * @var    bool     $postData['recursive']  If true && $user is SU, applies $postData['inherit'] to entire subtree
-     * @var    string   $postData['code']       Comma-separated codes
-     * @param  User              $user          the effecting user
-     * @throws OutOfBoundsException             if you lack permission to perform functions
-     * @throws RangeException                   if the database fails to save your folder
-     * @return Model                            representing the freshly saved folder
+     * @param  ArrayAccess|array $postData        the array structure we'll use to construct this folder
+     * @var int|null $postData['categoryID']      If absent, this is an INSERT, if present, an UPDATE
+     * @var string   $postData['name']
+     * @var int      $postData['parent']
+     * @var bool     $postData['inherit']         Whether to inherit permissions
+     * @var int      $postData['template']
+     * @var int[]    $postData['curriculumCodes']
+     * @var int[]    $postData['group']           Maps role to permission level
+     * @var bool     $postData['recursive']       If true && $user is SU, applies $postData['inherit'] to entire subtree
+     * @var string   $postData['code']            Comma-separated codes
+     * @param  User              $user            the effecting user
+     * @throws OutOfBoundsException               if you lack permission to perform functions
+     * @throws RangeException                     if the database fails to save your folder
+     * @return Model                              representing the freshly saved folder
      */
     public function persistFolder($postData, User $user)
     {

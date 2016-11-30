@@ -1,35 +1,30 @@
-{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+{#
+Usage:
+    $data = [
+        assessment:       IAssessable,
+        encodedReturnUrl: string,
+    ]
+#}
 
-{% if task.type == 1 %}
-    {% set doReveal %}data-reveal-id="modifyTask-{{ assessment.id }}"{% endset %}
-{% endif %}
-<li class="actions-small-1 actions-large-3" data-assessment_id="{{ assessment.id }}">
+<li class="actions-small-1 actions-large-3" data-assessment="{{ assessment.id }}">
     <div class="grip"></div>
     <div class="list-item">
         <div class="compact card small-11 wrap-down">
             {% if assessment is project %}
-                <a href="{{ routeLookup('learningAssessment.getStatus',{assessmentId: assessment.id}) }}?returnUrl={{ returnUrl[unit.id] }}">
+                <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}">
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <p>{{ assessment.title }}</p>
                 </a>
-            {% elseif assessment.link|length %}
-            <a data-plugin="preview" href="{{ assessment.link }}">
+            {% else %}
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}</p>
-            </a>
-            {% else %}
-            <span class="{{ icon.renderClass(assessment) }}"></span>
-            <p>{{ assessment.title }}</p>
-            {% endif %}
-            {% if assessment.label|length %}
-            <p class="meta">{{ assessment.label }}</p>
             {% endif %}
         </div>
     </div>
     <nav>
         <span class="show-for-large-up">
             <a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes"></a>
-            <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?returnUrl={{ returnUrl[unit.id]  }}" {{ doReveal }} class="icon-modify" title="Modify"></a>
+            <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" {{ doReveal }} class="icon-modify" title="Modify"></a>
             <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete" class="icon-delete" title="Delete"></a>
         </span>
         <span class="hide-for-large-up">
@@ -43,10 +38,10 @@
     </ul>
     <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
     <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
-        <input type="hidden" name="action"     value="delete" />
-        <input type="hidden" name="id"         value="{{ task.id }}" />
-        <input type="hidden" name="category"   value="{{ unit.id }}"/>
-        <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>
-        <input type="hidden" name="returnUrl"  value="{{ returnUrl[unit.id] }}"/>
+        <input type="hidden" name="action"    value="delete"/>
+        <input type="hidden" name="id"        value="{{ assessment.id }}"/>
+        <input type="hidden" name="category"  value="{{ unitSpec.folder.id }}"/>
+        <input type="hidden" name="component" value="{{ reveals[unit.id].component.id }}"/>
+        <input type="hidden" name="returnUrl" value="{{ encodedReturnUrl }}"/>
     </form>
 </li>

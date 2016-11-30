@@ -1,0 +1,40 @@
+{#
+Usage:
+    {% include '@learningAssessment/builder/unitAssessment.twig' with {
+            _writable:   bool,
+            assessment:  IAssessable
+    } only %}
+#}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<li class="actions-small-1" data-task_id="{{ assessment.id }}">
+    <div class="grip compact"></div>
+    <div class="list-item">
+        <div class="card small-12 compact wrap-down">
+            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                <span class="{{ icon.renderClass(assessment) }}"></span>
+                <p>{{ assessment.title }}</p>
+            </a>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ assessment.id }}"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        {% if assessment is quiz %}
+        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify">Modify</a></li>
+        {% else %}
+        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
+        {% endif %}
+        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
+    </ul>
+    <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
+    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
+        <input type="hidden" name="action"    value="delete" />
+        <input type="hidden" name="id"        value="{{ assessment.id }}" />
+        <input type="hidden" name="category"  value="{{ unit.id }}"/>
+        <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
+        <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
+    </form>
+</li>

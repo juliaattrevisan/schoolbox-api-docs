@@ -122,7 +122,7 @@ class RoleAccessMapper extends Mapper
     * Save category permissions, optionally recursively
     *
     * @param FolderModel $category
-    * @param array $perms - assoc array of role IDs and permission levels
+    * @param int[] $perms - assoc array of role IDs and permission levels
     * @param bool $recursive
     * @return bool
     */
@@ -143,7 +143,7 @@ class RoleAccessMapper extends Mapper
     * Recursive helper function for generating a collection of permissions
     *
     * @param FolderModel $category
-    * @param $perms
+    * @param int[] $perms Maps role to permission level
     * @param bool $recursive
     * @return Collection|RoleAccess[]
     */

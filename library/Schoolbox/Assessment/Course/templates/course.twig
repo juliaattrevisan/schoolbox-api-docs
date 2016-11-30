@@ -1,164 +1,54 @@
+{#
+Usage:
+    $data = [
+        courseSpec:        CourseSpecification  -
+        curriculumEnabled: bool                 - disable curriculum tagging ?
+        folderAccess:      int[]                - indexed by folder.id
+        encodedReturnUrls: string[]             - indexed by UnitSpec.id
+    ]
+#}
+
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
-
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
-    <li class="active">
-        {% if course.id %}
-            <a href="{{ routeLookup('course.modifyCourse', { id: course.id }) }}">Modify Course</a>
-        {% else %}
-            <a href="{{ routeLookup('course.newCourse') }}">New Course</a>
-        {% endif %}
-    </li>
-</ul>
-<div class="row">
-    <div class="small-12 actions-small-1 island">
-        <div class="list-item">
-            <h1>{{ course.id ? 'Modify' : 'New' }} Course</h1>
-        </div>
-            {% if course.id %}
-        <nav>
-                {% if course.folder.hasHomepage %}
-            <a class="icon-home" href="/homepage/{{ course.folder.id }}" title="View Homepage"></a>
-                {% else %}
-            <a class="icon-folder" href="/resources/{{ course.folder.id }}" title="View Resources"></a>
-                {% endif %}
-        </nav>
-            {% endif %}
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island" id="main-course">
-        <section>
-            <fieldset class="content" data-mage="course-info">
-                <legend>Course Information</legend>
-                <input type="hidden" name="id" value="{{ course.id }}">
-                <div class="small-12 column">
-                    <label>Name
-                        {% if query|length %}
-                            {% set val = query %}
-                        {% else %}
-                            {% set val = course.folder.name %}
-                        {% endif %}
-                        <input type="text" name="name" value="{{ val }}" placeholder="What's this course called?" required />
-                    </label>
-                </div>
-                <div class="small-12 column">
-                    {% include 'sub/selectorShard.twig' with {
-                            'formLabel': 'Faculty / Subject',
-                            'formInputName': 'parent',
-                            'formInputValue': course.folder.parent.id,
-                            'formInputLabel': course.folder.parent.name,
-                            'activator': 'data-course-selector',
-                            'title': 'Click to change the faculty / subject this course belongs to'
-                        } only
-                    %}
-                </div>
-
-                {% if curriculumEnabled %}
-                <div class="small-12 column">
-                    <label>Curriculum Codes
-                        {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: course.folder.curriculumNodes } %}
-                    </label>
-                </div>
-                {% endif %}
-
-                {% if not course.id %}
-                <div data-mage-submitrow>
-                    <div class="small-12 medium-8 column">
-                        {# Don't delete the inline style, it's needed -#}
-                        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-                    </div>
-                    <div class="small-12 medium-4 column">
-                        <input type="submit" class="button" value="Next"
-                               data-mage-next="unit-info"
-                               data-mage-working="Working..."
-                               formaction="{{ course.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}" />
-                    </div>
-                </div>
-                {% endif %}
-            </fieldset>
-            <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not course.id %} disabled="disabled"{% endif %}>
-                <legend>Units</legend>
-                <div class="small-12 column no-pad" {% if not course.id %}style="display:none;"{% endif %} data-mage-collapsed>
-                    {# Don't delete the inline style, it's needed -#}
-                    <ul class="information-list">
-                    {% for unit in course.units %}
-                        {% if access[unit.id] > 0 %}
-                            {% include '@course/unit.twig' with { unit: unit, i: loop.index, '_writable': access[unit.id] > 1 } %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if not course.id or access[course.folder.id] > 1 %}
-                        <li class="actions-small-1" data-unit>
-                            <input type="hidden" name="id" value="{{ course.id }}" data-folder-id>
-                            <div class="list-item content">
-                                <div class="small-1 column">
-                                    <span class="icon-add"></span>
-                                </div>
-                                <div class="small-11 column">
-                                    <label>
-                                        <input type="text" value="" placeholder="New Unit" id="noonit-name" />
-                                    </label>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="small-12 medium-8 column">
-                                    {# Don't delete the inline style, it's needed -#}
-                                    <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-                                </div>
-                                <div class="small-12 medium-4 column">
-                                    <input type="submit" class="button" value="Create Unit" data-mage-next="spawn-unit" data-mage-working="Working..." formaction="{{ routeLookup('course.newUnit') }}" />
-                                </div>
-                            </div>
-                        </li>
-                    {% endif %}
-                    </ul>
-                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                    <input type="hidden" data-mage-next="none" name="unit-info" value="1" />
-                </div>
-            </fieldset>
-        </section>
-        {% if not course.id or access[course.folder.id] > 1 %}
-        <div class="row" data-mage="unit-info">
-            {# Don't delete the inline style, it's needed -#}
-            <div class="small-12 column" {% if not course.id %}data-mage-collapsed style="display: none;"{% endif %}>
-                <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course" />
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</div>
-<div id="parent-select" data-reveal class="reveal-modal"></div>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
 
-        $('#main-course').setupCourseBuilder();
+        // Mage Buttons
+        var $mageNextButton = $('[data-mage-next="unit-info"]');
+        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
+        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
 
-        $('#unit-info').on('click', '[data-delete]', function (e) {
+
+
+        /**
+         * Deletion of Units
+         */
+        $(document).on('click', '[data-action="delete-unit"]', function (e) {
             e.preventDefault();
-
-            var $input = $(this);
+            var $button = $(this);
 
             $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this unit? This will also delete all coursework and content it contains.',
+                text: 'Are you sure you wish to delete this unit? This will also delete all Activities in the Unit.',
                 confirmEvent: function () {
-                    $.post($input.attr('href'))
+                    $.post($button.attr('href'))
                         .done(function () {
-                            var $listItem = $input.closest('[data-unit]');
+                            var $listItem = $button.closest('[data-unit-spec]');
                             $listItem.slideUp(400, function () {
                                 $listItem.detach();
                             });
                         });
                 }
             });
-
         });
 
-        $('[data-source]').on('click', function (e) {
+        /**
+         * Course Parent selector popup
+         */
+        $('[data-course-parent-selector]').on('click', function (e) {
             e.preventDefault();
 
             $.magnificPopup.open({
@@ -193,25 +83,35 @@
 
         var noonitName = $('#noonit-name');
 
-        // default setup
-        $('input[data-mage-next]').mage();
-
-        // overloads
-        $('[data-mage-next="unit-info"]').mage({
+        // 'Next' Button
+        $mageNextButton.mage({
             reenablePrevious: true,
             onXhrDone: function (data) {
                 if (data.id) {
-                    history.pushState(data, '', '/course/modify/' + data.id);
-                    $('[data-folder-id]').val(data.id);
+                    // Update the Browser URL
+                    history.pushState(data, '', data['urlModifyCourse']);
+
+                    // Update the DOM
+                    $mageCreateUnitButton.attr('formaction', data['urlNewUnit']);
                 }
-                $('[data-mage-next="unit-info"]').closest('[data-mage-submitrow]').slideUp(400, function () { $(this).detach(); });
-                $('[data-mage-next="main-course"]').closest('[data-mage-collapsed]').slideDown();
+                // Remove the submit row
+                $mageNextButton.closest('[data-mage-submitrow]').slideUp(400, function () {
+                    $(this).detach();
+                });
+                $mageNextButton.mage('enable');
+
+                // Show the 'New Unit' section
+                $mageCreateUnitButton.closest('[data-mage-collapsed]').slideDown();
+
+                // Display the 'Save Course' section
+                $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
             }
         });
 
-        $('[data-mage-next="spawn-unit"]').mage({
+        // 'Create Unit' Button
+        $mageCreateUnitButton.mage({
             reenablePrevious: true,
-            submittable: '[data-unit]',
+            submittable: '[data-unit-spec]',
 
             setFormData: function (formData) {
                 formData.push({name: 'name', value: noonitName.val()});
@@ -219,27 +119,166 @@
 
             onXhrDone: function (data) {
                 var newDOM = $(data).hide();
-                $(this).closest('[data-unit]').before(newDOM);
+                $(this).closest('[data-new-unit]').before(newDOM);
                 newDOM.slideDown();
                 newDOM.find('[data-collapser]').collapsable();
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
-                $(document).foundation();
             }
         });
 
-        $('[data-mage-next="main-course"]').mage({
+        // 'Save Course' Button
+        $mageSaveCourseButton.mage({
             submittable: '#main-course',
             onXhrDone: function () {
                 window.location = '{{ routeLookup('course.courseList') }}';
             }
         });
 
+        // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
-            var openId = window.location.hash.slice(1);
-            $('[data-collapser=unit-' + openId + ']').trigger('click');
+            var unitSpecId = window.location.hash.slice(1);
+            $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
 
     });
 </script>
+
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
+    <li class="active">
+        {% if courseSpec.id %}
+            <a href="{{ routeLookup('course.modifyCourse', { id: courseSpec.id }) }}">Modify Course</a>
+        {% else %}
+            <a href="{{ routeLookup('course.newCourse') }}">New Course</a>
+        {% endif %}
+    </li>
+</ul>
+<div class="row">
+    <div class="small-12 actions-small-1 island">
+        <div class="list-item">
+            <h1>{{ courseSpec.id ? 'Modify' : 'New' }} Course</h1>
+        </div>
+        {% if courseSpec.id %}
+            <nav>
+                {% if courseSpec.folder.hasHomepage %}
+                    <a class="icon-home" href="/homepage/{{ courseSpec.folder.id }}" title="View Homepage"></a>
+                {% else %}
+                    <a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}" title="View Resources"></a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island" id="main-course">
+        <section>
+            <fieldset class="content" data-mage="course-info">
+                <legend>Course Information</legend>
+                <div class="small-12 column">
+                    <label>Name
+                        <input type="text"
+                               name="name"
+                               value="{{ courseSpec.folder.name }}"
+                               placeholder="What's this course called?"
+                               required
+                        />
+                    </label>
+                </div>
+                <div class="small-12 column">
+                    <label>
+                        Faculty / Subject
+                        <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+                        <a data-course-parent-selector data-source="parent"
+                           title="Click to change the faculty / subject this course belongs to"
+                           class="source-select icon-folder"
+                           href="#" >{{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+                        </a>
+                    </label>
+                </div>
+
+                {% if curriculumEnabled %}
+                    <div class="small-12 column">
+                        <label>Curriculum Codes
+                            {% include 'sub/curriculumCodeSelector.twig' with {
+                                renderButton: false,
+                                codeList:     courseSpec.folder.curriculumNodes
+                            } only %}
+                        </label>
+                    </div>
+                {% endif %}
+
+                {% if not courseSpec.id %}
+                    <div data-mage-submitrow>
+                        <div class="small-12 medium-8 column">
+                            {# Don't delete the inline style, it's needed -#}
+                            <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                        </div>
+                        <div class="small-12 medium-4 column">
+                            <input type="submit" class="button" value="Next" data-mage-next="unit-info"
+                                   data-mage-working="Working..."
+                                   formaction="{{ courseSpec.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}"/>
+                        </div>
+                    </div>
+                {% endif %}
+            </fieldset>
+            <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec.id %} disabled="disabled"{% endif %}>
+                <legend>Units</legend>
+                {# Don't delete the inline style, it's needed -#}
+                <div class="small-12 column no-pad"{% if not courseSpec.id %} style="display:none;"{% endif %} data-mage-collapsed>
+                    <ul class="information-list">
+                        {% for unitSpec in courseSpec.units %}
+                            {% if folderAccess[unitSpec.folder.id] > 0 %}
+                                {% include '@course/unit.twig' with {
+                                    unitSpec:         unitSpec,
+                                    encodedReturnUrl: encodedReturnUrls[unitSpec.id],
+                                    '_expanded':      false,
+                                    '_writable':      folderAccess[unitSpec.folder.id] > 1
+                                } only %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
+                        {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
+                            <li class="actions-small-1" data-new-unit>
+                                <div class="list-item content">
+                                    <div class="small-1 column">
+                                        <span class="icon-add"></span>
+                                    </div>
+                                    <div class="small-11 column">
+                                        <label>
+                                            <input type="text" value="" placeholder="New Unit" id="noonit-name"/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small-12 medium-8 column">
+                                        {# Don't delete the inline style, it's needed -#}
+                                        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                                    </div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" class="button" value="Create Unit"
+                                               data-mage-next="spawn-unit" data-mage-working="Working..."
+                                               formaction="{{ routeLookup('course.newUnit', { id: courseSpec.Id }) }}"/>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                    <input type="hidden" data-mage-next="none" name="unit-info" value="1"/>
+                </div>
+            </fieldset>
+        </section>
+        {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
+            <div class="row" data-mage="unit-info">
+                {# Don't delete the inline style, it's needed -#}
+                <div class="small-12 column" {% if not courseSpec.id %}data-mage-collapsed style="display: none;"{% endif %}>
+                    <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<div id="parent-select" data-reveal class="reveal-modal"></div>
 

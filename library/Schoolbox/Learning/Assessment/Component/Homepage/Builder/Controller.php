@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -77,24 +78,22 @@ class Controller extends Component_Homepage_ControllerAbstract
             return $this->renderNotAUnitSpecification($templateHandle);
         }
 
-        // Get the units details
+        // Get the unit's details
         try {
-            $unit = $this->getUnitSpecificationMapper()->findByFolderId($folder->getId());
+            $unitSpec = $this->getUnitSpecificationMapper()->findByFolderId($folder->getId());
+            $unitSpec->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpec->getId()));
+            $unitImpls = $this->getUnitImplementationMapper()->findAllByUnitSpecId($unitSpec->getId());
 
             $data = [
-                'unit'      => $unit,
-                'tasks'     => $this->assessmentMapperProxy->findAllByUnitSpecificationId($unit->getId()),
-                'usages'    => new Collection(),
-                // TODO repair this. Provides 'export to class' functionality. see jquery.course-builder.js
-//                'usages'    => $this->getUnitImplementationMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
-                'returnUrl' => Assessment\Redirect::encode($_GET["page"]),
+                'unitSpec'         => $unitSpec,
+                'unitImpls'        => $unitImpls,
+                'returnUrlName'    => Assessment\Redirect::RETURN_URL,
+                'encodedReturnUrl' => Assessment\Redirect::encode($_GET["page"]),
             ];
         } catch (MapperException $e) {
-
+            // noop
         }
-
         $data['componentInstance'] = $this->getInstance();
-
 
         // Retrieve all of the parents for use as breadcrumbs
         if ($this->getContext() instanceof Folder) {
