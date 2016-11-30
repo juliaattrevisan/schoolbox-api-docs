@@ -1,42 +1,24 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     {CONFIGURATION}
-
     <!-- BEGIN empty_state -->
-
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="information-list" data-dz-container></ul>
-            </section>
-        </div>
-    </div>
-
     <div data-dz-wrap class="dropzone-wrap">
-        <div data-dz-container="">
-        </div>
+        <div data-dz-container></div>
         <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
         <div class="hide" data-dz-template>
-            <li>
-                <div class="card small-12">
-                    <div class="icon-audio icon-32"></div>
-                    <h3 data-dz-name></h3>
-                    <p class="meta" data-dz-status>Uploading...</p>
-                    <div class="progress dz-progress">
-                        <span class="meter dz-upload" style="width:0;"></span>
-                    </div>
+            <div class="text-center">
+                <img src="/images/foundation/preloader.gif" data-dz-thumbnail style="opacity:0.5"/>
+                <div class="progress dz-progress">
+                    <span class="meter dz-upload" style="width:0;"></span>
                 </div>
-            </li>
+            </div>
         </div>
-
-        <div class="empty-state">
+        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
             <i class="icon-image-slideshow"></i>
             <p>No images available!</p>
-
             <!-- BEGIN empty_modify -->
             <p>
                 <a href="/cms/file/new/{ID}">Post Image</a> or drag one onto this component
             </p>
-
             <script type="text/javascript">
                 $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                     wrapClass: 'dragging',
@@ -59,7 +41,7 @@
                                 .addClass('category-{ID}')
                                 .data('node', {ID});
 
-                        $('#img{COMPONENT_INSTANCE_ID}').remove();
+                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
 
                         formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
                         formData.append('category', $(file.previewElement).data('node'));
@@ -91,12 +73,9 @@
                     }
                 });
             </script>
-
             <!-- END empty_modify -->
         </div>
-
     </div>
-
     <!-- END empty_state -->
 
     <!-- BEGIN image -->
