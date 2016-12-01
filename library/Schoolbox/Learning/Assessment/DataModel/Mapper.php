@@ -776,7 +776,7 @@ class Mapper extends BaseMapper
             case FolderModel::class:
                 $joinName = 'contextFolder';
                 break;
-            case Project::class:
+            case ProjectModel::class:
                 $joinName = 'contextProject';
                 break;
             case UnitImplementationModel::class:
