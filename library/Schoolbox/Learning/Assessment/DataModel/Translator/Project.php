@@ -88,6 +88,7 @@ class Project implements IAssessmentTypeTranslator
             // Translate mark scheme
             // TODO move this to the mark scheme translator
             $markScheme = $assessment->getMarkScheme();
+
             if ($markScheme instanceof Percentage) {
                 $model->getMarkType()->setId(MarkType::TYPE_PERCENT);
 
@@ -146,10 +147,7 @@ class Project implements IAssessmentTypeTranslator
                     ->setId($model->getMarkType()->getId())
             );
             if ($model->getGradeGroup() instanceof GradeGroup) {
-                $assessable->setGradeGroup(
-                    (new GradeGroup())
-                        ->setId($model->getGradeGroup()->getId())
-                );
+                $assessable->setGradeGroup($model->getGradeGroup());
             }
 
             return $assessable;

@@ -184,6 +184,7 @@ class Translator
         $assessable = null;
         foreach ($this->subTranslators as $subTranslator) {
             $assessable = $subTranslator->translateToDomainModel($dataModel);
+
             if ($assessable instanceof IAssessable) {
                 break;
             }
@@ -253,6 +254,7 @@ class Translator
         } else {
             throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
         }
+
 
         return $assessable;
     }
