@@ -392,12 +392,12 @@ abstract class Mapper implements IMapper, Serializable
             return $object;
         }
         if ($object instanceof \ICollection) {
-            return $this->createCollection($object->getAll());
+            return new Collection($object->getAll());
         }
         if (is_array($object)) {
-            return $this->createCollection($object);
+            return new Collection($object);
         }
-        return $this->createCollection(array($object));
+        return new Collection(array($object));
     }
 
     /**
