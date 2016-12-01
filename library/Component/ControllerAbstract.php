@@ -941,15 +941,24 @@ abstract class Component_ControllerAbstract
         return intval($this->getConfig("src")) > 0;
     }
 
+    public function hasClassAccess() {
+        $subjectList = $this->getUser()->getSubjectCollection();
+        foreach ($subjectList as $subject) {
+            if ($subject['code'] == $this->getContext()->getCodeString()){
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Return whether we are able to render this component's content for current user.
-     * False if lacks READ+ permission on content, or because content is deleted.
+     * False if lacks READ+ permission on content and has no access to Class, or because content is deleted.
      * @return bool
      */
     public function isSourceRenderable()
     {
-        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
+        if ((!$this->hasReadAccess() && !$this->hasClassAccess()) || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
             return false;
         }
 
