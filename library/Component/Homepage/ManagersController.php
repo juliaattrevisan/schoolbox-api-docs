@@ -37,7 +37,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
 // Get collection of members
         $userMapper = new UserMapper();
-        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId());
+        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), Array ('lastname' => 'asc'));
 
         if (count($managerList) == 0) {
 
