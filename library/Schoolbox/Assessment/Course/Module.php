@@ -62,7 +62,7 @@ class Module extends BaseModule
             'POST' => [
                 '/finalise'         => 'persistCourse',
                 // AFAICT this was never used - I'm re-purposing it
-                '/delete/{id}'      => 'deleteCourseSpecification',
+
             ]
         ];
 
@@ -108,8 +108,10 @@ class Module extends BaseModule
             }
         };
 
+
         $this->register('GET',  '/modify/{id}',                                     'modifyCourse',   null, $preloadCourse);
         $this->register('POST', '/new',                                             'createCourse');
+        $this->register('POST', '/delete/{id}',                          'deleteCourseSpecification', null, $preloadCourse);
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
         $this->register('POST', '/{id}/units/new',                                  'newUnit',        null, $preloadCourse);
         $this->register('POST', '/modify/{id}',                                       'updateCourse', null, $preloadCourse);

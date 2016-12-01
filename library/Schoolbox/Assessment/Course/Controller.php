@@ -1020,20 +1020,31 @@ class Controller extends Base\Base
      * @api   POST /course/delete/{id}
      * @level 160
      *
-     * @param int $id The course to delete
+     * @param CourseSpecification $courseSpec The course to delete
+     * @param bool $deleteFolder
      */
-    public function deleteCourseSpecification($id)
+    public function deleteCourseSpecification(CourseSpecification $courseSpec, $deleteFolder = false)
     {
         // TODO: make delete of folder and course atomic
 
-        $courseSpec = $this->getCourseSpecificationMapper()->findById($id);
+        if($courseSpec->isDeleted()){
+            $this->getResponse()->status->set(410);
+        }
 
-        // Delete course specs (this also deletes constituent units)
+        // Call delete(), even if already deleted, to enable mapper hooks to fire
+        // (this also cascades the deletions to constituent units and assessments)
         $this->getCourseSpecificationMapper()->delete($courseSpec);
 
-        /** @var FolderController $folderController */
-        $folderController = $this->getController('folder');
-        $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
+        if($deleteFolder){
+            /** @var FolderController $folderController */
+            $folderController = $this->getController('folder');
+            $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'id'     => $courseSpec->getId(),
+            'result' => 'success',
+        ]));
     }
 
     /**
