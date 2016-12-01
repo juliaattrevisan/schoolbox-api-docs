@@ -1,10 +1,17 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
+ */
+
+/**
+ * Staff-only component.
+ *
+ * Displays the most recent N months of DueWork Submissions + Quiz Attempts for DueWork and Quizzes
+ * that were created by current user.
+ *
  */
 class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract {
 
@@ -12,9 +19,8 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
     private $max = 10;
     private $submissions;
     private $dump;
-
-    protected $componentName = 'Most Recent Submissions';
-    protected $componentHref = '/submission/listSubmission/';
+    private $componentName = 'Most Recent Submissions';
+    private $componentHref = '/submission/listSubmission/';
 
     /**
      * Prepares data for the render function. Business logic.
