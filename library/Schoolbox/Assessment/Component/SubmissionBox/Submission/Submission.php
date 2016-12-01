@@ -27,7 +27,7 @@ use Schoolbox\User;
 /**
  * A student's submission to a due work.
  *
- * The name File is a misnomer, as now a submission may contain multiple files.
+ * A submission may contain multiple files.
  *
  * TODO remove IStorage once all uses are found and removed
  */
