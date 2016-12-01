@@ -122,10 +122,16 @@ class Controller extends BaseController
                 // This is being imported, so do stuff
                 $sequences[$unit->getId()] = $unit->getAssessables()->count() + 1;
 
+                if ($implementation['imported']) {
+                    // This has already been exported between now and when the request was made.
+                    // That is probably fine to ignore
+                    continue;
+                }
+
                 if (!$implementation['allowed']) {
                     // banhammer
                     $this->sendError(
-                        'Could not export unit because you do not have permission',
+                        'You do not have permission to write to the selected class',
                         [],
                         403
                     );
