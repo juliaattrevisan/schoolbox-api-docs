@@ -494,7 +494,11 @@ class Controller extends Base\Base
             $folderName = 'this course';
         }
 
-        if($parentFolderId === "0" || $parentFolderId > 0){
+        if("0" === $parentFolderId){
+            $errors[] = "Courses may not be created in the root folder";
+        } elseif(!$parentFolderId){
+            $errors[] = "select a faculty or class for $folderName to live in";
+        } else {
             $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), [$parentFolderId]);
             if ($access < UserAccess::ACCESS_WRITE) {
                 $errors[] = "select a Faculty / Subject for which you have write access";
@@ -505,8 +509,6 @@ class Controller extends Base\Base
                     $errors[] = "select an existing faculty or class for $folderName to live in";
                 }
             }
-        } else {
-            $errors[] = "select a faculty or class for $folderName to live in";
         }
 
         // if there were any validation problems, throw that back
