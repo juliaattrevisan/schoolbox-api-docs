@@ -764,44 +764,42 @@ class Mapper extends BaseMapper
         $contextClass = get_class($assessment->getAssessmentContext());
         switch($contextClass){
             case FolderModel::class:
-                $joinTable = 'assessment_folder';
-                $otherField = 'folder_id';
+                $joinName = 'contextFolder';
                 break;
             case Project::class:
-                $joinTable = 'project_assessment';
-                $otherField = 'project_id';
+                $joinName = 'contextProject';
                 break;
             case UnitImplementationModel::class:
-                $joinTable = 'assessment_course_unit_implementation';
-                $otherField = 'course_unit_implementation_id';
+                $joinName = 'contextUnitImplementation';
                 break;
             case UnitSpecificationModel::class:
-                $joinTable = 'assessment_course_unit_specification';
-                $otherField = 'course_unit_specification_id';
+                $joinName = 'contextUnitSpecification';
                 break;
             default:
                 throw new \InvalidArgumentException('Unknown AssessmentContext: '.$contextClass);
         }
+        $multiJoin = $this->getMap()->getOffset($joinName)['join_def']['multi'];
+        $joinTable = $multiJoin['via_table'];
+        $thisKey   = $multiJoin['this_key'];
+        $otherKey  = $multiJoin['other_key'];
 
         $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
         $query = "
-            SELECT max(`a`.`sequence`)
+            SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`
-            JOIN `{$joinTable}` `o` ON `o`.`assessment_id` = `a`.`id`
+            JOIN `{$joinTable}` `o` ON `o`.`{$thisKey}` = `a`.`id`
         ";
 
         // Ignore this model's db sequence if it exists.
         // This enables us to clear a model's sequence, and save it again to place it at the end
         if($assessment->getId()){
-            $pb->notEquals('a.id', $assessment->getId());
+            $pb->notEquals("a.id", $assessment->getId());
         }
-        $pb->equals("o.{$otherField}", $assessment->getAssessmentContext()->getId());
-        $pb->isNull('a.deleted_at');
-        $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
+        $pb->isNull("a.deleted_at");
+        $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
-        $row = $statement->fetch(\PDO::FETCH_NUM);
-        $assessment->setSequence(++$row[0]);
-
+        $assessment->setSequence($statement->fetch(\PDO::FETCH_COLUMN));
     }
 }
