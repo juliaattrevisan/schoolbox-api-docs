@@ -170,60 +170,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     }
 
     /**
-     * POST action for reordering assessments.
-     *
-     * GET vars:
-     * * returnUrl
-     *
-     * POST vars:
-     * * id: a list of assessment IDs, in order of what their schedule should be
-     *
-     * @api   POST /learning/{contextType}/{contextId}/assessments/reorder
-     * @level 165
-     *
-     * @param AssessmentContext $context
-     */
-    public function postReorderAssessments(AssessmentContext $context)
-    {
-        /**
-         * @var IAssessable[] $allAssessments
-         * @var IAssessable[] $sortedAssessments
-         */
-        $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
-        $sortedAssessments = [];
-        foreach ($this->getRequest()->post->get('id', []) as $assessmentId) {
-            if (isset($allAssessments[$assessmentId])) {
-                // Put it in $sortedAssessments in order
-                $sortedAssessments[] = $allAssessments[$assessmentId];
-                unset($allAssessments[$assessmentId]);
-            }
-        }
-
-        // Anything not explicitly ordered gets pushed to the back of the queue
-        foreach ($allAssessments as $assessment) {
-            $sortedAssessments[] = $assessment;
-        }
-
-        // Save ordering
-        $sequence = 1;
-        foreach ($sortedAssessments as $assessment) {
-            $assessment->setSequence($sequence++);
-            $this->getAssessmentMapper()->save($assessment);
-        }
-
-        // Redirect to a return URL or something
-        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
-        if ($encodedReturnUrl) {
-            $returnUrl = Redirect::decode($encodedReturnUrl);
-        } else {
-            // If not provided, not sure where to redirect?
-            // Maybe to a URL relevant to $context?
-            $returnUrl = '/';
-        }
-        $this->redirect($returnUrl);
-    }
-
-    /**
      * Delete the given assessment.
      * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      *
