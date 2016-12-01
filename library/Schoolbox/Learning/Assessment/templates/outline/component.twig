@@ -50,9 +50,7 @@
 
 <!-- Form for reodering tasks -->
 <div class="hide">
-<form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
-    <input type="hidden" name="action"    value="reorder"/>
-    <input type="hidden" name="category"  value="{{ context.id }}"/>
+<form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unit', contextId: context.id}) }}" method="post" class="reorder_form">
     <input type="hidden" name="unit_id" value=""/>
 </form>
 </div>
