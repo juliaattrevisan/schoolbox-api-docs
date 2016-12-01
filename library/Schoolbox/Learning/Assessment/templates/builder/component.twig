@@ -30,7 +30,9 @@ $data = [
         {% for assessment in unitSpec.assessables %}
             {% include '@learningAssessment/builder/assessment.twig' with {
                 '_writable': true,
-                assessment:  assessment
+                assessment:  assessment,
+                returnUrl: encodedReturnUrl,
+                returnUrlName: returnUrlName
             } only %}
         {% else %}
             <li>
