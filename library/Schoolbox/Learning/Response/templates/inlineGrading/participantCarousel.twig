@@ -91,7 +91,7 @@
             }
         }
 
-        showSubmittedOnly.change(function (event) {
+        showSubmittedOnly.on('change.preload', function (event) {
             var ize = tgt[0].selectize,
                     skip = $(this).is(':checked') ? 1 : 0,
                     form = $(this).closest('form');
@@ -101,15 +101,18 @@
 
             ize.refreshOptions(false);
 
-            $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}', {
-                headers: {
-                    'X-HTTP-Method-Override': 'PATCH'
-                },
-                type: 'POST',
-                data: {
-                    showSubmittedOnly: skip
-                }
-            });
+            if (event.namespace != 'preload') {
+                $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}', {
+                    headers: {
+                        'X-HTTP-Method-Override': 'PATCH'
+                    },
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        showSubmittedOnly: skip
+                    }
+                });
+            }
 
             var nextUrl = findNext(tgt);
             var prevUrl = findPrev(tgt);
@@ -117,16 +120,7 @@
             refreshNav(navNext, nextUrl);
             refreshNav(navPrev, prevUrl);
 
-            {#// Form redirect points to next option, or home if no option selected#}
-            {#if (nextUrl.length > 0) {#}
-                {#nextUrl = nextUrl.data('value');#}
-            {#} else {#}
-                {#nextUrl = '/submission/viewSubmission/' + String(boxId);#}
-            {#}#}
-
-            {#returnWorkForm.find('input[name="redirect"]').val(nextUrl)#}
-
-        }).trigger('change');
+        }).trigger('change.preload');
     });
 </script>
 <div class="row">
