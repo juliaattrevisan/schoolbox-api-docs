@@ -113,8 +113,12 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /** @var Model $attempt */
             $attempt = $this->hydrate($row);
-            $attempt->setUser($this->hydrateJoin($row, 'user', 'u'));
-            $attempt->setAssessment($this->hydrateJoin($row, 'assessment', 'a'));
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            /** @var User $user */
+            $attempt->setUser($user);
+            /** @var Quiz $quiz */
+            $quiz = $this->hydrateJoin($row, 'assessment', 'a');
+            $attempt->setAssessment($quiz);
             $c->add($attempt);
         }
         return $c;
