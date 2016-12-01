@@ -14,6 +14,7 @@ use Component_DefinitionMapper;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
@@ -327,7 +328,7 @@ class Controller extends Base\Base
     {
         // Is course deleted ?
         if($courseSpec->isDeleted()){
-            throw new Deleted();
+            throw new NotFound();
         }
 
         $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
