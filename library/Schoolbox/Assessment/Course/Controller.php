@@ -494,9 +494,8 @@ class Controller extends Base\Base
             $folderName = 'this course';
         }
 
-        if("0" === $parentFolderId){
-            $errors[] = "Courses may not be created in the root folder";
-        } elseif(!$parentFolderId){
+        // Was no parent indicated? (as opposed to explicitly setting to root)
+        if(!$parentFolderId && "0" !== $parentFolderId){
             $errors[] = "select a faculty or class for $folderName to live in";
         } else {
             $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), [$parentFolderId]);
@@ -514,6 +513,11 @@ class Controller extends Base\Base
         // if there were any validation problems, throw that back
         if ($errors || !$parentFolder instanceof Folder) {
             throw new Base\Exception("Could not save", $errors);
+        }
+
+        // Explicitly set to root (as opposed to not set)
+        if("0" === $parentFolderId){
+            throw new Base\Exception("Courses may not be created in the root folder");
         }
 
 
