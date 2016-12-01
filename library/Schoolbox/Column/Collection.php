@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\GenericCollection;
 
 class Collection implements IColumnType {
 
@@ -56,7 +57,9 @@ class Collection implements IColumnType {
 			$mapper->getSetMethodName($id_property) :
 			$mapper->getSetIdentifierMethodName();
 
-		$collection = new \Schoolbox\Collection();
+		$collection = $mapper
+            ? new GenericCollection($mapper->getModel())
+            : new \Schoolbox\Collection();
 
 		foreach((array)$value as $v) {
 			$model = $mapper->createModel();
