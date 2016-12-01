@@ -60,7 +60,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
             null, null, 'curriculumNodes');
         $this->joinsReverse('assess_id', QuizSectionMapper::class, 'assess_id', null, self::COLUMN_JOIN_MULTI, 'sections', 'sections');
-        $this->joinsReverse('assess_id', QuizAttemptMapper::class, 'assess_id', null, self::COLUMN_JOIN_MULTI, 'attempts', 'attempts');
+        $this->joinsReverse('assess_id', QuizAttemptMapper::class, 'assess_id', null, self::COLUMN_JOIN_MULTI, 'attempts', 'attempt');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
@@ -98,7 +98,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
     public function softDeleteAttempts(Model $quiz)
     {
-        $quizAttemptMapper = $this->getJoinMapper('attempts');
+        $quizAttemptMapper = $this->getJoinMapper('attempt');
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // TODO - SA-1277 However this will also updated the 'deleted_at' field for already deleted items.
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
@@ -130,7 +130,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
     public function restoreAttempts(Model $quiz)
     {
-        $quizAttemptMapper = $this->getJoinMapper('attempts');
+        $quizAttemptMapper = $this->getJoinMapper('attempt');
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->restoreSoftDeleted($attempts);
@@ -349,7 +349,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
     {
         //
         // All submission boxes that are due in the future.
-        $attempt_mapper = $this->getJoinMapper('attempts');
+        $attempt_mapper = $this->getJoinMapper('attempt');
         $query = "
 			SELECT
 				{$this->getColumnString('a')},
