@@ -17,7 +17,10 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -206,13 +209,39 @@ class ListController extends Web\Controller\Base
         }
 
         // Redirect to a return URL or something
+        // If not provided, redirect to somewhere relevant to context
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
+
         } else {
-            // If not provided, not sure where to redirect?
-            // Maybe to a URL relevant to $context?
-            $returnUrl = '/';
+            if ($context instanceof Folder) {
+                // Folder homepage
+                $returnUrl = '/homepage/'.$context->getId();
+
+            } elseif ($context instanceof Project) {
+                // Project status page
+                $returnUrl = $this->getRouter()->generate(
+                    'learningAssessment.getStatus',
+                    ['assessmentId' => $context->getId()]
+                );
+
+            } elseif ($context instanceof UnitSpecification) {
+                // Course modify page for this unit
+                $returnUrl = $this->getRouter()->generate(
+                    'course.modifyCourse',
+                    ['id' => $context->getCourse()->getId()]
+                );
+                $returnUrl .= '#'.$context->getId();
+
+            } elseif ($context instanceof UnitImplementation) {
+                // Folder that this course is on
+                $returnUrl = '/homepage/'.$context->getCourse()->getFolder()->getId();
+
+            } else {
+                // Back to base?
+                $returnUrl = '/';
+            }
         }
         $this->redirect($returnUrl);
     }
