@@ -77,6 +77,16 @@ class Controller extends Base
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
+        if (!$response) {
+            $response = $participant->findMostRecentSubmittedResponse();
+        }
+
+        /* If there is an an actual Latest Response, use it and subject
+         * it to the usual checks.
+         *
+         * This means you won't be able to spawn Rubrics selections for
+         * Floating Feedback ref. jleckie
+         */
         if ($response) {
             if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
