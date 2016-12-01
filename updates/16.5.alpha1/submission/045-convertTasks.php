@@ -40,7 +40,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             updated_at,
             deleted_at
         )
-        VALUES (:title, :description, NULL, NULL, NULL, NULL, :weight, 1, :created, :updated, :deleted)
+        VALUES (:title, :description, NULL, NULL, NULL, NULL, :weight, :sequence, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id)
@@ -61,6 +61,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             t.category_id,
             t.title,
             COALESCE(`as`.description, sb.description, '') AS description,
+            t.order AS sequence,
             `as`.assess_id,
             sb.id AS box_id,
             t.created_at,
@@ -121,6 +122,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $folderId    = $row['category_id'];
         $title       = $row['title'];
         $description = $row['description'];
+        $sequence    = $row['sequence'];
         $quizId      = $row['assess_id'];
         $boxId       = $row['box_id'];
         $created     = $row['created_at'];
@@ -147,6 +149,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 'title'       => $title,
                 'description' => $description,
                 'weight'      => intval($weight),
+                'sequence'    => intval($sequence),
                 'created'     => $created,
                 'updated'     => $created,
                 'deleted'     => $deleted,
