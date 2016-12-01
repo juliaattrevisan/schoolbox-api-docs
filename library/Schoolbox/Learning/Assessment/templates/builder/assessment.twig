@@ -1,0 +1,32 @@
+{#
+Usage:
+    {% include '@learningAssessment/builder/unitAssessment.twig' with {
+            _writable:   bool,
+            assessment:  IAssessable
+    } only %}
+#}
+
+<li class="actions-small-1" data-assessment="{{ assessment.id }}">
+    <div class="grip compact"></div>
+    <div class="list-item">
+        <div class="card small-12 compact wrap-down">
+            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">
+                <span class="{{ icon.renderClass(assessment) }}"></span>
+                <p>{{ assessment.title }}</p>
+            </a>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ assessment.id }}"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        {% if assessment is quiz %}
+        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
+        {% else %}
+        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" {{ doReveal }} class="icon-modify">Modify</a></li>
+        {% endif %}
+        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
+    </ul>
+    <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
+</li>

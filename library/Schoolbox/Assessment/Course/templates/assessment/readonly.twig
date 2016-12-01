@@ -1,0 +1,15 @@
+{#
+Usage:
+    $data = [
+        assessment: IAssessable,
+    ]
+#}
+<li>
+    <div class="list-item">
+        <div class="compact card small-11 wrap-down">
+            <div class="{{ icon.renderClass(assessment) }} icon-16"></div>
+            <p>{{ assessment.title }}</p>
+            <p class="meta">{{ assessment.typeName }}</p>
+        </div>
+    </div>
+</li>

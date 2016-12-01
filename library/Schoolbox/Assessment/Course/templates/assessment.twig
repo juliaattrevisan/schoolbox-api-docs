@@ -1,0 +1,20 @@
+{#
+Usage:
+    $data = [
+        assessment:       IAssessable,
+        encodedReturnUrl: string        - only required if '_writable' is true ,
+        _writable:        bool
+    ]
+#}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+{% if _writable %}
+    {% include '@course/assessment/writable.twig' with {
+        assessment: assessment,
+        encodedReturnUrl: encodedReturnUrl
+    } only %}
+{% else %}
+    {% include '@course/assessment/readonly.twig' with {
+        assessment: assessment
+    } only %}
+{% endif %}

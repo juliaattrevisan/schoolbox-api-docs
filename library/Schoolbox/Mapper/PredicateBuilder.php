@@ -114,6 +114,16 @@ class PredicateBuilder
     }
 
     /**
+     * @param string     $columnName
+     * @param string|int $columnValue
+     * @return PredicateBuilder
+     */
+    public function notEquals($columnName, $columnValue)
+    {
+        return $this->addPredicate(self::NOT.$columnName, $columnValue);
+    }
+
+    /**
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
      *                            @see \Database::quoteForLike for escaping user input.

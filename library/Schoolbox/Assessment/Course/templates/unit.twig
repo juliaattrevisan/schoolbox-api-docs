@@ -1,3 +1,13 @@
+{#
+Usage:
+    $data = [
+        unitSpec:         UnitSpecification,
+        _expanded:        bool               - whether to initially display expanded or collapsed,
+        _writable:        bool               - dicates which sub-template to render
+        encodedReturnUrl: string             - URL to return to to focus on this UnitSpec in current CourseSpec
+    ]
+#}
+
 {% if _writable %}
     {% include '@course/unit/writable.twig' %}
 {% else %}

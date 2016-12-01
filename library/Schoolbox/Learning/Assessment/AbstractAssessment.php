@@ -135,6 +135,13 @@ abstract class AbstractAssessment implements IAssessable
     private $participantCache = [];
 
     /**
+     * 1-based, not 0-based, to enable the mapper to recognise when it needs auto-assign a value.
+     *
+     * @var int
+     */
+    private $sequence;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
@@ -175,6 +182,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $clone = clone $this;
         $clone->setId(null);
+        $clone->setSpecificationAssessment($this);
         return $clone;
     }
 
@@ -859,6 +867,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setSpecificationAssessment(IAssessable $specification = null)
     {
         $this->specificationAssessment = $specification;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param int $sequence
+     * @return static
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }

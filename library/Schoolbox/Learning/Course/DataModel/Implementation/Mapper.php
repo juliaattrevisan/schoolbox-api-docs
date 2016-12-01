@@ -96,8 +96,8 @@ class Mapper extends BaseMapper
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT  JOIN {$this->getJoinSql('folder', '', 'f')}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
-            INNER JOIN {$this->getJoinSql('specification', '', 's')}
-            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf')}
+            INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
+            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
         ";
     }
 
@@ -127,5 +127,17 @@ class Mapper extends BaseMapper
 
         // TODO: consider whether units should be populated here
         return $modelList;
+    }
+
+    /**
+     * Finds all course impls for this course spec.
+     *
+     * @param int|array $courseSpecId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByCourseSpecificationId($courseSpecId, $options = [])
+    {
+        return $this->findByColumn('course_specification_id', $courseSpecId, $options);
     }
 }

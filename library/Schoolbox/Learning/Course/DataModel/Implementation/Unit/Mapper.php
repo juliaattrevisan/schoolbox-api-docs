@@ -97,6 +97,18 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Finds all unit implementations for the specified Unit Specification[s].
+     *
+     * @param int|array $unitSpecId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByUnitSpecId($unitSpecId, $options = [])
+    {
+        return $this->findByColumn('course_unit_specification_id', $unitSpecId, $options);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getSelectString()
@@ -114,8 +126,8 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('course', '', 'c')}
             LEFT  JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
-            INNER JOIN {$this->getJoinSql('specification', '', 's')}
-            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf')}
+            INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
+            LEFT  JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
         ";
     }
 

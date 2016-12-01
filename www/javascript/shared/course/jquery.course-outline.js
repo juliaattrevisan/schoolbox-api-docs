@@ -104,22 +104,19 @@
         );
 
         // Delete task - are you sure?
-        component.on(
-            'click.courseInstance',
-            'a[data-interaction="open_delete_task_form"]',
-            function(event) {
+        component.on('click.courseInstance', '[data-action=delete]', function(event) {
                 event.preventDefault();
-                var element = $(this);
-                element.confirmDialog({
-                    text: 'Are you sure you wish to delete this task? Any linked due work items and quizzes will be deleted, as will all student\'s completion of this task.',
-                    confirmEvent: function(element) {
-                        var unit_element = element.closest('[data-unit-task]');
-                        var form         = unit_element.find('[data-form_type="delete_task"]');
+                var $element = $(this);
+                var $assessmentRow = $element.closest('[data-unit-assessment]');
 
-                        $.post(form.attr('action'), form.serialize(), function(data) {
-                            unit_element.remove();
-                            postCallback(form, data);
-                        }, 'json');
+                $element.confirmDialog({
+                    text: 'Are you sure you wish to delete this activity? Any student responses or feedback will also be deleted.',
+                    confirmEvent: function() {
+                        $.post($element.attr('href'), {}, function() {
+                            $assessmentRow.fadeOut({
+                                done: $assessmentRow.remove
+                            });
+                        });
                     }
                 });
             }
@@ -132,7 +129,7 @@
             function(event) {
                 event.preventDefault();
 
-                var taskRow = $(this).closest('[data-unit_task_id]');
+                var taskRow = $(this).closest('[data-unit-assessment]');
                 var taskId  = taskRow.data('unit_task_id');
 
                 $.ajax({type: 'post', url: this.href, dataType: 'json' })
@@ -146,7 +143,7 @@
                                 // Maybe just reload the component?
                                 var component = $(data.fragment);
                                 taskRow.empty().append(
-                                    component.find('[data-unit_task_id="'+taskId+'"]').children()
+                                    component.find('[data-unit-assessment="'+taskId+'"]').children()
                                 );
                                 // Reapply preview
                                 taskRow.find(settings.previewSelector).preview();

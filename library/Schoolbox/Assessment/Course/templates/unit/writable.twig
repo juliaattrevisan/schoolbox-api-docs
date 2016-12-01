@@ -1,64 +1,87 @@
-<li class="actions-small-1 content" data-unit="{{ unit.id }}" id="{{ reveals[unit.id].id }}">
+{#
+Usage:
+    $data = [
+        unitSpec:         UnitSpecification,
+        _expanded:        bool               - whether to initially display expanded or collapsed,
+        encodedReturnUrl: string             - URL to return to to focus on this UnitSpec in current CourseSpec
+    ]
+#}
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
+    });
+</script>
+
+<li class="actions-small-1 content" data-unit-spec="{{ unitSpec.id }}">
     <div class="list-item">
         <div class="small-1 column">
-            <a data-collapser="unit-{{ unit.id }}" class="icon-{{ _expanded ? 'up' : 'down' }}-arrow"></a>
+            <a data-collapser="unit-{{ unitSpec.id }}" class="icon-{{ _expanded ? 'up' : 'down' }}-arrow"></a>
         </div>
         <div class="small-11 column">
             <label>
-                <input type="text" value="{{ unit.folder.name }}" placeholder="Unit Name" name="unitname[{{ unit.id }}]" />
+                <input type="text" value="{{ unitSpec.folder.name }}" placeholder="Unit Name" name="unit[{{ unitSpec.id }}][name]"/>
             </label>
         </div>
     </div>
     <nav>
-        <a class="icon-overflow" title="" data-dropdown="unit-{{ unit.id }}-modify"></a>
+        <a class="icon-overflow" title="" data-dropdown="unit-{{ unitSpec.id }}-modify"></a>
     </nav>
-    <ul id="unit-{{ unit.id }}-modify" class="f-dropdown" data-dropdown-content>
-        {% if unit.folder.hasHomepage %}
-            <li><a href="/homepage/{{ unit.folder.id }}" class="icon-home">View Homepage</a></li>
+    <ul id="unit-{{ unitSpec.id }}-modify" class="f-dropdown" data-dropdown-content>
+        {% if unitSpec.folder.hasHomepage %}
+            <li><a href="/homepage/{{ unitSpec.folder.id }}" class="icon-home">View Homepage</a></li>
         {% else %}
-            <li><a href="/resources/{{ unit.folder.id }}" class="icon-folder">Browse Resources</a></li>
+            <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
-        <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unit.id}) }}" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
+        <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
     </ul>
-    <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
-        <ul class="information-list sortable" data-sortable data-task_list>
-            {% for task in tasks[unit.id] %}
-                {% include '@course/task.twig' with { '_writable': true } %}
-            {% else %}
-                <li>
-                    <div class="empty-state">
-                        <i class="icon-course"></i>
-                        <p>No coursework in this unit yet.</p>
-                    </div>
-                </li>
+    <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
+        <ul class="information-list sortable" data-sortable data-assessment-list data-action="{{ routeLookup('course.saveAssessmentSequence', {id: unitSpec.id}) }}">
+            {% for assessment in unitSpec.assessables %}
+                {% include '@course/assessment.twig' with {
+                    assessment:       assessment,
+                    encodedReturnUrl: encodedReturnUrl,
+                    _writable:        true
+                } only %}
             {% endfor %}
+
+            <li>
+                <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
+                    <i class="icon-course"></i>
+                    <p>No activities in this unit yet.</p>
+                </div>
+            </li>
+
         </ul>
         <ul class="flex-list buttons">
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}?type=project"
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?type=project&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Project"
                    class="button icon-project"
                 >New Project</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}?type=task"
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?type=task&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Task"
                    class="button icon-task"
                 >New Task</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}?type=dueWork"
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?type=dueWork&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Due Work"
                    class="button icon-due-work"
                 >New Due Work</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}?type=quiz"
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?type=quiz&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Quiz"
                    class="button icon-quiz"
                 >New Quiz</a></li>
         </ul>
     </div>
-    <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
+    <form action="/task/saveForm.php" method="post" data-interaction="reorder-assessments">
         <input type="hidden" name="action"    value="reorder"/>
-        <input type="hidden" name="category"   value="{{ unit.id }}"/>
-        <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>
+        <input type="hidden" name="category"  value="{{ unit.id }}"/>
+        <input type="hidden" name="component" value="{{ reveals[unit.id].component.id }}"/>
         <input type="hidden" name="returnUrl" value="{{ returnUrl[unit.id] }}"/>
     </form>
-    {% include '@course/task/reveal-modal.twig' with { reveal: reveals[unit.id] } %}
     {#
     Dialog for asking:
     When adding a new task - does it get copied into classes that use this unit?
@@ -70,13 +93,4 @@
         <a href="#" class="button" data-action="no_copy_task">No</a>
         <a href="#" class="button" data-action="cancel">Don't create task</a>
     </div>
-    <script type="text/javascript">
-        $(function () {
-            $('#{{ reveals[unit.id].id }}').setupCourseBuilder({% if usages[unit.id] | length -%}
-                {
-                units: {{ usages[unit.id] | json_encode }}
-            }
-        {%- endif %});
-        });
-    </script>
 </li>

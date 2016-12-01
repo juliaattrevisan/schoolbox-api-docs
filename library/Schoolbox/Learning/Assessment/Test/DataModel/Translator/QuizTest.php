@@ -45,7 +45,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         ;
 
         /** @var QuizModel $quizModel */
-        $quizModel = $this->translator->translateToDataModel($quiz, 0);
+        $quizModel = $this->translator->translateToDataModel($quiz);
 
         // Test type
         $this->assertInstanceOf(QuizModel::class, $quizModel);

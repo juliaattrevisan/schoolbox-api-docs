@@ -7,6 +7,8 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -155,6 +157,9 @@ class Mapper extends BaseMapper
             null,
             'specificationAssessment'
         );
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
@@ -350,8 +355,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us')}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
@@ -711,5 +716,90 @@ class Mapper extends BaseMapper
         }
 
         return $modelList;
+    }
+
+    /**
+     * Re-sequences specified Assessments
+     *
+     * @param array $assessmentIds
+     * @return bool whether any change was made
+     */
+    public function sequenceAssessments(array $assessmentIds)
+    {
+        if(!count($assessmentIds)){
+            return false;
+        }
+        $sequence = 1;
+        foreach ($assessmentIds as $assessmentId){
+            $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+            $query = "
+                UPDATE {$this->getTable()}
+                SET `sequence` = $sequence
+            ";
+            $pb->equals('id', $assessmentId);
+            $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+
+            $statement = $this->database->prepare($query);
+            $statement->execute($pb->getParams());
+            $sequence++;
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback.
+     *
+     * If the model's sequence is 0 (either because new model, or explicitly cleared),
+     * the system will allocate the next available integer in the series.
+     *
+     * @param Model $assessment
+     */
+    protected function setSequence(Model $assessment)
+    {
+        // Ignore if this Assessment already had a sequence explicitly set
+        if($assessment->getSequence()) {
+            return;
+        }
+
+        $contextClass = get_class($assessment->getAssessmentContext());
+        switch($contextClass){
+            case FolderModel::class:
+                $joinName = 'contextFolder';
+                break;
+            case Project::class:
+                $joinName = 'contextProject';
+                break;
+            case UnitImplementationModel::class:
+                $joinName = 'contextUnitImplementation';
+                break;
+            case UnitSpecificationModel::class:
+                $joinName = 'contextUnitSpecification';
+                break;
+            default:
+                throw new \InvalidArgumentException('Unknown AssessmentContext: '.$contextClass);
+        }
+        $multiJoin = $this->getMap()->getOffset($joinName)['join_def']['multi'];
+        $joinTable = $multiJoin['via_table'];
+        $thisKey   = $multiJoin['this_key'];
+        $otherKey  = $multiJoin['other_key'];
+
+        $pb = new BaseMapper\PredicateBuilder($this->database, $this->table);
+        $query = "
+            SELECT COALESCE(max(`a`.`sequence`), 0) + 1
+            FROM `{$this->getTable()}` `a`
+            JOIN `{$joinTable}` `o` ON `o`.`{$thisKey}` = `a`.`id`
+        ";
+
+        // Ignore this model's db sequence if it exists.
+        // This enables us to clear a model's sequence, and save it again to place it at the end
+        if($assessment->getId()){
+            $pb->notEquals("a.id", $assessment->getId());
+        }
+        $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
+        $pb->isNull("a.deleted_at");
+        $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+        $assessment->setSequence($statement->fetch(\PDO::FETCH_COLUMN));
     }
 }

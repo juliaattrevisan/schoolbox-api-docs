@@ -383,12 +383,11 @@ class MapperProxy
      * Saves an assessable
      *
      * @param IAssessable $assessable
-     * @param int         $sequence
      */
-    public function save(IAssessable $assessable, $sequence)
+    public function save(IAssessable $assessable)
     {
         // Save assessment
-        $dataModel = $this->translateToDataModel($assessable, $sequence);
+        $dataModel = $this->translateToDataModel($assessable);
         // Folder context translation:
         // Look up the data model's assessment object ID, and translate to a project ID
         $context = $dataModel->getAssessmentContext();
@@ -438,13 +437,12 @@ class MapperProxy
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
-                $i = 0;
                 foreach ($assessable->getAssessables() as $projectAssessable) {
                     // Disallow save of projects within projects
                     if ($projectAssessable instanceof ProjectObject) {
                         throw new \UnexpectedValueException('Projects may not contain projects');
                     }
-                    $this->save($projectAssessable, $i++);
+                    $this->save($projectAssessable);
                 }
             }
         }
@@ -492,7 +490,7 @@ class MapperProxy
     public function delete(IAssessable $assessable)
     {
         // Delete assessment
-        $dataModel = $this->translateToDataModel($assessable, 0);
+        $dataModel = $this->translateToDataModel($assessable);
         $this->baseMapper->delete($dataModel);
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
@@ -547,12 +545,11 @@ class MapperProxy
      * Translates the domain object to a data model.
      *
      * @param IAssessable $assessable
-     * @param int         $sequence
      * @return Model
      */
-    public function translateToDataModel(IAssessable $assessable, $sequence)
+    public function translateToDataModel(IAssessable $assessable)
     {
-        $dataModel = $this->translator->translateToDataModel($assessable, $sequence);
+        $dataModel = $this->translator->translateToDataModel($assessable);
         // Turn the data model inside out
         // TODO try to remove this, and update translator to accept Model objects directly
         $model = $dataModel->getAssessmentModel();

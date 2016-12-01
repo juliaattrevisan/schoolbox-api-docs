@@ -1,3 +1,20 @@
+{#
+$data = [
+    componentInstance: Component_Instance   - the component showing hosting this content
+    unitSpec:          UnitSpecification    - never null (if null, component displays empty-state template)
+    returnUrlName:     string               - key value of returnUrl key-value pair to insert in URL
+    encodedReturnUrl:  string               - encoded address of this page to return to after creating new assessments
+];
+#}
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
+    });
+</script>
+
 {% if breadcrumbs | length %}
 <ul class="breadcrumb">
     <li>
@@ -8,12 +25,29 @@
 </ul>
 {% endif %}
 
-{% include '@learningAssessment/builder/unit.twig' with { unit: unit } %}
+<div data-unit-spec="{{ unitSpec.id }}">
+    <ul class="information-list sortable" data-sortable data-assessment-list data-action="{{ routeLookup('course.saveAssessmentSequence', {id: unitSpec.id}) }}">
+        {% for assessment in unitSpec.assessables %}
+            {% include '@learningAssessment/builder/assessment.twig' with {
+                '_writable': true,
+                assessment:  assessment,
+                returnUrl: encodedReturnUrl,
+                returnUrlName: returnUrlName
+            } only %}
+        {% else %}
+            <li>
+                <div class="empty-state">
+                    <i class="icon-course"></i>
+                    <p>No coursework in this unit yet.</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 
 <div class="component-action">
     <section>
-        <a class="button" href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unit.id}) }}" title="Create a new activity">
-            Create Activity
-        </a>
+        {% set url = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) %}
+        <a class="button" href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Create a new activity">Create Activity</a>
     </section>
 </div>

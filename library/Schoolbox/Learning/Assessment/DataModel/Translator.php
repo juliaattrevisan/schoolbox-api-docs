@@ -96,10 +96,9 @@ class Translator
      * Translates the Assessment business domain model to a data model.
      *
      * @param IAssessable $assessment
-     * @param int         $sequence   The position of this assessment within its container
      * @return IAssessableDataModel
      */
-    public function translateToDataModel(IAssessable $assessment, $sequence)
+    public function translateToDataModel(IAssessable $assessment)
     {
         // Extract assessment base model
         // TODO figure out how to pass in the assessable's container (folder, course spec, course impl)
@@ -113,7 +112,7 @@ class Translator
             ->setDueDate($assessment->getDueAt())
             ->setCloseDate($assessment->getCloseAt())
             ->setWeight($assessment->getWeight())
-            ->setSequence($sequence)
+            ->setSequence($assessment->getSequence())
             ->setCreatedAt($assessment->getCreatedAt())
             ->setUpdatedAt($assessment->getUpdatedAt())
             ->setDeletedAt($assessment->getDeletedAt())
@@ -123,7 +122,7 @@ class Translator
         $specification = $assessment->getSpecificationAssessment();
         if ($specification instanceof IAssessable) {
             // Go to no great lengths here, as I need only an ID
-            $specModel = $this->translateToDataModel($specification, 0);
+            $specModel = $this->translateToDataModel($specification);
             // Turn inside out again
             $specAssessment = $specModel->getAssessmentModel();
             $specAssessment->setSubObject($specModel);
@@ -203,6 +202,7 @@ class Translator
         $assessable
             ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
+            ->setSequence($dataModel->getAssessmentModel()->getSequence())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
             ->setWeight($dataModel->getAssessmentModel()->getWeight())

@@ -65,18 +65,21 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                 ->add((new Task())
                     ->setId(1)
                     ->setTitle('Sub-task')
+                    ->setSequence(1)
                 )
                 ->add((new Quiz())
                     ->setId(2)
                     ->setTitle('Sub-quiz')
+                    ->setSequence(2)
                 )
                 ->add((new DueWork())
                     ->setId(3)
                     ->setTitle('Sub-work')
+                    ->setSequence(3)
                 );
 
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project, 1);
+        $projectModel = $this->translator->translateToDataModel($project);
 
         // Test project-specific fields
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -86,15 +89,15 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $projectModel->getAssessments());
 
         $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(0, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
         $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
 
         $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(1, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
         $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
 
         $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
         $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
     }
 
@@ -110,7 +113,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setId(12)
             ->setCreator($this->teacher1);
         $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1));
-        $this->translator->translateToDataModel($project, 1);
+        $this->translator->translateToDataModel($project);
     }
 
     /**
@@ -159,7 +162,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testTranslateSummatorToDataModel(Project $project, $summatorType)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project, 1);
+        $projectModel = $this->translator->translateToDataModel($project);
 
         // Test type
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -215,7 +218,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testTranslateMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project, 1);
+        $projectModel = $this->translator->translateToDataModel($project);
 
         // Test type
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -560,6 +563,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     (new Task())
                         ->setId(101)
                         ->setTitle('Sub-task')
+                        ->setSequence(1)
                         ->setSpecificationAssessment(
                             (new Task())
                                 ->setContext($unitSpec)
@@ -571,6 +575,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     (new Quiz())
                         ->setId(102)
                         ->setTitle('Sub-quiz')
+                        ->setSequence(2)
                         ->setSpecificationAssessment(
                             (new Quiz())
                                 ->setContext($unitSpec)
@@ -582,6 +587,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     (new DueWork())
                         ->setId(103)
                         ->setTitle('Sub-work')
+                        ->setSequence(3)
                         ->setSpecificationAssessment(
                             (new DueWork())
                                 ->setContext($unitSpec)
@@ -591,23 +597,23 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                 );
 
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project, 1);
+        $projectModel = $this->translator->translateToDataModel($project);
 
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
 
         $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(0, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
         $this->assertEquals(101, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
         $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSpecificationAssessment()->getId());
 
         $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(1, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
         $this->assertEquals(102, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
         $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSpecificationAssessment()->getId());
 
         $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
         $this->assertEquals(103, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
         $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSpecificationAssessment()->getId());
     }

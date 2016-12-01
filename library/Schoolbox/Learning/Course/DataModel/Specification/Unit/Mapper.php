@@ -14,6 +14,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 /**
  * Mapper for the data model for Unit Specifications.
@@ -36,6 +37,56 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // SoftDelete/Restore Assessments in UnitSpecification
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAssessments'));
+    }
+
+    /**
+     * Soft deletes all Assessments in the specified UnitSpecification
+     *
+     * @param Model $unitSpec
+     * @return bool
+     */
+    public function softDeleteAssessments(Model $unitSpec)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitSpec->getId(), ['deleted' => true]);
+        $assessmentMapper->delete($assessments);
+        return true;
+    }
+
+    /**
+     * Restores all soft-deleted Assessments in the specified UnitSpecification
+     *
+     * @param Model $unitSpec
+     * @return bool
+     */
+    public function restoreAssessments(Model $unitSpec)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitSpec->getId(), ['deleted' => true]);
+        $assessmentMapper->restoreSoftDeleted($assessments);
+        return true;
+    }
+
+    /**
+     * Ensures that if we restore a UnitSpec, the folder it is linked to is restored also
+     *
+     * Intentionally no corresponding post-delete callback. Deleting a UnitSpec should not automatically
+     * cascade to the folder. The Controller should explicitly do that if desired.
+     *
+     * @param Model $unitSpec
+     * @return bool
+     */
+    public function restoreFolder(Model $unitSpec)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder_id');
+        $folder = $folderMapper->findByColumn('id', $unitSpec->getFolder()->getId(), ['deleted' => true]);
+        $folderMapper->restoreSoftDeleted($folder);
+        return true;
     }
 
     /**
@@ -53,10 +104,10 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('course', 'c')},
                 {$this->getJoinColumnString('course.folder', 'cf')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
-            INNER JOIN {$this->getJoinSql('course', '', 'c')}
-            INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
+            INNER JOIN {$this->getJoinSql('course', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf', true)}
         ";
     }
 

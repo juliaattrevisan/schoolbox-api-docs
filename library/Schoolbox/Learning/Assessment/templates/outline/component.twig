@@ -2,11 +2,11 @@
 <script type="text/javascript">
         $(function() {
             var component = $('#component{{ componentInstance.id }}'),
-                    socialstreamSession = { categoryId: '{{ course.folder.id }}' };
+                    socialstreamSession = { categoryId: '{{ courseSpecification.folder.id }}' };
 
             component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
-                import_base_url: '{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: course.id, classCode: folder.id }) }}',
+                import_base_url: '{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpecification.id, classCode: courseImplementation.folder.id }) }}',
                 readonly:        {{ readOnly ? 'true':'false' }},
                 previewSelector: '[data-plugin=preview]'
             });
@@ -28,7 +28,7 @@
 <section>
     {% if courseImplementation.units|length %}
         <p class="component-titlebar meta">
-            <a class="icon-course" href="/homepage/{{ course.folder.id }}" title="Visit course page">{{ course.title }}</a>
+            <a class="icon-course" href="/homepage/{{ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
         </p>
         {% include '@learningAssessment/outline/unit.twig' %}
         {% if not readOnly %}

@@ -1,6 +1,9 @@
 <?php
 /**
- * Mapper for default course page permissions
+ * Mapper for default course and unit page permissions.
+ *
+ * When a user creates a new Course or Unit, the system creates a new Folder.
+ * This table dictates what the permissions will be on this new folder.
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -10,46 +13,20 @@
 namespace Schoolbox\Assessment\Course\Config;
 
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Collection;
-use Schoolbox\Role;
 
+/**
+ * @method Model[]|Collection findByColumn($columnName, $columnValue, $options = array())
+ */
 class Mapper extends BaseMapper
 {
-
     public function mapping()
     {
         $this->hasTable('course_builder_config');
         $this->hasModel(Model::class);
 
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'     => 'role_id',
-                'property'   => 'roleId',
-                'type'       => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'     => 'permission',
-                'property'   => 'permission',
-                'type'       => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'     => 'page',
-                'property'   => 'page',
-                'type'       => self::TYPE_STRING,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('role_id', self::TYPE_INTEGER);
+        $this->uses('permission', self::TYPE_STRING);
     }
 }
