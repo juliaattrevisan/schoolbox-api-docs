@@ -88,11 +88,10 @@ class Controller extends Component_Homepage_ControllerAbstract
             $options = ['order' => ['sequence' => 'ASC']];
             $assessables = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
             $unitSpec->setAssessables($assessables);
-            $unitImpls = $unitImplMapper->findAllByUnitSpecId($unitSpec->getId());
+
 
             $data = [
                 'unitSpec'         => $unitSpec,
-                'unitImpls'        => $unitImpls,
                 'returnUrlName'    => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl' => Assessment\Redirect::encode($_GET["page"]),
             ];

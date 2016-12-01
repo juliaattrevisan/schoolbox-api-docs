@@ -9,15 +9,7 @@ Usage:
 
 <script type="text/javascript">
     $(function () {
-        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({
-            {% if unitSpec.implementations | length %}
-            unitsImplementationsIds: [
-                {% for unitImpl in unitSpec.implementations %}
-                {{ unitImpl.id }}{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ]
-            {% endif %}
-        });
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
     });
 </script>
 

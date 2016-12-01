@@ -340,21 +340,6 @@ class Controller extends Base\Base
 
             // Need to hydrate parent to populate the 'Faculty/Subject' selector
             $courseSpec->getFolder()->setParent($this->getFolderMapper()->findById($courseSpec->getFolder()->getParent()->getId()));
-
-            // Link any CourseSpecs so we can export Assessments into Classes
-            $courseImpls = $this->getCourseImplementationMapper()->findAllByCourseSpecificationId($courseSpec->getId());
-            $courseSpec->setCourseImplementations($courseImpls);
-
-            // Load Unit Impls
-            foreach($courseSpec->getCourseImplementations() as $courseImpl){
-
-                $courseImpl->setUnits($this->getUnitImplementationMapper()->findAllByCourseId($courseImpl->getId()));
-
-                // Load Assessment Impls
-                foreach($courseImpl->getUnits() as $unitImpl){
-                    $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
-                }
-            }
         }
 
         /**

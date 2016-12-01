@@ -2,7 +2,6 @@
 $data = [
     componentInstance: Component_Instance   - the component showing hosting this content
     unitSpec:          UnitSpecification    - never null (if null, component displays empty-state template)
-    unitImpls:         UnitImplementation[] - Imports of this UnitSpec
     returnUrlName:     string               - key value of returnUrl key-value pair to insert in URL
     encodedReturnUrl:  string               - encoded address of this page to return to after creating new assessments
 ];
@@ -12,15 +11,7 @@ $data = [
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({
-            {% if unitImpls | length %}
-            unitsImplementationsIds: [
-                {% for unitImpl in unitImpls %}
-                    {{ unitImpl.id }}{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ]
-            {% endif %}
-        });
+        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
     });
 </script>
 
