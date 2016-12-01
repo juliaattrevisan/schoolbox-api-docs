@@ -11,7 +11,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,11 +33,6 @@ class Controller extends BaseController
     protected $assessmentDataSource;
 
     /**
-     * @var CourseImplementationDataSource
-     */
-    protected $courseImplementationDataSource;
-
-    /**
      * @var UnitImplementationDataSource
      */
     protected $unitImplementationDataSource;
@@ -46,21 +40,18 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Access                         $access
-     * @param AssessmentDataSource           $assessmentDataSource
-     * @param CourseImplementationDataSource $courseImplementationDataSource
-     * @param UnitImplementationDataSource   $unitImplementationDataSource
+     * @param Access                       $access
+     * @param AssessmentDataSource         $assessmentDataSource
+     * @param UnitImplementationDataSource $unitImplementationDataSource
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
-        CourseImplementationDataSource $courseImplementationDataSource,
         UnitImplementationDataSource $unitImplementationDataSource
     ) {
-        $this->access                         = $access;
-        $this->assessmentDataSource           = $assessmentDataSource;
-        $this->courseImplementationDataSource = $courseImplementationDataSource;
-        $this->unitImplementationDataSource   = $unitImplementationDataSource;
+        $this->access                       = $access;
+        $this->assessmentDataSource         = $assessmentDataSource;
+        $this->unitImplementationDataSource = $unitImplementationDataSource;
     }
 
     /**

@@ -96,10 +96,9 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'access'                         => Access::getInstance(),
-                    'assessmentDataSource'           => $this->getAssessmentMapperProxy(),
-                    'unitImplementationDataSource'   => $this->injector->get('unitImplementationDataSource'),
-                    'courseImplementationDataSource' => $this->injector->get('courseImplementationDataSource'),
+                    'access'                       => Access::getInstance(),
+                    'assessmentDataSource'         => $this->getAssessmentMapperProxy(),
+                    'unitImplementationDataSource' => $this->injector->get('unitImplementationDataSource'),
                 ]
             )
         );
