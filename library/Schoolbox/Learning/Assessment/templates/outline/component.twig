@@ -2,7 +2,7 @@
 <script type="text/javascript">
         $(function() {
             var component = $('#component{{ componentInstance.id }}'),
-                    socialstreamSession = { categoryId: '{{ courseSpecification.folder.id }}' };
+                socialstreamSession = { categoryId: '{{ courseSpecification.folder.id }}' };
 
             component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
