@@ -41,7 +41,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             updated_at,
             deleted_at
         )
-        VALUES (:title, :description, :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
+        VALUES (:title, :description, :publish, :open, :due, :close, :weight, :sequence, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_implementation (assessment_id, course_unit_implementation_id)
@@ -107,6 +107,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ti.course_unit_instance_id,
             ti.title,
             COALESCE(`as`.description, sb.description, '') AS description,
+            ti.order AS sequence,
             `as`.assess_id,
             sb.id AS box_id,
             ti.created_at,
@@ -137,6 +138,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $folderId             = $row['category_id'];
         $title                = $row['title'];
         $description          = $row['description'];
+        $sequence             = $row['sequence'];
         $quizId               = $row['assess_id'];
         $boxId                = $row['box_id'];
         $created              = $row['created_at'];
@@ -193,6 +195,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 'title'       => $title,
                 'description' => $description,
                 'weight'      => intval($weight),
+                'sequence'    => intval($sequence),
                 'publish'     => $publishDate,
                 'open'        => $openDate,
                 'due'         => $dueDate,
