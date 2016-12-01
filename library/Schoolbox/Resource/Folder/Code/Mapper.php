@@ -74,9 +74,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findForCategories($folder_ids)
     {
-        //
         // no IDs? return early so no invalid query is called.
-        if (empty($category_ids)) {
+        if (empty($folder_ids)) {
             return $this->hydrateList(array());
         }
         $params    = $this->getArrayParameters($folder_ids, 'id');
