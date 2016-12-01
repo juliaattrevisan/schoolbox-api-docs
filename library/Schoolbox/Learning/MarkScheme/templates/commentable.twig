@@ -33,7 +33,7 @@
         </div>
         {% endif %}
 
-        <div class="small-12 medium-3 column text-center">
+        <div class="small-12 medium-3 column">
             {% block grading %}{% endblock %}
 
             {% if assessment.useRubric and rubricContext %}
@@ -71,7 +71,7 @@
                     });
                 });
             </script>
-            <p><button id="use-rubric-value">Assign Grade From Rubric</button></p>
+            <p><button id="use-rubric-value" class="full-width">Assign Grade From Rubric</button></p>
             {% endif %}
         </div>
         <div class="small-12 medium-9 column">
