@@ -162,6 +162,7 @@ class Module extends BaseModule
             }
 
             return [
+                'assessment' => $assessment,
                 'participant' => $participant,
                 'response' => $response,
             ];

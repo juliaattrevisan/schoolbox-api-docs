@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Response;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
@@ -79,27 +80,30 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
+     * @param IAssessable $assessment
      * @param Participant $participant
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      */
-    public function getParticularResponse(Participant $participant, Submission $response)
+    public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response)
     {
         /* Module doesn't have access to $this->getUser()
          *
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
-        if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        if ($response) {
+            if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
         }
 
         /* ResponseFileFactory figures out which fragment is required
          */
         $file = null;
 
-        if ($response->getAllFiles()->count()) {
+        if ($response && $response->getAllFiles()->count()) {
             try {
                 $file = $response->findFileByHash($this->getRequest()->query['hash']);
             }
@@ -118,15 +122,15 @@ class Controller extends Base
          */
         try {
             $data = [
-                'assessment' => $response->getAssessable(),
+                'assessment' => $assessment,
                 'response' => $response,
                 'latestFeedback' => $latestFeedback,
                 'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
-                'markScheme' => $this->deriveSchemeName($response->getAssessable()->getMarkScheme()),
+                'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
                 'file' => $file,
                 'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
-                'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $response->getAssessable(), $response))->produce(),
+                'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $assessment, $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
                 /* For saving feedbacks
@@ -136,7 +140,7 @@ class Controller extends Base
 
                 /* Rubrics data
                  */
-                'rubricContext' => (new RubricContext())->generateMarkable($response->getAssessable(), $response->getSubmittedOnBehalfOf()),
+                'rubricContext' => (new RubricContext())->generateMarkable($assessment, $response->getSubmittedOnBehalfOf()),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
