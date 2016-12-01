@@ -44,14 +44,14 @@ class ListFactory
      * * all grade levels for the submission's grade group
      * * all error grades
      *
-     * @param SubmissionBox $box
+     * @param $thing
      *
      * @return Collection|Model[]
      */
-    public function buildGradeList(SubmissionBox $box)
+    public function buildGradeList($thing)
     {
         $collection = new Collection();
-        if ($box->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
+        if ($thing->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
             // "None" option
             $noneOption = new Model();
             $noneOption
@@ -67,7 +67,7 @@ class ListFactory
              */
             $collection->merge($this->gradeLevelMapper->findByColumnList(
                 array(
-                    'submission_grade_group_id' => $box->getGradeGroup()->getId()
+                    'submission_grade_group_id' => $thing->getGradeGroup()->getId()
                 ),
                 array(
                     'order' => array(

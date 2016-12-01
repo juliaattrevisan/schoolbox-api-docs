@@ -104,5 +104,6 @@ class Model
     public function addGradeLevel(GradeLevelModel $level)
     {
         $this->getGradeLevels()->add($level);
+        return $this;
     }
 }

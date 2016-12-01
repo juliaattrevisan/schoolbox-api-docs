@@ -199,7 +199,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
                     ->setCreator($user)
-                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7)->addGradeLevel(
+                        new DueWorkModel\GradeLevel\Model()
+                    ))),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 7,
             ],
@@ -393,7 +395,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
-                    ->setGradeGroup((new GradeGroup())->setId(1)),
+                    ->setGradeGroup((new GradeGroup())->setId(1)->addGradeLevel(
+                        new DueWorkModel\GradeLevel\Model()
+                    )),
                 LetterGrade::class,
                 1
             ],

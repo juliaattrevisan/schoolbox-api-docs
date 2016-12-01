@@ -156,7 +156,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setMarkScheme(new TotalMarkWholeNumber(10)),
+                    ->setMarkScheme((new TotalMarkWholeNumber(10))),
                 DueWorkModel\MarkType::TYPE_TOTAL,
                 10,
                 null,
@@ -164,7 +164,13 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())
                     ->setContext($context)
-                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                    ->setMarkScheme(new LetterGrade(
+                        (new DueWorkModel\GradeLevel\Group\Model())
+                            ->setId(7)
+                            ->addGradeLevel(
+                                new DueWorkModel\GradeLevel\Model()
+                            )
+                    )),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 null,
                 7,
@@ -425,7 +431,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
-                    ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)),
+                    ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->addGradeLevel(
+                        new DueWorkModel\GradeLevel\Model()
+                    )),
                 LetterGrade::class,
                 null,
                 1,

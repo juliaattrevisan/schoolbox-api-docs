@@ -32,6 +32,6 @@ class Mapper extends BaseMapper
         $this->joins('owner_id', UserMapper::class);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
         $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
-        $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup');
+        $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
     }
 }

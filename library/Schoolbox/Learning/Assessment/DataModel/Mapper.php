@@ -337,6 +337,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.grade_group', 'gg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
+                {$this->getJoinColumnString('project.grade_group', 'pgg')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
@@ -354,6 +355,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.grade_group', 'd', 'gg')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
+            LEFT JOIN {$this->getJoinSql('project.grade_group', 'p', 'pgg')}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
@@ -468,6 +470,13 @@ class Mapper extends BaseMapper
             // Project?
             if ($row['p.id']) {
                 $model->setProject($this->hydrateJoin($row, 'project', 'p'));
+
+                $model->getProject()->setGradeGroup(
+                    $this->hydrateJoin($row, 'project.grade_group', 'pgg')
+                        ->setGradeLevels(
+                            (new SubmissionBox\GradeLevel\ListFactory())->buildGradeList($model->getProject())
+                        )
+                );
             } else {
                 $model->setProject(null);
             }
@@ -518,6 +527,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
+
         return $modelList;
     }
     /**
