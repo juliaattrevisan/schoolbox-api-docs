@@ -87,7 +87,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'usages'    => new Collection(),
                 // TODO repair this. Provides 'export to class' functionality. see jquery.course-builder.js
 //                'usages'    => $this->getUnitImplementationMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id'),
-                'returnUrl' => $_GET["page"],
+                'returnUrl' => Assessment\Redirect::encode($_GET["page"]),
             ];
         } catch (MapperException $e) {
 

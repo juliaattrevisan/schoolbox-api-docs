@@ -14,7 +14,7 @@
         <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ task.id }}"></a>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
-        <li><a href="/task/export/{{ task.id }}?returnUrl={{ returnUrl }}" data-reveal-id="export-modal-{{ task.id }}" data-reveal-ajax="true" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
         {% if task is quiz %}
         <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: task.id}) }}" class="icon-modify">Modify</a></li>
         {% else %}
