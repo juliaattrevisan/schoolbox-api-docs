@@ -70,6 +70,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        $unitSpecMapper = $this->getUnitSpecificationMapper();
+        $unitImplMapper = $this->getUnitImplementationMapper();
+        $assessmentMapperProxy = $this->getAssessmentMapperProxy();
+
         // Get the current folder and hydrate its parent
         $folder = $this->getSource();
 
@@ -80,10 +84,11 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         // Get the unit's details
         try {
-            $unitSpec = $this->getUnitSpecificationMapper()->findByFolderId($folder->getId());
-            $unitSpec->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpec->getId()));
-            $unitSpec->getAssessables()->sortBy('sequence','ASC');
-            $unitImpls = $this->getUnitImplementationMapper()->findAllByUnitSpecId($unitSpec->getId());
+            $unitSpec = $unitSpecMapper->findByFolderId($folder->getId());
+            $options = ['order' => ['sequence' => 'ASC']];
+            $assessables = $assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
+            $unitSpec->setAssessables($assessables);
+            $unitImpls = $unitImplMapper->findAllByUnitSpecId($unitSpec->getId());
 
             $data = [
                 'unitSpec'         => $unitSpec,

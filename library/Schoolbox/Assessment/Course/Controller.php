@@ -377,8 +377,8 @@ class Controller extends Base\Base
         foreach($courseSpec->getUnits() as $unitSpec){
             $unitSpecId = $unitSpec->getId();
             $folderId = $unitSpec->getFolder()->getId();
-            $assessments = $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpecId);
-            $assessments->sortBy('sequence','ASC');
+            $options = ['order' => ['sequence' => 'ASC']];
+            $assessments = $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpecId, $options);
             $unitSpec->setAssessables($assessments);
             $folderAccess[$folderId] = $this->getAccess()->getFolderAccess($this->getUser(), [$folderId ]);
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
