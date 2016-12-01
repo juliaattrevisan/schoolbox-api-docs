@@ -59,7 +59,7 @@ class StudentCarousel
 
     /**
      * Produce a (currentPerson, allPeople) tuple to populate the
-     * student selector carousel on both the Response and ResponseList
+     * student selector carousel on getParticularResponse
      *
      * @return array
      */
