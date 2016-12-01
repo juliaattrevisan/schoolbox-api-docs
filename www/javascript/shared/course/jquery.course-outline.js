@@ -248,7 +248,6 @@
                 // Calculate ordering of all items
                 var form = component.find('form.reorder_form');
                 var unit = ui.item.closest('[data-unit]');
-                form.find('input[name="unit_id"]').val(unit.data('unit_id'))
                 var params = form.serializeArray();
                 unit.find('[data-unit-assessment]').each(function() {
                     // Switch dark on/off

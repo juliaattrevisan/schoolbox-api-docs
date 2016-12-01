@@ -47,11 +47,3 @@
         </div>
     {% endif %}
 </section>
-
-<!-- Form for reodering tasks -->
-<div class="hide">
-<form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unit', contextId: context.id}) }}" method="post" class="reorder_form">
-    <input type="hidden" name="unit_id" value=""/>
-</form>
-</div>
-
