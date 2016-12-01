@@ -559,7 +559,7 @@ class UserAccessMapper extends Mapper
      * @return UserAccess
      * @throws Mapper\Exception
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = false)
     {
         // Order of priority for permissions
         //
@@ -632,9 +632,12 @@ class UserAccessMapper extends Mapper
         // Permission check #3 - External DB
         $folderCodeList = CodeMapper::getInstance()->findForCategory($serviceIdentifier);
         if(count($folderCodeList) > 0) {
-            $result = $this->involvedInSubject($user, implode(',',$folderCodeList));
-            if ($result)
-            {
+            $allCodes = [];
+            foreach ($folderCodeList as $currentCode) {
+                $allCodes[]= $currentCode->getCode();
+            }
+            $result = $this->involvedInSubject($user, implode(',',$allCodes));
+            if ($result) {
                 // Found matching student, give them read/write perms if student/staff respectively
 
                 $model = new UserAccess();

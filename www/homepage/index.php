@@ -73,17 +73,9 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
     error(18);
 }
 
-$subjectList = $this->getDi()->get('session')->get('user')->getSubjectCollection();
-$classAccess = false;
-foreach ($subjectList as $subject) {
-    if ($subject['code'] == $code){
-        $classAccess = true;
-    }
-}
-
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), [$folder->getId()])) < READ_ACCESS && !$classAccess) {
+if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), [$folder->getId()])) < READ_ACCESS) {
     error(14);
 }
 
