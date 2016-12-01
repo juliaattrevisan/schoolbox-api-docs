@@ -26,7 +26,10 @@ $data = [
 {% endif %}
 
 <div data-unit-spec="{{ unitSpec.id }}">
-    <ul class="information-list sortable" data-sortable data-assessment-list data-action="{{ routeLookup('course.saveAssessmentSequence', {id: unitSpec.id}) }}">
+    <ul class="information-list sortable"
+        data-sortable
+        data-assessment-list
+        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
         {% for assessment in unitSpec.assessables %}
             {% include '@learningAssessment/builder/assessment.twig' with {
                 '_writable': true,
