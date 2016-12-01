@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
+use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -54,22 +55,22 @@ class Controller extends Base
         $this->responseDataSource = $responseDataSource;
     }
 
-    /**
-     * Get a list of Responses by $student for a particular
-     * IAssessable $assessment
-     *
-     * @param Participant $participant
-     */
-    public function getResponseList(Participant $participant)
-    {
-        $data = [
-            'participant' => $participant,
-            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
-            'timeline' => (new Timeline($participant))->getForTeacher(),
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
-    }
+//    /**
+//     * Get a list of Responses by $student for a particular
+//     * IAssessable $assessment
+//     *
+//     * @param Participant $participant
+//     */
+//    public function getResponseList(Participant $participant)
+//    {
+//        $data = [
+//            'participant' => $participant,
+//            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
+//            'timeline' => (new Timeline($participant))->getForTeacher(),
+//        ];
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
+//    }
 
     /**
      * Get the contents of a particular $response
@@ -130,6 +131,10 @@ class Controller extends Base
                 'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
                 'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment, $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+
+                /* A list of all the Responses that the participant has spawned
+                 */
+                'responseList' => (new ResponsesOnly($participant))->getForTeacher(),
 
                 /* This is now conditional depending on the presence of a $response
                  */
