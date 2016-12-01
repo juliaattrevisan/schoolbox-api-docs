@@ -57,7 +57,7 @@ class Module extends BaseModule
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
         $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('POST',   "/$participantRoute/{responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipantAndResponse);
+        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipantAndResponse);
         $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
     }
 

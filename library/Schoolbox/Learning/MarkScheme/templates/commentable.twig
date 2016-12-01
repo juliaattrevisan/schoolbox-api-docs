@@ -33,7 +33,7 @@
         </div>
         {% endif %}
 
-        <div class="small-12 medium-3 column text-center">
+        <div class="small-12 medium-3 column">
             {% block grading %}{% endblock %}
 
             {% if assessment.useRubric and rubricContext %}
@@ -54,10 +54,16 @@
                         }
                     });
 
-                    /**
-                     * Use the rubric value in the mark input field
-                     */
-                    $('#use-rubric-value').on('click', function(event) {
+                    {##
+                     # Use the rubric value in the mark input field
+                     #
+                     # Disabled upon load, since values are the same
+                     # at this point in time. Also disables when copying
+                     # the rubric mark value in.
+                     #}
+                    $('#use-rubric-value').prop('disabled', true).on('click', function(event) {
+                        $(this).prop('disabled', true);
+
                         $('#assessment-status')
                             .find('[data-mark-input]')
                             .val($.trim($('[data-final-summary]').text()))
@@ -65,7 +71,7 @@
                     });
                 });
             </script>
-            <p><button id="use-rubric-value">Assign Grade From Rubric</button></p>
+            <p><button id="use-rubric-value" class="full-width">Assign Grade From Rubric</button></p>
             {% endif %}
         </div>
         <div class="small-12 medium-9 column">

@@ -15,7 +15,7 @@
                     </a>
                 </div>
             </div>
-            {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id}) %}
+            {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
             {% if viewRoute %}
             <nav>
                 <a href="{{ viewRoute }}" class="icon-next" title="View in Inline Grader"></a>

@@ -14,7 +14,7 @@
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
         [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
         ['Inline Grader', null]
     ] %}
 {% else %}
@@ -22,24 +22,12 @@
         ['Learning', routeLookup('learning.getClasses')],
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getResponseList', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id})],
+        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
         ['Inline Grader', null]
     ] %}
 {% endif %}
 
 {{ bread.crumbsArray(nodes)}}
-
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>Grading {{ assessment.title }}</h1>
-            <ul class="meta">
-                <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, response.submittedOnBehalfOf) }}">{{ assessment.dueAt.short }}</span></li>
-                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
-            </ul>
-        </div>
-    </div>
-</div>
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
@@ -76,47 +64,85 @@
                 window.location.href = destination;
             }
         });
+
+        {# Go to the happy place
+         #}
+        $('#response-selector').change(function(event) {
+            event.preventDefault();
+
+            window.location.href = $(this).find('option:selected').attr('data-url');
+        });
     });
 </script>
 
-{% include '@learningResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Grading {{ assessment.title }}</h1>
+            <ul class="meta">
+                <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, participant.user) }}">{{ assessment.dueAt.short }}</span></li>
+                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
+{% if responseList|length %}
+<div class="row">
+    <div class="small-12 columns">
+        <select id="response-selector">
+            {% for currentResponse in responseList %}
+                {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id}) %}
+
+                {% if viewRoute %}
+                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.index }}. Submission at {{ currentResponse.submittedAt.local }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endif %}
+
+{% if response and file %}
+    {% include '@learningResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
+{% endif %}
+
+{% if response and response.allFiles.count %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Files</h2>
         <section>
-            {% if response.allFiles %}
-                <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
-                    {% for currentFile in response.allFiles %}
-                        {% set selected = '' %}
-                        {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
-                        {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
+            <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+                {% for currentFile in response.allFiles %}
+                    {% set selected = '' %}
+                    {% set defaultSelectedFile = selectedFileHash|length == 0 and loop.index0 == 0 %}
+                    {% set hasSelectedFile = selectedFileHash|length and currentFile.hash == selectedFileHash %}
 
-                        {% if hasSelectedFile or defaultSelectedFile %}
-                            {% set selected = 'selected' %}
-                        {% endif %}
+                    {% if hasSelectedFile or defaultSelectedFile %}
+                        {% set selected = 'selected' %}
+                    {% endif %}
 
-                        <li class="actions-small-1 {{ selected }}">
-                            <div class="list-item">
-                                <div class="card small-12 compact">
-                                    <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
-                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                                        <p>{{ currentFile.filename }}</p>
+                    <li class="actions-small-1 {{ selected }}">
+                        <div class="list-item">
+                            <div class="card small-12 compact">
+                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                    <p>{{ currentFile.filename }}</p>
 
-                                        {% include '@learning/dueWork/plagscan.twig' %}
-                                    </a>
-                                </div>
+                                    {% include '@learning/dueWork/plagscan.twig' %}
+                                </a>
                             </div>
-                            <nav>
-                                {% include '@learning/dueWork/plagscanLink.twig' %}
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+                        </div>
+                        <nav>
+                            {% include '@learning/dueWork/plagscanLink.twig' %}
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
         </section>
     </div>
 </div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
@@ -130,7 +156,7 @@
                 markScheme: assessment.markScheme,
                 fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
                     assessmentId: assessment.id,
-                    studentId: response.submittedOnBehalfOf.id,
+                    studentId: participant.user.id,
                     responseId: response.id
                 }),
                 feedbackAttachzone: attachzone

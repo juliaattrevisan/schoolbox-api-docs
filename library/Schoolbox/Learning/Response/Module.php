@@ -56,14 +56,9 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
 
-                /* Get a list of Responses for a particular Student and Assessment
-                 * Presented as a more succinct Submission History
-                 */
-                '/assessments/{assessmentId}/{studentId}/responses'           => 'getResponseList',
-
                 /* Download an annotated crocodoc
                  */
-                '/responses/{assessmentId}/{responseId}/{feedbackId}/download/{crocodocId}' => 'getCrocodocDownload',
+                '/responses/{assessmentId}/{responseId}/{feedbackId}/download/{crocodocId}'  => 'getCrocodocDownload',
 
                 /* View an annotated crocodoc
                  */
@@ -71,11 +66,11 @@ class Module extends BaseModule
 
                 /* View a Response in the Inline Grader
                  */
-                '/responses/{assessmentId}/{responseId}'                      => 'getParticularResponse',
+                '/responses/{assessmentId}/{studentId}{/responseId}'                         => 'getParticularResponse',
 
                 /* View a Response File's plagscan report
                  */
-                '/responses/plagscan/{plagscanId}'                            => 'getPlagscanReport',
+                '/responses/plagscan/{plagscanId}'                                           => 'getPlagscanReport',
             ],
             'POST' => []
         ];
@@ -94,7 +89,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getResponseList|getParticularResponse)';
+        $ruleRegexp = '(getParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
@@ -117,34 +112,38 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '(?:getResponseList)', function ($params) {
-            try {
-                $student = $this->getUserMapper()->findById($params['studentId']);
-            } catch (MapperException $e) {
-                $student = $this->getUserMapper()->createModel();
-            }
-
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-
-            $participant = $assessment->getParticipant($student);
-
-            return [
-                'participant' => $participant,
-            ];
-        });
-
         $this->addRoutePreload($matcher, '(get|delete)ParticularResponse', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 
-            try {
-                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+            $participant = null;
+            $response = null;
+
+            /* If a responseId was provided, load that particular response up
+             */
+            if ($params['responseId']) {
+                try {
+                    $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+                    $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
+                } catch (\OutOfBoundsException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
             }
-            catch (\OutOfBoundsException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            /* Otherwise spawn a floating feedback instead
+             */
+            elseif ($params['studentId']) {
+                try {
+                    $response = null;
+                    $student = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
+                    $participant = $assessment->getParticipant($student);
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
             }
 
             return [
-                'participant' =>  $assessment->getParticipant($response->getSubmittedOnBehalfOf()),
+                'assessment' => $assessment,
+                'participant' => $participant,
                 'response' => $response,
             ];
         });
