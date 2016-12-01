@@ -628,7 +628,7 @@ class UserMapper extends Mapper
      * @return Collection|User[] A list of users who have this level of access
      *                           to the given service.
      */
-    public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $limit = null)
+    public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $order = Array(), $limit = null)
     {
         $query = "
             SELECT DISTINCT {$this->getColumnString('u')}, {$this->getJoinColumnString('role', 'r')}
@@ -648,6 +648,14 @@ class UserMapper extends Mapper
         if (isset($serviceIdentifier)) {
             $query .= 'AND ua.sid=:serviceIdentifier';
             $params['serviceIdentifier'] = $serviceIdentifier;
+        }
+
+        if (is_array($order) && !empty($order)) {
+            $order_parts = Array();
+            foreach ($order as $column => $direction) {
+                $order_parts[] = $this->database->quoteIdentifier($column).(strtoupper($direction) == 'DESC'? ' DESC' : ' ASC');
+            }
+            $query .= ' ORDER BY ' . (implode(', ', $order_parts));
         }
 
         if ($limit !== null) {
