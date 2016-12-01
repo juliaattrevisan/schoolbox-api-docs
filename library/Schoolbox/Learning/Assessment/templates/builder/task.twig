@@ -22,12 +22,4 @@
         {% endif %}
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: task.id}) }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete</a></li>
     </ul>
-    <div data-reveal class="reveal-modal" id="export-modal-{{ task.id }}"></div>
-    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
-        <input type="hidden" name="action"    value="delete" />
-        <input type="hidden" name="id"        value="{{ task.id }}" />
-        <input type="hidden" name="category"  value="{{ unit.id }}"/>
-        <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
-        <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
-    </form>
 </li>
