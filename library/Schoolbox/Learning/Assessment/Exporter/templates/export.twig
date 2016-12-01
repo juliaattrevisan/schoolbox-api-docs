@@ -1,0 +1,101 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+{#{{ bread.crumbsArray(breadcrumbs) }}#}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+
+    {% if implementations|length == 0 %}
+        <div class="small-12 island">
+            <div class = "empty-state">
+                <i class="icon-class-list"></i>
+                <p>There are no open classes that currently use this unit.</p>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="small-12 island">
+            <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+            <form method="post"
+                  action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
+                  id="importForm">
+
+                <table>
+                    <colgroup>
+                        <col />
+                        <col class="full-width" />
+                    </colgroup>
+
+                    <thead>
+                    <tr>
+                        <th>
+                            <input id="checkAll"
+                                   type="checkbox"
+                                   data-select-all
+                                   data-select-all-for-group="unit-implementation" />
+                            <label for="checkAll" class="checkbox-label"></label>
+                        </th>
+                        <th>Class</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for implementation in implementations %}
+                        <tr>
+                            <td>
+                                <input name="unitImplementation[{{ implementation.unit.id }}]" type="hidden" value="0" />
+                                <input type="checkbox"
+                                       id="import-{{ implementation.unit.id }}"
+                                       name="unitImplementation[{{ implementation.unit.id }}]"
+                                       value="1"
+                                       {% if not implementation.allowed %}disabled{% endif %}
+                                       data-select-all-group="unit-implementation" />
+                                <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
+                            </td>
+                            <td>
+                                <div class="card small-12">
+                                    <a href="/homepage/{{ implementation.unit.course.folder.id }}">
+                                        <span class="icon-32 icon-home"></span>
+                                        <h3>{{ implementation.unit.course.folder.title }}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        <time title="{{ implementation.unit.openDate.short }}"
+                                              datetime="{{ implementation.unit.openDate.databaseDate }}"
+                                        >{{ implementation.unit.openDate.relativeTime }}</time>
+                                        &ndash;
+                                        <time title="{{ implementation.unit.dueDate.short }}"
+                                              datetime="{{ implementation.unit.dueDate.databaseDate }}"
+                                        >{{ implementation.unit.dueDate.relativeTime }}</time>
+                                    </p>
+                                    <p class="meta">
+                                        {% if implementation.allowed %}
+                                            This task does not exist in this class.
+                                        {% else %}
+                                            {# why not? #}
+                                            {% if implementation.imported %}
+                                                This task already exists in this class.
+                                            {% else %}
+                                                You don't have write permission for this class.
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <input type="submit" class='expand' value="Export to selected classes" />
+            </form>
+        </div>
+
+    {% endif %}
+</div>

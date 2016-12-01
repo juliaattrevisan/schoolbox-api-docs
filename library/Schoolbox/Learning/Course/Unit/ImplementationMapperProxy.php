@@ -62,6 +62,19 @@ class ImplementationMapperProxy
     }
 
     /**
+     * Find all unit implementations that are imported from the given specification.
+     *
+     * @param int   $unitSpecificationId
+     * @param array $options
+     * @return Collection|Implementation[]
+     */
+    public function findAllByUnitSpecificationId($unitSpecificationId, $options = [])
+    {
+        return $this->mapper->findByColumn('course_unit_specification_id', $unitSpecificationId, $options)
+                            ->map([$this->translator, 'translateToDomainModel']);
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Implementation $implementation

@@ -15,6 +15,7 @@ use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
+use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 
 
 class Learning implements ModuleConfigInterface
@@ -50,5 +51,8 @@ class Learning implements ModuleConfigInterface
 
         $upcomingModule = new UpcomingModule($di);
         $upcomingModule->init("/$namespace/due");
+
+        $assessmentExporterModule = new AssessmentExporterModule($di);
+        $assessmentExporterModule->init("/$namespace/export");
     }
 }

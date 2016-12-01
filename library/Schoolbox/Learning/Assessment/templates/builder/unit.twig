@@ -12,24 +12,6 @@
     {% endfor %}
 </ul>
 
-<form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks" class="no-margin">
-    <input type="hidden" name="action"    value="reorder"/>
-    <input type="hidden" name="category"  value="{{ unit.id }}"/>
-    <input type="hidden" name="component" value="{{ reveals.component.id }}"/>
-    <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
-</form>
-
-{% include '@learningAssessment/builder/task/reveal-modal.twig' %}
-
-<div class="reveal-modal" data-reveal role="dialog" data-interaction="copy_task_dialog">
-    <h2>This unit is in use by one or more classes</h2>
-    <p>Do you want to add this task to the classes which are currently using this unit?</p>
-    <a href="#" class="button submit" data-action="copy_task">Yes</a>
-    <a href="#" class="button" data-action="no_copy_task">No</a>
-    <a href="#" class="button" data-action="cancel">Don't create task</a>
-</div>
-
-
 <script type="text/javascript">
     $(function () {
         $('#component{{ componentInstance.id }}').setupCourseBuilder({% if usages | length %}
