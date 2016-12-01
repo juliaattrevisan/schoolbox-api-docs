@@ -48,6 +48,7 @@ use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\IFolder;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 
 class Controller extends Base\Base
 {
@@ -104,6 +105,9 @@ class Controller extends Base\Base
 
     /** @var AssessmentMapper */
     private $assessmentMapper;
+
+    /** @var CurriculumNodeMapper */
+    private $curriculumNodeMapper;
 
 
     /**
@@ -258,6 +262,24 @@ class Controller extends Base\Base
     protected function courseTpl($template, $data = [])
     {
         $this->tpl('course', $template, $data);
+    }
+
+    /**
+     * @return CurriculumNodeMapper
+     */
+    public function getCurriculumNodeMapper()
+    {
+        return $this->curriculumNodeMapper;
+    }
+
+    /**
+     * @param CurriculumNodeMapper $curriculumNodeMapper
+     * @return static
+     */
+    public function setCurriculumNodeMapper(CurriculumNodeMapper $curriculumNodeMapper)
+    {
+        $this->curriculumNodeMapper = $curriculumNodeMapper;
+        return $this;
     }
 
 
@@ -555,6 +577,7 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
         $courseSpec->getFolder()->setName(trim($post['name']));
         $parentFolderId = trim($post['parent']);
+        $curriculumCodes = explode(',', $post['curriculumCodes'][0]);
 
         try{
             $this->validateCourseData($courseSpec->getFolder()->getId(), $courseSpec->getFolder()->getName(), $parentFolderId);
@@ -585,10 +608,11 @@ class Controller extends Base\Base
         $this->getCourseSpecificationMapper()->save($courseSpec);
 
         // Save the folder
-        // TODO update the curriculumCodes on the Folder
-        $curriculumCodes = explode(',', $post['curriculumCodes'][0]);
-
-        $this->getFolderMapper()->save($courseSpec->getFolder());
+        $folder = $courseSpec->getFolder();
+        if(count($curriculumCodes)){
+            $folder->setCurriculumNodes($this->getCurriculumNodeMapper()->findByColumn('id', $curriculumCodes));
+        }
+        $this->getFolderMapper()->save($folder);
 
         if ($this->getRequest()->isXhr()) {
             // respond to XHR with JSON

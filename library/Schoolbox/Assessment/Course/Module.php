@@ -33,6 +33,7 @@ use \Component_DefinitionMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 
 class Module extends BaseModule
 {
@@ -170,6 +171,7 @@ class Module extends BaseModule
                 'setUserMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
                 'setErrorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'setAssessmentMapper'           => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
+                'setCurriculumNodeMapper'       => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
             ])
         );
     }
