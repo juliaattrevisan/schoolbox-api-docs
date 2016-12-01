@@ -67,7 +67,7 @@
             den = this.attr('data-denominator'),
             prc = parseInt(num / den * 100);
 
-        callback.call(this, prc + '%');
+        callback.call(this, prc + ' %');
     }
 
     function calcLetter(conf, callback) {

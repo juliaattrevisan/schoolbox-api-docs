@@ -61,7 +61,19 @@
             publishText: 'Publish And Continue',
 
             onPublishCallback: function() {
-                window.location.href = nextUrl.data('value')
+                var destination = '';
+
+                if (nextUrl.data('value') != undefined) {
+                    destination = nextUrl.data('value');
+                }
+                else {
+                    destination = '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}'
+                }
+
+                {# Go to next available person in the carousel
+                 # If there is nobody, just visit Status screen
+                 #}
+                window.location.href = destination;
             }
         });
     });
@@ -105,16 +117,6 @@
         </section>
     </div>
 </div>
-
-{% if assessment.useRubric %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Marking Guide</h2>
-
-        {% include '@rubric/grid-markable.twig' with {rubric: rubricContext.rubric, markType: rubricContext.markType} only %}
-    </div>
-</div>
-{% endif %}
 
 <div class="row">
     <div class="small-12 island">

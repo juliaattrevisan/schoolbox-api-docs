@@ -497,6 +497,8 @@ class Controller extends Assessment\Controller
              */
         }
 
+        $this->getResponse()->status->setCode(204);
+        $this->getResponse()->content->set($this->buildJsonOutput(null));
         return;
     }
 

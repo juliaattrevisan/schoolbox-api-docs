@@ -1,5 +1,15 @@
 {# TODO create feedback routes #}
 
+{##
+ # assessment           An IAssessable instance
+ # fbUrl                A url to a place which saves the values of this form
+ # feedbackAttachzone   An attachzone for uploading files
+ # latestFeedback       An IFeedback instance for most recent Feedback for response
+ # participant          A Participant instance
+ # response             An IResponse instance
+ # rubricContext        A RubricContext instance
+ #}
+
 {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
     {% set savedStatusText = 'Saved as Draft' %}
 {% else %}
@@ -14,9 +24,49 @@
 
 <form method="post" action="{{ fbUrl }}">
     <input type="hidden" name="responseId" value="{{ response.id }}" />
+
     <div class="row">
-        <div class="small-12 medium-3 column">
+
+        {% if assessment.useRubric and rubricContext %}
+        <div class="small-12 island">
+            {% include '@rubric/grid-markable.twig' with {rubric: rubricContext.rubric, markType: rubricContext.markType} only %}
+        </div>
+        {% endif %}
+
+        <div class="small-12 medium-3 column text-center">
             {% block grading %}{% endblock %}
+
+            {% if assessment.useRubric and rubricContext %}
+            <script type="text/javascript">
+                $(function () {
+
+                    var $rb = $('#rb-{{ rubricContext.rubric.id }}');
+
+                    $rb.on('change', '[data-rubric], [data-rubric-group]', function(e) {
+                        var currentRubricValue = $.trim($rb.find('[data-final-summary]').text());
+                        var currentMarkInput = $('#assessment-status').find('[data-mark-input]').val();
+
+                        if (currentRubricValue === currentMarkInput) {
+                            $('#use-rubric-value').prop('disabled', true);
+                        }
+                        else {
+                            $('#use-rubric-value').prop('disabled', false);
+                        }
+                    });
+
+                    /**
+                     * Use the rubric value in the mark input field
+                     */
+                    $('#use-rubric-value').on('click', function(event) {
+                        $('#assessment-status')
+                            .find('[data-mark-input]')
+                            .val($.trim($('[data-final-summary]').text()))
+                            .change();
+                    });
+                });
+            </script>
+            <p><button id="use-rubric-value">Assign Grade From Rubric</button></p>
+            {% endif %}
         </div>
         <div class="small-12 medium-9 column">
             <label>Comment

@@ -55,7 +55,7 @@ class Marksheet_Percent extends Marksheet_Abstract
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
         $mark = $this->cleanNumber($rawMark, 0, $blankZero);
-        return $asText ? "$mark%" : $mark;
+        return $asText ? "$mark %" : $mark;
     }
 
     public function outputUI(SitePage $page, $mark)
