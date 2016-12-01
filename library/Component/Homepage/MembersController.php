@@ -37,7 +37,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = new UserMapper();
-        $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), Array('lastname' => 'desc'));
+        $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), Array('lastname' => 'asc'));
 
         if (count($userList) == 0) {
 
