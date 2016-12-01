@@ -109,9 +109,9 @@ class StudentCarousel
                 $label = 'Not submitted';
             }
 
-            /* Viewing a ResponseList for a particular student
+            /* Viewing the most recent response for the next student
              */
-            $urlValue = $this->getRouter()->generate('learningResponse.getResponseList', [
+            $urlValue = $this->getRouter()->generate('learningResponse.getParticularResponse', [
                 'assessmentId' => $this->getAssessment()->getId(),
                 'studentId'    => $currentParticipant->getUser()->getId()
             ]);
@@ -144,9 +144,7 @@ class StudentCarousel
      */
     private function getCurrentPerson()
     {
-        /* Viewing a ResponseList for a particular student
-         */
-        return $this->getRouter()->generate('learningResponse.getResponseList', [
+        return $this->getRouter()->generate('learningResponse.getParticularResponse', [
             'assessmentId' => $this->getAssessment()->getId(),
             'studentId'    => $this->getStudent()->getId(),
         ]);

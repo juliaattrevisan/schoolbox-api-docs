@@ -56,11 +56,6 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
 
-                /* Get a list of Responses for a particular Student and Assessment
-                 * Presented as a more succinct Submission History
-                 */
-                '/assessments/{assessmentId}/{studentId}/responses'                          => 'getResponseList',
-
                 /* Download an annotated crocodoc
                  */
                 '/responses/{assessmentId}/{responseId}/{feedbackId}/download/{crocodocId}'  => 'getCrocodocDownload',
@@ -94,7 +89,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getResponseList|getParticularResponse)';
+        $ruleRegexp = '(getParticularResponse)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
@@ -117,22 +112,6 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '(?:getResponseList)', function ($params) {
-            try {
-                $student = $this->getUserMapper()->findById($params['studentId']);
-            } catch (MapperException $e) {
-                $student = $this->getUserMapper()->createModel();
-            }
-
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-
-            $participant = $assessment->getParticipant($student);
-
-            return [
-                'participant' => $participant,
-            ];
-        });
-
         $this->addRoutePreload($matcher, '(get|delete)ParticularResponse', function ($params) {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
 

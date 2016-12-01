@@ -55,23 +55,6 @@ class Controller extends Base
         $this->responseDataSource = $responseDataSource;
     }
 
-//    /**
-//     * Get a list of Responses by $student for a particular
-//     * IAssessable $assessment
-//     *
-//     * @param Participant $participant
-//     */
-//    public function getResponseList(Participant $participant)
-//    {
-//        $data = [
-//            'participant' => $participant,
-//            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $participant->getAssessable(), null))->produce(),
-//            'timeline' => (new Timeline($participant))->getForTeacher(),
-//        ];
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/responseList.twig', $data));
-//    }
-
     /**
      * Get the contents of a particular $response
      *
