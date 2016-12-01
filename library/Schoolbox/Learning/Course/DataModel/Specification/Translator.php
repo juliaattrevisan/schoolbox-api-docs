@@ -8,7 +8,9 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -50,7 +52,7 @@ class Translator
             ->setCreatedAt($specification->getCreatedAt())
             ->setUpdatedAt($specification->getUpdatedAt())
             ->setDeletedAt($specification->getDeletedAt())
-            ->setUnits(new Collection());
+            ->setUnits(new GenericCollection(UnitSpecificationModel::class));
         ;
 
         // Allow translate if folder is empty, for now.
