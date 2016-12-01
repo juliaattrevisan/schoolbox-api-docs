@@ -32,6 +32,9 @@ use Schoolbox\UserMapper;
 class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
 {
 
+    /**
+     * SQL map definition
+     */
     protected function mapping()
     {
         $this->hasTable('assess');
@@ -58,7 +61,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
             null, null, 'curriculumNodes');
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
@@ -132,9 +135,10 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      * @param  Model $object
      * @return bool             Always returns true
      */
-    public function preSave(Model $object)
+    protected function setWorkType(Model $object)
     {
-        $object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
+        $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        return true;
     }
 
     /**
