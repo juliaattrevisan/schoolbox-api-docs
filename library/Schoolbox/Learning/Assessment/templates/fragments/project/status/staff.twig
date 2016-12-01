@@ -1,8 +1,20 @@
 <script type="text/javascript">
     $(function() {
-        $('#content').find('ul[data-sortable]').sortable({
-            handle:      '.grip',
-            axis:        'y'
+        // Setup sortable
+        var assessmentList = $('ul[data-assessment-list]');
+        assessmentList.sortable({
+            handle: '.grip',
+            axis:   'y'
+        })
+        .on('sortstop', function() {
+            var sequence = [];
+            assessmentList.find('[data-assessment]').each(function(idx, elem){
+                sequence.push($(elem).attr('data-assessment'));
+            });
+            var data = {
+                id: sequence
+            };
+            $.post(assessmentList.attr('data-action'), data);
         });
 
         $('[data-delete]').click(function(event) {
@@ -49,11 +61,14 @@
 
                 {% if assessment.assessables | length %}
                 <section>
-                    <ul class="information-list sortable-card ui-sortable" data-sortable>
+                    <ul class="information-list sortable-card"
+                        data-sortable
+                        data-assessment-list
+                        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                         {% for assessable in assessment.assessables %}
                             {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
-                            <li class="actions-small-2">
+                            <li class="actions-small-2" data-assessment="{{ assessable.id }}">
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="compact card wrap-down small-12">

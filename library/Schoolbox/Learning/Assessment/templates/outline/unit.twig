@@ -38,7 +38,11 @@
         </ul>
         {% endif %}
 
-        <form action="/course/unit/delete" method="post" data-form_type="delete_unit" class="hide">
+            <!-- Form for reordering tasks - one per unit -->
+            <form action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'units', contextId: unit.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post" class="reorder_form">
+            </form>
+
+            <form action="/course/unit/delete" method="post" data-form_type="delete_unit" class="hide">
             <input type="hidden" name="id"        value="{{ unit.id }}" />
             <input type="hidden" name="component" value="{{ componentInstance.id }}"/>
         </form>

@@ -171,6 +171,24 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Override findByColumnList to always order by sequence.
+     *
+     * If another order is defined, the sequence ordering will apply as a lower
+     * priority to that order.
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return Collection
+     */
+    public function findByColumnList($columnList, $options = [])
+    {
+        if (empty($options['order']['sequence'])) {
+            $options['order']['sequence'] = 'asc';
+        }
+        return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
      * When deleting an Assessment that is a Quiz, we need to delete all sub-objects of the Quiz
      * @param Model $assessment
      */

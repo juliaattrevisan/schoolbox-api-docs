@@ -2,7 +2,7 @@
 <script type="text/javascript">
         $(function() {
             var component = $('#component{{ componentInstance.id }}'),
-                    socialstreamSession = { categoryId: '{{ courseSpecification.folder.id }}' };
+                socialstreamSession = { categoryId: '{{ courseSpecification.folder.id }}' };
 
             component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
@@ -47,13 +47,3 @@
         </div>
     {% endif %}
 </section>
-
-<!-- Form for reodering tasks -->
-<div class="hide">
-<form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
-    <input type="hidden" name="action"    value="reorder"/>
-    <input type="hidden" name="category"  value="{{ context.id }}"/>
-    <input type="hidden" name="unit_id" value=""/>
-</form>
-</div>
-

@@ -80,9 +80,10 @@ class Module extends BaseModule
 
 
         // register the routes
-        $this->register('GET',  "$assListRoute",     'getAssessmentsByContext', $isSuper, $preloadContext);
-        $this->register('POST', "$assListRoute",     'postCreateAssessment',    $isStaff, $preloadContext);
-        $this->register('GET',  "$assListRoute/new", 'getCreateAssessmentForm', $isStaff, $preloadContext);
+        $this->register('GET',  "$assListRoute",         'getAssessmentsByContext', $isSuper, $preloadContext);
+        $this->register('POST', "$assListRoute",         'postCreateAssessment',    $isStaff, $preloadContext);
+        $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments',  $isStaff, $preloadContext);
+        $this->register('GET',  "$assListRoute/new",     'getCreateAssessmentForm', $isStaff, $preloadContext);
 
         $this->register('GET',  "$assRoute",        'getAssessment',            $loggedIn, $preloadAssessment);
         $this->register('POST', "$assRoute",        'postUpdateAssessment',     $isStaff,  $preloadAssessment);
