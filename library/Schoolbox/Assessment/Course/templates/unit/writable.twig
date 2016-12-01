@@ -36,7 +36,10 @@ Usage:
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
-        <ul class="information-list sortable" data-sortable data-assessment-list data-action="{{ routeLookup('course.saveAssessmentSequence', {id: unitSpec.id}) }}">
+        <ul class="information-list sortable"
+            data-sortable
+            data-assessment-list
+            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
             {% for assessment in unitSpec.assessables %}
                 {% include '@course/assessment.twig' with {
                     assessment:       assessment,

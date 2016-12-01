@@ -27,13 +27,11 @@
             });
             assessmentList.bind('sortstop', function(event, ui) {
                 var sequence = [];
-                console.log(event);
-                console.log(ui);
                 assessmentList.find('[data-assessment]').each(function(idx, elem){
                     sequence.push($(elem).attr('data-assessment'));
                 });
                 var data = {
-                    sequence:   sequence
+                    id: sequence
                 };
                 $.post(assessmentList.attr('data-action'), data);
             })
