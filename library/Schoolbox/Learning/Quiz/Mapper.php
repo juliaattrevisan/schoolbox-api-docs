@@ -31,7 +31,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
 {
-
     /**
      * SQL map definition
      */
@@ -77,6 +76,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function softDeleteSections(Model $quiz)
     {
@@ -85,12 +85,14 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         // However this will also updated the 'deleted_at' field for already deleted items.
         $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizSectionMapper->delete($sections);
+        return true;
     }
 
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function softDeleteAttempts(Model $quiz)
     {
@@ -99,6 +101,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         // TODO - SA-1277 However this will also updated the 'deleted_at' field for already deleted items.
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->delete($attempts);
+        return true;
     }
 
 
@@ -106,6 +109,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function restoreSections(Model $quiz)
     {
@@ -113,12 +117,14 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizSectionMapper->restoreSoftDeleted($sections);
+        return true;
     }
 
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function restoreAttempts(Model $quiz)
     {
@@ -126,14 +132,16 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->restoreSoftDeleted($attempts);
+        return true;
     }
 
     /**
      * Pre-save callback.
-     * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
+     *
+     * Ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
      *
      * @param  Model $object
-     * @return bool             Always returns true
+     * @return true
      */
     protected function setWorkType(Model $object)
     {
@@ -148,7 +156,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      *
      * @param  Model $object
      * @param  Model|null $previous
-     * @return bool             Always returns true
+     * @return true
      */
     public function updateExternalMarkbook(Model $object, $previous = null)
     {
@@ -163,19 +171,21 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
     }
 
     /**
-     * Removes this assessment from the markbook.
+     * Post-delete callback.
      *
-     * This is used as a post-delete hook.
+     * Removes this assessment from the external markbook.
      *
      * @param Model $object
+     * @return true
      */
     public function deleteFromMarkbook(Model $object)
     {
         $externalMarkbook = new \External_Markbook();
-        $activityFactory = new \Schoolbox\Assessment\ActivityFactory();
+        $activityFactory = new ActivityFactory();
         $externalMarkbook->deleteAssessment(
             $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
         );
+        return true;
     }
 
     /**
