@@ -559,7 +559,7 @@ class UserAccessMapper extends Mapper
      * @return UserAccess
      * @throws Mapper\Exception
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = false)
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
     {
         // Order of priority for permissions
         //
