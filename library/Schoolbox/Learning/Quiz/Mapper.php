@@ -62,7 +62,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
             null, null, 'curriculumNodes');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
@@ -143,24 +143,23 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 
     /**
      * Post-save callback.
-     * Creates record in external markbook system
+     *
+     * Saves a record in external markbook system
      *
      * @param  Model $object
      * @param  Model|null $previous
      * @return bool             Always returns true
      */
-    public function postSave(Model $object, $previous = null)
+    public function updateExternalMarkbook(Model $object, $previous = null)
     {
-        /**
-         * This saves the assessment to the remote system
-         */
         $externalMarkbook = new \External_Markbook();
-        $activityFactory = new \Schoolbox\Assessment\ActivityFactory();
+        $activityFactory = new ActivityFactory();
         if (is_null($previous)) {
             $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
         } else {
             $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
         }
+        return true;
     }
 
     /**
