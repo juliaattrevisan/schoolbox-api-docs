@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper for the OnlineAssessment model.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -23,149 +21,39 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
+use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\UserMapper;
 
 /**
- * Formerly known as OnlineAssessmentMapper
- *
- * @package Schoolbox\Assessment\Component
  * @method Model createModel($id=null)
- * @method Collection|Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  */
 class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface {
 
 	protected function mapping () {
-		$this->hasTable('assess');
+        $this->hasTable('assess');
 		$this->hasModel(Model::class);
-		$this->hasMap(array(
-			'column'     => 'assess_id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'category_id',
-			'property'   => 'category',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'category',
-		));
-		$this->hasMap(array(
-			'column'     => 'user_id',
-			'property'   => 'user',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'user',
-		));
-		$this->hasMap(array(
-			'column'     => 'type',
-			'property'   => 'workType',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'work_type',
-		));
-		$this->hasMap(array(
-			'column'     => 'title',
-			'property'   => 'title',
-			'type'       => self::TYPE_STRING,
-		));
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->uses('completion_message', self::TYPE_STRING);
-		$this->hasMap(array(
-			'column'     => 'start',
-			'property'   => 'start',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'finish',
-			'property'   => 'finish',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'duration',
-			'property'   => 'duration',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'max_attempts',
-			'property'   => 'maxAttempts',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'weight',
-			'property'   => 'weight',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'availability',
-			'property'   => 'availability',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'anonymous_result',
-			'property'   => 'anonymousResult',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'notify_author',
-			'property'   => 'notifyAuthor',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'mark_visibility',
-            'property'   => 'markVisibility',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'created',
-			'type'       => self::TYPE_DATETIME,
-			'created_timestamp' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasJoin('category', array(
-			'mapper'    => FolderMapper::class,
-			'this_key'  => 'category_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('user', array(
-			'mapper'    => Schoolbox\UserMapper::class,
-			'this_key'  => 'user_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('work_type', array(
-			'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper::class,
-			'this_key'  => 'type',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('attempt', array(
-			'mapper'    => QuizAttemptMapper::class,
-			'multiple'  => true,
-			'this_key'  => 'assess_id',
-			'other_key' => 'assess_id',
-		));
-
-
-       $this->joinsVia(
-            'curriculum_node_for_assess',
-            Node\Mapper::class,
-            'id',
-            'curriculum_node_id',
-            'assess_id',
-            null,
-            null,
-            null,
-            'curriculumNodes'
-        );
-
+		$this->uses('assess_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'am');
-
-		$this->hasSoftDeleteDateField('deleted_at');
+        $this->joins('category_id', FolderMapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('type', WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('completion_message', self::TYPE_STRING);
+        $this->uses('start', self::TYPE_DATETIME);
+        $this->uses('finish', self::TYPE_DATETIME);
+        $this->uses('duration', self::TYPE_INTEGER);
+        $this->uses('max_attempts', self::TYPE_INTEGER);
+        $this->uses('weight', self::TYPE_INTEGER);
+        $this->uses('availability', self::TYPE_STRING);
+        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
+        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
+        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
+        $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null, null, null, 'curriculumNodes');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
