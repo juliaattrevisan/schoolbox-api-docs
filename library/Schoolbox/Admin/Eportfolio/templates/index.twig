@@ -1,0 +1,148 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        var previousUser = null;
+
+        $('#sourceUserId').selectizeSelector({
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {groupID: 0},
+                dataType: 'json'
+            }
+        }).on('selectize.item_add', function (e, value) {
+            {# Retrieve pages for the selected user #}
+
+            if (previousUser != value) {
+                previousUser = value;
+
+                $.get('{{ routeLookup('adminEportfolio.getUserPages', {userId: 'userId'}) }}'.replace(/userId/g, value))
+                        .done(function (data) {
+
+                            {# Blow away any existing old checkboxes#}
+
+                            $('[data-pages]').html('');
+
+                            if (data.pages.length > 0) {
+                                {# Clone a checkbox for each page#}
+
+                                for (var i = 0; i < data.pages.length; i++) {
+                                    var pageCurrent = data.pages[i];
+                                    $('[data-pages]').append(
+                                            $('[data-clone-page]').html()
+                                                    .replace(/pageId/g, pageCurrent.pageId)
+                                                    .replace(/pageTitle/g, pageCurrent.pageTitle)
+                                    );
+                                }
+                                $('#source-empty').hide();
+                                $('[data-pages]').show();
+                            } else {
+                                $('#source-empty').show();
+                                $('[data-pages]').hide();
+                            }
+                        })
+                        .fail(function (data) {
+
+                        });
+            }
+        }).on('selectize.item_remove', function () {
+            $('[data-pages]').html('');
+            $('#source-empty').show();
+            $('[data-pages]').hide();
+            previousUser = null;
+        });
+
+        $('#destinationUserId').selectizeSelector({
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {groupID: 0},
+                dataType: 'json'
+            },
+            multiple: true
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="small-12 island">
+    <h2 class="subheader">ePortfolio Deployment</h2>
+    <form action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
+        <section>
+            <fieldset class="content">
+                <div class="small-12">
+                    <div class="small-12 columns">
+                        <label>Source User</label>
+                        <input type="text" id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>Select Page(s) To Copy</label>
+                        <fieldset class="checklist" data-pages style="display: none;"></fieldset>
+
+                        <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
+
+                        <div class="hide">
+                            <div data-clone-page>
+                                <input data-checkbox id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
+                                <label for="checkbox-pageId">pageTitle</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>Target User(s)</label>
+                        <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label>Target Role(s)</label>
+                        <fieldset class="checklist">
+                            {% for role in roles %}
+                                <input id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
+                                <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>Target Campus(es)</label>
+                        <fieldset class="checklist">
+                            {% for campus in campuses %}
+                                <input id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
+                                <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label>Skip Duplicates</label>
+                        <div class="switch round">
+                            <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
+                            <label for="skipDuplicates">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label>Enable ePortfolios</label>
+                        <div class="switch round">
+                            <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
+                            <label for="enableEportfolios">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </section>
+        <input type="submit" class="expand" value="Deploy Selected Pages">
+    </form>
+</div>

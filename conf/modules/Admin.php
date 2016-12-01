@@ -45,6 +45,11 @@ class Admin implements ModuleConfigInterface
         $lists = new \Schoolbox\Admin\Lists\Module($di);
         $lists->init('/adminv2/lists');
 
+        // Admin lists
+
+        $lists = new \Schoolbox\Admin\Eportfolio\Module($di);
+        $lists->init('/adminv2/eportfolio');
+
         // LTI
 
         $lti = new \Schoolbox\Admin\LTI\Module($di);
