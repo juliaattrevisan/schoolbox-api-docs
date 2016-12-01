@@ -59,8 +59,20 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
         $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
             null, null, 'curriculumNodes');
-        $this->joinsReverse('assess_id', QuizSectionMapper::class, 'assess_id', null, self::COLUMN_JOIN_MULTI, 'sections', 'sections');
-        $this->joinsReverse('assess_id', QuizAttemptMapper::class, 'assess_id', null, self::COLUMN_JOIN_MULTI, 'attempts', 'attempt');
+
+        $this->hasJoin('section', array(
+            'mapper'    => QuizSectionMapper::class,
+            'multiple'  => true,
+            'this_key'  => 'assess_id',
+            'other_key' => 'assess_id',
+        ));
+
+        $this->hasJoin('attempt', array(
+            'mapper'    => QuizAttemptMapper::class,
+            'multiple'  => true,
+            'this_key'  => 'assess_id',
+            'other_key' => 'assess_id',
+        ));
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
