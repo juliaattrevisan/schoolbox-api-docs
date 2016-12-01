@@ -395,9 +395,13 @@ abstract class Mapper implements IMapper, Serializable
             return $this->createCollection($object->getAll());
         }
         if (is_array($object)) {
+            if(count($object)){
+                $first = reset($object);
+                return new GenericCollection(get_class($first), $object);
+            }
             return $this->createCollection($object);
         }
-        return $this->createCollection(array($object));
+        return new GenericCollection(get_class($object), array($object));
     }
 
     /**
