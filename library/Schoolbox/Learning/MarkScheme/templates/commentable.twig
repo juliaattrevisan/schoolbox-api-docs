@@ -54,10 +54,16 @@
                         }
                     });
 
-                    /**
-                     * Use the rubric value in the mark input field
-                     */
-                    $('#use-rubric-value').on('click', function(event) {
+                    {##
+                     # Use the rubric value in the mark input field
+                     #
+                     # Disabled upon load, since values are the same
+                     # at this point in time. Also disables when copying
+                     # the rubric mark value in.
+                     #}
+                    $('#use-rubric-value').prop('disabled', true).on('click', function(event) {
+                        $(this).prop('disabled', true);
+
                         $('#assessment-status')
                             .find('[data-mark-input]')
                             .val($.trim($('[data-final-summary]').text()))
