@@ -153,6 +153,7 @@ class Module extends BaseModule
              */
             elseif ($params['studentId']) {
                 try {
+                    $response = null;
                     $student = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
                     $participant = $assessment->getParticipant($student);
                 }

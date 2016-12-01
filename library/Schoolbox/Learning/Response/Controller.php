@@ -128,10 +128,13 @@ class Controller extends Base
                 'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
                 'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
-                'file' => $file,
-                'subfragment' => (new ResponseFileFactory($response, $file, $this->getUser()))->produce(),
-                'carousel' => (new StudentCarousel($this->getRouter(), $response->getSubmittedOnBehalfOf(), $assessment, $response))->produce(),
+                'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment, $response))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+
+                /* This is now conditional depending on the presence of a $response
+                 */
+                'file' => $file,
+                'subfragment' => $file ? (new ResponseFileFactory($response, $file, $this->getUser()))->produce() : null,
 
                 /* For saving feedbacks
                  */
@@ -140,7 +143,7 @@ class Controller extends Base
 
                 /* Rubrics data
                  */
-                'rubricContext' => (new RubricContext())->generateMarkable($assessment, $response->getSubmittedOnBehalfOf()),
+                'rubricContext' => (new RubricContext())->generateMarkable($assessment, $participant->getUser()),
             ];
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
