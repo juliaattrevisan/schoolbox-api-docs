@@ -23,6 +23,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
      */
     public function execute()
     {
+        /* I guess this component is actually deprecated in favour
+         * of Pending Assessments screen?
+         */
+        return false;
+
         // init handlers
         $this->submissionHandler = new Submission();
 
