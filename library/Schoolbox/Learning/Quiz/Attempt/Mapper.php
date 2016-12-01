@@ -7,7 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-
 namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress_Date_Format;
@@ -23,13 +22,15 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 
 /**
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
-
+    /**
+     * SQL definition
+     */
     protected function mapping()
     {
         $this->hasTable('assess_attempt');
@@ -42,37 +43,47 @@ class Mapper extends BaseMapper
         $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+        $this->hasJoin('answers', array(
+            'mapper'    => QuizAnswerMapper::class,
+            'multiple'  => true,
+            'this_key'  => 'attempt_id',
+            'other_key' => 'attempt_id',
+        ));
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
-
     }
 
 
     /**
-     * Soft deletes all Answers (formerly known as Responses) for the specified Attempt
+     * Soft deletes all Answers in the specified Attempt
      *
      * @param Model $attempt
+     * @return true
      */
     public function softDeleteAnswers(Model $attempt)
     {
-        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        $quizAnswerMapper = $this->getJoinMapper('answers');
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
         $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId());
         $quizAnswerMapper->delete($answers);
+        return true;
     }
 
     /**
-     * Restores all Answers (formerly known as Responses) for the specified Attempt
+     * Restores all Answers in for the specified Attempt
      *
      * @param Model $attempt
+     * @return true
      */
     public function restoreAnswers(Model $attempt)
     {
-        $quizAnswerMapper = QuizAnswerMapper::getInstance();
+        $quizAnswerMapper = $this->getJoinMapper('answers');
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
         $quizAnswerMapper->restoreSoftDeleted($answers);
+        return true;
     }
 
     /**
@@ -110,21 +121,27 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * On post save, write mark data back into remote markbook
+     * Post-Save callback.
+     *
+     * Writes mark data back into remote markbook
+     *
      * @param Model $object
      * @param Model|null $previous
+     * @return true
      */
-    public function postSave(Model $object, $previous = null) {
+    protected function updateExternalMarkbook(Model $object, $previous = null)
+    {
         //Copy data to remote system
         $externalMarkbook = new \External_Markbook();
         $externalMarkbook->setMark($object);
+        return true;
     }
 
     /**
      * Gets a string of placeholders for an array - usually used for creating a
      * list of placeholders for an IN condition.
      *
-     * @param array  $input
+     * @param array $input
      * @param string $prefix If not supplied, ? will be used as the placeholder
      *                       for all values.
      *
@@ -181,8 +198,8 @@ class Mapper extends BaseMapper
     /**
      * Builds list of student's marks for all attempts in the given category.
      *
-     * @param int   $category_id
-     * @param int   $student_id
+     * @param int $category_id
+     * @param int $student_id
      * @param array $extra_params Any extra filters:
      *                            * owner - the creator of the submission box
      *                            * from (Alaress_Date_Format)
@@ -194,7 +211,7 @@ class Mapper extends BaseMapper
     {
         //
         // Build filters for query
-        $params  = array(
+        $params = array(
             'category' => $category_id,
             'student'  => $student_id,
         );
@@ -227,7 +244,7 @@ class Mapper extends BaseMapper
 
         $filters = implode(' AND ', $filters);
 
-        $query     = "
+        $query = "
             SELECT
                 aa.attempt_id,
                 aa.assess_id,
@@ -288,17 +305,17 @@ class Mapper extends BaseMapper
             GROUP BY aa.assess_id, aa.attempt_id
             ORDER BY aa.start DESC
         ";
-        $stmt  = $this->database->prepare($query);
+        $stmt = $this->database->prepare($query);
         $stmt->execute($params);
 
         $attempts = array();
 
-        $sum   = 0;
+        $sum = 0;
         $count = 0;
 
         foreach ($stmt as $row) {
 
-            if($row['user_id']) {
+            if ($row['user_id']) {
                 // only include the most recent attempt for each user (ie. first seen)
                 if (!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
                     // if the user is already in the array (ie already seen), just increment the attempt count
@@ -382,11 +399,11 @@ class Mapper extends BaseMapper
             'studentId' => $studentId,
             'folderId'  => $folderId,
         ];
-        if(!$from->isNull()){
+        if (!$from->isNull()) {
             $params['from'] = $from->getDatabaseDate();
             $parts[] = 'DATE(a.finish) >= :from';
         }
-        if(!$to->isNull()){
+        if (!$to->isNull()) {
             $params['to'] = $to->getDatabaseDate();
             $parts[] = 'DATE(a.finish) <= :to';
         }
@@ -423,11 +440,11 @@ class Mapper extends BaseMapper
         $params = [
             'studentId' => $studentId,
         ];
-        if(!$from->isNull()){
+        if (!$from->isNull()) {
             $params['from'] = $from->getDatabaseDate();
             $parts[] = 'DATE(a.finish) >= :from';
         }
-        if(!$to->isNull()){
+        if (!$to->isNull()) {
             $params['to'] = $to->getDatabaseDate();
             $parts[] = 'DATE(a.finish) <= :to';
         }
@@ -444,11 +461,11 @@ class Mapper extends BaseMapper
         $statement->execute($params);
 
         $folderIds = [];
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $folderIds[] = $row['id'];
         }
 
-        if(count($folderIds)){
+        if (count($folderIds)) {
             return FolderMapper::getInstance()->findByColumn('id', $folderIds);
         }
         return new Collection();
@@ -491,8 +508,7 @@ class Mapper extends BaseMapper
                 /** @var Model $model */
                 return $model
                     ->setAssessment($quiz)
-                    ->setUser($user)
-                ;
+                    ->setUser($user);
             }
         );
     }

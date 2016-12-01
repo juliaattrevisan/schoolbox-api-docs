@@ -60,7 +60,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
             null, null, 'curriculumNodes');
 
-        $this->hasJoin('section', array(
+        $this->hasJoin('sections', array(
             'mapper'    => QuizSectionMapper::class,
             'multiple'  => true,
             'this_key'  => 'assess_id',
