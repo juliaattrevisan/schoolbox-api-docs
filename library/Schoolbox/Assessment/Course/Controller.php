@@ -575,6 +575,7 @@ class Controller extends Base\Base
             }
         } catch (Base\Exception $e){
             $this->sendError($e);
+            return;
         }
 
         // Save each Unit's name
