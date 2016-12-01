@@ -43,6 +43,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 
 
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
@@ -487,6 +488,19 @@ class Bootstrap implements BootstrapInterface {
                     $dateFormats = new Alaress_Date_Locale_Config();
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
+
+                    // Global access to returnUrl vars
+                    $encodedUrl = Redirect::encode($_GET["page"]);
+                    $twig->addGlobal(
+                        'RETURN_URL',
+                        [
+                            'name'     => Redirect::RETURN_URL,
+                            'current'  => $encodedUrl,
+                            'previous' => (isset($_REQUEST[Redirect::RETURN_URL])
+                                ? $_REQUEST[Redirect::RETURN_URL]
+                                : $encodedUrl),
+                        ]
+                    );
 
                     // Define modules that are required by a template
                     $twig->addFunction(
