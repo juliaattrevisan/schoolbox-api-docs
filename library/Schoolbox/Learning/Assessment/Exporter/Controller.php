@@ -147,7 +147,23 @@ class Controller extends BaseController
             $this->assessmentDataSource->save($newImplementation, $sequences[$unitId]);
         }
 
-        // Redir back to the return URL (if set) or the course page
+        // Decode the return URL, if it was set
+        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
+        if ($encodedReturnUrl) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->getRouter()->generate(
+                'course.modifyCourse',
+                ['id' => $assessment->getContext()->getId(),]
+            );
+        }
+
+        // Redir back to the return URL (if set) or the course page if not
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $returnUrl ]));
+        } else {
+            $this->getResponse()->redirect->afterPost($returnUrl);
+        }
     }
 
     /**
