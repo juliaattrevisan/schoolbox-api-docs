@@ -170,6 +170,11 @@ DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 7, id FROM groups WHERE group_type = 'staff' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 14, id FROM groups WHERE group_type = 'student' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'peninsula';
 
+-- Demo settings
+
+INSERT INTO menu_top (id, sort_order, title, text, token, icon, url, target, webmail, deleted_at)
+  SELECT 14, 6, 'Access your messages here', 'Webmail', null, 'email', 'https://www.gmail.com/', '_blank', 1, null
+WHERE (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
 
 DELETE FROM menu_top_role WHERE menu_top_id = 7 AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
 INSERT INTO menu_top_role (menu_top_id, role_id) SELECT 7, id FROM groups WHERE group_type = 'staff' AND (SELECT `value` FROM `config` WHERE `name` = 'site_location') = 'demo';
