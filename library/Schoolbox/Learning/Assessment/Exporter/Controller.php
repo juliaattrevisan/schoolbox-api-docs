@@ -124,7 +124,12 @@ class Controller extends BaseController
 
                 if (!$implementation['allowed']) {
                     // banhammer
-                    break;
+                    $this->sendError(
+                        'Could not export unit because you do not have permission',
+                        [],
+                        403
+                    );
+                    return;
                 }
 
                 // clone $assessment for this implementation
