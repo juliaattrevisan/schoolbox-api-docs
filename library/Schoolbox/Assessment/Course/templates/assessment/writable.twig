@@ -32,7 +32,7 @@ Usage:
         </span>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
-        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes"></a></li>
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" {{ doReveal }} class="icon-modify">Modify</a></li>
         <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete" class="icon-delete">Delete</a></li>
     </ul>
