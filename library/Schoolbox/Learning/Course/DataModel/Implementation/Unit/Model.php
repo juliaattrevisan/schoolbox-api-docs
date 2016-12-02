@@ -217,21 +217,27 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     /**
      * Is this unit open for submissions?
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isBeforeOpenDate() {
-        $date = Alaress_Date_Format::now();
-        return $date->compareDateOnly($this->getOpenDate()) < 0;
+    public function isBeforeOpenDate(Alaress_Date_Format $now = null) {
+        if(!$now instanceof Alaress_Date_Format){
+            $now = Alaress_Date_Format::now();
+        }
+        return $now->compareDateOnly($this->getOpenDate()) < 0;
     }
 
     /**
      * Is this unit open for submissions?
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isAfterDueDate() {
-        $date = Alaress_Date_Format::now();
-        return $date->compareDateOnly($this->getDueDate()) > 0;
+    public function isAfterDueDate(Alaress_Date_Format $now = null) {
+        if(!$now instanceof Alaress_Date_Format){
+            $now = Alaress_Date_Format::now();
+        }
+        return $now->compareDateOnly($this->getDueDate()) > 0;
     }
 
     /**
