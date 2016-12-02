@@ -8,8 +8,11 @@
 namespace Schoolbox\Admin\Eportfolio;
 
 use Alaress\Web\Controller\Base;
+use Component\Eportfolio\TextboxMapper as EportfolioTextboxMapper;
+use Component_Eportfolio_TextboxController as ComponentEportfolioTextboxController;
 use Eportfolio\Page as EportfolioPage;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
@@ -48,6 +51,12 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param EportfolioPageMapper $eportfolioPageMapper
+     * @param RoleMapper $roleMapper
+     * @param CampusMapper $campusMapper
+     * @param UserMapper $userMapper
+     * @param EportfolioImportMapper $eportfolioImportMapper
+     * @param EportfolioImportLogMapper $eportfolioImportLogMapper
      */
     public function __construct(
         EportfolioPageMapper $eportfolioPageMapper,
@@ -93,6 +102,9 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Display deployment screen
+     */
     public function getDeploy()
     {
         // Render this thing out
@@ -108,6 +120,9 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Deploy eportfolio pages to destination users
+     */
     public function postDeploy()
     {
         $post = $this->getRequest()->post;
@@ -180,8 +195,6 @@ class Controller extends Base
                 $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus));
             }
         }
-
-        $importCount = 0;
 
         // We now had a list of destination users, lets make this party happen
 
@@ -301,17 +314,17 @@ class Controller extends Base
                             }
 
                             // Clone a new textbox for any textbox components
-                            if ($component instanceof \Component_Eportfolio_TextboxController) {
+                            if ($component instanceof ComponentEportfolioTextboxController) {
                                 try {
                                     /** @var \Component\Eportfolio\Textbox $textbox */
-                                    $textbox = \Component\Eportfolio\TextboxMapper::getInstance()->findOneByColumn(
+                                    $textbox = EportfolioTextboxMapper::getInstance()->findOneByColumn(
                                         'component_instance_id',
                                         $component->getInstance()->getId()
                                     );
 
                                     $newTextbox = clone $textbox;
                                     $newTextbox->setComponentInstanceId($newInstance->getId());
-                                    \Component\Eportfolio\TextboxMapper::getInstance()->create($newTextbox);
+                                    EportfolioTextboxMapper::getInstance()->create($newTextbox);
                                 } catch (MapperException $e) {
                                     // This component has no textbox yet, that's okay.
                                 }
@@ -322,11 +335,11 @@ class Controller extends Base
                         $parentPermission = 0;
 
                         /** @var \Eportfolio\Permission $perm */
-                        foreach (\Eportfolio\PermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
+                        foreach (EportfolioPermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
                             $parentPermission = $perm->getValue();
                         }
 
-                        \Eportfolio\PermissionMapper::getInstance()->updatePermissions(
+                        EportfolioPermissionMapper::getInstance()->updatePermissions(
                             $newPage->getPageId(),
                             $parentPermission,
                             array(),
