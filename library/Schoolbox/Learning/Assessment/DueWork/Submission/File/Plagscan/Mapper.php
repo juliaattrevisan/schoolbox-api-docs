@@ -97,7 +97,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @return Gateway
      */
-    private function getGateway()
+    public function getGateway()
     {
         return $this->gateway;
     }

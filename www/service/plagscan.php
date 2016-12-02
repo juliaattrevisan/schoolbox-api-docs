@@ -10,69 +10,22 @@
 
 require_once '../../library/Bootstrap.php';
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Callback as PlagscanCallback;
 
-/* TODO wtf
- */
-class Plagscan_ServiceController {
-    private $gateway;
+try {
+    $callback = new PlagscanCallback();
+}
+catch (\DomainException $e) {
 
-    public function __construct () {
-        $plagscanApiKey = Config::get('plagscan_api_key');
-        $plagscanUsername = Config::get('plagscan_username');
-
-        $this->gateway = new PlagscanGateway($plagscanUsername, $plagscanApiKey);
-    }
-
-    /**
-     * Executed when callback from PlagScan is triggered, and requests the report from PlagScan
-     * @param $documentId
-     * @return bool
+    /* Plagscan not configured - nothing to do
      */
-    public function notifyComplete ($documentId) {
-        try {
-            $plagscanMapper = PlagscanMapper::getInstance();
-        }
-        catch (\DomainException $e) {
-
-            /* Plagscan not configured - nothing to do
-             */
-            return false;
-        }
-
-        try {
-            /* @var $document Plagscan */
-            $document = $plagscanMapper->findOneByColumn('plagscan_id', $documentId);
-            if (!($document instanceof Plagscan)) {
-                return false;
-            }
-
-            $plagscanStat = $this->gateway->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
-            $plagscanHtml = $this->gateway->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE);
-
-            $document->setScore($plagscanStat->LEVEL / 10);
-            $document->setStatus(Plagscan::STATUS_COMPLETE);
-
-            $document->setHtml($plagscanHtml);
-
-            $plagscanMapper->save($document);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
-            return false;
-        }
-
-        return true;
-    }
-
+    exit();
 }
 
-/* Handles responses from PlagScan which indicate a document has completed plagiarism scanning */
+/* Handles responses from PlagScan which indicate a document has completed plagiarism scanning
+ */
 $documentId = $_SERVER["QUERY_STRING"];
 
-if ( !empty($documentId) ) {
-    $serviceController = new Plagscan_ServiceController;
-
-    echo $serviceController->notifyComplete($documentId);
+if (!empty($documentId) ) {
+    echo $callback->notifyComplete($documentId);
 }
