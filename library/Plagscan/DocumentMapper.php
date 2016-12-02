@@ -6,8 +6,6 @@
  * @version     SVN: $Id$
  * 
  */
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
 /**
@@ -23,15 +21,32 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	 */
 	private $gateway;
 
+	/**
+	 * Hook method
+	 */
 	protected function setup()
     {
 		parent::setup();
+
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
-        $this->submissionMapper = SubmissionMapper::getInstance();
-		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+
+		/* If plagscan credentials exist, set up all the other stuff
+		 */
+		if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
+			$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+		}
+		else {
+
+			/* Otherwise die magnificently
+			 */
+			throw new \DomainException('Plagscan credentials are not specified.');
+		}
 	}
 
+	/**
+	 * Mapping.
+	 */
 	protected function mapping () {
 		$this->hasTable('plagscan_document');
 		$this->hasModel(Plagscan::class);
@@ -44,81 +59,40 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	}
 
 	/**
-	 * Saves a Plagscan document.
+	 * Save a Plagscan payload into db
 	 *
-	 * @param Plagscan $dirtyDocument
-	 *
-	 * @return array|bool
+	 * @param Plagscan $plagscanPayload
+	 * @return array
 	 */
-	public function save($dirtyDocument)
+	public function save($plagscanPayload)
 	{
-        // It no longer makes sense to not update an existing document,
-        // because submission files shouldn't be updated after the submission gets published.
-        // TODO port to an async process
-		$existing_id = null;
+		/* Find out if the Plagscan record already exists
+		 */
+		$existingId = null;
+
+		/** @var Plagscan $plagscanPayload */
 		try {
-			// Don't do anything if $existing_document exists already
-			$existing_document = $this->findById($dirtyDocument->getId());
-			$existing_id       = $existing_document->getId();
+			$existingPlagscan = $this->findById($plagscanPayload->getId());
 		}
-		catch (Schoolbox\Mapper\Exception $e) {}
-		if (!isset($existing_id)) {
-//			$this->clearPreviousVersions($dirtyDocument);
-			$documentId = $this->gateway->submit($dirtyDocument->getFile());
+		catch (\Schoolbox\Mapper\Exception $e) {
+
+			/* No existing Plagscan found for $dirtyDocument
+			 * Spawn new and ship it to Plagscan Gateway
+			 */
+			$documentId = $this->gateway->submit($plagscanPayload->getFile());
 
 			if (!empty($documentId)) {
 				$this->gateway->check($documentId);
-				$dirtyDocument->setPlagscanId($documentId);
-				$dirtyDocument->setStatus(Plagscan::STATUS_QUEUED);
+
+				$plagscanPayload->setPlagscanId($documentId);
+				$plagscanPayload->setStatus(Plagscan::STATUS_QUEUED);
 			}
-			else {
-				return false;
-			}
+
+			return parent::save($plagscanPayload);
 		}
-		return parent::save($dirtyDocument);
+
+		/* Don't need to save anything else if it already exists
+		 */
+		return null;
 	}
-
-//    /**
-//     * Deletes all plagscan documents for previous versions of this file, from
-//     * the database and the gateway.
-//     *
-//     * @param Plagscan_Document $dirtyDocument
-//     */
-//    public function clearPreviousVersions($dirtyDocument) {
-//        $file = $this->submissionMapper->findById($dirtyDocument->getFile()->getId());
-//
-//        // Previous submissions of this file for this box and student.
-//        $fileList = $this->submissionMapper->findByColumnList(
-//            array(
-//                'box_id' => $file->getSubmissionBox()->getId(),
-//                'owner'  => $file->getOwner()->getId(),
-//            )
-//        );
-//
-//        // Previous Plagscan documents - delete them all, from here and from
-//        // Plagscan.
-//        /** @var Plagscan_Document[] $documentList */
-//        $documentList = $this->findByColumn('file_id', $fileList->getColumnValues('id'));
-//        foreach ($documentList as $document) {
-//            // Set the document as deleted.
-//            if ($this->gateway->delete($document->getPlagscanId())) {
-//                $this->delete($document);
-//            }
-//        }
-//    }
-
-    /**
-     * Populates a Plagscan document out of a submission. Doesn't actually save
-     * it, though.
-     *
-     * TODO make this work with multiple files
-     *
-     * @param  Submission $submission
-     * @return Plagscan
-     */
-    public function createFromSubmission(Submission $submission)
-    {
-        $plagMap = Plagscan_DocumentMapper::getInstance();
-        return $plagMap->createModel()->setFile($submission);
-    }
 }

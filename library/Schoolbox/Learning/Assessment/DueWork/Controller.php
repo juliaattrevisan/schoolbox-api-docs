@@ -357,6 +357,37 @@ class Controller extends Assessment\Controller
          */
         $this->getDueWorkResponseMapper()->save($response);
 
+
+
+//        $this->getResponse()->content->set([
+//            'postOutput' => [
+//                function() use ($rulesetId, $provisioner) {
+//                    $this->dryRunCallback($rulesetId, $provisioner);
+//                }
+//            ],
+//        ]);
+
+
+
+        /* Send each file in the Submission to Plagscan
+         */
+        if ($response->getId()) {
+            $plagMap = \Plagscan_DocumentMapper::getInstance();
+
+            foreach ($response->getAllFiles() as $currentFile) {
+                $plagMap->save($plagMap->createModel()->setFile($currentFile));
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         /* Saving drafts from the wizzywig
          */
         if ($rq->isXhr()) {

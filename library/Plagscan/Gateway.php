@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
@@ -61,15 +62,15 @@ class Plagscan_Gateway
 
 
     /**
-     * @param Submission\SingleFile\Model $submission
+     * @param SubmissionFile $submissionFile
      * @return string
      */
-    public function submit(Submission\SingleFile\Model $submission)
+    public function submit(SubmissionFile $submissionFile)
     {
-        $documentName = $submission->getBasename();
+        $documentName = $submissionFile->getBasename();
 
         /** @var Schoolbox\Resource\Storage\Model $file */
-        $file = $submission->getStorage();
+        $file = $submissionFile->getStorage();
         $documentData = $file->read();
 
         return $this->postForToken($documentName, $documentData);

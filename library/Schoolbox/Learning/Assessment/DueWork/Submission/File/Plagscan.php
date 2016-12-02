@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
 
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 
 class Plagscan
 {
@@ -62,6 +63,15 @@ class Plagscan
      * @var string
      */
     protected $html;
+
+    /**
+     * A file to upload to Plagscan for checking
+     *
+     * This class is also used as a payload to Plagscan Gateway
+     *
+     * @var SubmissionFile
+     */
+    protected $file;
 
     /**
      * Plagscan constructor.
@@ -217,6 +227,24 @@ class Plagscan
     public function setHtml($html)
     {
         $this->html = $html;
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param Model $file
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
         return $this;
     }
 }
