@@ -54,6 +54,21 @@ class Gateway
     private $response;
 
     /**
+     * A key/value array of allowable file types as specified
+     * by Plagscan themselves
+     *
+     * @var array
+     */
+    private $validDocuments = [
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'doc'  => 'application/msword',
+        'pdf'  => 'application/pdf',
+        'txt'  => 'text/plain',
+        'rtf'  => 'text/richtext',
+        'html' => 'text/html',
+    ];
+
+    /**
      * Gateway constructor.
      * @param $username
      * @param $apiKey
@@ -87,24 +102,23 @@ class Gateway
      * @return string
      */
     protected function postForToken($documentName, $documentData) {
-        $parameterList = $this->createParameters([
-            'METHOD' => self::METHOD_SUBMIT
-        ]);
 
+        /* Check valid extensions and die early if trying
+         * to analyse an illegal file type
+         */
         $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
-        $validDocumentExtensionList = array(
-            'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'doc'=>'application/msword',
-            'pdf'=>'application/pdf',
-            'txt'=>'text/plain',
-            'rtf'=>'text/richtext',
-            'html'=>'text/html',
-        );
+        $validDocumentExtensionList = $this->getValidDocuments();
 
         if (!isset($validDocumentExtensionList[$documentExtension])) {
             return null;
         }
+
+        /* Otherwise continue normally
+         */
+        $parameterList = $this->createParameters([
+            'METHOD' => self::METHOD_SUBMIT
+        ]);
 
         $documentParameter = "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
         $documentParameter .= "Content-Type: {$validDocumentExtensionList[$documentExtension]}\n";
@@ -114,12 +128,12 @@ class Gateway
         $this->createRequest($parameterList, array($documentParameter));
 
         $response = $this->parseXmlResponse($this->response);
-        if($response instanceof \SimpleXMLElement) {
+
+        if ($response instanceof \SimpleXMLElement) {
             return (string)$response->PID;
         }
-        else {
-            return null;
-        }
+
+        return null;
     }
 
     /**
@@ -159,7 +173,6 @@ class Gateway
             }
         }
 
-        echo 'e';
         return false;
     }
 
@@ -401,6 +414,24 @@ class Gateway
     private function setErrorMessage($errorMessage)
     {
         $this->errorMessage = $errorMessage;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    private function getValidDocuments()
+    {
+        return $this->validDocuments;
+    }
+
+    /**
+     * @param array $validDocuments
+     * @return $this
+     */
+    private function setValidDocuments($validDocuments)
+    {
+        $this->validDocuments = $validDocuments;
         return $this;
     }
 }
