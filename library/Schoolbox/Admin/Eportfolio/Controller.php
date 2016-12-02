@@ -98,6 +98,27 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
+        // Do the import in a detached state so it doesn't time out
+
+        $this->getResponse()->content->set([
+            'template' => '@adminEportfolio/importResults.twig',
+            'data'     => array(
+                'pageCurrent' => 'eportfolio'
+            ),
+            'postOutput' => [
+                function() use ($post) {
+                    $this->deployCallback($post);
+                }
+            ],
+        ]);
+    }
+
+    /**
+     * Callback that does the actual copying of ePortfolio records
+     * @param array $post POST data array
+     * @throws MapperException
+     */
+    private function deployCallback($post) {
         // Load source user
 
         try {
@@ -278,9 +299,5 @@ class Controller extends Base
                 }
             }
         }
-
-        // All done
-
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminEportfolio.getDeploy', []));
     }
 }
