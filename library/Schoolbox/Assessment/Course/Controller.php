@@ -592,6 +592,7 @@ class Controller extends Base\Base
 
         // Save each Unit's name
         if (is_array($post['unit'])) {
+            $courseSpec->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($courseSpec->getId()));
             // save unit name changes
             foreach ($courseSpec->getUnits() as $unitSpec) {
                 $unitName = $post['unit'][$unitSpec->getId()]['name'];
