@@ -358,37 +358,32 @@ class Controller extends Assessment\Controller
          */
         $this->getDueWorkResponseMapper()->save($response);
 
-
-
-//        $this->getResponse()->content->set([
-//            'postOutput' => [
-//                function() use ($rulesetId, $provisioner) {
-//                    $this->dryRunCallback($rulesetId, $provisioner);
-//                }
-//            ],
-//        ]);
-
-
-
-        /* Send each file in the Submission to Plagscan
-         * if the Submission was saved successfully
-         *
-         * Only plagscan when actually submitting final
+        /* Send it off to plagscan after finishing up in this method
          */
-        if ($isFinal && $response->getId()) {
-            foreach ($response->getAllFiles() as $currentFile) {
-                PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
-            }
-        }
+        $this->getResponse()->content->set([
+            'postOutput' => [
+                function() use ($isFinal, $response) {
 
+                    /* Send each file in the Submission to Plagscan
+                     * if the Submission was saved successfully
+                     *
+                     * Only plagscan when actually submitting final
+                     */
+                    $i = 40;
 
+                    if ($isFinal && $response->getId()) {
+                        foreach ($response->getAllFiles() as $currentFile) {
 
+                            /* TODO: Dirty hack because $currentFile has no primary key value atm
+                             */
+                            $currentFile->setId($i++);
 
-
-
-
-
-
+                            PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
+                        }
+                    }
+                }
+            ],
+        ]);
 
         /* Saving drafts from the wizzywig
          */
