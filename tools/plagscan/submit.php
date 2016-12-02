@@ -19,8 +19,16 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
-$mapper = PlagscanMapper::getInstance();
-$docs   = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
+try {
+    $mapper = PlagscanMapper::getInstance();
+}
+catch (\DomainException $e) {
+    /* Plagscan not configured - nothing to do
+     */
+    exit();
+}
+
+$docs = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
 //
 // Hit the Plagscan API for each document.

@@ -376,7 +376,14 @@ class Controller extends Assessment\Controller
                              */
                             $currentFile->setId($i++);
 
-                            PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
+                            try {
+                                PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
+                            }
+                            catch (\DomainException $e) {
+
+                                /* noop - plagscan not configured
+                                 */
+                            }
                         }
                     }
                 }

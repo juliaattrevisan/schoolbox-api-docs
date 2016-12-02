@@ -33,8 +33,18 @@ class Plagscan_ServiceController {
      */
     public function notifyComplete ($documentId) {
         try {
+            $plagscanMapper = PlagscanMapper::getInstance();
+        }
+        catch (\DomainException $e) {
+
+            /* Plagscan not configured - nothing to do
+             */
+            return false;
+        }
+
+        try {
             /* @var $document Plagscan */
-            $document = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
+            $document = $plagscanMapper->findOneByColumn('plagscan_id', $documentId);
             if (!($document instanceof Plagscan)) {
                 return false;
             }
@@ -47,11 +57,12 @@ class Plagscan_ServiceController {
 
             $document->setHtml($plagscanHtml);
 
-            PlagscanMapper::getInstance()->save($document);
+            $plagscanMapper->save($document);
         }
         catch (Schoolbox\Mapper\Exception $e) {
             return false;
         }
+
         return true;
     }
 

@@ -19,22 +19,22 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
-$opts = getopt('', ['re-retrieve']);
-$reRetrieveMode = isset($opts['re-retrieve']);
+try {
+    $mapper = PlagscanMapper::getInstance();
+}
+catch (\DomainException $e) {
+    $log->warning("Plagscan scan not run, as Plagscan is not configured");
 
-//
-// Hit the Plagscan API for each document.
-$key      = Config::get('plagscan_api_key');
-$username = Config::get('plagscan_username');
-if (empty($username) || empty($key)) {
-	$log->warning("Plagscan scan not run, as Plagscan is not configured");
-	exit;
+    /* Plagscan not configured - nothing to do
+     */
+    exit();
 }
 
 $log->info("Plagscan scan started");
 
-// Get documents
-$mapper = PlagscanMapper::getInstance();
+$opts = getopt('', ['re-retrieve']);
+$reRetrieveMode = isset($opts['re-retrieve']);
+
 if ($reRetrieveMode) {
     $log->info("Scanner running in re-retrieve mode");
     $docs = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
@@ -43,7 +43,8 @@ if ($reRetrieveMode) {
     $docs = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-
+// Hit the Plagscan API for each document.
+// Get documents
 $gateway      = new PlagscanGateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
@@ -70,7 +71,7 @@ foreach ($docs as $doc) {
         if ((string)$stats->MSG === 'ERR') {
             if (!$reRetrieveMode) {
                 $doc->setStatus(Plagscan::STATUS_UNSCANNABLE);
-                PlagscanMapper::getInstance()->save($doc);
+                $mapper->save($doc);
             }
             $log->error("Document unscannable: ". print_r( $stats, true ));
             continue;
@@ -90,7 +91,7 @@ foreach ($docs as $doc) {
                     PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE
                 )
             );
-            PlagscanMapper::getInstance()->save($doc);
+            $mapper->save($doc);
             $updated_docs++;
             $log->info("Retrieved scan status for $doc_id");
         } else {
