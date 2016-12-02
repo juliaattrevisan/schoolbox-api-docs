@@ -156,6 +156,12 @@ class Controller extends Base
      */
     private function deployCallback($post, $id) {
 
+        if ($post['dryRun'] == '1') {
+            $this->log('Starting dry run.', $id);
+        } else {
+            $this->log('Starting import.', $id);
+        }
+
         // Load source user
         try {
             $user = $this->userMapper->findById($post['sourceUserId']);
@@ -276,7 +282,7 @@ class Controller extends Base
 
                             // If this is a dry run, skip the import step
 
-                            if (false) {
+                            if ($post['dryRun'] == '1') {
                                 $this->log('Would have imported page "' . $page->getPageTitle() . '".', $id);
                                 continue;
                             } else {
