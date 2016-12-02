@@ -61,38 +61,26 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	/**
 	 * Save a Plagscan payload into db
 	 *
-	 * @param Plagscan $plagscanPayload
-	 * @return array
+	 * @param \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model $file
+	 * @return array|null
 	 */
-	public function save($plagscanPayload)
+	public function saveNewPlagscan(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Model $file)
 	{
-		/* Find out if the Plagscan record already exists
+		/* No existing Plagscan found for $dirtyDocument
+		 * Spawn new and ship it to Plagscan Gateway
 		 */
-		$existingId = null;
+		$documentId = $this->gateway->submit($file);
 
-		/** @var Plagscan $plagscanPayload */
-		try {
-			$existingPlagscan = $this->findById($plagscanPayload->getId());
-		}
-		catch (\Schoolbox\Mapper\Exception $e) {
+		if (!empty($documentId)) {
+			$this->gateway->check($documentId);
 
-			/* No existing Plagscan found for $dirtyDocument
-			 * Spawn new and ship it to Plagscan Gateway
-			 */
-			$documentId = $this->gateway->submit($plagscanPayload->getFile());
-
-			if (!empty($documentId)) {
-				$this->gateway->check($documentId);
-
-				$plagscanPayload->setPlagscanId($documentId);
-				$plagscanPayload->setStatus(Plagscan::STATUS_QUEUED);
-			}
+			$plagscanPayload = $this->createModel();
+			$plagscanPayload->setPlagscanId($documentId);
+			$plagscanPayload->setStatus(Plagscan::STATUS_QUEUED);
 
 			return parent::save($plagscanPayload);
 		}
 
-		/* Don't need to save anything else if it already exists
-		 */
 		return null;
 	}
 }

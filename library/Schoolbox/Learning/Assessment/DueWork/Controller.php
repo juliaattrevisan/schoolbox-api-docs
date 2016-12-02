@@ -370,12 +370,11 @@ class Controller extends Assessment\Controller
 
 
         /* Send each file in the Submission to Plagscan
+         * if the Submission was saved successfully
          */
         if ($response->getId()) {
-            $plagMap = \Plagscan_DocumentMapper::getInstance();
-
             foreach ($response->getAllFiles() as $currentFile) {
-                $plagMap->save($plagMap->createModel()->setFile($currentFile));
+                \Plagscan_DocumentMapper::getInstance()->saveNewPlagscan($currentFile);
             }
         }
 

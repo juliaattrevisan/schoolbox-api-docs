@@ -65,15 +65,6 @@ class Plagscan
     protected $html;
 
     /**
-     * A file to upload to Plagscan for checking
-     *
-     * This class is also used as a payload to Plagscan Gateway
-     *
-     * @var SubmissionFile
-     */
-    protected $file;
-
-    /**
      * Plagscan constructor.
      */
     public function __construct()
@@ -227,24 +218,6 @@ class Plagscan
     public function setHtml($html)
     {
         $this->html = $html;
-        return $this;
-    }
-
-    /**
-     * @return Model
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * @param Model $file
-     * @return $this
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
         return $this;
     }
 }
