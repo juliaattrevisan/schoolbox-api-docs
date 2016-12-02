@@ -88,6 +88,18 @@ class TreeBuilder extends AbstractTreeBuilder
         return '/send.php?id=' . $file->getId();
     }
 
+    
+    /**
+     * Return the given folder's colour
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderColour(IFolder $folder)
+    {
+        return $folder->getColour();
+    }
+
 
     /**
      * @param int $folderId
