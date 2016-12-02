@@ -112,18 +112,18 @@
     });
 </script>
 
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
-
 <div class="small-12 island">
-    <h2 class="subheader">ePortfolio Deployment</h2>
+    <h1>ePortfolio Deployment</h1>
     <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
         <section>
             <fieldset class="content">
                 <div class="row">
                     <div class="small-12">
                         <div class="small-12 columns">
-                            <label>Source User</label>
+                            <label>
+                                Source User
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter the name of the user whose ePortfolio pages you want to copy">?</span>
+                            </label>
                             <input type="text" required id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
                         </div>
 
@@ -148,12 +148,18 @@
                 <div class="row">
                     <div class="small-12">
                         <div class="small-12 columns">
-                            <label>Target User(s)</label>
+                            <label>
+                                Target User(s)
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter the names of users you want to copy the selected ePortfolio pages to">?</span>
+                            </label>
                             <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
                         </div>
 
                         <div class="small-12 medium-6 columns">
-                            <label>Target Role(s)</label>
+                            <label>
+                                Target Role(s)
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the roles you want to copy the selected ePortfolio pages to. All users in the selected roles will receive a copy of the ePortfolio pages selected.">?</span>
+                            </label>
                             <fieldset class="checklist">
                                 {% for role in roles %}
                                     <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
@@ -162,7 +168,10 @@
                             </fieldset>
                         </div>
                         <div class="small-12 medium-6 columns">
-                            <label>Target Campus(es)</label>
+                            <label>
+                                Target Campus(es)
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the campuses you want to copy the selected ePortfolio pages to. All users in the selected campuses will receive a copy of the ePortfolio pages selected.">?</span>
+                            </label>
                             <fieldset class="checklist">
                                 {% for campus in campuses %}
                                     <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
@@ -177,7 +186,10 @@
                 <div class="row">
                     <div class="small-12">
                         <div class="small-12 columns">
-                            <label>Skip Duplicates</label>
+                            <label>
+                                Skip Duplicates
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled pages will not be copied to users if they already have a page with the same name.">?</span>
+                            </label>
                             <div class="switch round">
                                 <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
                                 <label for="skipDuplicates">
@@ -187,7 +199,10 @@
                             </div>
                         </div>
                         <div class="small-12 columns">
-                            <label>Enable ePortfolios</label>
+                            <label>
+                                Enable ePortfolios
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled users who do not have ePortfolios enabled will have the setting automatically enabled.">?</span>
+                            </label>
                             <div class="switch round">
                                 <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
                                 <label for="enableEportfolios">
@@ -197,7 +212,10 @@
                             </div>
                         </div>
                         <div class="small-12 columns">
-                            <label>Perform Dry Run</label>
+                            <label>
+                                Perform Dry Run
+                                <span class="hint has-tip tip-top" data-tooltip title="If enabled no changes will be made to the database.">?</span>
+                            </label>
                             <div class="switch round">
                                 <input id="dryRun" type="checkbox" name="dryRun" value="1" checked>
                                 <label for="dryRun">
