@@ -32,6 +32,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('plagscan_document');
         $this->hasModel(Plagscan::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('student_submission_file_id', self::TYPE_INTEGER);
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
@@ -78,11 +79,13 @@ class Mapper extends \Schoolbox\Mapper
         if (!empty($documentId)) {
             $this->gateway->check($documentId);
 
-            $plagscanPayload = $this->createModel();
-            $plagscanPayload->setPlagscanId($documentId);
-            $plagscanPayload->setStatus(Plagscan::STATUS_QUEUED);
+            /** @var Plagscan $plagscan */
+            $plagscan = $this->createModel();
+            $plagscan->setPlagscanId($documentId);
+            $plagscan->setStatus(Plagscan::STATUS_QUEUED);
+            $plagscan->setStudentSubmissionFileId($file->getId());
 
-            return parent::save($plagscanPayload);
+            return parent::save($plagscan);
         }
 
         return null;

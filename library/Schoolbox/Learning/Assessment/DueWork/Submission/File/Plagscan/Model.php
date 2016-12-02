@@ -64,11 +64,9 @@ class Model
     protected $html;
 
     /**
-     * Plagscan constructor.
+     * @var
      */
-    public function __construct()
-    {
-    }
+    protected $studentSubmissionFileId;
 
     /**
      * Figure out the url to the plagscan report
@@ -217,6 +215,24 @@ class Model
     public function setHtml($html)
     {
         $this->html = $html;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStudentSubmissionFileId()
+    {
+        return $this->studentSubmissionFileId;
+    }
+
+    /**
+     * @param mixed $studentSubmissionFileId
+     * @return $this
+     */
+    public function setStudentSubmissionFileId($studentSubmissionFileId)
+    {
+        $this->studentSubmissionFileId = $studentSubmissionFileId;
         return $this;
     }
 }
