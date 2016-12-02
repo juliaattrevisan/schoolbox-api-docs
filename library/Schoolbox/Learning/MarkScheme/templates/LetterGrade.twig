@@ -6,7 +6,7 @@
         <select name="mark" tabindex="{{ tabIndex.mark }}">
 
             {# Empty state #}
-            <option value="" {% if mark.humanReadable is null %}selected{% endif %}>(no grade)</option>
+            <option value="" disabled {% if mark.humanReadable is null %}selected{% endif %}>(no grade)</option>
 
             {# Grade levels #}
             <optgroup label="Grades">
