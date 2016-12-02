@@ -20,7 +20,7 @@
 
             var $element = $(this);
             var $courseImpl = $element.closest('[data-course-impl]');
-            var name = $courseImpl.attr('data-course-name');
+            var name = $courseImpl.find('[data-course-impl-name]').html();
 
             $element.confirmDialog({
                 header: 'Confirm Import Deletion of ' + name,
@@ -65,14 +65,19 @@
             event.preventDefault();
             var $restoreButton = $(this);
             var $courseImpl = $restoreButton.closest('[data-course-impl]');
-            var name = $courseImpl.attr('data-course-name');
+            var $icon = $courseImpl.find('[data-course-impl-icon]');
+            var $name = $courseImpl.find('[data-course-impl-name]');
             var $restoreFeedback = $('[data-relation="save-label"]');
 
             $restoreFeedback.toastActivate({text: 'Restoring Component...'});
-            $.post($restoreButton[0].href, function(responseText) {
-                if ('success' == responseText.result) {
+            $.post($restoreButton[0].href, function(data) {
+                if ('success' == data.result) {
                     $restoreFeedback.toastTimeout({text: 'Component Restored!', css: 'success'});
                     $restoreButton.remove();
+                    $icon.removeClass('icon-archive').addClass('icon-course');
+                    $name.removeClass('del');
+                    data.componentName = 'Course Outline'; // TODO get this from server as default component name
+                    $name.html($name.html() + ' <span class="meta">('+data.componentName+')</span>');
                 }
                 else {
                     $restoreFeedback.toastTimeout({text: 'Restoration Failed!', css: 'alert'});
@@ -103,16 +108,20 @@
             </nav>
         </div>
 
-        {% if courseImpls|length %}
+        {% if courseImpls | length %}
         <section>
             <ul class="action-list" id="course_list">
                 {% for currentCourse in courseImpls %}
-                <li class="actions-small-2" data-course-impl="{{ currentCourse.id }}" data-course-name="{{ currentCourse.specification.folder.name }}">
+                <li class="actions-small-2" data-course-impl="{{ currentCourse.id }}">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/homepage/{{ currentCourse.specification.folder.id }}">
                                 <h3>
-                                    <span class="icon-course"></span>{{ currentCourse.specification.folder.name }}
+                                    {% if not componentCounts[currentCourse.id] %}
+                                        <span class="icon-archive" data-course-impl-icon></span> <span class="del" data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                    {% else %}
+                                        <span class="icon-course" data-course-impl-icon></span> <span data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                    {% endif %}
                                 </h3>
                             </a>
                         </div>
