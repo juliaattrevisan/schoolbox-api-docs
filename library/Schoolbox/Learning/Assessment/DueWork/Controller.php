@@ -278,8 +278,6 @@ class Controller extends Assessment\Controller
             if ($rq->isXhr()) {
                 $result['success'] = false;
                 $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-                // Probably don't need id
-//                $result['id']      = 72;
 
                 $rs->status->setCode(403);
                 $rs->content->set($this->buildJsonOutput($result));
