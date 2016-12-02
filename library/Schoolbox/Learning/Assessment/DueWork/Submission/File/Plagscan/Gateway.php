@@ -27,18 +27,24 @@ class Gateway
     const MODE_RETRIEVE_STATISTICS_ONLY = 0;
 
     const MODE_RETRIEVE_PLAINTEXT = 1;
-    const MODE_RETRIEVE_XML       = 2;
-    const MODE_RETRIEVE_DOCX      = 3;
+    const MODE_RETRIEVE_XML = 2;
+    const MODE_RETRIEVE_DOCX = 3;
 
-    const MODE_RETRIEVE_HTML_ANNOTATED   = 4;
-    const MODE_RETRIEVE_HTML_SOURCES     = 5;
+    const MODE_RETRIEVE_HTML_ANNOTATED = 4;
+    const MODE_RETRIEVE_HTML_SOURCES = 5;
     const MODE_RETRIEVE_HTML_INTERACTIVE = 6;
 
     const MODE_RETRIEVE_PDF_ANNOTATED = 8;
-    const MODE_RETRIEVE_PDF_SOURCES   = 9;
+    const MODE_RETRIEVE_PDF_SOURCES = 9;
 
+    /**
+     * @var string
+     */
     private $username;
 
+    /**
+     * @var string
+     */
     private $apiKey;
 
     private $errorCode;
@@ -47,22 +53,16 @@ class Gateway
 
     private $response;
 
+    /**
+     * Gateway constructor.
+     * @param $username
+     * @param $apiKey
+     */
     public function __construct($username, $apiKey)
     {
-        $this->username = $username;
-        $this->apiKey   = $apiKey;
+        $this->setUsername($username);
+        $this->setApiKey($apiKey);
     }
-
-    public function getErrorCode()
-    {
-        return $this->errorCode;
-    }
-
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
-    }
-
 
     /**
      * @param SubmissionFile $submissionFile
@@ -78,7 +78,6 @@ class Gateway
 
         return $this->postForToken($documentName, $documentData);
     }
-
 
     /**
      * POSTs the given filedata to Plagscan, and returns the ID assigned
@@ -145,21 +144,23 @@ class Gateway
             if ($retrieveMode == self::MODE_RETRIEVE_PLAINTEXT) {
                 // plaintext
                 return $this->parsePlainResponse($this->response);
-            } elseif ($retrieveMode < self::MODE_RETRIEVE_DOCX) {
+            }
+            elseif ($retrieveMode < self::MODE_RETRIEVE_DOCX) {
                 // xml
                 return $this->parseXmlResponse($this->response);
-            } elseif ($retrieveMode == self::MODE_RETRIEVE_DOCX
-                || $retrieveMode > self::MODE_RETRIEVE_HTML_INTERACTIVE
-            ) {
+            }
+            elseif ($retrieveMode == self::MODE_RETRIEVE_DOCX || $retrieveMode > self::MODE_RETRIEVE_HTML_INTERACTIVE) {
                 // file download
                 return $this->parseFileResponse($this->response);
-            } else {
+            }
+            else {
                 // html
                 return $this->parseHtmlResponse($this->response);
             }
-        } else {
-            return false;
         }
+
+        echo 'e';
+        return false;
     }
 
     public function check($documentId)
@@ -308,5 +309,98 @@ class Gateway
     {
         list($header, $content) = explode("\r\n\r\n", $response, 2);
         return $content;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return string
+     */
+    private function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     * @return $this
+     */
+    private function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    private function getApiKey()
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * @param string $apiKey
+     * @return $this
+     */
+    private function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param mixed $response
+     * @return $this
+     */
+    private function setResponse($response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * @param mixed $errorCode
+     * @return $this
+     */
+    private function setErrorCode($errorCode)
+    {
+        $this->errorCode = $errorCode;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * @param mixed $errorMessage
+     * @return $this
+     */
+    private function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+        return $this;
     }
 }
