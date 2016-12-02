@@ -208,11 +208,15 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * This unit is open if the current date is after the open date, and before
      * the due date.
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isOpen()
+    public function isOpen(Alaress_Date_Format $now)
     {
-        return !($this->isBeforeOpenDate() || $this->isAfterDueDate());
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+        return !($this->isBeforeOpenDate($now) || $this->isAfterDueDate($now));
     }
 
     /**
