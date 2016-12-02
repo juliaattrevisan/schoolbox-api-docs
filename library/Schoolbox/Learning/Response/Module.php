@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
@@ -27,6 +26,7 @@ use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
 
 class Module extends BaseModule
@@ -64,13 +64,14 @@ class Module extends BaseModule
                  */
                 '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocView',
 
+                /* View a Response File's plagscan report
+                 */
+                '/responses/plagscan/{plagscanId}'                                           => 'getPlagscanReport',
+
                 /* View a Response in the Inline Grader
                  */
                 '/responses/{assessmentId}/{studentId}{/responseId}'                         => 'getParticularResponse',
 
-                /* View a Response File's plagscan report
-                 */
-                '/responses/plagscan/{plagscanId}'                                           => 'getPlagscanReport',
             ],
             'POST' => []
         ];
@@ -217,11 +218,11 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getPlagscanReport)', function ($params) {
+        $this->addRoutePreload($matcher, 'getPlagscanReport', function ($params) {
 
             /* @var Plagscan $document */
             try {
-                $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+                $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
             }
             catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
