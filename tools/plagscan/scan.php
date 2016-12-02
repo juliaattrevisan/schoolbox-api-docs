@@ -55,6 +55,7 @@ $numUpdated = 0;
 /** @var Plagscan $currentDocument */
 foreach ($allDocuments as $currentDocument) {
 
+
     /* Sometimes plagscan gives you back -1 as the plagscan_id
      * In this case, just skip it, so the daemon doesn't get
      * stuck trying to process the unprocessable
@@ -91,7 +92,7 @@ foreach ($allDocuments as $currentDocument) {
             }
 
             $currentDocument->setHtml($mapper->getGateway()->retrieve(
-                $currentDocument->getId(),
+                $currentDocument->getPlagscanId(),
                 PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE
             ));
 
