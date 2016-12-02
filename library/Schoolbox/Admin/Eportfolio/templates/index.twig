@@ -4,6 +4,8 @@
 <script type="text/javascript">
     $(function () {
 
+        var pages = $('[data-pages]');
+        var sourceEmpty = $('#source-empty');
         var previousUser = null;
 
         $('#sourceUserId').selectizeSelector({
@@ -14,42 +16,40 @@
                 dataType: 'json'
             }
         }).on('selectize.item_add', function (e, value) {
+
             {# Retrieve pages for the selected user #}
 
             if (previousUser != value) {
                 previousUser = value;
 
                 $.get('{{ routeLookup('adminEportfolio.getUserPages', {userId: 'userId'}) }}'.replace(/userId/g, value))
-                        .done(function (data) {
+                    .done(function (data) {
 
-                            {# Blow away any existing old checkboxes#}
+                        {# Blow away any existing old checkboxes#}
 
-                            $('[data-pages]').html('');
+                        pages.html('');
 
-                            if (data.pages.length > 0) {
-                                {# Clone a checkbox for each page#}
+                        if (data.pages.length > 0) {
+                            {# Clone a checkbox for each page#}
 
-                                for (var i = 0; i < data.pages.length; i++) {
-                                    var pageCurrent = data.pages[i];
-                                    $('[data-pages]').append(
-                                            $('[data-clone-page]').html()
-                                                    .replace(/pageId/g, pageCurrent.pageId)
-                                                    .replace(/pageTitle/g, pageCurrent.pageTitle)
-                                    );
-                                }
-                                $('#source-empty').hide();
-                                $('[data-pages]').show();
-                            } else {
-                                $('#source-empty').show();
-                                $('[data-pages]').hide();
+                            for (var i = 0; i < data.pages.length; i++) {
+                                var pageCurrent = data.pages[i];
+                                pages.append(
+                                        $('[data-clone-page]').html()
+                                                .replace(/pageId/g, pageCurrent.pageId)
+                                                .replace(/pageTitle/g, pageCurrent.pageTitle)
+                                );
                             }
-                        })
-                        .fail(function (data) {
-
-                        });
+                            sourceEmpty.hide();
+                            pages.show();
+                        } else {
+                            sourceEmpty.show();
+                            pages.hide();
+                        }
+                    })
             }
         }).on('selectize.item_remove', function () {
-            $('[data-pages]').html('');
+            pages.html('');
             $('#source-empty').show();
             $('[data-pages]').hide();
             previousUser = null;
