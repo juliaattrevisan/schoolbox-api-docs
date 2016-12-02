@@ -45,8 +45,9 @@ if ($reRetrieveMode) {
 
 // Hit the Plagscan API for each document.
 // Get documents
-$gateway      = new PlagscanGateway($username, $key);
+$gateway      = $mapper->getGateway();
 $updated_docs = 0;
+
 foreach ($docs as $doc) {
 
 	/** @var Plagscan $doc */
