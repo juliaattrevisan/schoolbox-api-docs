@@ -23,66 +23,8 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	 */
 	private $gateway;
 
-	/**
-	 * Hook method
-	 */
-	protected function setup()
-    {
-		parent::setup();
 
-		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
-		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
-		/* If plagscan credentials exist, set up all the other stuff
-		 */
-		if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
-			$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
-		}
-		else {
 
-			/* Otherwise die magnificently
-			 */
-			throw new \DomainException('Plagscan credentials are not specified.');
-		}
-	}
 
-	/**
-	 * Mapping.
-	 */
-	protected function mapping () {
-		$this->hasTable('plagscan_document');
-		$this->hasModel(Plagscan::class);
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('plagscan_id', self::TYPE_INTEGER);
-        $this->uses('status', self::TYPE_INTEGER);
-        $this->uses('score', self::TYPE_STRING);
-        $this->uses('html', self::TYPE_STRING);
-        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
-	}
-
-	/**
-	 * Save a Plagscan payload into db
-	 *
-	 * @param SubmissionFile $file
-	 * @return array|null
-	 */
-	public function saveNewPlagscan(SubmissionFile $file)
-	{
-		/* No existing Plagscan found for $dirtyDocument
-		 * Spawn new and ship it to Plagscan Gateway
-		 */
-		$documentId = $this->gateway->submit($file);
-
-		if (!empty($documentId)) {
-			$this->gateway->check($documentId);
-
-			$plagscanPayload = $this->createModel();
-			$plagscanPayload->setPlagscanId($documentId);
-			$plagscanPayload->setStatus(Plagscan::STATUS_QUEUED);
-
-			return parent::save($plagscanPayload);
-		}
-
-		return null;
-	}
 }

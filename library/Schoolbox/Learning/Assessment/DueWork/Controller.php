@@ -31,6 +31,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
 class Controller extends Assessment\Controller
 {
@@ -374,7 +375,7 @@ class Controller extends Assessment\Controller
          */
         if ($response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
-                \Plagscan_DocumentMapper::getInstance()->saveNewPlagscan($currentFile);
+                PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
             }
         }
 

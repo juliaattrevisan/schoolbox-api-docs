@@ -26,7 +26,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
 
 class Module extends BaseModule

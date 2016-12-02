@@ -8,12 +8,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
+namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 
-class Plagscan
+class Model
 {
     use DeletedAtDate;
 
