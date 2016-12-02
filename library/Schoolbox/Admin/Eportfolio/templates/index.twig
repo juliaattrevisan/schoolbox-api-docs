@@ -64,6 +64,51 @@
             },
             multiple: true
         });
+
+        jQuery.validator.addMethod("pageSelected", function () {
+            if ($('#sourceUserId').val() === '') {
+                return true;
+            }
+            return ($('[data-checkbox-page]:checked').length > 1);
+        }, jQuery.validator.format("You must select at least one page before you can proceed"));
+
+
+        jQuery.validator.addMethod("destinationSelected", function () {
+            return (
+                $('[data-campus]:checked').length > 0 ||
+                $('[data-role]:checked').length > 0 ||
+                $('#destinationUserId').val() !== ''
+            )
+        }, jQuery.validator.format("You must select at least one target user, role or campus before you can proceed"));
+
+
+        $('#form').alaressValidate({
+            rules: {
+                'sourceUserId': {
+                    'required': true
+                },
+                'destinationUserId': {
+                    'destinationSelected': true
+                },
+                'page[]': {
+                    'pageSelected': true
+                }
+            },
+            messages: {
+                'sourceUserId': {
+                    'required': 'You must specify a source user before you can proceed'
+                }
+            },
+             errorPlacement: function(error, element) {
+                if ($(element).attr('name') == 'page[]') {
+                    error.appendTo($('#errorPage'));
+                }
+                else {
+                    $.alaressValidate.defaultErrorPlacement(error, element);
+                }
+             }
+        })
+
     });
 </script>
 
@@ -72,72 +117,85 @@
 
 <div class="small-12 island">
     <h2 class="subheader">ePortfolio Deployment</h2>
-    <form action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
+    <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
         <section>
             <fieldset class="content">
-                <div class="small-12">
-                    <div class="small-12 columns">
-                        <label>Source User</label>
-                        <input type="text" id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
-                    </div>
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>Source User</label>
+                            <input type="text" required id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
+                        </div>
 
-                    <div class="small-12 columns">
-                        <label>Select Page(s) To Copy</label>
-                        <fieldset class="checklist" data-pages style="display: none;"></fieldset>
+                        <div class="small-12 columns">
+                            <label>Select Page(s) To Copy</label>
+                            <span id="errorPage"></span>
+                            <fieldset class="checklist" data-pages style="display: none;"></fieldset>
 
-                        <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
+                            <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
 
-                        <div class="hide">
-                            <div data-clone-page>
-                                <input data-checkbox id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
-                                <label for="checkbox-pageId">pageTitle</label>
+                            <div class="hide">
+                                <div data-clone-page>
+                                    <input data-checkbox-page id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
+                                    <label for="checkbox-pageId">pageTitle</label>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </fieldset>
+            <fieldset class="content">
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>Target User(s)</label>
+                            <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
+                        </div>
 
-                    <div class="small-12 columns">
-                        <label>Target User(s)</label>
-                        <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
-                    </div>
-
-                    <div class="small-12 medium-6 columns">
-                        <label>Target Role(s)</label>
-                        <fieldset class="checklist">
-                            {% for role in roles %}
-                                <input id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
-                                <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
-                            {% endfor %}
-                        </fieldset>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <label>Target Campus(es)</label>
-                        <fieldset class="checklist">
-                            {% for campus in campuses %}
-                                <input id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
-                                <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
-                            {% endfor %}
-                        </fieldset>
-                    </div>
-
-                    <div class="small-12 medium-6 columns">
-                        <label>Skip Duplicates</label>
-                        <div class="switch round">
-                            <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
-                            <label for="skipDuplicates">
-                                <span>Yes</span>
-                                <span>No</span>
-                            </label>
+                        <div class="small-12 medium-6 columns">
+                            <label>Target Role(s)</label>
+                            <fieldset class="checklist">
+                                {% for role in roles %}
+                                    <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
+                                    <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                                {% endfor %}
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <label>Target Campus(es)</label>
+                            <fieldset class="checklist">
+                                {% for campus in campuses %}
+                                    <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
+                                    <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                                {% endfor %}
+                            </fieldset>
                         </div>
                     </div>
+                </div>
+            </fieldset>
+            <fieldset class="content">
+                <div class="row">
+                    <div class="small-12">
+                        <div class="small-12 columns">
+                            <label>Skip Duplicates</label>
+                            <div class="switch round">
+                                <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
+                                <label for="skipDuplicates">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
 
-                    <div class="small-12 medium-6 columns">
-                        <label>Enable ePortfolios</label>
-                        <div class="switch round">
-                            <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
-                            <label for="enableEportfolios">
-                                <span>Yes</span>
-                                <span>No</span>
-                            </label>
+                        <div class="small-12 columns">
+                            <label>Enable ePortfolios</label>
+                            <div class="switch round">
+                                <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
+                                <label for="enableEportfolios">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
