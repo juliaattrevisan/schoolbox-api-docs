@@ -59,7 +59,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		/** @var Article $article */
 		$article = $bundle->getEvent()->getObject();
 
-		$publishDate = $article->getPublishDate()->getUnixTimestamp();
+		$publishDate = $article->getPublishDate()->getUnixTimeStamp();
 
 		switch ($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE:
