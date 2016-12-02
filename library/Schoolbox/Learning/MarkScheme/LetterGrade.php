@@ -89,13 +89,6 @@ class LetterGrade extends AbstractMarkScheme
      */
     public function getGradeGroup()
     {
-        /* This should never really be the case, but if you try
-         * to operate on nonexistent gradelevels, die magnificently
-         */
-        if (!$this->gradeGroup->getGradeLevels()->count()) {
-            throw new \UnderflowException('No grade levels found');
-        }
-
         return $this->gradeGroup;
     }
 
