@@ -358,37 +358,38 @@ class Controller extends Assessment\Controller
 
         /* Send it off to plagscan after finishing up in this method
          */
-        $this->getResponse()->content->set([
-            'postOutput' => [
-                function() use ($isFinal, $response) {
 
-                    /* Send each file in the Submission to Plagscan
-                     * if the Submission was saved successfully
-                     *
-                     * Only plagscan when actually submitting final
-                     */
-                    $i = 40;
+        try {
+            $plagscanMapper = PlagscanMapper::getInstance();
 
-                    if ($isFinal && $response->getId()) {
-                        foreach ($response->getAllFiles() as $currentFile) {
+            $this->getResponse()->content->set([
+                'postOutput' => [
+                    function() use ($plagscanMapper, $isFinal, $response) {
 
-                            /* TODO: Dirty hack because $currentFile has no primary key value atm
-                             */
-                            $currentFile->setId($i++);
+                        /* Send each file in the Submission to Plagscan
+                         * if the Submission was saved successfully
+                         *
+                         * Only plagscan when actually submitting final
+                         *
+                         * TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
+                         * TODO: Rip it back out like Pacific Rim
+                         */
+                        $response = $this->getDueWorkResponseMapper()->findById($response->getId());
 
-                            try {
-                                PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
-                            }
-                            catch (\DomainException $e) {
-
-                                /* noop - plagscan not configured
-                                 */
+                        if ($isFinal && $response->getId()) {
+                            foreach ($response->getAllFiles() as $currentFile) {
+                                $plagscanMapper->saveNewPlagscan($currentFile);
                             }
                         }
                     }
-                }
-            ],
-        ]);
+                ],
+            ]);
+        }
+        catch (\DomainException $e) {
+
+            /* noop - plagscan not configured
+             */
+        }
 
         /* Saving drafts from the wizzywig
          */
