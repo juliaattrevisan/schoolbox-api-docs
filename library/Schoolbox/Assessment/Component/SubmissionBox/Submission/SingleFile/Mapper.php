@@ -14,7 +14,8 @@ use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\File\Mimetype as Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -40,7 +41,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joinsReverse('student_submission_file_id', \Plagscan_DocumentMapper::class, 'id', null, null, 'plagscan', 'plagscan');
+        $this->joinsReverse('student_submission_file_id', PlagscanMapper::class, 'id', null, null, 'plagscan', 'plagscan');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));

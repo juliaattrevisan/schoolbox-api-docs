@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
