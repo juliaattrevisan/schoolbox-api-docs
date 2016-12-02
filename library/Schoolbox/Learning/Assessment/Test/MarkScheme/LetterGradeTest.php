@@ -12,13 +12,13 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use \RangeException;
-use \DomainException;
+use \InvalidArgumentException;
 
 class LetterGradeTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @expectedException DomainException
+     * @expectedException InvalidArgumentException
      */
     public function test_Unknown_Caption()
     {

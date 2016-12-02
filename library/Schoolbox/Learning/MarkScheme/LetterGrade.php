@@ -66,7 +66,7 @@ class LetterGrade extends AbstractMarkScheme
      *
      * @param string         $humanReadableMark eg 'Excellent'
      * @param IResponse|null $response
-     * @throws DomainException if unable to locate corresponding GradeLevel
+     * @throws InvalidArgumentException if unable to locate corresponding GradeLevel
      * @return float
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
@@ -78,7 +78,7 @@ class LetterGrade extends AbstractMarkScheme
         }
 
         $gradeGroup = $this->getGradeGroup()->getName();
-        throw new DomainException("No GradeLevel found. GradeGroup: $gradeGroup, GradeLevel: '.$humanReadableMark");
+        throw new InvalidArgumentException("No GradeLevel found. GradeGroup: $gradeGroup, GradeLevel: '.$humanReadableMark");
     }
 
     /* Getters / Setters
