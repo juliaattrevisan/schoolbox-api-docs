@@ -135,7 +135,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     protected $max_mark;
 
     /**
-     * @var MarkType
+     * @var int
      */
     protected $mark_type;
 
@@ -896,4 +896,13 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         $this->submissions->replaceWith($submissions);
         return $this;
     }
+
+    /**
+     * @return Assessment ID
+     */
+    public function getAssessmentId()
+    {
+        return $this->getAssessmentModel()->getId();
+    }
+
 }
