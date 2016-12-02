@@ -603,7 +603,7 @@ class Controller extends Base\Base
             ]));
         } else {
             // respond to synchronous POST with redirect
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.modify', [ $courseSpec->getId() ]));
+            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList', [ $courseSpec->getId() ]));
         }
     }
 

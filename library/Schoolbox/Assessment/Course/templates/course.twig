@@ -129,12 +129,12 @@ Usage:
         });
 
         // 'Save Course' Button
-        $mageSaveCourseButton.mage({
+       /* $mageSaveCourseButton.mage({
             submittable: '#main-course',
             onXhrDone: function () {
                 window.location = '{{ routeLookup('course.courseList') }}';
             }
-        });
+        });*/
 
         // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
@@ -173,7 +173,7 @@ Usage:
 </div>
 <div class="row">
     <div class="small-12 island" id="main-course">
-        <form action="post">
+        <form method="post" action="{{ routeLookup('course.updateCourse', {id: courseSpec.id}) }}">
             <section>
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
