@@ -210,7 +210,8 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      *
      * @return bool
      */
-    public function isOpen() {
+    public function isOpen()
+    {
         return !($this->isBeforeOpenDate() || $this->isAfterDueDate());
     }
 
@@ -220,8 +221,9 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isBeforeOpenDate(Alaress_Date_Format $now = null) {
-        if(!$now instanceof Alaress_Date_Format){
+    public function isBeforeOpenDate(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();
         }
         return $now->compareDateOnly($this->getOpenDate()) < 0;
@@ -233,8 +235,9 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isAfterDueDate(Alaress_Date_Format $now = null) {
-        if(!$now instanceof Alaress_Date_Format){
+    public function isAfterDueDate(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();
         }
         return $now->compareDateOnly($this->getDueDate()) > 0;
@@ -247,7 +250,8 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      *
      * @return Alaress_Date_Format
      */
-    public function getRelativeOpenDate() {
+    public function getRelativeOpenDate()
+    {
         $date = clone $this->getOpenDate()->getDateTimeObject();
         $date->modify('00:00:00');
         return new Alaress_Date_Format($date);
@@ -260,7 +264,8 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      *
      * @return Alaress_Date_Format
      */
-    public function getRelativeDueDate() {
+    public function getRelativeDueDate()
+    {
         $date = clone $this->getDueDate()->getDateTimeObject();
         $date->modify('23:59:59');
         return new Alaress_Date_Format($date);
