@@ -10,6 +10,9 @@
  * @link             http://www.alaress.com.au/
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -31,20 +34,21 @@ if (empty($username) || empty($key)) {
 $log->info("Plagscan scan started");
 
 // Get documents
-$mapper = Plagscan_DocumentMapper::getInstance();
+$mapper = PlagscanMapper::getInstance();
 if ($reRetrieveMode) {
     $log->info("Scanner running in re-retrieve mode");
-    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
+    $docs = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
 } else {
     $log->info("Scanner running in scan mode");
-    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
+    $docs = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-$gateway      = new Plagscan_Gateway($username, $key);
+
+$gateway      = new PlagscanGateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
 
-	/** @var Plagscan_Document $doc */
+	/** @var Plagscan $doc */
 	$doc_id = $doc->getPlagscanId();
 
     /* Sometimes plagscan gives you back -1 as the plagscan_id
@@ -55,7 +59,7 @@ foreach ($docs as $doc) {
      * than zero. I can't think of why zero would be valid.
      */
     if ($doc_id > 0) {
-        $stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
+        $stats  = $gateway->retrieve($doc_id, PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
         if (!$stats) {
             $log->error("Plagscan scan failed - check API key and username?");
             exit(2);
@@ -65,8 +69,8 @@ foreach ($docs as $doc) {
         // Is this document scannable? If not, mark as such and don't scan again.
         if ((string)$stats->MSG === 'ERR') {
             if (!$reRetrieveMode) {
-                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
-                Plagscan_DocumentMapper::getInstance()->save($doc);
+                $doc->setStatus(Plagscan::STATUS_UNSCANNABLE);
+                PlagscanMapper::getInstance()->save($doc);
             }
             $log->error("Document unscannable: ". print_r( $stats, true ));
             continue;
@@ -78,15 +82,15 @@ foreach ($docs as $doc) {
         if (strlen($level) > 0) {
             if (!$reRetrieveMode) {
                 $doc->setScore($level / 10)
-                    ->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
+                    ->setStatus(Plagscan::STATUS_COMPLETE);
             }
             $doc->setHtml(
                 $gateway->retrieve(
                     $doc_id,
-                    Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE
+                    PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE
                 )
             );
-            Plagscan_DocumentMapper::getInstance()->save($doc);
+            PlagscanMapper::getInstance()->save($doc);
             $updated_docs++;
             $log->info("Retrieved scan status for $doc_id");
         } else {

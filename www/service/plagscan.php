@@ -10,6 +10,12 @@
 
 require_once '../../library/Bootstrap.php';
 
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
+
+/* TODO wtf
+ */
 class Plagscan_ServiceController {
     private $gateway;
 
@@ -17,7 +23,7 @@ class Plagscan_ServiceController {
         $plagscanApiKey = Config::get('plagscan_api_key');
         $plagscanUsername = Config::get('plagscan_username');
 
-        $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+        $this->gateway = new PlagscanGateway($plagscanUsername, $plagscanApiKey);
     }
 
     /**
@@ -27,21 +33,21 @@ class Plagscan_ServiceController {
      */
     public function notifyComplete ($documentId) {
         try {
-            /* @var $document \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan */
-            $document = Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
-            if (!($document instanceof \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan)) {
+            /* @var $document Plagscan */
+            $document = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
+            if (!($document instanceof Plagscan)) {
                 return false;
             }
 
-            $plagscanStat = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
-            $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
+            $plagscanStat = $this->gateway->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
+            $plagscanHtml = $this->gateway->retrieve($documentId, PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 
             $document->setScore($plagscanStat->LEVEL / 10);
-            $document->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
+            $document->setStatus(Plagscan::STATUS_COMPLETE);
 
             $document->setHtml($plagscanHtml);
 
-            Plagscan_DocumentMapper::getInstance()->save($document);
+            PlagscanMapper::getInstance()->save($document);
         }
         catch (Schoolbox\Mapper\Exception $e) {
             return false;

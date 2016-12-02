@@ -10,14 +10,17 @@
  */
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
-$mapper = Plagscan_DocumentMapper::getInstance();
-$docs   = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
+$mapper = PlagscanMapper::getInstance();
+$docs   = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
 //
 // Hit the Plagscan API for each document.
@@ -30,8 +33,10 @@ if (empty($username) || empty($key)) {
 
 
 $log->info("Plagscan resubmission started processing ".$docs->count()." docs");
-$gateway      = new Plagscan_Gateway($username, $key);
+$gateway      = new PlagscanGateway($username, $key);
 
+/* TODO Repair ALL of this
+ */
 foreach ($docs as $doc) {
 
     try{
@@ -45,7 +50,7 @@ foreach ($docs as $doc) {
 
             if($response) {
                 $doc->setPlagscanId($documentId);
-                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
+                $doc->setStatus(Plagscan::STATUS_QUEUED);
                 $mapper->save($doc);
 
                 $log->info("Resubmitted document ".$doc->getId()." for processing: ".$documentId);

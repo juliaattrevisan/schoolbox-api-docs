@@ -21,7 +21,7 @@ class Mapper extends \Schoolbox\Mapper
      * An instance of the Plagscan Gateway
      * which is where files end up
      * 
-     * @var Plagscan_Gateway
+     * @var Gateway
      */
     private $gateway;
 
@@ -52,7 +52,7 @@ class Mapper extends \Schoolbox\Mapper
         /* If plagscan credentials exist, set up all the other stuff
          */
         if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
-            $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+            $this->gateway = new Gateway($plagscanUsername, $plagscanApiKey);
         }
         else {
 
@@ -92,7 +92,7 @@ class Mapper extends \Schoolbox\Mapper
      */
 
     /**
-     * @return Plagscan_Gateway
+     * @return Gateway
      */
     private function getGateway()
     {
@@ -100,7 +100,7 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param Plagscan_Gateway $gateway
+     * @param Gateway $gateway
      */
     private function setGateway($gateway)
     {

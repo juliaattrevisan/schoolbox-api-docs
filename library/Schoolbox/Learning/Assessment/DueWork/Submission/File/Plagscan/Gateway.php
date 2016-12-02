@@ -1,7 +1,4 @@
 <?php
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
@@ -10,7 +7,13 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFi
  * @version     SVN: $Id$
  *
  */
-class Plagscan_Gateway
+
+namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+
+class Gateway
 {
 
     const API_VERSION = '2.0';
@@ -69,7 +72,7 @@ class Plagscan_Gateway
     {
         $documentName = $submissionFile->getBasename();
 
-        /** @var Schoolbox\Resource\Storage\Model $file */
+        /** @var \Schoolbox\Resource\Storage\Model $file */
         $file = $submissionFile->getStorage();
         $documentData = $file->read();
 
@@ -112,7 +115,7 @@ class Plagscan_Gateway
         $this->createRequest($parameterList, array($documentParameter));
 
         $response = $this->parseXmlResponse($this->response);
-        if($response instanceof SimpleXMLElement) {
+        if($response instanceof \SimpleXMLElement) {
             return (string)$response->PID;
         }
         else {
@@ -126,7 +129,7 @@ class Plagscan_Gateway
      * @param $documentId
      * @param $retrieveMode
      *
-     * @return bool|SimpleXMLElement
+     * @return bool|\SimpleXMLElement
      */
     public function retrieve($documentId, $retrieveMode)
     {
@@ -203,7 +206,7 @@ class Plagscan_Gateway
         $boundary = '---------------------' . substr(md5(rand(0, 32000)), 0, 10);
 
         // build a proxy context (will be null if proxy isn't configured)
-        $context = Proxy\Server::getInstance()->getContext('https');
+        $context = \Proxy\Server::getInstance()->getContext('https');
         if ($socket = stream_socket_client(
             "ssl://$host:443",
             $errorCode,
@@ -278,13 +281,13 @@ class Plagscan_Gateway
             // unfortunately try-catch isn't enough here, temporarily set a custom error handler for this scenario
             set_error_handler(
                 function ($errno, $errstr, $errfile, $errline, $errcontext) {
-                    throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
+                    throw new \ErrorException($errstr, $errno, 1, $errfile, $errline);
                 }
             );
-            $sxe = new SimpleXMLElement($content);
+            $sxe = new \SimpleXMLElement($content);
             restore_error_handler();
             return $sxe;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             restore_error_handler();
             return false;
         }
