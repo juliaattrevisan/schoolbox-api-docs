@@ -1,14 +1,35 @@
 {% extends '@learningMarkScheme/commentable.twig' %}
 
 {% block grading %}
+    {% set mark = participant.mark.unpublished %}
     <label>Grade
         <select name="mark" tabindex="{{ tabIndex.mark }}">
-        {% for level in markScheme.gradeGroup.gradeLevels %}
-            {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
-            {% set selected = isGt and not found ? 'selected="selected"' : '' %}
-            {% if isGt %}{% set found = true %}{% endif %}
-            <option {{ selected }} value="{{ level.caption }}">{{ level.caption }}</option>
-        {% endfor %}
+
+            {# Empty state #}
+            <option value="" {% if mark.humanReadable is null %}selected{% endif %}>(no grade)</option>
+
+            {# Grade levels #}
+            <optgroup label="Grades">
+                {% for level in markScheme.gradeGroup.gradeLevels %}
+
+                    {% set selected = not (mark.humanReadable is null) and (mark.humanReadable == level.caption) %}
+
+                    {#{% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}#}
+                    {#{% set selected = isGt and not found ? 'selected="selected"' : '' %}#}
+                    {#{% if isGt %}{% set found = true %}{% endif %}#}
+
+                    <option {% if selected %}selected{% endif %} value="{{ level.caption }}">{{ level.caption }}</option>
+                {% endfor %}
+            </optgroup>
+
+            {# Submission states #}
+            <optgroup label="States">
+                {% for state in errors %}
+                    {% set selected = not (mark.humanReadable is null) and (mark.humanReadable == state) %}
+                    <option {% if selected %}selected{% endif %} value="{{ state }}">{{ state }}</option>
+                {% endfor %}
+            </optgroup>
+
         </select>
     </label>
 {% endblock %}
