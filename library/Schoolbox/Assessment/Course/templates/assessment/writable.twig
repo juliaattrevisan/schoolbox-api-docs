@@ -34,6 +34,6 @@ Usage:
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
         <li><a href="{{ routeLookup('learningAssessmentExporter.getExportForm', {assessmentId: task.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify">Modify</a></li>
-        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete" class="icon-delete">Delete</a></li>
+        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
     </ul>
 </li>
