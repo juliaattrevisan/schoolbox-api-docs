@@ -8,6 +8,8 @@
  */
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+
 /**
  * @method Plagscan createModel()
  */
@@ -61,10 +63,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 	/**
 	 * Save a Plagscan payload into db
 	 *
-	 * @param \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model $file
+	 * @param SubmissionFile $file
 	 * @return array|null
 	 */
-	public function saveNewPlagscan(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Model $file)
+	public function saveNewPlagscan(SubmissionFile $file)
 	{
 		/* No existing Plagscan found for $dirtyDocument
 		 * Spawn new and ship it to Plagscan Gateway
