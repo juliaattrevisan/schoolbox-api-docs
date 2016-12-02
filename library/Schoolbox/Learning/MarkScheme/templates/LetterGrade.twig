@@ -11,13 +11,7 @@
             {# Grade levels #}
             <optgroup label="Grades">
                 {% for level in markScheme.gradeGroup.gradeLevels %}
-
                     {% set selected = not (mark.humanReadable is null) and (mark.humanReadable == level.caption) %}
-
-                    {#{% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}#}
-                    {#{% set selected = isGt and not found ? 'selected="selected"' : '' %}#}
-                    {#{% if isGt %}{% set found = true %}{% endif %}#}
-
                     <option {% if selected %}selected{% endif %} value="{{ level.caption }}">{{ level.caption }}</option>
                 {% endfor %}
             </optgroup>
