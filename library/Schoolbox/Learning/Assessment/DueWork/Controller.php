@@ -372,8 +372,10 @@ class Controller extends Assessment\Controller
 
         /* Send each file in the Submission to Plagscan
          * if the Submission was saved successfully
+         *
+         * Only plagscan when actually submitting final
          */
-        if ($response->getId()) {
+        if ($isFinal && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 PlagscanMapper::getInstance()->saveNewPlagscan($currentFile);
             }
