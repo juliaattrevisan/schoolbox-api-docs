@@ -23,10 +23,12 @@
                         <i class="icon-settings"></i>
                         <p>To use LTI you must first select a provider.</p>
                         <p>
+                            {% set foundLearningField = false %}
                             {% for provider in providers %}
                                 {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
                                     {% set learningfieldProviderId = provider.id %}
                                     <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
+                                    {% set foundLearningField = true %}
                                 {% else %}
                                     <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
                                 {% endif %}
@@ -39,17 +41,19 @@
         <script>
             $(function() {
 
-                $('[data-provider-learningfield]').click(function() {
+                {% if foundLearningField %}
+                    $('[data-provider-learningfield]').click(function() {
 
-                    $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
-                        url: $('#learningfieldUrl').val()
-                    }).success(function () {
-                        $('#modal-learningfield').foundation('reveal', 'close');
-                        $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, {{ learningfieldProviderId }}));
-                        $('#lti-select-provider').remove();
-                        $('#lti-frame').show();
+                        $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
+                            url: $('#learningfieldUrl').val()
+                        }).success(function () {
+                            $('#modal-learningfield').foundation('reveal', 'close');
+                            $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, {{ learningfieldProviderId }}));
+                            $('#lti-select-provider').remove();
+                            $('#lti-frame').show();
+                        });
                     });
-                });
+                {% endif %}
 
                 $('[data-provider]').click(function() {
 
