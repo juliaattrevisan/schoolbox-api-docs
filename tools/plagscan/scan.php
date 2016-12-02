@@ -63,7 +63,7 @@ foreach ($allDocuments as $currentDocument) {
      * than zero. I can't think of why zero would be valid.
      */
     if ($currentDocument->getPlagscanId() > 0) {
-        $stats  = $mapper->getGateway()->retrieve($currentDocument->getPlagscanId(), PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
+        $stats = $mapper->getGateway()->retrieve($currentDocument->getPlagscanId(), PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
 
         if (!$stats) {
             $log->error("Plagscan failed at Gateway retrieval. Check API key and username?");

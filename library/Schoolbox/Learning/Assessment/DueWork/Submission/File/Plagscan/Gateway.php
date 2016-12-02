@@ -154,6 +154,8 @@ class Gateway
             )
         );
 
+        /* Process the list of pending plagscans
+         */
         if ($this->createRequest($parameterList)) {
             if ($retrieveMode == self::MODE_RETRIEVE_PLAINTEXT) {
                 // plaintext
@@ -210,6 +212,13 @@ class Gateway
         }
     }
 
+    /**
+     * Initiate a request to Plagscan
+     *
+     * @param $parameterList
+     * @param array $rawParameterList
+     * @return bool
+     */
     private function createRequest($parameterList, $rawParameterList = array())
     {
         $url = parse_url(self::API_URL);
@@ -221,6 +230,7 @@ class Gateway
 
         // build a proxy context (will be null if proxy isn't configured)
         $context = \Proxy\Server::getInstance()->getContext('https');
+
         if ($socket = stream_socket_client(
             "ssl://$host:443",
             $errorCode,
@@ -265,7 +275,8 @@ class Gateway
             $this->response = $response;
 
             return true;
-        } else {
+        }
+        else {
             $this->errorCode    = $errorCode;
             $this->errorMessage = $errorMessage;
 
