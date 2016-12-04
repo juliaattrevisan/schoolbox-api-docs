@@ -11,9 +11,9 @@ Vcs-Browser: https://github.com/alaress/schoolbox
 Package: schoolbox
 Architecture: all
 Depends: ${misc:Depends}
-Provides: schoolbox-mobile, schoolbox-leave, schoolbox-resource
-Replaces: schoolbox-mobile, schoolbox-leave, schoolbox-resource
-Conflicts: javascript-common, schoolbox-mobile, schoolbox-leave, schoolbox-resource
+Provides: schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
+Replaces: schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
+Conflicts: javascript-common, schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
 Description: Schoolbox LMS by Alaress Pty. Ltd.
  Schoolbox is at the leading edge of eLearning solutions for the K-12
  education market. The Schoolbox system is carefully integrated with school
@@ -22,9 +22,3 @@ Description: Schoolbox LMS by Alaress Pty. Ltd.
  accessible. Furthermore Schoolbox streamlines the education process by
  increasing staff efficiency, leaving greater time for the core purpose of
  schools - learning.
-
-Package: schoolbox-eotc
-Architecture: all
-Depends: schoolbox, ${misc:Depends}
-Description: EOTC module for the Schoolbox LMS
- Education Outside The Classroom (EOTC) module for the Schoolbox LMS
