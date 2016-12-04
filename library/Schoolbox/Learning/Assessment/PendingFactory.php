@@ -1025,7 +1025,15 @@ class PendingFactory
     /**
      * Create QuizResponses and QuizFeedbacks from DB results
      *
-     * @param array $quizResults
+     * @param string[][] $quizResults
+     * @var string[]    $quizResults[]
+     * @var int         $quizResults[]['q.assessment_id']
+     * @var int         $quizResults[]['qa.attempt_id']
+     * @var int         $quizResults[]['qa.user_id']
+     * @var string      $quizResults[]['qa.start']
+     * @var string|null $quizResults[]['qa.finish']
+     * @var string|null $quizResults[]['qa.reviewed_at']
+     * @var int         $quizResults[]['qa.first_section_id']
      */
     private function hydrateQuizResults($quizResults)
     {
@@ -1036,6 +1044,7 @@ class PendingFactory
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
+            $response->setSubmittedAt($this->getFastDateFromString($row['qa.finish']));
             $response->setFirstSectionId($row['qs.first_section_id']);
             $response->setAssessable($quiz);
             $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
@@ -1070,7 +1079,7 @@ class PendingFactory
     /**
      * Create TaskResponses and TaskFeedbacks from DB results
      *
-     * @param array $taskResults
+     * @param string[][] $taskResults
      */
     private function hydrateTaskResults($taskResults)
     {
@@ -1112,7 +1121,14 @@ class PendingFactory
     /**
      * Create DueWorkResponses from DB results
      *
-     * @param array $dueWorkResponses
+     * @param string[][] $dueWorkResponses
+     * @var string[] $dueWorkResponses[]
+     * @var int $dueWorkResponses['sb.assessment_id']
+     * @var int $dueWorkResponses['sb.mark_visibility']
+     * @var int $dueWorkResponses['ss.id']
+     * @var int $dueWorkResponses['ss.owner']
+     * @var int $dueWorkResponses['ss.submitted_at']
+     * @var int $dueWorkResponses['ss.updated_at']
      */
     private function hydrateDueWorkResponses($dueWorkResponses)
     {

@@ -100,7 +100,11 @@ interface IResponse
 
     /**
      * Get the datetime at which this response was submitted.
-     * This is NOT the creation date; it's the date at which this transitioned from "draft" to "submitted".
+     *
+     * This is the when:
+     * * DueWorkSubmission: transitioned from "draft" to "submitted"
+     * * QuizAttempt:       student finished
+     * * TaskCompletion:    creation
      *
      * @return Alaress_Date_Format
      */
