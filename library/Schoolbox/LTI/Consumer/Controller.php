@@ -88,6 +88,9 @@ class Controller extends Base
      */
     public function getLaunch($provider, $component, $folder) {
 
+        // Prevent BTTF from caching this page in its history
+        $this->getSession()->set('historySkip', 1);
+
         $launch_data = [
             'resource_link_id' => $folder->getId() . '_' . $component->getInstance()->getId(),
             'resource_link_title' => $component->getConfig('componentname'),

@@ -141,14 +141,18 @@ class Session extends BaseSession {
             $history = array();
         }
         else {
-            // Don't save history if this is the same as the most recent item in
-            // history.
-            list($mostRecent) = $history;
-            if ($value != $mostRecent && stripos($value, '/lti-consumer/') === false) {
-                array_unshift($history, $value);
+            if ($session->get('historySkip') == 1) {
+                $session->set('historySkip', 0);
+            } else {
+                // Don't save history if this is the same as the most recent item in
+                // history.
+                list($mostRecent) = $history;
+                if ($value != $mostRecent) {
+                    array_unshift($history, $value);
+                }
+                // 3 most recent only
+                $history = array_slice($history, 0, 3);
             }
-            // 3 most recent only
-            $history = array_slice($history, 0, 3);
         }
         $session->set('history', $history);
     }
