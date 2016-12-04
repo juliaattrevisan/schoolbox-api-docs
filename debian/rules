@@ -24,22 +24,6 @@ export DH_OPTIONS
 	dh $@ 
 
 override_dh_install:
-	# Fixes for --no-- deb handling of exclude
-	## EOTC Module
-	mkdir -pv $(CURDIR)/eotc
-	cp -a --parents library/Calendar/Api/Config/Connector/EOTC.php $(CURDIR)/eotc
-	rm -fR library/Calendar/Api/Config/Connector/EOTC.php
-	cp -a --parents library/Calendar/Api/EventType/Custom/EOTC $(CURDIR)/eotc
-	rm -fR library/Calendar/Api/EventType/Custom/EOTC
-	cp -a --parents library/Calendar/Event/Type/EOTC $(CURDIR)/eotc
-	rm -fR library/Calendar/Event/Type/EOTC
-	cp -a --parents library/EOTC $(CURDIR)/eotc
-	rm -fR library/EOTC
-	cp -a --parents templates/core/modules/eotc $(CURDIR)/eotc
-	rm -fR templates/core/modules/eotc
-	cp -a --parents www/modules/eotc $(CURDIR)/eotc
-	rm -fR www/modules/eotc
-	## End EOTC Module
 	# Start install
 	dh_install
 	# Remove moved files
