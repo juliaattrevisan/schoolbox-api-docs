@@ -672,7 +672,6 @@ class Controller extends Base\Base
                     $this->getUnitImplementationMapper()->save($unitImpl);
 
                     // Create/Update AssessmentImpls
-                    $sequence = 1;
                     foreach ($unitPair['a'] as $assessmentId => $aData) {
                         // Ignore unchecked items. ( If they were already imported, they were deleted above.)
                         if (!$aData['checked']) {
