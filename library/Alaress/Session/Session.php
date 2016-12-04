@@ -144,7 +144,7 @@ class Session extends BaseSession {
             // Don't save history if this is the same as the most recent item in
             // history.
             list($mostRecent) = $history;
-            if ($value != $mostRecent) {
+            if ($value != $mostRecent && stripos($value, '/lti-consumer/') === false) {
                 array_unshift($history, $value);
             }
             // 3 most recent only

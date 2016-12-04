@@ -611,13 +611,14 @@ class SitePage extends Page
         $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
-        if ($_SESSION['history'][0] != $requestUri) {
+        if ($_SESSION['history'][0] != $requestUri && stripos($requestUri, '/lti-consumer/') === false) {
             array_unshift($_SESSION['history'], $requestUri);
 
             if (count($_SESSION['history']) > 3) {
                 array_pop($_SESSION['history']);
             }
         }
+        var_dump($_SESSION['history']);
     }
 
     /**
