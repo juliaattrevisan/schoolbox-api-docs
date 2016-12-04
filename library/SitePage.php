@@ -618,7 +618,6 @@ class SitePage extends Page
                 array_pop($_SESSION['history']);
             }
         }
-        var_dump($_SESSION['history']);
     }
 
     /**
