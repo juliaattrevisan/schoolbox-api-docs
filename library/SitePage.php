@@ -608,19 +608,14 @@ class SitePage extends Page
             $_SESSION['history'] = array();
         }
 
-        if ($_SESSION["historySkip"] == 1) {
-            $_SESSION["historySkip"] = 0;
-        } else {
+        $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
-            $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
+        /* Dont handle duplicates (page refreshes) */
+        if ($_SESSION['history'][0] != $requestUri) {
+            array_unshift($_SESSION['history'], $requestUri);
 
-            /* Dont handle duplicates (page refreshes) */
-            if ($_SESSION['history'][0] != $requestUri) {
-                array_unshift($_SESSION['history'], $requestUri);
-
-                if (count($_SESSION['history']) > 3) {
-                    array_pop($_SESSION['history']);
-                }
+            if (count($_SESSION['history']) > 3) {
+                array_pop($_SESSION['history']);
             }
         }
     }
