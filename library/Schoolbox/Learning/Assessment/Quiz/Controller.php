@@ -251,7 +251,7 @@ class Controller extends Assessment\Controller
     protected function getQuizForAssessmentId($assessmentId)
     {
         /** @var Quiz $quiz */
-        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId)->first();
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
 
         if (Quiz::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);

@@ -174,7 +174,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
      *
      * On success, respond with '204 No Content' and a Location header to the list
-     * On failure, respond appropriately
+     * On failure, respond with '4XX' or '5XX' as appropriate
      *
      * @api   POST /learning/assessments/{assessmentId}/delete
      * @level 165
@@ -183,12 +183,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postDeleteAssessment(IAssessable $assessment)
     {
-        // Already deleted?
-        if ($assessment->isDeleted()) {
-            $this->getResponse()->status->setCode(204);
-        } else {
+        // If not already deleted?
+        if (!$assessment->isDeleted()) {
             $this->getAssessmentMapper()->delete($assessment);
         }
+        $this->getResponse()->status->setCode(204);
 
         $folder = $assessment->getContext()->getFolder();
         $postReturnUrl = $this->getRequest()->query[Redirect::RETURN_URL];
