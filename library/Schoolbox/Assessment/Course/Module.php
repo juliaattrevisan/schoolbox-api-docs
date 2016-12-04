@@ -95,7 +95,7 @@ class Module extends BaseModule
             } catch (MapperException\Deleted $e) {
                 return ['courseSpec' => $e->getDeletedObject()];
             } catch (MapperException $e){
-                return ['courseSpec' => $this->getCourseSpecificationMapper()->createModel()];
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         };
 
@@ -198,5 +198,13 @@ class Module extends BaseModule
     protected function getUnitSpecificationMapper()
     {
         return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
