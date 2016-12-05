@@ -72,6 +72,7 @@ foreach ($allDocuments as $currentDocument) {
                 $mapper->save($currentDocument);
 
                 $log->info("{$prefix}: set document {$currentDocument->getId()} to pending status");
+                $numUpdated++;
             }
             else {
                 $log->warning("{$prefix}: check of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
@@ -91,3 +92,12 @@ foreach ($allDocuments as $currentDocument) {
     }
 }
 
+$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+
+/* Also tell me how many died
+ */
+$numFailed = $allDocuments->count() - $numUpdated;
+
+if ($numFailed) {
+    $log->info("$numFailed documents failed scanning");
+}
