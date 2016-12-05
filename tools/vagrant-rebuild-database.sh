@@ -17,7 +17,7 @@ rm /vagrant/data/* -fR;
 
 echo "$vag Creating Schoolbox data directories";
 cd /vagrant;
-tar -xzf $cachedir/schoolboxdemo-latest.tar.gz;
+tar -xzf $cachedir/schoolboxdemo-v6.1.tar.gz;
 rm -rf /vagrant/data/cache;
 cd /vagrant/tools;
 ./create-data-dirs.sh /vagrant/data;
@@ -30,13 +30,13 @@ mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
 
 echo "$vag Generating data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> $cachedir/schoolboxdemo-vagrant-latest.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
 
 echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-vagrant-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-vagrant-v6.1.sql
 
 echo "$vag Building SQL updates";
 cd /vagrant/tools;
