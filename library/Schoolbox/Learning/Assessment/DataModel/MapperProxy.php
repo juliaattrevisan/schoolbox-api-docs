@@ -119,6 +119,25 @@ class MapperProxy
     }
 
     /**
+     * Find an assessment for the given quiz ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland quiz URLs will always have a quiz ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $quizId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByQuizId($quizId, User $student = null)
+    {
+        return $this->findSingle('q.assess_id', $quizId, true, $student);
+    }
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec
