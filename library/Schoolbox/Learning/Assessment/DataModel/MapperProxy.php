@@ -138,6 +138,44 @@ class MapperProxy
     }
 
     /**
+     * Find an assessment for the given due work ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland due work URLs will always have a due work ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $dueWorkId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByDueWorkId($dueWorkId, User $student = null)
+    {
+        return $this->findSingle('d.id', $dueWorkId, true, $student);
+    }
+
+    /**
+     * Find an assessment for the given task ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland task URLs will always have a task ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $taskId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByTaskId($taskId, User $student = null)
+    {
+        return $this->findSingle('t.id', $taskId, true, $student);
+    }
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec
