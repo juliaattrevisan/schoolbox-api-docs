@@ -971,10 +971,52 @@ class Controller extends Base\Base
             }
         }
 
+        // Traverse the ancestry of each CourseSpec's folder so we can render breadcrumbs, caching along the way
+        $folderCache = [];
+        foreach($courseImpls as $courseImpl){
+            $folder = $courseImpl->getSpecification()->getFolder();
+
+            while(true)
+            {
+                $folderId = $folder->getId();
+
+                // Have we seen this folder before?
+                if($folderCache[$folderId] instanceof Folder){
+                    break;
+                }
+                // Add to cache
+                $folderCache[$folderId] = $folder;
+
+                // Is this the root?
+                if(0 == $folderId){
+                    break;
+                }
+                $folder = $this->getFolderMapper()->findCheaplyById($folder->getParent()->getId());
+            }
+        }
+
+        // Convert our cache to linear arrays for twig
+        $folderAncestry = [];
+        foreach($courseImpls as $courseImpl){
+            $parent = $courseImpl->getSpecification()->getFolder();
+            $parent = $folderCache[$parent->getParent()->getId()];
+            $folderAncestry[$courseImpl->getId()] = [];
+            while(true){
+                $folderAncestry[$courseImpl->getId()][] = $parent;
+
+                if(0 == $parent->getId()){
+                    break;
+                }
+                $parent = $folderCache[$parent->getParent()->getId()];
+            }
+            $folderAncestry[$courseImpl->getId()] = array_reverse($folderAncestry[$courseImpl->getId()]);
+        }
+
         $this->tpl('management', [
             'folder'         => $folder,
             'courseImpls'    => $courseImpls,
             'componentNames' => $componentNames,
+            'folderAncestry' => $folderAncestry,
         ]);
     }
 

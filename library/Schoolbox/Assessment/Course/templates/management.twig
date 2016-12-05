@@ -1,9 +1,10 @@
 {#
 Usage:
     $data = [
-        folder:         Folder
-        courseImpls:    CourseImplementation[]|Collection
-        componentNames: string[][] grouped by CourseImpl.ID
+        folder:         Folder                               - The class page we are managing
+        courseImpls:    CourseImplementation[]|Collection    - All Course's imported to this class
+        componentNames: string[][]                           - CourseOutline component names, grouped by CourseImpl.ID
+        folderAncestry: Folder[][]                           - Grouped by CourseImpl.ID
     ]
 #}
 
@@ -139,13 +140,27 @@ Usage:
                             </a>
                         </div>
                         <div class="small-12 column" data-collapse-state="collapsed" data-collapsable="course-impl-{{ currentCourse.id }}" style="display: none;">
-                            <span class="meta">Imported on: {{ currentCourse.createdAt.database }}</span><br>
-                            <span class="meta">Components:</span>
-                            <ul class="" data-component-names>
-                                {% for componentName in componentNames[currentCourse.id] %}
-                                    <li>{{ componentName }}</li>
+                            <span class="meta">
+                                {% for folder in folderAncestry[currentCourse.id] %}
+                                    {{ folder.name }}{% if not loop.last and loop.length > 1 %} &raquo;{% endif %}
                                 {% endfor %}
+                            </span>
+                            <ul>
+                                <li class="meta">Imported on: {{ currentCourse.createdAt.database }}</span></li>
+                                <li class="meta">
+                                    <span class="meta">Components:</span>
+                                    <ul class="" data-component-names>
+                                        {% for componentName in componentNames[currentCourse.id] %}
+                                            <li class="meta">{{ componentName }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
                             </ul>
+
+
+
+
+
                         </div>
                     </div>
                     <nav>
