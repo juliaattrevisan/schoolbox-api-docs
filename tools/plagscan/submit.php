@@ -12,7 +12,6 @@
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -23,25 +22,25 @@ try {
     $mapper = PlagscanMapper::getInstance();
 }
 catch (\DomainException $e) {
+
     /* Plagscan not configured - nothing to do
      */
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly.");
     exit();
 }
 
+
+
+
+
+
+
+
 $docs = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
-//
-// Hit the Plagscan API for each document.
-$key      = Config::get('plagscan_api_key');
-$username = Config::get('plagscan_username');
-if (empty($username) || empty($key)) {
-    $log->warning("Plagscan scan not run, as Plagscan is not configured");
-    exit;
-}
+$log->info("Plagscan resubmission started processing {$docs->count()} docs");
 
-
-$log->info("Plagscan resubmission started processing ".$docs->count()." docs");
-$gateway      = new PlagscanGateway($username, $key);
+$gateway = $mapper->getGateway();
 
 /* TODO Repair ALL of this
  */

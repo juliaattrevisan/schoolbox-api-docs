@@ -23,10 +23,10 @@ try {
     $mapper = PlagscanMapper::getInstance();
 }
 catch (\DomainException $e) {
-    $log->warning("Plagscan scan did not run: username/api key is not configured correctly.");
 
     /* Plagscan not configured - nothing to do
      */
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly.");
     exit();
 }
 
@@ -48,13 +48,12 @@ else {
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-$log->info("Plagscan scan now starting.");
+$log->info("Plagscan now starting.");
 
 $numUpdated = 0;
 
 /** @var Plagscan $currentDocument */
 foreach ($allDocuments as $currentDocument) {
-
 
     /* Sometimes plagscan gives you back -1 as the plagscan_id
      * In this case, just skip it, so the daemon doesn't get
