@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $questionHandler = new Assess_Question();
@@ -16,6 +18,12 @@ $factory = new Assess_Factory();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler = new Group();
+
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -47,7 +55,8 @@ if (!$section) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+if (!$assessment->isParticipant($_SESSION['user'])) {
     error(19);
 }
 
