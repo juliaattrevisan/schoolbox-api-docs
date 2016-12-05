@@ -1472,6 +1472,28 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * Generates a custom query
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return Collection
+     */
+    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
+    }
+
+    /**
+     * Create a PredicateBuilder for this Mapper's table.
+     *
+     * @return PredicateBuilder
+     */
+    public function createPredicateBuilder()
+    {
+        return new PredicateBuilder($this->getDatabase(), $this->getTable());
+    }
+
+    /**
      * @param string           $select
      * @param string           $from
      * @param PredicateBuilder $predicate
