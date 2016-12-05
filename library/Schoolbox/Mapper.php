@@ -2731,10 +2731,10 @@ abstract class Mapper implements IMapper, Serializable
                 return "$column IS NULL";
             }
             if ($value === false) {
-                return "$column IS FALSE";
+                return "$column = FALSE";
             }
             if ($value === true) {
-                return "$column IS TRUE";
+                return "$column = TRUE";
             }
             return "$column = " . $this->database->quote($value);
         }
