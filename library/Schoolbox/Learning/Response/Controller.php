@@ -303,12 +303,18 @@ class Controller extends Base
      *
      * @param Plagscan $plagscan
      * @param IAssessable $assessment
+     * @param \Schoolbox\User $creator
+     * @param int $responseId
      */
-    public function getPlagscanReport(Plagscan $plagscan, IAssessable $assessment)
+    public function getPlagscanReport(Plagscan $plagscan, IAssessable $assessment, \Schoolbox\User $creator, $responseId)
     {
         $data = [
             'plagscan' => $plagscan,
             'assessment' => $assessment,
+            'creator' => $creator,
+            'response' => [
+                'id' => $responseId,
+            ]
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));

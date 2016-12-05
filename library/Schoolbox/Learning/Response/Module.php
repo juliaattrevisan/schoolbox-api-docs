@@ -252,6 +252,8 @@ class Module extends BaseModule
             return [
                 'plagscan' => $plagscanDocument,
                 'assessment' => $assessment,
+                'creator' => $submission->getOwner(),
+                'responseId' => $submission->getId(),
             ];
         });
 
