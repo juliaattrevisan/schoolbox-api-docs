@@ -694,7 +694,13 @@ class Controller extends Base\Base
                             // TODO need to implement __clone() on DueWork to clone Rubric correctly
                             // TODO unify unit implementation data and domain model so this shenanigan isn't required
                             $assessmentImpl->setContext(
-                                (new Course\Unit\Implementation())->setId($unitImpl->getId())
+                                (new Course\Unit\Implementation())
+                                    ->setId($unitImpl->getId())
+                                    ->setCourse(
+                                        (new Course\Implementation())
+                                            ->setId($courseImpl->getId())
+                                            ->setFolder($courseImpl->getFolder())
+                                    )
                             );
                             $unitImpl->getAssessables()->add($assessmentImpl);
                         } // Else we have been passed the Assessment Impl
