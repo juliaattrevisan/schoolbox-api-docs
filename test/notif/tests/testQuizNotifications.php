@@ -8,8 +8,7 @@
 
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
@@ -17,7 +16,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 
 /**
@@ -89,7 +87,7 @@ class QuizNotifications extends AbstractNotificationTest
         );
 
         // erase any existing quizzes in the target folder
-        QuizMapper::getInstance()->deleteByColumnList([
+        Quiz\Mapper::getInstance()->deleteByColumnList([
             'category_id'  => $this->folder->getId(),
             'availability' => 'assess'
         ]);
@@ -151,7 +149,7 @@ class QuizNotifications extends AbstractNotificationTest
                     return;
                 }
 
-                $this->attemptQuiz(QuizMapper::getInstance()->findById($quizId), $recipient);
+                $this->attemptQuiz(Quiz\Mapper::getInstance()->findById($quizId), $recipient);
                 return;
 
             // new attempt
@@ -181,7 +179,7 @@ class QuizNotifications extends AbstractNotificationTest
                     return;
                 }
 
-                $attempts = Quiz\AttemptMapper::getInstance()->findByColumnList([
+                $attempts = Quiz\Attempt\Mapper::getInstance()->findByColumnList([
                     'user_id'   => $matches[1],
                     'assess_id' => $quizId
                 ]);
@@ -194,14 +192,14 @@ class QuizNotifications extends AbstractNotificationTest
 
             case ":staff has marked :child's attempt of :quiz in :cat":
                 // parent has received mark notification: verify that should have happened
-                $this->assertTrue(QuizMapper::getInstance()->findById($quizId)->isMarkShownToParents());
+                $this->assertTrue(Quiz\Mapper::getInstance()->findById($quizId)->isMarkShownToParents());
                 $this->log->notice("Parent {$recipient->formatName()} has correctly received mark notification");
 
                 return;
 
             case ":staff has marked your attempt of :quiz in :cat":
                 // student has received mark notification: verify that should have happened
-                $this->assertTrue(QuizMapper::getInstance()->findById($quizId)->isMarkShownToStudents());
+                $this->assertTrue(Quiz\Mapper::getInstance()->findById($quizId)->isMarkShownToStudents());
                 $this->log->notice("Student {$recipient->formatName()} has correctly received mark notification");
 
                 return;
@@ -246,7 +244,7 @@ class QuizNotifications extends AbstractNotificationTest
             // drop the cache for this quiz
             unset($this->markGivenCache[$quizId]);
 
-            $qm = QuizMapper::getInstance();
+            $qm = Quiz\Mapper::getInstance();
 
             // raise the steaks. I mean visibility. But also, steak.
             $quiz = $qm->findById($quizId);
@@ -265,10 +263,10 @@ class QuizNotifications extends AbstractNotificationTest
 
 
     /**
-     * @param Quiz $quiz
+     * @param Quiz\Model $quiz
      * @param User $as
      */
-    protected function attemptQuiz(Quiz $quiz, User $as)
+    protected function attemptQuiz(Quiz\Model $quiz, User $as)
     {
         // 1. Know your quiz
         $this->log->notice("Attempting quiz {$quiz->getId()} as {$as->formatName()}", [ 'char' => '+' ]);
@@ -277,12 +275,12 @@ class QuizNotifications extends AbstractNotificationTest
         $meta = json_decode($quiz->getDescription(), true);
 
         // 3. spawn an assess_attempt record
-        $aMap = Quiz\AttemptMapper::getInstance();
+        $aMap = Quiz\Attempt\Mapper::getInstance();
         $aMap->setSessionData(['user' => $as]);
 
         $this->log->debug("Starting attempt");
-        /** @var Quiz\Attempt $attempt */
-        $attempt = $this->mapperCreate(Quiz\AttemptMapper::getInstance(), [
+        /** @var Quiz\Attempt\Model $attempt */
+        $attempt = $this->mapperCreate(Quiz\Attempt\Mapper::getInstance(), [
             'assess_id' => $quiz->getId(),
             'user_id'   => $as->getId(),
             'start'     => Alaress_Date_Format::now()->getDatabase(),
@@ -306,15 +304,15 @@ class QuizNotifications extends AbstractNotificationTest
         // 5. finalise the attempt by updating the end time
         $this->log->debug("Finishing attempt");
         $attempt->setFinish(Alaress_Date_Format::now());
-        Quiz\AttemptMapper::getInstance()->save($attempt);
+        Quiz\Attempt\Mapper::getInstance()->save($attempt);
     }
 
 
     /**
-     * @param Quiz\Attempt $attempt
+     * @param Quiz\Attempt\Model $attempt
      * @param User $as
      */
-    protected function markAttempt(Quiz\Attempt $attempt, User $as)
+    protected function markAttempt(Quiz\Attempt\Model $attempt, User $as)
     {
         $student = $this->getUser($attempt->getUser()->getId());
 
@@ -322,7 +320,7 @@ class QuizNotifications extends AbstractNotificationTest
 
         $attempt->setReviewed(Alaress_Date_Format::now());
 
-        $aMap = Quiz\AttemptMapper::getInstance();
+        $aMap = Quiz\Attempt\Mapper::getInstance();
         $aMap->setSessionData([ 'user' => $as ]);
 
         $aMap->save($attempt);
@@ -334,7 +332,7 @@ class QuizNotifications extends AbstractNotificationTest
      * @param Alaress_Date_Format|string $creation
      * @param Alaress_Date_Format|string $start
      * @param Alaress_Date_Format|string $finish
-     * @return Quiz
+     * @return Quiz\Model
      */
     protected function generateQuiz($visibility, $creation = 'now', $start = 'now', $finish = '2 days')
     {
@@ -350,10 +348,10 @@ class QuizNotifications extends AbstractNotificationTest
             $finish = new Alaress_Date_Format(new DateTimeImmutable($finish));
         }
 
-        $quiz = QuizMapper::getInstance()->createModel();
+        $quiz = Quiz\Mapper::getInstance()->createModel();
 
         $quiz
-            ->setAvailability(Quiz::AVAILABILITY_ASSESS)
+            ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
             ->setWeight(0)
             ->setDescription(json_encode([ $visibility, $creation->getDatabase(), $start->getDatabase(), $finish->getDatabase() ]))
             ->setCategory($this->folder)
@@ -382,17 +380,17 @@ class QuizNotifications extends AbstractNotificationTest
     /**
      * Helper function for persisting a Quiz entity, requiring declaration of who is performing the action.
      *
-     * @param Quiz $quiz
+     * @param Quiz\Model $quiz
      * @param User $as
      * @return void
      */
-    protected function saveQuiz(Quiz $quiz, User $as)
+    protected function saveQuiz(Quiz\Model $quiz, User $as)
     {
         // define the effector as the author
         $quiz->setUser($as);
 
         // ensure the mapper thinks this is the effector
-        $oam = QuizMapper::getInstance();
+        $oam = Quiz\Mapper::getInstance();
         $oam->setSessionData([ 'user' => $as ]);
         $oam->save($quiz);
 
@@ -418,7 +416,7 @@ class QuizNotifications extends AbstractNotificationTest
 
         // keep tabs on this question ID so I can get it easily later
         $quiz->setDescription(json_encode($meta));
-        QuizMapper::getInstance()->save($quiz);
+        Quiz\Mapper::getInstance()->save($quiz);
     }
 
 
