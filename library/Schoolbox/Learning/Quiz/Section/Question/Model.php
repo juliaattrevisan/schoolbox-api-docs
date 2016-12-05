@@ -196,7 +196,7 @@ class Model implements ISoftDeletable
      * @param array $config
      * @return static
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config = null)
     {
         $this->config = $config;
         return $this;
