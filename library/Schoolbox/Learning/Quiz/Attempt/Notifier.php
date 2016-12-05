@@ -15,6 +15,7 @@ use Monolog\Logger;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -23,6 +24,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -161,11 +163,13 @@ class Notifier extends AbstractModuleNotifier {
 			->setSeverity(Logger::NOTICE)
 			->setIcon("/portrait?size={$this->iconSize}&userId=".$student->getExternalId())
 			->setHref($href)
-			->addTopic("assess.$assessId.attempted");
+			->addTopic("assess.$assessId.attempted")
+			->setFilter([
+				'roletype' => Role::STAFF
+			]);
 
-		foreach ($this->userAccessMapper->findTeachersInCategory($category) as $teacher) {
-			$envelope->targetToUser($teacher, $bob->build());
-		}
+		// send this to all staff with write access
+		$envelope->broadcastToCategory($category, UserAccess::ACCESS_WRITE, $bob->build());
 
 		return $envelope;
 	}
