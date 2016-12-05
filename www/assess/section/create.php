@@ -29,10 +29,6 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id'])) {
-        error(130);
-    }
-
     /* Create new Section
      */
     $sectionHandler = new Assess_Section();
