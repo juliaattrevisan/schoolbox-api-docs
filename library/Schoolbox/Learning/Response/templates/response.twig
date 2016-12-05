@@ -14,16 +14,14 @@
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
         [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
-        ['Inline Grader', null]
+        ['Inline Grader']
     ] %}
 {% else %}
     {% set nodes = [
         ['Learning', routeLookup('learning.getClasses')],
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
-        ['Inline Grader', null]
+        ['Inline Grader'],
     ] %}
 {% endif %}
 
