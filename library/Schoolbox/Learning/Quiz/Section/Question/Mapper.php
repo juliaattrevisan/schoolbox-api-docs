@@ -7,10 +7,13 @@
 
 namespace Schoolbox\Learning\Quiz\Section\Question;
 
+use PDOStatement;
+use Schoolbox\GenericCollection;
 use \Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Mapper as QuizQuestionTypeMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
 class Mapper extends BaseMapper
@@ -24,11 +27,65 @@ class Mapper extends BaseMapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('type_id', QuizQuestionTypeMapper::class, 'type_id', null, null, 'type', 'type');
         $this->uses('marks', self::TYPE_DECIMAL);
+        $this->uses('question', self::TYPE_STRING);
         $this->uses('config', self::TYPE_JSON);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->joinsReverse('question_id', QuizSolutionMapper::class, 'question_id', self::TYPE_MODEL, null, 'solution', 'solution');
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSolution'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSolution'));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+          SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('solution', 's')}
+        ";
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            LEFT JOIN {$this->getJoinSql('solution', '', 's')}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $solutionMapper = $this->getJoinMapper('solution');
+
+        $questions = $this->createCollection();
+        $solutions = $solutionMapper->createCollection();
+
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC))
+        {
+            $quizId = $row[$this->getIdentifierColumn()];
+            $solutionId = $row["s.{$solutionMapper->getIdentifierColumn()}"];
+
+            if(!$questions->getOffset($quizId) instanceof Model){
+                $questions->setOffset($quizId, $this->hydrate($row));
+            }
+            if(!$solutions->getOffset($solutionId) instanceof QuizSolution){
+                $solutions->setOffset($solutionId, $solutionMapper->hydrate($row, 's'));
+            }
+            $questions->getOffset($quizId)->setSolution($solutions->getOffset($solutionId));
+            $solutions->getOffset($solutionId)->setQuestion($questions->getOffset($quizId));
+        }
+        return $questions;
     }
 
     /**
