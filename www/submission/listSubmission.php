@@ -1,14 +1,16 @@
 <?php
 
-$url = '/learning/classes/';
-if (isset($this->arg[0]) && is_numeric($this->arg[0])){
-    $url .= $this->arg[0]; //term
-    if (isset($this->arg[1]) && is_numeric($this->arg[1])) {
-        $url .= $this->arg[1]; //subject
-    }
-}
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+//Just redirect to pending assessments
+SitePage::localRedir('/learning/pending/', null, 301);
 
-SitePage::localRedir($url, null, 301);
+/*
+*Old code
+*/
 
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
