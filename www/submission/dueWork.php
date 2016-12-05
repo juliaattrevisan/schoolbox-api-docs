@@ -1,4 +1,21 @@
 <?php
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$url = '/learning/due/';
+if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    $url.= $this->arg[0];
+    if (isset($this->arg[1]) && is_numeric($this->arg[1])) {
+        $url .= '/'.$this->arg[1];
+    }
+}
+SitePage::localRedir($url, null, 301);
+
+/*
+*Old code
+*/
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
