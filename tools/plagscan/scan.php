@@ -59,8 +59,8 @@ foreach ($allDocuments as $currentDocument) {
      * In this case, just skip it, so the daemon doesn't get
      * stuck trying to process the unprocessable
      *
-     * I am also going to assume that $docId has to be greater
-     * than zero. I can't think of why zero would be valid.
+     * I am also going to assume that $currentDocument->getPlagscanId()
+     *  has to be greater than zero. I can't think of why zero would be valid.
      */
     if ($currentDocument->getPlagscanId() > 0) {
         $stats = $mapper->getGateway()->retrieve($currentDocument->getPlagscanId(), PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
