@@ -68,6 +68,7 @@ foreach ($allDocuments as $currentDocument) {
             if ($response) {
                 $currentDocument->setPlagscanId($documentId);
                 $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
                 $mapper->save($currentDocument);
 
                 $log->info("{$prefix}: set document {$currentDocument->getId()} to pending status");
