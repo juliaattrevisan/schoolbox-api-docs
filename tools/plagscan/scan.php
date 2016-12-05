@@ -48,7 +48,7 @@ else {
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-$log->info("Plagscan now starting.");
+$log->info("Plagscan now processing {$allDocuments->count()} documents.");
 
 $numUpdated = 0;
 

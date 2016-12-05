@@ -29,51 +29,40 @@ catch (\DomainException $e) {
     exit();
 }
 
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
+$log->info("Plagscan now re-processing {$allDocuments->count()} documents.");
 
+$numUpdated = 0;
 
-
-
-
-
-$docs = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
-
-$log->info("Plagscan resubmission started processing {$docs->count()} docs");
-
-$gateway = $mapper->getGateway();
-
-/* TODO Repair ALL of this
- */
-foreach ($docs as $doc) {
-
-    try{
-        $submission = SubmissionMapper::getInstance()->findById($doc->getFile()->getId());
+foreach ($allDocuments as $currentDocument) {
+    try {
+        $submission = SubmissionMapper::getInstance()->findById($currentDocument->getFile()->getId());
 
         // TODO fix this to work with multiple files
-        $documentId = $gateway->submit($submission);
+        $documentId = $mapper->getGateway()->submit($submission);
 
         if (!empty($documentId)) {
-            $response = $gateway->check($documentId);
+            $response = $mapper->getGateway()->check($documentId);
 
             if($response) {
-                $doc->setPlagscanId($documentId);
-                $doc->setStatus(Plagscan::STATUS_QUEUED);
-                $mapper->save($doc);
+                $currentDocument->setPlagscanId($documentId);
+                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                $mapper->save($currentDocument);
 
-                $log->info("Resubmitted document ".$doc->getId()." for processing: ".$documentId);
+                $log->info("Resubmitted document ".$currentDocument->getId()." for processing: ".$documentId);
             }
             else {
-                $log->warning("Check of document failed ".$doc->getId().": ".$response);
+                $log->warning("Check of document failed ".$currentDocument->getId().": ".$response);
 
             }
 
         }
         else {
-            $log->warning("Submission of document ".$doc->getId()." failed: ".$documentId);
+            $log->warning("Submission of document ".$currentDocument->getId()." failed: ".$documentId);
         }
     } catch (Schoolbox\Mapper\Exception $e) {
-        $log->warning("Unable to find submission ".$doc->getFile()->getId());
+        $log->warning("Unable to find submission ".$currentDocument->getFile()->getId());
     }
-
 }
 
