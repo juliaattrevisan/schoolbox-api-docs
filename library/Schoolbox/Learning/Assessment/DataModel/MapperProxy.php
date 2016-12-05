@@ -88,13 +88,7 @@ class MapperProxy
      */
     public function findById($id)
     {
-        try {
-            $originalModel = $this->baseMapper->findById($id);
-            return $this->translateToDomainModel($originalModel);
-        } catch (MapperException\Deleted $e) {
-            $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
-            throw $e;
-        }
+        return $this->findSingle('id', $id);
     }
 
     /**
@@ -121,9 +115,7 @@ class MapperProxy
      */
     public function findByIdForReview($id, User $student = null)
     {
-        $assessment = $this->findById($id);
-        $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-        return $assessment;
+        return $this->findSingle('id', $id, true, $student);
     }
 
     /**
