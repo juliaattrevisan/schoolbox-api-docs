@@ -16,6 +16,8 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Resource\Storage\IStorage;
+use Alaress\Color\Color;
 
 
 abstract class AbstractTreeBuilder
@@ -166,6 +168,7 @@ abstract class AbstractTreeBuilder
                 'root',
                 $this->getRootNodeLabel(),
                 null,
+                null,
                 [
                     'data-permission' => $this->getFolderPermission($folderId),
                     'data-type' => 'folder'
@@ -221,6 +224,7 @@ abstract class AbstractTreeBuilder
         $name = $this->getFolderName($folder);
         $href = $this->getFolderHref($folder);
         $colour = $this->getFolderColour($folder);
+        $coverImage = $this->getFolderCoverImage($folder);
 
         if (empty($permission)) {
             // ensure that the direct tree to the selected node is available by generating ghost nodes
@@ -234,7 +238,7 @@ abstract class AbstractTreeBuilder
         }
 
         // Output something.
-        return $this->generateFolderArray($folder, $type, $name, $colour,
+        return $this->generateFolderArray($folder, $type, $name, $colour, $coverImage,
             [
                 'data-permission' => $permission,
                 'data-type' => $type
@@ -274,14 +278,15 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @param string $type
      * @param string $name
-     * @param \Alaress\Color\Color $colour
+     * @param Color $colour
+     * @param IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
      * @return array
      */
-    protected function generateFolderArray(IFolder $folder, $type, $name = null, \Alaress\Color\Color $colour = null, array $liAttributes = null, array $aAttributes = null)
+    protected function generateFolderArray(IFolder $folder, $type, $name = null, Color $colour = null, IStorage $coverImage, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name ?: $folder->getName(), $colour, $liAttributes, $aAttributes);
+        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name ?: $folder->getName(), $colour, $coverImage, $liAttributes, $aAttributes);
     }
 
 
@@ -304,11 +309,12 @@ abstract class AbstractTreeBuilder
      * @param string $type
      * @param string $name
      * @param \Alaress\Color\Color $colour
+     * @param \Schoolbox\Resource\Storage\IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
      * @return array
      */
-    protected function generateNodeArray($nodeId, $parentId, $type, $name, \Alaress\Color\Color $colour, array $liAttributes = null, array $aAttributes = null)
+    protected function generateNodeArray($nodeId, $parentId, $type, $name, Color $colour, IStorage $coverImage, array $liAttributes = null, array $aAttributes = null)
     {
         $array = array(
             'id' => $nodeId,
@@ -316,7 +322,8 @@ abstract class AbstractTreeBuilder
             'text' => $name,
             'children' => 0,
             'type' => $type,
-            'colour' => $colour
+            'colour' => $colour,
+            'coverImage' => $coverImage,
         );
 
         if ($type == 'file' || $type == 'link') {
@@ -529,4 +536,13 @@ abstract class AbstractTreeBuilder
      * @return string
      */
     protected abstract function getFolderColour(IFolder $folder);
+
+
+    /**
+     * Return the given folder's cover image
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected abstract function getFolderCoverImage(IFolder $folder);
 }

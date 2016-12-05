@@ -102,6 +102,18 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
+     * Return the given folder's cover image
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderCoverImage(IFolder $folder)
+    {
+        return $folder->getCoverImage();
+    }
+
+
+    /**
      * @param int $folderId
      * @return string
      */
