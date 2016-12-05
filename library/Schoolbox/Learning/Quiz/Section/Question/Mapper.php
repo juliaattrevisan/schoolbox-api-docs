@@ -68,22 +68,29 @@ class Mapper extends BaseMapper
     {
         $solutionMapper = $this->getJoinMapper('solution');
 
+        /** @var Model[]|GenericCollection $questions */
         $questions = $this->createCollection();
         $solutions = $solutionMapper->createCollection();
 
         while($row = $statement->fetch(\PDO::FETCH_ASSOC))
         {
-            $quizId = $row[$this->getIdentifierColumn()];
+            $questionId = $row[$this->getIdentifierColumn()];
             $solutionId = $row["s.{$solutionMapper->getIdentifierColumn()}"];
 
-            if(!$questions->getOffset($quizId) instanceof Model){
-                $questions->setOffset($quizId, $this->hydrate($row));
+            if(!$questions->getOffset($questionId) instanceof Model){
+                $questions->setOffset($questionId, $this->hydrate($row));
             }
             if(!$solutions->getOffset($solutionId) instanceof QuizSolution){
                 $solutions->setOffset($solutionId, $solutionMapper->hydrate($row, 's'));
             }
-            $questions->getOffset($quizId)->setSolution($solutions->getOffset($solutionId));
-            $solutions->getOffset($solutionId)->setQuestion($questions->getOffset($quizId));
+
+            // Does this Question have a Solution?
+            if($solutions->getOffset($solutionId)){
+                $questions->getOffset($questionId)->setSolution($solutions->getOffset($solutionId));
+                $solutions->getOffset($solutionId)->setQuestion($questions->getOffset($questionId));
+            } else {
+                $questions[$questionId]->setSolution(null);
+            }
         }
         return $questions;
     }
