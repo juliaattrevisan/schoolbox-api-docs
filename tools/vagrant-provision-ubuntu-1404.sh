@@ -240,13 +240,14 @@ then
 echo "[DEBUG] $currentnpmsha";
         if [ "$currentnpmsha" == "$npmlocksha" ];
         then
-                echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change";
+                echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
                 npmfile='ignore';
         fi
 fi
 
 if [ "$npmfile" != 'ignore' ];
 then
+        echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
         check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
         if [ $check -gt 0 ];
         then
