@@ -473,7 +473,11 @@ class Factory
     protected function augmentSubjectWithTeacher(array $subject)
     {
         // Get every teacher by their tch_code
-        $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
+        if (!empty($subject['tch_code'])) {
+            $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
+        } else {
+            $subject['teachers'] = [];
+        }
         return $subject;
     }
 
