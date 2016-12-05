@@ -361,13 +361,13 @@ class Controller extends Assessment\Controller
          *
          * Only plagscan when actually submitting final
          */
-        if ($isFinal && $response->getId()) {
-            try {
-                $plagscanMapper = PlagscanMapper::getInstance();
+        try {
+            $plagscanMapper = PlagscanMapper::getInstance();
 
-                $this->getResponse()->content->set([
-                    'postOutput' => [
-                        function() use ($plagscanMapper, $isFinal, $response) {
+            $this->getResponse()->content->set([
+                'postOutput' => [
+                    function() use ($plagscanMapper, $isFinal, $response) {
+                        if ($isFinal && $response->getId()) {
 
                             /* TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
                              * TODO: Rip it back out like Pacific Rim
@@ -378,14 +378,14 @@ class Controller extends Assessment\Controller
                                 $plagscanMapper->saveNewPlagscan($currentFile);
                             }
                         }
-                    ],
-                ]);
-            }
-            catch (\DomainException $e) {
+                    }
+                ],
+            ]);
+        }
+        catch (\DomainException $e) {
 
-                /* noop - plagscan not configured
-                 */
-            }
+            /* noop - plagscan not configured
+             */
         }
 
         /* Saving drafts from the wizzywig
