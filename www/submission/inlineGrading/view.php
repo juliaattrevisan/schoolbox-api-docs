@@ -1,4 +1,25 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+$url = '/learning/responses/';
+if (isset($this->arg[0]) && is_numeric($this->arg[0]) && isset($this->arg[1]) && is_numeric($this->arg[1])) {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    $assessmentId = $submissionBox->getAssessmentId();
+    $url .= $assessmentId.'/'.$this->arg[1]; //assessmentId/userId
+    SitePage::localRedir($url, null, 301);
+}
+else {
+    SitePage::pageNotFound();
+}
+
+/*
+*Old code
+*/
 /**
  * View and grade students submissions
  *
