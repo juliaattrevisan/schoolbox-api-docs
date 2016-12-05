@@ -57,7 +57,7 @@ class MapperProxy
      *
      * @var ParticipantDataSource
      */
-    protected $particpantDataSource;
+    protected $participantDataSource;
 
     /**
      * Constructor
@@ -88,13 +88,7 @@ class MapperProxy
      */
     public function findById($id)
     {
-        try {
-            $originalModel = $this->baseMapper->findById($id);
-            return $this->translateToDomainModel($originalModel);
-        } catch (MapperException\Deleted $e) {
-            $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
-            throw $e;
-        }
+        return $this->findSingle('id', $id);
     }
 
     /**
@@ -121,9 +115,64 @@ class MapperProxy
      */
     public function findByIdForReview($id, User $student = null)
     {
-        $assessment = $this->findById($id);
-        $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-        return $assessment;
+        return $this->findSingle('id', $id, true, $student);
+    }
+
+    /**
+     * Find an assessment for the given quiz ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland quiz URLs will always have a quiz ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $quizId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByQuizId($quizId, User $student = null)
+    {
+        return $this->findSingle('q.assess_id', $quizId, true, $student);
+    }
+
+    /**
+     * Find an assessment for the given due work ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland due work URLs will always have a due work ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $dueWorkId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByDueWorkId($dueWorkId, User $student = null)
+    {
+        return $this->findSingle('d.id', $dueWorkId, true, $student);
+    }
+
+    /**
+     * Find an assessment for the given task ID.
+     *
+     * This is intended to ease transition from Handlerland to the Aura
+     * promised land - Handlerland task URLs will always have a task ID.
+     * Eventually, this will be deprecated.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int  $taskId
+     * @param User $student If provided, load only this student's participation
+     * @return IAssessable
+     * @throws MapperException\Deleted if the quiz is deleted
+     */
+    public function findByTaskId($taskId, User $student = null)
+    {
+        return $this->findSingle('t.id', $taskId, true, $student);
     }
 
     /**
@@ -557,6 +606,39 @@ class MapperProxy
         $model = $dataModel->getAssessmentModel();
         $model->setSubObject($dataModel);
         return $model;
+    }
+
+    /**
+     * Helper function for finding a single assessment by a column and value.
+     *
+     * @param string $column
+     * @param int    $value
+     * @param bool   $loadParticipants
+     * @param User   $student
+     * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws MapperException         if the assessment doesn't exist at all
+     */
+    protected function findSingle($column, $value, $loadParticipants = false, User $student = null)
+    {
+        try {
+            // Load model and its participants
+            $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
+            $assessment    = $this->translateToDomainModel($originalModel);
+            if ($loadParticipants) {
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            }
+            return $assessment;
+
+        } catch (MapperException\Deleted $e) {
+            // Populate participants for the deleted assessment, and rethrow
+            $assessment = $this->translateToDomainModel($e->getDeletedObject());
+            if ($loadParticipants) {
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            }
+            $e->setDeletedObject($assessment);
+            throw $e;
+        }
     }
 
     /**

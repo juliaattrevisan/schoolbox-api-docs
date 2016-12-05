@@ -176,7 +176,7 @@ class Controller extends Assessment\Controller
      */
     protected function redirectToSummaryOrIntro(User $sessionUser, User $participantUser, IAssessable $assessment)
     {
-        if ($sessionUser == $participantUser->getId()) {
+        if ($sessionUser->getId() == $participantUser->getId()) {
             // this is the special case: redirect to intro
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ])

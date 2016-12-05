@@ -29,10 +29,6 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id'])) {
-        error(130);
-    }
-
     /* Create new Section
      */
     $sectionHandler = new Assess_Section();
@@ -62,14 +58,14 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($this->arg[0])) {
-        error(130);
-    }
-
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
     $assess = $assessHandler->getByID($this->arg[0]);
+
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
     if (empty($assess)) {
         error(112);

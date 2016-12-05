@@ -12,12 +12,19 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
 $userHandler = new User();
+
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -42,7 +49,8 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+if (!$assessment->isParticipant($_SESSION['user'])) {
     error(19);
 }
 

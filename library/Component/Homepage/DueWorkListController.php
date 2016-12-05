@@ -1,5 +1,6 @@
 <?php
 /**
+ * @deprecated by \Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
