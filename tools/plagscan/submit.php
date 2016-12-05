@@ -56,17 +56,21 @@ foreach ($allDocuments as $currentDocument) {
          * that we don't seem to keep anywhere - it's some kind
          * of internal id for Plagscan itself
          */
+        $log->info("{$prefix}: resubmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+
         $documentId = $mapper->getGateway()->submit($submissionFile);
 
         if (!empty($documentId)) {
+
+            $log->info("{$prefix}: checking that plagscan has {$currentDocument->getStudentSubmissionFileId()}");
             $response = $mapper->getGateway()->check($documentId);
 
             if ($response) {
-//                $currentDocument->setPlagscanId($documentId);
-//                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
-//                $mapper->save($currentDocument);
-//
-//                $log->info("Resubmitted document ".$currentDocument->getId()." for processing: ".$documentId);
+                $currentDocument->setPlagscanId($documentId);
+                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                $mapper->save($currentDocument);
+
+                $log->info("{$prefix}: set document {$currentDocument->getId()} to pending status");
             }
             else {
                 $log->warning("{$prefix}: check of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
@@ -77,15 +81,12 @@ foreach ($allDocuments as $currentDocument) {
         }
     }
     catch (Schoolbox\Mapper\Exception $e) {
-        $log->warning("{$prefix}: unable to find submission file {$currentDocument->getStudentSubmissionFileId()}");
+        $log->warning("{$prefix}: unable to find student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
         /* Couldn't find the file or any of its pieces
          * So we continue instead, ignoring this plagscan doc
          */
         continue;
     }
-
-
-
 }
 
