@@ -192,7 +192,7 @@ class Controller extends AbstractController
         /** @var QuizAttempt[] $attempts */
         $attempts = $this->quizAttemptMapper->findByColumn('assess_id', $quiz->getId());
         foreach($attempts as $attempt){
-            $attempt->setAssessment($quiz);
+            $attempt->setQuiz($quiz);
             $quiz->getAttempts()->setOffset($attempt->getId(), $attempt);
         }
 

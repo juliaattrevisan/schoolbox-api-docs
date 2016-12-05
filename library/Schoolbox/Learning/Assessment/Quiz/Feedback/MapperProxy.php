@@ -114,7 +114,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $ids[] = $attempt->getId();
             $response = (new DomainObject())
                 ->setId($attempt->getId())
-                ->setAssessable((new Quiz())->setId($attempt->getAssessment()->getAssessmentModel()->getId()))
+                ->setAssessable((new Quiz())->setId($attempt->getQuiz()->getAssessmentModel()->getId()))
                 // The completion serves as both a response and a feedback.
                 // Add a corresponding stub response.
                 ->setResponse(
@@ -163,7 +163,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = (new DataObject())
                 ->setId($domainObject->getId())
-                ->setAssessment(
+                ->setQuiz(
                     (new QuizDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )

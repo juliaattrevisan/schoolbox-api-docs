@@ -144,12 +144,12 @@ class Notifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 		$bob = new Builder();
 
-		$assessId = $attempt->getAssessment()->getId();
+		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
         $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
-		$href = "/assess/results/".$attempt->getAssessment()->getId();
+		$href = "/assess/results/".$attempt->getQuiz()->getId();
 
 		$bob->setTitle(':student attempted :quiz in :category')
 			->setParams(array(
@@ -181,7 +181,7 @@ class Notifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 		$bob = new Builder();
 
-		$assessId = $attempt->getAssessment()->getId();
+		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 
@@ -225,7 +225,7 @@ class Notifier extends AbstractModuleNotifier {
 	public function notifyParentMarked($attempt, $teacher, $diff = null) {
 		$envelope = new Envelope();
 
-		$assessId = $attempt->getAssessment()->getId();
+		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
 		$assess   = $this->assessMapper->findById($assessId);
 

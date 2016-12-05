@@ -258,7 +258,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $dueDate = $box->getDueDate();
         } elseif ($result instanceof QuizAttempt) {
             /* Handle quiz attempt */
-            $quiz = QuizMapper::getInstance()->findById($result->getAssessment()->getId());
+            $quiz = QuizMapper::getInstance()->findById($result->getQuiz()->getId());
             $activity->setAssessment($quiz);
             $activity->setCategory($quiz->getCategory());
             $student = UserMapper::getInstance()->findById($result->getUser()->getId());
@@ -266,7 +266,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             /* TODO Some old handler action needs to be deprecated */
             $evAttempt = new Assess_Attempt();
-            $total = $evAttempt->getTotalMarks($result->getAssessment()->getId(), $result->getId());
+            $total = $evAttempt->getTotalMarks($result->getQuiz()->getId(), $result->getId());
             $actual = $evAttempt->getMarksForAttempt($result->getId());
             $mark = ($actual / $total)*100;
             $comment = '';

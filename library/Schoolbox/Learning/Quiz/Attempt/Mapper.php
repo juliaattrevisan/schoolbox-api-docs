@@ -118,7 +118,7 @@ class Mapper extends BaseMapper
             $attempt->setUser($user);
             /** @var Quiz $quiz */
             $quiz = $this->hydrateJoin($row, 'assessment', 'a');
-            $attempt->setAssessment($quiz);
+            $attempt->setQuiz($quiz);
             $c->add($attempt);
         }
         return $c;
@@ -511,7 +511,7 @@ class Mapper extends BaseMapper
                 $user = $this->hydrateJoin($row, 'user', 'u');
                 /** @var Model $model */
                 return $model
-                    ->setAssessment($quiz)
+                    ->setQuiz($quiz)
                     ->setUser($user);
             }
         );
