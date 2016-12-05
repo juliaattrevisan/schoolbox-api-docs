@@ -35,7 +35,7 @@ class Model implements IStorage
     /**
      * A plagscan result instance
      *
-     * @var PlagscanPayload
+     * @var Plagscan
      */
     protected $plagscan;
 
@@ -98,7 +98,7 @@ class Model implements IStorage
     }
 
     /**
-     * @return PlagscanPayload
+     * @return Plagscan
      */
     public function getPlagscan()
     {
