@@ -321,6 +321,22 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
     }
 
+    /**
+     * Loads up the Plagscan report contents - used in conjunction with
+     * getPlagscanReport() because this loads plagscan-formatted html
+     * which needs to be spawned in an iframe (sigh)
+     *
+     * @param Plagscan $plagscan
+     */
+    public function getPlagscanReportContents(Plagscan $plagscan)
+    {
+        $data = [
+            'html' => $plagscan->getHtml()
+        ];
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscanReportContents.twig', $data));
+    }
+
     /* Getters/Setters
      */
 

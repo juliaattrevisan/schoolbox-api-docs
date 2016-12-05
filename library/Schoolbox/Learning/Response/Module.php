@@ -64,9 +64,11 @@ class Module extends BaseModule
                  */
                 '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocView',
 
-                /* View a Response File's plagscan report
+                /* View a Response File's plagscan report iframe
+                 * View a Response File's plagscan report contents
                  */
                 '/responses/plagscan/{plagscanId}'                                           => 'getPlagscanReport',
+                '/responses/plagscan/{plagscanId}/contents'                                  => 'getPlagscanReportContents',
 
                 /* View a Response in the Inline Grader
                  */
@@ -218,7 +220,7 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, 'getPlagscanReport', function ($params) {
+        $this->addRoutePreload($matcher, 'getPlagscanReport|getPlagscanReportContents', function ($params) {
 
             /* @var Plagscan $document */
             try {
