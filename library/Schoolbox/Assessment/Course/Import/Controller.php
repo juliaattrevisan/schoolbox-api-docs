@@ -803,7 +803,7 @@ class Controller extends Base\Base
      *
      * @param CourseImplementation $courseImpl
      * @param Component_Instance|null $compInstance
-     * @return bool
+     * @return string The name of the new Component
      */
     protected function injectImportIntoComponent(CourseImplementation $courseImpl, Component_Instance $compInstance = null)
     {
@@ -842,9 +842,12 @@ class Controller extends Base\Base
             $folder = $courseImpl->getFolder();
             $configDefinition = ['importedCourse' => $courseImpl->getId()];
             $courseOutlineClass = HomepageOutlineComponentController::class;
-            $this->getComponentInstanceMapper()->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            $compInstance = $this->getComponentInstanceMapper()->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            $compInstance = $this->getComponentInstanceMapper()->findByInstanceId($compInstance->getId());
         }
-        return true;
+        $config = $compInstance->getConfigArray();
+        $componentName = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
+        return $componentName;
     }
 
     /**
@@ -951,23 +954,27 @@ class Controller extends Base\Base
         $class = HomepageOutlineComponentController::class;
         $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folder->getId(), $class);
 
-        // For each CourseImpl, determine how many components are displaying it on the homepage
-        $componentCounts = [];
-        foreach ($courseImpls as $courseImpl) {
-            $componentCounts[$courseImpl->getId()] = 0;
+        // Find the names of components displaying each CourseImport
+        $componentNames = [];
+        foreach($courseImpls as $impl){
+            $componentNames[$impl->getId()] = [];
         }
 
         foreach ($components as $component) {
             $courseImplId = $component->getConfigArray()['importedCourse']['value'];
+
+            // Is it displaying a CourseImport ?
             if ($courseImplId) {
-                $componentCounts[$courseImplId]++;
+                $config = $component->getConfigArray();
+                $name = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
+                $componentNames[$courseImplId][] = $name;
             }
         }
 
         $this->tpl('management', [
-            'folder'          => $folder,
-            'courseImpls'     => $courseImpls,
-            'componentCounts' => $componentCounts,
+            'folder'         => $folder,
+            'courseImpls'    => $courseImpls,
+            'componentNames' => $componentNames,
         ]);
     }
 
@@ -1026,8 +1033,11 @@ class Controller extends Base\Base
     public function restoreCourse(CourseImplementation $courseImpl)
     {
         $componentInstance = $this->findAvailableCourseOutlineComponent($courseImpl->getFolder()->getId());
-        $this->injectImportIntoComponent($courseImpl, $componentInstance);
-        $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'success']));
+        $componentName = $this->injectImportIntoComponent($courseImpl, $componentInstance);
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'result'        => 'success',
+            'componentName' => $componentName]
+        ));
     }
 
 
