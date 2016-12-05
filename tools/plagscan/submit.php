@@ -29,18 +29,19 @@ catch (\DomainException $e) {
 
     /* Plagscan not configured - nothing to do
      */
-    $log->warning("Plagscan scan did not run: username/api key is not configured correctly.");
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
     exit();
 }
 
 $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
-$log->info("Plagscan now re-processing {$allDocuments->count()} documents.");
+$log->info("Plagscan now re-processing {$allDocuments->count()} documents");
 
 $numUpdated = 0;
 
 /** @var Plagscan $currentDocument */
 foreach ($allDocuments as $currentDocument) {
+    $prefix = "Plagscan_id {$currentDocument->getPlagscanId()}";
 
     try {
         /** @var StudentSubmissionFile $studentSubmissionFile */
@@ -58,27 +59,25 @@ foreach ($allDocuments as $currentDocument) {
         $documentId = $mapper->getGateway()->submit($submissionFile);
 
         if (!empty($documentId)) {
-//            $response = $mapper->getGateway()->check($documentId);
-//
-//            if($response) {
+            $response = $mapper->getGateway()->check($documentId);
+
+            if ($response) {
 //                $currentDocument->setPlagscanId($documentId);
 //                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
 //                $mapper->save($currentDocument);
 //
 //                $log->info("Resubmitted document ".$currentDocument->getId()." for processing: ".$documentId);
-//            }
-//            else {
-//                $log->warning("Check of document failed ".$currentDocument->getId().": ".$response);
-//
-//            }
-//
+            }
+            else {
+                $log->warning("{$prefix}: check of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
+            }
         }
         else {
-            $log->warning("Plagscan_id {$currentDocument->getPlagscanId()}: submission of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
+            $log->warning("{$prefix}: submission of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
         }
     }
     catch (Schoolbox\Mapper\Exception $e) {
-        $log->warning("Plagscan_id {$currentDocument->getPlagscanId()}: unable to find submission file {$currentDocument->getStudentSubmissionFileId()}");
+        $log->warning("{$prefix}: unable to find submission file {$currentDocument->getStudentSubmissionFileId()}");
 
         /* Couldn't find the file or any of its pieces
          * So we continue instead, ignoring this plagscan doc

@@ -26,11 +26,11 @@ catch (\DomainException $e) {
 
     /* Plagscan not configured - nothing to do
      */
-    $log->warning("Plagscan scan did not run: username/api key is not configured correctly.");
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
     exit();
 }
 
-$log->info("Plagscan is now choosing modes and options.");
+$log->info("Plagscan is now choosing modes and options");
 
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
@@ -48,7 +48,7 @@ else {
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-$log->info("Plagscan now processing {$allDocuments->count()} documents.");
+$log->info("Plagscan now processing {$allDocuments->count()} documents");
 
 $numUpdated = 0;
 
@@ -108,12 +108,12 @@ foreach ($allDocuments as $currentDocument) {
     }
 }
 
-$log->info("Plagscan scan completed. $numUpdated documents were scanned.");
+$log->info("Plagscan scan completed. $numUpdated documents were scanned");
 
 /* Also tell me how many died
  */
 $numFailed = $allDocuments->count() - $numUpdated;
 
 if ($numFailed) {
-    $log->info("$numFailed documents failed scanning.");
+    $log->info("$numFailed documents failed scanning");
 }

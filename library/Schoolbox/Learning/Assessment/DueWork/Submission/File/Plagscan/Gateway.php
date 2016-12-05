@@ -178,6 +178,14 @@ class Gateway
         return false;
     }
 
+    /**
+     * Checks whether Plagscan has its own internal id for a file that
+     * we have previously uploaded. We use this to determine if Plagscan
+     * has one of our files on record
+     *
+     * @param $documentId
+     * @return bool|\SimpleXMLElement
+     */
     public function check($documentId)
     {
         $parameterList = $this->createParameters(
@@ -188,11 +196,10 @@ class Gateway
         );
 
         if ($this->createRequest($parameterList)) {
-            $response = $this->parseXmlResponse($this->response);
-            return $response;
-        } else {
-            return false;
+            return $this->parseXmlResponse($this->response);
         }
+
+        return false;
     }
 
     public function delete($documentId)
