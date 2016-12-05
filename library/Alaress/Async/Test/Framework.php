@@ -212,7 +212,7 @@ class Framework
             // reset
             $conditions = [];
 
-            // invoke methods that begin with 'test'
+            // invoke methods that begin with 'on'
             if (strpos($method->getName(), 'on') !== 0) {
                 continue;
             }
