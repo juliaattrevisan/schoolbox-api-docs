@@ -36,7 +36,7 @@ class Mapper extends BaseMapper
         $this->hasTable('assess_attempt');
         $this->hasModel(Model::class);
         $this->uses('attempt_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'assessment', 'assessment');
+        $this->joins('assess_id', QuizMapper::class, 'assess_id', null, null, 'quiz', 'quiz');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('start', self::TYPE_DATETIME);
         $this->uses('finish', self::TYPE_DATETIME);
@@ -95,10 +95,10 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('assessment', 'a')}
+                {$this->getJoinColumnString('quiz', 'a')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
-            INNER JOIN {$this->getJoinSql('assessment', '', 'a')}
+            INNER JOIN {$this->getJoinSql('quiz', '', 'a')}
         ";
     }
 
@@ -117,7 +117,7 @@ class Mapper extends BaseMapper
             /** @var User $user */
             $attempt->setUser($user);
             /** @var Quiz $quiz */
-            $quiz = $this->hydrateJoin($row, 'assessment', 'a');
+            $quiz = $this->hydrateJoin($row, 'quiz', 'a');
             $attempt->setQuiz($quiz);
             $c->add($attempt);
         }
@@ -485,10 +485,10 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 {$this->getColumnString('aa')},
-                {$this->getJoinColumnString('assessment', 'as')},
+                {$this->getJoinColumnString('quiz', 'as')},
                 {$this->getJoinColumnString('user', 'u')}
             FROM {$this->getTable()} aa
-            INNER JOIN {$this->getJoinSql('assessment', 'aa', 'as')}
+            INNER JOIN {$this->getJoinSql('quiz', 'aa', 'as')}
             INNER JOIN {$this->getJoinSql('user', 'aa', 'u')}
             WHERE `as`.`availability` = 'assess'
             AND   `as`.`duration` > 0
@@ -506,7 +506,7 @@ class Mapper extends BaseMapper
             'aa',
             function ($mapper, $model, $row) {
                 /** @var Quiz $quiz */
-                $quiz = $this->hydrateJoin($row, 'assessment', 'as');
+                $quiz = $this->hydrateJoin($row, 'quiz', 'as');
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
                 /** @var Model $model */
