@@ -305,17 +305,8 @@ class Controller extends Base
      */
     public function getPlagscanReport(Plagscan $plagscan)
     {
-        /* Make an absolute url
-         *
-         * http or https, and top-level host where we are installed
-         */
-        $requestScheme = $this->getRequest()->server->get('REQUEST_SCHEME');
-        $host = $this->getRequest()->server->get('HTTP_HOST');
-
-        /* Twiggle it
-         */
         $data = [
-            'url' => $plagscan->getUrl($requestScheme, $host)
+            'plagscan' => $plagscan
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
