@@ -208,30 +208,43 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      * This unit is open if the current date is after the open date, and before
      * the due date.
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isOpen() {
-        return !($this->isBeforeOpenDate() || $this->isAfterDueDate());
+    public function isOpen(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+        return !($this->isBeforeOpenDate($now) || $this->isAfterDueDate($now));
     }
 
     /**
      * Is this unit open for submissions?
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isBeforeOpenDate() {
-        $date = Alaress_Date_Format::now();
-        return $date->compareDateOnly($this->getOpenDate()) < 0;
+    public function isBeforeOpenDate(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+        return $now->compareDateOnly($this->getOpenDate()) < 0;
     }
 
     /**
      * Is this unit open for submissions?
      *
+     * @param Alaress_Date_Format $now Optionally override to enable testing
      * @return bool
      */
-    public function isAfterDueDate() {
-        $date = Alaress_Date_Format::now();
-        return $date->compareDateOnly($this->getDueDate()) > 0;
+    public function isAfterDueDate(Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+        return $now->compareDateOnly($this->getDueDate()) > 0;
     }
 
     /**
@@ -241,7 +254,8 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      *
      * @return Alaress_Date_Format
      */
-    public function getRelativeOpenDate() {
+    public function getRelativeOpenDate()
+    {
         $date = clone $this->getOpenDate()->getDateTimeObject();
         $date->modify('00:00:00');
         return new Alaress_Date_Format($date);
@@ -254,7 +268,8 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      *
      * @return Alaress_Date_Format
      */
-    public function getRelativeDueDate() {
+    public function getRelativeDueDate()
+    {
         $date = clone $this->getDueDate()->getDateTimeObject();
         $date->modify('23:59:59');
         return new Alaress_Date_Format($date);
