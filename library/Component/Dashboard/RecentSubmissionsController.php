@@ -6,21 +6,32 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use \Schoolbox\GenericCollection;
+use \Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Model as Folder;
+
+
 /**
  * Staff-only component.
  *
  * Displays the most recent N months of DueWork Submissions + Quiz Attempts for DueWork and Quizzes
  * that were created by current user.
- *
  */
-class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract
+{
 
-    private $submissionHandler;
-    private $max = 10;
-    private $submissions;
-    private $dump;
-    private $componentName = 'Most Recent Submissions';
-    private $componentHref = '/submission/listSubmission/';
+    /**
+     * Sorted by most recent student response first
+     *
+     * @var Collection|DueWork[]|Quiz[]
+     */
+    private $assessments;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -29,91 +40,112 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
      */
     public function execute()
     {
-        /* I guess this component is actually deprecated in favour
-         * of Pending Assessments screen?
-         */
-        return false;
-
-        // init handlers
-        $this->submissionHandler = new Submission();
-
         // don't try to parse data if we're not a teacher
         if (!$this->getUser()->getRole()->isStaff()) {
             return false;
         }
 
-        // TODO. SA-1309 - Disabled due to reliaance on old schema.
-        // Need to update to use new Mappers + Models + object graph
-        echo '<h3>Component_Dashboard_RecentSubmissionsController is disabled. See SA-1309</h3>';
-        return false;
+        $cutoffDate = Alaress_Date_Format::now();
+        $cutoffDate->addMonths(-6); // Create a Config Item for this
 
-        // returns appropriately sorted and formatted data for this module
-        $this->submissions = $this->getSubmissionHandler()->getTotalSubmissionsByOwner($_SESSION['id']);
-
-
-        return true;
-    }
-
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'recentSubmissions') ) {
-            return false;
-        }
+        // Get most recent N months of DueWork Submissions
+        $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
+        $pb = $studentSubmissionMapper->createPredicateBuilder();
+        $pb->equals('b.owner', $this->getUser()->getId());
+        $pb->greaterThan('created_at', $cutoffDate->getDatabase());
+        $studentSubmissions = $studentSubmissionMapper->findByPredicates($pb);
 
 
-        $this->setBlock($templateHandle, 'work', 'work_block');
-        $this->setBlock('work', 'submission', 'submission_block');
-        $this->setBlock('work', 'assess', 'assess_block');
+        // Get most recent N months of Quiz Attempts
+        $quizAttemptMapper = $this->getMapperFactory()->get(QuizAttemptMapper::class);
+        $pb = $quizAttemptMapper->createPredicateBuilder();
+        $pb->equals('a.user_id', $this->getUser()->getId());
+        $pb->greaterThan('start', $cutoffDate->getDatabase());
+        $quizAttempts = $quizAttemptMapper->findByPredicates($pb);
 
-        $this->setVar('work_block','');
+        /** @var Folder[] Indexed by folder.id */
+        $folderCache = [];
 
-        // determine how many results to output
-        $count = 0;
-        $limit = $this->getConfig('size');
+        // Group By DueWork.Id and Quiz.ID and convert to IAssessables
 
-        if(is_array($this->submissions)) {
-            foreach($this->submissions as $submit) {
-                // don't exceed the limit
-                if ($limit > 0 && $count >= $limit) {
-                    break;
+        /** @var Quiz[]|Collection $quizzes */
+        $quizzes = new Collection();
+        foreach($quizAttempts as $quizAttempt){
+            $quizId = $quizAttempt->getQuiz()->getId();
+            if(!$quizzes[$quizId] instanceof Quiz){
+                $quizzes[$quizId] = $quizAttempt->getQuiz();
+                $folderId = $quizzes[$quizId]->getCategory()->getId();
+                if(!$folderCache[$folderId] instanceof Folder){
+                    $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
                 }
-
-                $date = new Alaress_Date_Format($submit['datestamp'], 'Y-m-d H:i');
-
-                $output = array(
-                    'WORK_DATE'        => $date->getRelativeTime(),
-                    'WORK_SUBJECT'     => Scrub::Text($submit['category_name']),
-                    'WORK_SUBJECT_ID'  => $submit['cid'],
-                    'WORK_DESCRIPTION' => Scrub::Text($submit['name']),
-                    'WORK_COUNT'       => $submit['count'],
-                    'WORK_BOX_ID'      => $submit['id'],
-                    'ROW_COLOR'        => ++$count%2 ? 'dark' : ''
-                );
-
-                $this->setVar($output);
-
-                if($submit['availability'] == 'assess') {
-                    $this->parse('assess_block', 'assess', false);
-                    $this->setVar('submission_block', '');
-                } else {
-                    $this->parse('submission_block', 'submission', false);
-                    $this->setVar('assess_block', '');
-
-                }
-
-                $this->parse('work_block', 'work', true);
+                $quizzes[$quizId]->setCategory($folderCache[$folderId]);
             }
+            $quizzes[$quizId]->getAttempts()->add($quizAttempt);
+        }
 
-            return true;
+        // Sort quiz attempts most recent first
+        foreach($quizzes as $quiz){
+            $quiz->getAttempts()->sortBy('start', 'DESC');
         }
-        else {
-            return false;
+
+        /** @var DueWork[]|Collection $dueWorks */
+        $dueWorks = new Collection();
+        foreach($studentSubmissions as $submission){
+            $boxId = $submission->getSubmissionBox()->getId();
+            if(!$dueWorks[$boxId] instanceof DueWork){
+                $dueWorks[$boxId] = $submission->getSubmissionBox();
+                $folderId = $dueWorks[$boxId]->getCategory()->getId();
+                if(!$folderCache[$folderId] instanceof Folder){
+                    $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
+                }
+                $dueWorks[$boxId]->setCategory($folderCache[$folderId]);
+            }
+            $dueWorks[$boxId]->getSubmissions()->add($submission);
         }
+
+        // Sort DueWork Submission most recent first
+        foreach($dueWorks as $dueWork){
+            $dueWork->getSubmissions()->sortBy('submittedAt', 'DESC');
+        }
+
+        $assessments = $dueWorks->merge($quizzes);
+
+        $mostRecentFunction = function($assessment){
+            if($assessment instanceof Quiz){
+                /** @var QuizAttempt $mostRecentAttempt */
+                return $assessment->getAttempts()[0]->getStart();
+            } elseif($assessment instanceof DueWork){
+                /** @var StudentSubmission $mostRecentSubmission */
+                return $assessment->getSubmissions()[0]->getSubmittedAt();
+            } else {
+                throw new InvalidArgumentException('Unknown Assessment: '.get_class($assessment));
+            }
+        };
+
+        // Sort by most recent response date
+        $this->assessments = $assessments->sortByCallback(function($assessmentA, $assessmentB) use ($mostRecentFunction){
+            /** @var Alaress_Date_Format $dateA */
+            /** @var Alaress_Date_Format $dateB */
+            $dateA = $mostRecentFunction($assessmentA);
+            $dateB = $mostRecentFunction($assessmentB);
+            return $dateA->compare($dateB);
+        });
+        return $this->assessments->count();
     }
 
     /**
-     * @return Submission
+     * @param String $templateHandle
+     * @return bool
      */
-    public function getSubmissionHandler() {
-        return $this->submissionHandler;
+    public function renderTemplate($templateHandle)
+    {
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learning/component/recentSubmissions.twig',
+            [
+                'assessments'         => $this->assessments,
+                'limit'               => $limit = $this->getConfig('size'),
+            ]
+        );
     }
 }
