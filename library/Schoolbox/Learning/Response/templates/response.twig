@@ -95,7 +95,7 @@
                 {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id}) %}
 
                 {% if viewRoute %}
-                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.index }}. Submission at {{ currentResponse.submittedAt.local }}</option>
+                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
                 {% endif %}
             {% endfor %}
         </select>
