@@ -9,6 +9,26 @@
  * @version     SVN: $Id$
  */
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+if(isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    $params = $this->arg[0];
+    if(isset($this->arg[1]) && is_numeric($this->arg[0])) {
+        $params .= '/' . $this->arg[1];
+        if (isset($this->arg[2]) && is_numeric($this->arg[2])) {
+            $params .= '/' . $this->arg[2];
+        }
+    }
+    SitePage::localRedir('/learning/grades/'.$params, null, 301);
+}
+SitePage::pageNotFound();
+
+/*
+ * Old code
+ */
 define('PERMISSION_GRANTED', true);
 define('PERMISSION_DENIED', false);
 
@@ -22,12 +42,19 @@ if(!isset($this)) {
 	SitePage::localRedir('/submission/allWork');
 }
 
+if(isset($this->arg[2])) {
+    if(is_numeric($this->arg[0])) {
+        $subject = $this->arg[0];
+    }
+}
+$this->localRedir("/submission/allWork/");
+
 $userId = $_SESSION['id'];
 
 if(isset($this->arg[0])) {
 	if(is_numeric($this->arg[0])) {
 		$userId = $this->arg[0];
-	}
+    }
 	else {
 		// this is a fail case
 		$this->localRedir("/submission/allWork/");

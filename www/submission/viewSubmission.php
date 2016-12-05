@@ -27,7 +27,7 @@ try {
      *
      * */
     $assessmentId= $submissionBox->getAssessmentId();
-    SitePage::localRedir('/learning/assessments/'.$assessmentId);
+    SitePage::localRedir('/learning/assessments/'.$assessmentId, null, 301);
 }
 catch (\Schoolbox\Mapper\Exception\Deleted $e) {
     error(17);
