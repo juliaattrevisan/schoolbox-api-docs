@@ -34,7 +34,7 @@ class Notifier extends AbstractModuleNotifier {
     const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
 
 	/** @var QuizMapper */
-	protected $assessMapper;
+	protected $quizMapper;
 
     /** @var FolderMapper */
     protected $folderMapper;
@@ -49,11 +49,11 @@ class Notifier extends AbstractModuleNotifier {
 	 * @param array $dependencies
 	 */
 	public function loadDependencies($dependencies = null) {
-		if(empty($dependencies['assessMapper'])) {
-			$dependencies['assessMapper'] = QuizMapper::getInstance();
+		if(empty($dependencies['quizMapper'])) {
+			$dependencies['quizMapper'] = QuizMapper::getInstance();
 		}
-        if (empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = FolderMapper::getInstance();
+        if (empty($dependencies['folderMapper'])) {
+            $dependencies['folderMapper'] = FolderMapper::getInstance();
         }
         if (empty($dependencies['userAccessMapper'])) {
             $dependencies['userAccessMapper'] = UserAccessMapper::getInstance();
@@ -70,7 +70,7 @@ class Notifier extends AbstractModuleNotifier {
      * @return static
 	 */
 	protected function setQuizMapper($mapper) {
-		$this->assessMapper = $mapper;
+		$this->quizMapper = $mapper;
         return $this;
 	}
 
@@ -146,7 +146,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
         $category = $this->folderMapper->findById($assess->getCategory()->getId());
 
 		$href = "/assess/results/".$attempt->getQuiz()->getId();
@@ -183,7 +183,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'student'));
@@ -227,7 +227,7 @@ class Notifier extends AbstractModuleNotifier {
 
 		$assessId = $attempt->getQuiz()->getId();
 		/** @var Quiz $assess */
-		$assess   = $this->assessMapper->findById($assessId);
+		$assess   = $this->quizMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));
