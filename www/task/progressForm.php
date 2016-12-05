@@ -1,4 +1,16 @@
 <?php
+
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+SitePage::localRedir('/', null, 410);
+
+/*
+*Old code
+*/
+
 /**
  * Save form for a student's status.
  *

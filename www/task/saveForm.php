@@ -1,4 +1,14 @@
 <?php
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+SitePage::localRedir('/', null, 410);
+
+/*
+*Old code
+*/
 /**
  * Form for creating or modifying a task
  *

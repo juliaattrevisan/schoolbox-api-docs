@@ -1,5 +1,14 @@
 <?php
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+SitePage::localRedir('/', null, 410);
 
+/*
+*Old code
+*/
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBox;
