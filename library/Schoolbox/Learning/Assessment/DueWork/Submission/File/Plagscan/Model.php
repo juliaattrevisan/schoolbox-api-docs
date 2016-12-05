@@ -68,7 +68,7 @@ class Model
     protected $html;
 
     /**
-     * @var
+     * @var int
      */
     protected $studentSubmissionFileId;
 
