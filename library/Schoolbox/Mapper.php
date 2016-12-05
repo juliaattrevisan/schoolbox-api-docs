@@ -1231,7 +1231,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList)
     {
-        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
+        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList,  $options);
     }
 
 
@@ -1242,9 +1242,10 @@ abstract class Mapper implements IMapper, Serializable
      * @param string           $deleteString
      * @param PredicateBuilder $predicate
      * @param array            $columnList
+     * @param array            $options
      * @return int
      */
-    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
+    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList) && empty($predicate->getWhere())) {
@@ -1267,7 +1268,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Call pre-delete hooks
-        $deletedItems = $this->findByColumnList($columnList);
+        $deletedItems = $this->findByColumnList($columnList, $options);
         foreach ($deletedItems as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return 0;
