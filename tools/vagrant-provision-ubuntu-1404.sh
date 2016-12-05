@@ -233,11 +233,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
 npmlocksha=`sha1sum ../node_modules/npm.shrinkwrap.checksum 2>/dev/null | awk '{print $1}'`;
-echo "[DEBUG] $npmlocksha";
 if [ -f /vagrant/node_modules/npm.shrinkwrap.checksum ];
 then
         currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
-echo "[DEBUG] $currentnpmsha";
         if [ "$currentnpmsha" == "$npmlocksha" ];
         then
                 echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
@@ -306,11 +304,15 @@ then
                         tar xzf /vagrant/vagrantcache/$npmfile;
                 else
                         # Still no luck, build from scratch with npm
+                        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+                        cat /vagrant/vagrantcache/npm.cache;
                         echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
                         /vagrant/tools/pkg-build-npm.sh 2>&1;
                 fi
         else
                 # Still no luck, build from scratch with npm
+                echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+                cat /vagrant/vagrantcache/npm.cache;
                 echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
                 /vagrant/tools/pkg-build-npm.sh 2>&1;
         fi
