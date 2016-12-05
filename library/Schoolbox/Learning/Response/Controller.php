@@ -318,7 +318,7 @@ class Controller extends Base
             'url' => $plagscan->getUrl($requestScheme, $host)
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
     }
 
     /**
@@ -334,7 +334,7 @@ class Controller extends Base
             'html' => $plagscan->getHtml()
         ];
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscanReportContents.twig', $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscan/contents.twig', $data));
     }
 
     /* Getters/Setters
