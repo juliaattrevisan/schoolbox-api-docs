@@ -10,10 +10,14 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /**

@@ -37,6 +37,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
     }
 
@@ -84,6 +86,8 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setPlagscanId($documentId);
             $plagscan->setStatus(Plagscan::STATUS_QUEUED);
             $plagscan->setStudentSubmissionFileId($file->getId());
+            $plagscan->setCreatedAt(\Alaress_Date_Format::now());
+            $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
             return parent::save($plagscan);
         }
