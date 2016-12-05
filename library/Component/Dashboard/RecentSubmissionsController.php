@@ -15,6 +15,11 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use \Schoolbox\GenericCollection;
 use \Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkSubmissionMapperProxy;
+use \Schoolbox\Learning\Assessment\IAssessable;
+use \Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessable;
+use \Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 
 
 /**
@@ -46,7 +51,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         }
 
         $cutoffDate = Alaress_Date_Format::now();
-        $cutoffDate->addMonths(-6); // Create a Config Item for this
+        $cutoffDate->addMonths(-6); // TODO - Create a Config Item for this
 
         // Get most recent N months of DueWork Submissions
         $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
@@ -55,81 +60,77 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $pb->greaterThan('created_at', $cutoffDate->getDatabase());
         $studentSubmissions = $studentSubmissionMapper->findByPredicates($pb);
 
-
         // Get most recent N months of Quiz Attempts
         $quizAttemptMapper = $this->getMapperFactory()->get(QuizAttemptMapper::class);
         $pb = $quizAttemptMapper->createPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
+        $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
         $pb->greaterThan('start', $cutoffDate->getDatabase());
         $quizAttempts = $quizAttemptMapper->findByPredicates($pb);
 
+        // Convert to IAssessables and IResponses
+        $quizAttemptMapperProxy = new QuizAttemptMapperProxy($quizAttemptMapper);
+        $submissionMapperProxy = new DueWorkSubmissionMapperProxy($studentSubmissionMapper);
+
         /** @var Folder[] Indexed by folder.id */
         $folderCache = [];
+        /** @var IAssessable[] $assessables */
+        $assessables = new GenericCollection(IAssessable::class);
 
-        // Group By DueWork.Id and Quiz.ID and convert to IAssessables
-
-        /** @var Quiz[]|Collection $quizzes */
-        $quizzes = new Collection();
-        foreach($quizAttempts as $quizAttempt){
-            $quizId = $quizAttempt->getQuiz()->getId();
-            if(!$quizzes[$quizId] instanceof Quiz){
-                $quizzes[$quizId] = $quizAttempt->getQuiz();
-                $folderId = $quizzes[$quizId]->getCategory()->getId();
-                if(!$folderCache[$folderId] instanceof Folder){
-                    $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
-                }
-                $quizzes[$quizId]->setCategory($folderCache[$folderId]);
-            }
-            $quizzes[$quizId]->getAttempts()->add($quizAttempt);
-        }
-
-        // Sort quiz attempts most recent first
-        foreach($quizzes as $quiz){
-            $quiz->getAttempts()->sortBy('start', 'DESC');
-        }
-
-        /** @var DueWork[]|Collection $dueWorks */
-        $dueWorks = new Collection();
+        /** @var StudentSubmission[] $studentSubmissions */
         foreach($studentSubmissions as $submission){
-            $boxId = $submission->getSubmissionBox()->getId();
-            if(!$dueWorks[$boxId] instanceof DueWork){
-                $dueWorks[$boxId] = $submission->getSubmissionBox();
-                $folderId = $dueWorks[$boxId]->getCategory()->getId();
-                if(!$folderCache[$folderId] instanceof Folder){
-                    $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
-                }
-                $dueWorks[$boxId]->setCategory($folderCache[$folderId]);
+            $assessableId = $submission->getSubmissionBox()->getAssessmentModel()->getId();
+            if(!$assessables[$assessableId] instanceof IAssessable){
+                $dueWork = $submission->getSubmissionBox();
+                $assessable = (new DueWorkAssessable())
+                    ->setId($dueWork->getAssessmentModel()->getId())
+                    ->setTitle($dueWork->getName())
+                    ->setContext($dueWork->getCategory());
+                $assessables[$assessableId] = $assessable;
+                $folderCache[$dueWork->getCategory()->getId()] = true;
             }
-            $dueWorks[$boxId]->getSubmissions()->add($submission);
+            $response = $submissionMapperProxy->transformModels(new Collection([$submission]))->first();
+            $assessables[$assessableId]->getResponses()->add($response);
         }
 
-        // Sort DueWork Submission most recent first
-        foreach($dueWorks as $dueWork){
-            $dueWork->getSubmissions()->sortBy('submittedAt', 'DESC');
+        /** @var QuizAttempt[] $quizAttempts */
+        foreach($quizAttempts as $attempt){
+            $assessableId = $attempt->getQuiz()->getAssessmentModel()->getId();
+            if(!$assessables[$assessableId] instanceof IAssessable){
+                $quiz = $attempt->getQuiz();
+                $assessable = (new QuizAssessable())
+                    ->setId($quiz->getAssessmentModel()->getId())
+                    ->setTitle($quiz->getTitle())
+                    ->setContext($quiz->getCategory());
+                $assessables[$assessableId] = $assessable;
+                $folderCache[$quiz->getCategory()->getId()] = true;
+            }
+            $response = $quizAttemptMapperProxy->transformModels(new Collection([$attempt]))->first();
+            $assessables[$assessableId]->getResponses()->add($response);
         }
 
-        $assessments = $dueWorks->merge($quizzes);
-
-        $mostRecentFunction = function($assessment){
-            if($assessment instanceof Quiz){
-                /** @var QuizAttempt $mostRecentAttempt */
-                return $assessment->getAttempts()[0]->getStart();
-            } elseif($assessment instanceof DueWork){
-                /** @var StudentSubmission $mostRecentSubmission */
-                return $assessment->getSubmissions()[0]->getSubmittedAt();
-            } else {
-                throw new InvalidArgumentException('Unknown Assessment: '.get_class($assessment));
+        // Hydrate folders so we can print breadcrumbs
+        foreach($assessables as $assessable){
+            $folderId = $assessable->getContext()->getId();
+            if(!$folderCache[$folderId] instanceof Folder){
+                $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
             }
-        };
+            $assessable->setContext($folderCache[$folderId]);
 
-        // Sort by most recent response date
-        $this->assessments = $assessments->sortByCallback(function($assessmentA, $assessmentB) use ($mostRecentFunction){
-            /** @var Alaress_Date_Format $dateA */
-            /** @var Alaress_Date_Format $dateB */
-            $dateA = $mostRecentFunction($assessmentA);
-            $dateB = $mostRecentFunction($assessmentB);
+            // Sort responses most recent first
+            $assessable->getResponses()->sortBy('submittedAt', 'DESC');
+        }
+
+        // Sort by most recent first, in most recent first
+        $assessables->sortByCallback(function($assessmentA, $assessmentB){
+            /** @var IAssessable $assessmentA */
+            /** @var IAssessable $assessmentB */
+            $dateA = $assessmentA->getResponses()[0]->getSubmittedAt();
+            $dateB = $assessmentB->getResponses()[0]->getSubmittedAt();
             return $dateA->compare($dateB);
         });
+
+        $this->assessments = $assessables;
         return $this->assessments->count();
     }
 

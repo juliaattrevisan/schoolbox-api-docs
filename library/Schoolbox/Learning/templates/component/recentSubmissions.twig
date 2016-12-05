@@ -1,47 +1,31 @@
 {#
 Usage:
-    'componentInstanceId' => $this->getInstance()->getId(),
-    'componentClass'      => $this->getComponentName(),
-    'currentUser'         => $this->getUser(),
-    'assessments'         => $this->assessments,
-    'limit'               => $limit = $this->getConfig('size'),
+    assessments: IAssessable[],
+    limit:       int,
 #}
 <ul class="information-list">
     {% set count = 0 %}
     {% for assessment in assessments %}
-        {% if assessment.attempts %}
-            {% set title = assessment.title %}
-            {% set responseType = 'attempt' %}
-            {% set responses = assessment.attempts %}
-            {% set link = "/assess/results/"~assessment.id %}
-            {% set folder = assessment.category %}
-            {% set dateField = 'start' %}
-        {% elseif assessment.submissions %}
-            {% set title = assessment.name %}
-            {% set responseType = 'submission' %}
-            {% set responses = assessment.submissions %}
-            {% set link = "/submission/viewSubmission/"~assessment.id %}
-            {% set folder = assessment.category %}
-            {% set dateField = 'submittedAt' %}
-        {% endif %}
-
         {% if not limit or count < limit %}
             <li class="list-item" data-equalizer>
                 <div class="small-2 columns">
-                    <p class='counter' title="{{ responses | length }} new {{ responseType }}(s)">{{ responses | length }}</p>
+                    {% set responseType = assessment is quiz ? 'attempt' : 'submission' %}
+                    {% if assessment.responses | length > 1 %}
+                        {% set responseType = responseType ~ 's' %}
+                    {% endif %}
+                    <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}">{{ assessment.responses | length }}</p>
                 </div>
                 <div class="card small-10" data-equalizer-watch>
-                    <h3><a href="{{ link }}">{{ title }}</a></h3>
+                    <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></h3>
 
-                    {% set date = 'attempt' == responseType ? responses.first.start : responses.first.submittedAt %}
                     <p class="meta">
-                        Last attempt {{ date.database }} in
-                        <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
+                        Last attempt {{ assessment.responses.first.submittedAt.relativeTime }} in
+                        <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.name }}</a>
                     </p>
                 </div>
             </li>
         {% endif %}
-        
+
         {% set count = count + 1 %}
 
     {% endfor %}
