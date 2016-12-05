@@ -302,11 +302,13 @@ class Controller extends Base
      * Dump out a plagscan report
      *
      * @param Plagscan $plagscan
+     * @param IAssessable $assessment
      */
-    public function getPlagscanReport(Plagscan $plagscan)
+    public function getPlagscanReport(Plagscan $plagscan, IAssessable $assessment)
     {
         $data = [
-            'plagscan' => $plagscan
+            'plagscan' => $plagscan,
+            'assessment' => $assessment,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
@@ -322,7 +324,7 @@ class Controller extends Base
     public function getPlagscanReportContents(Plagscan $plagscan)
     {
         $data = [
-            'html' => $plagscan->getHtml()
+            'html' => $plagscan->getHtml(),
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscan/contents.twig', $data));

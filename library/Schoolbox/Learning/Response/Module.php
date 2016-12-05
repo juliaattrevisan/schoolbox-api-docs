@@ -28,6 +28,11 @@ use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SingleFile;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SingleFileMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
+use \Schoolbox\Learning\Assessment\IAssessable;
 
 class Module extends BaseModule
 {
@@ -219,9 +224,40 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, 'getPlagscanReport|getPlagscanReportContents', function ($params) {
+        $this->addRoutePreload($matcher, 'getPlagscanReport', function ($params) {
 
             /* @var Plagscan $document */
+            try {
+                $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+            }
+            catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Get a whole bunch of extra crap for the gd breadcrumbs
+             *
+             * And thus the sky was torn asunder and the tears of angels fell as rain,
+             * hydrating the dessicated earth with a multitude of data
+             */
+            /** @var SingleFile $submissionFile */
+            $submissionFile = SingleFileMapper::getInstance()->findById($plagscanDocument->getStudentSubmissionFileId());
+
+            /** @var Submission $submission */
+            $submission = SubmissionMapper::getInstance()->findById($submissionFile->getSubmission()->getId());
+
+            /** @var IAssessable $assessment */
+            $assessmentId = $submission->getSubmissionBox()->getAssessmentModel()->getId();
+            $assessment = $this->getAssessmentMapperProxy()->findById($assessmentId);
+
+            return [
+                'plagscan' => $plagscanDocument,
+                'assessment' => $assessment,
+            ];
+        });
+
+        $this->addRoutePreload($matcher, 'getPlagscanReportContents', function ($params) {
+
+            /* @var Plagscan $plagscanDocument */
             try {
                 $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
             }
