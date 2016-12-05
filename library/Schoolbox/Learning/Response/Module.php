@@ -47,7 +47,6 @@ class Module extends BaseModule
         $this->register('DELETE', '/assessments/{assessmentId}/responses/{responseId}', 'deleteParticularResponse');
     }
 
-
     /**
      * @inheritdoc
      */
@@ -92,7 +91,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getParticularResponse)';
+        $ruleRegexp = '(getParticularResponse|getPlagscanReport|getPlagscanReportContents)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
