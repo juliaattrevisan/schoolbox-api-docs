@@ -560,6 +560,39 @@ class MapperProxy
     }
 
     /**
+     * Helper function for finding a single assessment by a column and value.
+     *
+     * @param string $column
+     * @param int    $value
+     * @param bool   $loadParticipants
+     * @param User   $student
+     * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws MapperException         if the assessment doesn't exist at all
+     */
+    protected function findSingle($column, $value, $loadParticipants = false, User $student = null)
+    {
+        try {
+            // Load model and its participants
+            $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
+            $assessment    = $this->translateToDomainModel($originalModel);
+            if ($loadParticipants) {
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            }
+            return $assessment;
+
+        } catch (MapperException\Deleted $e) {
+            // Populate participants for the deleted assessment, and rethrow
+            $assessment = $this->translateToDomainModel($e->getDeletedObject());
+            if ($loadParticipants) {
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            }
+            $e->setDeletedObject($assessment);
+            throw $e;
+        }
+    }
+
+    /**
      * Helper function for converting a list of options into a column list.
      *
      * Currently, only converts "term" to a due date span.

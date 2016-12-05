@@ -32,6 +32,7 @@ use Schoolbox\User;
  *
  * @method Model createModel($id=null)
  * @method Model findById($id)
+ * @method Model findOneByColumnList($columnList, $order = [])
  */
 class Mapper extends BaseMapper
 {
