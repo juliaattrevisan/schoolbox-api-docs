@@ -108,9 +108,11 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * @param Gateway $gateway
+     * @return $this
      */
     private function setGateway($gateway)
     {
         $this->gateway = $gateway;
+        return $this;
     }
 }
