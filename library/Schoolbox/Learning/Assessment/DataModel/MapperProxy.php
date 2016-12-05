@@ -57,7 +57,7 @@ class MapperProxy
      *
      * @var ParticipantDataSource
      */
-    protected $particpantDataSource;
+    protected $participantDataSource;
 
     /**
      * Constructor
