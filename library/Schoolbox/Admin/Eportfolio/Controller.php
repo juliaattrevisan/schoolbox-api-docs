@@ -263,9 +263,9 @@ class Controller extends Base
                             /** @var \Component_ControllerAbstract[] $componentList */
                             list($page, $componentList) = $eportfolio;
 
-                            if ($post['skipDuplicates']) {
+                            // Check this user doesn't already have this page.
 
-                                // Check this user doesn't already have this page.
+                            if ($post['skipDuplicates']) {
 
                                 $existingPageList = $this->eportfolioPageMapper->findByColumnList(
                                     array(

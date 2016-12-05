@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Eportfolio\PageMapper as EportfolioPageMapper;
 use Twig_Loader_Chain;
 
 /**
@@ -62,7 +63,17 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class, [
+                'eportfolioImportMapper' => $this->getMapperFactory()->getLazy(Import\Mapper::class),
+                'eportfolioImportLogMapper' => $this->getMapperFactory()->getLazy(Import\Log\Mapper::class),
+                'eportfolioPageMapper' => $this->getMapperFactory()->getLazy(EportfolioPageMapper::class),
+                'roleMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\RoleMapper::class),
+                'campusMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\CampusMapper::class),
+                'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
+            ])
+        );
     }
 
     /**
