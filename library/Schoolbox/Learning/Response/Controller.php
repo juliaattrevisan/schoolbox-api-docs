@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
@@ -106,6 +107,7 @@ class Controller extends Base
         }
 
         // The zone which contains the files
+        /** @var IFeedback $latestFeedback */
         $latestFeedback    = $participant->findMostRecentFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
@@ -114,6 +116,11 @@ class Controller extends Base
          * crocodocable files that somehow die
          */
         try {
+
+            /* Sort files alphabetically
+             */
+            $response->getAllFiles()->sortBy('filename', 'asc');
+
             $data = [
                 'assessment' => $assessment,
                 'response' => $response,
