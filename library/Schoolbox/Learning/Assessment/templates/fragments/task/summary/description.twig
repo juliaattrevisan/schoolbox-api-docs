@@ -23,10 +23,10 @@
         </div>
     {% elseif preview.type == 'redirect' %}
         <div class="card small-12">
-            <a href="{{ assessment.url }}">
+            <a href="{{ assessment.url }}" target="_blank" title="Visit {{ preview.fragment }}">
                 <div class="icon-link"></div>
                 <h3>{{ assessment.title }}</h3>
-                <p class="meta">{{preview.fragment}}</p>
+                <p class="meta">{{ preview.fragment }}</p>
             </a>
         </div>
     {% elseif preview.fragment|length %}
