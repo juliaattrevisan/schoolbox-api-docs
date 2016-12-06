@@ -210,6 +210,7 @@ class SubmissionMapper extends BaseMapper
      * @param int $userId
      * @param int $boxId
      * @return ActivityCollection
+     * @deprecated 165
      */
     public function getHistory($userId, $boxId)
     {

@@ -136,7 +136,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
      *
      * @param \Schoolbox\User $user
      * @param int $limit
-     * @return Schoolbox\Collection
+     * @return Schoolbox\Collection|Showcase[]
      */
 	public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5) {
         $submissionBoxMapper = $this->getJoinMapper('submissionBox');

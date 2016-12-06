@@ -319,6 +319,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * @param $box_id
      *
      * @return ActivityCollection
+     * @deprecated 165
      */
     public function getHistory($user_id, $box_id)
     {
