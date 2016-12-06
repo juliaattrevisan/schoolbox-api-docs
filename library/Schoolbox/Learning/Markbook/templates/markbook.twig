@@ -152,31 +152,11 @@
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
                         <td class="column-{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
-                                {% set mostRecentFeedback = assessment.getParticipant(student).findMostRecentPublishedFeedback %}
                                 {% if assessment is task %}
                                     {# An icon that shows if the student has attempted the task or not #}
-                                    {# TODO abstract this out #}
-                                    <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                          method="POST"
-                                          class="progress-tick-form"
-                                          data-progress-tick-form>
-                                        {% if mostRecentFeedback.isMarkedAsCompleted %}
-                                            <a href="#"
-                                               class="no-text progress-tick complete"
-                                               title="Completed"
-                                               data-progress-tick-status="complete"></a>
-                                        {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
-                                            <a href="#"
-                                               class="no-text progress-tick pending"
-                                               title="Self-assessed"
-                                               data-progress-tick-status="selfAssessed"></a>
-                                        {% else %}
-                                            <a href="#"
-                                               class="no-text progress-tick"
-                                               title="Not attempted"
-                                               data-progress-tick-status="notAttempted"></a>
-                                        {% endif %}
-                                    </form>
+                                    {% include '@learningAssessment/task/progressTickForm.twig' with {
+                                        participant: assessment.getParticipant(student)
+                                    } %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"

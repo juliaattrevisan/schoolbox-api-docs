@@ -1,0 +1,29 @@
+{##
+ # @learningAssessment/task/progressTickForm.twig
+ #
+ # Params:
+ # * participant: The participant object
+ #}
+
+{% set mostRecentFeedback = participant.findMostRecentPublishedFeedback %}
+<form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
+      method="POST"
+      class="progress-tick-form"
+      data-progress-tick-form>
+    {% if mostRecentFeedback.isMarkedAsCompleted %}
+        <a href="#"
+           class="no-text progress-tick complete"
+           title="Completed"
+           data-progress-tick-status="complete"></a>
+    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
+        <a href="#"
+           class="no-text progress-tick pending"
+           title="Self-assessed"
+           data-progress-tick-status="selfAssessed"></a>
+    {% else %}
+        <a href="#"
+           class="no-text progress-tick"
+           title="Not attempted"
+           data-progress-tick-status="notAttempted"></a>
+    {% endif %}
+</form>
