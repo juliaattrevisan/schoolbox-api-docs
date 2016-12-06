@@ -1,5 +1,3 @@
 {% set fbUrl %}{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: participant.assessable.id, studentId: participant.user.id }) }}{% endset %}
 
-<form class="progress-tick-form" method="post" action="{{ fbUrl }}">
-    <a href="#" data-completion class="progress-tick {{ pStatusClass }}" title="{{ pTooltip }}"></a>
-</form>
+{% include '@learningAssessment/task/progressTickForm.twig' with {participant: participant} %}

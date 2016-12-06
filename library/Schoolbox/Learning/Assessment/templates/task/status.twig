@@ -49,53 +49,15 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('#assessment-status').on('click', '[data-completion]', function (e) {
-                e.preventDefault();
-
-                var $a = $(this),
-                    $row  = $a.closest('[data-status]'),
-                    $form = $a.closest('form'),
-                    map = {
-                        1: 'incomplete',
-                        2: 'pending',
-                        3: 'complete'
-                    },
-                    newStatusCode;
-
-                if ($form.attr('disabled')) {
-                    return;
+            $('form[data-progress-tick-form]').progressTickForm({
+                transitions: {
+                    notAttempted: 'complete',
+                    selfAssessed: 'notAttempted',
+                    complete:     'notAttempted'
                 }
-
-                if ($a.hasClass('complete')) {
-                    newStatusCode  = 1;
-                } else {
-                    newStatusCode  = 3;
-                }
-
-                $.ajax($form.attr('action'), {
-                    type: $form.attr('method') || 'post',
-                    dataType: 'json',
-                    data: { status: newStatusCode }
-                })
-                .done(function (rs) {
-                    var newClass = map[rs.status],
-                        $light   = $row.find('[data-status]'),
-                        newLabel = function (string) { return string && (string.charAt(0).toUpperCase() + string.slice(1)); }(newClass);
-
-                    $row.attr('data-status', newClass);
-
-                    $a.removeClass('incomplete pending complete').addClass(newClass);
-                    $light.removeClass('incomplete pending complete').addClass(newClass);
-
-                    $light.siblings('span').html(newLabel);
-                })
-                .always(function () {
-                    $form.removeAttr('disabled')
-                });
-
-                $form.attr('disabled', 'disabled');
             });
         });
     </script>
