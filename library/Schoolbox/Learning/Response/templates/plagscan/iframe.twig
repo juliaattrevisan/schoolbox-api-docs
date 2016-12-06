@@ -1,23 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-<script src="/javascript/shared/jquery.responsive-iframe.js"></script>
-<script type="text/javascript">
-    $(function() {
-
-        /**
-         * Resize iframe dynamically ("responsively")
-         */
-        $.fn.responsiveIframe({
-            onLoad: function() {
-                $('#plagscan-report').height($(window).height() * 0.75);
-            },
-            onResize: function() {
-                $('#plagscan-report').height($(window).height() * 0.75);
-            }
-        });
-    });
-</script>
-
 {# Conditional bread?? -_-
  #}
 {% if assessment.context is project %}
@@ -43,7 +25,6 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <iframe id='plagscan-report' src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {plagscanId: plagscan.plagscanId}) }}" class="no-margin no-padding" frameborder="0"></iframe>
+        <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {plagscanId: plagscan.plagscanId}) }}" frameborder="0"></iframe>
     </div>
 </div>
-
