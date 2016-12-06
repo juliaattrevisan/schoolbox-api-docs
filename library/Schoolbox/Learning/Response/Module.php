@@ -66,7 +66,7 @@ class Module extends BaseModule
                  * View a Response File's plagscan report contents
                  */
                 '/responses/{assessmentId}/{responseId}/plagscan/{plagscanId}'               => 'getPlagscanReport',
-                '/responses/{assessmentId}/{responseId}/plagscan/{plagscanId}/contents'      => 'getPlagscanReportContents',
+                '/responses/plagscan/{plagscanId}/contents'                                  => 'getPlagscanReportContents',
 
                 /* View a Response in the Inline Grader
                  */
