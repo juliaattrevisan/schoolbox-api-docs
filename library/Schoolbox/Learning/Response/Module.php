@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
@@ -26,8 +25,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
-
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
 class Module extends BaseModule
 {
@@ -47,7 +46,6 @@ class Module extends BaseModule
         $this->register('DELETE', '/assessments/{assessmentId}/responses/{responseId}', 'deleteParticularResponse');
     }
 
-
     /**
      * @inheritdoc
      */
@@ -64,13 +62,16 @@ class Module extends BaseModule
                  */
                 '/responses/{assessmentId}/{responseId}/{feedbackId}/annotated/{crocodocId}' => 'getCrocodocView',
 
+                /* View a Response File's plagscan report iframe
+                 * View a Response File's plagscan report contents
+                 */
+                '/responses/{assessmentId}/{responseId}/plagscan/{plagscanId}'               => 'getPlagscanReport',
+                '/responses/plagscan/{plagscanId}/contents'                                  => 'getPlagscanReportContents',
+
                 /* View a Response in the Inline Grader
                  */
                 '/responses/{assessmentId}/{studentId}{/responseId}'                         => 'getParticularResponse',
 
-                /* View a Response File's plagscan report
-                 */
-                '/responses/plagscan/{plagscanId}'                                           => 'getPlagscanReport',
             ],
             'POST' => []
         ];
@@ -89,7 +90,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getParticularResponse)';
+        $ruleRegexp = '(getParticularResponse|getPlagscanReport|getPlagscanReportContents)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\Any(
@@ -217,11 +218,45 @@ class Module extends BaseModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:getPlagscanReport)', function ($params) {
+        $this->addRoutePreload($matcher, 'getPlagscanReport', function ($params) {
 
             /* @var Plagscan $document */
             try {
-                $plagscanDocument = \Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+                $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+            }
+            catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Die early when requested Assessment doesn't exist
+             */
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
+            /* Die early when requested Response doesn't exist in $assessment
+             */
+            try {
+                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+            }
+            catch (\OutOfBoundsException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+            return [
+                'assessment' => $assessment,
+                'response' => $response,
+                'plagscan' => $plagscanDocument,
+            ];
+        });
+
+        $this->addRoutePreload($matcher, 'getPlagscanReportContents', function ($params) {
+
+            /* @var Plagscan $plagscanDocument */
+            try {
+                $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
             }
             catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);

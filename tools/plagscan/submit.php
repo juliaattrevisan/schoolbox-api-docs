@@ -9,59 +9,95 @@
  *
  */
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
+
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
-$mapper = Plagscan_DocumentMapper::getInstance();
-$docs   = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
+try {
+    $mapper = PlagscanMapper::getInstance();
+}
+catch (\DomainException $e) {
 
-//
-// Hit the Plagscan API for each document.
-$key      = Config::get('plagscan_api_key');
-$username = Config::get('plagscan_username');
-if (empty($username) || empty($key)) {
-    $log->warning("Plagscan scan not run, as Plagscan is not configured");
-    exit;
+    /* Plagscan not configured - nothing to do
+     */
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
+    exit();
 }
 
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
 
-$log->info("Plagscan resubmission started processing ".$docs->count()." docs");
-$gateway      = new Plagscan_Gateway($username, $key);
+$log->info("Plagscan now re-processing {$allDocuments->count()} documents");
 
-foreach ($docs as $doc) {
+$numUpdated = 0;
 
-    try{
-        $submission = SubmissionMapper::getInstance()->findById($doc->getFile()->getId());
+/** @var Plagscan $currentDocument */
+foreach ($allDocuments as $currentDocument) {
+    $prefix = "Plagscan_id {$currentDocument->getPlagscanId()}";
 
-        // TODO fix this to work with multiple files
-        $documentId = $gateway->submit($submission);
+    try {
+        /** @var StudentSubmissionFile $studentSubmissionFile */
+        $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
+
+        /* Convert to new format
+         */
+        $submissionFile = new SubmissionFile();
+        $submissionFile->setStorage($studentSubmissionFile->getStorage());
+
+        /* Send it back to plag which returns some other int
+         * that we don't seem to keep anywhere - it's some kind
+         * of internal id for Plagscan itself
+         */
+        $log->info("{$prefix}: resubmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+
+        $documentId = $mapper->getGateway()->submit($submissionFile);
 
         if (!empty($documentId)) {
-            $response = $gateway->check($documentId);
 
-            if($response) {
-                $doc->setPlagscanId($documentId);
-                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
-                $mapper->save($doc);
+            $log->info("{$prefix}: checking that plagscan has {$currentDocument->getStudentSubmissionFileId()}");
+            $response = $mapper->getGateway()->check($documentId);
 
-                $log->info("Resubmitted document ".$doc->getId()." for processing: ".$documentId);
+            if ($response) {
+                $currentDocument->setPlagscanId($documentId);
+                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                $mapper->save($currentDocument);
+
+                $log->info("{$prefix}: set document {$currentDocument->getId()} to pending status");
+                $numUpdated++;
             }
             else {
-                $log->warning("Check of document failed ".$doc->getId().": ".$response);
-
+                $log->warning("{$prefix}: check of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
             }
-
         }
         else {
-            $log->warning("Submission of document ".$doc->getId()." failed: ".$documentId);
+            $log->warning("{$prefix}: submission of document {$currentDocument->getId()} failed for submission file {$currentDocument->getStudentSubmissionFileId()}");
         }
-    } catch (Schoolbox\Mapper\Exception $e) {
-        $log->warning("Unable to find submission ".$doc->getFile()->getId());
     }
+    catch (Schoolbox\Mapper\Exception $e) {
+        $log->warning("{$prefix}: unable to find student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
+        /* Couldn't find the file or any of its pieces
+         * So we continue instead, ignoring this plagscan doc
+         */
+        continue;
+    }
 }
 
+$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+
+/* Also tell me how many died
+ */
+$numFailed = $allDocuments->count() - $numUpdated;
+
+if ($numFailed) {
+    $log->info("$numFailed documents failed scanning");
+}

@@ -120,6 +120,10 @@ class Factory
 
         $files = [];
 
+        /* Sort files alphabetically
+         */
+        $response->getAllFiles()->sortBy('filename', 'asc');
+
         foreach ($response->getAllFiles() as $file) {
 
             /* Ignore accumulation of wizzywig contents
@@ -148,6 +152,11 @@ class Factory
 
         $files = [];
         if ($feedback instanceof Feedback) {
+
+            /* Sort files alphabetically
+             */
+            $feedback->getAllFiles()->sortBy('filename', 'asc');
+
             foreach ($feedback->getAllFiles() as $file) {
                 $files[] = $file->getHash();
             }

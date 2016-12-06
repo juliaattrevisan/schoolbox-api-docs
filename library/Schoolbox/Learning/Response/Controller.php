@@ -10,21 +10,21 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
-use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
@@ -98,6 +98,11 @@ class Controller extends Base
         $file = null;
 
         if ($response && $response->getAllFiles()->count()) {
+
+            /* Sort files alphabetically
+             */
+            $response->getAllFiles()->sortBy('filename', 'asc');
+
             try {
                 $file = $response->findFileByHash($this->getRequest()->query['hash']);
             }
@@ -107,6 +112,7 @@ class Controller extends Base
         }
 
         // The zone which contains the files
+        /** @var IFeedback $latestFeedback */
         $latestFeedback    = $participant->findMostRecentFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
@@ -115,6 +121,7 @@ class Controller extends Base
          * crocodocable files that somehow die
          */
         try {
+
             $data = [
                 'assessment' => $assessment,
                 'response' => $response,
@@ -301,24 +308,35 @@ class Controller extends Base
     /**
      * Dump out a plagscan report
      *
+     * @param IAssessable $assessment
+     * @param IResponse $response
      * @param Plagscan $plagscan
      */
-    public function getPlagscanReport(Plagscan $plagscan)
+    public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
     {
-        /* Make an absolute url
-         *
-         * http or https, and top-level host where we are installed
-         */
-        $requestScheme = $this->getRequest()->server->get('REQUEST_SCHEME');
-        $host = $this->getRequest()->server->get('HTTP_HOST');
-
-        /* Twiggle it
-         */
         $data = [
-            'url' => $plagscan->getUrl($requestScheme, $host)
+            'plagscan' => $plagscan,
+            'assessment' => $assessment,
+            'response' => $response
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscanReport.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
+    }
+
+    /**
+     * Loads up the Plagscan report contents - used in conjunction with
+     * getPlagscanReport() because this loads plagscan-formatted html
+     * which needs to be spawned in an iframe (sigh)
+     *
+     * @param Plagscan $plagscan
+     */
+    public function getPlagscanReportContents(Plagscan $plagscan)
+    {
+        $data = [
+            'html' => $plagscan->getHtml(),
+        ];
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscan/contents.twig', $data));
     }
 
     /* Getters/Setters

@@ -212,6 +212,10 @@ class Full
                             $currentFeedback->getAllFiles()->add($currentFile);
                         }
                     }
+
+                    /* Sort files alphabetically
+                     */
+                    $currentFeedback->getAllFiles()->sortBy('filename', 'asc');
                 }
 
                 /* Mutate collection :/
@@ -219,6 +223,10 @@ class Full
                  * to display crocodocked files in the Feedback File list
                  */
                 $currentResponse->setAllFeedback($includedFeedback);
+
+                /* Sort files alphabetically
+                 */
+                $currentResponse->getAllFiles()->sortBy('filename', 'asc');
 
                 $this->getRecombined()->add($currentResponse);
             }

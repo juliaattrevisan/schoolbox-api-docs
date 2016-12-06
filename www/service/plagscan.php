@@ -10,52 +10,22 @@
 
 require_once '../../library/Bootstrap.php';
 
-class Plagscan_ServiceController {
-    private $gateway;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Callback as PlagscanCallback;
 
-    public function __construct () {
-        $plagscanApiKey = Config::get('plagscan_api_key');
-        $plagscanUsername = Config::get('plagscan_username');
+try {
+    $callback = new PlagscanCallback();
+}
+catch (\DomainException $e) {
 
-        $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
-    }
-
-    /**
-     * Executed when callback from PlagScan is triggered, and requests the report from PlagScan
-     * @param $documentId
-     * @return bool
+    /* Plagscan not configured - nothing to do
      */
-    public function notifyComplete ($documentId) {
-        try {
-            /* @var $document \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan */
-            $document = Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
-            if (!($document instanceof \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan)) {
-                return false;
-            }
-
-            $plagscanStat = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
-            $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
-
-            $document->setScore($plagscanStat->LEVEL / 10);
-            $document->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
-
-            $document->setHtml($plagscanHtml);
-
-            Plagscan_DocumentMapper::getInstance()->save($document);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
-            return false;
-        }
-        return true;
-    }
-
+    exit();
 }
 
-/* Handles responses from PlagScan which indicate a document has completed plagiarism scanning */
+/* Handles responses from PlagScan which indicate a document has completed plagiarism scanning
+ */
 $documentId = $_SERVER["QUERY_STRING"];
 
-if ( !empty($documentId) ) {
-    $serviceController = new Plagscan_ServiceController;
-
-    echo $serviceController->notifyComplete($documentId);
+if (!empty($documentId) ) {
+    echo $callback->notifyComplete($documentId);
 }

@@ -10,90 +10,110 @@
  * @link             http://www.alaress.com.au/
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Gateway as PlagscanGateway;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
+try {
+    $mapper = PlagscanMapper::getInstance();
+}
+catch (\DomainException $e) {
+
+    /* Plagscan not configured - nothing to do
+     */
+    $log->warning("Plagscan scan did not run: username/api key is not configured correctly");
+    exit();
+}
+
+$log->info("Plagscan is now choosing modes and options");
+
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
 
-//
-// Hit the Plagscan API for each document.
-$key      = Config::get('plagscan_api_key');
-$username = Config::get('plagscan_username');
-if (empty($username) || empty($key)) {
-	$log->warning("Plagscan scan not run, as Plagscan is not configured");
-	exit;
-}
-
-$log->info("Plagscan scan started");
-
-// Get documents
-$mapper = Plagscan_DocumentMapper::getInstance();
+/* Re-scan plagscan records
+ */
 if ($reRetrieveMode) {
-    $log->info("Scanner running in re-retrieve mode");
-    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
-} else {
-    $log->info("Scanner running in scan mode");
-    $docs = $mapper->findByColumn('status', \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_QUEUED);
+    $log->info("Scanner running in re-retrieve mode.");
+    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
+}
+/* Scan currently-pending plagscan records
+ */
+else {
+    $log->info("Scanner running in scan mode.");
+    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
 }
 
-$gateway      = new Plagscan_Gateway($username, $key);
-$updated_docs = 0;
-foreach ($docs as $doc) {
+$log->info("Plagscan now processing {$allDocuments->count()} documents");
 
-	/** @var Plagscan_Document $doc */
-	$doc_id = $doc->getPlagscanId();
+$numUpdated = 0;
+
+/** @var Plagscan $currentDocument */
+foreach ($allDocuments as $currentDocument) {
 
     /* Sometimes plagscan gives you back -1 as the plagscan_id
      * In this case, just skip it, so the daemon doesn't get
      * stuck trying to process the unprocessable
      *
-     * I am also going to assume that $doc_id has to be greater
-     * than zero. I can't think of why zero would be valid.
+     * I am also going to assume that $currentDocument->getPlagscanId()
+     *  has to be greater than zero. I can't think of why zero would be valid.
      */
-    if ($doc_id > 0) {
-        $stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
+    if ($currentDocument->getPlagscanId() > 0) {
+        $stats = $mapper->getGateway()->retrieve($currentDocument->getPlagscanId(), PlagscanGateway::MODE_RETRIEVE_STATISTICS_ONLY);
+
         if (!$stats) {
-            $log->error("Plagscan scan failed - check API key and username?");
+            $log->error("Plagscan failed at Gateway retrieval. Check API key and username?");
             exit(2);
         }
 
-        //
         // Is this document scannable? If not, mark as such and don't scan again.
         if ((string)$stats->MSG === 'ERR') {
             if (!$reRetrieveMode) {
-                $doc->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_UNSCANNABLE);
-                Plagscan_DocumentMapper::getInstance()->save($doc);
+                $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
+                $mapper->save($currentDocument);
             }
-            $log->error("Document unscannable: ". print_r( $stats, true ));
+
+            $log->error("Document {$currentDocument->getId()} unscannable: ". print_r($stats, true));
+
             continue;
         }
 
-        //
         // Has a level been retrieved yet? How can I tell?
         $level = (string)$stats->LEVEL;
+
         if (strlen($level) > 0) {
             if (!$reRetrieveMode) {
-                $doc->setScore($level / 10)
-                    ->setStatus(\Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan::STATUS_COMPLETE);
+                $currentDocument->setScore($level / 10)->setStatus(Plagscan::STATUS_COMPLETE);
             }
-            $doc->setHtml(
-                $gateway->retrieve(
-                    $doc_id,
-                    Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE
-                )
-            );
-            Plagscan_DocumentMapper::getInstance()->save($doc);
-            $updated_docs++;
-            $log->info("Retrieved scan status for $doc_id");
-        } else {
-            $response = $gateway->check($doc_id);
+
+            $currentDocument->setHtml($mapper->getGateway()->retrieve(
+                $currentDocument->getPlagscanId(),
+                PlagscanGateway::MODE_RETRIEVE_HTML_INTERACTIVE
+            ));
+
+            $mapper->save($currentDocument);
+            $numUpdated++;
+
+            $log->info("Retrieved scan status for {$currentDocument->getPlagscanId()}");
+        }
+        else {
+            $response = $mapper->getGateway()->check($currentDocument->getPlagscanId());
+
             $log->warning("Bad level for document, still pending result: ".print_r($stats,true).print_r($response,true));
         }
     }
 }
 
-$log->info("Plagscan scan completed - $updated_docs documents scanned");
+$log->info("Plagscan scan completed. $numUpdated documents were scanned");
+
+/* Also tell me how many died
+ */
+$numFailed = $allDocuments->count() - $numUpdated;
+
+if ($numFailed) {
+    $log->info("$numFailed documents failed scanning");
+}

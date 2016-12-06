@@ -79,6 +79,12 @@
                 <textarea tabindex="{{ tabIndex.comment }}" name="comment" placeholder="Feedback for {{ participant.user.firstName }}" rows="3">{{ latestFeedback.comment }}</textarea>
             </label>
         </div>
+        {# Maybe files may be uploaded here? #}
+        {% if feedbackAttachzone %}
+            <div class="small-12 columns">
+                {% include 'sub/attachzone.twig' with {attachzone: feedbackAttachzone} %}
+            </div>
+        {% endif %}
         <div class="small-12 column no-pad">
             <div class="component-action">
                 <section>
@@ -91,12 +97,5 @@
                 </section>
             </div>
         </div>
-
-        {# Maybe files may be uploaded here? #}
-        {% if feedbackAttachzone %}
-        <div class="small-12 columns no-pad">
-            {% include 'sub/attachzone.twig' with {attachzone: feedbackAttachzone} %}
-        </div>
-        {% endif %}
     </div>
 </form>

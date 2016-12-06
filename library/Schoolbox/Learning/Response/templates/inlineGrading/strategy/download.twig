@@ -17,11 +17,11 @@
                             </a>
                             <p class="meta">{{ file.size | bytes }}</p>
 
-                            {% include '@learning/dueWork/plagscan.twig' with {currentFile: file} %}
+                            {% include '@learning/dueWork/plagscan/status.twig' with {currentFile: file} %}
                         </div>
                     </div>
                     <nav>
-                        {% include '@learning/dueWork/plagscanLink.twig' with {currentFile: file} %}
+                        {% include '@learning/dueWork/plagscan/link.twig' with {currentFile: file} %}
                         <a href="/storage/fetch.php?hash={{ file.hash }}" class="icon-download" title="Download"></a>
                     </nav>
                 </li>

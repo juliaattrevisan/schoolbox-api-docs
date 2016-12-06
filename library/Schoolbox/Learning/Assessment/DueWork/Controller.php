@@ -31,6 +31,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 
 class Controller extends Assessment\Controller
 {
@@ -124,6 +125,14 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
@@ -136,8 +145,7 @@ class Controller extends Assessment\Controller
         ];
 
         try {
-            // TODO this should be called 'assert', not 'is'
-            $assessment->isAcceptSubmission();
+            $assessment->assertAcceptSubmission($allResponses);
             $twigData['submissionsBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
@@ -166,10 +174,21 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         /* Work out if we are going to accept responses
          */
         try {
-            $assessment->isAcceptSubmission();
+
+            /* assertAcceptSubmission() requires a list of responses to decide outcome
+             */
+            $assessment->assertAcceptSubmission($allResponses);
 
         } catch (DomainException $e) {
             throw $this->getErrorMapper()->generateException($e->getCode());
@@ -180,14 +199,6 @@ class Controller extends Assessment\Controller
         $latestResponse = null;
         $editorContents = '';
         $dangerZone = null;
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-
-        /** @var Submission\File\Model $submission */
-        $allResponses = $participant->getAllResponses();
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -264,10 +275,21 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         /* Work out if we are going to accept responses
          */
         try {
-            $assessment->isAcceptSubmission();
+
+            /* assertAcceptSubmission() requires a list of responses to decide outcome
+             */
+            $assessment->assertAcceptSubmission($allResponses);
         }
         catch (DomainException $e) {
 
@@ -277,8 +299,6 @@ class Controller extends Assessment\Controller
             if ($rq->isXhr()) {
                 $result['success'] = false;
                 $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-                // Probably don't need id
-//                $result['id']      = 72;
 
                 $rs->status->setCode(403);
                 $rs->content->set($this->buildJsonOutput($result));
@@ -356,6 +376,38 @@ class Controller extends Assessment\Controller
         /* Do the actual saving
          */
         $this->getDueWorkResponseMapper()->save($response);
+
+        /* Send each file in the Submission to Plagscan
+         * if the Submission was saved successfully
+         *
+         * Only plagscan when actually submitting final
+         */
+        try {
+            $plagscanMapper = PlagscanMapper::getInstance();
+
+            $this->getResponse()->content->set([
+                'postOutput' => [
+                    function() use ($plagscanMapper, $isFinal, $response) {
+                        if ($isFinal && $response->getId()) {
+
+                            /* TODO: Dirty hack because $currentFile has no primary key value atm due to swamp
+                             * TODO: Rip it back out like Pacific Rim
+                             */
+                            $response = $this->getDueWorkResponseMapper()->findById($response->getId());
+
+                            foreach ($response->getAllFiles() as $currentFile) {
+                                $plagscanMapper->saveNewPlagscan($currentFile);
+                            }
+                        }
+                    }
+                ],
+            ]);
+        }
+        catch (\DomainException $e) {
+
+            /* noop - plagscan not configured
+             */
+        }
 
         /* Saving drafts from the wizzywig
          */

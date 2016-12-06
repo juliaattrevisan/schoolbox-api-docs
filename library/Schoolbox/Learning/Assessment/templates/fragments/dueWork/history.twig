@@ -64,7 +64,7 @@
             {# Lookahead to see if there was at least one submission
              #}
             {% for currentInteraction in timeline %}
-                {% if currentInteraction is response %}
+                {% if currentInteraction is response and not firstSubmissionIndex %}
                     {% set firstSubmissionIndex = loop.index %}
                 {% endif %}
             {% endfor %}

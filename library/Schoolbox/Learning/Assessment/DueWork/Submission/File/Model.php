@@ -17,6 +17,8 @@ use Schoolbox\Resource\Storage\IStorage;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Resource\File\StorableTrait;
 
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+
 class Model implements IStorage
 {
     use StorableTrait;
@@ -43,13 +45,6 @@ class Model implements IStorage
      * @var bool
      */
     protected $editableInline;
-
-    /**
-     * File constructor.
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * This Submission File has an attached Plagscan result document

@@ -16,7 +16,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use Schoolbox\Mapper;

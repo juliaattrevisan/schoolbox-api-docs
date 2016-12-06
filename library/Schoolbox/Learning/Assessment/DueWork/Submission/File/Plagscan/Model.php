@@ -8,12 +8,16 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
+namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class Plagscan
+class Model
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /**
@@ -64,11 +68,9 @@ class Plagscan
     protected $html;
 
     /**
-     * Plagscan constructor.
+     * @var int
      */
-    public function __construct()
-    {
-    }
+    protected $studentSubmissionFileId;
 
     /**
      * Figure out the url to the plagscan report
@@ -217,6 +219,24 @@ class Plagscan
     public function setHtml($html)
     {
         $this->html = $html;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStudentSubmissionFileId()
+    {
+        return $this->studentSubmissionFileId;
+    }
+
+    /**
+     * @param mixed $studentSubmissionFileId
+     * @return $this
+     */
+    public function setStudentSubmissionFileId($studentSubmissionFileId)
+    {
+        $this->studentSubmissionFileId = $studentSubmissionFileId;
         return $this;
     }
 }

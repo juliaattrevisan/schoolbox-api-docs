@@ -14,16 +14,14 @@
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
         [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
-        ['Inline Grader', null]
+        ['Inline Grader']
     ] %}
 {% else %}
     {% set nodes = [
         ['Learning', routeLookup('learning.getClasses')],
         ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
         [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Timeline', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id})],
-        ['Inline Grader', null]
+        ['Inline Grader'],
     ] %}
 {% endif %}
 
@@ -87,7 +85,7 @@
     </div>
 </div>
 
-{% if responseList|length %}
+{% if responseList|length > 1 %}
 <div class="row">
     <div class="small-12 columns">
         <select id="response-selector">
@@ -95,7 +93,7 @@
                 {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id}) %}
 
                 {% if viewRoute %}
-                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.index }}. Submission at {{ currentResponse.submittedAt.local }}</option>
+                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -111,7 +109,6 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Files</h2>
-        <section>
             <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                 {% for currentFile in response.allFiles %}
                     {% set selected = '' %}
@@ -129,17 +126,16 @@
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
 
-                                    {% include '@learning/dueWork/plagscan.twig' %}
+                                    {% include '@learning/dueWork/plagscan/status.twig' %}
                                 </a>
                             </div>
                         </div>
                         <nav>
-                            {% include '@learning/dueWork/plagscanLink.twig' %}
+                            {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
                         </nav>
                     </li>
                 {% endfor %}
             </ul>
-        </section>
     </div>
 </div>
 {% endif %}

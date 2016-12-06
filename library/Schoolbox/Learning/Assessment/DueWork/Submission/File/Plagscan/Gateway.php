@@ -1,6 +1,4 @@
 <?php
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
@@ -9,7 +7,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
  * @version     SVN: $Id$
  *
  */
-class Plagscan_Gateway
+
+namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+
+class Gateway
 {
 
     const API_VERSION = '2.0';
@@ -23,18 +27,24 @@ class Plagscan_Gateway
     const MODE_RETRIEVE_STATISTICS_ONLY = 0;
 
     const MODE_RETRIEVE_PLAINTEXT = 1;
-    const MODE_RETRIEVE_XML       = 2;
-    const MODE_RETRIEVE_DOCX      = 3;
+    const MODE_RETRIEVE_XML = 2;
+    const MODE_RETRIEVE_DOCX = 3;
 
-    const MODE_RETRIEVE_HTML_ANNOTATED   = 4;
-    const MODE_RETRIEVE_HTML_SOURCES     = 5;
+    const MODE_RETRIEVE_HTML_ANNOTATED = 4;
+    const MODE_RETRIEVE_HTML_SOURCES = 5;
     const MODE_RETRIEVE_HTML_INTERACTIVE = 6;
 
     const MODE_RETRIEVE_PDF_ANNOTATED = 8;
-    const MODE_RETRIEVE_PDF_SOURCES   = 9;
+    const MODE_RETRIEVE_PDF_SOURCES = 9;
 
+    /**
+     * @var string
+     */
     private $username;
 
+    /**
+     * @var string
+     */
     private $apiKey;
 
     private $errorCode;
@@ -43,38 +53,51 @@ class Plagscan_Gateway
 
     private $response;
 
-    public function __construct($username, $apiKey)
-    {
-        $this->username = $username;
-        $this->apiKey   = $apiKey;
-    }
-
-    public function getErrorCode()
-    {
-        return $this->errorCode;
-    }
-
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
-    }
-
+    /**
+     * A key/value array of allowable file types as specified
+     * by Plagscan themselves
+     *
+     * @var array
+     */
+    private $validDocuments = [
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'doc'  => 'application/msword',
+        'pdf'  => 'application/pdf',
+        'ppt'  => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'xls'  => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'odt'  => 'application/vnd.oasis.opendocument.text',
+        'txt'  => 'text/plain',
+        'rtf'  => 'text/richtext',
+        'html' => 'text/html',
+    ];
 
     /**
-     * @param Submission\SingleFile\Model $submission
+     * Gateway constructor.
+     * @param $username
+     * @param $apiKey
+     */
+    public function __construct($username, $apiKey)
+    {
+        $this->setUsername($username);
+        $this->setApiKey($apiKey);
+    }
+
+    /**
+     * @param SubmissionFile $submissionFile
      * @return string
      */
-    public function submit(Submission\SingleFile\Model $submission)
+    public function submit(SubmissionFile $submissionFile)
     {
-        $documentName = $submission->getBasename();
+        $documentName = $submissionFile->getBasename();
 
-        /** @var Schoolbox\Resource\Storage\Model $file */
-        $file = $submission->getStorage();
+        /** @var \Schoolbox\Resource\Storage\Model $file */
+        $file = $submissionFile->getStorage();
         $documentData = $file->read();
 
         return $this->postForToken($documentName, $documentData);
     }
-
 
     /**
      * POSTs the given filedata to Plagscan, and returns the ID assigned
@@ -84,24 +107,23 @@ class Plagscan_Gateway
      * @return string
      */
     protected function postForToken($documentName, $documentData) {
-        $parameterList = $this->createParameters([
-            'METHOD' => self::METHOD_SUBMIT
-        ]);
 
+        /* Check valid extensions and die early if trying
+         * to analyse an illegal file type
+         */
         $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
-        $validDocumentExtensionList = array(
-            'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'doc'=>'application/msword',
-            'pdf'=>'application/pdf',
-            'txt'=>'text/plain',
-            'rtf'=>'text/richtext',
-            'html'=>'text/html',
-        );
+        $validDocumentExtensionList = $this->getValidDocuments();
 
         if (!isset($validDocumentExtensionList[$documentExtension])) {
             return null;
         }
+
+        /* Otherwise continue normally
+         */
+        $parameterList = $this->createParameters([
+            'METHOD' => self::METHOD_SUBMIT
+        ]);
 
         $documentParameter = "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
         $documentParameter .= "Content-Type: {$validDocumentExtensionList[$documentExtension]}\n";
@@ -111,12 +133,12 @@ class Plagscan_Gateway
         $this->createRequest($parameterList, array($documentParameter));
 
         $response = $this->parseXmlResponse($this->response);
-        if($response instanceof SimpleXMLElement) {
+
+        if ($response instanceof \SimpleXMLElement) {
             return (string)$response->PID;
         }
-        else {
-            return null;
-        }
+
+        return null;
     }
 
     /**
@@ -125,7 +147,7 @@ class Plagscan_Gateway
      * @param $documentId
      * @param $retrieveMode
      *
-     * @return bool|SimpleXMLElement
+     * @return bool|\SimpleXMLElement
      */
     public function retrieve($documentId, $retrieveMode)
     {
@@ -137,27 +159,38 @@ class Plagscan_Gateway
             )
         );
 
+        /* Process the list of pending plagscans
+         */
         if ($this->createRequest($parameterList)) {
             if ($retrieveMode == self::MODE_RETRIEVE_PLAINTEXT) {
                 // plaintext
                 return $this->parsePlainResponse($this->response);
-            } elseif ($retrieveMode < self::MODE_RETRIEVE_DOCX) {
+            }
+            elseif ($retrieveMode < self::MODE_RETRIEVE_DOCX) {
                 // xml
                 return $this->parseXmlResponse($this->response);
-            } elseif ($retrieveMode == self::MODE_RETRIEVE_DOCX
-                || $retrieveMode > self::MODE_RETRIEVE_HTML_INTERACTIVE
-            ) {
+            }
+            elseif ($retrieveMode == self::MODE_RETRIEVE_DOCX || $retrieveMode > self::MODE_RETRIEVE_HTML_INTERACTIVE) {
                 // file download
                 return $this->parseFileResponse($this->response);
-            } else {
+            }
+            else {
                 // html
                 return $this->parseHtmlResponse($this->response);
             }
-        } else {
-            return false;
         }
+
+        return false;
     }
 
+    /**
+     * Checks whether Plagscan has its own internal id for a file that
+     * we have previously uploaded. We use this to determine if Plagscan
+     * has one of our files on record
+     *
+     * @param $documentId
+     * @return bool|\SimpleXMLElement
+     */
     public function check($documentId)
     {
         $parameterList = $this->createParameters(
@@ -168,11 +201,10 @@ class Plagscan_Gateway
         );
 
         if ($this->createRequest($parameterList)) {
-            $response = $this->parseXmlResponse($this->response);
-            return $response;
-        } else {
-            return false;
+            return $this->parseXmlResponse($this->response);
         }
+
+        return false;
     }
 
     public function delete($documentId)
@@ -192,6 +224,13 @@ class Plagscan_Gateway
         }
     }
 
+    /**
+     * Initiate a request to Plagscan
+     *
+     * @param $parameterList
+     * @param array $rawParameterList
+     * @return bool
+     */
     private function createRequest($parameterList, $rawParameterList = array())
     {
         $url = parse_url(self::API_URL);
@@ -202,7 +241,8 @@ class Plagscan_Gateway
         $boundary = '---------------------' . substr(md5(rand(0, 32000)), 0, 10);
 
         // build a proxy context (will be null if proxy isn't configured)
-        $context = Proxy\Server::getInstance()->getContext('https');
+        $context = \Proxy\Server::getInstance()->getContext('https');
+
         if ($socket = stream_socket_client(
             "ssl://$host:443",
             $errorCode,
@@ -247,7 +287,8 @@ class Plagscan_Gateway
             $this->response = $response;
 
             return true;
-        } else {
+        }
+        else {
             $this->errorCode    = $errorCode;
             $this->errorMessage = $errorMessage;
 
@@ -277,13 +318,13 @@ class Plagscan_Gateway
             // unfortunately try-catch isn't enough here, temporarily set a custom error handler for this scenario
             set_error_handler(
                 function ($errno, $errstr, $errfile, $errline, $errcontext) {
-                    throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
+                    throw new \ErrorException($errstr, $errno, 1, $errfile, $errline);
                 }
             );
-            $sxe = new SimpleXMLElement($content);
+            $sxe = new \SimpleXMLElement($content);
             restore_error_handler();
             return $sxe;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             restore_error_handler();
             return false;
         }
@@ -304,5 +345,116 @@ class Plagscan_Gateway
     {
         list($header, $content) = explode("\r\n\r\n", $response, 2);
         return $content;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return string
+     */
+    private function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     * @return $this
+     */
+    private function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    private function getApiKey()
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * @param string $apiKey
+     * @return $this
+     */
+    private function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param mixed $response
+     * @return $this
+     */
+    private function setResponse($response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * @param mixed $errorCode
+     * @return $this
+     */
+    private function setErrorCode($errorCode)
+    {
+        $this->errorCode = $errorCode;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * @param mixed $errorMessage
+     * @return $this
+     */
+    private function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    private function getValidDocuments()
+    {
+        return $this->validDocuments;
+    }
+
+    /**
+     * @param array $validDocuments
+     * @return $this
+     */
+    private function setValidDocuments($validDocuments)
+    {
+        $this->validDocuments = $validDocuments;
+        return $this;
     }
 }
