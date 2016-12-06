@@ -4,6 +4,7 @@
 <script type="text/javascript">
     $(function() {
         $('[data-plugin="preview"]').preview();
+        console.log('mog');
     });
 </script>
 
@@ -21,20 +22,23 @@
 </div>
 
 <div class="row">
-{% if preview.fragment|length %}
+    {% if preview.fragment|length %}
     <div class="small-12 island">
-    {% if preview.type == 'image' %}
-        <img src="{{ preview.fragment }}">
-    {% elseif preview.type == 'file' %}
-    <section>
-        <div class="card small-12">
-            <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
-                <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="{{ preview.file.mimetype }}" />
-                <h3>{{ preview.file.filename }}</h3>
+
+        {% if preview.type == 'image' %}
+        <a href="{{ preview.fragment }}" data-plugin="preview">
+            <img src="{{ preview.fragment }}" data-plugin="preview">
+        </a>
+        {% elseif preview.type == 'file' %}
+        <section>
+            <div class="card small-12 compact">
+                <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
+                    <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="mime {{ preview.file.mimetype }}" />
+                    <p>{{ preview.file.filename }}</p>
+                </a>
                 <p class="meta">{{ preview.file.size|bytes}}</p>
-            </a>
-        </div>
-    </section>
+            </div>
+        </section>
         {% elseif preview.type == 'redirect' %}
         <section>
             <div class="card small-12">
