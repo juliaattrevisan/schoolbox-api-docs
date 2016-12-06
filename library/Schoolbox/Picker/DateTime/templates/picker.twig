@@ -1,4 +1,13 @@
+{# Placeholder for calendar ot be rendered in #}
+
 <div id="pickerCalendar{{ id }}"></div>
+
+{# Placeholder for appointments to be rendered in #}
+
+<div id="pickerApointments{{ id }}"></div>
+
+{# Setup calendar #}
+
 <script>
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
         defaultDate: '{{ value }}',
@@ -8,8 +17,45 @@
         altFormat: '{{ databaseFormat }}',
         enableTime: true,
         onChange: function(selectedDates, dateString, instance) {
+
+            {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
+
             $('#pickerCalendar{{ id }}').data('dateDisplay', dateString);
-            // This is where we would AJAX in the student appointments etc
+
+            {# AJAX in appointments for the selected date #}
+
+            var pickerApointments = $('#pickerApointments{{ id }}');
+
+            pickerApointments.html('Loading events');
+
+            $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(instance.altInput.value)))
+                .done(function(data) {
+
+                    if (data.appointments.length == 0) {
+
+                        {# There we no appointment on the selected date #}
+
+                        pickerApointments.html('No events found');
+
+                    } else {
+
+                        {# Clear out any old appointments #}
+
+                        pickerApointments.html('');
+
+                        {# Populate with appointments for the selected date #}
+
+                        for (var i = 0; i < data.appointments.length; i++) {
+                            pickerApointments.append(
+                                    data.appointments[i].title + '<br>' +
+                                    data.appointments[i].startDateTime + '<br>'
+                            )
+                        }
+                    }
+                })
+                .fail(function() {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
         }
     });
 </script>

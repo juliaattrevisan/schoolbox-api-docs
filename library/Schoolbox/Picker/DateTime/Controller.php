@@ -75,8 +75,8 @@ class Controller extends Base
 
             $timezoneUTC = new \DateTimeZone('UTC');
 
-            $start = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC);
-            $end = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
+            $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
+            $end = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
 
             // Retrieve all events
 
@@ -94,6 +94,7 @@ class Controller extends Base
             // $appointments = $this->loadDummyAppointments();
 
         } catch (\Exception $e) {
+            var_dump($e->getMessage());
         }
 
         $this->getResponse()->content->set(

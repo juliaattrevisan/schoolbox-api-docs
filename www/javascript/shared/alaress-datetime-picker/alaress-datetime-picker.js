@@ -77,7 +77,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     // Default options
 
     var options = {
-        databaseFormat: 'Y-m-d H:i',
+        databaseFormat: 'Y-m-d H:i:S',
         displayFormat: 'l, F J Y h:iK'
     };
 
@@ -140,7 +140,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 // AJAX in the modal contents if they haven't already been loaded
 
-                picker.load('/picker/datetime/display/' + encodeURI(options.displayFormat) + '/database/' + encodeURI(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValue, function () {
+                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValue, function () {
 
                     $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 
