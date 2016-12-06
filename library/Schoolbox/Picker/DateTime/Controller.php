@@ -47,12 +47,34 @@ class Controller extends Base
     }
 
     /**
-     * Return JSON list of appointment for a given date
+     * Return JSON list of appointments for a given date
      * @param string $date
      */
     public function getByDate($date)
     {
-        $appointments = $this->loadDummyAppointments();
+        $appointments = [];
+
+        try {
+            $timezoneUTC = new \DateTimeZone('UTC');
+
+            $start = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC);
+            $end = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
+
+            $api = new \Calendar_Api_EventType_Event_Schoolbox_All();
+            $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+
+            foreach ($events as $event) {
+                $appointments[] = [
+                    'startDateTime' => $event->getStartTime()->getDatabase(),
+                    'endDateTime' => $event->getEndTime()->getDatabase(),
+                    'title' => $event->getTitle()
+                ];
+            }
+
+            // $appointments = $this->loadDummyAppointments();
+
+        } catch (\Exception $e) {
+        }
 
         $this->getResponse()->content->set(
             array(
