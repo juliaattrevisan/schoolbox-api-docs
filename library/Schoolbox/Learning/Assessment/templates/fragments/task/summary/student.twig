@@ -24,14 +24,14 @@
 {# student submit form #}
 {% set participant         = assessment.getParticipant(currentUser) %}
 {% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
-{% set isViewingOwnSummary = mostRecentFeedback.reviewee.id == currentUser.id %}
+{% set isViewingOwnSummary = participant.user.id == currentUser.id %}
 
 <div class="row">
     <div class="small-12 island">
         <section>
             <ul class="information-list">
                 <li>
-                    {# Student's completion of this task#}
+                    {# Student's completion of this task #}
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -50,10 +50,18 @@
                                     </p>
                                 {% else %}
                                     <p class="meta">
-                                        {% if isViewingOwnSummary %}
-                                            You have not yet attempted this task.
+                                        {% if assessment.isSelfAssessed %}
+                                            {% if isViewingOwnSummary %}
+                                                You have not yet attempted this task.
+                                            {% else %}
+                                                has not yet attempted this task.
+                                            {% endif %}
                                         {% else %}
-                                            has not yet attempted this task.
+                                            {% if isViewingOwnSummary %}
+                                                Your teacher has not verified that you have completed this task.
+                                            {% else %}
+                                                has not been verified as having completed this task.
+                                            {% endif %}
                                         {% endif %}
                                     </p>
                                 {% endif %}
