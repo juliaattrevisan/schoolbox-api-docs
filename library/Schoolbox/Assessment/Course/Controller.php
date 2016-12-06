@@ -265,25 +265,6 @@ class Controller extends Base\Base
     }
 
     /**
-     * @return CurriculumNodeMapper
-     */
-    public function getCurriculumNodeMapper()
-    {
-        return $this->curriculumNodeMapper;
-    }
-
-    /**
-     * @param CurriculumNodeMapper $curriculumNodeMapper
-     * @return static
-     */
-    public function setCurriculumNodeMapper(CurriculumNodeMapper $curriculumNodeMapper)
-    {
-        $this->curriculumNodeMapper = $curriculumNodeMapper;
-        return $this;
-    }
-
-
-    /**
      * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
      *
      * @param Folder $unitFolder
@@ -702,7 +683,6 @@ class Controller extends Base\Base
             $unitSpec->setCourse($courseSpec);
             $this->getUnitSpecificationMapper()->save($unitSpec);
 
-//            $instance  = $this->getCourseBuilderInstance($folder);
             $encodedReturnUrl = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
 
             $data = [
@@ -763,43 +743,69 @@ class Controller extends Base\Base
     }
 
     /**
-     * Dump out a list of courses
-     * The Filter field allows you to search Course names
+     * Generate a list of CourseSpecs
      *
      * @api   GET /course/list
      * @level 160
+     *
+     * @var string[] $_GET                       AJAX GET params
+     * @var string   $_GET['encodedReturnUrl']   For URL generation
+     * @var int      $_GET['folder']             Folder.id for URL generation
+     * @var int      $_GET['component']          ComponentInstance.id for URL generation
      */
     public function courseList()
     {
-        $this->displayCourseList('courseList');
+        $query = $this->getRequest()->query;
+        $data = $this->getCourseData('');
+        $data['returnUrlKey'] = Redirect::RETURN_URL;
+
+        if ($this->getRequest()->isXhr()) {
+            $options = [
+                'hasClose'         => true,
+                'hasAdd'           => false,
+                'hasTot'           => false,
+                'linkToUnits'      => false,
+                'hasBreadcrumb'    => false,
+                'encodedReturnUrl' => $query->get('encodedReturnUrl'),
+                'folder'           => [ 'id' => $query->get('folder') ],
+                'component'        => [ 'id' => $query->get('component') ],
+            ];
+        } else {
+            $options = [
+                'hasClose'         => false,
+                'hasAdd'           => true,
+                'hasTot'           => true,
+                'linkToUnits'      => true,
+                'hasBreadcrumb'    => true,
+                'encodedReturnUrl' => Redirect::encode($this->getRequest()->url->get(PHP_URL_PATH)),
+            ];
+        }
+        $this->courseTpl('courseList', array_merge($data, $options));
     }
 
 
     /**
-     * Dump out AJAX'd search results
-     * The Filter field allows you to search Course names
+     * Generated when user types in CourseSpec search field
+     * Performs a search by CourseSpec's Folder name
      *
      * @api   GET /course/list/ajax
      * @level 160
+     *
+     * @var string[] $_GET                       AJAX GET params
+     * @var string   $_GET['search']             Search string submitted by user
+     * @var string   $_GET['encodedReturnUrl']   For URL generation
+     * @var bool     $_GET['hasAdd']
+     * @var bool     $_GET['hasTot']
+     * @var bool     $_GET['linkToUnits']
+     * @var int      $_GET['folder']
+     * @var int      $_GET['component']
      */
     public function courseListAjax()
     {
-        $this->displayCourseList('courseListResults');
-    }
-
-
-    /**
-     * Sub-method for course list renderings
-     *
-     * @param string $template
-     */
-    protected function displayCourseList($template)
-    {
         $query = $this->getRequest()->query;
 
-        $componentId = $query->get('component');
+        $search = $query->get('search');
         $folder = $query->get('folder');
-        $search = $query->get('query');
 
         $data = $this->getCourseData($search);
 
@@ -809,32 +815,18 @@ class Controller extends Base\Base
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
 
-        /* Remember what the user searched for
-         */
-        $data['query'] = $query->get('query');
-        $data['hasTot'] = true;
+        $options = [
+            'search'           => $search,
+            'folder'           => [ 'id' => $folder ],
+            'component'        => [ 'id' => $query->get('component') ],
+            'hasAdd'           => 'true' === $query->get('hasAdd'),
+            'hasTot'           => 'true' === $query->get('hasTot'),
+            'linkToUnits'      => 'true' === $query->get('linkToUnits'),
+            'returnUrlKey'     => Redirect::RETURN_URL,
+            'encodedReturnUrl' => $query->get('encodedReturnUrl'),
+        ];
 
-        if ($this->getRequest()->isXhr()) {
-            $options = [
-                'hasBreadcrumb' => false,
-                'hasAdd' => false,
-                'linkToUnits' => false,
-                'hasClose' => true,
-                'componentId' => $componentId,
-            ];
-        } else {
-            $options = [
-                'hasBreadcrumb' => true,
-                'hasAdd' => true,
-                'linkToUnits' => true,
-                'hasClose' => false,
-            ];
-        }
-
-        if ($folder) {
-            $options['folder']['id'] = $folder;
-        }
-        $this->courseTpl($template, array_merge($data, $options));
+        $this->courseTpl('courseListResults', array_merge($data, $options));
     }
 
     /**
@@ -852,7 +844,9 @@ class Controller extends Base\Base
      * and information about any found Units and their task counts
      *
      * @param string $searchParam
-     * @return array
+     * @return array $data
+     * @var Folder[] $data['lineage']
+     * @var CourseSpecification[] $data['courses']
      */
     protected function getCourseData($searchParam)
     {
@@ -1466,6 +1460,25 @@ class Controller extends Base\Base
     public function setAssessmentMapper(AssessmentMapper $assessmentMapper)
     {
         $this->assessmentMapper = $assessmentMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return CurriculumNodeMapper
+     */
+    public function getCurriculumNodeMapper()
+    {
+        return $this->curriculumNodeMapper;
+    }
+
+    /**
+     * @param CurriculumNodeMapper $curriculumNodeMapper
+     * @return static
+     */
+    public function setCurriculumNodeMapper(CurriculumNodeMapper $curriculumNodeMapper)
+    {
+        $this->curriculumNodeMapper = $curriculumNodeMapper;
         return $this;
     }
 }

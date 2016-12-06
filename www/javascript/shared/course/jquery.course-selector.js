@@ -33,7 +33,12 @@
                     url: '/course/list/ajax',
 
                     // any additional params to send with the AJAX request
-                    query: {},
+                    query: {
+                        hasBreadcrumb: false,
+                        hasAdd:        false,
+                        hasTot:        true,
+                        linkToUnits:   false
+                    },
 
                     /* Ajax requests spawn inside this element
                      * These should reference the same element
@@ -68,7 +73,7 @@
          * to put this on an element which DOES always exist >.<
          *
          * Delay as you type on keydown, so it waits a second after you've
-         * stopped typing before firing an ajax missle out
+         * stopped typing before firing an ajax missile out
          */
         function courseSelector() {
 
@@ -85,7 +90,7 @@
                     var params = $.extend(true, {}, config.courseSelector.query);
 
                     // load the query into the params
-                    params.query = $(config.courseSelector.filter).val();
+                    params.search = $(config.courseSelector.filter).val();
 
                     addLoadingState(config.courseSelector.filter);
 
