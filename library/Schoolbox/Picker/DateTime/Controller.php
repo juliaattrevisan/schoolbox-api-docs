@@ -43,13 +43,19 @@ class Controller extends Base
 
     /**
      * Return the HTML picker for injecting into modal
+     * @param int $id The ID number of the javascript picker
+     * @param string $value Default date to display
      */
-    public function getPicker() {
+    public function getPicker($id, $display, $database, $value) {
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
                 'format' => 'nochrome',
                 'data' => [
+                    'id' => $id,
+                    'value' => $value,
+                    'displayFormat' => urldecode($display),
+                    'databaseFormat' => urldecode($database)
                 ]
             )
         );

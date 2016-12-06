@@ -1,15 +1,15 @@
-<div id="flatpickr"></div>
+<div id="pickerCalendar{{ id }}"></div>
 <script>
-    $(function () {
-        flatpickr("#flatpickr", {
-            minDate: new Date(), // "today" / "2016-12-20" / 1477673788975
-            maxDate: "2016-12-20",
-            dateFormat: 'Y-m-d',
-            inline: true,
-            enableTime: true,
-            onChange: function(selectedDates, dateString, instance) {
-                console.log(selectedDates, dateString, instance);
-            }
-        });
+    window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {
+        defaultDate: '{{ value }}',
+        dateFormat: '{{ displayFormat }}',
+        inline: true,
+        altInput: true,
+        altFormat: '{{ databaseFormat }}',
+        enableTime: true,
+        onChange: function(selectedDates, dateString, instance) {
+            $('#pickerCalendar{{ id }}').data('dateDisplay', dateString);
+            // This is where we would AJAX in the student appointments etc
+        }
     });
 </script>

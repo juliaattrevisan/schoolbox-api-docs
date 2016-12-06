@@ -43,7 +43,7 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '' => 'getPicker',
+                '/display/{display}/database/{database}/id/{id}/value{/value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
                 '/date/{date}/class/{classCode}' => 'getByClassCode',
             ],

@@ -1,12 +1,99 @@
-$.fn.alaressDateTimePicker = function (options) {
+// To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
 
-    // Keep an array of the flatpickr instances
+(function (m) {
+    var formatMap = {
+            d: 'DD',
+            D: 'ddd',
+            j: 'D',
+            J: 'Do',
+            l: 'dddd',
+            N: 'E',
+            K: 'A',
+            S: function () {
+                return '[' + this.format('Do').replace(/\d*/g, '') + ']';
+            },
+            w: 'd',
+            z: function () {
+                return this.format('DDD') - 1;
+            },
+            W: 'W',
+            F: 'MMMM',
+            m: 'MM',
+            M: 'MMM',
+            n: 'M',
+            t: function () {
+                return this.daysInMonth();
+            },
+            L: function () {
+                return this.isLeapYear() ? 1 : 0;
+            },
+            o: 'GGGG',
+            Y: 'YYYY',
+            y: 'YY',
+            a: 'a',
+            A: 'A',
+            B: function () {
+                var thisUTC = this.clone().utc(),
+                    // Shamelessly stolen from http://javascript.about.com/library/blswatch.htm
+                    swatch = ((thisUTC.hours() + 1) % 24) + (thisUTC.minutes() / 60) + (thisUTC.seconds() / 3600);
+                return Math.floor(swatch * 1000 / 24);
+            },
+            g: 'h',
+            G: 'H',
+            h: 'hh',
+            H: 'HH',
+            i: 'mm',
+            s: 'ss',
+            u: '[u]', // not sure if moment has this
+            e: '[e]', // moment does not have this
+            I: function () {
+                return this.isDST() ? 1 : 0;
+            },
+            O: 'ZZ',
+            P: 'Z',
+            T: '[T]', // deprecated in moment
+            Z: function () {
+                return parseInt(this.format('ZZ'), 10) * 36;
+            },
+            c: 'YYYY-MM-DD[T]HH:mm:ssZ',
+            r: 'ddd, DD MMM YYYY HH:mm:ss ZZ',
+            U: 'X'
+        },
+        formatEx = /[dDjlNSwzWFmMntLoYyaABgGhHisueIOPTZcrUJK]/g;
 
-    window.calendarInstance = [];
+    moment.fn.formatFlatpickr = function (format) {
+        var that = this;
+
+        return this.format(format.replace(formatEx, function (phpStr) {
+            return typeof formatMap[phpStr] === 'function' ? formatMap[phpStr].call(that) : formatMap[phpStr];
+        }));
+    };
+}(moment));
+
+// Extend jQuery with our datepicker function
+
+$.fn.alaressDateTimePicker = function(optionsOverride) {
+
+    // Default options
+
+    var options = {
+        databaseFormat: 'Y-m-d H:i',
+        displayFormat: 'l, F J Y h:iK'
+    };
+
+    // Override with user any options
+
+    for (var attribute in optionsOverride) {
+        options[attribute] = optionsOverride[attribute];
+    }
 
     // Counter for uniquely identifying these things
 
-    window.alaressDateTimePickerCount = 0;
+    window.pickerCount = 0;
+
+    // Keep track of picker instances that we've created
+
+    window.pickerInstance = [];
 
     // Iterate all the elements that want datetime pickers
 
@@ -14,106 +101,91 @@ $.fn.alaressDateTimePicker = function (options) {
 
     elements.each(function (index, element) {
 
-        var id = window.alaressDateTimePickerCount;
-        var idWrapper = 'alaressDateTimePicker_' + id;
-        var idCalendar = 'alaressDateTimePickerCalendar_' + id;
+        var element = $(element);
 
-        // Insert the HTML for the datetime picker modal
+        var originalId = element.attr('id');
+        var originalName = element.attr('name');
+        var originalValue = element.val();
 
-        $(element).after(
-            '<div data-reveal id="' + idWrapper + '" class="reveal-modal">' +
-                '<div class="row">' +
-                    '<div class="small-12 medium-4 island">' +
-                        '<section>' +
-                            '<div class="content">' +
-                                '<h2>Select Date/Time</h2>' +
-                                '<div id="' + idCalendar + '"></div>' +
-                            '</div>' +
-                        '</section>' +
-                    '</div>' +
-                    '<div class="small-12 medium-4 island">' +
-                        '<section>' +
-                            '<div class="content">' +
-                                '<h2>Students</h2>' +
-                                '<ul class="information-list">' +
-                                    '<li class="actions-small-1">' +
-                                        '<div class="list-item">' +
-                                            '<div class="card small-12">' +
-                                                '<a href="#">' +
-                                                    '<img src="/portrait.php?userId=135&amp;size=square64" width="48">' +
-                                                    '<h3>Sub Zero</h3>' +
-                                                '</a>' +
-                                                '<p class="meta">' +
-                                                    '3 Events Scheduled' +
-                                                '</p>' +
-                                            '</div>' +
-                                        '</div>' +
-                                        '<nav>' +
-                                            '<a class="icon-next no-text" href="#" title="Modify"></a>' +
-                                        '</nav>' +
-                                    '</li>' +
-                                '</ul>' +
-                            '</div>' +
-                        '</section>' +
-                    '</div>' +
-                    '<div class="small-12 medium-4 island">' +
-                        '<section>' +
-                            '<div class="content">' +
-                                '<h2>Scheduled Events &amp; Work</h2>' +
-                            '</div>' +
-                        '</section>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        );
+        // We need to do a bit of shuffling of the DOM. We move the original element over to a hidden form input
+        // that will hold the date in a DB friendly format for form submission, and we put a readonly textbox in its place for
+        // displaying a friendlier date format to the end users
 
+        element.after('<input type="hidden" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + '">');
+        element.after('<input readonly data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue).formatFlatpickr(options.displayFormat) + '">');
+        element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
+        element.remove();
+        
+        element = $('#pickerDisplay' + window.pickerCount);
 
         // Store the ID of the datetime picker on the element for use in the click event
 
-        $(element).data('alaressDateTimePickerId', id);
+        element.data('pickerId', window.pickerCount);
 
         // Create click event to open the modal for the element
 
-        $(element).click(function () {
+        element.click(function () {
 
-            // Set the flatpickr to the date currently shown in the textbox
+            var elementClicked = $(this);
+            var pickerId = + elementClicked.data('pickerId');
+            var picker = $('#picker' + pickerId);
 
-            window.calendarInstance[$(this).data('alaressDateTimePickerId')].setDate($(element).val());
+            // Only AJAX in the picker if we haven't already
 
-            // Display the datetime picker modal
+            if (picker.data('status') === undefined) {
 
-            $('#alaressDateTimePicker_' + $(this).data('alaressDateTimePickerId')).foundation('reveal', 'open');
-        });
+                // Update picker status
 
-        // Setup flatpickr calendar
+                picker.data('status', 'loading');
 
-        var optionsCurrent = {
-            defaultDate: $(element).val(),
-            inline: true,
-            dateFormat: 'Y-m-d H:i',
-            enableTime: true,
+                // AJAX in the modal contents if they haven't already been loaded
 
-            onChange: function (selectedDates, dateString, instance) {
-                // Write the chosen value back to the element
+                picker.load('/picker/datetime/display/' + encodeURI(options.displayFormat) + '/database/' + encodeURI(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValue, function () {
 
-                instance.config.element.val(dateString);
+                    $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
+
+                    // Capture closure of modal
+
+                    $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
+
+                        // Update the elements value with the selected date
+
+                        var pickerDisplay = $('#pickerDisplay' + pickerId);
+                        pickerDisplay.val($('#pickerCalendar' + pickerId).data('dateDisplay'));
+
+                        var originalField = $('#' + pickerDisplay.data('originalId'));
+                        originalField.val(window.pickerInstance[pickerId].altInput.value);
+                    });
+
+                    // Update picker status
+
+                    picker.data('status', 'loaded');
+
+                    // Display the datetime picker modal
+
+                    $('#picker' + pickerId).foundation('reveal', 'open');
+                });
+
+            } else if (picker.data('status') == 'loaded') {
+
+                // Put the elements current value back in to the modal just in case it had changed somehow
+
+                var pickerDisplay = $('#pickerDisplay' + pickerId);
+                var originalField = $('#' + pickerDisplay.data('originalId'));
+                
+                window.pickerInstance[pickerId].setDate(originalField.val());
+
+                $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
+
+                // Since the contents have already been AJAX'd in, we can just show the modal again
+
+                picker.foundation('reveal', 'open');
             }
-        };
 
-        // Put in user override options
-
-        for (var attribute in options) {
-            optionsCurrent[attribute] = options[attribute];
-        }
-
-        window.calendarInstance[id] = flatpickr("#" + idCalendar, optionsCurrent);
-
-        // Keep a link back to the element it needs to update
-
-        window.calendarInstance[id].set('element', $(element));
+        });
 
         // Increment global counter
 
-        window.alaressDateTimePickerCount++;
+        window.pickerCount++;
     });
 };
