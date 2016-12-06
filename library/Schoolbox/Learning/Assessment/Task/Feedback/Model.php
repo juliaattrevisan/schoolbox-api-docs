@@ -33,4 +33,16 @@ class Model extends AbstractFeedback implements ICompletion
     {
         return null;
     }
+
+    /**
+     * A task is only complete if:
+     * * the feedback is published
+     * * this has been marked as complete by a teacher
+     *
+     * @return bool
+     */
+    public function isComplete()
+    {
+        return $this->isComplete() && $this->isMarkedAsCompleted();
+    }
 }
