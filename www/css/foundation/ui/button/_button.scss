@@ -172,9 +172,6 @@ a.submit {
  */
 ul.flex-list {
     &.buttons > li > a, button {
-        @extend .button;
-        @include button-dimensions();
-
         /* Allow long content
          * This expands UPWARDS! Don't know why
          */

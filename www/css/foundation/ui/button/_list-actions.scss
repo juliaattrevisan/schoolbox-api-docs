@@ -35,12 +35,11 @@
 
 				a[class*="icon-"] {
 					@include button-dimensions();
-					padding:0;
+					padding: 0;
 					display: inline-block;
 					text-align: center;
 					width: $button-size;
 					line-height: $button-size;
-					height: $button-size;
 					color: $button-color;
 
 					&:before {

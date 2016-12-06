@@ -1044,10 +1044,6 @@ ul.flex-list {
 		> a {
 			width: 100%;
 			white-space: nowrap;
-			&.button {
-				height: 3rem;
-				line-height: 2rem;
-			}
 			&:empty:before {
 				float: none !important; // grrrr :(
 			}

@@ -1,11 +1,8 @@
 $sub-nav-border-radius: 0px;
-
 $sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
-
 //$sub-nav-padding: rem-calc(($base-font-size - 6));
 //$sub-nav-active-padding: $sub-nav-padding;
 $sub-nav-list-padding-top: rem-calc(0);
-
 $sub-nav-font-size: $base-font-size;
 $sub-nav-active-font-weight: $font-weight-normal;
 
@@ -15,9 +12,7 @@ $sub-nav-active-font-weight: $font-weight-normal;
 @import "../../../../javascript/components/foundation/scss/foundation/components/sub-nav";
 
 // Sub Navigation
-// .secondary is the sub-sub nav that first appeared in adminv2/setting
-// I've temporarily made it the same as the regular sub-nav style
-.sub-nav, .sub-nav.secondary {
+.sub-nav{
     list-style: none;
 	li, dd {
 		margin: 0 1px 1px 0;
@@ -33,18 +28,16 @@ $sub-nav-active-font-weight: $font-weight-normal;
                 text-decoration: none;
             }
         }
-        &.active {
-            a {
-                @include button-dimensions();
+        &.active a {
+            @include button-dimensions();
+            cursor: default;
+            color: $content-ui-foreground;
+            background-color: $content-ui-selected;
+
+            &:hover {
                 cursor: default;
                 color: $content-ui-foreground;
                 background-color: $content-ui-selected;
-
-                &:hover {
-                    cursor: default;
-                    color: $content-ui-foreground;
-                    background-color: $content-ui-selected;
-                }
             }
         }
 	}
