@@ -8,10 +8,19 @@
 </script>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/fragments/dueWork/summary/meta.twig' with {assessment: assessment, user: currentUser, icon: 'icon-task'} %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
         {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment, user: currentUser} %}
     </div>
+</div>
+
+<div class="row">
 {% if preview.fragment|length %}
     <div class="small-12 island">
     {% if preview.type == 'image' %}
