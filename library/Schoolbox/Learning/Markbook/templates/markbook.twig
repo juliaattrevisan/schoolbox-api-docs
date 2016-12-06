@@ -20,10 +20,14 @@
 
             var element = $(this);
             var form    = element.closest('form');
-            $.post(
-                form.attr('action'),
-                form.serialize(),
-                function(data) {
+            form.prop('disabled', true).attr('disabled', '');
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method') || 'post',
+                dataType: 'json',
+                data: form.serialize()
+            })
+                .done(function(data) {
                     // Update something.
                     // I guess add the same class the update submission has.
                     element.removeClass('pending complete').addClass('ajax-updated');
@@ -46,12 +50,20 @@
                         css: 'success'
                     });
 
+                })
+                .fail(function() {
+                    label.toastTimeout({
+                        text: 'Could not save!',
+                        css: 'alert'
+                    });
+                })
+                .always(function() {
+                    form.removeAttr('disabled');
                     setTimeout(function() {
                         element.removeClass('ajax-updated');
-                    }, 1000)
-                },
-                'json'
-            );
+                    }, 1000);
+                });
+            form.attr('disabled', 'disabled');
         });
     });
 </script>
@@ -189,7 +201,8 @@
                                     {# An icon that shows if the student has attempted the task or not #}
                                     {# TODO abstract this out #}
                                     <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                          method="POST">
+                                          method="POST"
+                                          class="progress-tick-form">
                                         {% if mostRecentFeedback.isMarkedAsCompleted %}
                                             <input type="hidden" name="status" value="1" />
                                             <a href="#"
