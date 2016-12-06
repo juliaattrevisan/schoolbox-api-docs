@@ -27,7 +27,7 @@
         // value: new status
         transitions: {
             notAttempted: 'complete',
-            selfAssessed: 'notAttempted',
+            selfAssessed: 'complete',
             complete:     'notAttempted'
         },
 
