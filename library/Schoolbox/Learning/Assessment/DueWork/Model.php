@@ -127,7 +127,7 @@ class Model extends AbstractAssessment
      * @param Collection $responses
      * @throws \DomainException
      */
-    public function isAcceptSubmission(\Schoolbox\Collection $responses)
+    public function assertAcceptSubmission(\Schoolbox\Collection $responses)
     {
         if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);

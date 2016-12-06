@@ -145,8 +145,7 @@ class Controller extends Assessment\Controller
         ];
 
         try {
-            // TODO this should be called 'assert', not 'is'
-            $assessment->isAcceptSubmission($allResponses);
+            $assessment->assertAcceptSubmission($allResponses);
             $twigData['submissionsBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
@@ -187,9 +186,9 @@ class Controller extends Assessment\Controller
          */
         try {
 
-            /* isAcceptSubmission() requires a list of responses to decide outcome
+            /* assertAcceptSubmission() requires a list of responses to decide outcome
              */
-            $assessment->isAcceptSubmission($allResponses);
+            $assessment->assertAcceptSubmission($allResponses);
 
         } catch (DomainException $e) {
             throw $this->getErrorMapper()->generateException($e->getCode());
@@ -288,9 +287,9 @@ class Controller extends Assessment\Controller
          */
         try {
 
-            /* isAcceptSubmission() requires a list of responses to decide outcome
+            /* assertAcceptSubmission() requires a list of responses to decide outcome
              */
-            $assessment->isAcceptSubmission($allResponses);
+            $assessment->assertAcceptSubmission($allResponses);
         }
         catch (DomainException $e) {
 
