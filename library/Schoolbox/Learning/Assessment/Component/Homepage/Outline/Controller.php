@@ -148,8 +148,6 @@ class Controller extends Component_Homepage_ControllerAbstract
 //                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
             }
 
-            $this->userCollection = $this->userAccessMapper->findStudentsInCategory($this->getContext());
-
             // TODO get permissions working, I guess
 //            $this_student_id = null;
 //            if ($this->readOnly) {
@@ -187,7 +185,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             'context'              => $this->getContext(),
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
-            'studentCount'         => count($this->userCollection),
             'componentInstance'    => $this->getInstance(),
             'returnUrl'            => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];

@@ -9,6 +9,7 @@
         {% set taskTooltip = 'Incomplete, click to mark completed' %}
 
         {% set completionCount    = 0 %}
+        {% set studentCount       = task.allParticipants|length %}
         {% if studentCount %}
             {% set completionGradient = (completionCount / studentCount) / 10 | round %}
         {% endif %}
