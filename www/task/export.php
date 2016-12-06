@@ -1,4 +1,21 @@
 <?php
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+if (is_numeric($this->arg[0])) {
+
+    $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+    $assessmentId = $assessmentDataSource->findByTaskId($this->arg[0])->getId();
+    SitePage::localRedir('/learning/export/assessment/'.$assessmentId, null, 301);
+}
+SitePage::pageNotFound();
+
+/*
+ * Old code
+ */
+
 /**
  * Page for exporting tasks into classes.
  *
