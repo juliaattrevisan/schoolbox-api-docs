@@ -1,6 +1,16 @@
+{#
+Usage:
+    $data = [
+        folder:         Folder                               - The class page we are managing
+        courseImpls:    CourseImplementation[]|Collection    - All Course's imported to this class
+        componentNames: string[][]                           - CourseOutline component names, grouped by CourseImpl.ID
+        folderAncestry: Folder[][]                           - Grouped by CourseImpl.ID
+    ]
+#}
+
+
 <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
     $(function() {
-
         /* Attach Course Selector Modal listeners
          */
         $.fn.courseSelectorModal({
@@ -20,7 +30,7 @@
 
             var $element = $(this);
             var $courseImpl = $element.closest('[data-course-impl]');
-            var name = $courseImpl.attr('data-course-name');
+            var name = $courseImpl.find('[data-course-impl-name]').html();
 
             $element.confirmDialog({
                 header: 'Confirm Import Deletion of ' + name,
@@ -65,14 +75,21 @@
             event.preventDefault();
             var $restoreButton = $(this);
             var $courseImpl = $restoreButton.closest('[data-course-impl]');
-            var name = $courseImpl.attr('data-course-name');
+            var $componentList = $courseImpl.find('[data-component-names]');
+            var $icon = $courseImpl.find('[data-course-impl-icon]');
+            var $name = $courseImpl.find('[data-course-impl-name]');
             var $restoreFeedback = $('[data-relation="save-label"]');
 
             $restoreFeedback.toastActivate({text: 'Restoring Component...'});
-            $.post($restoreButton[0].href, function(responseText) {
-                if ('success' == responseText.result) {
+
+            $.post($restoreButton[0].href, function(data) {
+                if ('success' == data.result) {
                     $restoreFeedback.toastTimeout({text: 'Component Restored!', css: 'success'});
                     $restoreButton.remove();
+                    $icon.removeClass('icon-archive').addClass('icon-course');
+                    $name.removeClass('del');
+                    /** @var string data.componentName */
+                    $componentList.append('<li>'+data.componentName+'</li>');
                 }
                 else {
                     $restoreFeedback.toastTimeout({text: 'Restoration Failed!', css: 'alert'});
@@ -84,7 +101,8 @@
 
 
 <ul class="breadcrumb">
-    <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
+    <li><a href="/learning/classes">Learning</a></li>
+    <li><a href="/homepage/{{ folder.id }}">{{ folder.title }}</a></li>
     <li class="active">
         <a href="{{ routeLookup('courseImport.getManagement', { folderId: folder.id }) }}">Modify Course</a>
     </li>
@@ -95,7 +113,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">Courses Imported to {{ folder.name }}</h2>
+                    <h2 class="subheader">Courses Imported to {{ folder.title }}</h2>
                 </div>
             </div>
             <nav>
@@ -103,28 +121,50 @@
             </nav>
         </div>
 
-        {% if courseImpls|length %}
+        {% if courseImpls | length %}
         <section>
             <ul class="action-list" id="course_list">
                 {% for currentCourse in courseImpls %}
-                <li class="actions-small-2" data-course-impl="{{ currentCourse.id }}" data-course-name="{{ currentCourse.specification.folder.name }}">
+                <li class="actions-small-1" data-course-impl="{{ currentCourse.id }}">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/homepage/{{ currentCourse.specification.folder.id }}">
                                 <h3>
-                                    <span class="icon-course"></span>{{ currentCourse.specification.folder.name }}
+                                    {% if not componentNames[currentCourse.id] | length %}
+                                        <span class="icon-archive" data-course-impl-icon></span> <span class="del" data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                    {% else %}
+                                        <span class="icon-course" data-course-impl-icon></span> <span data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                    {% endif %}
                                 </h3>
                             </a>
+                            <p class="meta">
+                                {% for folderCrumb in folderAncestry[currentCourse.id] %}
+                                    {{ folderCrumb.name }}{% if not loop.last and not loop.first %} &raquo;{% endif %}
+                                {% endfor %}
+                            </p>
+                            <p class="meta">Imported on {{ currentCourse.createdAt.long }}</p>
+                            {% if componentNames[currentCourse.id] | length %}
+                            <p class="meta">Displayed in <span data-component-names>{% for componentName in componentNames[currentCourse.id] %}{{ componentName }} {% endfor %}</p>
+                            {% endif %}
                         </div>
                     </div>
                     <nav>
-                        {% if not componentCounts[currentCourse.id] %}
-                            <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
-                        {% endif %}
-
-                        <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import"></a>
-                        <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete></a>
+                        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ currentCourse.id }}" aria-expanded="false" title="Actions"></a>
                     </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">
+                        {% if not componentNames[currentCourse.id] %}
+                            <li>
+                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}">Restore Component</a>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import">Modify</a>
+                        </li>
+                        <li>
+                            <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete>Delete</a>
+                        </li>
+                    </ul>
+
                 </li>
                 {% endfor %}
             </ul>

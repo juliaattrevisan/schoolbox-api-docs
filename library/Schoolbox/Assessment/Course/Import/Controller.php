@@ -853,7 +853,7 @@ class Controller extends Base\Base
      *
      * @param CourseImplementation $courseImpl
      * @param Component_Instance|null $compInstance
-     * @return bool
+     * @return string The name of the new Component
      */
     protected function injectImportIntoComponent(CourseImplementation $courseImpl, Component_Instance $compInstance = null)
     {
@@ -892,9 +892,12 @@ class Controller extends Base\Base
             $folder = $courseImpl->getFolder();
             $configDefinition = ['importedCourse' => $courseImpl->getId()];
             $courseOutlineClass = HomepageOutlineComponentController::class;
-            $this->getComponentInstanceMapper()->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            $compInstance = $this->getComponentInstanceMapper()->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            $compInstance = $this->getComponentInstanceMapper()->findByInstanceId($compInstance->getId());
         }
-        return true;
+        $config = $compInstance->getConfigArray();
+        $componentName = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
+        return $componentName;
     }
 
     /**
@@ -1001,23 +1004,69 @@ class Controller extends Base\Base
         $class = HomepageOutlineComponentController::class;
         $components = $this->getComponentInstanceMapper()->findByContextAndClass($module, $folder->getId(), $class);
 
-        // For each CourseImpl, determine how many components are displaying it on the homepage
-        $componentCounts = [];
-        foreach ($courseImpls as $courseImpl) {
-            $componentCounts[$courseImpl->getId()] = 0;
+        // Find the names of components displaying each CourseImport
+        $componentNames = [];
+        foreach($courseImpls as $impl){
+            $componentNames[$impl->getId()] = [];
         }
 
         foreach ($components as $component) {
             $courseImplId = $component->getConfigArray()['importedCourse']['value'];
+
+            // Is it displaying a CourseImport ?
             if ($courseImplId) {
-                $componentCounts[$courseImplId]++;
+                $config = $component->getConfigArray();
+                $name = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
+                $componentNames[$courseImplId][] = $name;
             }
         }
 
+        // Traverse the ancestry of each CourseSpec's folder so we can render breadcrumbs, caching along the way
+        $folderCache = [];
+        foreach($courseImpls as $courseImpl){
+            $folderCrumb = $courseImpl->getSpecification()->getFolder();
+
+            while(true)
+            {
+                $folderId = $folderCrumb->getId();
+
+                // Have we seen this folder before?
+                if($folderCache[$folderId] instanceof Folder){
+                    break;
+                }
+                // Add to cache
+                $folderCache[$folderId] = $folderCrumb;
+
+                // Is this the root?
+                if(0 == $folderCrumb->getParent()->getId()){
+                    break;
+                }
+                $folderCrumb = $this->getFolderMapper()->findCheaplyById($folderCrumb->getParent()->getId());
+            }
+        }
+
+        // Convert our cache to linear arrays for twig
+        $folderAncestry = [];
+        foreach($courseImpls as $courseImpl){
+            $parent = $courseImpl->getSpecification()->getFolder();
+            $parent = $folderCache[$parent->getParent()->getId()];
+            $folderAncestry[$courseImpl->getId()] = [];
+            while(true){
+                $folderAncestry[$courseImpl->getId()][] = $parent;
+
+                if(!$parent instanceof Folder){
+                    break;
+                }
+                $parent = $folderCache[$parent->getParent()->getId()];
+            }
+            $folderAncestry[$courseImpl->getId()] = array_reverse($folderAncestry[$courseImpl->getId()]);
+        }
+
         $this->tpl('management', [
-            'folder'          => $folder,
-            'courseImpls'     => $courseImpls,
-            'componentCounts' => $componentCounts,
+            'folder'         => $folder,
+            'courseImpls'    => $courseImpls,
+            'componentNames' => $componentNames,
+            'folderAncestry' => $folderAncestry,
         ]);
     }
 
@@ -1076,8 +1125,11 @@ class Controller extends Base\Base
     public function restoreCourse(CourseImplementation $courseImpl)
     {
         $componentInstance = $this->findAvailableCourseOutlineComponent($courseImpl->getFolder()->getId());
-        $this->injectImportIntoComponent($courseImpl, $componentInstance);
-        $this->getResponse()->content->set($this->buildJsonOutput(['result' => 'success']));
+        $componentName = $this->injectImportIntoComponent($courseImpl, $componentInstance);
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'result'        => 'success',
+            'componentName' => $componentName]
+        ));
     }
 
 
