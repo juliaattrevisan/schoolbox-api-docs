@@ -23,7 +23,6 @@ use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class ReturnedWork implements ISoftDeletable
 {
-
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -35,11 +34,15 @@ class ReturnedWork implements ISoftDeletable
     protected $submission_box;
 
     /**
+     * The person who marked the work
+     *
      * @var User
      */
     protected $marker;
 
     /**
+     * The person who the mark is for
+     *
      * @var User
      */
     protected $owner;
@@ -101,7 +104,7 @@ class ReturnedWork implements ISoftDeletable
      * Calculates a gradient (from 0 to 10) from the normalized mark for this
      * return.
      *
-     * @return int|void
+     * @return int|null
      */
     public function getGradientFromNormalizedMark()
     {
@@ -155,7 +158,6 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
-     *
      * @return $this
      */
     public function setSubmissionBox($submission_box)
@@ -165,7 +167,6 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * The person who marked the work
      * @return \Schoolbox\User
      */
     public function getMarker()
@@ -174,9 +175,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * The person who marked the work
      * @param \Schoolbox\User $marker
-     *
      * @return $this
      */
     public function setMarker($marker)
@@ -186,7 +185,6 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * The person who the mark is for
      * @return \Schoolbox\User
      */
     public function getOwner()
@@ -195,9 +193,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * The person who the mark is for
      * @param  \Schoolbox\User $owner
-     *
      * @return $this
      */
     public function setOwner($owner)
@@ -234,7 +230,6 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @param  string $comment
-     *
      * @return $this
      */
     public function setComment($comment)
@@ -254,7 +249,6 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @param  string $mark
-     *
      * @return $this
      */
     public function setHumanReadableMark($mark)
@@ -273,7 +267,6 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @param  float $normalized_mark
-     *
      * @return $this
      */
     public function setNormalizedMark($normalized_mark)
@@ -293,7 +286,6 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @param  boolean $isConfirmationOfSubmission
-     *
      * @return $this
      */
     public function setIsConfirmationOfSubmission($isConfirmationOfSubmission)

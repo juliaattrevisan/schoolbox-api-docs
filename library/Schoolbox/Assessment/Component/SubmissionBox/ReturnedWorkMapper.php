@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use PDOStatement;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 
 /**
@@ -45,20 +46,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
         $this->uses('norm_mark', self::TYPE_STRING, null, 'normalizedMark');
         $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('published_at', self::TYPE_DATETIME);
+        $this->joinsReverseMany('submission_return_id', ReturnedWork\SingleFile\Mapper::class, 'id', 'files', 'files');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        // Unmapped join onto individual files
-        $this->hasJoin(
-            'file',
-            [
-                'mapper'    => ReturnedWork\SingleFile\Mapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'submission_return_id',
-            ]
-        );
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
@@ -75,7 +67,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function softDeleteReturnedWorkFiles(ReturnedWork $return)
     {
-        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->delete($files);
     }
@@ -88,7 +80,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function restoreReturnedWorkFiles(ReturnedWork $return)
     {
-        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->restoreSoftDeleted($files);
     }
@@ -100,18 +92,14 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function getSelectString()
     {
-        $markerMapper = $this->getJoinMapper('marker');
-        $submissionMapper = $this->getJoinMapper('submission');
-
-        $select = "
+        return "
             SELECT
                 {$this->getColumnString()},
-                {$markerMapper->getColumnString('m')},
+                {$this->getJoinColumnString('marker', 'm')},
                 {$this->getJoinColumnString('submission_box', 'b')},
-                {$submissionMapper->getColumnString('ss')}
+                {$this->getJoinColumnString('submission', 's')},
+                {$this->getJoinColumnString('files', 'f')}
         ";
-
-        return $select;
     }
 
 
@@ -123,14 +111,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function getFromString()
     {
-        $from = "
+        return "
             FROM `{$this->table}`
-            LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
-            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b')}
-            LEFT JOIN {$this->getJoinSql('submission', '', 'ss')}
+            LEFT JOIN {$this->getJoinSql('marker', '', 'm', true)}
+            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b', true)}
+            LEFT JOIN {$this->getJoinSql('submission', '', 's', true)}
+            LEFT JOIN {$this->getJoinSql('files', '', 'f', true)}
         ";
-
-        return $from;
     }
 
     /**
@@ -140,37 +127,31 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
-        $markerMapper = $this->getJoinMapper('marker');
-        $submissionMapper = $this->getJoinMapper('submission');
-
-        /** @var ReturnedWork[] $collection */
-        $collection = new Collection();
-        $ids        = [];
+        /** @var ReturnedWork[]|Schoolbox\GenericCollection $returnedWork */
+        $returnedWork = $this->createCollection();
 
         foreach ($statement as $row) {
-            $return = $this->hydrate($row);
-            $ids[]  = $return->getId();
-            $return->setSubmission($submissionMapper->hydrate($row, 'ss'));
-            $return->setMarker($markerMapper->hydrate($row, 'm'));
-            $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
 
-            $collection->add($return);
-        }
+            $returnedWorkId = $row["{$this->getIdentifierColumn()}"];
 
-        // Fetch and hydrate files
-        $files = $this->getJoinMapper('file')
-                      ->findByColumn('submission_return_id', $ids)
-                      ->groupByCallback(function($f) {
-                          /** @var ReturnedWork\SingleFile\Model $f */
-                          return $f->getReturn()->getId();
-                      });
-        foreach ($collection as $result) {
-            if (isset($files[$result->getId()])) {
-                $result->setFiles($files[$result->getId()]);
+            if(!$returnedWork[$returnedWorkId] instanceof ReturnedWork){
+                $return = $this->hydrate($row);
+                /** @var StudentSubmission $submission */
+                $submission = $this->hydrateJoin($row, 'submission', 'ss');
+                $return->setSubmission($submission->getId() ? $submission : null);
+                $return->setMarker($this->hydrateJoin($row, 'marker', 'm'));
+                $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
+                $returnedWork[$returnedWorkId] = $return;
+            }
+
+            /** @var ReturnedWork\SingleFile\Model $returnedWorkFile */
+            $returnedWorkFile = $this->hydrateJoin($row, 'files', 'f');
+            if($returnedWorkFile->getId()){
+                $returnedWorkFile->setReturn($returnedWork[$returnedWorkId]);
+                $returnedWork[$returnedWorkId]->getFiles()->add($returnedWorkFile);
             }
         }
-
-        return $collection;
+        return $returnedWork;
     }
 
     /**
