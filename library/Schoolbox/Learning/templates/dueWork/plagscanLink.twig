@@ -1,3 +1,8 @@
-{% if currentFile.plagscan.isComplete %}
-<a href="{{ routeLookup('learningResponse.getPlagscanReport', {plagscanId: currentFile.plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
+{##
+ # assessment   an IAssessable instance containing id
+ # response     an IResponse instance containing id
+ # plagscan     a Plagscan\Model instance containing plagscan_id
+ #}
+{% if plagscan.isComplete %}
+<a href="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReport', {assessmentId: assessment.id, responseId: response.id, plagscanId: plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
 {% endif %}

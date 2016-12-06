@@ -132,7 +132,7 @@
                             </div>
                         </div>
                         <nav>
-                            {% include '@learning/dueWork/plagscanLink.twig' %}
+                            {% include '@learning/dueWork/plagscanLink.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
                         </nav>
                     </li>
                 {% endfor %}

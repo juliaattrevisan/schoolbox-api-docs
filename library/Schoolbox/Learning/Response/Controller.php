@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
@@ -301,20 +302,16 @@ class Controller extends Base
     /**
      * Dump out a plagscan report
      *
-     * @param Plagscan $plagscan
      * @param IAssessable $assessment
-     * @param \Schoolbox\User $creator
-     * @param int $responseId
+     * @param IResponse $response
+     * @param Plagscan $plagscan
      */
-    public function getPlagscanReport(Plagscan $plagscan, IAssessable $assessment, \Schoolbox\User $creator, $responseId)
+    public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
     {
         $data = [
             'plagscan' => $plagscan,
             'assessment' => $assessment,
-            'creator' => $creator,
-            'response' => [
-                'id' => $responseId,
-            ]
+            'response' => $response
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
