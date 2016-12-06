@@ -128,6 +128,9 @@ module.exports = function(grunt) {
                     // Course selector
                     'www/javascript/shared/course/jquery.course-selector.js',
 
+                    // Flatpickr date selector
+                    'www/javascript/shared/flatpickr/flatpickr.js',
+
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
                     // their own files/plugins

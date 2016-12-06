@@ -1,1 +1,15 @@
-[Insert DateTime Picker Here]
+<div id="flatpickr"></div>
+<script>
+    $(function () {
+        flatpickr("#flatpickr", {
+            minDate: new Date(), // "today" / "2016-12-20" / 1477673788975
+            maxDate: "2016-12-20",
+            dateFormat: 'Y-m-d',
+            inline: true,
+            enableTime: true,
+            onChange: function(selectedDates, dateString, instance) {
+                console.log(selectedDates, dateString, instance);
+            }
+        });
+    });
+</script>
