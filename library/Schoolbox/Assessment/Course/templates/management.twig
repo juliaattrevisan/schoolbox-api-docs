@@ -11,8 +11,6 @@ Usage:
 
 <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
     $(function() {
-        $('[data-collapser]').collapsable();
-
         /* Attach Course Selector Modal listeners
          */
         $.fn.courseSelectorModal({
@@ -103,7 +101,8 @@ Usage:
 
 
 <ul class="breadcrumb">
-    <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
+    <li><a href="/learning/classes">Learning</a></li>
+    <li><a href="/homepage/{{ folder.id }}">{{ folder.title }}</a></li>
     <li class="active">
         <a href="{{ routeLookup('courseImport.getManagement', { folderId: folder.id }) }}">Modify Course</a>
     </li>
@@ -114,7 +113,7 @@ Usage:
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">Courses Imported to {{ folder.name }}</h2>
+                    <h2 class="subheader">Courses Imported to {{ folder.title }}</h2>
                 </div>
             </div>
             <nav>
@@ -126,7 +125,7 @@ Usage:
         <section>
             <ul class="action-list" id="course_list">
                 {% for currentCourse in courseImpls %}
-                <li class="actions-small-2" data-course-impl="{{ currentCourse.id }}">
+                <li class="actions-small-1" data-course-impl="{{ currentCourse.id }}">
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/homepage/{{ currentCourse.specification.folder.id }}">
@@ -138,33 +137,18 @@ Usage:
                                     {% endif %}
                                 </h3>
                             </a>
-                        </div>
-                        <div class="small-12 column" data-collapse-state="collapsed" data-collapsable="course-impl-{{ currentCourse.id }}" style="display: none;">
-                            <span class="meta">
-                                {% for folder in folderAncestry[currentCourse.id] %}
-                                    {{ folder.name }}{% if not loop.last and loop.length > 1 %} &raquo;{% endif %}
+                            <p class="meta">
+                                {% for folderCrumb in folderAncestry[currentCourse.id] %}
+                                    {{ folderCrumb.name }}{% if not loop.last and loop.length > 1 %} &raquo;{% endif %}
                                 {% endfor %}
-                            </span>
-                            <ul>
-                                <li class="meta">Imported on: {{ currentCourse.createdAt.database }}</span></li>
-                                <li class="meta">
-                                    <span class="meta">Components:</span>
-                                    <ul class="" data-component-names>
-                                        {% for componentName in componentNames[currentCourse.id] %}
-                                            <li class="meta">{{ componentName }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            </ul>
-
-
-
-
-
+                            </p>
+                            <p class="meta">Imported on {{ currentCourse.createdAt.long }}</p>
+                            {% if componentNames[currentCourse.id] | length %}
+                            <p class="meta">Displayed in <span data-component-names>{% for componentName in componentNames[currentCourse.id] %}{{ componentName }} {% endfor %}</p>
+                            {% endif %}
                         </div>
                     </div>
                     <nav>
-                        <a href="#" class="icon-down-arrow" data-collapser="course-impl-{{ currentCourse.id }}"></a>
                         <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ currentCourse.id }}" aria-expanded="false" title="Actions"></a>
                     </nav>
                     <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">

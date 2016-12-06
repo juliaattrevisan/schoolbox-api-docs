@@ -974,24 +974,24 @@ class Controller extends Base\Base
         // Traverse the ancestry of each CourseSpec's folder so we can render breadcrumbs, caching along the way
         $folderCache = [];
         foreach($courseImpls as $courseImpl){
-            $folder = $courseImpl->getSpecification()->getFolder();
+            $folderCrumb = $courseImpl->getSpecification()->getFolder();
 
             while(true)
             {
-                $folderId = $folder->getId();
+                $folderId = $folderCrumb->getId();
 
                 // Have we seen this folder before?
                 if($folderCache[$folderId] instanceof Folder){
                     break;
                 }
                 // Add to cache
-                $folderCache[$folderId] = $folder;
+                $folderCache[$folderId] = $folderCrumb;
 
                 // Is this the root?
-                if(0 == $folderId){
+                if(0 == $folderCrumb->getParent()->getId()){
                     break;
                 }
-                $folder = $this->getFolderMapper()->findCheaplyById($folder->getParent()->getId());
+                $folderCrumb = $this->getFolderMapper()->findCheaplyById($folderCrumb->getParent()->getId());
             }
         }
 
@@ -1004,7 +1004,7 @@ class Controller extends Base\Base
             while(true){
                 $folderAncestry[$courseImpl->getId()][] = $parent;
 
-                if(0 == $parent->getId()){
+                if(!$parent instanceof Folder){
                     break;
                 }
                 $parent = $folderCache[$parent->getParent()->getId()];
