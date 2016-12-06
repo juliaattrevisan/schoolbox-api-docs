@@ -42,6 +42,10 @@
         this.each(function() {
             var form = $(this);
 
+            form.find('a[data-progress-tick-status]')
+                .prop('disabled', false)
+                .removeAttr('disabled');
+
             form.on('click.progressTickForm', 'a[data-progress-tick-status]', function(event) {
                 event.preventDefault();
 
