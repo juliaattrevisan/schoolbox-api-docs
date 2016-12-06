@@ -21,9 +21,38 @@
 </div>
 
 {% if assessment.isSelfAssessed %}
-<div class="row">
-    <div class="small-12 island">
-        <input type="submit" class="full-width" value="Complete Task" />
-    </div>
-</div>
+
+    {# student submit form #}
+    {% set participant        = assessment.getParticipant(currentUser) %}
+    {% set mostRecentFeedback = participant.findMostRecentPublishedFeedback %}
+
+    <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
+          method="POST">
+
+        <div class="row">
+
+            <section>
+                <div class="card small-12">
+                    {% if mostRecentFeedback.isMarkedAsCompleted %}
+                        You have completed this task, and teacher has confirmed it
+                    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed  %}
+                        You have completed this task.
+                    {% else %}
+                        You have not yet completed this task.
+                    {% endif %}
+                </div>
+            </section>
+
+            <div class="small-12 island">
+                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
+                    <input type="hidden" name="status" value="1" />
+                    <input type="submit" class="full-width" value="Mark Task as Not Attempted" />
+                {% else %}
+                    <input type="hidden" name="status" value="2" />
+                    <input type="submit" class="full-width" value="Mark Task as Completed" />
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
 {% endif %}
