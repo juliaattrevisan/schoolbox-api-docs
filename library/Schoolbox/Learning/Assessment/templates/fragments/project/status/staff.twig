@@ -71,18 +71,30 @@
                             <li class="actions-small-2" data-assessment="{{ assessable.id }}">
                                 <div class="grip"></div>
                                 <div class="list-item">
-                                    <div class="compact card wrap-down small-12">
-                                        <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
+                                    <div class="card small-12">
+                                        <div class="{{ icon.renderClass(assessable) }} icon-64" title="{{ assessable.getTypeName }}"></div>
                                         <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessable.id}) }}">
                                             <h3>
                                                 {{ assessable.title }}
                                             </h3>
                                         </a>
+
                                         {% if assessable.getDueAt.isNull == false %}
-                                        <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                                            {{ assessableCounts[assessable.id].total }} / {{ assessment.allParticipants | length }} Students,
-                                            Due {{ assessable.getDueAt.getRelativeTime }}
-                                        </p>
+                                            <p class="meta">
+                                                Due {{ assessable.getDueAt.getRelativeTime }}
+                                            </p>
+                                        {% endif %}
+
+                                        {% if assessable.weight %}
+                                            <p class="meta">
+                                                Weight: {{ assessable.weight }}
+                                            </p>
+                                        {% endif %}
+
+                                        {% if assessable.getDueAt.isNull == false %}
+                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                                {{ assessableCounts[assessable.id].total }} / {{ assessment.allParticipants | length }} Students Completed
+                                            </p>
                                         {% endif %}
                                     </div>
                                 </div>
