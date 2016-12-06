@@ -72,18 +72,25 @@
                         // Update something.
                         // I guess add the same class the update submission has.
                         element.removeClass('pending complete');
-                        form.find('input[name="current_status"]').val(data.status);
 
-                        // Update name and class as well
+                        // Update name, class and value
                         switch (data.status) {
                             case statusValues.notAttempted:
-                                element.attr('title', config.titles.notAttempted);
+                                element
+                                    .data('progressTickStatus', 'notAttempted')
+                                    .attr('title', config.titles.notAttempted);
                                 break;
                             case statusValues.selfAssessed:
-                                element.addClass('pending').attr('title', config.titles.selfAssessed);
+                                element
+                                    .data('progressTickStatus', 'selfAssessed')
+                                    .addClass('pending')
+                                    .attr('title', config.titles.selfAssessed);
                                 break;
                             case statusValues.complete:
-                                element.addClass('complete').attr('title', config.titles.complete);
+                                element
+                                    .data('progressTickStatus', 'complete')
+                                    .addClass('complete')
+                                    .attr('title', config.titles.complete);
                                 break;
                         }
 
