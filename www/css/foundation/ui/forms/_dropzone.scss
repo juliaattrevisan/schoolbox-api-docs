@@ -366,7 +366,7 @@ ul.az-error-list {
 
 
 .dzone {
-    @extend %p;
+    //@extend %p;
     overflow: hidden;
     position: relative;
     background-color: $attachzone-resting-background;
@@ -701,7 +701,7 @@ ul.az-error-list {
     position: relative;
     display: table-cell;
     vertical-align: middle;
-    @extend %p;
+    //@extend %p;
 }
 .dropzone.dz-square .dz-default.dz-message {
     background-position: 0 -123px;

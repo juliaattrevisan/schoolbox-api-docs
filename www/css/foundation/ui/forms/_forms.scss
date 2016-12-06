@@ -140,7 +140,7 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
-	@extend %p;
+	//@extend %p;
 	min-height: $input-height;
 	line-height: inherit;
 	font-weight: $font-weight-normal;
@@ -257,7 +257,6 @@ th, td{
         }
 
         &:after {
-            @extend %iconify;
             display: block;
             content: "\e604";
             color: rgba($white, 0);
@@ -327,7 +326,7 @@ input[type=radio]{
 		line-height: 2;
 		@include transition(all, 0.1s, ease-in);
 		i{
-			@extend .icon-32;
+			@extend .size-32;
 			color: $content-ui-foreground;
 			padding-right: 0.35rem;
 			float: left;
@@ -489,7 +488,6 @@ input[type=radio]:not(.plain):disabled:checked + label{
 }
 
 select.visibility {
-	@extend %iconify;
 	&.show-icon-only {
 		width: 3rem !important;
         padding: 0.5rem 1rem 0.5rem 0.3rem;
@@ -651,7 +649,7 @@ section > fieldset {
 	}
 
 	> legend {
-		@extend %h3;
+		font-size: $h3-font-size;
 		@extend .column;
 		margin: 0.2rem 0 0.5rem;
 		font-weight: $header-font-weight;
@@ -662,7 +660,7 @@ section > fieldset {
 		padding: 0;
 		margin: 0 0 0.5rem;
 		legend {
-			@extend %h4;
+			font-size: $h4-font-size;
 			font-weight: $header-font-weight;
 			margin-bottom: 0.5rem;
 		}
