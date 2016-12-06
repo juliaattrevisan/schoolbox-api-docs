@@ -200,16 +200,12 @@ Usages:
             stageFour.mage({
                 onXhrDone: function(data) {
 
-                    try {
-                        if (typeof data == 'object' && 'redirect' in data && data.redirect) {
-                            {# Go back to wherever you came from (hopefully) -#}
-                            window.location.href = data.redirect;
-                        } else {
-                                window.history.back();
-                        }
-                    } catch (e) {
-                            window.history.back();
+                    if (typeof data == 'object' && 'redirect' in data && data.redirect) {
+                        {# Go back to wherever you came from (hopefully) -#}
+                        window.location.href = data.redirect;
                     }
+                    // If something goes wrong, DO NOT redirect. Stay here to enable debugging.
+                    // TODO this should display an error message in mage, but there's no documentation on how to do that.
                 }
             }).bind('validate', function() {
 
