@@ -4,14 +4,27 @@
 (function($) {
     "use strict";
 
+    // Form submit/return values for each config type
+    var statusValues = {
+        notAttempted: 1,
+        selfAssessed: 2,
+        complete:     3
+    };
+
     var defaults = {
+        // Toast label
         label: false,
-        button: 'a[data-interaction="update_progress"]',
+
+        // Button title for each status
         titles: {
             notAttempted: 'Not attempted',
             selfAssessed: 'Self-assessed',
             complete:     'Complete'
         },
+
+        // Transitions
+        // key:   old status
+        // value: new status
         transitions: {
             notAttempted: 'complete',
             selfAssessed: 'notAttempted',
@@ -26,60 +39,78 @@
         this.each(function() {
             var form = $(this);
 
-            form.on('click.progressTickForm', config.button, function(event) {
+            form.on('click.progressTickForm', 'a[data-progress-tick-status]', function(event) {
                 event.preventDefault();
 
-                var label = $(config.label);
-                if ('toastActivate' in label) {
+                var element = $(this),
+                    label = $(config.label);
+
+                // Toast if we can
+                if (label.length && 'toastActivate' in label) {
                     label.toastActivate();
                 }
 
-                var element = $(this);
-                form.prop('disabled', true).attr('disabled', '');
+                // Look up status to transition to, based on current status
+                var formData = [
+                    {
+                        name: 'status',
+                        value: statusValues[config.transitions[element.data('progressTickStatus')]]
+                    }
+                ];
 
+                // Disable form for aesthetic reasons
+                form.attr('disabled', 'disabled');
+
+                // And transition
                 $.ajax({
                     url: form.attr('action'),
                     type: form.attr('method') || 'post',
                     dataType: 'json',
-                    data: form.serialize()
+                    data: formData
                 })
                     .done(function(data) {
                         // Update something.
                         // I guess add the same class the update submission has.
-                        element.removeClass('pending complete').addClass('ajax-updated');
+                        element.removeClass('pending complete');
                         form.find('input[name="current_status"]').val(data.status);
+
                         // Update name and class as well
                         switch (data.status) {
-                            case 1: // not attempted
+                            case statusValues.notAttempted:
                                 element.attr('title', config.titles.notAttempted);
                                 break;
-                            case 2: // self-assessed
+                            case statusValues.selfAssessed:
                                 element.addClass('pending').attr('title', config.titles.selfAssessed);
                                 break;
-                            case 3: // complete
+                            case statusValues.complete:
                                 element.addClass('complete').attr('title', config.titles.complete);
                                 break;
                         }
 
-                        label.toastTimeout({
-                            text: 'Saved',
-                            css: 'success'
-                        });
+                        // Toast if we can
+                        if (label.length && 'toastTimeout' in label) {
+                            label.toastTimeout({
+                                text: 'Saved',
+                                css: 'success'
+                            });
+                        }
 
                     })
                     .fail(function() {
-                        label.toastTimeout({
-                            text: 'Could not save!',
-                            css: 'alert'
-                        });
+                        // Toast if we can
+                        if (label.length && 'toastTimeout' in label) {
+                            label.toastTimeout({
+                                text: 'Could not save!',
+                                css: 'alert'
+                            });
+                        }
+
                     })
                     .always(function() {
+                        // Re-enable form
                         form.removeAttr('disabled');
-                        setTimeout(function() {
-                            element.removeClass('ajax-updated');
-                        }, 1000);
+
                     });
-                form.attr('disabled', 'disabled');
             });
         })
     };

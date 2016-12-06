@@ -14,7 +14,12 @@
 
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
-            label: $('[data-save-progress-state]')
+            label: $('[data-save-progress-state]'),
+            transitions: {
+                notAttempted: 'complete',
+                selfAssessed: 'notAttempted',
+                complete:     'notAttempted'
+            }
         });
     });
 </script>
@@ -156,23 +161,20 @@
                                           class="progress-tick-form"
                                           data-progress-tick-form>
                                         {% if mostRecentFeedback.isMarkedAsCompleted %}
-                                            <input type="hidden" name="status" value="1" />
                                             <a href="#"
                                                class="no-text progress-tick complete"
-                                               title="Completed – click to mark as not attempted"
-                                               data-interaction="update_progress"></a>
+                                               title="Completed"
+                                               data-progress-tick-status="complete"></a>
                                         {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
-                                            <input type="hidden" name="status" value="3" />
                                             <a href="#"
                                                class="no-text progress-tick pending"
-                                               title="Self-assessed – click to mark as complete"
-                                               data-interaction="update_progress"></a>
+                                               title="Self-assessed"
+                                               data-progress-tick-status="selfAssessed"></a>
                                         {% else %}
-                                            <input type="hidden" name="status" value="3" />
                                             <a href="#"
                                                class="no-text progress-tick"
-                                               title="Not attempted – click to mark as complete"
-                                               data-interaction="update_progress"></a>
+                                               title="Not attempted"
+                                               data-progress-tick-status="notAttempted"></a>
                                         {% endif %}
                                     </form>
                                 {% else %}
