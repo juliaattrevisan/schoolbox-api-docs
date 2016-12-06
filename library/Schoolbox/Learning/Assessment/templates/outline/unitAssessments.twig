@@ -11,6 +11,9 @@
         {% set completionCount    = 0 %}
         {% set studentCount       = 0 %}
 
+        {# Is this user particpating? #}
+        {% set isParticipant = task.isParticipant(currentUser) %}
+
         {# count students which have completed this #}
         {% for participant in task.allParticipants %}
             {% if participant.complete %}
@@ -44,10 +47,12 @@
                 <p>{{ task.title }}</p>
                 </a>
 
-                <!--
-                Student: see buttons for starting/ending task
-                Teacher: sees completion stats
-                -->
+                {##
+                 # Metadata
+                 #
+                 # Teacher: sees completion stats
+                 # Others: see due date
+                 #}
                 {% if readOnly == false %}
                 <p class="meta">
                     <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
@@ -60,9 +65,15 @@
             </div>
         </div>
         <nav>
+            {##
+             # Buttons
+             #
+             # Teacher: sees nav
+             # Participant: sees complete task button
+             #}
             {% if readOnly == false %}
             <a href="#" class="icon-more" data-dropdown="options-task{{ task.id }}" aria-expanded="false" title="Actions"></a>
-            {% else %}
+            {% elseif isParticipant %}
             <a href="/task/start/{{ task.id }}{{ taskAction }}" class="progress-tick {{ taskClass }}" data-interaction="update_progress" title="{{ taskTooltip }}"></a>
             {% endif %}
         </nav>

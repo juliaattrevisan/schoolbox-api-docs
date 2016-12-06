@@ -181,6 +181,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
+            'currentUser'          => $this->getUser(),
             'readOnly'             => $this->readOnly,
             'context'              => $this->getContext(),
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
