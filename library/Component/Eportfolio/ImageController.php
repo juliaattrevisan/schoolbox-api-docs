@@ -8,9 +8,22 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
-class Component_Eportfolio_ImageController extends Component_Eportfolio_ControllerAbstract {
 
-	/**
+/**
+ * @method \Schoolbox\Resource\My\File\Mapper getMapper()
+ */
+class Component_Eportfolio_ImageController extends Component_Eportfolio_ControllerAbstract
+{
+    /**
+     * @return bool
+     */
+    public function execute()
+    {
+        $this->setMapper($this->getMapperFactory()->get(\Schoolbox\Resource\My\File\Mapper::class));
+        return true;
+    }
+
+    /**
 	 * Outputs HTML template defined by config variable 'template'
 	 *
 	 * @param String $templateHandle
@@ -42,8 +55,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		/* Load a file, if one exists - otherwise clear phplibs
 		 */
 		try {
-			$fileMapper = new \Schoolbox\Resource\My\File\Mapper();
-			$file = $fileMapper->findById($this->getConfig('eportfolioImage'));
+			$file = $this->getMapper()->findById($this->getConfig('eportfolioImage'));
 
 			$this->setVar(array(
 				'PREVIEW_IMAGE_URL' => "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel",

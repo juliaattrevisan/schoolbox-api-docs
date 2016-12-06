@@ -9,14 +9,19 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
-class Component_Eportfolio_ImageListController extends Component_Eportfolio_ControllerAbstract {
-
-	/**
-	 * A mapper instance, for polymorphism
-	 *
-	 * @var null
-	 */
-	protected $mapperClass = null;
+/**
+ * @method \Component\Eportfolio\FileListMapper getMapper()
+ */
+class Component_Eportfolio_ImageListController extends Component_Eportfolio_ControllerAbstract
+{
+    /**
+     * @return bool
+     */
+    public function execute()
+    {
+        $this->setMapper($this->getMapperFactory()->get(\Component\Eportfolio\FileListMapper::class));
+        return true;
+    }
 
 	/**
 	 * Outputs HTML template defined by config variable 'template'
@@ -51,9 +56,7 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 			$this->setVar('modify_button_block', '');
 		}
 
-		$mapper = new \Component\Eportfolio\FileListMapper();
-
-		$allImages = $mapper->findAllImagesByPage($this->getInstance()->getIdentifier());
+		$allImages = $this->getMapper()->findAllImagesByPage($this->getInstance()->getIdentifier());
 
 		if ($allImages->count()) {
 			foreach($allImages as $currentImage) {

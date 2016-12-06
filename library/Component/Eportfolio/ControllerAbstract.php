@@ -22,7 +22,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      *
      * @var \Schoolbox\Mapper
      */
-    protected $mapperClass = null;
+    private $mapper;
 
     /**
      * Apply permissions here
@@ -139,19 +139,19 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      */
 
     /**
-     * @param \Schoolbox\Mapper $mapperClass
+     * @param \Schoolbox\Mapper $mapper
      */
-    protected function setMapperClass($mapperClass)
+    protected function setMapper($mapper)
     {
-        $this->mapperClass = $mapperClass;
+        $this->mapper = $mapper;
     }
 
     /**
      * @return \Schoolbox\Mapper
      */
-    protected function getMapperClass()
+    protected function getMapper()
     {
-        return $this->mapperClass;
+        return $this->mapper;
     }
 
     /**

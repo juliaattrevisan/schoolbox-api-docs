@@ -9,23 +9,16 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
-class Component_Eportfolio_TextboxController extends Component_Eportfolio_ControllerAbstract {
-
-	/**
-	 * A mapper instance, for polymorphism
-	 *
-	 * @var null
-	 */
-	protected $mapperClass = null;
-
+class Component_Eportfolio_TextboxController extends Component_Eportfolio_ControllerAbstract
+{
 	/**
 	 * Prepares data for the render function. Business logic.
 	 *
 	 * @return bool Whether to continue on and attempt Component render
 	 */
-	public function execute() {
-		$mapper = new \Component\Eportfolio\TextboxMapper();
-		$this->setMapperClass($mapper);
+	public function execute()
+    {
+		$this->setMapper($this->getMapperFactory()->get(\Component\Eportfolio\TextboxMapper::class));
 		return true;
 	}
 
@@ -37,7 +30,8 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 	 * @param String $templateHandle
 	 * @return bool
 	 */
-	public function renderTemplate($templateHandle) {
+	public function renderTemplate($templateHandle)
+    {
 		if (!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
 			return false;
 		}
@@ -65,7 +59,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 		$this->setVar('TEXTBOX_ITEM_ID', $instance_id);
 
 		try {
-			$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $instance_id);
+			$textBox = $this->getMapper()->findOneByColumn('component_instance_id', $instance_id);
             $this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
 
 
