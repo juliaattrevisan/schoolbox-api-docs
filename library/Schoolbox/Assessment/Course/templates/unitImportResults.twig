@@ -30,32 +30,30 @@
             .datepicker('option', 'closeText', 'Use Unit Date')
         ;
 
+        // Copy dates from Unit to Assessment when user clicks 'Use Unit Date'
         $(document).on('click', '[data-handler="hide"]', function () {
 
             if (typeof $.datepicker._curInst.id == 'string') {
 
-                var $input, side, $unit;
+                var $input = $('#' + $.datepicker._curInst.id);
 
-                $input = $('#' + $.datepicker._curInst.id);
-
+                {# for task, will be 'publish_date' or 'due_date' #}
                 {# for quiz, will be either 'finish_date' or 'start_date' -#}
-                {# for work, will one one of 'publish_date', 'open_date' ,'due_date' or 'late_date' -#}
-                side = $input.data('role');
+                {# for work, will one one of 'publish_date', 'open_date' ,'due_date' or 'close_date' -#}
+                var side = $input.data('role');
 
-                // cast work to quiz for ease-of-use
+                // cast dates to unit equivalent
                 if ([ 'publish_date', 'open_date' ].indexOf(side) >= 0) {
                     side = 'start_date'
-                } else if ([ 'due_date', 'late_date' ].indexOf(side) >= 0) {
+                } else if ([ 'due_date', 'close_date' ].indexOf(side) >= 0) {
                     side = 'finish_date'
                 }
 
-                $unit = $input.closest('[data-' + side + ']');
-
+                var $unit = $input.closest('[data-' + side + ']');
                 if ($unit.length) {
                     $input.val($unit.data(side));
                 }
             }
-
         });
 
         $('[data-collapser]').click(function(e) {
