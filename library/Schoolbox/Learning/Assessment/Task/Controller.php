@@ -20,6 +20,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
 
 class Controller extends Assessment\Controller
 {
@@ -88,31 +89,59 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
+        /** @var Task $task */
         $task = $participant->getAssessable();
         $previewFragment = [];
 
-        if($task->getUrl()) {
+        /* If there was a specified url, it could be to some external location
+         * or even to a storage file on this server - use the PreviewFactory to
+         * decide which one it is
+         */
+        if ($task->getUrl()) {
             $previewFragment = (new PreviewFactory())->urlFragment($task->getUrl(), $this->getUser());
-            //Just foward if we only have a URL
+
             if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
+
+                /* Just forward if we only have a URL
+                 */
                 $this->getResponse()->redirect->temporaryRedirect($task->getUrl());
                 return;
             }
-            else if($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
-                    $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
-                    $previewFragment['type'] = 'file';
+            elseif ($previewFragment['type'] == 'image') {
+
+                /* The specified url is actually an image
+                 *
+                 * This actually has the same url structure as any other regular file
+                 * so we need to check for image-ness first
+                 *
+                 * In this case $previewFragment['fragment'] already contains the url
+                 * and we don't need to do anything more
+                 */
+
+            }
+            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
+
+                /* Other regular files
+                 *
+                 * Download them as some kind of attachment
+                 */
+                $previewFragment['type'] = 'file';
+                $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
+            }
+            elseif ($previewFragment['type'] == 'inline') {
+
+                /* Embedded content like youtube videos etc
+                 */
+                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
             }
         }
 
-        if($previewFragment['type'] == 'inline') {
-            $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
-        }
-
-        $twigData = [ 'breadcrumbs' => $this->getBakery()->produceFromAssessment($task)->add([ $task->getTitle(), '' ]),
-                      'assessment'  => $task,
-                      'preview'     => $previewFragment,
-                      'currentUser' => $this->getUser(),
-                      'student'     => $participant->getUser(),
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($task)->add([ $task->getTitle(), '' ]),
+            'assessment'  => $task,
+            'preview'     => $previewFragment,
+            'currentUser' => $this->getUser(),
+            'student'     => $participant->getUser(),
         ];
 
         $this->getResponse()->content->set(

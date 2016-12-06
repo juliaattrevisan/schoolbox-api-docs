@@ -21,14 +21,11 @@
     </div>
 </div>
 
+{% if preview.fragment|length %}
 <div class="row">
-    {% if preview.fragment|length %}
     <div class="small-12 island">
-
         {% if preview.type == 'image' %}
-        <a href="{{ preview.fragment }}" data-plugin="preview">
-            <img src="{{ preview.fragment }}" data-plugin="preview">
-        </a>
+        <img src="{{ preview.fragment }}" data-plugin="preview">
         {% elseif preview.type == 'file' %}
         <section>
             <div class="card small-12 compact">
@@ -54,8 +51,9 @@
         {{ preview.fragment | raw}}
     {% endif %}
     </div>
-{% endif %}
 </div>
+{% endif %}
+
 {% if assessment.isSelfAssessed %}
 <div class="row">
     <div class="small-12 island">
