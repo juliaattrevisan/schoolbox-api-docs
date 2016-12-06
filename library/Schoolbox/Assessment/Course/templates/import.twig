@@ -377,6 +377,7 @@ Usages:
                 <fieldset class='content' data-mage="part-assessments-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
+                        <input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}" />
                         <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <input type="hidden" data-mage-next="none" name="part-assessments-select" value="1" />

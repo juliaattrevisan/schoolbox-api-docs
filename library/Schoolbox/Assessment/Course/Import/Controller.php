@@ -220,6 +220,8 @@ class Controller extends Base\Base
             'ownershipCandidates' => self::IMPORT_STAGE_OWNERSHIPS == $initialStage
                 ? $this->getPossibleOwnerships([$targetClass]) :
                 [],
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ]);
     }
 
@@ -811,9 +813,9 @@ class Controller extends Base\Base
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
          */
-        $explicitReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
-        if($explicitReturnUrl){
-            $redirect = $explicitReturnUrl;
+        $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
+        if($encodedReturnUrl){
+            $redirect = Redirect::decode($encodedReturnUrl);
         } else {
             $redirect = $this->getSession()->getHistory(2);
         }
@@ -978,6 +980,8 @@ class Controller extends Base\Base
             ],
             'unitsImpls'          => $courseImpl->getUnits(),
             'ownerships'          => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}",
+            'returnUrlName'       => Redirect::RETURN_URL,
+            'encodedReturnUrl'    => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ]);
     }
 
