@@ -127,12 +127,12 @@
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
 
-                                    {% include '@learning/dueWork/plagscan.twig' %}
+                                    {% include '@learning/dueWork/plagscan/status.twig' %}
                                 </a>
                             </div>
                         </div>
                         <nav>
-                            {% include '@learning/dueWork/plagscanLink.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
+                            {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
                         </nav>
                     </li>
                 {% endfor %}
