@@ -25,7 +25,7 @@
             }
         });
 
-        var writePermission = {{ writePermission }};
+        var writePermission = {{ write }};
 
         $('[data-checkbox-inherit]').change(function(event) {
             if ($(event.target).prop('checked')) {
@@ -203,7 +203,7 @@
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a colour that will be used for this folder">?</span>
                             </span>
                             <span class="small-12 column">
-                                <input type="text" value="{{ folder.colour.asRgb }}" name="colour" data-colour-picker />
+                                <input type="text" value="{{ folder.colour.asRgb }}" id="colour" name="colour" data-colour-picker />
                             </span>
                         </label>
                     </div>
