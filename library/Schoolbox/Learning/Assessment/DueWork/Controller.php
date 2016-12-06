@@ -125,6 +125,14 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
@@ -138,7 +146,7 @@ class Controller extends Assessment\Controller
 
         try {
             // TODO this should be called 'assert', not 'is'
-            $assessment->isAcceptSubmission();
+            $assessment->isAcceptSubmission($allResponses);
             $twigData['submissionsBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
@@ -167,10 +175,21 @@ class Controller extends Assessment\Controller
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         /* Work out if we are going to accept responses
          */
         try {
-            $assessment->isAcceptSubmission();
+
+            /* isAcceptSubmission() requires a list of responses to decide outcome
+             */
+            $assessment->isAcceptSubmission($allResponses);
 
         } catch (DomainException $e) {
             throw $this->getErrorMapper()->generateException($e->getCode());
@@ -181,14 +200,6 @@ class Controller extends Assessment\Controller
         $latestResponse = null;
         $editorContents = '';
         $dangerZone = null;
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-
-        /** @var Submission\File\Model $submission */
-        $allResponses = $participant->getAllResponses();
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -265,10 +276,21 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
 
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+
+        /** @var Submission\File\Model $submission */
+        $allResponses = $participant->getAllResponses();
+
         /* Work out if we are going to accept responses
          */
         try {
-            $assessment->isAcceptSubmission();
+
+            /* isAcceptSubmission() requires a list of responses to decide outcome
+             */
+            $assessment->isAcceptSubmission($allResponses);
         }
         catch (DomainException $e) {
 

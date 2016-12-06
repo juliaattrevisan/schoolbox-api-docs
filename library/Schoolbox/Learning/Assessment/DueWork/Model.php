@@ -110,6 +110,10 @@ class Model extends AbstractAssessment
     }
 
     /**
+
+     */
+
+    /**
      * Work out if we are going to accept responses
      * TODO an 'is' method should safely return a boolean; this logic should be in an 'assertAcceptSubmission()' method
      *
@@ -120,9 +124,10 @@ class Model extends AbstractAssessment
      *      - If the assessment only accepts single, and a response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
+     * @param Collection $responses
      * @throws \DomainException
      */
-    public function isAcceptSubmission()
+    public function isAcceptSubmission(\Schoolbox\Collection $responses)
     {
         if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
@@ -136,7 +141,7 @@ class Model extends AbstractAssessment
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
-        if ($this->isAcceptSingle() && $this->getResponses()->count()) {
+        if ($this->isAcceptSingle() && $responses->count()) {
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
