@@ -139,7 +139,7 @@ Usage:
                             </a>
                             <p class="meta">
                                 {% for folderCrumb in folderAncestry[currentCourse.id] %}
-                                    {{ folderCrumb.name }}{% if not loop.last and loop.length > 1 %} &raquo;{% endif %}
+                                    {{ folderCrumb.name }}{% if not loop.last and not loop.first %} &raquo;{% endif %}
                                 {% endfor %}
                             </p>
                             <p class="meta">Imported on {{ currentCourse.createdAt.long }}</p>
