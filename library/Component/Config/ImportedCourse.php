@@ -60,7 +60,7 @@ class Component_Config_ImportedCourse extends Component_Config_Abstract
         foreach ($allCourseImpls as $currentCourse) {
             $courseName = Scrub::text($currentCourse->getSpecification()->getFolder()->getName());
             if($courseSpecCounts[$currentCourse->getSpecification()->getId()] >= 2){
-                $courseName .= " - Imported " . $currentCourse->getCreatedAt()->getDatabase();
+                $courseName .= " - Imported " . $currentCourse->getCreatedAt()->getShort();
             }
 
             $page->setVar(
