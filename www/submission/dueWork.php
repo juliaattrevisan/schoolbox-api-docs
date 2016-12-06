@@ -4,14 +4,16 @@
  * redirect to Redirection to 16.5 url
  *
  */
-$url = '/learning/due/';
+
 if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
+    $url = '/learning/due/';
     $url.= $this->arg[0];
     if (isset($this->arg[1]) && is_numeric($this->arg[1])) {
         $url .= '/'.$this->arg[1];
     }
+    SitePage::localRedir($url, null, 301);
 }
-SitePage::localRedir($url, null, 301);
+SitePage::pageNotFound();
 
 /*
 *Old code

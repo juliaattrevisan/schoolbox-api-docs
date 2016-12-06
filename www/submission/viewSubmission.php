@@ -41,14 +41,6 @@ if (!is_numeric($submissionBoxId)) {
 try {
     $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
     $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
-
-    /*
-     *
-     * Redirection to 16.5 url
-     *
-     * */
-    $assessmentId= $submissionBox->getAssessmentId();
-    SitePage::localRedir('/learning/assessments/'.$assessmentId, null, 301);
 }
 catch (\Schoolbox\Mapper\Exception\Deleted $e) {
     error(17);

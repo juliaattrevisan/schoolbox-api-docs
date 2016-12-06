@@ -5,8 +5,9 @@
  * redirect to Redirection to 16.5 url
  *
  */
-$url = '/learning/markbook/';
+
 if (isset($this->arg[0]) && is_numeric($this->arg[0])){
+    $url = '/learning/markbook/';
     $url .= $this->arg[0]; //folder
     if (isset($this->arg[1])) {
         $url .= '/term/'.$this->arg[1]; //term
@@ -14,9 +15,10 @@ if (isset($this->arg[0]) && is_numeric($this->arg[0])){
 //            $url .= '/'.$this->$arg[2]; //export, not ready yet
 //        }
     }
+    SitePage::localRedir($url, null, 301);
 }
 
-SitePage::localRedir($url, null, 301);
+SitePage::pageNotFound();
 
 /*
 *Old code
