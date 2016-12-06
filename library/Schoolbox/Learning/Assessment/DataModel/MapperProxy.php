@@ -275,6 +275,24 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for a unit implementation.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int   $unitImplId
+     * @param User  $student If provided, load only this student's participation
+     * @param array $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByUnitImplementationIdForCourseOutline($unitImplId, User $student = null, $options = [])
+    {
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->findAllByUnitImplementationId($unitImplId, $options),
+            $student
+        );
+    }
+
+    /**
      * Finds all assessables for a folder.
      *
      * This now defaults to finding assessables that are within a course

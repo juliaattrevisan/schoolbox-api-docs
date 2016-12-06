@@ -129,7 +129,21 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
             foreach ($this->courseImplementation->getUnits() as $unitImpl) {
-                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationId($unitImpl->getId()));
+                if ($this->readOnly) {
+                    // I might be a student, but can't be anything more.
+                    // In any case, load only my participation - if I'm not a participant, there will be nothing.
+                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                        $unitImpl->getId(),
+                        $this->getUser()
+                    );
+                } else {
+                    // I'm a teacher - load all participants.
+                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                        $unitImpl->getId()
+                    );
+                }
+                $unitImpl->setAssessables($assessments);
+
 //                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
 //                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
             }
