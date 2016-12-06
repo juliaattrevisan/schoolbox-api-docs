@@ -40,6 +40,13 @@ use \Component_InstanceMapper;
 use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
 class Controller extends Base\Base
 {
@@ -96,6 +103,18 @@ class Controller extends Base\Base
 
     /** @var ErrorMapper */
     private $errorMapper;
+
+    /** @var QuizMapper */
+    private $quizMapper;
+
+    /** @var QuizSectionMapper */
+    private $quizSectionMapper;
+
+    /** @var QuizQuestionMapper */
+    private $quizQuestionMapper;
+
+    /** @var QuizSolutionMapper */
+    private $quizSolutionMapper;
 
     /**
      * @var ImportFactory
@@ -672,7 +691,6 @@ class Controller extends Base\Base
                     $this->getUnitImplementationMapper()->save($unitImpl);
 
                     // Create/Update AssessmentImpls
-                    $sequence = 1;
                     foreach ($unitPair['a'] as $assessmentId => $aData) {
                         // Ignore unchecked items. ( If they were already imported, they were deleted above.)
                         if (!$aData['checked']) {
@@ -727,6 +745,38 @@ class Controller extends Base\Base
                             $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
                         }
                         $assessmentMapperProxy->save($assessmentImpl);
+
+                        // Did we just clone a Quiz?
+                        if(!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable){
+                            /** @var Quiz $quizSpec */
+                            $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
+                            $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
+
+                            foreach($quizSpec->getSections() as $section){
+                                $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
+                                $section->setQuestions($questions);
+                            }
+
+                            // Copy to our implementation
+                            /** @var Quiz $quizImpl */
+                            $quizImpl = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentImpl->getId())->first();
+                            $clone = clone $quizSpec;
+                            $quizImpl->setSections($clone->getSections());
+
+                            // Save
+                            foreach($quizImpl->getSections() as $section){
+                                $section->setQuiz($quizImpl);
+                                $this->getQuizSectionMapper()->save($section);
+
+                                foreach($section->getQuestions() as $question){
+                                    $this->getQuizQuestionMapper()->save($question);
+                                    if($question->getSolution() instanceof QuizSolution){
+                                        $this->getQuizSolutionMapper()->save($question->getSolution());
+                                    }
+
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -751,7 +801,7 @@ class Controller extends Base\Base
                     $this->injectImportIntoComponent($courseImpl, $componentInstance);
                 }
             }
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             $this->sendError($e->getMessage());
             return;
         }
@@ -1351,6 +1401,78 @@ class Controller extends Base\Base
     public function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return QuizMapper
+     */
+    public function getQuizMapper()
+    {
+        return $this->quizMapper;
+    }
+
+    /**
+     * @param QuizMapper $quizMapper
+     * @return static
+     */
+    public function setQuizMapper(QuizMapper $quizMapper)
+    {
+        $this->quizMapper = $quizMapper;
+        return $this;
+    }
+
+    /**
+     * @return QuizSectionMapper
+     */
+    public function getQuizSectionMapper()
+    {
+        return $this->quizSectionMapper;
+    }
+
+    /**
+     * @param QuizSectionMapper $quizSectionMapper
+     * @return static
+     */
+    public function setQuizSectionMapper(QuizSectionMapper $quizSectionMapper)
+    {
+        $this->quizSectionMapper = $quizSectionMapper;
+        return $this;
+    }
+
+    /**
+     * @return QuizQuestionMapper
+     */
+    public function getQuizQuestionMapper()
+    {
+        return $this->quizQuestionMapper;
+    }
+
+    /**
+     * @param QuizQuestionMapper $quizQuestionMapper
+     * @return static
+     */
+    public function setQuizQuestionMapper(QuizQuestionMapper $quizQuestionMapper)
+    {
+        $this->quizQuestionMapper = $quizQuestionMapper;
+        return $this;
+    }
+
+    /**
+     * @return QuizSolutionMapper
+     */
+    public function getQuizSolutionMapper()
+    {
+        return $this->quizSolutionMapper;
+    }
+
+    /**
+     * @param QuizSolutionMapper $quizSolutionMapper
+     * @return static
+     */
+    public function setQuizSolutionMapper(QuizSolutionMapper $quizSolutionMapper)
+    {
+        $this->quizSolutionMapper = $quizSolutionMapper;
         return $this;
     }
 }

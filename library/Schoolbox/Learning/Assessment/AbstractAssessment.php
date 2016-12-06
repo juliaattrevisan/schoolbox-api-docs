@@ -183,6 +183,7 @@ abstract class AbstractAssessment implements IAssessable
         $clone = clone $this;
         $clone->setId(null);
         $clone->setSpecificationAssessment($this);
+        $clone->setSequence(null);
         return $clone;
     }
 

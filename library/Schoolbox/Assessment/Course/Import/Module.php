@@ -29,6 +29,10 @@ use \Component_InstanceMapper;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
 class Module extends \Alaress\Module\Module
 {
@@ -112,6 +116,10 @@ class Module extends \Alaress\Module\Module
                 'setUserAccessMapper'                => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
                 'setAccess'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
                 'setUserMapper'                      => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'setQuizMapper'                      => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                'setQuizSectionMapper'               => $this->getMapperFactory()->getLazy(QuizSectionMapper::class),
+                'setQuizQuestionMapper'              => $this->getMapperFactory()->getLazy(QuizQuestionMapper::class),
+                'setQuizSolutionMapper'              => $this->getMapperFactory()->getLazy(QuizSolutionMapper::class),
                 'setImportFactory'                   => $injector->lazyNew(ImportFactory::class),
                 'setAssessmentMapper'                => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
                 'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),

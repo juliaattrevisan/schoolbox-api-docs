@@ -229,7 +229,9 @@ class Model implements ISoftDeletable, IAssessableDataModel
         // Clone Sections to clear their IDs, so subsequent save is INSERT instead of UPDATE
         $clonedSections = new GenericCollection(QuizSection::class);
         foreach($this->sections as $section){
-            $clonedSections->add(clone $section);
+            $cloneSection = clone $section;
+            $cloneSection->setQuiz($this);
+            $clonedSections->add($cloneSection);
         }
         $this->setSections($clonedSections);
     }

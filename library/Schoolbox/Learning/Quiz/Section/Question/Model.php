@@ -59,7 +59,7 @@ class Model implements ISoftDeletable
     private $answers;
 
     /**
-     * @var QuizSolution
+     * @var QuizSolution|null
      */
     private $solution;
 
@@ -84,7 +84,11 @@ class Model implements ISoftDeletable
         $this->setAnswers(new GenericCollection(QuizAnswer::class));
 
         // Clone Solution to clear its IDs, so subsequent save is INSERT instead of UPDATE
-        $this->setSolution(clone $this->solution);
+        if($this->solution instanceof QuizSolution){
+            $cloneSolution = clone $this->solution;
+            $cloneSolution->setQuestion($this);
+            $this->setSolution($cloneSolution);
+        }
     }
 
     /* Getters / Setters
@@ -219,7 +223,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return QuizSolution
+     * @return QuizSolution|null
      */
     public function getSolution()
     {
@@ -227,10 +231,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param QuizSolution $solution
+     * @param QuizSolution|null $solution
      * @return static
      */
-    public function setSolution(QuizSolution $solution)
+    public function setSolution(QuizSolution $solution = null)
     {
         $this->solution = $solution;
         return $this;

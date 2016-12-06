@@ -64,6 +64,7 @@ Usages:
             value: {{ destinations|json_encode|raw }}
         });
 
+        // This function name is called dynamically. (hence erroneous storm-warning re: unused local var)
         var initStage1 = function() {
             {# Init stage 1 mage #}
             var stageOne = $('input[data-mage-next="part-ownership"]');
