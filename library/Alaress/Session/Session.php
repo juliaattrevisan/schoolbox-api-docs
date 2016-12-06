@@ -135,6 +135,7 @@ class Session extends BaseSession {
      * @param string $value The URL to store in history.
      */
     public function pushHistory($value) {
+
         $session = $this->getSegment(null);
         $history = $session->get('history');
         if (empty($history)) {

@@ -88,6 +88,8 @@ class Controller extends Base
      */
     public function getLaunch($provider, $component, $folder) {
 
+        $this->setAllowBackToTheFuture(false);
+
         $launch_data = [
             'resource_link_id' => $folder->getId() . '_' . $component->getInstance()->getId(),
             'resource_link_title' => $component->getConfig('componentname'),

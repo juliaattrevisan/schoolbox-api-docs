@@ -55,6 +55,8 @@ abstract class Base {
     /** @var IExceptionGenerator */
     private $eg;
 
+    /** @var bool */
+    private $allowBackToTheFuture = true;
 
     /**
      * @param  Request $request
@@ -70,6 +72,22 @@ abstract class Base {
      */
     public function getRequest() {
         return $this->request;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setAllowBackToTheFuture($value) {
+        $this->allowBackToTheFuture = $value;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowBackToTheFuture() {
+        return $this->allowBackToTheFuture;
     }
 
     /**

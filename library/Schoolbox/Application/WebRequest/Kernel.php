@@ -266,7 +266,9 @@ class Kernel extends \Alaress\Application\Kernel
             // store this request in history.
             $isXhr    = $controller->getRequest()->isXhr();
             $redirect = $controller->getResponse()->headers->get('location');
-            if (!($isXhr || $redirect)) {
+            $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
+
+            if (!($isXhr || $redirect || !$allowBackToTheFuture)) {
                 $session->pushHistory($_SERVER['REQUEST_URI']);
             }
             exit;
