@@ -1,10 +1,20 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript">
     // Add previews
     $(function() {
         $('[data-plugin="preview"]').preview();
+
+        // Save form for task completion
+        $('form[data-progress-tick-form]').progressTickForm({
+            transitions: {
+                notAttempted: 'selfAssessed',
+                selfAssessed: 'notAttempted',
+                complete:     'notAttempted'
+            }
+        });
     });
 </script>
 
