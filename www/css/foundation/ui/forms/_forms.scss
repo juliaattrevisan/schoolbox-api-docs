@@ -140,7 +140,7 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
-	//@extend %p;
+	font-size: $paragraph-font-size;
 	min-height: $input-height;
 	line-height: inherit;
 	font-weight: $font-weight-normal;

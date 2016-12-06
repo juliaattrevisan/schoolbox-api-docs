@@ -484,7 +484,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 
 	h4 {
-		//@extend %p;
+		font-size: $paragraph-font-size;
 	}
 
 	// Left nav arrow override

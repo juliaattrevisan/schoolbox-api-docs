@@ -51,7 +51,7 @@ $login-img-max-height: 12rem !default; // 192px
 
             padding: 0 0 $login-footer-height;
             margin: 0 auto;
-            //@extend %p;
+            font-size: $paragraph-font-size;
 
             form {
                 margin: 0;

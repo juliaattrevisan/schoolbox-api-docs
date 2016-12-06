@@ -409,13 +409,13 @@ $container-bg: white !default;
 	pointer-events: none;
 }
 
-//section {
-//	table tr > td,
-//	table tr > th,
-//	label {
-//		@extend %p;
-//	}
-//}
+section {
+	table tr > td,
+	table tr > th,
+	label {
+		font-size: $paragraph-font-size;
+	}
+}
 
 // Tables
 table{
@@ -492,7 +492,7 @@ tr.sub-row {
 	.dataTables_wrapper {
 		.dataTables_info {
 			@extend .meta;
-			//@extend %p;
+			font-size: $paragraph-font-size;
 			text-align: left;
 
 			margin-bottom: 1.5rem;
@@ -542,7 +542,7 @@ $rotate-th-width: $square-grid-td-size;
 			}
 		}
 
-		//@extend %p;
+		font-size: $paragraph-font-size;
 		border-color: $vapor;
 		height: $rotate-width * 2 + 1;
 		min-width: $rotate-th-width;
