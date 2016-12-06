@@ -69,12 +69,18 @@
              # Buttons
              #
              # Teacher: sees nav
-             # Participant: sees complete task button
+             # Participant: sees complete task button (if of course it's a task that's self-assessable)
              #}
             {% if readOnly == false %}
             <a href="#" class="icon-more" data-dropdown="options-task{{ task.id }}" aria-expanded="false" title="Actions"></a>
-            {% elseif isParticipant %}
-            <a href="/task/start/{{ task.id }}{{ taskAction }}" class="progress-tick {{ taskClass }}" data-interaction="update_progress" title="{{ taskTooltip }}"></a>
+            {% elseif isParticipant and task is task and task.selfAssessed %}
+
+                {% include '@learningMarkScheme/Completion.twig' with {
+                    participant: task.getParticipant(currentUser),
+                    markScheme: task.markScheme,
+                } %}
+
+            {#<a href="/task/start/{{ task.id }}{{ taskAction }}" class="progress-tick {{ taskClass }}" data-interaction="update_progress" title="{{ taskTooltip }}"></a>#}
             {% endif %}
         </nav>
         {% if readOnly == false  %}
