@@ -66,31 +66,20 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $solutionMapper = $this->getJoinMapper('solution');
-
         /** @var Model[]|GenericCollection $questions */
         $questions = $this->createCollection();
-        $solutions = $solutionMapper->createCollection();
 
         while($row = $statement->fetch(\PDO::FETCH_ASSOC))
         {
-            $questionId = $row[$this->getIdentifierColumn()];
-            $solutionId = $row["s.{$solutionMapper->getIdentifierColumn()}"];
-
-            if(!$questions->getOffset($questionId) instanceof Model){
-                $questions->setOffset($questionId, $this->hydrate($row));
-            }
-            if(!$solutions->getOffset($solutionId) instanceof QuizSolution){
-                $solutions->setOffset($solutionId, $solutionMapper->hydrate($row, 's'));
-            }
+            /** @var Model $question */
+            $question = $this->hydrate($row)
+                ->setSolution($this->hydrateJoin($row, 'solution', 's'));
 
             // Does this Question have a Solution?
-            if($solutions->getOffset($solutionId)){
-                $questions->getOffset($questionId)->setSolution($solutions->getOffset($solutionId));
-                $solutions->getOffset($solutionId)->setQuestion($questions->getOffset($questionId));
-            } else {
-                $questions[$questionId]->setSolution(null);
+            if(!$question->getSolution()->getId()){
+                $question->setSolution(null);
             }
+            $questions->add($question);
         }
         return $questions;
     }
