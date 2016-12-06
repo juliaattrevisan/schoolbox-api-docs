@@ -157,6 +157,23 @@ class Participant
     }
 
     /**
+     * Has this participant completed this assessment?
+     *
+     * The logic for whether an assessment is completed is determined by the
+     * feedback within this participant - if the latest feedback is marked
+     * completed, the assessment is.
+     *
+     * @return bool
+     */
+    public function isComplete()
+    {
+        $mostRecent = $this->findMostRecentPublishedFeedback();
+        return ($mostRecent instanceof IFeedback)
+            ? $mostRecent->isComplete()
+            : false;
+    }
+
+    /**
      * @deprecated misnomer, use hasPublishedFeedback()
      * This Participant received a Published Feedback for the $assessable
      *
