@@ -164,6 +164,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
     /**
      * Render recent showcased work
+     * @todo For now, just to get this working for 165, we are rendering the first file in StudentSubmissions and
+     * ReturnedWork. But since 165+ can have multiple files per Submission or Return, this templates needs updating.
+     * @see SA-1606
      */
     private function renderShowcasedWork()
     {
@@ -199,12 +202,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Show submitted work information (if available)
                  */
-                if ($latestSubmission) {
+                if ($latestSubmission && $latestSubmission->getFiles()->first()) {
+                    /** @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model $firstFile */
+                    $firstFile = $latestSubmission->getFiles()->first();
                     $this->getPage()->setVar(array(
                         'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
-                        'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getSize()),
-                        'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getCreatedAt()->getShort(),
-                        'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getIconFile(),
+                        'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($firstFile->getSize()),
+                        'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $firstFile->getCreatedAt()->getShort(),
+                        'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $firstFile->getMimetype()->getIconFile(),
                     ));
 
                     $this->getPage()->parse('has_submission_block', 'has_submission');
@@ -222,7 +227,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Show returned work information (if available)
                  */
                 if ($latestReturn && $currentBox->isMarkShownToRole($currentUser->getRole())) {
-                    $mark = $latestReturn->getMark();
+                    $mark = $latestReturn->getHumanReadableMark();
                     $this->getPage()->setVar(array(
                         'SHOWCASED_WORK_RETURNED_MARK' => $mark,
                         'SHOWCASED_WORK_RETURNED_GRADIENT' => $latestReturn->getGradientFromNormalizedMark(),
