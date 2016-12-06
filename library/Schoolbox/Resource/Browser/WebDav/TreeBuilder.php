@@ -77,4 +77,28 @@ class TreeBuilder extends AbstractTreeBuilder
     }
 
 
+    /**
+     * Return the given folder's colour
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderColour(IFolder $folder)
+    {
+        return $folder->getColour();
+    }
+
+
+    /**
+     * Return the given folder's cover image
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderCoverImage(IFolder $folder)
+    {
+        return $folder->getCoverImage();
+    }
+
+
 }

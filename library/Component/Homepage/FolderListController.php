@@ -75,10 +75,22 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('source_folder_exists', 'folders', 'folders_block');
+            $this->setBlock('source_folder_exists', 'grid_view', 'grid_view_block');
+            $this->setBlock('source_folder_exists', 'list_view', 'list_view_block');
             $this->setBlock('source_folder_exists', "submit_folder", "submit_folder_block");
-            $this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
-            $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
+
+            if ($this->getConfig('displayPortraits') == 'grid') {
+                $this->setBlock('grid_view', 'grid_folders', 'grid_folders_block');
+                $this->setBlock('grid_folders', 'modify_folder', 'modify_folder_block');
+                $this->parse('grid_view_block', 'grid_view');
+                $this->setVar('list_view_block', '');
+
+            } else {
+                $this->setBlock('list_view', 'list_folders', 'list_folders_block');
+                $this->setBlock('list_folders', 'modify_folder', 'modify_folder_block');
+                $this->parse('list_view_block', 'list_view');
+                $this->setVar('grid_view_block', '');
+            }
 
             $this->setVar('empty_state_block', '');
 
@@ -87,22 +99,54 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             } else {
                 $this->setVar('source_folder_deleted_block', '');
 
-                $this->setVar('folders_block', '');
-
                 $maxFolders = $this->getConfig('size');
-                if (count($allFolders) && $this->getContentPermission() > UserAccess::ACCESS_DENY) {
-                    $j = 0;
+                if ($this->getContentPermission() > UserAccess::ACCESS_DENY) {
 
-                    $this->setVar('folders_block', '');
+                    $j = 0;
+                    $colourIndex = 0;
+
                     $icons = array('homepage' => 'home', 'folder' => 'folder', 'course' => 'course-builder');
+                    $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
                     foreach ($allFolders as $currentFolder) {
-                        //set name
+
+                        /**
+                         * Set folder colour and cover image for grid layout
+                         */
+                        if ($this->getConfig('displayPortraits') == 'grid') {
+
+                            /**
+                             * Check for folder colour and apply colour from list if no colour exists
+                             */
+                            if (empty($currentFolder['colour'])) {
+                                $folderColour = $colourList[$colourIndex]->getHexColour();
+                                $colourIndex = ($colourIndex + 1) % $colourList->count();
+                            } else {
+                                $folderColour = Scrub::text($currentFolder['colour']);
+                            }
+
+                            /**
+                             * Check for folder cover image
+                             */
+                            if ($currentFolder['coverImage']->getHash() != '') {
+                                $folderCoverImage = 'background-image: url(\'/storage/image.php?hash=' . $currentFolder['coverImage']->getHash() . '&size=cardImageLarge\'); background-size: cover; background-repeat: no-repeat; background-position: center;';
+                            } else {
+                                $folderCoverImage = '';
+                            }
+
+                        } else {
+                            $folderColour = '';
+                            $folderCoverImage = '';
+                        }
+
                         $output = array(
                             'FOLDER_ID' => $currentFolder['id'],
                             'FOLDER_NAME' => Scrub::text($currentFolder['text']),
                             'FOLDER_ICON' => $icons[$currentFolder['type']],
+                            'FOLDER_COLOUR' => $folderColour,
+                            'FOLDER_COVER_IMAGE' => $folderCoverImage,
                         );
+
                         if ($maxFolders > 0 && $j > $maxFolders) {
                             break;
                         }
@@ -115,20 +159,20 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                             $this->setVar('modify_folder_block', '');
                         }
 
-                        $this->parse('folders_block', 'folders', true);
+                        if ($this->getConfig('displayPortraits') == 'grid') {
+                            $this->parse('grid_folders_block', 'grid_folders', true);
+                        } else {
+                            $this->parse('list_folders_block', 'list_folders', true);
+                        }
                     }
-                } else {
-                    $this->setVar('folders_block', '');
                 }
 
-                $this->setVar(
-                    array(
+                $this->setVar([
                         'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
                         'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
                         'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
                         'COMPONENT_HANDLE' => strtolower($templateHandle)
-                    )
-                );
+                ]);
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar("submit_folder_block", "");

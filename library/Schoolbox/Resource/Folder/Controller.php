@@ -270,7 +270,10 @@ class Controller extends BaseController
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
-                    'writePermission'   => UserAccess::ACCESS_WRITE,
+                    'deny'              => UserAccess::ACCESS_DENY,
+                    'read'              => UserAccess::ACCESS_READ,
+                    'write'             => UserAccess::ACCESS_WRITE,
+                    'moderate'          => UserAccess::ACCESS_FULL,
                     'coverImageZone'    => $zone->getTwigContext(),
                 ),
             )

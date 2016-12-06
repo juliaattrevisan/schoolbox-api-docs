@@ -11,6 +11,8 @@ namespace Schoolbox\Resource;
 
 
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Resource\Storage\IStorage;
+use Alaress\Color\Color;
 
 /**
  * Class AbstractFolder
@@ -48,6 +50,20 @@ abstract class AbstractFolder implements IFolder
      * @var self
      */
     protected $parent;
+
+    /**
+     * Folder colour
+     *
+     * @var Color
+     */
+    protected $colour;
+
+    /**
+     * Cover image
+     *
+     * @var IStorage
+     */
+    protected $coverImage;
 
 
     /**
@@ -158,6 +174,26 @@ abstract class AbstractFolder implements IFolder
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Get folder colour
+     *
+     * @return Color
+     */
+    public function getColour()
+    {
+        return $this->colour;
+    }
+
+    /**
+     * Get folder cover image
+     *
+     * @return IStorage
+     */
+    public function getCoverImage()
+    {
+        return $this->coverImage;
     }
 
 }

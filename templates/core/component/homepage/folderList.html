@@ -5,7 +5,7 @@
 
     <div class="empty-state">
         <i class="icon-folder"></i>
-        <p>No folders available!</p>
+        <p>No folders found.</p>
         <!-- BEGIN empty_modify -->
         <p>
             <a href="/resource/folder/create/{FOLDER_CAT_ID}">Add folder</a>
@@ -25,32 +25,66 @@
                 <!-- END source_folder_deleted -->
 
                 <!-- BEGIN source_folder_exists -->
-                <ul class="action-list">
-                    <!-- BEGIN folders -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="compact card small-12">
-                                <a href="/homepage/{FOLDER_ID}/">
-                                    <div class="icon-{FOLDER_ICON}"></div>
-                                    <h3>{FOLDER_NAME}</h3>
-                                </a>
+
+                    <!-- BEGIN grid_view -->
+                        <!-- BEGIN grid_folders -->
+                        <div class="columns small-6 medium-6 large-4 left">
+                            <div class="row">
+                                <div class="card-new small-12">
+                                    <a href="/homepage/{FOLDER_ID}">
+                                        <div class="card-feature-image" style="background-color:{FOLDER_COLOUR}; border-bottom: 10px solid {FOLDER_COLOUR}; {FOLDER_COVER_IMAGE}"></div>
+                                    </a>
+                                    <div class="card-content actions-small-1">
+                                        <div class="list-item">
+                                            <h3><a href="/homepage/{FOLDER_ID}">{FOLDER_NAME}</a></h3>
+                                        </div>
+
+                                        <!-- BEGIN modify_folder -->
+                                        <nav>
+                                            <a class="icon-modify" href="/resource/folder/modify/{FOLDER_ID}" title="Modify"></a>
+                                        </nav>
+                                        <!-- END modify_folder -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <nav>
-                            <!-- BEGIN modify_folder -->
-                            <a class="icon-modify" href="/resource/folder/modify/{FOLDER_ID}" title="Modify"></a>
-                            <!-- END modify_folder -->
-                        </nav>
-                    </li>
-                    <!-- END folders -->
-                </ul>
-                <!-- BEGIN submit_folder -->
-                <div class="component-action">
-                    <section>
-                        <a href="/resource/folder/create/{FOLDER_CAT_ID}" class="button">Add Folder</a>
-                    </section>
-                </div>
-                <!-- END submit_folder -->
+                        <!-- END grid_folders -->
+                    <!-- END grid_view -->
+
+                    <!-- BEGIN list_view -->
+                        <ul class="action-list">
+                            <!-- BEGIN list_folders -->
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="compact card small-12">
+                                        <a href="/homepage/{FOLDER_ID}/">
+                                            <div class="icon-{FOLDER_ICON}"></div>
+                                            <h3>{FOLDER_NAME}</h3>
+                                        </a>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <!-- BEGIN modify_folder -->
+                                    <a class="icon-modify" href="/resource/folder/modify/{FOLDER_ID}" title="Modify"></a>
+                                    <!-- END modify_folder -->
+                                </nav>
+                            </li>
+                            <!-- END list_folders -->
+                        </ul>
+                    <!-- END list_view -->
+
+                    <!-- BEGIN submit_folder -->
+                    <div class="columns">
+                        <div class="row">
+                            <div class="component-action">
+                                <section>
+                                    <a href="/resource/folder/create/{FOLDER_CAT_ID}" class="button">Add Folder</a>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END submit_folder -->
+
                 <!-- END source_folder_exists -->
             </section>
         </div>
