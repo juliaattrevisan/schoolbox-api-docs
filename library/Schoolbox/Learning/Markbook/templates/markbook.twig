@@ -2,6 +2,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -12,58 +13,8 @@
         $('[data-mark-sheet]').marksheetInputs();
 
         // Save form for task completion
-        $('a[data-interaction="update_progress"]').on('click', function(event){
-            event.preventDefault();
-
-            var label = $('[data-save-progress-state]');
-            label.toastActivate();
-
-            var element = $(this);
-            var form    = element.closest('form');
-            form.prop('disabled', true).attr('disabled', '');
-            $.ajax({
-                url: form.attr('action'),
-                type: form.attr('method') || 'post',
-                dataType: 'json',
-                data: form.serialize()
-            })
-                .done(function(data) {
-                    // Update something.
-                    // I guess add the same class the update submission has.
-                    element.removeClass('pending complete').addClass('ajax-updated');
-                    form.find('input[name="current_status"]').val(data.status);
-                    // Update name and class as well
-                    switch (data.status) {
-                        case 1: // incomplete
-                            element.attr('title', 'Not attempted – click to mark as complete');
-                            break;
-                        case 2: // pending
-                            element.addClass('pending').attr('title', 'Self-assessed – click to mark as complete');
-                            break;
-                        case 3: // complete
-                            element.addClass('complete').attr('title', 'Completed – click to mark as not attempted');
-                            break;
-                    }
-
-                    label.toastTimeout({
-                        text: 'Saved',
-                        css: 'success'
-                    });
-
-                })
-                .fail(function() {
-                    label.toastTimeout({
-                        text: 'Could not save!',
-                        css: 'alert'
-                    });
-                })
-                .always(function() {
-                    form.removeAttr('disabled');
-                    setTimeout(function() {
-                        element.removeClass('ajax-updated');
-                    }, 1000);
-                });
-            form.attr('disabled', 'disabled');
+        $('form[data-progress-tick-form]').progressTickForm({
+            label: $('[data-save-progress-state]')
         });
     });
 </script>
@@ -202,7 +153,8 @@
                                     {# TODO abstract this out #}
                                     <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}"
                                           method="POST"
-                                          class="progress-tick-form">
+                                          class="progress-tick-form"
+                                          data-progress-tick-form>
                                         {% if mostRecentFeedback.isMarkedAsCompleted %}
                                             <input type="hidden" name="status" value="1" />
                                             <a href="#"
