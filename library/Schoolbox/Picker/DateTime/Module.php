@@ -14,6 +14,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -76,7 +78,8 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
+                'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class)
             ])
         );
     }

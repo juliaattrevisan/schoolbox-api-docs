@@ -338,6 +338,37 @@ class UserMapper extends Mapper
     }
 
     /**
+     * Find a user by their external id and come with roles, campus, etc
+     *
+     * @param array $ids
+     * @return array
+     * @throws Mapper\Exception
+     */
+    public function findCheaplyByExternalIds($ids) {
+
+        $inQuery = implode(',', array_fill(0, count($ids), '?'));
+
+        $query = "
+            SELECT u.id, u.synergy_id
+            FROM `user` u
+            WHERE u.synergy_id IN ({$inQuery}) AND u.deleted_at is null
+        ";
+        $statement = $this->database->prepare($query);
+
+        foreach ($ids as $k => $id)
+            $statement->bindValue(($k+1), $id);
+
+        $statement->execute();
+
+        /** @var User $user */
+        foreach ($statement as $row) {
+            $externals[$row['synergy_id']] = $row['id'];
+        }
+
+        return $externals;
+    }
+
+    /**
      * Fetches the user, and all of the user's subjects.
      *
      * @throws Schoolbox\Mapper\Exception if user wasn't found
