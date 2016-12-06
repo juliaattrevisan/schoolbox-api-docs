@@ -29,7 +29,10 @@
             notAttempted: 'complete',
             selfAssessed: 'notAttempted',
             complete:     'notAttempted'
-        }
+        },
+
+        // Change callback
+        onChange: function(newStatus) {}
     };
 
     $.fn.progressTickForm = function(options) {
@@ -74,24 +77,27 @@
                         element.removeClass('pending complete');
 
                         // Update name, class and value
+                        var statusString = '';
                         switch (data.status) {
                             case statusValues.notAttempted:
-                                element
-                                    .data('progressTickStatus', 'notAttempted')
-                                    .attr('title', config.titles.notAttempted);
+                                statusString = 'notAttempted';
                                 break;
+
                             case statusValues.selfAssessed:
-                                element
-                                    .data('progressTickStatus', 'selfAssessed')
-                                    .addClass('pending')
-                                    .attr('title', config.titles.selfAssessed);
+                                statusString = 'selfAssessed';
+                                element.addClass('pending');
                                 break;
+
                             case statusValues.complete:
-                                element
-                                    .data('progressTickStatus', 'complete')
-                                    .addClass('complete')
-                                    .attr('title', config.titles.complete);
+                                statusString = 'complete';
+                                element.addClass('complete');
                                 break;
+                        }
+
+                        if (statusString) {
+                            element
+                                .data('progressTickStatus', statusString)
+                                .attr('title', config.titles[statusString]);
                         }
 
                         // Toast if we can
@@ -102,6 +108,8 @@
                             });
                         }
 
+                        // Callback
+                        config.onChange.apply(form, [statusString])
                     })
                     .fail(function() {
                         // Toast if we can
