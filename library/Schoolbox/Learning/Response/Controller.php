@@ -98,6 +98,11 @@ class Controller extends Base
         $file = null;
 
         if ($response && $response->getAllFiles()->count()) {
+
+            /* Sort files alphabetically
+             */
+            $response->getAllFiles()->sortBy('filename', 'asc');
+
             try {
                 $file = $response->findFileByHash($this->getRequest()->query['hash']);
             }
@@ -116,10 +121,6 @@ class Controller extends Base
          * crocodocable files that somehow die
          */
         try {
-
-            /* Sort files alphabetically
-             */
-            $response->getAllFiles()->sortBy('filename', 'asc');
 
             $data = [
                 'assessment' => $assessment,
