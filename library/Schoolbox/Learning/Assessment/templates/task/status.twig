@@ -57,6 +57,38 @@
                     notAttempted: 'complete',
                     selfAssessed: 'notAttempted',
                     complete:     'notAttempted'
+                },
+                onChange: function(newStatus) {
+                    // Update the light and the row's status
+                    var newClass,
+                        $a = $(this).find('a[data-progress-tick-status]'),
+                        $row = $(this).closest('[data-status]'),
+                        $light = $row.find('[data-status]'),
+                        newLabel;
+
+                    switch (newStatus) {
+                        case 'notAttempted':
+                            newClass = 'incomplete';
+                            newLabel = 'Not Attempted';
+                            break;
+
+                        case 'selfAssessed':
+                            newClass = 'pending';
+                            newLabel = 'Self-Assessed';
+                            break;
+
+                        case 'complete':
+                            newClass = 'complete';
+                            newLabel = 'Complete';
+                            break;
+                    }
+
+                    $row.attr('data-status', newClass);
+
+                    $a.removeClass('incomplete pending complete').addClass(newClass);
+                    $light.removeClass('incomplete pending complete').addClass(newClass);
+
+                    $light.siblings('span').html(newLabel);
                 }
             });
         });
