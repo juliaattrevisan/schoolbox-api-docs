@@ -19,7 +19,7 @@ class TextboxMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_textbox_item');
-		$this->hasModel(TextboxMapper::class);
+		$this->hasModel(Textbox::class);
 
 		$this->hasMap(array(
 			'column'     => 'id',
