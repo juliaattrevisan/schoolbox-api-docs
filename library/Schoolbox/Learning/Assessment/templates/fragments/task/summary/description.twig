@@ -31,6 +31,8 @@
         </div>
     {% elseif preview.fragment|length %}
         {# This usage of raw is because the embedded code is raw html for embedding external content etc using oEmbed or multimedia videos #}
-        {{ preview.fragment | raw }}
+        <div class="content">
+            {{ preview.fragment | raw }}
+        </div>
     {% endif %}
 </section>
