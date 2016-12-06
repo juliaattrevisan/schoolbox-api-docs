@@ -43,6 +43,6 @@ class Model extends AbstractFeedback implements ICompletion
      */
     public function isComplete()
     {
-        return $this->isComplete() && $this->isMarkedAsCompleted();
+        return $this->isPublished() && $this->isMarkedAsCompleted();
     }
 }
