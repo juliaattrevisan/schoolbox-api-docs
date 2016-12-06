@@ -13,14 +13,13 @@ use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as ReturnedWorkFileMapper;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use PDOStatement;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 
 /**
  * Class ReturnedWorkMapper
@@ -28,7 +27,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
  * @package Schoolbox\Assessment\Component\SubmissionBox
  * @method ReturnedWork findById($id)
  * @method ReturnedWork hydrate(array $row, $alias = '', $callback = null)
- * @method ReturnedWork createModel()
+ * @method ReturnedWork createModel($idValue = null)
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
 {
@@ -37,19 +36,19 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->hasTable('submission_return');
         $this->hasModel(ReturnedWork::class);
 
-        $this->uses('id', Schoolbox\Mapper::TYPE_INTEGER, Schoolbox\Mapper::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
-        $this->joins('owner', Schoolbox\UserMapper::class, 'id', null, null, 'owner', 'owner');
-        $this->joins('marker', Schoolbox\UserMapper::class, 'id', null, null, 'marker', 'marker');
-        $this->joins('student_submission_id', SubmissionBox\Submission\SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
-        $this->uses('comment', Schoolbox\Mapper::TYPE_STRING);
-        $this->uses('mark', Schoolbox\Mapper::TYPE_STRING, null, 'humanReadableMark');
-        $this->uses('norm_mark', Schoolbox\Mapper::TYPE_STRING, null, 'normalizedMark');
-        $this->uses('is_confirmation_of_submission', Schoolbox\Mapper::TYPE_BOOLEAN);
-        $this->uses('created_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('published_at', Schoolbox\Mapper::TYPE_DATETIME);
-        $this->uses('updated_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
+        $this->joins('owner', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('marker', UserMapper::class, 'id', null, null, 'marker', 'marker');
+        $this->joins('student_submission_id', StudentSubmissionMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->uses('comment', self::TYPE_STRING);
+        $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
+        $this->uses('norm_mark', self::TYPE_STRING, null, 'normalizedMark');
+        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('published_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Unmapped join onto individual files
         $this->hasJoin(
