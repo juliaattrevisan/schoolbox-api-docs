@@ -74,32 +74,9 @@
             {% if readOnly == false %}
             <a href="#" class="icon-more" data-dropdown="options-task{{ task.id }}" aria-expanded="false" title="Actions"></a>
             {% elseif isParticipant and task is task and task.selfAssessed %}
-
-                {% set participant      = task.getParticipant(currentUser) %}
-                {% set statusIncomplete = 'incomplete' %}
-                {% set statusPending    = 'pending'    %}
-                {% set statusComplete   = 'complete'   %}
-                {% set latestFeedback   = participant.findMostRecentFeedback %}
-                {% set pStatusClass     = latestFeedback.isMarkedAsCompleted
-                    ? statusComplete
-                    : (latestFeedback.isMarkedAsSelfAssessed
-                        ? statusPending
-                        : statusIncomplete )
-                %}
-                {% set pTooltip         = latestFeedback.isMarkedAsCompleted
-                    ? 'Completed'
-                    : (latestFeedback.isMarkedAsSelfAssessed
-                        ? 'Self-Assessed'
-                        : 'Not Attempted')
-                %}
-                {% include '@learningMarkScheme/Completion.twig' with {
-                    participant: participant,
-                    markScheme: task.markScheme,
-                    pStatusClass: pStatusClass,
-                    pTooltip: pTooltip,
+                {% include '@learningAssessment/task/progressTickForm.twig' with {
+                    participant: task.getParticipant(currentUser)
                 } %}
-
-            {#<a href="/task/start/{{ task.id }}{{ taskAction }}" class="progress-tick {{ taskClass }}" data-interaction="update_progress" title="{{ taskTooltip }}"></a>#}
             {% endif %}
         </nav>
         {% if readOnly == false  %}
