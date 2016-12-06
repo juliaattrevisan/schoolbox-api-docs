@@ -845,70 +845,6 @@ nav {
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
 			margin-top: 0.5rem;
 		}
-		.one-column{
-			@media #{$small-up} { @include grid-column(1); }
-		}
-		.two-column{
-			@media #{$small-up} { @include grid-column(2); }
-		}
-		.three-column{
-			@media #{$small-up} { @include grid-column(3); }
-		}
-		.four-column{
-			@media #{$small-up} { @include grid-column(4); }
-		}
-		.five-column{
-			@media #{$small-up} { @include grid-column(5); }
-		}
-		.six-column{
-			@media #{$small-up} { @include grid-column(6); }
-		}
-		.seven-column{
-			@media #{$small-up} { @include grid-column(7); }
-		}
-		.eight-column{
-			@media #{$small-up} { @include grid-column(8); }
-		}
-		.nine-column{
-			@media #{$small-up} { @include grid-column(9); }
-		}
-		.ten-column{
-			@media #{$small-up} { @include grid-column(10); }
-		}
-		.eleven-column{
-			@media #{$small-up} { @include grid-column(11); }
-		}
-		.twelve-column{
-			@media #{$small-up} { @include grid-column(12); }
-		}
-		// Column with thumbnail - No Padding
-		.one-column.thumbnail{
-			padding: 0;
-			text-align: center;
-		}
-		// Responsive Column Padding
-		.one-column,
-		.two-column,
-		.three-column,
-		.four-column,
-		.five-column,
-		.six-column,
-		.seven-column,
-		.eight-column,
-		.nine-column,
-		.ten-column,
-		.eleven-column,
-		.twelve-column{
-			@media #{$small-up} {
-				padding: rem-calc(($base-font-size - 8));
-			}
-			@media #{$medium-up} {
-				padding: rem-calc(($base-font-size - 4));
-			}
-			@media #{$large-up} {
-				padding: rem-calc(($base-font-size));
-			}
-		}
 	}
 	form {
 		margin: 0;
@@ -936,12 +872,6 @@ nav {
 		 */
 		&:empty {
 			padding: 0;
-		}
-
-		@media #{$small-only} {
-			p {
-				font-size: (0.8125 * rem-calc($base-font-size));
-			}
 		}
 	}
 }
@@ -1236,19 +1166,6 @@ ul.flex-list {
 	}
 }
 
-p{
-  @media #{$small-up} {
-    margin-bottom: rem-calc(($base-font-size - 8));
-  }
-  @media #{$medium-up} {
-    margin-bottom: rem-calc(($base-font-size - 4));
-  }
-  @media #{$large-up} {
-    margin-bottom: rem-calc(($base-font-size));
-  }
-
-}
-
 // Threaded / Social Stream
 .threaded {
 	@include information-list;
@@ -1499,7 +1416,6 @@ ul.meta {
 dl {
 	&.inline-dl {
 		@include grid-row($behavior:nest);
-
         margin-bottom: 1rem;
 
         dt, dd {
@@ -1624,30 +1540,22 @@ $train-line-unvisited-color: $content-ui-background;
 @media #{$small-only} {
     // top level breadcrumbing: on mobile, only show current and previous
     #content > .breadcrumb li {
-
-        a {
-            //width: 0;
-        }
         display: none;
 
         &:nth-last-child(-n+2) {
             display: list-item;
-            a {
-                //width: auto;
-            }
         }
     }
 }
 
 @media #{$large-up} {
-  #content > .breadcrumb {
-	margin-left: -1rem;
-  }
+	#content > .breadcrumb {
+		margin-left: -1rem;
+	}
 }
 
-
 article {
-  @extend .clearfix;
+  	@extend .clearfix;
 }
 
 

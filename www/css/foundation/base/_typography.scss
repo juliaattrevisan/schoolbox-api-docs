@@ -46,7 +46,7 @@ $subheader-bottom-margin: .5rem;
 // $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 2));
 $paragraph-line-height: 1.6;
-$paragraph-margin-bottom: rem-calc(($base-font-size - 2));
+$paragraph-margin-bottom: $base-font-size;
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
 // $paragraph-aside-font-style: italic;
@@ -136,6 +136,15 @@ h1{
 h2, h3, h4, h5, h6 {
 	&.subheader {
 		@include contrast-bg();
+	}
+}
+
+p{
+	@media #{$small-only} {
+		margin-bottom: rem-calc(($base-font-size - 8));
+	}
+	@media #{$medium-only} {
+		margin-bottom: rem-calc(($base-font-size - 4));
 	}
 }
 
