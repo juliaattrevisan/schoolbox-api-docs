@@ -121,7 +121,7 @@ class StudentCarousel
                 'value' => $urlValue,
                 'html' => "
                     <div class=\"row\">
-                        <div class=\"avatar card small-10\">
+                        <div class=\"card small-10\">
                             <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
                             <p>{$currentParticipant->getUser()->getFullName()}</p>
                             <span class=\"label status {$css}\">{$label}</span>

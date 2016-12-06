@@ -42,7 +42,7 @@
                         {% for item in news[topic.id] %}
                             <li>
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         {% if item.showLink %}
                                             <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
                                         {% endif %}
@@ -73,7 +73,7 @@
                     {% for item in newsAll %}
                         <li>
                             <div class="list-item">
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
                                         {% if item.image %}
                                             <img src="/storage/image.php?hash={{ item.image }}&size=square64">
