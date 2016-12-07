@@ -73,7 +73,7 @@
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}" title="Go to {{ division.name }} lobby">
-                                <div class="icon-division icon-16"></div>
+                                <div class="icon-division"></div>
                                 <h3>{{ division.name }}</h3>
                             </a>
                             <p class="meta">
@@ -90,7 +90,7 @@
                             <ul class="unit-list">
                                 {% for team in division.teams %}
                                     <li>
-                                        <span class="icon-16 icon-team"></span>
+                                        <span class="icon-team"></span>
                                         <span>{{ team.name }}</span>
                                         {% if team.coaches | length %}
                                             <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>

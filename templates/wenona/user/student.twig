@@ -38,14 +38,14 @@
 {% block buttons %}
     <li class="no-pad">
         <a href="https://intranet.wenona.nsw.edu.au/contentpages/studentprofile/default.aspx?studentID={{ user.getExternalId() }}"
-           class="no-margin fat button icon-fat icon-32 icon-synergetic"
+           class="no-margin fat button icon-fat size-32 icon-synergetic"
            data-equalizer-watch>Intranet</a>
     </li>
     {{ parent() }}
     {# Change of information request can go here #}
     <li class="no-pad">
         <a href="{{ session.mailhandler }}changeofinformation@wenona.nsw.edu.au"
-           class="no-margin fat button icon-fat icon-32 icon-email"
+           class="no-margin fat button icon-fat size-32 icon-email"
            title="Email Wenona about updates to your information"
            data-equalizer-watch>Email Updates</a>
     </li>
@@ -58,7 +58,7 @@
     {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
         <li class="no-pad">
             <a href="https://intranet.wenona.nsw.edu.au/contentpages/studentprofile/default.aspx?studentID={{ user.getExternalId() }}"
-               class="no-margin fat button icon-fat icon-32 icon-tick"
+               class="no-margin fat button icon-fat size-32 icon-tick"
             >My Progress</a>
         </li>
     {% endif %}

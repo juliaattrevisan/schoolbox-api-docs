@@ -21,9 +21,9 @@
         {% if folder.hasCoverImage %}
             <img class="icon" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square128" alt="{{ folder.name }}" {{ colouring }} />
         {% elseif folder.hasHomepage %}
-            <a class="icon-{{ icon }} icon-64" title="View Homepage" href="/homepage/{{ folder.id }}"></a>
+            <a class="icon-{{ icon }} size-64" title="View Homepage" href="/homepage/{{ folder.id }}"></a>
         {% else %}
-            <div class="icon-{{ icon }} icon-64" alt="{{ folder.name }}"></div>
+            <div class="icon-{{ icon }} size-64" alt="{{ folder.name }}"></div>
         {% endif %}
         {% if access > 1 %}
             <div class="s32" style="margin-top: 1rem">

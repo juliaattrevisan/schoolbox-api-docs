@@ -307,7 +307,7 @@
                                         {% set gradePath = routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: currentTerm.code, subjectId: subject.folder.id}) %}
                                         <div class="small-{{ subject.grade ? 8 : 12 }} card">
                                             <a href="{{ gradePath }}" title="View Grades">
-                                                <span class="icon-home icon-32" title="{{ subject.folder.title }}"></span>
+                                                <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
                                                 <p>{{ subject.folder.title }}</p>
                                             </a>
                                             <p class="meta">{{ subject.folder.codeString }}</p>

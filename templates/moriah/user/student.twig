@@ -3,9 +3,7 @@
 {% block buttons_grades %}
     {% if not (config.restrict_parent_grades and session.user.getRole().isParent()) %}
         <li class="no-pad">
-            <a href="/learning/grades/{{ user.getId() }}"
-               class="no-margin fat button icon-fat icon-32 icon-tick"
-            >Grades</a>
+            <a href="/learning/grades/{{ user.getId() }}" class="no-margin fat button icon-fat size-32 icon-tick">Grades</a>
         </li>
     {% endif %}
     <li class="no-pad"><a href="/synRedir.php?page=Docs&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-files">Reports</a></li>
