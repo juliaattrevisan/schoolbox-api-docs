@@ -1484,7 +1484,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return PredicateBuilder
      */
-    public function createPredicateBuilder()
+    public function getPredicateBuilder()
     {
         return new PredicateBuilder($this->getDatabase(), $this->getTable());
     }
