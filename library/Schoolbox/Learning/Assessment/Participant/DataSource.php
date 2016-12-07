@@ -120,6 +120,10 @@ class DataSource
     }
 
     /**
+     * Loads participation into all assessments.
+     *
+     * This includes records for responses and feedbacks for every participant in each assessment.
+     *
      * @param Collection|IAssessable[] $assessments
      * @param User                     $user
      * @param bool                     $includeResponses
@@ -131,13 +135,26 @@ class DataSource
         $includeResponses = true,
         $includeFeedbacks = true
     ) {
+        /** @var Collection|IAssessable[] $assessmentsWithProjectActivities */
+        $assessmentsWithProjectActivities = new Collection();
+        foreach ($assessments as $assessment) {
+            $assessmentsWithProjectActivities->add($assessment);
+
+            if ($assessment instanceof Project) {
+                $assessmentsWithProjectActivities->merge($assessment->getAssessables());
+            }
+        }
+
+        // Load stack of participants for all assessments, plus activities in projects
         $participantStack = $this->findForAssessmentCollection(
-            $assessments,
+            $assessmentsWithProjectActivities,
             $user,
             $includeResponses,
             $includeFeedbacks
         );
-        foreach ($assessments as $assessment) {
+
+        // Set participants for all of them
+        foreach ($assessmentsWithProjectActivities as $assessment) {
             if (isset($participantStack[$assessment->getId()])) {
                 $assessment->setAllParticipants($participantStack[$assessment->getId()]);
             }
