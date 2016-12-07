@@ -1054,13 +1054,11 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string $columnName
      * @param string $columnValue
-     * @param array  $options @see findByColumnList() $options param
-     *
      * @return int
      */
-    public function deleteByColumn($columnName, $columnValue, $options = array())
+    public function deleteByColumn($columnName, $columnValue)
     {
-        return $this->deleteByColumnList(array($columnName => $columnValue), $options);
+        return $this->deleteByColumnList(array($columnName => $columnValue));
     }
 
 
@@ -1069,11 +1067,9 @@ abstract class Mapper implements IMapper, Serializable
      * Returns the number of records deleted.
      *
      * @param array $columnList
-     * @param array $options @see findByColumnList() $options param
-     *
      * @return int
      */
-    public function deleteByColumnList($columnList, $options = array())
+    public function deleteByColumnList($columnList)
     {
         return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
     }
