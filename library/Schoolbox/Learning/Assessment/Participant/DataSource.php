@@ -164,96 +164,12 @@ class DataSource
      */
     protected function findForAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
-        // Build a participant list
-        $participants = new Collection();
-        foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
-            $participants->add(
-                new Participant($currentUser, $assessment)
-            );
-        }
-
-        // Need to add them into the assessment
-        $assessment->setAllParticipants($participants);
-
-        /* Add responses
-         *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the submitter of the Response before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
-         */
-        if ($includeResponses) {
-            foreach ($this->responseDataSource->findForAssessment($assessment) as $response) {
-                if ($user === null || ($user instanceof User && $response->isAuthoredBy($user))) {
-                    $responseUser = $response->getSubmittedOnBehalfOf();
-
-                    // Find participant, creating if required
-                    if ($assessment->isParticipant($responseUser)) {
-                        $responseParticipant = $assessment->getParticipant($responseUser);
-
-                    } else {
-                        // Add them
-                        $responseParticipant = new Participant($responseUser, $assessment);
-                        $assessment->getAllParticipants()->add($responseParticipant);
-                    }
-
-                    $responseParticipant->getAllResponses()->add($response);
-                }
-            }
-        }
-
-        /* Add feedback
-         *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the reviewee of the Feedback before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
-         */
-        if ($includeFeedbacks) {
-            foreach ($this->feedbackDataSource->findForAssessment($assessment) as $feedback) {
-                if ($user === null || ($user instanceof User && $feedback->isReviewedFor($user))) {
-                    $feedbackUser = $feedback->getReviewee();
-
-                    // Find participant, creating if required
-                    if ($assessment->isParticipant($feedbackUser)) {
-                        $responseParticipant = $assessment->getParticipant($feedbackUser);
-
-                    } else {
-                        // Add them
-                        $responseParticipant = new Participant($feedbackUser, $assessment);
-                        $assessment->getAllParticipants()->add($responseParticipant);
-                    }
-
-                    // Feedbacks may have a stub response.
-                    // If so, use it to find the actual response, and associate them together.
-                    $stubResponse = $feedback->getResponse();
-                    if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
-                        $stubResponseId = $stubResponse->getId();
-
-                        foreach ($responseParticipant->getAllResponses() as $response) {
-                            // For now assume that the types of response and feedback match
-                            if ($stubResponseId == $response->getId()) {
-                                $response->getAllFeedback()->add($feedback);
-                                $feedback->setResponse($response);
-                                break;
-                            }
-                        }
-                    }
-
-                    $responseParticipant->getAllFeedbacks()->add($feedback);
-                }
-            }
-        }
-
-        // Sort by name after all that
-        $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
-        $assessment->setAllParticipants($participants);
-
-        return $participants;
+        return $this->findForAssessmentCollection(
+            new Collection([$assessment]),
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        )->first();
     }
 
     /**
