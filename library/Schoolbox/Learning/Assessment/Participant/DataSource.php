@@ -119,6 +119,31 @@ class DataSource
     }
 
     /**
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $user
+     * @param bool                     $includeResponses
+     * @param bool                     $includeFeedbacks
+     */
+    public function loadParticipationIntoAssessmentCollection(
+        Collection $assessments,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        $participantStack = $this->findForAssessmentCollection(
+            $assessments,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+        foreach ($assessments as $assessment) {
+            if (isset($participantStack[$assessment->getId()])) {
+                $assessment->setAllParticipants($participantStack[$assessment->getId()]);
+            }
+        }
+    }
+
+    /**
      * Find all Participants for a given assessment.
      *
      * This is a union of:
