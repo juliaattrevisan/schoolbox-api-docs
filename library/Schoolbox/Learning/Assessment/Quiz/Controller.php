@@ -24,6 +24,7 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 /**
  * Class Controller
@@ -94,10 +95,18 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+        $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
+        $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
+
         $twigData = [
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
             'assessment' => $assessment,
+
+            /* Need this suffix so we can return to the status screen after
+             * finishing the modification of le quiz
+             */
+            'returnUrlSuffix' => $returnUrlSuffix,
         ];
 
         $this->getResponse()->content->set(
