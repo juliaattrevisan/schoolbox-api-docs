@@ -57,7 +57,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
         $pb = $studentSubmissionMapper->createPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
-        $pb->greaterThan('created_at', $cutoffDate->getDatabase());
+        $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
         $studentSubmissions = $studentSubmissionMapper->findByPredicates($pb);
 
         // Get most recent N months of Quiz Attempts
@@ -65,7 +65,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $pb = $quizAttemptMapper->createPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
-        $pb->greaterThan('start', $cutoffDate->getDatabase());
+        $pb->greaterThan('finish', $cutoffDate->getDatabase());
         $quizAttempts = $quizAttemptMapper->findByPredicates($pb);
 
         // Convert to IAssessables and IResponses
