@@ -21,16 +21,14 @@ use \Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessable;
 use \Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 
-
 /**
  * Staff-only component.
  *
- * Displays the most recent N months of DueWork Submissions + Quiz Attempts for DueWork and Quizzes
- * that were created by current user.
+ * Displays the most recent N days of DueWork Submissions + Quiz Attempts for DueWork
+ * and Quizzes that were created by current user.
  */
 class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Sorted by most recent student response first
      *
@@ -51,7 +49,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         }
 
         $cutoffDate = Alaress_Date_Format::now();
-        $cutoffDate->addMonths(-6); // TODO - Create a Config Item for this
+        $cutoffDate->addDays(-$this->getConfig('days'));
 
         // Get most recent N months of DueWork Submissions
         $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
