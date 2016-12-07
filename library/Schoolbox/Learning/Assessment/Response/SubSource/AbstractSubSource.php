@@ -60,6 +60,19 @@ abstract class AbstractSubSource implements IResponseDataSource
     }
 
     /**
+     * @param Collection $assessments
+     * @return Collection|IResponse[][]
+     */
+    public function findForAssessmentCollection(Collection $assessments)
+    {
+        return $this->mapperProxy
+            ->findByColumnList(
+                ['assessment_id' => $assessments->filter([$this, 'recognizes'])->getColumnValues('id'),]
+            )
+            ->indexBy('id');
+    }
+
+    /**
      * @inheritdoc
      */
     public function findForStudent(User $student)

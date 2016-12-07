@@ -65,6 +65,19 @@ class DataSource implements IResponseDataSource
     }
 
     /**
+     * @param Collection $assessments
+     * @return Collection|IResponse[][]
+     */
+    public function findForAssessmentCollection(Collection $assessments)
+    {
+        $responses = new Collection();
+        foreach ($this->subSources as $subSource) {
+            $responses = $responses->union($subSource->findForAssessmentCollection($assessments));
+        }
+        return $responses;
+    }
+
+    /**
      * Find a particular $response by its id among a set of IResponses
      *
      * @param $responseId
