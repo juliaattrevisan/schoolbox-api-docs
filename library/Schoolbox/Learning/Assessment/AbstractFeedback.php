@@ -106,6 +106,16 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
+     * Does this feedback mark this participant as having completed the assessment?
+     *
+     * @return bool
+     */
+    public function isComplete()
+    {
+        return $this->isPublished();
+    }
+
+    /**
      * $user is the reviewee of this Feedback
      *
      * @param User $user

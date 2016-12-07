@@ -20,10 +20,93 @@
     </div>
 </div>
 
-{% if assessment.isSelfAssessed %}
+
+{# student submit form #}
+{% set participant         = assessment.getParticipant(currentUser) %}
+{% set mostRecentFeedback  = participant.findMostRecentPublishedFeedback %}
+{% set isViewingOwnSummary = participant.user.id == currentUser.id %}
+
 <div class="row">
     <div class="small-12 island">
-        <input type="submit" class="full-width" value="Complete Task" />
+        <section>
+            <ul class="information-list">
+                <li>
+                    {# Student's completion of this task #}
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64"
+                                     alt="{{ participant.user.formatName }}"
+                                     class="hide-for-small-only">
+                                <p>{{ participant.user.formatName }}</p>
+
+                                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
+                                    <p class="meta">
+                                        {% if isViewingOwnSummary %}
+                                            You completed this task on {{ mostRecentFeedback.publishedAt.short }}.
+                                        {% else %}
+                                            completed this task on {{ mostRecentFeedback.publishedAt.short }}.
+                                        {% endif %}
+                                    </p>
+                                {% else %}
+                                    <p class="meta">
+                                        {% if assessment.isSelfAssessed %}
+                                            {% if isViewingOwnSummary %}
+                                                You have not yet attempted this task.
+                                            {% else %}
+                                                has not yet attempted this task.
+                                            {% endif %}
+                                        {% else %}
+                                            {% if isViewingOwnSummary %}
+                                                Your teacher has not verified that you have completed this task.
+                                            {% else %}
+                                                has not been verified as having completed this task.
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    {# Has teacher confirmed this is complete? #}
+                    {% if mostRecentFeedback.isMarkedAsCompleted %}
+                        <ul class="information-list reply">
+                            <li class="list-item">
+                                <div class="card small-12">
+                                    <a href="/search/user/{{ mostRecentFeedback.reviewer.id }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ mostRecentFeedback.reviewer.externalId }}&amp;size=square64"
+                                             alt="{{ mostRecentFeedback.reviewer.formatName }}"
+                                             class="hide-for-small-only">
+                                        <p>{{ mostRecentFeedback.reviewer.formatName }}</p>
+
+                                        <p class="meta">
+                                            {% if isViewingOwnSummary %}
+                                                verified that you have completed this task.
+                                            {% else %}
+                                                verified this task is complete.
+                                            {% endif %}
+                                        </p>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </li>
+            </ul>
+        </section>
+
+        {% if assessment.isSelfAssessed %}
+            <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
+                  method="POST">
+                {% if mostRecentFeedback.isMarkedAsCompleted or mostRecentFeedback.isMarkedAsSelfAssessed %}
+                    <input type="hidden" name="status" value="1" />
+                    <input type="submit" class="full-width" value="Mark Task as Not Attempted" />
+                {% else %}
+                    <input type="hidden" name="status" value="2" />
+                    <input type="submit" class="full-width" value="Complete Task" />
+                {% endif %}
+            </form>
+        {% endif %}
     </div>
 </div>
-{% endif %}

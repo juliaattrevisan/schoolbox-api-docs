@@ -8,4 +8,19 @@
     {% include '@learningAssessment/task/componentListItem.twig' %}
 {% endblock %}
 
-
+{% block scripts %}
+    {# Mark as complete form #}
+    <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            // Save form for task completion
+            $('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+                transitions: {
+                    notAttempted: 'selfAssessed',
+                    selfAssessed: 'notAttempted',
+                    complete:     'notAttempted'
+                }
+            });
+        });
+    </script>
+{% endblock %}

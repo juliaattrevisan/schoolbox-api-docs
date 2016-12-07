@@ -4,22 +4,19 @@
     <div class="list-item">
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable) }} icon-32" title="{{ assessable.getTypeName }}"></div>
-            {# Not all tasks have links #}
-            {% if assessable.url %}
-                <a data-plugin="preview" href="{{ assessable.url }}">
-                    <h3>{{ assessable.title }}</h3>
-                </a>
-            {% else %}
-                <h3>{{ assessable.title }}</h3>
-            {% endif %}
+
+            <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) }}">
+                <h3 data-assessment-title>{{ assessable.title }}</h3>
+            </a>
+
             <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                 Due {{ assessable.getDueAt.getRelativeTime }}
             </p>
         </div>
     </div>
     <nav>
-        {% if assessable.isParticipant(student) and (assessable.getParticipant(student).getAllResponses | length) %}
-            <a disabled href="#" class="icon-tick no-text" title="Completed"></a>
+        {% if assessable.isParticipant(student) %}
+            {% include '@learningAssessment/task/progressTickForm.twig' with {participant: assessable.getParticipant(student)} %}
         {% endif %}
     </nav>
 </li>

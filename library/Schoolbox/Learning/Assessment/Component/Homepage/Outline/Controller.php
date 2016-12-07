@@ -129,12 +129,24 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
             foreach ($this->courseImplementation->getUnits() as $unitImpl) {
-                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationId($unitImpl->getId()));
+                if ($this->readOnly) {
+                    // I might be a student, but can't be anything more.
+                    // In any case, load only my participation - if I'm not a participant, there will be nothing.
+                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                        $unitImpl->getId(),
+                        $this->getUser()
+                    );
+                } else {
+                    // I'm a teacher - load all participants.
+                    $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                        $unitImpl->getId()
+                    );
+                }
+                $unitImpl->setAssessables($assessments);
+
 //                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
 //                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
             }
-
-            $this->userCollection = $this->userAccessMapper->findStudentsInCategory($this->getContext());
 
             // TODO get permissions working, I guess
 //            $this_student_id = null;
@@ -169,11 +181,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
+            'currentUser'          => $this->getUser(),
             'readOnly'             => $this->readOnly,
             'context'              => $this->getContext(),
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
-            'studentCount'         => count($this->userCollection),
             'componentInstance'    => $this->getInstance(),
             'returnUrl'            => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];

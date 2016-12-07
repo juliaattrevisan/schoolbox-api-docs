@@ -9,8 +9,21 @@
         {% set taskTooltip = 'Incomplete, click to mark completed' %}
 
         {% set completionCount    = 0 %}
+        {% set studentCount       = 0 %}
+
+        {# Is this user particpating? #}
+        {% set isParticipant = task.isParticipant(currentUser) %}
+
+        {# count students which have completed this #}
+        {% for participant in task.allParticipants %}
+            {% if participant.complete %}
+                {% set completionCount = completionCount + 1 %}
+            {% endif %}
+            {% set studentCount = studentCount + 1 %}
+        {% endfor %}
+
         {% if studentCount %}
-            {% set completionGradient = (completionCount / studentCount) / 10 | round %}
+            {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
         {# TODO: if unit.isopen and not task.requireConfirmation #}
@@ -34,13 +47,15 @@
                 <p>{{ task.title }}</p>
                 </a>
 
-                <!--
-                Student: see buttons for starting/ending task
-                Teacher: sees completion stats
-                -->
+                {##
+                 # Metadata
+                 #
+                 # Teacher: sees completion stats
+                 # Others: see due date
+                 #}
                 {% if readOnly == false %}
                 <p class="meta">
-                    <span class="gradient-{{ completionGradient }}">{{ completionCount }}/{{ studentCount }} students completed</span>
+                    <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
                 </p>
                 {% else %}
                 <p class="meta spaced">
@@ -50,10 +65,18 @@
             </div>
         </div>
         <nav>
+            {##
+             # Buttons
+             #
+             # Teacher: sees nav
+             # Participant: sees complete task button (if of course it's a task that's self-assessable)
+             #}
             {% if readOnly == false %}
             <a href="#" class="icon-more" data-dropdown="options-task{{ task.id }}" aria-expanded="false" title="Actions"></a>
-            {% else %}
-            <a href="/task/start/{{ task.id }}{{ taskAction }}" class="progress-tick {{ taskClass }}" data-interaction="update_progress" title="{{ taskTooltip }}"></a>
+            {% elseif isParticipant and task is task %}
+                {% include '@learningAssessment/task/progressTickForm.twig' with {
+                    participant: task.getParticipant(currentUser)
+                } %}
             {% endif %}
         </nav>
         {% if readOnly == false  %}

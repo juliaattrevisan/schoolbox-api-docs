@@ -22,6 +22,18 @@ interface IFeedback
      */
     public function isPublished();
 
+    /**
+     * Should the existence of this feedback specify that the participant has
+     * completed the assessment?
+     *
+     * Usually, this will be true if this feedback is published - in the future,
+     * I see us implementing a min mark that a participant must achieve for them
+     * to be marked completed?
+     *
+     * @return bool
+     */
+    public function isComplete();
+
     /* Getters/Setters
      */
 

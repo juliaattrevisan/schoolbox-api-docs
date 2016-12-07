@@ -1,4 +1,5 @@
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-outline.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript">
         $(function() {
             var component = $('#component{{ componentInstance.id }}'),
@@ -21,7 +22,14 @@
                 $(this).closest('li').toggleClass('expanded');
             });
 
-
+            // Save form for task completion
+            $('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+                transitions: {
+                    notAttempted: 'selfAssessed',
+                    selfAssessed: 'notAttempted',
+                    complete:     'notAttempted'
+                }
+            });
 
         });
 </script>
