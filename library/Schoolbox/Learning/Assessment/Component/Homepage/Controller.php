@@ -137,14 +137,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     protected abstract function getTwigTemplate();
 
     /**
-     * Return whether or not this assessment is of the relevant type for the current controller
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected abstract function filterAssessment(IAssessable $assessment);
-
-    /**
      * Return the type of assessment to retrieve
      *
      * @return string

@@ -10,8 +10,6 @@
 namespace Schoolbox\Learning\Assessment\Task\Component\Homepage;
 
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends \Schoolbox\Learning\Assessment\Component\Homepage\Controller
@@ -22,18 +20,6 @@ class Controller extends \Schoolbox\Learning\Assessment\Component\Homepage\Contr
     protected function getTwigTemplate()
     {
         return '@learningAssessment/task/component.twig';
-    }
-
-
-    /**
-     * Return whether or not this assessment is of the relevant type for the current controller
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected function filterAssessment(IAssessable $assessment)
-    {
-        return $assessment instanceof Task\Model;
     }
 
     /**
