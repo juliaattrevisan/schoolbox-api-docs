@@ -112,7 +112,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/index.twig',
             'data' => [
-                'pageCurrent' => 'eportfolio',
+                'pageCurrent' => 'eportfolio/deploy',
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],

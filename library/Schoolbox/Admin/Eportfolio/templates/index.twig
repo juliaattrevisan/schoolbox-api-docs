@@ -112,6 +112,10 @@
     });
 </script>
 
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
 <div class="small-12 island">
     <h1>ePortfolio Deployment</h1>
     <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
