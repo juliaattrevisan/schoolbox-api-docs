@@ -80,7 +80,7 @@
                                         </a>
 
                                         {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta">
+                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                                                 Due {{ assessable.getDueAt.getRelativeTime }}
                                             </p>
                                         {% endif %}
@@ -92,8 +92,8 @@
                                         {% endif %}
 
                                         {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                                                {{ assessableCounts[assessable.id].total }} / {{ assessment.allParticipants | length }} Students Completed
+                                            <p class="meta">
+                                                {{ assessmentCounts.completed[assessable.id] }}/{{ assessmentCounts.totalParticipants }} students completed
                                             </p>
                                         {% endif %}
                                     </div>
@@ -160,7 +160,7 @@
                                                 {% endif %}
                                             </p>
                                             <p class="meta">
-                                                {{ counts[participant.user.id].totalCompleted }} / {{ counts[participant.user.id].total }} Completed
+                                                {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
                                             </p>
                                         </div>
                                     </div>
