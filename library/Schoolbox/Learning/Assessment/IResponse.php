@@ -33,6 +33,14 @@ interface IResponse
      */
     public function findMostRecentPublishedFeedback();
 
+    /**
+     * $user is the author of this Response
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isAuthoredBy(User $user);
+
     /* Getters/Setters
      */
 
