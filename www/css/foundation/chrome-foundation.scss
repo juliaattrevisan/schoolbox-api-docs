@@ -17,26 +17,20 @@
 @import "base/reset";
 @import "base/typography";
 
-// Components
-@import "components/content";
+// General
+@import "ui/content";
 
 // Must import before forms, as forms reimports buttons.scss
 @import "components/buttons";
 
 @import "ui/forms/forms";
-//@import "components/joyride";
 @import "components/tree";
 @import "components/masonry";
 @import "components/ups";
 @import "ui/preview";
 @import "components/debugbar/debugbar";
 
-//////////////////////////////////////////////////////////
 // Refined UI Elements
-//
-// These override defaults in @import /buttons
-// We have refined these elements
-//////////////////////////////////////////////////////////
 @import "ui/button/button";
 @import "ui/button/list-actions";       // requires _button.scss
 @import "ui/button/header-actions";     // requires _list-actions.scss
@@ -121,5 +115,5 @@
 @import "../../javascript/components/jquery-ui/themes/base/draggable.css";
 @import "../../javascript/components/jquery-ui/themes/base/sortable.css";
 
-// client custom CSS overrrides
+// client custom CSS overrides
 @import "utils/custom";

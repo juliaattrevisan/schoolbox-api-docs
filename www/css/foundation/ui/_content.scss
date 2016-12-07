@@ -722,7 +722,7 @@ $rotate-th-width: $square-grid-td-size;
 	display: inline-block;
 	position: relative;
 	margin-bottom: auto;
-	font-size: 0.75rem;
+	font-size: $small-font-size;
 	background-color: $content-ui-background;
 	border-radius: 0.5rem;
 

@@ -59,13 +59,12 @@ a[disabled], a.disabled {
 	&.expand {
 		font-weight: 700;
 		font-size: $base-font-size;
-		padding: $global-button-padding;
 	}
 
 	&:empty {
 		@extend .no-text;
 		&:after {
-			// Use dark magick to ensure empty buttons have line-height of button's non-Schoolbox font.
+			// Use dark magic to ensure empty buttons have line-height of button's non-Schoolbox font.
 			content: ".";
 			visibility: hidden;
 			display: inline-block;

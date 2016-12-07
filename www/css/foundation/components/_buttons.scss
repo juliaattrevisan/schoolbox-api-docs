@@ -27,7 +27,7 @@ $global-button-padding: rem-calc(($base-font-size / 2));
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
 // $button-med: rem-calc(12);
-$button-med: rem-calc(($base-font-size - 8));
+$button-med: $global-button-padding;
 // $button-lrg: rem-calc(18);
 
 // We use this to control the display property.

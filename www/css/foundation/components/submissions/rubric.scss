@@ -113,7 +113,7 @@ table.rb {
         background-color: #f9f9f9 !important;
         &:not(:last-child):hover:before {
             content: 'Click to add descriptor';
-            font-size: 0.75rem;
+            font-size: $small-font-size;
             opacity: 0.5;
             font-style: italic;
         }

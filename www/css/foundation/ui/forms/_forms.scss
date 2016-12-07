@@ -17,7 +17,7 @@ $form-label-font-color: $black;
 $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
-$input-font-size: rem-calc(($base-font-size - 3));
+$input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 
 $input-bg-color: $white;
@@ -140,8 +140,7 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
-	font-size: $paragraph-font-size;
-	min-height: $input-height;
+	min-height: $global-button-input-height;
 	line-height: inherit;
 	font-weight: $font-weight-normal;
 	&:hover{
@@ -156,10 +155,6 @@ select{
 		outline: none;
 	}
 }
-input:not([type]), #{text-inputs(all, 'input')} {
-	// Ensure input height respects my settings
-	height: $global-button-input-height;
-}
 
 input[type="checkbox"],
 input[type="radio"]{
@@ -167,13 +162,14 @@ input[type="radio"]{
 }
 
 input[type="number"]{
-  padding: 0 0 0 $form-spacing / 2;
+  	padding: 0 0 0 $form-spacing / 2;
 }
 
 input,
 textarea{
 	padding-left: 0.75rem;
 }
+
 select {
 	padding-top: 0;
 	padding-bottom: 0;
@@ -375,10 +371,6 @@ input[type=radio]{
 		}
 	}
 
-	+ label {
-		font-weight: $font-weight-normal;
-	}
-
 	&:hover {
 		+ #{$label-selector} {
 			background-color: $hover-background-color;
@@ -455,14 +447,14 @@ ul.filters {
 // Win7/IE11 fix for size of checkboxes
 // For now I'm just going to guess a pixel value
 html.no-pseudoelementlineheightinrems {
-  input[type=radio]:not(.plain),
-  input[type=checkbox]:not(.plain) {
-    + label {
-      &:after {
-        line-height: ($base-font-size * 1.25);
-      }
-    }
-  }
+	input[type=radio]:not(.plain),
+	input[type=checkbox]:not(.plain) {
+		+ label {
+			&:after {
+				line-height: ($base-font-size * 1.25);
+			}
+		}
+	}
 }
 
 input[type=radio]:not(.plain) + label {
@@ -474,12 +466,12 @@ input[type=radio]:not(.plain) + label {
 // Disabled
 input[type=checkbox]:not(.plain):disabled,
 input[type=radio]:not(.plain):disabled{
-  & + label{
-    opacity: 0.5;
-    &:after{
-      opacity: 0.5;
-    }
-  }
+	& + label{
+	opacity: 0.5;
+		&:after{
+			opacity: 0.5;
+		}
+	}
 }
 
 input[type=checkbox]:not(.plain):disabled:checked + label,
@@ -496,7 +488,6 @@ select.visibility {
 
 // Component Forms
 .editPanel{
-
     // Socialstreams-specific colouring
     &.socialstream-new-post {
         background-color: $asgard;
@@ -649,7 +640,6 @@ section > fieldset {
 	}
 
 	> legend {
-		font-size: $h3-font-size;
 		@extend .column;
 		margin: 0.2rem 0 0.5rem;
 		font-weight: $header-font-weight;
