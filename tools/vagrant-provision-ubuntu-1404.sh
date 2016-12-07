@@ -232,7 +232,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
-npmlocksha=`sha1sum ../node_modules/npm.shrinkwrap.checksum 2>/dev/null | awk '{print $1}'`;
+npmlocksha=`sha1sum /vagrant/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
 if [ -f /vagrant/node_modules/npm.shrinkwrap.checksum ];
 then
         currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
