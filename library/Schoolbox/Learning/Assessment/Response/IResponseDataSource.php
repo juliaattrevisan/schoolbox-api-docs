@@ -34,6 +34,14 @@ interface IResponseDataSource
     public function findForAssessment(IAssessable $assessment);
 
     /**
+     * Returns responses for all these assessments.
+     *
+     * @param Collection|IAssessable[] $assessments
+     * @return Collection|IResponse[][]
+     */
+    public function findForAssessmentCollection(Collection $assessments);
+
+    /**
      * Returns responses that this student has submitted, or that have been
      * submitted on their behalf.
      *
