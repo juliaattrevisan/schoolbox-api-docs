@@ -1087,7 +1087,7 @@ abstract class Mapper implements IMapper, Serializable
     protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
-        if (empty($columnList)) {
+        if (empty($columnList) && empty($predicate->getWhere())) {
             return 0;
         }
 
@@ -1466,7 +1466,6 @@ abstract class Mapper implements IMapper, Serializable
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
-
     /**
      * Generates a custom query
      *
@@ -1477,6 +1476,18 @@ abstract class Mapper implements IMapper, Serializable
     public function findByPredicates(PredicateBuilder $pb, array $options = [])
     {
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
+    }
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given Predicates
+     * Returns the number of records deleted.
+     *
+     * @param PredicateBuilder $pb
+     * @return int
+     */
+    public function deleteByPredicates(PredicateBuilder $pb)
+    {
+        return $this->executeDelete($this->getDeleteString(), $pb, []);
     }
 
     /**
