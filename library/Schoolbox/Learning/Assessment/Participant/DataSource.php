@@ -109,14 +109,12 @@ class DataSource
      */
     public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null, $includeResponses = true, $includeFeedbacks = true)
     {
-        $assessment->setAllParticipants($this->findForAssessment($assessment, $user, $includeResponses, $includeFeedbacks));
-
-        if ($assessment instanceof Project) {
-            foreach ($assessment->getAssessables() as $currentAssessment) {
-                // recurse
-                $this->loadParticipationIntoAssessment($currentAssessment, $user, $includeResponses, $includeFeedbacks);
-            }
-        }
+        $this->loadParticipationIntoAssessmentCollection(
+            new Collection([$assessment]),
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
     }
 
     /**
