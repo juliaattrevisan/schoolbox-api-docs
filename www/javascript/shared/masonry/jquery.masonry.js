@@ -254,28 +254,31 @@
 
         // attach control panel button listener
         page.on('click', btnsSelector, function (event) {
-            var btn    = $(this),
-                state  = btn.attr('data-state'),
-                box    = btn.closest(opt.component.selector),
-                target = box.find('[data-component-panel='+btn.data('target')+']');
+            var btnClicked  = $(this),
+                state       = btnClicked.data('state'),
+                box         = btnClicked.closest(opt.component.selector),
+                target      = box.find('[data-component-panel='+btnClicked.data('target')+']'),
+
+                // All the buttons on the page with this target
+                targetBtns  = box.find('a[data-target="' + btnClicked.data('target') + '"]');
 
             event.preventDefault();
 
             /* Start hiding all open panels
              */
             box.find(opt.component.allPanels).stop().slideUp();
-            box.find(opt.component.allButtons).attr('data-state', 'closed');
+            box.find(opt.component.allButtons).data('state', 'closed');
 
             /* Only start opening the one you choze
              */
             if (state == 'opened') {
-                btn.attr('data-state', 'closed').removeClass(activeClass);
+                box.data('state', 'closed').removeClass(activeClass);
 
                 target.off('click', opt.component.removeActionSelector);
                 target.stop().slideUp();
             }
             else {
-                btn.attr('data-state', 'opened').addClass(activeClass);
+                targetBtns.data('state', 'opened');
 
                 target
                     .stop()
@@ -302,7 +305,7 @@
 
                         } else {
                             target.off('click', opt.component.removeActionSelector).slideUp();
-                            btn.attr('data-state', 'closed');
+                            targetBtns.data('state', 'closed');
                         }
                     });
             }
