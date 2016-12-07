@@ -1483,6 +1483,25 @@ abstract class Mapper implements IMapper, Serializable
      * Returns the number of records deleted.
      *
      * @param PredicateBuilder $pb
+     * @param  array $options
+     * @see $this->findByColumnList()
+     * @return int
+     */
+    public function countByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        try {
+            $stmt = $this->selectScalarByPredicates('COUNT(*)', $pb, $options);
+            return intval($stmt->fetchColumn());
+        } catch (UnderflowException $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given Predicates
+     * Returns the number of records deleted.
+     *
+     * @param PredicateBuilder $pb
      * @return int
      */
     public function deleteByPredicates(PredicateBuilder $pb)
@@ -1772,6 +1791,29 @@ abstract class Mapper implements IMapper, Serializable
 
         $statement->execute();
 
+        return $statement;
+    }
+
+    /**
+     * Returns a statement that attempts to select the scalar given by $selection
+     *
+     * @param  string $selection
+     * @param  PredicateBuilder $pb
+     * @param  array  $options
+     *
+     * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
+     * @return PDOStatement
+     */
+    protected function selectScalarByPredicates($selection, PredicateBuilder $pb, array $options = [])
+    {
+        $select = "SELECT $selection";
+
+        // grab a from string if it hasn't been implemented yet
+        if (!($from = $this->getFromString())) {
+            $from = "FROM {$this->getTable()}";
+        }
+        $statement = $this->prepareSelect($select, $from, $pb, [], $options);
+        $statement->execute();
         return $statement;
     }
 
