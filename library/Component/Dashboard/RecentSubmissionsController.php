@@ -113,9 +113,10 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         foreach($assessables as $assessable){
             $folderId = $assessable->getContext()->getId();
             if(!$folderCache[$folderId] instanceof Folder){
-                $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId);
+                $folderCache[$folderId] = $this->getFolderMapper()->findCheaplyById($folderId, ['deleted' => true]);
             }
             $assessable->setContext($folderCache[$folderId]);
+
 
             // Sort responses most recent first
             $assessable->getResponses()->sortBy('submittedAt', 'DESC');
