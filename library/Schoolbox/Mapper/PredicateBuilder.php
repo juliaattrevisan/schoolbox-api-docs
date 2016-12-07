@@ -190,11 +190,11 @@ class PredicateBuilder
     /**
      * @param string $columnName
      * @param mixed  $columnValue
-     * @param string $operand
+     * @param string $operator
      * @throws UnderflowException if an empty IN is attempted
      * @return self
      */
-    protected function addPredicate($columnName, $columnValue, $operand = '=')
+    protected function addPredicate($columnName, $columnValue, $operator = '=')
     {
         // check for valid column definition
         if (!preg_match('`^([^a-z0-9_\.]*)([a-z0-9_\.]+)$`i', $columnName, $matches)) {
@@ -228,7 +228,7 @@ class PredicateBuilder
 
         if ($negate) {
             $whereNot = "NOT ";
-            $operand  = "<>";
+            $operator  = "<>";
         } else {
             $whereNot = "";
         }
@@ -278,12 +278,12 @@ class PredicateBuilder
                 // alias the param
                 $a = $this->getNonCollidingParamAlias($columnName);
 
-                if ($fuzzy || ($operand == '=' && strpos($columnValue, '%') !== false)) {
+                if ($fuzzy || ($operator == '=' && strpos($columnValue, '%') !== false)) {
                     // if wildcards are in the value, do a LIKE search rather than equals
-                    $operand = "{$whereNot}LIKE";
+                    $operator = "{$whereNot}LIKE";
                 }
 
-                $this->where[] = "$escaped_name $operand :$a";
+                $this->where[] = "$escaped_name $operator :$a";
                 $this->putParam($a, $columnValue);
             }
         }
