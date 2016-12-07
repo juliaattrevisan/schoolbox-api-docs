@@ -116,29 +116,7 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
-            if ($row['sdw.id']) {
-                $assessmentSpec = new DueWorkAssessment();
-                // Need to know if this accepts submissions, because that
-                // determines whether open/late date fields show.
-                if ($row['sdw.accept_submission']) {
-                    if ($row['sdw.multi_submission']) {
-                        $assessmentSpec->setAcceptsMultiple();
-                    } else {
-                        $assessmentSpec->setAcceptsSingle();
-                    }
-                } else {
-                    $assessmentSpec->setAcceptsNone();
-                }
-            } elseif ($row['sqz.id']) {
-                $assessmentSpec = new QuizAssessment();
-            } elseif ($row['stk.id']) {
-                $assessmentSpec = new TaskAssessment();
-            } else {
-                throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
-            }
-            $assessmentSpec->setId($row['sa.id']);
-            $assessmentSpec->setTitle($row['sa.title']);
-            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+            $assessmentSpec = $this->buildAssessmentFromRow($row);
 
             $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
         }
@@ -417,5 +395,47 @@ class ImportFactory
         } else {
             return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
         }
+    }
+
+    /**
+     * Builds an assessment from this row.
+     *
+     * @param string $row
+     * @return IAssessable
+     */
+    protected function buildAssessmentFromRow($row)
+    {
+        if ($row['sdw.id']) {
+            $assessmentSpec = new DueWorkAssessment();
+            // Need to know if this accepts submissions, because that
+            // determines whether open/late date fields show.
+            if ($row['sdw.accept_submission']) {
+                if ($row['sdw.multi_submission']) {
+                    $assessmentSpec->setAcceptsMultiple();
+                } else {
+                    $assessmentSpec->setAcceptsSingle();
+                }
+            } else {
+                $assessmentSpec->setAcceptsNone();
+            }
+
+        } elseif ($row['sqz.id']) {
+            $assessmentSpec = new QuizAssessment();
+
+        } elseif ($row['stk.id']) {
+            $assessmentSpec = new TaskAssessment();
+
+        } else {
+            throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
+        }
+
+        $assessmentSpec->setId($row['sa.id']);
+        $assessmentSpec->setTitle($row['sa.title']);
+        if(is_null($row['sa.deleted_at'])){
+            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+        } else {
+            $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
+        }
+        return $assessmentSpec;
     }
 }
