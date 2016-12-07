@@ -87,7 +87,7 @@ class MapperProxy
     /**
      * Finds an assessable by ID.
      *
-     * This method does not load participants.
+     * This method does not load participants, but does load the rubric grid.
      *
      * @param int $id
      * @return IAssessable
@@ -102,7 +102,7 @@ class MapperProxy
     /**
      * Find by ID for modification.
      *
-     * This method does not load participants.
+     * This method does not load participants, but does load the rubric grid.
      *
      * @param int $id
      * @return IAssessable
@@ -115,7 +115,7 @@ class MapperProxy
     /**
      * Find by ID for review, either of a single student or all in the class.
      *
-     * This method loads participants, responses and feedback.
+     * This method loads participants, responses, feedback and rubric grid.
      *
      * @param int  $id
      * @param User $student If provided, load only this student's participation
@@ -148,6 +148,7 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because quizzes don't have rubrics.
      *
      * @param int  $quizId
      * @param User $student If provided, load only this student's participation
@@ -167,6 +168,8 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because rubrics shouldn't be used
+     * in any context where this method is used.
      *
      * @param int  $dueWorkId
      * @param User $student If provided, load only this student's participation
@@ -186,6 +189,7 @@ class MapperProxy
      * Eventually, this will be deprecated.
      *
      * This method loads participants, responses and feedback.
+     * It does not load the rubric grid, because tasks don't have rubrics.
      *
      * @param int  $taskId
      * @param User $student If provided, load only this student's participation
@@ -202,6 +206,7 @@ class MapperProxy
      *
      * This method does not load participants, because assessments in a unit spec
      * do not have participants.
+     * It does load the rubric grid.
      *
      * @param int $assessmentId
      * @return IAssessable
@@ -219,8 +224,8 @@ class MapperProxy
     /**
      * Finds the specification assessment for a implementation assessment.
      *
-     * Currently, this does not load participants - I am not yet sure which
-     * context this method will be used.
+     * Currently, this does not load participants or the rubric grid - I am not
+     * yet sure which context this method will be used.
      *
      * @param int $assessmentId
      * @param array $options
@@ -240,7 +245,7 @@ class MapperProxy
      * If $context is a Folder, this method does not retrieve assessables that
      * are within a course implementation that has been created on that folder.
      *
-     * This method does not load participants.
+     * This method does not load participants or the rubric grid.
      *
      * @param AssessmentContext $context
      * @param array             $options
@@ -268,6 +273,8 @@ class MapperProxy
      *
      * This method does not load participants, because assessments in a unit spec
      * do not have participants.
+     * Currently, this does not load the rubric grid - a variant which does load
+     * the grid may need to be implemented.
      *
      * @param int   $unitSpecId
      * @param array $options
@@ -283,7 +290,7 @@ class MapperProxy
     /**
      * Finds all assessables for a unit implementation.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $unitImplId
      * @param array $options
@@ -321,7 +328,7 @@ class MapperProxy
      * implementation of the given folder.
      * This is more likely to be the expected behavior of this method.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $folderId A folder or list of folders
      * @param array $options
@@ -340,6 +347,8 @@ class MapperProxy
 
     /**
      * Finds all assessables for a folder for review.
+     *
+     * This method loads participants, responses, feedback and rubric grids.
      *
      * @param int   $folderId A folder or list of folders
      * @param User  $student If provided, load only this student's participation
@@ -364,7 +373,7 @@ class MapperProxy
      * Finds all assessables for a folder, not including course implementation
      * assessables.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @param int   $folderId
      * @param array $options
@@ -381,7 +390,7 @@ class MapperProxy
      * Finds all assessables that have been imported into a folder through a
      * course import.
      *
-     * This method does not currently load participants.
+     * This method does not currently load participants or the rubric grid.
      *
      * @deprecated Use `findAllForFolderId` to find assessables in a folder,
      *             along with any that are in a unit import on that folder.
@@ -401,8 +410,8 @@ class MapperProxy
     /**
      * Finds all assessables that are part of the given project.
      *
-     * This method does not load participants - see `$this->findAllByProjectIdForReview`
-     * for a version which does.
+     * This method does not load participants or the rubric grid - see
+     * `$this->findAllByProjectIdForReview` for a version which does.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
@@ -417,7 +426,7 @@ class MapperProxy
 
     /**
      * Finds all assessables that are part of the given project, along with
-     * all participation.
+     * all participation and rubric grids.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param User  $student If provided, load only this student's participation
@@ -433,7 +442,8 @@ class MapperProxy
     /**
      * Finds all assessables that this student is participating in.
      *
-     * This method loads participation for $student only.
+     * This method loads participation for $student only, and does not load the
+     * rubric grid.
      *
      * @param User $student
      * @param Term $term    Restrict results to this term
