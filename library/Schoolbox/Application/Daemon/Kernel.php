@@ -234,6 +234,9 @@ EOL;
 		if(strpos($errStr, 'pclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
+		if(strpos($errStr, 'Error while sending QUERY packet') === 0) {
+			throw new PDOException($errStr);
+		}
 
         try {
             $this->logger()->info("$errStr in $errFile:$errLine [$errNum]", array('char' => 'e'));
