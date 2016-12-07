@@ -1,31 +1,54 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
+
+    {CONFIGURATION}
+
+    <!-- BEGIN empty_state -->
+    <div class="empty-state">
+        <i class="icon-countdown"></i>
+
+        <!-- BEGIN empty_read_only -->
+        <p>No countdown set.</p>
+        <!-- END empty_read_only -->
+
+        <!-- BEGIN empty_modify -->
+        <p>To use the countdown you must first <a href="#" class="edit empty-edit" data-target="settings">set a date and time</a></p>
+        <!-- END empty_modify -->
+
+        <!-- BEGIN empty_invalid -->
+        <p>The date & time entered is in an invalid format. Please <a href="#" class="edit empty-edit" data-target="settings">try again</a></p>
+        <!-- END empty_invalid -->
+
+    </div>
+    <!-- END empty_state -->
+
+    <!-- BEGIN countdown -->
     <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
     <script type='text/javascript'>
         $(function () {
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
 
-            $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime).on('update.countdown', function(event) {
-                    var format =
-                        '<li><span class="count">%H</span> <span class="labels">Hrs</span></li>'
-                        + '<li><span class="count">%M</span> <span class="labels">Mins</span></li>'
-                        + '<li><span class="count">%S</span> <span class="labels">Secs</span></li>'
-                    if(event.offset.days > 0) {
-                        format = ' <li><span class="count">%-d</span> <span class="labels">Day%!d</span></li> ' + format;
-                    }
-                    if(event.offset.weeks > 0) {
-                        format = ' <li><span class="count">%-w</span> <span class="labels">Week%!w</span></li>' + format;
-                    }
+            $('#component{COMPONENT_INSTANCE_ID}-countdown')
+            .countdown(endTime)
+            .on('update.countdown', function(event) {
+                var format = '<li><span class="count">%H</span> <span class="labels">Hrs</span></li>'
+                    + '<li><span class="count">%M</span> <span class="labels">Mins</span></li>'
+                    + '<li><span class="count">%S</span> <span class="labels">Secs</span></li>'
+
+                if (event.offset.days > 0) {
+                    format = ' <li><span class="count">%-d</span> <span class="labels">Day%!d</span></li> ' + format;
+                }
+
+                if (event.offset.weeks > 0) {
+                    format = ' <li><span class="count">%-w</span> <span class="labels">Week%!w</span></li>' + format;
+                }
 
                 $(this).html(event.strftime(format));
             })
             .on('finish.countdown', function(event) {
                 $(this).html('Countdown has been reached!').parent().addClass('disabled');
             });
-
         });
     </script>
-
-    {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
@@ -36,8 +59,6 @@
             </section>
         </div>
     </div>
+    <!-- END countdown -->
+
 </div>
-
-
-
-
