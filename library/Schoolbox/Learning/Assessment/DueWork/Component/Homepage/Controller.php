@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Component\Homepage;
 
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -33,5 +34,13 @@ class Controller extends \Schoolbox\Learning\Assessment\Component\Homepage\Contr
     protected function filterAssessment(IAssessable $assessment)
     {
         return $assessment instanceof DueWork\Model;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAssessmentType()
+    {
+        return AssessmentType::TYPE_DUE_WORK;
     }
 }
