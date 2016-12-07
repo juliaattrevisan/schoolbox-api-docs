@@ -45,12 +45,19 @@ abstract class AbstractSubSource implements IResponseDataSource
 
     /**
      * @param IAssessable $assessment
+     * @param User        $student If set, only return this student's responses
      * @return Collection|IResponse[]
      */
-    public function findForAssessment(IAssessable $assessment)
+    public function findForAssessment(IAssessable $assessment, User $student = null)
     {
         if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
+            // Only fetch for student if provided
+            $columns = ['assessment_id' => $assessment->getId(),];
+            if ($student instanceof User) {
+                $columns[$this->studentField] = $student->getId();
+            }
+
+            return $this->mapperProxy->findByColumnList($columns)
                                      ->map(function ($item) use ($assessment) {
                                          /** @var IResponse $item */
                                          return $item->setAssessable($assessment);
@@ -61,17 +68,24 @@ abstract class AbstractSubSource implements IResponseDataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
+     * @param User                     $student If set, only return this student's responses
      * @return Collection|IResponse[][]
      */
-    public function findForAssessmentCollection(Collection $assessments)
+    public function findForAssessmentCollection(Collection $assessments, User $student = null)
     {
         // Find responses which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getColumnValues('id');
 
+        // Only fetch for student if provided
+        $columns = ['assessment_id' => $recognizedIds,];
+        if ($student instanceof User) {
+            $columns[$this->studentField] = $student->getId();
+        }
+
         // Group responses by assessment
         /** @var Collection|IResponse[][] $responses */
         $responses = $this->mapperProxy
-            ->findByColumnList(['assessment_id' => $recognizedIds,])
+            ->findByColumnList($columns)
             ->groupByCallback(function(IResponse $v) {
                 return $v->getAssessable()->getId();
             })

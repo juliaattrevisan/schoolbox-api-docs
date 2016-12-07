@@ -51,28 +51,30 @@ class DataSource implements IResponseDataSource
 
     /**
      * @param IAssessable $assessment
+     * @param User        $student If set, only return this student's responses
      * @return Collection|IResponse[]
      */
-    public function findForAssessment(IAssessable $assessment)
+    public function findForAssessment(IAssessable $assessment, User $student = null)
     {
         $assessments = new Collection();
         foreach ($this->subSources as $subSource) {
             if ($subSource->recognizes($assessment)) {
-                $assessments = $assessments->merge($subSource->findForAssessment($assessment));
+                $assessments = $assessments->merge($subSource->findForAssessment($assessment, $student));
             }
         }
         return $assessments;
     }
 
     /**
-     * @param Collection $assessments
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $student If set, only return this student's responses
      * @return Collection|IResponse[][]
      */
-    public function findForAssessmentCollection(Collection $assessments)
+    public function findForAssessmentCollection(Collection $assessments, User $student = null)
     {
         $responses = new Collection();
         foreach ($this->subSources as $subSource) {
-            $responses = $responses->union($subSource->findForAssessmentCollection($assessments));
+            $responses = $responses->union($subSource->findForAssessmentCollection($assessments, $student));
         }
         return $responses;
     }
