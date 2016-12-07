@@ -1,5 +1,25 @@
 <?php
 
+/*
+ *
+ * redirect to Redirection to 16.5 url
+ *
+ */
+if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
+
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    $assessmentId= $submissionBox->getAssessmentId();
+
+    SitePage::localRedir('/learning/responses/'.$assessmentId.'/'.$this->arg[1], null, 301); // assessmentId/userId
+}
+SitePage::pageNotFound();
+
+/*
+ * Old code
+ */
+
+
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
