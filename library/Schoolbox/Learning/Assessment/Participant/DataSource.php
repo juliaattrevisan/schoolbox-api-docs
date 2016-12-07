@@ -297,6 +297,12 @@ class DataSource
             }
         }
 
+        // Sort by name after all that
+        foreach ($assessments as $assessment) {
+            $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
+            $assessment->setAllParticipants($participants);
+        }
+
         return $participantCollection;
     }
 
