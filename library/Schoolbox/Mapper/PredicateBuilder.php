@@ -79,6 +79,15 @@ class PredicateBuilder
      * @param string $columnName
      * @return PredicateBuilder
      */
+    public function isNotNull($columnName)
+    {
+        return $this->addPredicate(self::NOT . $columnName, null);
+    }
+
+    /**
+     * @param string $columnName
+     * @return PredicateBuilder
+     */
     public function isTrue($columnName)
     {
         return $this->addPredicate($columnName, true);
