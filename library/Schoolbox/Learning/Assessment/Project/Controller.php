@@ -85,33 +85,56 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment)
     {
+
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
-        $counts = [];
-        $assessableCounts = [];
-        foreach ($participants as $participant) {
-            $counts[$participant->getUser()->getId()] = [
-                'total' => 0,
-                'totalCompleted' => 0,
-            ];
+        /* The number of assessments that have been completed by
+         * their respective total number of participants
+         */
+        $participantCounts = [
+            'completed' => [],
+            'totalAssessments' => $assessment->getAssessables()->count()
+        ];
+
+        /* The number of participants who have completed their
+         * respective total number of assessments
+         */
+        $assessmentCounts = [
+            'completed' => [],
+            'totalParticipants' => $participants->count()
+        ];
+
+        /* A tally per-participant
+         */
+        foreach ($participants as $currentParticipant) {
+            $participantCounts['completed'][$currentParticipant->getUser()->getId()] = 0;
         }
 
-        // This isn't necessarily a project.
-        foreach ($assessment->getAssessables() as $subAssessment) {
-            $assessableCounts[$subAssessment->getId()]['total'] = 0;
+        /* A tally per-assessment
+         */
+        foreach ($assessment->getAssessables() as $currentAssessment) {
 
-            // Count participants for every single sub-assessment
-            foreach ($subAssessment->getAllParticipants() as $participant) {
-                $counts[$participant->getUser()->getId()]['total']++;
-                $assessableCounts[$subAssessment->getId()]['total']++;
+            /* Initialise count of IResponses for $currentAssessment
+             */
+            $assessmentCounts['completed'][$currentAssessment->getId()] = 0;
 
-                if ($participant->getAllResponses()->count() > 0) {
-                    $counts[$participant->getUser()->getId()]['totalCompleted']++;
-                    $assessableCounts[$subAssessment->getId()]['totalCompleted']++;
+            /* Count the number of IResponses submitted by each participant in $currentAssessment
+             * and update both tallies
+             */
+            foreach ($currentAssessment->getAllParticipants() as $currentParticipant) {
+
+                /* $currentParticipant has an IResponse for $currentAssessment
+                 */
+                if ($currentParticipant->getAllResponses()->count()) {
+                    $assessmentCounts['completed'][$currentAssessment->getId()]++;
+                    $participantCounts['completed'][$currentParticipant->getUser()->getId()]++;
                 }
             }
         }
+
+        new \Alaress_Probe('$assessmentCounts', '$participantCounts');
+        new \Alaress_Probe($assessmentCounts, $participantCounts);
 
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
@@ -120,14 +143,14 @@ class Controller extends Assessment\Controller
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
         $twigData = [
-            'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment),
-            'baseContext'      => $assessment->getBaseContext(),
-            'counts'           => $counts,
-            'assessableCounts' => $assessableCounts,
-            'assessment'       => $assessment,
-            'currentUser'      => $this->getUser(),
-            'returnUrlSuffix'  => $returnUrlSuffix,
-            'returnUrl'        => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment),
+            'baseContext'       => $assessment->getBaseContext(),
+            'assessment'        => $assessment,
+            'participantCounts' => $participantCounts,
+            'assessmentCounts'  => $assessmentCounts,
+            'currentUser'       => $this->getUser(),
+            'returnUrlSuffix'   => $returnUrlSuffix,
+            'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(
@@ -137,7 +160,6 @@ class Controller extends Assessment\Controller
             )
         );
     }
-
 
     /**
      * Display appropriate landing page based on role
