@@ -222,37 +222,30 @@ class DataSource
 
         /* Add responses
          *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the submitter of the Response before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         * findForAssessmentCollection now can filter by user
          */
         if ($includeResponses) {
 
-            $allResponses = $this->responseDataSource->findForAssessmentCollection($assessments);
+            $allResponses = $this->responseDataSource->findForAssessmentCollection($assessments, $user);
 
             // Load into each assessment
             foreach ($assessments as $assessment) {
                 if (isset($allResponses[$assessment->getId()])) {
                     foreach ($allResponses[$assessment->getId()] as $response) {
                         /** @var IResponse $response */
-                        if ($user === null || ($user instanceof User && $response->isAuthoredBy($user))) {
-                            $responseUser = $response->getSubmittedOnBehalfOf();
+                        $responseUser = $response->getSubmittedOnBehalfOf();
 
-                            // Find participant, creating if required
-                            if ($assessment->isParticipant($responseUser)) {
-                                $responseParticipant = $assessment->getParticipant($responseUser);
+                        // Find participant, creating if required
+                        if ($assessment->isParticipant($responseUser)) {
+                            $responseParticipant = $assessment->getParticipant($responseUser);
 
-                            } else {
-                                // Add them
-                                $responseParticipant = new Participant($responseUser, $assessment);
-                                $assessment->getAllParticipants()->add($responseParticipant);
-                            }
-
-                            $responseParticipant->getAllResponses()->add($response);
+                        } else {
+                            // Add them
+                            $responseParticipant = new Participant($responseUser, $assessment);
+                            $assessment->getAllParticipants()->add($responseParticipant);
                         }
+
+                        $responseParticipant->getAllResponses()->add($response);
                     }
                 }
             }
@@ -260,53 +253,46 @@ class DataSource
 
         /* Add feedback
          *
-         * If if you've specified a particular user to accumulate information about,
-         * ensure that they are the reviewee of the Feedback before adding it
-         *
-         * Otherwise just add all of them
-         *
-         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         * findForAssessmentCollection now can filter by user
          */
         if ($includeFeedbacks) {
 
-            $allFeedback = $this->feedbackDataSource->findForAssessmentCollection($assessments);
+            $allFeedback = $this->feedbackDataSource->findForAssessmentCollection($assessments, $user);
 
             foreach ($assessments as $assessment) {
                 if (isset($allFeedback[$assessment->getId()])) {
                     foreach ($allFeedback[$assessment->getId()] as $feedback) {
                         /** @var IFeedback $feedback */
-                        if ($user === null || ($user instanceof User && $feedback->isReviewedFor($user))) {
-                            $feedbackUser = $feedback->getReviewee();
+                        $feedbackUser = $feedback->getReviewee();
 
-                            // Find participant, creating if required
-                            if ($assessment->isParticipant($feedbackUser)) {
-                                $responseParticipant = $assessment->getParticipant($feedbackUser);
+                        // Find participant, creating if required
+                        if ($assessment->isParticipant($feedbackUser)) {
+                            $responseParticipant = $assessment->getParticipant($feedbackUser);
 
-                            } else {
-                                // Add them
-                                $responseParticipant = new Participant($feedbackUser, $assessment);
-                                $assessment->getAllParticipants()->add($responseParticipant);
-                            }
+                        } else {
+                            // Add them
+                            $responseParticipant = new Participant($feedbackUser, $assessment);
+                            $assessment->getAllParticipants()->add($responseParticipant);
+                        }
 
-                            // Feedbacks may have a stub response.
-                            // If so, use it to find the actual response, and associate them together.
-                            // (Assume that the stub response lives in the same assessment!)
-                            $stubResponse = $feedback->getResponse();
-                            if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
-                                $stubResponseId = $stubResponse->getId();
+                        // Feedbacks may have a stub response.
+                        // If so, use it to find the actual response, and associate them together.
+                        // (Assume that the stub response lives in the same assessment!)
+                        $stubResponse = $feedback->getResponse();
+                        if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                            $stubResponseId = $stubResponse->getId();
 
-                                foreach ($responseParticipant->getAllResponses() as $response) {
-                                    // For now assume that the types of response and feedback match
-                                    if ($stubResponseId == $response->getId()) {
-                                        $response->getAllFeedback()->add($feedback);
-                                        $feedback->setResponse($response);
-                                        break;
-                                    }
+                            foreach ($responseParticipant->getAllResponses() as $response) {
+                                // For now assume that the types of response and feedback match
+                                if ($stubResponseId == $response->getId()) {
+                                    $response->getAllFeedback()->add($feedback);
+                                    $feedback->setResponse($response);
+                                    break;
                                 }
                             }
-
-                            $responseParticipant->getAllFeedbacks()->add($feedback);
                         }
+
+                        $responseParticipant->getAllFeedbacks()->add($feedback);
                     }
                 }
             }
