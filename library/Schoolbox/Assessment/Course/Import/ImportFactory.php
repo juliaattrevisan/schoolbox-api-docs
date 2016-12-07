@@ -83,6 +83,8 @@ class ImportFactory
                 sa.id AS 'sa.id',
                 sa.title AS 'sa.title',
                 sdw.assessment_id AS 'sdw.id',
+                sdw.accept_submission as 'sdw.accept_submission',
+                sdw.multi_submission as 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
                 stk.assessment_id AS 'stk.id'
             FROM course_unit_specification us
@@ -116,6 +118,17 @@ class ImportFactory
 
             if ($row['sdw.id']) {
                 $assessmentSpec = new DueWorkAssessment();
+                // Need to know if this accepts submissions, because that
+                // determines whether open/late date fields show.
+                if ($row['sdw.accept_submission']) {
+                    if ($row['sdw.multi_submission']) {
+                        $assessmentSpec->setAcceptsMultiple();
+                    } else {
+                        $assessmentSpec->setAcceptsSingle();
+                    }
+                } else {
+                    $assessmentSpec->setAcceptsNone();
+                }
             } elseif ($row['sqz.id']) {
                 $assessmentSpec = new QuizAssessment();
             } elseif ($row['stk.id']) {
