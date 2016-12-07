@@ -69,14 +69,16 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
+            $options = [
+                'type'     => $this->getAssessmentType(),
+                'dueAfter' => \Alaress_Date_Format::now(),
+            ];
+
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview(
                     $this->getSource()->getId(),
                     $this->getUser(),
-                    [
-                        'type'     => $this->getAssessmentType(),
-                        'dueAfter' => \Alaress_Date_Format::now(),
-                    ]
+                    $options
                 )
                 ->filter(
                     function (IAssessable $assessment) use ($visibility)
@@ -84,7 +86,11 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                         return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
-                ->limit($this->getConfig('size') ?: null);
+            ;
+
+            if ($this->getConfig('size') > 0) {
+                $this->assessments->limit($this->getConfig('size'));
+            }
 
 
         } catch (\DomainException $e) {
