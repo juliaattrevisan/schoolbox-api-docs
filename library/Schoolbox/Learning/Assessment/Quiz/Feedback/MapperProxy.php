@@ -64,8 +64,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     public function findByColumnList(array $columnList, $options = [])
     {
-        $columnList['!reviewed_at'] = null;
-        return parent::findByColumnList($columnList, $options);
+        if($this->isColumnTranslationRequired($columnList)){
+            $columnList = $this->translateColumnList($columnList);
+        }
+
+        $pb = $this->getMapper()->getPredicateBuilder();
+        $pb->notNull('reviewed_at');
+        $pb->addColumnList($columnList);
+        return $this->findByPredicates($pb, $options);
     }
 
     /**

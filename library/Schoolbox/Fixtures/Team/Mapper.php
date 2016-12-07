@@ -125,10 +125,10 @@ class Mapper extends BaseMapper
      */
     public function findByName($divisionId, $keyword)
     {
-        return $this->findByColumnList([
-            'division_id' => $divisionId,
-            '~name'       => "%{$this->database->quoteForLike($keyword)}%"
-        ]);
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('division_id', $divisionId);
+        $pb->like('name', "%{$this->getDatabase()->quoteForLike($keyword)}%");
+        return $this->findByPredicates($pb);
     }
 
     /**

@@ -74,15 +74,14 @@ class Controller extends AbstractController
         if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
 
             // quote the query string to protect against injection and the like
-            $query = $this->getMapper()->getDatabase()->quoteForLike($this->getRequest()->query->get('query'));
+            $query = $this->getRequest()->query->get('query');
 
-            $search = [
-                '~name'       => "%$query%",
-                'archived_at' => null
-            ];
+            $pb = $this->getMapper()->getPredicateBuilder();
+            $pb->like('name', "%{$this->getMapper()->getDatabase()->quoteForLike($query)}%");
+            $pb->isNull('archived_at');
 
             // get the list with archived excluded, sort by start and end, then transform to be selectize-compatible
-            $seasons = $this->getMapper()->findByColumnList($search, $options)->map(
+            $seasons = $this->getMapper()->findByPredicates($pb, $options)->map(
                 function ($season) {
                     /** @var Season $season */
                     return array_combine(['id', 'name'], $season->findValueLabelPair());
