@@ -76,11 +76,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->setVar('textbox_block', '');
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                if ($this->getTextbox()->getId()) {
-                    $this->setVar('empty_create_block', '');
-                } else {
-                    $this->parse('empty_create_block', 'empty_create');
-                }
+                $this->parse('empty_create_block', 'empty_create');
             }
             else {
                 $this->setVar('empty_create_block', '');
