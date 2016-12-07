@@ -69,7 +69,7 @@ abstract class AbstractMapperProxy
      */
     public function findByColumnList(array $columnList, $options = array())
     {
-        if($this->isTranslationRequired($columnList)){
+        if($this->isColumnTranslationRequired($columnList)){
             $columnList = $this->translateColumnList($columnList);
         }
 
@@ -77,6 +77,27 @@ abstract class AbstractMapperProxy
 
         return $this->transformModels($mapperModels);
     }
+
+    /**
+     * Gets a typed Collection of objects that match the specified predicates
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findByPredicates(PredicateBuilder $pb, $options = array())
+    {
+        if($this->isPredicatesTranslationRequired($pb)){
+            // TODO. For now, you cannot find by Predicates on columns that require translation.
+            // TODO. You can avoid hitting this by translating the columns first using translateColumnList()
+            throw new \BadMethodCallException('Not yet implemented.');
+        }
+
+        $mapperModels = $this->getMapper()->findByPredicates($pb, $options);
+        return $this->transformModels($mapperModels);
+    }
+
+
 
     /**
      * Saves this object or collection of objects.
@@ -132,9 +153,31 @@ abstract class AbstractMapperProxy
      * @param array $columnList
      * @return bool
      */
-    protected function isTranslationRequired(array $columnList)
+    protected function isColumnTranslationRequired(array $columnList)
     {
         return array_key_exists($this->getExternalColumnName(), $columnList);
+    }
+
+    /**
+     * Determines if the specified predicates requires translation before being
+     * submitted to the Mapper
+     *
+     * @param PredicateBuilder $pb
+     * @return bool
+     */
+    protected function isPredicatesTranslationRequired(PredicateBuilder $pb)
+    {
+        $pattern = $pb->getTable()
+            ? "/^`{$pb->getTable()}`.`{$this->getExternalColumnName()}`/"
+            : "/^`{$this->getExternalColumnName()}`/";
+
+        foreach($pb->getWhere() as $whereClause)
+        {
+            if(preg_match($pattern, $whereClause)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
