@@ -11,6 +11,7 @@ use External_ClassInterface;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
@@ -253,6 +254,134 @@ class DataSource
         $assessment->setAllParticipants($participants);
 
         return $participants;
+    }
+
+    /**
+     * @param Collection|IAssessable[] $assessments
+     * @param User                     $user
+     * @param bool                     $includeResponses
+     * @param bool                     $includeFeedbacks
+     * @return Collection|\Schoolbox\Learning\Assessment\Participant[][]
+     *         A collection of collections of participants
+     */
+    protected function findForAssessmentCollection(
+        Collection $assessments,
+        User $user = null,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        $participantCollection = new Collection();
+
+        // Load basic list
+        foreach ($assessments as $assessment) {
+            $assessmentParticipants = new Collection();
+
+            // It's acceptable to findAllStudents in a loop for now, because the list is cached
+            foreach ($this->findAllStudentsForAssessment($assessment) as $currentUser) {
+                $assessmentParticipants->add(
+                    new Participant($currentUser, $assessment)
+                );
+            }
+
+            // Need to add participants into the assessment
+            $assessment->setAllParticipants($assessmentParticipants);
+
+            $participantCollection[$assessment->getId()] = $assessmentParticipants;
+        }
+
+        /* Add responses
+         *
+         * If if you've specified a particular user to accumulate information about,
+         * ensure that they are the submitter of the Response before adding it
+         *
+         * Otherwise just add all of them
+         *
+         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         */
+        if ($includeResponses) {
+
+            $allResponses = $this->responseDataSource->findForAssessmentCollection($assessments);
+
+            // Load into each assessment
+            foreach ($assessments as $assessment) {
+                if (isset($allResponses[$assessment->getId()])) {
+                    foreach ($allResponses[$assessment->getId()] as $response) {
+                        /** @var IResponse $response */
+                        if ($user === null || ($user instanceof User && $response->isAuthoredBy($user))) {
+                            $responseUser = $response->getSubmittedOnBehalfOf();
+
+                            // Find participant, creating if required
+                            if ($assessment->isParticipant($responseUser)) {
+                                $responseParticipant = $assessment->getParticipant($responseUser);
+
+                            } else {
+                                // Add them
+                                $responseParticipant = new Participant($responseUser, $assessment);
+                                $assessment->getAllParticipants()->add($responseParticipant);
+                            }
+
+                            $responseParticipant->getAllResponses()->add($response);
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Add feedback
+         *
+         * If if you've specified a particular user to accumulate information about,
+         * ensure that they are the reviewee of the Feedback before adding it
+         *
+         * Otherwise just add all of them
+         *
+         * TODO findForAssessment() should filter for $user at the query level instead of traversing around them
+         */
+        if ($includeFeedbacks) {
+
+            $allFeedback = $this->feedbackDataSource->findForAssessmentCollection($assessments);
+
+            foreach ($assessments as $assessment) {
+                if (isset($allFeedback[$assessment->getId()])) {
+                    foreach ($allFeedback[$assessment->getId()] as $feedback) {
+                        /** @var IFeedback $feedback */
+                        if ($user === null || ($user instanceof User && $feedback->isReviewedFor($user))) {
+                            $feedbackUser = $feedback->getReviewee();
+
+                            // Find participant, creating if required
+                            if ($assessment->isParticipant($feedbackUser)) {
+                                $responseParticipant = $assessment->getParticipant($feedbackUser);
+
+                            } else {
+                                // Add them
+                                $responseParticipant = new Participant($feedbackUser, $assessment);
+                                $assessment->getAllParticipants()->add($responseParticipant);
+                            }
+
+                            // Feedbacks may have a stub response.
+                            // If so, use it to find the actual response, and associate them together.
+                            // (Assume that the stub response lives in the same assessment!)
+                            $stubResponse = $feedback->getResponse();
+                            if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                                $stubResponseId = $stubResponse->getId();
+
+                                foreach ($responseParticipant->getAllResponses() as $response) {
+                                    // For now assume that the types of response and feedback match
+                                    if ($stubResponseId == $response->getId()) {
+                                        $response->getAllFeedback()->add($feedback);
+                                        $feedback->setResponse($response);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            $responseParticipant->getAllFeedbacks()->add($feedback);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $participantCollection;
     }
 
     /**
