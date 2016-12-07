@@ -116,9 +116,11 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
-            $assessmentSpec = $this->buildAssessmentFromRow($row);
+            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
-            $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+            if ($assessmentSpec instanceof IAssessable) {
+                $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+            }
         }
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
@@ -204,6 +206,8 @@ class ImportFactory
                 sa.deleted_at     AS 'sa.deleted_at',
                 sa.sequence       AS 'sa.sequence',
                 sdw.assessment_id AS 'sdw.id',
+                sdw.accept_submission AS 'sdw.accept_submission',
+                sdw.multi_submission  AS 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
                 stk.assessment_id AS 'stk.id',
                 ia.id             AS 'ia.id',
@@ -288,26 +292,7 @@ class ImportFactory
             }
 
             // Create AssessmentSpec (if one exists)
-            if(is_null($row['sa.id'])){
-                $assessmentSpec = null;
-            } else {
-                if ($row['sdw.id']) {
-                    $assessmentSpec = new DueWorkAssessment();
-                } elseif ($row['sqz.id']) {
-                    $assessmentSpec = new QuizAssessment();
-                } elseif ($row['stk.id']) {
-                    $assessmentSpec = new TaskAssessment();
-                } else {
-                    throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
-                }
-                $assessmentSpec->setId($row['sa.id']);
-                $assessmentSpec->setTitle($row['sa.title']);
-                if(is_null($row['sa.deleted_at'])){
-                    $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
-                } else {
-                    $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
-                }
-            }
+            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             // Create corresponding AssessmentImpl (if one exists)
             if(is_null($row['ia.id'])){
@@ -398,15 +383,22 @@ class ImportFactory
     }
 
     /**
-     * Builds an assessment from this row.
+     * Builds an assessment spec from this row.
      *
      * @param string $row
-     * @return IAssessable
+     * @return IAssessable|null
      */
-    protected function buildAssessmentFromRow($row)
+    protected function buildAssessmentSpecFromRow($row)
     {
+        // Short-circuit if there's no assessment at all
+        if (is_null($row['sa.id'])) {
+            return null;
+        }
+
+        // Different constructor logic for different assessment types
         if ($row['sdw.id']) {
             $assessmentSpec = new DueWorkAssessment();
+
             // Need to know if this accepts submissions, because that
             // determines whether open/late date fields show.
             if ($row['sdw.accept_submission']) {
