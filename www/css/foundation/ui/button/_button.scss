@@ -1,14 +1,3 @@
-
-/* Button Dimensions
- */
-@mixin button-dimensions() {
-    min-height: $global-button-height;
-    padding: $global-button-padding;
-	position: relative;
-	overflow: hidden;
-	vertical-align: middle;
-}
-
 a[disabled], a.disabled {
     // Make disabled links not clickable
     pointer-events: none;

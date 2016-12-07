@@ -10,7 +10,7 @@ $form-spacing: rem-calc(($base-font-size));
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
 $form-label-font-size: rem-calc(($base-font-size - 2));
-$form-label-font-weight: $font-weight-bold;
+$form-label-font-weight: $font-weight-normal;
 $form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
@@ -206,33 +206,52 @@ th, td{
 		@include single-transition(opacity, $switch-paddle-transition-speed, $switch-paddle-transition-ease);
 	}
 }
-
+%fancy-check{
+	position: absolute;
+	width: 0;
+	height: 0;
+	min-height: 0;
+	opacity: 0;
+}
+%fancy-check-selector{
+	position: relative;
+	display: block;
+	cursor: pointer;
+}
+%fancy-check-before{
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	display: block;
+	content: "";
+}
+%fancy-check-after{
+	position: absolute;
+	display: block;
+	content: "\e604";
+	color: rgba($white, 0);
+	margin: 0;
+	text-align: center;
+}
 @mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
-
     $label-selector: "label";
 
+	@extend %fancy-check;
     // overwrite to append class if required
     @if($label-class) {
         $label-selector: "label.#{$label-class}";
     }
 
-    position: absolute;
-    width: 0;
-    height: 0;
-    min-height: 0;
-    opacity: 0;
-
     + #{$label-selector} {
         // this is where the magic happens
-        position: relative;
-        display: block;
+		@extend %fancy-check-selector;
         min-height: $checkbox-size;
         line-height: $checkbox-size;
         padding: 0 0 0 ($checkbox-size + $checkbox-margin);
         font-weight: $font-weight-normal;
-        cursor: pointer;
         margin: 0 0 $checkbox-margin 0;
 
         &:before, &:after {
@@ -241,30 +260,20 @@ th, td{
         }
 
         &:before {
-            display: block;
-            content: "";
+			@extend %fancy-check-before;
             width: $checkbox-size;
             height: $checkbox-size;
             background-color: $hover-color;
-            position: absolute;
-            top: 0;
-            left: 0;
-            margin: 0;
         }
 
         &:after {
-            display: block;
-            content: "\e604";
-            color: rgba($white, 0);
+            @extend %fancy-check-after;
             width: $checkbox-inner-size;
             height: $checkbox-inner-size;
-            position: absolute;
             top: $input-border-width;
             left: $input-border-width;
             background-color: $input-bg-color;
-            margin: 0;
             line-height: $checkbox-size - $input-border-width;
-            text-align: center;
             font-size: $icon-size;
         }
 

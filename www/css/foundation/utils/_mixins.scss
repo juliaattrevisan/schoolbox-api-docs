@@ -3,6 +3,9 @@
 @mixin button-dimensions() {
 	min-height: $global-button-height;
 	padding: $global-button-padding;
+	position: relative;
+	overflow: hidden;
+	vertical-align: middle;
 }
 
 @mixin flex {
@@ -305,17 +308,24 @@
 	}
 }
 
+%switch-first-child{
+	text-align: left;
+	color: $content-ui-background;
+	opacity: 0;
+}
+%switch-last-child{
+	text-align: right;
+	color: $content-ui-foreground;
+	opacity: 1;
+}
 @mixin switch-label($indent: 0.75rem) {
 	span {
-
         /* The label inside the paddle
          */
 		&:first-child {
 			// this is the active state
 			left: $indent;
-			text-align: left;
-			color: $content-ui-background;
-			opacity: 0;
+			@extend %switch-first-child;
 		}
 
         /* The label inside the paddle
@@ -323,9 +333,7 @@
 		&:last-child {
 			// this is the inactive state
 			right: $indent;
-			text-align: right;
-			color: $content-ui-foreground;
-			opacity: 1;
+			@extend %switch-last-child;
 		}
 
 		&[class^="icon-"]:before {

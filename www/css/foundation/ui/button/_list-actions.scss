@@ -44,6 +44,7 @@
 
 					&:before {
 						padding-right: 0;
+						float: none;
 					}
 					&[disabled], &.disabled {
 						opacity: 0.33;
@@ -90,28 +91,27 @@
 				}
 			}
 		}
-	}
+		$interaction-map: (
+				selectable-card: 'selector',
+				sortable-card:   'grip',
+				expandable-card: 'expander'
+		);
 
-	$interaction-map: (
-		selectable-card: 'selector',
-		sortable-card:   'grip',
-		expandable-card: 'expander'
-	);
+		@each $interaction, $selector in $interaction-map {
 
-	@each $interaction, $selector in $interaction-map {
+			.#{$interaction} {
+				li {
+					display: table;
+					width: calc(100% + 2rem);
+					.#{$selector} {
+						display: table-cell;
+						vertical-align: middle;
+						width: 2rem;
+						padding: 0 0.7rem;
 
-		.#{$interaction} {
-			li {
-				display: table;
-				width: calc(100% + 2rem);
-				.#{$selector} {
-					display: table-cell;
-					vertical-align: middle;
-					width: 2rem;
-					padding: 0 0.7rem;
-
-					&:before{
-						padding: 0;
+						&:before{
+							padding: 0;
+						}
 					}
 				}
 			}

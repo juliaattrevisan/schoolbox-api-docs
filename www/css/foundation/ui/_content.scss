@@ -737,6 +737,7 @@ $rotate-th-width: $square-grid-td-size;
 .accordion{
 	// insane core foundation override
 	.accordion-navigation.active > a{
+		background: $off-canvas;
 		color: $accordion-navigation-font-color;
 	}
 	a {
@@ -770,24 +771,35 @@ nav {
   @extend .hide-for-print;
 }
 
+/*
+ * Uses .expander, .selector or .grip
+ * Use %placeholders to prevent the same CSS getting spat out over and over again.
+ */
+%interaction-li{
+	display: table;
+	width: calc(100% + 2rem);
+}
+%interaction-selector{
+	padding: 0 0.75rem;
+	display: table-cell;
+	vertical-align: middle;
+	width: 2rem;
+	&:before {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 0;
+	}
+}
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
 	> li{
-		display: table;
-		width: calc(100% + 2rem);
+		@extend %interaction-li;
 		.#{$selector} {
 			@if str-length($icon) > 0 {
 				@extend .icon-#{$icon};
 			}
-			@extend [class^="icon-"];
-			padding: 0 0.75rem;
+			@extend %interaction-selector;
 			cursor: $cursor;
-			display: table-cell;
-			vertical-align: middle;
-			width: 2rem;
 			&:before {
-				display: table-cell;
-				vertical-align: middle;
-				padding: 0;
 				color: $color;
 			}
 		}
@@ -797,18 +809,38 @@ nav {
 	}
 }
 
-@mixin information-list() {
+%information-list{
 	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	clear:both;
+}
+%information-li{
+	@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+	@include responsive-sides(-1, margin);
+	border-bottom: 1px solid $body-bg;
+	position: relative;
+	overflow: visible;
+	list-style: none;
+	@include single-transition(background-color, 0.3s, ease-in);
+}
+%card-article{
+	padding: 1rem 2rem 1rem 1rem;
+	clear: both;
+}
+%ui-sortable-helper{
+	border-bottom: none;
+	background-color: $row-action-hover-background;
+}
+@mixin information-list() {
+	@extend %information-list;
 
 	&.expandable {
-		@include list-interaction('expander', 'pointer');
+		@include list-interaction(expander, pointer);
 	}
 	&.card-selectable {
-		@include list-interaction('selector', 'pointer');
+		@include list-interaction(selector, pointer);
 		li .selector{
 			width: 3rem;
 			label{
@@ -817,29 +849,18 @@ nav {
 		}
 	}
     &.sortable, &.sortable-card {
-        .ui-sortable-helper {
-            border-bottom: none;
-            background-color: $row-action-hover-background;
-        }
-		@include list-interaction('grip', 'move', 'grip');
+		@include list-interaction(grip, move, grip);
+		.ui-sortable-helper {
+			@extend %ui-sortable-helper;
+		}
 	}
 	> li{
-		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
-		@include responsive-sides(-1, margin);
-		border-bottom: 1px solid $body-bg;
-		position: relative;
-		overflow: visible;
-		list-style: none;
-		@include single-transition(background-color, 0.3s, ease-in);
+		@extend %information-li;
 		> &:first-child{
 			padding-top: 0;
 		}
 		&:last-child{
 			border: 0;
-		}
-		[class^="icon-"]:before,
-		[class*=" icon-"]:before{
-			float: none;
 		}
 		input[type=radio]:not(.plain)+label.checkbox-label,
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
@@ -853,15 +874,12 @@ nav {
 		background-color: $row-action-hover-background;
 	}
 
-	/* <article> is no longer inside a .card instance due to .card buttons
-	 * unnecessarily occupying space, reducing article width unfairly
-	 * Reconstruct such that <article> immediately follows <nav> has a special
+	/* <article> immediately follows <nav> has a special
 	 * layout rule to display content
 	 */
 	.list-item ~ article,
 	.card ~ article{
-		padding: 1rem 2rem 1rem 1rem;
-		clear: both;
+		@extend %card-article;
 
 		P:last-child{
 			margin-bottom: 0;
