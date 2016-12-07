@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_CountdownController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -21,34 +23,79 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        // Date/time: assume today/12:00 am respectively if not provided
+        /**
+         * Get date & time set in config
+         */
         $date = $this->getConfig('date');
         $time = $this->getConfig('time');
-        if (strlen($date) === 0) {
-            $date = date('Y-m-d');
-        }
-        if (strlen($time) === 0) {
+
+        /**
+         * If a date has been set but no time - default time to 12:00am
+         */
+        if (strlen($date) !== 0 && strlen($time) === 0) {
             $time = '00:00:00';
         }
-        try {
-            $deadline = new Alaress_Date_Format("$date $time", Alaress_Date_Format::DATABASE_FORMAT);
-        } catch (Exception $e) {
-            // Couldn't create a date, so default to now.
-            // Use +1 seconds to offset some js rendering weirdness
-            // This way it initialises at 00/00/00/00/00
-            $deadline = Alaress_Date_Format::now()->addSeconds(1);
+
+        /**
+         * If date fields are empty, or we can't parse a date out of what's entered..
+         * set an empty state to show
+         */
+        $showEmpty = false;
+        $invalidDate = false;
+
+        if (strlen($date) === 0 && strlen($time) === 0) {
+            $showEmpty = true;
+        } else {
+            try {
+                $deadline = new Alaress_Date_Format($date . ' ' . $time, Alaress_Date_Format::DATABASE_FORMAT);
+            } catch (Exception $e) {
+                $showEmpty = true;
+                $invalidDate = true;
+            }
         }
 
-        $this->setVar(
-            array(
+        $this->setBlock($templateHandle, 'countdown', 'countdown_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+        if ($showEmpty) {
+
+            $this->setVar('countdown_block', '');
+            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
+            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_modify_block', '');
+                $this->setVar('empty_invalid_block', '');
+                $this->parse('empty_read_only_block', 'empty_read_only');
+            } else {
+                $this->setVar('empty_read_only_block', '');
+                if ($invalidDate) {
+                    $this->setVar('empty_modify_block', '');
+                    $this->parse('empty_invalid_block', 'empty_invalid');
+                } else {
+                    $this->setVar('empty_invalid_block', '');
+                    $this->parse('empty_modify_block', 'empty_modify');
+                }
+            }
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setVar('empty_state_block', '');
+
+            $this->setVar([
                 'DEADLINE_YEAR'  => $deadline->getYear(),
                 'DEADLINE_MONTH' => $deadline->getMonth(),
                 'DEADLINE_DAY'   => $deadline->getDay(),
                 'DEADLINE_HOUR'  => $deadline->getHour(),
                 'DEADLINE_MIN'   => $deadline->getMinute(),
                 'DEADLINE_SEC'   => $deadline->getSecond(),
-            )
-        );
+            ]);
+
+            $this->parse('countdown_block', 'countdown');
+        }
 
         return true;
     }
