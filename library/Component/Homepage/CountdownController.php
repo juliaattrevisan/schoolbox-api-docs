@@ -30,6 +30,13 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         $time = $this->getConfig('time');
 
         /**
+         * If a date has been set but no time - default time to 12:00am
+         */
+        if (strlen($date) !== 0 && strlen($time) === 0) {
+            $time = '00:00:00';
+        }
+
+        /**
          * If date fields are empty, or we can't parse a date out of what's entered..
          * set an empty state to show
          */
