@@ -72,6 +72,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             $options = [
                 'type'     => $this->getAssessmentType(),
                 'dueAfter' => \Alaress_Date_Format::now(),
+                'order'    => ['due_date' => 'asc'],
             ];
 
             $this->assessments = $this->getAssessmentMapper()
