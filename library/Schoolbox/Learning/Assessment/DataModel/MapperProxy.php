@@ -820,9 +820,13 @@ class MapperProxy
         $includeResponses = true,
         $includeFeedbacks = true
     ) {
-        return $collection->map(function(IAssessable $assessable) use ($user, $includeResponses, $includeFeedbacks) {
-            return $this->loadParticipantsIntoAssessment($assessable, $user, $includeResponses, $includeFeedbacks);
-        });
+        $this->participantDataSource->loadParticipationIntoAssessmentCollection(
+            $collection,
+            $user,
+            $includeResponses,
+            $includeFeedbacks
+        );
+        return $collection;
     }
 
     /**
