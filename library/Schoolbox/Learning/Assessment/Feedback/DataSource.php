@@ -65,6 +65,19 @@ class DataSource implements IFeedbackDataSource
     }
 
     /**
+     * @param Collection $assessments
+     * @return Collection|IFeedback[][]
+     */
+    public function findForAssessmentCollection(Collection $assessments)
+    {
+        $feedback = new Collection();
+        foreach ($this->subSources as $subSource) {
+            $feedback = $feedback->union($subSource->findForAssessmentCollection($assessments));
+        }
+        return $feedback;
+    }
+
+    /**
      * @param User $student
      * @return Collection|IFeedback[]
      */
