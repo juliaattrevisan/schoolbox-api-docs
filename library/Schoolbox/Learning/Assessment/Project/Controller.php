@@ -133,9 +133,6 @@ class Controller extends Assessment\Controller
             }
         }
 
-        new \Alaress_Probe('$assessmentCounts', '$participantCounts');
-        new \Alaress_Probe($assessmentCounts, $participantCounts);
-
         /* Manufacture a universal returnUrl
          * Return to summary screen with this suffix
          */
