@@ -189,11 +189,11 @@ class DataSource
                     $responseUser = $response->getSubmittedOnBehalfOf();
 
                     // Find participant, creating if required
-                    try {
+                    if ($assessment->isParticipant($responseUser)) {
                         $responseParticipant = $assessment->getParticipant($responseUser);
 
-                    } catch (\UnexpectedValueException $e) {
-                        // Not a participant: add them
+                    } else {
+                        // Add them
                         $responseParticipant = new Participant($responseUser, $assessment);
                         $assessment->getAllParticipants()->add($responseParticipant);
                     }
@@ -218,11 +218,11 @@ class DataSource
                     $feedbackUser = $feedback->getReviewee();
 
                     // Find participant, creating if required
-                    try {
+                    if ($assessment->isParticipant($feedbackUser)) {
                         $responseParticipant = $assessment->getParticipant($feedbackUser);
 
-                    } catch (\UnexpectedValueException $e) {
-                        // Not a participant: add them
+                    } else {
+                        // Add them
                         $responseParticipant = new Participant($feedbackUser, $assessment);
                         $assessment->getAllParticipants()->add($responseParticipant);
                     }
