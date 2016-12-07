@@ -7,7 +7,9 @@
  */
 
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
-    SitePage::localRedir('/learning/assessments/'.$this->arg[1].'/modify/', null, 301);
+    $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+    $assessmentId = $assessmentDataSource->findByTaskId($this->arg[1])->getId();
+    SitePage::localRedir('/learning/assessments/'.$assessmentId.'/modify/', null, 301);
 }
 elseif ($this->arg[0] == 'create' && is_numeric($this->arg[1])) {
     SitePage::localRedir('/learning/folders/'.$this->arg[1].'/assessments/new?type=task', null, 301);
