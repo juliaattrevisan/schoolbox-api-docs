@@ -43,12 +43,19 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
     /**
      * @param IAssessable $assessment
+     * @param User        $student If set, only return this student's responses
      * @return Collection|IFeedback[]
      */
-    public function findForAssessment(IAssessable $assessment)
+    public function findForAssessment(IAssessable $assessment, User $student = null)
     {
         if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByColumnList(['assessment_id' => $assessment->getId()])
+            // Only fetch for student if provided
+            $columns = ['assessment_id' => $assessment->getId(),];
+            if ($student instanceof User) {
+                $columns[$this->studentField] = $student->getId();
+            }
+
+            return $this->mapperProxy->findByColumnList($columns)
                                      ->map(function ($item) use ($assessment) {
                                          /** @var IFeedback $item */
                                          return $item->setAssessable($assessment);
@@ -59,17 +66,24 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
+     * @param User                     $student If set, only return this student's responses
      * @return Collection|IFeedback[][]
      */
-    public function findForAssessmentCollection(Collection $assessments)
+    public function findForAssessmentCollection(Collection $assessments, User $student = null)
     {
         // Find feedback which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getColumnValues('id');
 
+        // Only fetch for student if provided
+        $columns = ['assessment_id' => $recognizedIds,];
+        if ($student instanceof User) {
+            $columns[$this->studentField] = $student->getId();
+        }
+
         // Group feedback by assessment
         /** @var Collection|IFeedback[][] $feedback */
         $feedback = $this->mapperProxy
-            ->findByColumnList(['assessment_id' => $recognizedIds,])
+            ->findByColumnList($columns)
             ->groupByCallback(function(IFeedback $v) {
                 return $v->getAssessable()->getId();
             })
