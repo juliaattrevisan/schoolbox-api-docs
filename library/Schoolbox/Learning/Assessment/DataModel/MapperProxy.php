@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -760,7 +761,11 @@ class MapperProxy
     /**
      * Helper function for converting a list of options into a column list.
      *
-     * Currently, only converts "term" to a due date span.
+     * Currently:
+     * * converts "term" to a due date span
+     * * converts "dueBefore" and "dueAfter" to due date filters
+     * * converts "type" to a filter which matches only that assessment type
+     *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
      * @return array
@@ -768,16 +773,44 @@ class MapperProxy
     protected function convertOptionsToColumnList($options)
     {
         $columnList = [];
+
+        // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
-            /** @var Term $term */
             $term = $options['term'];
-            if ($term->getStart() instanceof \Alaress_Date_Format && !$term->getStart()->isNull()) {
-                $columnList['due_date >='] = $term->getStart()->getDatabase();
-            }
-            if ($term->getActualFinish() instanceof \Alaress_Date_Format && !$term->getActualFinish()->isNull()) {
-                $columnList['due_date <='] = $term->getActualFinish()->getDatabase();
-            }
+            $options['dueAfter']  = $term->getStart();
+            $options['dueBefore'] = $term->getActualFinish();
         }
+
+        // Due before / after filter (an ADF)
+        if ($options['dueBefore'] instanceof \Alaress_Date_Format && !$options['dueBefore']->isNull()) {
+            $columnList['due_date <='] = $options['dueBefore']->getDatabase();
+        }
+        if ($options['dueAfter'] instanceof \Alaress_Date_Format && !$options['dueAfter']->isNull()) {
+            $columnList['due_date >='] = $options['dueAfter']->getDatabase();
+        }
+
+        // Assessment type filter
+        switch ($options['type']) {
+            case AssessmentType::TYPE_DUE_WORK:
+                $columnList['!d.id'] = null;
+                break;
+
+            case AssessmentType::TYPE_TASK:
+                $columnList['!t.id'] = null;
+                break;
+
+            case AssessmentType::TYPE_QUIZ:
+                $columnList['!q.assess_id'] = null;
+                break;
+
+            case AssessmentType::TYPE_PROJECT:
+                $columnList['!p.id'] = null;
+                break;
+
+            default:
+                break;
+        }
+
         return $columnList;
     }
 
