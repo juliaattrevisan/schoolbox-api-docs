@@ -8,13 +8,6 @@
             >Grades</a>
         </li>
     {% endif %}
-    {% if session.user.getRole().isStaff() or (session.user.getRole().isParent() and not config.restrict_parent_grades) %}
-        <li class="no-pad">
-            <a href="/modules/custom/moriah/cohort/student/{{ user.getId() }}"
-               class="no-margin fat button icon-fat icon-32 icon-report"
-            >Cohort Report</a>
-        </li>
-    {% endif %}
     <li class="no-pad"><a href="/synRedir.php?page=Docs&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-files">Reports</a></li>
     <li class="no-pad"><a href="/synRedir.php?page=pti&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-group">PT Interviews</a></li>
     <li class="no-pad"><a href="/synRedir.php?page=StudentParentContacts&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-group">Parent Contacts</a></li>
