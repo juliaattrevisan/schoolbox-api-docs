@@ -569,6 +569,9 @@ setmailcatcher () {
   mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1025' WHERE name='mail_smtp_port'";
   mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='mail_enable'";
 }
+setdebugstacktrace () {
+  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace'";
+}
 titleprefix='';
 if [ "$package" = 'vagrant' ];
 then
@@ -576,6 +579,7 @@ then
 	updatetitle;
 	setmailcatcher;
 	setsqlconfig;
+	setdebugstacktrace;
 fi
 if [ "$package" = 'schoolboxdev' ];
 then
@@ -583,6 +587,7 @@ then
 	updatetitle;
 	setmailcatcher;
 	setsqlconfig;
+	setdebugstacktrace;
 fi
 
 # Restart apache
