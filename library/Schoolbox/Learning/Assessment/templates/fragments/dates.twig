@@ -13,12 +13,21 @@
         });
     });
 </script>
-{{ dateForm.dateField('publish', assessment.publishAt) }}
+
+{% if acceptingResponses %}
+    {% set endDateSelector = '' %}
+{% else %}
+    {% set endDateSelector = 'input[name="dueDate"]' %}
+{% endif %}
+
+{{ dateForm.dateField('publish', assessment.publishAt, endDateSelector) }}
+
 {% if acceptingResponses %}
 {{ dateForm.dateField('open', assessment.openAt) }}
 {% endif %}
+
 {{ dateForm.dateField('due', assessment.dueAt) }}
+
 {% if acceptingResponses %}
 {{ dateForm.dateField('close', assessment.closeAt) }}
 {% endif %}
-
