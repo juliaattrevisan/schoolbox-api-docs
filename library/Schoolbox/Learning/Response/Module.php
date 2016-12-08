@@ -114,7 +114,12 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher, '(get|delete)ParticularResponse', function ($params) {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
             $participant = null;
             $response = null;
