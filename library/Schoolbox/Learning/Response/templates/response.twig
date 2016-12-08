@@ -122,7 +122,7 @@
                     <li class="actions-small-1 {{ selected }}">
                         <div class="list-item">
                             <div class="card small-12 compact">
-                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
+                                <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
 
