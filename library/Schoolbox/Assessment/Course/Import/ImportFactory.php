@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\IDatabase;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
@@ -83,8 +84,11 @@ class ImportFactory
                 sa.id AS 'sa.id',
                 sa.title AS 'sa.title',
                 sdw.assessment_id AS 'sdw.id',
+                sdw.accept_submission as 'sdw.accept_submission',
+                sdw.multi_submission as 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
-                stk.assessment_id AS 'stk.id'
+                stk.assessment_id AS 'stk.id',
+                spr.assessment_id AS 'spr.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -92,6 +96,7 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
+            LEFT JOIN project spr ON spr.assessment_id = sa.id
         ";
 
         $pb = new PredicateBuilder($this->database, '');
@@ -114,20 +119,11 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
-            if ($row['sdw.id']) {
-                $assessmentSpec = new DueWorkAssessment();
-            } elseif ($row['sqz.id']) {
-                $assessmentSpec = new QuizAssessment();
-            } elseif ($row['stk.id']) {
-                $assessmentSpec = new TaskAssessment();
-            } else {
-                throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
-            }
-            $assessmentSpec->setId($row['sa.id']);
-            $assessmentSpec->setTitle($row['sa.title']);
-            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
-            $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+            if ($assessmentSpec instanceof IAssessable) {
+                $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+            }
         }
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
@@ -213,8 +209,11 @@ class ImportFactory
                 sa.deleted_at     AS 'sa.deleted_at',
                 sa.sequence       AS 'sa.sequence',
                 sdw.assessment_id AS 'sdw.id',
+                sdw.accept_submission AS 'sdw.accept_submission',
+                sdw.multi_submission  AS 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
                 stk.assessment_id AS 'stk.id',
+                spr.assessment_id AS 'spr.id',
                 ia.id             AS 'ia.id',
                 ia.title          AS 'ia.title',
                 ia.publish_date   AS 'ia.publish_date',
@@ -224,7 +223,8 @@ class ImportFactory
                 ia.sequence       AS 'ia.sequence',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id'
+                itk.assessment_id AS 'itk.id',
+                ipr.assessment_id AS 'ipr.id'
             FROM course_unit_specification us
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -232,11 +232,13 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
+            LEFT JOIN project spr ON spr.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1` ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
+            LEFT JOIN project ipr ON ipr.assessment_id = ia.id
         ";
         $pbOuter1 = new PredicateBuilder($this->database, '');
         $pbOuter1->anyOf('us.id', array_keys($unitSpecCache));
@@ -255,6 +257,7 @@ class ImportFactory
                 null              AS 'sdw.id',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
+                null              AS 'spr.id',
                 ia.id             AS 'ia.id',
                 ia.title          AS 'ia.title',
                 ia.publish_date   AS 'ia.publish_date',
@@ -263,8 +266,11 @@ class ImportFactory
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
                 idw.assessment_id AS 'idw.id',
+                idw.accept_submission AS 'idw.accept_submission',
+                idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id'
+                itk.assessment_id AS 'itk.id',
+                ipr.assessment_id AS 'ipr.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -273,6 +279,7 @@ class ImportFactory
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
+            LEFT JOIN project ipr ON ipr.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new PredicateBuilder($this->database, '');
@@ -297,48 +304,10 @@ class ImportFactory
             }
 
             // Create AssessmentSpec (if one exists)
-            if(is_null($row['sa.id'])){
-                $assessmentSpec = null;
-            } else {
-                if ($row['sdw.id']) {
-                    $assessmentSpec = new DueWorkAssessment();
-                } elseif ($row['sqz.id']) {
-                    $assessmentSpec = new QuizAssessment();
-                } elseif ($row['stk.id']) {
-                    $assessmentSpec = new TaskAssessment();
-                } else {
-                    throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
-                }
-                $assessmentSpec->setId($row['sa.id']);
-                $assessmentSpec->setTitle($row['sa.title']);
-                if(is_null($row['sa.deleted_at'])){
-                    $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
-                } else {
-                    $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
-                }
-            }
+            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             // Create corresponding AssessmentImpl (if one exists)
-            if(is_null($row['ia.id'])){
-                $assessmentImpl = null;
-            } else {
-                if ($row['idw.id']) {
-                    $assessmentImpl = new DueWorkAssessment();
-                } elseif ($row['iqz.id']) {
-                    $assessmentImpl = new QuizAssessment();
-                } elseif ($row['itk.id']) {
-                    $assessmentImpl = new TaskAssessment();
-                } else {
-                    throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
-                }
-                $assessmentImpl->setId($row['ia.id']);
-                $assessmentImpl->setTitle($row['ia.title']);
-                $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
-                $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
-                $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
-                $assessmentImpl->setCloseAt($this->createDate($row['ia.close_date']));
-                $assessmentImpl->setDeletedAt($this->createDate($row['ia.deleted_at']));
-            }
+            $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
                 $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
@@ -404,5 +373,121 @@ class ImportFactory
         } else {
             return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
         }
+    }
+
+    /**
+     * Builds an assessment spec from this row.
+     *
+     * @param string $row
+     * @return IAssessable|null
+     */
+    protected function buildAssessmentSpecFromRow($row)
+    {
+        // Short-circuit if there's no assessment at all
+        if (is_null($row['sa.id'])) {
+            return null;
+        }
+
+        // Different constructor logic for different assessment types
+        if ($row['sdw.id']) {
+            $assessmentSpec = new DueWorkAssessment();
+
+            // Need to know if this accepts submissions, because that
+            // determines whether open/late date fields show.
+            $assessmentSpec = $this->setDueWorkAccepts(
+                $assessmentSpec,
+                $row['sdw.accept_submission'],
+                $row['sdw.multi_submission']
+            );
+
+        } elseif ($row['sqz.id']) {
+            $assessmentSpec = new QuizAssessment();
+
+        } elseif ($row['stk.id']) {
+            $assessmentSpec = new TaskAssessment();
+
+        } elseif ($row['spr.id']) {
+            $assessmentSpec = new Project();
+
+        } else {
+            throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
+        }
+
+        $assessmentSpec->setId($row['sa.id']);
+        $assessmentSpec->setTitle($row['sa.title']);
+        if(is_null($row['sa.deleted_at'])){
+            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+        } else {
+            $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
+        }
+        return $assessmentSpec;
+    }
+
+    /**
+     * Builds an assessment implementation from this row.
+     *
+     * @param $row
+     * @return IAssessable|null
+     */
+    protected function buildAssessmentImplFromRow($row)
+    {
+        // Short-circuit if there's no assessment at all
+        if (is_null($row['ia.id'])) {
+            return null;
+        }
+
+        // Different constructor logic for different assessment types
+        if ($row['idw.id']) {
+            $assessmentImpl = new DueWorkAssessment();
+            $assessmentImpl = $this->setDueWorkAccepts(
+                $assessmentImpl,
+                $row['idw.accept_submission'],
+                $row['idw.multi_submission']
+            );
+
+        } elseif ($row['iqz.id']) {
+            $assessmentImpl = new QuizAssessment();
+
+        } elseif ($row['itk.id']) {
+            $assessmentImpl = new TaskAssessment();
+
+        } elseif ($row['ipr.id']) {
+            $assessmentImpl = new Project();
+
+        } else {
+            throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
+        }
+
+        $assessmentImpl->setId($row['ia.id']);
+        $assessmentImpl->setTitle($row['ia.title']);
+        $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
+        $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
+        $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
+        $assessmentImpl->setCloseAt($this->createDate($row['ia.close_date']));
+        $assessmentImpl->setDeletedAt($this->createDate($row['ia.deleted_at']));
+
+        return $assessmentImpl;
+    }
+
+    /**
+     * Helper for setting the accepts assessments attribute on a constructed due work.
+     *
+     * @param DueWorkAssessment $assessment
+     * @param bool              $accepts
+     * @param bool              $acceptsMulti
+     * @return DueWorkAssessment
+     */
+    protected function setDueWorkAccepts(DueWorkAssessment $assessment, $accepts, $acceptsMulti)
+    {
+        if ($accepts) {
+            if ($acceptsMulti) {
+                $assessment->setAcceptsMultiple();
+            } else {
+                $assessment->setAcceptsSingle();
+            }
+        } else {
+            $assessment->setAcceptsNone();
+        }
+        return $assessment;
     }
 }
