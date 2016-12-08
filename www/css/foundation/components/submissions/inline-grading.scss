@@ -9,8 +9,10 @@
 /* Indicate which file you're currently viewing
  */
 .inline-grader-filelist {
-  background-color: $white;
-  .selected {
+  li {
+    background-color: $white;
+  }
+  li.selected {
     background-color: $accent-background;
   }
 }
