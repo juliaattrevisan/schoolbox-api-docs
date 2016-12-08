@@ -38,7 +38,7 @@
 					display: inline-block;
 					text-align: center;
 					width: $button-size;
-					line-height: $button-size;
+					line-height: strip-unit($button-size);
 					color: $button-color;
 
 					&:before {
