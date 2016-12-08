@@ -53,7 +53,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 
         // Unmapped join onto individual files
         $this->hasJoin(
-            'file',
+            'files',
             [
                 'mapper'    => ReturnedWork\SingleFile\Mapper::class,
                 'this_key'  => 'id',
@@ -205,13 +205,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
 				{$category_join->getColumnString('c')},
-				{$storage_join->getColumnString('file')},
+				{$storage_join->getColumnString('files')},
 				{$mime_join->getColumnString('mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
-			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime', true)}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
+			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'files', 'mime', true)}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.deleted IS FALSE
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
@@ -347,13 +347,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
 				{$category_join->getColumnString('c')},
-				{$this->getJoinColumnString('storage', 'file')},
+				{$this->getJoinColumnString('storage', 'files')},
 				{$this->getJoinColumnString('storage.allowedFileExtension', 'mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
-			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'file', 'mime')}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
+			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'files', 'mime')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
 			AND sr.is_confirmation_of_submission IS FALSE
@@ -403,8 +403,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $box->setCategory($category);
         $return->setSubmissionBox($box);
 
-        if ($row['file.hash']) {
-            $storage  = $storage_join->hydrate($row, 'file');
+        if ($row['files.hash']) {
+            $storage  = $storage_join->hydrate($row, 'files');
             $mime     = $mime_join->hydrate($row, 'mime');
 
             $storage->setMimetype($mime);
@@ -473,7 +473,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function persistFiles(ReturnedWork $object, ReturnedWork $previous = null)
     {
-        $joinMapper = $this->getJoinMapper('file');
+        $joinMapper = $this->getJoinMapper('files');
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('submission_return_id', $object->getId());
