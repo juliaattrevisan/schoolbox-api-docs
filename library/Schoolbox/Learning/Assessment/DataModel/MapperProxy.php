@@ -447,6 +447,46 @@ class MapperProxy
     }
 
     /**
+     * Finds all assessables for a staff member.
+     *
+     * This method loads participation for $staff only.
+     *
+     * @param User $staff
+     * @param Term $term    Restrict results to this term
+     * @return Collection|IAssessable[]
+     */
+    public function findAllByStaff(User $staff, Term $term)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
+
+        // Find this user's folders from folder mapper
+        $classFolderIds = $folderMapper->findForUser(
+            $staff,
+            true,
+            UserAccess::ACCESS_READ,
+            false
+        )->getColumnValues('id');
+
+        // Build a list of parameters to pass to findAllForFolderId
+        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
+        $extraParams['id'] = [];
+
+        foreach ($classFolderIds as $id) {
+            foreach ($this->baseMapper->findAllForFolderId($id, []) as $assessable) {
+                $extraParams['id'][] = $assessable->getId();
+            }
+        }
+
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection(
+                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            ),
+            $staff
+        );
+    }
+
+    /**
      * Saves an assessable
      *
      * @param IAssessable $assessable
