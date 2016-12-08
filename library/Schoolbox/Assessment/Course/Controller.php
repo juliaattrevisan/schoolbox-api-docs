@@ -889,13 +889,15 @@ class Controller extends Base\Base
                 continue;
             }
 
+            // Get units for a course
+            $currentCourse->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($currentCourse->getId()));
+
             // Remove units whose folders aren't accessible by this user
             $currentCourse->getUnits()->filter(function($unit) {
                 /** @var UnitSpecification $unit */
                 return $this->confirmAccess($unit->getFolder()->getId());
             });
-            // Get units for a course
-            $currentCourse->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($currentCourse->getId()));
+
             // Add course directly into $data
             $data['courses'][] = $currentCourse;
         }
