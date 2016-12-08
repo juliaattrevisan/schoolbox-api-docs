@@ -9,6 +9,7 @@
 /* Indicate which file you're currently viewing
  */
 .inline-grader-filelist {
+  background-color: $white;
   .selected {
     background-color: $accent-background;
   }
