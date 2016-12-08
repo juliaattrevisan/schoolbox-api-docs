@@ -480,6 +480,9 @@ class MapperProxy
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
+            // Legacy DueWork SitePage Controllers require that we preserve this field
+            $subObject->setCategory($assessable->getBaseContext()->getFolder());
+
             // TODO figure out what to do, if anything, about rubric result sets
             // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
             // Thereafter, it's ignored.
