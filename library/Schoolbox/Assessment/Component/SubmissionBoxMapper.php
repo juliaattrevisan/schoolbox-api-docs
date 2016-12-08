@@ -228,6 +228,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+                $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
             }
             // Hydrate curriculum nodes
 
