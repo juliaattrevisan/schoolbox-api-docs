@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\IDatabase;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
@@ -86,7 +87,8 @@ class ImportFactory
                 sdw.accept_submission as 'sdw.accept_submission',
                 sdw.multi_submission as 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
-                stk.assessment_id AS 'stk.id'
+                stk.assessment_id AS 'stk.id',
+                spr.assessment_id AS 'spr.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -94,6 +96,7 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
+            LEFT JOIN project spr ON spr.assessment_id = sa.id
         ";
 
         $pb = new PredicateBuilder($this->database, '');
@@ -210,6 +213,7 @@ class ImportFactory
                 sdw.multi_submission  AS 'sdw.multi_submission',
                 sqz.assessment_id AS 'sqz.id',
                 stk.assessment_id AS 'stk.id',
+                spr.assessment_id AS 'spr.id',
                 ia.id             AS 'ia.id',
                 ia.title          AS 'ia.title',
                 ia.publish_date   AS 'ia.publish_date',
@@ -219,7 +223,8 @@ class ImportFactory
                 ia.sequence       AS 'ia.sequence',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id'
+                itk.assessment_id AS 'itk.id',
+                ipr.assessment_id AS 'ipr.id'
             FROM course_unit_specification us
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -227,11 +232,13 @@ class ImportFactory
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
+            LEFT JOIN project spr ON spr.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1` ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
+            LEFT JOIN project ipr ON ipr.assessment_id = ia.id
         ";
         $pbOuter1 = new PredicateBuilder($this->database, '');
         $pbOuter1->anyOf('us.id', array_keys($unitSpecCache));
@@ -250,6 +257,7 @@ class ImportFactory
                 null              AS 'sdw.id',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
+                null              AS 'spr.id',
                 ia.id             AS 'ia.id',
                 ia.title          AS 'ia.title',
                 ia.publish_date   AS 'ia.publish_date',
@@ -261,7 +269,8 @@ class ImportFactory
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id'
+                itk.assessment_id AS 'itk.id',
+                ipr.assessment_id AS 'ipr.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -270,6 +279,7 @@ class ImportFactory
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
+            LEFT JOIN project ipr ON ipr.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new PredicateBuilder($this->database, '');
@@ -396,6 +406,9 @@ class ImportFactory
         } elseif ($row['stk.id']) {
             $assessmentSpec = new TaskAssessment();
 
+        } elseif ($row['spr.id']) {
+            $assessmentSpec = new Project();
+
         } else {
             throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
         }
@@ -437,6 +450,9 @@ class ImportFactory
 
         } elseif ($row['itk.id']) {
             $assessmentImpl = new TaskAssessment();
+
+        } elseif ($row['ipr.id']) {
+            $assessmentImpl = new Project();
 
         } else {
             throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
