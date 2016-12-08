@@ -258,6 +258,8 @@ class ImportFactory
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
                 idw.assessment_id AS 'idw.id',
+                idw.accept_submission AS 'idw.accept_submission',
+                idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id'
             FROM course_unit_implementation ui
@@ -295,26 +297,7 @@ class ImportFactory
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             // Create corresponding AssessmentImpl (if one exists)
-            if(is_null($row['ia.id'])){
-                $assessmentImpl = null;
-            } else {
-                if ($row['idw.id']) {
-                    $assessmentImpl = new DueWorkAssessment();
-                } elseif ($row['iqz.id']) {
-                    $assessmentImpl = new QuizAssessment();
-                } elseif ($row['itk.id']) {
-                    $assessmentImpl = new TaskAssessment();
-                } else {
-                    throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
-                }
-                $assessmentImpl->setId($row['ia.id']);
-                $assessmentImpl->setTitle($row['ia.title']);
-                $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
-                $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
-                $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
-                $assessmentImpl->setCloseAt($this->createDate($row['ia.close_date']));
-                $assessmentImpl->setDeletedAt($this->createDate($row['ia.deleted_at']));
-            }
+            $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
                 $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
@@ -401,15 +384,11 @@ class ImportFactory
 
             // Need to know if this accepts submissions, because that
             // determines whether open/late date fields show.
-            if ($row['sdw.accept_submission']) {
-                if ($row['sdw.multi_submission']) {
-                    $assessmentSpec->setAcceptsMultiple();
-                } else {
-                    $assessmentSpec->setAcceptsSingle();
-                }
-            } else {
-                $assessmentSpec->setAcceptsNone();
-            }
+            $assessmentSpec = $this->setDueWorkAccepts(
+                $assessmentSpec,
+                $row['sdw.accept_submission'],
+                $row['sdw.multi_submission']
+            );
 
         } elseif ($row['sqz.id']) {
             $assessmentSpec = new QuizAssessment();
@@ -429,5 +408,70 @@ class ImportFactory
             $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
         }
         return $assessmentSpec;
+    }
+
+    /**
+     * Builds an assessment implementation from this row.
+     *
+     * @param $row
+     * @return IAssessable|null
+     */
+    protected function buildAssessmentImplFromRow($row)
+    {
+        // Short-circuit if there's no assessment at all
+        if (is_null($row['ia.id'])) {
+            return null;
+        }
+
+        // Different constructor logic for different assessment types
+        if ($row['idw.id']) {
+            $assessmentImpl = new DueWorkAssessment();
+            $assessmentImpl = $this->setDueWorkAccepts(
+                $assessmentImpl,
+                $row['idw.accept_submission'],
+                $row['idw.multi_submission']
+            );
+
+        } elseif ($row['iqz.id']) {
+            $assessmentImpl = new QuizAssessment();
+
+        } elseif ($row['itk.id']) {
+            $assessmentImpl = new TaskAssessment();
+
+        } else {
+            throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
+        }
+
+        $assessmentImpl->setId($row['ia.id']);
+        $assessmentImpl->setTitle($row['ia.title']);
+        $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
+        $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
+        $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
+        $assessmentImpl->setCloseAt($this->createDate($row['ia.close_date']));
+        $assessmentImpl->setDeletedAt($this->createDate($row['ia.deleted_at']));
+
+        return $assessmentImpl;
+    }
+
+    /**
+     * Helper for setting the accepts assessments attribute on a constructed due work.
+     *
+     * @param DueWorkAssessment $assessment
+     * @param bool              $accepts
+     * @param bool              $acceptsMulti
+     * @return DueWorkAssessment
+     */
+    protected function setDueWorkAccepts(DueWorkAssessment $assessment, $accepts, $acceptsMulti)
+    {
+        if ($accepts) {
+            if ($acceptsMulti) {
+                $assessment->setAcceptsMultiple();
+            } else {
+                $assessment->setAcceptsSingle();
+            }
+        } else {
+            $assessment->setAcceptsNone();
+        }
+        return $assessment;
     }
 }
