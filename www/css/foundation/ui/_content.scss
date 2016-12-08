@@ -836,7 +836,8 @@ nav {
 @mixin information-list() {
 	@extend %information-list;
 
-	&.expandable {
+	&.expandable,
+	&.expandable-card{
 		@include list-interaction(expander, pointer);
 	}
 	&.card-selectable {

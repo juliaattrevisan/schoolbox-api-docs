@@ -34,7 +34,6 @@
 				}
 
 				a[class*="icon-"] {
-					@include button-dimensions();
 					padding: 0;
 					display: inline-block;
 					text-align: center;
@@ -88,31 +87,6 @@
 			.actions-#{$size}-#{$i} {
 				nav {
 					right: 0;
-				}
-			}
-		}
-		$interaction-map: (
-				selectable-card: 'selector',
-				sortable-card:   'grip',
-				expandable-card: 'expander'
-		);
-
-		@each $interaction, $selector in $interaction-map {
-
-			.#{$interaction} {
-				li {
-					display: table;
-					width: calc(100% + 2rem);
-					.#{$selector} {
-						display: table-cell;
-						vertical-align: middle;
-						width: 2rem;
-						padding: 0 0.7rem;
-
-						&:before{
-							padding: 0;
-						}
-					}
 				}
 			}
 		}
