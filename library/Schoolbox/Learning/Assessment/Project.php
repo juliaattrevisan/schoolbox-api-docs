@@ -18,6 +18,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
@@ -192,6 +193,23 @@ class Project extends AbstractAssessment implements AssessmentContext
     public function isFeedbackVisibleToUser(User $viewingUser)
     {
         return true;
+    }
+
+    /**
+     * Clones this object in preparation for persisting as a copy of this object.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        /** @var Project $clone */
+        $clone = parent::cloneForCopy();
+        $clonedAssessables = new GenericCollection(IAssessable::class);
+        foreach($clone->getAssessables() as $assessable){
+            $clonedAssessables->add($assessable->cloneForCopy());
+        }
+        $clone->setAssessables($clonedAssessables);
+        return $clone;
     }
 
     /* Getters/Setters
