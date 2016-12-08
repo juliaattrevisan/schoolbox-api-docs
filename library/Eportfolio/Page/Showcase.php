@@ -157,14 +157,15 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show submitted work information (if available)
                          */
-                        if ($submission) {
+                        if ($submission && $submission->getFiles()->first()) {
+                            $firstFile = $submission->getFiles()->first();
                             $this->getPage()->setVar(
                                 array(
                                     'SHOWCASED_WORK_SUBMISSION_ID' => $submission->getId(),
                                     'SHOWCASED_WORK_SUBMISSION_FILESIZE' =>
-                                        Alaress_Byte_Format::bytesToString($submission->getSize()),
+                                        Alaress_Byte_Format::bytesToString($firstFile->getSize()),
                                     'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $submission->getCreatedAt()->getShort(),
-                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $submission->getMimetype()->getIconFile(),
+                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $firstFile->getMimetype()->getIconFile(),
                                 )
                             );
 

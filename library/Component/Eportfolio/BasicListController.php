@@ -9,23 +9,19 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
-class Component_Eportfolio_BasicListController extends Component_Eportfolio_ControllerAbstract {
-
-	/**
-	 * A mapper instance, for polymorphism
-	 *
-	 * @var null
-	 */
-	protected $mapperClass = null;
-
+/**
+ * @method \Component\Eportfolio\BasicListMapper getMapper()
+ */
+class Component_Eportfolio_BasicListController extends Component_Eportfolio_ControllerAbstract
+{
 	/**
 	 * Prepares data for the render function. Business logic.
 	 *
 	 * @return bool Whether to continue on and attempt Component render
 	 */
-	public function execute() {
-		$mapper = new \Component\Eportfolio\BasicListMapper();
-		$this->setMapperClass($mapper);
+	public function execute()
+    {
+		$this->setMapper($this->getMapperFactory()->get(\Component\Eportfolio\BasicListMapper::class));
 		return true;
 	}
 
@@ -66,7 +62,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 		/* Gather everything
 		 */
         $instance_id = $this->getInstance()->getId();
-		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $instance_id);
+		$allItems = $this->getMapper()->findByColumn('component_instance_id', $instance_id);
 
 		if ($allItems->count()) {
 			$j = 0;

@@ -13,14 +13,14 @@ use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as ReturnedWorkFileMapper;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use PDOStatement;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 
 /**
  * Class ReturnedWorkMapper
@@ -28,7 +28,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
  * @package Schoolbox\Assessment\Component\SubmissionBox
  * @method ReturnedWork findById($id)
  * @method ReturnedWork hydrate(array $row, $alias = '', $callback = null)
- * @method ReturnedWork createModel()
+ * @method ReturnedWork createModel($idValue = null)
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
 {
@@ -37,23 +37,23 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->hasTable('submission_return');
         $this->hasModel(ReturnedWork::class);
 
-        $this->uses('id', Schoolbox\Mapper::TYPE_INTEGER, Schoolbox\Mapper::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
-        $this->joins('owner', Schoolbox\UserMapper::class, 'id', null, null, 'owner', 'owner');
-        $this->joins('marker', Schoolbox\UserMapper::class, 'id', null, null, 'marker', 'marker');
-        $this->joins('student_submission_id', SubmissionBox\Submission\SubmissionMapper::class, 'id', null, null, 'submission', 'submission');
-        $this->uses('comment', Schoolbox\Mapper::TYPE_STRING);
-        $this->uses('mark', Schoolbox\Mapper::TYPE_STRING, null, 'humanReadableMark');
-        $this->uses('norm_mark', Schoolbox\Mapper::TYPE_STRING, null, 'normalizedMark');
-        $this->uses('is_confirmation_of_submission', Schoolbox\Mapper::TYPE_BOOLEAN);
-        $this->uses('created_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('published_at', Schoolbox\Mapper::TYPE_DATETIME);
-        $this->uses('updated_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', Schoolbox\Mapper::TYPE_DATETIME, Schoolbox\Mapper::COLUMN_SOFTDELETE);
+        $this->joins('owner', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('marker', UserMapper::class, 'id', null, null, 'marker', 'marker');
+        $this->joins('student_submission_id', StudentSubmissionMapper::class, 'id', null, null, 'submission', 'submission');
+        $this->uses('comment', self::TYPE_STRING);
+        $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
+        $this->uses('norm_mark', self::TYPE_STRING, null, 'normalizedMark');
+        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
+        $this->uses('published_at', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Unmapped join onto individual files
         $this->hasJoin(
-            'file',
+            'files',
             [
                 'mapper'    => ReturnedWork\SingleFile\Mapper::class,
                 'this_key'  => 'id',
@@ -76,7 +76,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function softDeleteReturnedWorkFiles(ReturnedWork $return)
     {
-        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->delete($files);
     }
@@ -89,7 +89,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function restoreReturnedWorkFiles(ReturnedWork $return)
     {
-        $returnedWorkFileMapper = ReturnedWorkFileMapper::getInstance();
+        $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->restoreSoftDeleted($files);
     }
@@ -101,18 +101,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function getSelectString()
     {
-        $markerMapper = $this->getJoinMapper('marker');
-        $submissionMapper = $this->getJoinMapper('submission');
-
-        $select = "
+        return "
             SELECT
                 {$this->getColumnString()},
-                {$markerMapper->getColumnString('m')},
+                {$this->getJoinColumnString('marker', 'm')},
                 {$this->getJoinColumnString('submission_box', 'b')},
-                {$submissionMapper->getColumnString('ss')}
+                {$this->getJoinColumnString('submission', 's')}
         ";
-
-        return $select;
     }
 
 
@@ -124,14 +119,12 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function getFromString()
     {
-        $from = "
+        return "
             FROM `{$this->table}`
-            LEFT JOIN {$this->getJoinSql('marker', null, 'm')}
-            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b')}
-            LEFT JOIN {$this->getJoinSql('submission', '', 'ss')}
+            LEFT JOIN {$this->getJoinSql('marker', '', 'm', true)}
+            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b', true)}
+            LEFT JOIN {$this->getJoinSql('submission', '', 's', true)}
         ";
-
-        return $from;
     }
 
     /**
@@ -159,7 +152,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         }
 
         // Fetch and hydrate files
-        $files = $this->getJoinMapper('file')
+        $files = $this->getJoinMapper('files')
                       ->findByColumn('submission_return_id', $ids)
                       ->groupByCallback(function($f) {
                           /** @var ReturnedWork\SingleFile\Model $f */
@@ -212,13 +205,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
 				{$category_join->getColumnString('c')},
-				{$storage_join->getColumnString('file')},
+				{$storage_join->getColumnString('files')},
 				{$mime_join->getColumnString('mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
-			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime', true)}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
+			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'files', 'mime', true)}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.deleted IS FALSE
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
@@ -339,6 +332,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * @param $box_id
      *
      * @return ActivityCollection
+     * @deprecated 165
      */
     public function getHistory($user_id, $box_id)
     {
@@ -353,13 +347,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
 				{$category_join->getColumnString('c')},
-				{$this->getJoinColumnString('storage', 'file')},
+				{$this->getJoinColumnString('storage', 'files')},
 				{$this->getJoinColumnString('storage.allowedFileExtension', 'mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
-			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'file', 'mime')}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
+			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'files', 'mime')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
 			AND sr.is_confirmation_of_submission IS FALSE
@@ -409,8 +403,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $box->setCategory($category);
         $return->setSubmissionBox($box);
 
-        if ($row['file.hash']) {
-            $storage  = $storage_join->hydrate($row, 'file');
+        if ($row['files.hash']) {
+            $storage  = $storage_join->hydrate($row, 'files');
             $mime     = $mime_join->hydrate($row, 'mime');
 
             $storage->setMimetype($mime);
@@ -479,7 +473,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function persistFiles(ReturnedWork $object, ReturnedWork $previous = null)
     {
-        $joinMapper = $this->getJoinMapper('file');
+        $joinMapper = $this->getJoinMapper('files');
 
         // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('submission_return_id', $object->getId());

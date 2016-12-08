@@ -9,23 +9,19 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
-class Component_Eportfolio_LinkListController extends Component_Eportfolio_ControllerAbstract {
-
-	/**
-	 * A mapper instance, for polymorphism
-	 *
-	 * @var null
-	 */
-	protected $mapperClass = null;
-
+/**
+ * @method \Component\Eportfolio\LinkListMapper getMapper()
+ */
+class Component_Eportfolio_LinkListController extends Component_Eportfolio_ControllerAbstract
+{
 	/**
 	 * Prepares data for the render function. Business logic.
 	 *
 	 * @return bool Whether to continue on and attempt Component render
 	 */
-	public function execute() {
-		$mapper = new \Component\Eportfolio\LinkListMapper();
-		$this->setMapperClass($mapper);
+	public function execute()
+    {
+		$this->setMapper($this->getMapperFactory()->get(\Component\Eportfolio\LinkListMapper::class));
 		return true;
 	}
 
@@ -65,7 +61,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->getInstance()->getId());
+		$allItems = $this->getMapper()->findByColumn('component_instance_id', $this->getInstance()->getId());
 
 		if ($allItems->count()) {
 			$j = 0;

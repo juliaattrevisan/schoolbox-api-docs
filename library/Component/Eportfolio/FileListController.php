@@ -9,23 +9,19 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
-class Component_Eportfolio_FileListController extends Component_Eportfolio_ControllerAbstract {
-
-	/**
-	 * A mapper instance, for polymorphism
-	 *
-	 * @var \Component\Eportfolio\FileListMapper
-	 */
-	protected $mapperClass = null;
-
+/**
+ * @method \Component\Eportfolio\FileListMapper getMapper()
+ */
+class Component_Eportfolio_FileListController extends Component_Eportfolio_ControllerAbstract
+{
 	/**
 	 * Prepares data for the render function. Business logic.
 	 *
 	 * @return bool Whether to continue on and attempt Component render
 	 */
-	public function execute() {
-		$mapper = new \Component\Eportfolio\FileListMapper();
-		$this->setMapperClass($mapper);
+	public function execute()
+    {
+        $this->setMapper($this->getMapperFactory()->get(\Component\Eportfolio\FileListMapper::class));
 		return true;
 	}
 
@@ -54,7 +50,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			'list_item_block' => ''
 		));
 
-		$allItems = $this->mapperClass->findForPage($this->getInstance()->getIdentifier());
+		$allItems = $this->getMapper()->findForPage($this->getInstance()->getIdentifier());
 
 		/* Show edit buttons
 		 */

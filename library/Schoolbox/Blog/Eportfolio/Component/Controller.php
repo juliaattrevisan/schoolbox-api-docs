@@ -28,21 +28,16 @@ use SitePage;
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
     /**
-     * Injectable constructor
-     *
-     * @param Component_Instance       $instance
-     * @param User                     $user
-     * @param SitePage                 $sitepage
+     * @return bool
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    public function execute()
     {
-        parent::__construct($instance, $user, $sitepage);
-
-        $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
-        $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
-        $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
-        $this->setEportfolioPageMapper(EportfolioPageMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
+        $this->setEportfolioBlogMapper($this->getMapperFactory()->get(EportfolioBlogMapper::class));
+        $this->setEportfolioBlogImageMapper($this->getMapperFactory()->get(EportfolioBlogImageMapper::class));
+        $this->setEportfolioBlogCommentMapper($this->getMapperFactory()->get(EportfolioBlogCommentMapper::class));
+        $this->setEportfolioPageMapper($this->getMapperFactory()->get(EportfolioPageMapper::class));
+        $this->setUserMapper($this->getMapperFactory()->get(UserMapper::class));
+        return true;
     }
 
     /**

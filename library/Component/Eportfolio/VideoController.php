@@ -7,9 +7,11 @@
  */
 use \Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * @method \Schoolbox\Video\ResourceVideoMapper getMapper()
+ */
 class Component_Eportfolio_VideoController extends Component_Eportfolio_ControllerAbstract
 {
-
     /**
     * @var \Schoolbox\Collection
     */
@@ -34,6 +36,14 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
     */
     protected $sortFields = array('name', 'date');
 
+    /**
+     * @return bool
+     */
+    public function execute()
+    {
+        $this->setMapper($this->getMapperFactory()->get(\Schoolbox\Video\ResourceVideoMapper::class));
+        return true;
+    }
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -57,19 +67,18 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
             'sortdir' => $this->getConfig('sortdir')
         );
 
-        $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
         if ($this->getConfig('size') > 1) {
-            $this->outputList = $videoResourceMapper->findByEportfolioPage($pageId, $sortConfig, $this->getConfig('size')-1);
+            $this->outputList = $this->getMapper()->findByEportfolioPage($pageId, $sortConfig, $this->getConfig('size')-1);
         } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByEportfolioPage($pageId, $sortConfig);
+            $this->outputList = $this->getMapper()->findByEportfolioPage($pageId, $sortConfig);
         } else {
             $this->outputList = new \Schoolbox\Collection();
         }
 
         if ($this->getConfig('eportfolioVideo')) {
             try {
-                $this->defaultVideo = $videoResourceMapper->findByMyFileId($this->getConfig('eportfolioVideo'));
+                $this->defaultVideo = $this->getMapper()->findByMyFileId($this->getConfig('eportfolioVideo'));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->defaultVideo = $this->outputList->first();
             }

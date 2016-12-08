@@ -219,16 +219,25 @@ abstract class Eportfolio_Page_Abstract {
      *
      * @param User $user
      * @param SubmissionBox $box
-     * @return mixed
+     * @return \Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission
      */
-	protected function getLatestSubmission(User $user, SubmissionBox $box) {
-		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper();
+	protected function getLatestSubmission(User $user, SubmissionBox $box)
+    {
+        // TODO use findByPredicates() in SA-1543 when it becomes available
+        $mapper = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::getInstance();
 
-		$history = $mapper->getHistory($user->getId(), $box->getId());
+        $columnList = [
+            'box_id' => $box->getId(),
+            'owner'  => $user->getId(),
+        ];
 
-		if ($history->count()) {
-			return $history->first()->getSubmission();
-		}
+        $options = [
+            'order' => [
+                'submitted_at' => 'DESC',
+            ],
+            'limit' => 1,
+        ];
+        return $mapper->findByColumnList($columnList, $options)->first();
 	}
 
     /**
@@ -236,16 +245,25 @@ abstract class Eportfolio_Page_Abstract {
      *
      * @param User $user
      * @param SubmissionBox $box
-     * @return mixed
+     * @return SubmissionBox\ReturnedWork
      */
-	protected function getLatestReturn(User $user, SubmissionBox $box) {
-		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+	protected function getLatestReturn(User $user, SubmissionBox $box)
+    {
+        // TODO use findByPredicates() in SA-1543 when it becomes available
+		$mapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
 
-		$history = $mapper->getHistory($user->getId(), $box->getId());
+		$columnList = [
+            'box_id' => $box->getId(),
+            'owner'  => $user->getId(),
+        ];
 
-		if ($history->count()) {
-			return $history->first()->getReturnedWork();
-		}
+		$options = [
+		    'order' => [
+		        'published_at' => 'DESC',
+            ],
+		    'limit' => 1,
+        ];
+		return $mapper->findByColumnList($columnList, $options)->first();
 	}
 
 	/* Getters/Setters

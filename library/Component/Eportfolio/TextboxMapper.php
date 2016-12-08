@@ -10,41 +10,21 @@
 namespace Component\Eportfolio;
 use Schoolbox;
 
-class TextboxMapper extends Schoolbox\Mapper {
-
+class TextboxMapper extends Schoolbox\Mapper
+{
 	/**
 	 * Define column/property mapping
 	 *
-	 * @return Bool|void
+	 * @return void
 	 */
-	protected function mapping() {
+	protected function mapping()
+    {
 		$this->hasTable('eportfolio_component_textbox_item');
-		$this->hasModel(TextboxMapper::class);
+		$this->hasModel(Textbox::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'component_instance_id',
-			'property'   => 'componentInstanceId',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'content',
-			'property'   => 'content',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'sequence',
-			'property'   => 'sequence',
-			'type'       => self::TYPE_INTEGER,
-		));
-
+		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('component_instance_id', self::TYPE_INTEGER);
+        $this->uses('content', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
 	}
 }
