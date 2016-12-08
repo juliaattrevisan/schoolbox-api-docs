@@ -179,6 +179,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			background-color: $white;
 			border: 2px solid $navigation-hover;
 			color: $black;
+			font-size: $base-font-size;
 			width: 100%;
 			opacity: 1;
 		}
