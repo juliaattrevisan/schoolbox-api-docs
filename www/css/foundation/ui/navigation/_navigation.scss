@@ -385,7 +385,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				padding: 27px 10px;
 				vertical-align: middle;
 			}
-			&:hover .profile-drop,
+			&:hover .profile-drop{
+				background-color: $off-canvas-hover;
+			}
 			&.active .profile-drop{
 				background-color: $off-canvas;
 			}
@@ -400,7 +402,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				@include transition(ease-out, 0.2s, max-height);
 
 				&.active {
-					display: block;
 					max-height: 3000px;
 					visibility: visible;
 					@include transition(ease-in, 0.2s, max-height);
@@ -422,7 +423,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				}
 			}
 			ul{
-				font-size: 0.875rem;
 				margin: 0;
 				list-style: none;
 			}
