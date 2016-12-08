@@ -406,6 +406,7 @@ class Controller extends Base\Base
      * @level 160
      *
      * @var $_POST   $post
+     * @var string   $post['encodedReturnUrl']      Optional. Return URL set by caller.
      * @var string   $post['action']                {'import'|'modify'}
      * @var int      $post['course_spec_id']
      * @var int      $post['course_impl_id']
@@ -424,6 +425,7 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
 
         $action = trim($post['action']);
+        $encodedReturnUrl = trim($post[Redirect::RETURN_URL]);
         $courseSpecId = trim($post['course_spec_id']);
         $courseImplId = trim($post['course_impl_id']);
         $componentId = trim($post['component_id']);
@@ -518,12 +520,14 @@ class Controller extends Base\Base
 
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
-            'action'       => $action,
-            'courseSpecId' => $courseSpecId,
-            'courseImplId' => $courseImplId,
-            'componentId'  => $componentId,
-            'ownerships'   => $post['ownerships'],
-            'dto'          => $dto,
+            'action'           => $action,
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'encodedReturnUrl' => $encodedReturnUrl,
+            'courseSpecId'     => $courseSpecId,
+            'courseImplId'     => $courseImplId,
+            'componentId'      => $componentId,
+            'ownerships'       => $post['ownerships'],
+            'dto'              => $dto,
         ]);
     }
 
@@ -534,6 +538,8 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/activities
      * @level 160
+     * @var $_GET    $query
+     * @var string   $query[Redirect::RETURN_URL]                              Optional return URL set by caller
      * @var $_POST   $post
      * @var string   $post['action']                                           {'import' | 'modify'}
      * @var int      $post['course_spec_id']
@@ -643,8 +649,6 @@ class Controller extends Base\Base
         }
 
         try {
-
-
             // Create any un-imported UnitImpls from corresponding UnitSpec
             // Update any already-imported UnitImpls
             // Create any un-imported AssessmentImpls from corresponding AssessmentSpec
@@ -808,12 +812,10 @@ class Controller extends Base\Base
             return;
         }
 
-
-
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
          */
-        $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
+        $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
         if($encodedReturnUrl){
             $redirect = Redirect::decode($encodedReturnUrl);
         } else {

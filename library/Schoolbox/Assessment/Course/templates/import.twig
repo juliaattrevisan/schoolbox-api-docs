@@ -9,10 +9,12 @@ Usages:
     action:                 string {'import' | 'modify'}
     initialStage:           int {1,2,3}
     courseSpec:             CourseSpecification | null
-    courseImpl:             CourseImplementation | null - null if an 'import'
+    courseImpl:             CourseImplementation | null  - null if an 'import'
     destinations:           array
     destinations[]['id']:   int
     destinations[]['name']: string
+    returnUrlName:          string                       - (optional) GET key
+    encodedReturnUrl:       string                       - (optional) GET value
 #}
 
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
@@ -354,6 +356,7 @@ Usages:
                 </fieldset>
                 <fieldset class='content' data-mage="part-unit-select">
                     <legend>3. Units</legend>
+                    {% if encodedReturnUrl %}<input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}" />{% endif %}
                     <div class="small-12 column{% if 3 != initialStage %} hide{% endif %}" data-mage-collapsed >
                         <div id="import_units">
                             {% if 3 == initialStage %}
@@ -373,7 +376,6 @@ Usages:
                 <fieldset class='content' data-mage="part-assessments-select">
                     <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}" />
                         <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <input type="hidden" data-mage-next="none" name="part-assessments-select" value="1" />

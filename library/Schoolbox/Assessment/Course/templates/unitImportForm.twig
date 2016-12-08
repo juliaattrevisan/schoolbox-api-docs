@@ -1,11 +1,11 @@
 {# Usage:
     {% include '@course/unitImportForm.twig' with {
-        action:       string {'import'|'modify'},
-        courseSpecId: int,
-        courseImplId: int|null,
-        unitsImpls:   UnitImplementation[],
-        componentId:  int|null,
-        ownerships:   string
+        action:           string                       - {'import'|'modify'}
+        courseSpecId:     int
+        courseImplId:     int|null
+        unitsImpls:       UnitImplementation[]
+        componentId:      int|null                     - (optional)
+        ownerships:       string
     } only %}
 #}
 
