@@ -46,8 +46,8 @@ a[disabled], a.disabled {
 	}
 
 	&.expand {
-		font-weight: 700;
 		font-size: $base-font-size;
+		font-weight: $font-weight-semibold;
 	}
 
 	&:empty {
@@ -103,8 +103,6 @@ button {
     @extend .button;
 	font-size: $base-font-size;
     /* Remove mysterious highlight effect when you click
-     * this particular element which, for all intents and
-     * purposes, is visually just another .button
      */
     outline: 0;
 }
@@ -121,10 +119,9 @@ button {
  */
 input[type="submit"]{
 	@extend .button;
-	border: none;
+	@extend .expand;
 	color: $submit-button-color;
 	background-color: $submit-button-bg-color;
-	font-size: $base-font-size;
 	&:hover, &:focus {
 		color: $submit-button-color;
 		background-color: $submit-button-bg-hover;
@@ -147,7 +144,7 @@ input[type="submit"]{
  */
 a.submit {
 	@extend input[type="submit"];
-
+	width: auto;
 	.splash {
 		background-color: $submit-button-color;
 	}
