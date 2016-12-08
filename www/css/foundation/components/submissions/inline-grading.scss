@@ -11,8 +11,8 @@
 .inline-grader-filelist {
   li {
     background-color: $white;
-  }
-  li.selected {
-    background-color: $accent-background;
+    &.selected {
+      background-color: $accent-background;
+    }
   }
 }
