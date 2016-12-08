@@ -894,7 +894,8 @@ class Controller extends Base\Base
                 /** @var UnitSpecification $unit */
                 return $this->confirmAccess($unit->getFolder()->getId());
             });
-
+            // Get units for a course
+            $currentCourse->setUnits($this->getUnitSpecificationMapper()->findAllByCourseId($currentCourse->getId()));
             // Add course directly into $data
             $data['courses'][] = $currentCourse;
         }
