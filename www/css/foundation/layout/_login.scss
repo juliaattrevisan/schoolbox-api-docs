@@ -100,7 +100,8 @@ $login-img-max-height: 12rem !default; // 192px
             font-size: inherit;
         }
 
-        #footer {
+        #footer,
+        #footer a{
             color: calc-text-color($login-overlay);
         }
 
