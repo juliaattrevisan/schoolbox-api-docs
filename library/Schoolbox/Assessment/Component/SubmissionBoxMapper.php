@@ -31,7 +31,6 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\Assessment\Component
  * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
- * @method SubmissionBox createModel($id=null)
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = array())
@@ -71,7 +70,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
-        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
+        $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessmentModel');
 
         $this->joinsVia('submission_box_file', Storage\Mapper::class, 'hash', 'storage_id', 'box_id', 'id', null, null, 'attachments');
 
@@ -101,6 +100,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
+    }
+
+
+    /**
+     * Creates a new instance of class with name passed in $this->hasModel().
+     *
+     * @param int $idValue
+     * @throws \Schoolbox\Mapper\Exception
+     * @return object
+     */
+    public function createModel($idValue = null)
+    {
+        /** @var SubmissionBox $model */
+        return parent::createModel($idValue)->setAssessmentModel($this->getJoinMapper('assessmentModel')->createModel());
     }
 
 

@@ -205,7 +205,7 @@ class Factory
     private function produceNew()
     {
         // Instantiate empty Assessment model
-        $assessment = AssessmentType::stringToObject($this->getAssessmentType());
+        $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->getContext());
         if($assessment instanceof Project){
             $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
