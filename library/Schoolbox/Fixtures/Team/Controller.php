@@ -131,7 +131,7 @@ class Controller extends AbstractController
 
             if ($context == null) {
                 $pb = $this->getMapper()->getPredicateBuilder();
-                $pb->like('name', "%{$this->getMapper()->getDatabase()->quoteForLike($query)}%");
+                $pb->like('name', "%{$this->getMapper()->getDatabase()->escapeForLike($query)}%");
                 $allTeams = $this->getMapper()->findByPredicates($pb);
             } else {
                 $allTeams = $this->getMapper()->findByName($context->getId(), $query);

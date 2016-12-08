@@ -142,7 +142,7 @@ class PredicateBuilder
      *
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
-     *                            @see \Database::quoteForLike for escaping user input.
+     *                            @see \Database::escapeForLike for escaping user input.
      * @return PredicateBuilder
      */
     public function like($columnName, $columnValue)
@@ -161,7 +161,7 @@ class PredicateBuilder
      *
      * @param string $columnName
      * @param string $columnValue Used directly in NOT LIKE statement.
-     *                            @see \Database::quoteForLike for escaping user input.
+     *                            @see \Database::escapeForLike for escaping user input.
      * @return PredicateBuilder
      */
     public function notLike($columnName, $columnValue)

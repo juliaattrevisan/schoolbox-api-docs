@@ -139,12 +139,12 @@ class MockDatabase implements IDatabase
 
 
     /**
-     * Mock of quoteForLike
+     * Mock of escapeForLike
      *
      * @param  string $string
      * @return string
      */
-    public function quoteForLike($string)
+    public function escapeForLike($string)
     {
         return $string;
     }

@@ -67,7 +67,7 @@ class Mapper extends BaseMapper
     public function findByName($keyword)
     {
         $pb = $this->getPredicateBuilder();
-        $pb->like('name', "%{$this->getDatabase()->quoteForLike($keyword)}%");
+        $pb->like('name', "%{$this->getDatabase()->escapeForLike($keyword)}%");
         return $this->findByPredicates($pb);
     }
 }

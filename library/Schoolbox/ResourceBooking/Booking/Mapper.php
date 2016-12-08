@@ -158,7 +158,7 @@ class Mapper extends BaseMapper
     */
     public function findColumnLike($column, $value)
     {
-        $searchTerm = '%' . $this->getDatabase()->quoteForLike($value) .'%';
+        $searchTerm = '%' . $this->getDatabase()->escapeForLike($value) .'%';
 
         $query = "
 			SELECT {$this->getColumnString('b')}

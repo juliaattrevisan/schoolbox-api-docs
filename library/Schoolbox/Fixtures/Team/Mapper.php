@@ -127,7 +127,7 @@ class Mapper extends BaseMapper
     {
         $pb = $this->getPredicateBuilder();
         $pb->equals('division_id', $divisionId);
-        $pb->like('name', "%{$this->getDatabase()->quoteForLike($keyword)}%");
+        $pb->like('name', "%{$this->getDatabase()->escapeForLike($keyword)}%");
         return $this->findByPredicates($pb);
     }
 

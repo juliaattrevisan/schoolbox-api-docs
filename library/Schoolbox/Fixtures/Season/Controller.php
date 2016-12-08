@@ -77,7 +77,7 @@ class Controller extends AbstractController
             $query = $this->getRequest()->query->get('query');
 
             $pb = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$this->getMapper()->getDatabase()->quoteForLike($query)}%");
+            $pb->like('name', "%{$this->getMapper()->getDatabase()->escapeForLike($query)}%");
             $pb->isNull('archived_at');
 
             // get the list with archived excluded, sort by start and end, then transform to be selectize-compatible

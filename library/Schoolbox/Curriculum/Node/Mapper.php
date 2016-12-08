@@ -197,7 +197,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             WHERE n.deleted_at IS NULL
             AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
-        $quotedLike = $this->getDatabase()->quoteForLike($keyword);
+        $quotedLike = $this->getDatabase()->escapeForLike($keyword);
         $params     = [
             'codeLike' => $quotedLike . '%',
             'nameLike' => '%' . $quotedLike . '%',

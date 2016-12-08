@@ -63,7 +63,7 @@ class Group extends DeprecatedModel
      */
     public function searchByName($name)
     {
-        $query = "SELECT * FROM groups WHERE name LIKE \"%{$this->db->quoteForLike($name)}%\"";
+        $query = "SELECT * FROM groups WHERE name LIKE \"%{$this->db->escapeForLike($name)}%\"";
 
         return $this->db->getAll($query);
     }
