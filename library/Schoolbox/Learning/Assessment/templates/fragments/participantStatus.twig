@@ -6,10 +6,13 @@
     - cardSize:    (string) sizing for foundation
  #}
 <div class="{{ cardSize ?: 'small-12' }} card">
-    <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
-    <h3>{{ user.fullName }}</h3>
-    <p class="meta">
-        <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
-        <span>{{ statusText }}</span>
-    </p>
+    <a href="/search/user/{{ user.id }}" title="View Profile">
+        <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
+        <h3>{{ user.fullName }}</h3>
+        <p class="meta">
+            <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
+            <span>{{ statusText }}</span>
+        </p>
+    </a>
 </div>
+
