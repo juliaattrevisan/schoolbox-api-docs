@@ -1,4 +1,5 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
+
     <a id="textbox{TEXTBOX_ID}"></a>
     <!-- Custom javascript -->
     <script type="text/javascript">
@@ -19,22 +20,20 @@
     </script>
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-textbox"></i>
-        <p>No content available!</p>
-        <!-- BEGIN empty_create -->
-        <p>To use first <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}">create content</a>.</p>
-        <!-- END empty_create -->
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN textbox -->
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-textbox"></i>
+                <p>No content available!</p>
+                <!-- BEGIN empty_create -->
+                <p>To use first <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}">create content</a>.</p>
+                <!-- END empty_create -->
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN textbox -->
             <section>
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
@@ -97,11 +96,10 @@
                 <!-- END text_locked -->
                 <!-- END source_folder_exists -->
             </section>
+            <!-- END textbox -->
+
         </div>
     </div>
-
-    <!-- END textbox -->
-
 </div>
 
 
