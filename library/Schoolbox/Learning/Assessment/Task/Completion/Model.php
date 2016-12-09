@@ -39,47 +39,6 @@ class Model extends AbstractResponse implements ICompletion
      */
 
     /**
-     * Find the most recent Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     */
-    public function findMostRecentFeedback()
-    {
-        if ($this->getAllFeedback()->count()) {
-            return $this->getAllFeedback()->first();
-        }
-
-        return null;
-    }
-
-    /**
-     * Find the most recent Published Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     */
-    public function findMostRecentPublishedFeedback()
-    {
-        if ($this->getAllFeedback()->count()) {
-            $latest = $this->getAllFeedback()->first();
-
-            foreach ($this->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->getPublishedAt()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
-                        $latest = $currentFeedback;
-                    }
-                }
-            }
-
-            return $latest;
-        }
-
-        return null;
-    }
-
-
-    /**
      * This response is submitted (no longer a draft)
      *
      * @return bool
