@@ -8,6 +8,7 @@
  */
 
 use Zend\Uri\UriFactory;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_TwitterController extends Component_Homepage_ControllerAbstract
 {
@@ -23,74 +24,108 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'tweet', 'tweet_block');
+        $this->setBlock($templateHandle, 'twitter_feed', 'twitter_feed_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+        $this->setBlock('twitter_feed', 'tweet', 'tweet_block');
         $this->setBlock('tweet', 'tweet_media', 'tweet_media_block');
-
-        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
-        $allTweets->setMaxTweets($this->getConfig('size'))->load();
-
-        $allResults = $allTweets->getTweets();
-
-        // Render out tweets
         $this->setVar('tweet_block', '');
 
-        if (count($allResults)) {
-            $i = 0;
+        $emptyState = false;
+        $noConfig = false;
 
+        /**
+         * Check if any username or hashtag has been set
+         */
+        if ($this->getConfig('username') == '' && $this->getConfig('keywords') == '') {
+            $emptyState = true;
+            $noConfig = true;
+        }
+
+        /**
+         * Search for tweets
+         */
+        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
+        $allTweets->setMaxTweets($this->getConfig('size'))->load();
+        $allResults = $allTweets->getTweets();
+
+        if (empty($allResults)) {
+            $emptyState = true;
+        }
+
+        /**
+         * Show empty state or show content - that is the if statement
+         */
+        if ($emptyState) {
+
+            $this->setVar('twitter_feed_block', '');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
+
+            if ($noConfig) {
+
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                    $this->setVar('empty_config_block', '');
+                    $this->setVar('empty_results_block', '');
+                    $this->parse('empty_read_only_block', 'empty_read_only');
+                } else {
+                    $this->setVar('empty_read_only_block', '');
+                    $this->setVar('empty_results_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                }
+
+            } else {
+                $this->setVar('empty_config_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+            }
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setVar('empty_state_block', '');
+
+            $i = 0;
             foreach ($allResults as $currentTweet) {
                 $color = ++$i % 2 ? '' : 'dark';
                 $date  = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
+                //$date  = new Alaress_Date_Format();
 
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);
-                $this->setVar(
-                    array(
-                        'TWEET_TEXT'     => Scrub::html($currentTweet['text']),
-                        'TWEET_DATE'     => $date->getShort(),
-                        'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
-                        'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
-                        'TWEET_AVATAR'   => Scrub::text($avatarUrl),
-                        'ON_OFF'         => $color,
-                    )
-                );
+                $this->setVar([
+                    'TWEET_TEXT'     => Scrub::html($currentTweet['text']),
+                    'TWEET_DATE'     => $date->getShort(),
+                    'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
+                    'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
+                    'TWEET_AVATAR'   => Scrub::text($avatarUrl),
+                    'ON_OFF'         => $color,
+                ]);
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
-                    foreach ($currentTweet['media'] as $currentMedia) {
-                        $this->setVar(
-                            array(
-                                'TWEET_MEDIA_URL' => $currentMedia->media_url_https,
-                            )
-                        );
 
+                    foreach ($currentTweet['media'] as $currentMedia) {
+                        $this->setVar('TWEET_MEDIA_URL', $currentMedia->media_url_https);
                         $this->parse('tweet_media_block', 'tweet_media', true);
                     }
+
                 } else {
-                    $this->setVar(
-                        array(
-                            'tweet_media_block' => ''
-                        )
-                    );
+                    $this->setVar('tweet_media_block', '');
                 }
 
                 $this->parse('tweet_block', 'tweet', true);
 
                 /* Clear children after parsing out the parent
                  */
-                $this->setVar(
-                    array(
-                        'tweet_media_block' => ''
-                    )
-                );
+                $this->setVar('tweet_media_block', '');
             }
-        } else {
-            $this->setVar(
-                array(
-                    'tweet_media_block' => ''
-                )
-            );
+
+            $this->parse('twitter_feed_block', 'twitter_feed');
         }
 
-        // Build Twitter Search URL
+        /**
+         * Build Twitter Search URL
+         */
         $q = 'https://twitter.com/search?q=';
         $q .= urlencode($this->getConfig('username'));
         if ($this->getConfig('username') && $this->getConfig('keywords')) {
@@ -98,11 +133,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         }
         $q .= urlencode($this->getConfig('keywords'));
 
-        $this->setVar(
-            array(
-                'SEARCH_URL' => $q
-            )
-        );
+        $this->setVar('SEARCH_URL', $q);
 
         return true;
     }
