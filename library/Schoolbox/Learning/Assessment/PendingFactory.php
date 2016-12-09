@@ -408,6 +408,7 @@ class PendingFactory
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
                 tk.id        AS 'tk.id',
+                tk.requires_confirmation AS 'tk.requires_confirmation',
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
@@ -452,6 +453,7 @@ class PendingFactory
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
                 tk.id        AS 'tk.id',
+                tk.requires_confirmation AS 'tk.requires_confirmation',
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
@@ -499,6 +501,7 @@ class PendingFactory
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
                 tk.id        AS 'tk.id',
+                tk.requires_confirmation AS 'tk.requires_confirmation',
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
@@ -550,6 +553,7 @@ class PendingFactory
                 qz.assess_id AS 'qz.id',
                 dw.id        AS 'dw.id',
                 tk.id        AS 'tk.id',
+                tk.requires_confirmation AS 'tk.requires_confirmation',
                 
                 fc.code      AS 'fc.code',
                 ug.cid       AS 'g.id'                
@@ -611,7 +615,7 @@ class PendingFactory
                     $this->assessmentsCache[$assessmentId] = new DueWork();
                 } elseif (!is_null($row['tk.id'])) {
                     $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId] = new Task();
+                    $this->assessmentsCache[$assessmentId] = (new Task())->setIsSelfAssessed(!$row['tk.requires_confirmation']);
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task: ' . print_r($row, true));
                 }
