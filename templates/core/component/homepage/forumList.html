@@ -3,27 +3,25 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
 
-        <div class="empty-state">
-            <i class="icon-forum"></i>
-            <p>No posts available!</p>
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-forum"></i>
+                <p>No posts available!</p>
 
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post a thread</a>
-            </p>
-            <!-- END empty_modify -->
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post a thread</a>
+                </p>
+                <!-- END empty_modify -->
 
-        </div>
+            </div>
+            <!-- END empty_state -->
 
-    <!-- END empty_state -->
-
-    <!-- BEGIN posts -->
-
-        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-            <div class="small-12 island">
-                <section>
+            <!-- BEGIN posts -->
+            <section>
                     <!-- BEGIN source_folder_deleted -->
                     {SOURCE_FOLDER_UNAVAILABLE}
                     <!-- END source_folder_deleted -->
@@ -62,9 +60,8 @@
 
                     <!-- END source_folder_exists -->
                 </section>
-            </div>
+            <!-- END posts -->
+
         </div>
-
-    <!-- END posts -->
-
+    </div>
 </div>
