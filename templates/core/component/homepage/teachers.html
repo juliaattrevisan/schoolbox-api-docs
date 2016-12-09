@@ -3,19 +3,17 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-teacher"></i>
-        <p>No teachers in this class</p>
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN teachers -->
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-teacher"></i>
+                <p>No teachers in this class</p>
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN teachers -->
             <section>
                 <ul class="grid small-block-grid-1 {GRID_VIEW_CLASSES}">
                     <!-- BEGIN person -->
@@ -36,8 +34,8 @@
                     <!-- END person -->
                 </ul>
             </section>
+            <!-- END teachers -->
+
         </div>
     </div>
-
-    <!-- END teachers -->
 </div>
