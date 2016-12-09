@@ -107,6 +107,11 @@ class Participant
     public function isMarkingRequired()
     {
         $latestResponse = $this->findMostRecentSubmittedResponse();
+
+        if($latestResponse instanceof TaskCompletion){
+            return !$latestResponse->isMarkedAsCompleted();
+        }
+
         $latestFeedback = $this->findMostRecentFeedback();
 
         /* If there is a feedback sans response, is ok
