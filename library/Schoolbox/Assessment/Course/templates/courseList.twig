@@ -25,15 +25,15 @@ Usage:
             courseSelector: {
                 query: {
                     {% if folder.id %}
-                        folder:           "{{ folder.id }}",
-                    {% endif %}
+                        folder:           "{{ folder.id | escape('js') }}",
+                    {% endif -%}
                     {% if component.id %}
-                        component:        "{{ component.id }}",
-                    {% endif %}
+                        component:        "{{ component.id | escape('js') }}",
+                    {% endif -%}
                     hasAdd:           {% if hasAdd %}true{% else %}false{% endif %},
                     hasTot:           {% if hasTot %}true{% else %}false{% endif %},
                     linkToUnits:      {% if linkToUnits %}true{% else %}false{% endif %},
-                    encodedReturnUrl: "{{ encodedReturnUrl }}"
+                    encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
                 }
             }
 
