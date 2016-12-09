@@ -94,20 +94,20 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $query =
             "
-            SELECT DISTINCT 
-            n.PeriodNumber, 
+            SELECT DISTINCT
+            p.PeriodID as PeriodNumber, 
             1 AS PeriodNumberSeq, 
-            n.PeriodName AS Description, 
+            CASE WHEN n.PeriodName IS NULL THEN CONCAT('Lesson ', p.PeriodID) ELSE n.PeriodName END AS Description,
             1 AS DayNumber, 
             p.PeriodDuration
-            FROM PeriodNames n
-            LEFT JOIN AttendancePeriods p ON p.AcademicYear = n.AcademicYear  AND p.DayOfWeek = 1 AND p.PeriodID = n.PeriodNumber 
+            FROM AttendancePeriods p
+            LEFT JOIN PeriodNames n ON p.AcademicYear = n.AcademicYear AND p.DayOfWeek = 1 AND p.PeriodID = n.PeriodNumber and n.yeargroupid = p.yeargroup
 	    ";
 
         if ($type == 'student') {
             $query .= "   
 	            WHERE
-	            n.AcademicYear = '{$fileYear}' AND
+	            p.AcademicYear = '{$fileYear}' AND
 	            p.YearGroup = '{$studentDetails['YearGroupID']}'
 	        ";
         } else {
@@ -119,7 +119,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             $query .=
                 "
 		        WHERE
-                    n.AcademicYear = '{$fileYear}' AND
+                    p.AcademicYear = '{$fileYear}' AND
                     p.YearGroup IN ({$yearGroups})                     
     		";
         }
