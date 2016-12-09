@@ -84,12 +84,6 @@
                                             {% include '@learningAssessment/task/progressTickForm.twig' with {
                                                 participant: participant
                                             } %}
-
-                                            {#<form action="/learning/assessments/330/229/submit" method="POST" class="progress-tick-form text-right" data-progress-tick-form="selfAssessed">#}
-                                                {#<div style="display: inline-block;">#}
-                                                    {#<a href="#" class="no-text progress-tick pending" title="Self-assessed" data-progress-tick-status="selfAssessed"></a>#}
-                                                {#</div>#}
-                                            {#</form>#}
                                         </div>
                                     {% else %}
                                         <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
