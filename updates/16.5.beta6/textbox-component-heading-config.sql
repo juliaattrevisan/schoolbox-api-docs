@@ -3,6 +3,6 @@ INSERT INTO component_config_definition
 VALUES (
   (SELECT `id` FROM component_definition WHERE class = 'Component_Homepage_TextBoxController'),
   'componentname',
-  'Text Box',
+  '',
   'Heading'
 );
