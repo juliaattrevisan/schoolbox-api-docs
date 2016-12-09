@@ -1,10 +1,12 @@
 {#
 Usage:
     $data = [
-        folder:         Folder                               - The class page we are managing
-        courseImpls:    CourseImplementation[]|Collection    - All Course's imported to this class
-        componentNames: string[][]                           - CourseOutline component names, grouped by CourseImpl.ID
-        folderAncestry: Folder[][]                           - Grouped by CourseImpl.ID
+        folder:           Folder                               - The class page we are managing
+        courseImpls:      CourseImplementation[]|Collection    - All Course's imported to this class
+        componentNames:   string[][]                           - CourseOutline component names, grouped by CourseImpl.ID
+        folderAncestry:   Folder[][]                           - Grouped by CourseImpl.ID
+        returnUrlName:    string                               - (optional) GET name
+        encodedReturnUrl: string                               - (optional) GET value
     ]
 #}
 
@@ -16,7 +18,11 @@ Usage:
         $.fn.courseSelectorModal({
             courseSelector: {
                 query: {
-                    folder: {{ folder.id }}
+                    folder:           {{ folder.id }},
+                    hasAdd:           false,
+                    hasTot:           false,
+                    linkToUnits:      false,
+                    encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
                 }
             }
         });
@@ -158,7 +164,7 @@ Usage:
                             </li>
                         {% endif %}
                         <li>
-                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}" class="icon-modify" title="Modify Import">Modify</a>
+                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify Import">Modify</a>
                         </li>
                         <li>
                             <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete>Delete</a>

@@ -1069,10 +1069,12 @@ class Controller extends Base\Base
         }
 
         $this->tpl('management', [
-            'folder'         => $folder,
-            'courseImpls'    => $courseImpls,
-            'componentNames' => $componentNames,
-            'folderAncestry' => $folderAncestry,
+            'folder'           => $folder,
+            'courseImpls'      => $courseImpls,
+            'componentNames'   => $componentNames,
+            'folderAncestry'   => $folderAncestry,
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('courseImport.getManagement', ['folderId' => $folder->getId()])),
         ]);
     }
 
