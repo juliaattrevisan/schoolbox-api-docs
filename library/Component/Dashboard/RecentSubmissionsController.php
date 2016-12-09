@@ -52,6 +52,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $cutoffDate->addDays(-1 * $this->getConfig('days'));
 
         // Get most recent N months of DueWork Submissions
+        /** @var StudentSubmissionMapper $studentSubmissionMapper */
         $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
         $pb = $studentSubmissionMapper->createPredicateBuilder();
         $pb->equals('b.owner', $this->getUser()->getId());
@@ -59,6 +60,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $studentSubmissions = $studentSubmissionMapper->findByPredicates($pb);
 
         // Get most recent N months of Quiz Attempts
+        /** @var QuizAttemptMapper $quizAttemptMapper */
         $quizAttemptMapper = $this->getMapperFactory()->get(QuizAttemptMapper::class);
         $pb = $quizAttemptMapper->createPredicateBuilder();
         $pb->equals('a.user_id', $this->getUser()->getId());
