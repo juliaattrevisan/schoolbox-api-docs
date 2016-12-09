@@ -6,8 +6,6 @@ Usage:
         _writable:        bool
     ]
 #}
-{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
-
 {% if _writable %}
     {% include '@course/assessment/writable.twig' with {
         assessment: assessment,
