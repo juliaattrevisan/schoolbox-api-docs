@@ -49,7 +49,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         }
 
         $cutoffDate = Alaress_Date_Format::now();
-        $cutoffDate->addDays(-$this->getConfig('days'));
+        $cutoffDate->addDays(-1 * $this->getConfig('days'));
 
         // Get most recent N months of DueWork Submissions
         $studentSubmissionMapper = $this->getMapperFactory()->get(StudentSubmissionMapper::class);
