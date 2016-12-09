@@ -2869,8 +2869,8 @@ abstract class Mapper implements IMapper, Serializable
 
         // retrieve records that already exist for this match and index by ID
         $existing = $foreignMapper->findByColumnList($search)->indexBy($foreignIdProperty);
-        $create   = $this->createCollection($collection->getAll())->filterBy($foreignIdProperty, null);
-        $updated  = $this->createCollection($collection->getAll())->indexBy($foreignIdProperty);
+        $create   = (new GenericCollection($collection->first(), $collection->getAll()))->filterBy($foreignIdProperty, null);
+        $updated  = (new GenericCollection($collection->first(), $collection->getAll()))->indexBy($foreignIdProperty);
 
         unset($updated[null]);
 
