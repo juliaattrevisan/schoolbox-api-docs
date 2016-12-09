@@ -10,8 +10,18 @@
         $('input[data-mage-next]').mage();
 
         /**
-         * alaressValidate options for each assessment type form
-         * Set a default set of rules because everything except for quiz requires the same rules
+         * Function to check if open and close dates are visible
+         * Used for jq validation
+         */
+        var openCloseVisible = function() {
+            var openVisible = $('input[name="openDate"]').is(':visible');
+            var closeVisible = $('input[name="closeDate"]').is(':visible');
+            return openVisible && closeVisible;
+        };
+
+        /**
+         * Set a default set of validation rules
+         * An activity specific set of rules can be set below
          */
         var defaultRules = {
             title: {required: true},
@@ -27,58 +37,56 @@
                 required: true,
                 timepickerTime: true
             },
+            openDate: {
+                required: {
+                    depends: openCloseVisible
+                },
+                datepickerDate: {
+                    depends: openCloseVisible
+                }
+            },
+            openTime: {
+                required: {
+                    depends: openCloseVisible
+                },
+                timepickerTime: {
+                    depends: openCloseVisible
+                }
+            },
             dueDate: {
-                required: true
+                required: true,
+                datepickerDate: true
             },
             dueTime: {
                 required: true,
                 timepickerTime: true
+            },
+            closeDate: {
+                required: {
+                    depends: openCloseVisible
+                },
+                datepickerDate: {
+                    depends: openCloseVisible
+                }
+            },
+            closeTime: {
+                required: {
+                    depends: openCloseVisible
+                },
+                timepickerTime: {
+                    depends: openCloseVisible
+                }
             }
         };
 
+        /**
+         * alaressValidate options for each assessment type form
+         */
         var validationRules = {
             project: defaultRules,
             dueWork: defaultRules,
             task: defaultRules,
-            quiz: {
-                title: {required: true},
-                weight: {
-                    required: true,
-                    number: true
-                },
-                publishDate: {
-                    required: true,
-                    datepickerDate: true
-                },
-                publishTime: {
-                    required: true,
-                    timepickerTime: true
-                },
-                openDate: {
-                    required: true,
-                    datepickerDate: true
-                },
-                openTime: {
-                    required: true,
-                    timepickerTime: true
-                },
-                dueDate: {
-                    required: true,
-                    datepickerDate: true
-                },
-                dueTime: {
-                    required: true,
-                    timepickerTime: true
-                },
-                closeDate: {
-                    required: true,
-                    datepickerDate: true
-                },
-                closeTime: {
-                    required: true,
-                    timepickerTime: true
-                }
-            }
+            quiz: defaultRules
         };
 
         /**
