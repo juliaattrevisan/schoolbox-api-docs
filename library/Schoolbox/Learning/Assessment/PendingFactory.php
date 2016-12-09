@@ -10,6 +10,7 @@ use Alaress\IDatabase;
 use Carbon\Carbon;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -1084,6 +1085,12 @@ class PendingFactory
      * Create TaskResponses and TaskFeedbacks from DB results
      *
      * @param string[][] $taskResults
+     * @var string $taskResults[]['t.assessment_id']
+     * @var string $taskResults[]['t.requires_confirmation']
+     * @var string $taskResults[]['tc.id']
+     * @var string $taskResults[]['tc.student_id']
+     * @var string $taskResults[]['tc.marking_user_id']
+     * @var string $taskResults[]['tc.completion_date']
      */
     private function hydrateTaskResults($taskResults)
     {
@@ -1094,7 +1101,14 @@ class PendingFactory
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
+            $response->setCreatedAt($this->getDateFromString($row['tc.completion_date']));
             $response->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
+
+            // TODO - sigh replace this with composition ASAP
+            $response->markAs($row['tc.student_id'] == $row['tc.marking_user_id']
+                ? ICompletion::STATUS_SELF_ASSESSED
+                : ICompletion::STATUS_COMPLETED
+            );
 
             $task->getResponses()->add($response);
             $participants = $task->getAllParticipants();
