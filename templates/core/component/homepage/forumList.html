@@ -22,44 +22,44 @@
 
             <!-- BEGIN posts -->
             <section>
-                    <!-- BEGIN source_folder_deleted -->
-                    {SOURCE_FOLDER_UNAVAILABLE}
-                    <!-- END source_folder_deleted -->
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
 
-                    <!-- BEGIN source_folder_exists -->
-                    <ul class="action-list">
-                        <!-- BEGIN forum -->
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href='/forum/thread/{THREAD_ID}' title="View Thread">
-                                        <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
-                                        <h3>{THREAD_TITLE}</h3>
-                                    </a>
+                <!-- BEGIN source_folder_exists -->
+                <ul class="action-list">
+                    <!-- BEGIN forum -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href='/forum/thread/{THREAD_ID}' title="View Thread">
+                                    <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
+                                    <h3>{THREAD_TITLE}</h3>
+                                </a>
 
-                                    <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
-                                </div>
+                                <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
                             </div>
-                            <nav>
-                                <!-- BEGIN forum_reply -->
-                                <a class="icon-forum" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
-                                <!-- END forum_reply -->
-                            </nav>
-                        </li>
-                        <!-- END forum -->
-                    </ul>
+                        </div>
+                        <nav>
+                            <!-- BEGIN forum_reply -->
+                            <a class="icon-forum" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
+                            <!-- END forum_reply -->
+                        </nav>
+                    </li>
+                    <!-- END forum -->
+                </ul>
 
-                    <div class="component-action">
-                        <section>
-                            <!-- BEGIN forum_post -->
-                            <a class="button" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post Thread</a>
-                            <!-- END forum_post -->
-                            <a class="button" href="/forum/{COMPONENT_CONFIG_SRC_ID}">Go to Forum</a>
-                        </section>
-                    </div>
+                <div class="component-action">
+                    <section>
+                        <!-- BEGIN forum_post -->
+                        <a class="button" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post Thread</a>
+                        <!-- END forum_post -->
+                        <a class="button" href="/forum/{COMPONENT_CONFIG_SRC_ID}">Go to Forum</a>
+                    </section>
+                </div>
 
-                    <!-- END source_folder_exists -->
-                </section>
+                <!-- END source_folder_exists -->
+            </section>
             <!-- END posts -->
 
         </div>

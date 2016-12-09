@@ -69,43 +69,43 @@
 
             <!-- BEGIN chat -->
             <section>
-                        <ul class="information-list chat-messages" data-chat-log></ul>
-                        <!-- BEGIN chat_state_active -->
-                            <div class="content">
-                                <form action="#" method="post" class="chat-send" id="chatSend">
-                                    <div class="chat-message-container">
-                                        <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
-                                    </div>
-                                </form>
+                <ul class="information-list chat-messages" data-chat-log></ul>
+                <!-- BEGIN chat_state_active -->
+                    <div class="content">
+                        <form action="#" method="post" class="chat-send" id="chatSend">
+                            <div class="chat-message-container">
+                                <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
+                            </div>
+                        </form>
 
-                                <div class="chat-error hide"></div>
+                        <div class="chat-error hide"></div>
 
-                                <div id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal" data-reveal>
-                                    <h2>Chat Participants</h2>
-                                    <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
-                                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                                </div>
-                            </div>
-                            <div class="component-action">
-                                <section>
-                                    <a href="#" class="button" data-interaction-send>Send Message</a>
-                                </section>
-                            </div>
-                        <!-- END chat_state_active -->
-                        <!-- BEGIN chat_state_inactive -->
-                            <div class="content">
-                                <p class="alert-box warning">The chat is inactive.</p>
-                            </div>
-                            <div class="component-action">
-                                <section>
-                                    <a class="button" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate
-                                        Chat</a>
-                                    <a href="/homepage/chatArchive/{ID}/" class="button">View Archive</a>
-                                    <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button">Participants</a>
-                                </section>
-                            </div>
-                        <!-- END chat_state_inactive -->
-                    </section>
+                        <div id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal" data-reveal>
+                            <h2>Chat Participants</h2>
+                            <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
+                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                        </div>
+                    </div>
+                    <div class="component-action">
+                        <section>
+                            <a href="#" class="button" data-interaction-send>Send Message</a>
+                        </section>
+                    </div>
+                <!-- END chat_state_active -->
+                <!-- BEGIN chat_state_inactive -->
+                    <div class="content">
+                        <p class="alert-box warning">The chat is inactive.</p>
+                    </div>
+                    <div class="component-action">
+                        <section>
+                            <a class="button" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate
+                                Chat</a>
+                            <a href="/homepage/chatArchive/{ID}/" class="button">View Archive</a>
+                            <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button">Participants</a>
+                        </section>
+                    </div>
+                <!-- END chat_state_inactive -->
+            </section>
             <!-- END chat -->
 
         </div>
