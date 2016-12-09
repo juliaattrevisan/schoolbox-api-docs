@@ -1,0 +1,44 @@
+{% set participant = assessable.getParticipant(student) %}
+    {% if participant %}
+        {% set latestFeedback    = participant.findMostRecentFeedback %}
+        {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
+        {% set multipleResponses = participant.allResponses | length > 1 %}
+
+        {% set isPublished  = latestFeedback.published %}
+        {% set canPublish   = latestFeedback and not isPublished %}
+
+        {% if assessment.acceptsNone %}
+            {% set pStatusClass = '' %}
+            {% set pTooltip     = '' %}
+        {% else %}
+            {% set pStatusClass = participant.isMarkingRequired or latestFeedback.isMarkedAsSelfAssessed ? 'pending' : (latestResponse or latestFeedback ? 'complete' : 'incomplete') %}
+            {% set pTooltip     = participant.isMarkingRequired ? 'Mark required' : (latestResponse or latestFeedback ? 'Marked' : 'No submission') %}
+
+            {% set pStatusText %}
+                {%- spaceless %}
+                    {% if not latestResponse %}
+                        Not submitted
+                    {% else %}
+
+                        {% if latestFeedback.isMarkedAsSelfAssessed  %}
+                            Self-assessed
+                        {% else %}
+                            {% if multipleResponses %}
+                                Resubmitted
+                            {% else %}
+                                Submitted
+                            {% endif %}
+                            {% if latestResponse.submittedOnTime %}
+                                on time
+                            {% else %}
+                                late
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endspaceless -%}
+            {% endset %}
+        {%  endif %}
+
+        <span class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span> {{ pStatusText }}
+
+    {% endif %}
