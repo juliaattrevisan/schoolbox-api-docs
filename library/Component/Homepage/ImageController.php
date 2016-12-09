@@ -46,12 +46,9 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             return false;
         }
 
-
-        /* Need image title to be injected here
+        /**
+         * Get the image
          */
-        $this->parseConfig();
-
-        // Get the image
         $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$this->getContext()->getId()],
             [
@@ -63,6 +60,28 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             ]
         );
 
+        /**
+         * Set the component heading, priority as follows..
+         * - Heading set in component config
+         * - Filename (if a file is going to be shown)
+         * - Default 'Image'
+         */
+        if ($this->getConfig('Heading') != '') {
+            // noop
+        } else if (count($images)) {
+            /** @var Schoolbox\Resource\File\Model $image */
+            $image = $images->first();
+            $this->setComponentName($image->getFilename());
+        } else {
+            $this->setComponentName('Image');
+        }
+
+        $this->parseConfig();
+
+
+        /**
+         * Check if query found any image - if not then set empty state
+         */
         if (count($images) == 0) {
 
             $this->setBlock($templateHandle, 'image', 'image_block');
@@ -111,9 +130,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                     $image = $images->first();
                 } else {
                     $this->setComponentName('Image');
-
                     $this->setVar('preview_block', '');
-
                     /* Parse the empty/default title even if no images are present/chosen
                      */
                     $this->parseConfig();
