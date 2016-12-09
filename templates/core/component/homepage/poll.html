@@ -22,27 +22,25 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
 
-        <div class="empty-state">
-            <i class="icon-poll"></i>
-            <p>No polls available!</p>
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-poll"></i>
+                <p>No polls available!</p>
 
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}">Create a poll</a>.
-            </p>
-            <!-- END empty_modify -->
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}">Create a poll</a>.
+                </p>
+                <!-- END empty_modify -->
 
-        </div>
+            </div>
+            <!-- END empty_state -->
 
-    <!-- END empty_state -->
-
-    <!-- BEGIN poll -->
-
-        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-            <div class="small-12 island">
-                <section>
+            <!-- BEGIN poll -->
+            <section>
                     <ul class="action-list">
                         <!-- BEGIN poll_question -->
                         <li class="actions-small-1">
@@ -157,9 +155,8 @@
                     </div>
                     <!-- END new_poll -->
                 </section>
-            </div>
+            <!-- END poll -->
+
         </div>
-
-    <!-- END poll -->
-
+    </div>
 </div>
