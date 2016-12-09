@@ -777,7 +777,7 @@ class Controller extends Base\Base
                 'hasTot'           => true,
                 'linkToUnits'      => true,
                 'hasBreadcrumb'    => true,
-                'encodedReturnUrl' => Redirect::encode($this->getRequest()->url->get(PHP_URL_PATH)),
+                'encodedReturnUrl' => Redirect::encode($this->getRouter()->generate('course.courseList')),
             ];
         }
         $this->courseTpl('courseList', array_merge($data, $options));
