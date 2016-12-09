@@ -131,19 +131,19 @@
                 openDate.rules('add', {
                     datepickerDateNotBefore: publishDate,
                     messages: {
-                        timepickerNotBefore: 'This should not be before the publish date above'
+                        datepickerDateNotBefore: 'This should not be before the publish date above'
                     }
                 });
                 dueDate.rules('add', {
                     datepickerDateNotBefore: openDate,
                     messages: {
-                        timepickerNotBefore: 'This should not be before the open date above'
+                        datepickerDateNotBefore: 'This should not be before the open date above'
                     }
                 });
                 closeDate.rules('add', {
                     datepickerDateNotBefore: dueDate,
                     messages: {
-                        timepickerNotBefore: 'This should not be before the due date above'
+                        datepickerDateNotBefore: 'This should not be before the due date above'
                     }
                 });
                 // check the times aren't earlier than the one above (if the dates are the same)
