@@ -1,14 +1,43 @@
 {% extends '@learningMarkScheme/commentable.twig' %}
 
 {% block grading %}
+    {% set mark = participant.mark.unpublished %}
     <label>Grade
         <select name="mark" tabindex="{{ tabIndex.mark }}">
-        {% for level in markScheme.gradeGroup.gradeLevels %}
-            {% set isGt = participant.mark.unpublished.normalised >= level.lowerBound %}
-            {% set selected = isGt and not found ? 'selected="selected"' : '' %}
-            {% if isGt %}{% set found = true %}{% endif %}
-            <option {{ selected }} value="{{ level.rawGrade }}">{{ level.caption }}</option>
-        {% endfor %}
+
+            {# Empty state #}
+            {% set found = (mark.humanReadable is null) %}
+            <option value="" disabled {% if mark.humanReadable is null %}selected{% endif %}>(no grade)</option>
+
+            {# Grade levels #}
+            <optgroup label="Grades">
+                {% for level in markScheme.gradeGroup.gradeLevels %}
+                    {% set selected = false %}
+                    {% if not (mark.humanReadable is null) and (mark.humanReadable == level.caption) %}
+                        {% set selected = true %}
+                        {% set found = true %}
+                    {% endif %}
+                    <option {% if selected %}selected{% endif %} value="{{ level.caption }}">{{ level.caption }}</option>
+                {% endfor %}
+            </optgroup>
+
+            {# Submission states #}
+            <optgroup label="States">
+                {% for state in errors %}
+                    {% set selected = false %}
+                    {% if not (mark.humanReadable is null) and (mark.humanReadable == state) %}
+                        {% set selected = true %}
+                        {% set found = true %}
+                    {% endif %}
+                    <option {% if selected %}selected{% endif %} value="{{ state }}">{{ state }}</option>
+                {% endfor %}
+            </optgroup>
+
+            {# If nothing at all was selected, then either a grade level or submission state changed. #}
+            {# Show this as a disabled option - on save, nothing will change #}
+            {% if not found %}
+                <option value="" disabled selected>{{ mark.humanReadable }}</option>
+            {% endif %}
         </select>
     </label>
 {% endblock %}
