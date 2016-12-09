@@ -625,7 +625,7 @@ class PendingFactory
                 $assessment->setTitle($row['a.title']);
 
                 // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
-                $assessment->setDueAt($this->getFastDateFromString($row['a.due_date']));
+                $assessment->setDueAt($this->getDateFromString($row['a.due_date']));
 
                 $projectId = intval($row['p.id']);
                 $projectTitle = $row['p.title'];
@@ -1048,11 +1048,11 @@ class PendingFactory
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
-            $response->setSubmittedAt($this->getFastDateFromString($row['qa.finish']));
+            $response->setSubmittedAt($this->getDateFromString($row['qa.finish']));
             $response->setFirstSectionId($row['qs.first_section_id']);
             $response->setAssessable($quiz);
             $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
-            $response->setUpdatedAt($this->getFastDateFromString($updatedAt));
+            $response->setUpdatedAt($this->getDateFromString($updatedAt));
 
             $quiz->getResponses()->add($response);
             $participants = $quiz->getAllParticipants();
@@ -1067,8 +1067,8 @@ class PendingFactory
             if (!is_null($row['qa.reviewed_at'])) {
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
-                $feedback->setPublishedAt($this->getFastDateFromString($row['qa.reviewed_at']));
-                $feedback->setUpdatedAt($this->getFastDateFromString($row['qa.reviewed_at']));
+                $feedback->setPublishedAt($this->getDateFromString($row['qa.reviewed_at']));
+                $feedback->setUpdatedAt($this->getDateFromString($row['qa.reviewed_at']));
 
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
@@ -1094,7 +1094,7 @@ class PendingFactory
             $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
-            $response->setUpdatedAt($this->getFastDateFromString($row['tc.completion_date']));
+            $response->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
 
             $task->getResponses()->add($response);
             $participants = $task->getAllParticipants();
@@ -1110,8 +1110,8 @@ class PendingFactory
             if ($userId != $row['tc.marking_user_id']) {
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tc.id']);
-                $feedback->setPublishedAt($this->getFastDateFromString($row['tc.completion_date']));
-                $feedback->setUpdatedAt($this->getFastDateFromString($row['tc.completion_date']));
+                $feedback->setPublishedAt($this->getDateFromString($row['tc.completion_date']));
+                $feedback->setUpdatedAt($this->getDateFromString($row['tc.completion_date']));
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
@@ -1144,8 +1144,8 @@ class PendingFactory
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
-            $response->setSubmittedAt($this->getFastDateFromString($row['ss.submitted_at']));
-            $response->setUpdatedAt($this->getFastDateFromString($row['ss.updated_at']));
+            $response->setSubmittedAt($this->getDateFromString($row['ss.submitted_at']));
+            $response->setUpdatedAt($this->getDateFromString($row['ss.updated_at']));
 
             $dueWork->getResponses()->add($response);
             $participants = $dueWork->getAllParticipants();
@@ -1170,8 +1170,8 @@ class PendingFactory
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
             $feedback->setId($row['sr.id']);
-            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.updated_at']));
-            $feedback->setPublishedAt($this->getFastDateFromString($row['sr.published_at']));
+            $feedback->setUpdatedAt($this->getDateFromString($row['sr.updated_at']));
+            $feedback->setPublishedAt($this->getDateFromString($row['sr.published_at']));
             $feedback->setAssessable($dueWork);
 
             $dueWork->getFeedbacks()->add($feedback);
@@ -1254,12 +1254,12 @@ class PendingFactory
      * @param string $format
      * @return \Alaress_Date_Format
      */
-    private function getFastDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
+    private function getDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
         if (empty($dateString)) {
             return new \Alaress_Date_NullDate();
         }
-        return new \Alaress_Date_Format(new Carbon($dateString), $format);
+        return new \Alaress_Date_Format($dateString, $format);
     }
 
 
