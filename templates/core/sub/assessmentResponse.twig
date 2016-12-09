@@ -7,23 +7,7 @@
     {%- elseif response.assessable is dueWork -%}
         {{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id}) }}
     {%- elseif response.assessable is task -%}
-
-        {%- set context = response.assessable.context -%}
-        {%- set prefix = '/task/progressReport/' -%}
-
-        {%- if context is folder -%}
-            {{ prefix }}{{ context.folder.id }}
-        {%- elseif context is unitImplementation -%}
-            {{ prefix }}{{ context.course.folder.id }}/{{ context.course.specification.folder.id }}
-
-            {%- set projectContext = context.context -%}
-
-            {%- if projectContext is folder -%}
-                {{ prefix }}{{ projectContext.folder.id }}
-            {%- else -%}
-                {{ prefix }}{{ projectContext.course.folder.id }}/{{ projectContext.course.specification.folder.id }}
-            {%- endif -%}
-        {%- endif -%}
+        {# no link. Caller should not render a link if assessable is a task #}
     {%- endif -%}
 {% endmacro %}
 
