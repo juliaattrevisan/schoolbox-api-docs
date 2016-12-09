@@ -41,6 +41,21 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     protected $sortFields = array('name', 'date');
 
     /**
+     * Component_Homepage_FileListController constructor.
+     * @param Component_Instance $instance
+     * @param \Schoolbox\User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
+        parent::__construct($instance, $user, $sitepage);
+
+        $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
+        $this->userMapper         = Schoolbox\UserMapper::getInstance();
+        $this->allowedFileHandler = new AllowedFile();
+    }
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
@@ -53,9 +68,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             return $this->hasContextWriteAccess();
         }
 
-        $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
-        $this->userMapper         = Schoolbox\UserMapper::getInstance();
-        $this->allowedFileHandler = new AllowedFile();
         return true;
     }
 
