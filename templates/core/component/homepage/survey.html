@@ -3,26 +3,24 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-collab-docs"></i>
-        <p>No surveys available!</p>
-
-        <!-- BEGIN empty_modify -->
-        <p>
-            <a href="/survey/create/{ID}">Create a survey</a>
-        </p>
-        <!-- END empty_modify -->
-
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN surveys -->
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-collab-docs"></i>
+                <p>No surveys available!</p>
+
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/survey/create/{ID}">Create a survey</a>
+                </p>
+                <!-- END empty_modify -->
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN surveys -->
             <section>
                 <ul class="action-list">
                     <!-- BEGIN survey -->
@@ -79,8 +77,8 @@
                 </div>
                 <!-- END createSurvey -->
             </section>
+            <!-- END surveys -->
+
         </div>
     </div>
-
-    <!-- END surveys -->
 </div>
