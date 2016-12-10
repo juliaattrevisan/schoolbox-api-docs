@@ -60,23 +60,36 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             $this->setVar('twitter_feed_block', '');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
-            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
 
             if ($noConfig) {
 
+                $this->setVar('empty_results_block', '');
+                $this->setVar('empty_results_write_block', '');
+
+                /**
+                 * If user is read only just display as no results found
+                 * Otherwise give a link for opening config
+                 */
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar('empty_config_block', '');
-                    $this->setVar('empty_results_block', '');
-                    $this->parse('empty_read_only_block', 'empty_read_only');
+                    $this->parse('empty_results_block', 'empty_results');
                 } else {
-                    $this->setVar('empty_read_only_block', '');
                     $this->setVar('empty_results_block', '');
                     $this->parse('empty_config_block', 'empty_config');
                 }
 
             } else {
+
                 $this->setVar('empty_config_block', '');
-                $this->parse('empty_results_block', 'empty_results');
+
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_results_block', 'empty_results');
+                } else {
+                    $this->setVar('empty_results_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
             }
 
             $this->parse('empty_state_block', 'empty_state');
