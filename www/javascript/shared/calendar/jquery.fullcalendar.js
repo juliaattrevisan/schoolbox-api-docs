@@ -53,7 +53,7 @@ function Calendar(id, bubbleId, opts) {
             header: {
                 left: 'prev,today,next',
                 center: 'title',
-                right: 'month,agendaWeek,agendaDay'
+                right: 'listMonth,listWeek,listDay,month,agendaWeek,agendaDay'
             },
             buttonText: {
                 prev:     '', // ◀
