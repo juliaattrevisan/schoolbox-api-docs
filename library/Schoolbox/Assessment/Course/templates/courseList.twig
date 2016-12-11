@@ -30,9 +30,9 @@ Usage:
                     {% if component.id %}
                         component:        "{{ component.id | escape('js') }}",
                     {% endif -%}
-                    hasAdd:           {% if hasAdd %}true{% else %}false{% endif %},
-                    hasTot:           {% if hasTot %}true{% else %}false{% endif %},
-                    linkToUnits:      {% if linkToUnits %}true{% else %}false{% endif %},
+                    hasAdd:           {{ hasAdd ? 1 : 0 }},
+                    hasTot:           {{ hasTot ? 1 : 0 }},
+                    linkToUnits:      {{ linkToUnits ? 1 : 0 }},
                     encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
                 }
             }
