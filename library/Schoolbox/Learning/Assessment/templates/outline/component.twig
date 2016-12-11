@@ -33,6 +33,7 @@
 
         });
 </script>
+{% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
 <section>
     {% if courseImplementation.units|length %}
         <p class="component-titlebar meta">
@@ -42,7 +43,8 @@
         {% if not readOnly %}
         <div class="component-action">
             <section>
-                <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}" class="button">Modify</a>
+
+                <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}{{ urlSuffix }}" class="button">Modify</a>
             </section>
         </div>
         {% endif %}

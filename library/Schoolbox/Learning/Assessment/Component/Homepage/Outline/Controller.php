@@ -187,7 +187,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
             'componentInstance'    => $this->getInstance(),
-            'returnUrl'            => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
+            'returnUrlName'        => Redirect::RETURN_URL,
+            'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];
 
 

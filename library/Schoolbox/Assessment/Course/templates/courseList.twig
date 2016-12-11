@@ -1,3 +1,20 @@
+{#
+Usage:
+    $data = [
+        hasClose:         bool     - whether to render the close icon
+        hasAdd:           bool     - whether to render icon to add new CourseSpec
+        hasTot:           bool     - whether each CourseSpec item should have action overflow menu
+        linkToUnits:      bool     - should CourseSpec title link to modify-course or import-to-class page
+        hasBreadcrumb:    bool     - whether to render folder lineage breadcrumbs
+        courses:          CourseSpecification[]
+        folder.id:        int      - (optional) whether to link import-to-class to specific class
+        returnUrlKey:     string   - GET key name
+        encodedReturnUrl: string   - GET value
+        component.id:     int      - (optional) whether to link import-to-class to specific component
+        lineage:          Folder[] - (optional) ancestor folders
+
+#}
+
 <script type="text/javascript">
     $(function() {
 
@@ -7,10 +24,16 @@
 
             courseSelector: {
                 query: {
-{% if folder.id and component.id %}
-                    component: {{ component.id }},
-                    folder: {{ folder.id }}
-{% endif %}
+                    {% if folder.id %}
+                        folder:           "{{ folder.id | escape('js') }}",
+                    {% endif -%}
+                    {% if component.id %}
+                        component:        "{{ component.id | escape('js') }}",
+                    {% endif -%}
+                    hasAdd:           {% if hasAdd %}true{% else %}false{% endif %},
+                    hasTot:           {% if hasTot %}true{% else %}false{% endif %},
+                    linkToUnits:      {% if linkToUnits %}true{% else %}false{% endif %},
+                    encodedReturnUrl: "{{ encodedReturnUrl | escape('js') }}"
                 }
             }
 
@@ -19,9 +42,9 @@
 </script>
 
 {% if hasBreadcrumb %}
-<ul class="breadcrumb">
-    <li class="active"><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
-</ul>
+    <ul class="breadcrumb">
+        <li class="active"><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
+    </ul>
 {% endif %}
 
 <div class="row actions-small-1">
@@ -31,9 +54,9 @@
         </div>
     </div>
     {% if hasAdd %}
-    <nav>
-        <a href="/course/new" class="icon-add"></a>
-    </nav>
+        <nav>
+            <a href="/course/new" class="icon-add"></a>
+        </nav>
     {% endif %}
 </div>
 
@@ -48,5 +71,5 @@
 </div>
 
 {% if hasClose %}
-<a class="close-reveal-modal">&#215;</a>
+    <a class="close-reveal-modal">&#215;</a>
 {% endif %}

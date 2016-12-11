@@ -1,13 +1,16 @@
 {# Usage:
     {% include '@course/courseListResults.twig' with {
-         suggestions:    CourseSpecification[],
-         courses:        CourseSpecification[],
-         folder:         Folder,
-         component:      ComponentInstance | null,
-         lineage:        Folder[courseSpec.id][]
-         hasTot:         bool,
-         currentUser:    User,
-         query:          string | null
+         suggestions:      CourseSpecification[],
+         courses:          CourseSpecification[],
+         folder.id:        int | null
+         linkToUnits:      bool - should Course title link to modify-course or import-course page?
+         component.id:     int | null,
+         lineage:          Folder[courseSpec.id][]
+         hasTot:           bool,
+         currentUser:      User,
+         search:           string | null
+         returnUrlKey:     string
+         encodedReturnUrl: string
     } only %}
 #}
 
@@ -17,11 +20,13 @@
         <section>
             <h3>Suggested Courses</h3>
             <ul class="information-list">
+
                 {% for course in suggestions %}
                     {% include '@course/courseListResult.twig' with {
                         courseSpec:     course,
                         folder:         folder,
-                        componentId:    componentId,
+                        linkToUnits:    linkToUnits,
+                        component:      component,
                         cparents:       lineage[course.id],
                         hasTot:         hasTot,
                         currentUser:    currentUser,
@@ -40,12 +45,16 @@
             <ul class="information-list">
                 {% for course in courses %}
                     {% include '@course/courseListResult.twig' with {
-                        courseSpec:  course,
-                        folder:      folder,
-                        componentId: componentId,
-                        cparents:    lineage[course.id],
-                        hasTot:      hasTot,
-                        currentUser: currentUser
+                        courseSpec:        course,
+                        folder:            folder,
+                        linkToUnits:       linkToUnits,
+                        component:         component,
+                        cparents:          lineage[course.id],
+                        hasTot:            hasTot,
+                        currentUser:       currentUser,
+                        linkTitleToModify: linkTitleToModify,
+                        returnUrlKey:      returnUrlKey,
+                        encodedReturnUrl:  encodedReturnUrl
                     } only %}
                 {% endfor %}
             </ul>
@@ -55,8 +64,8 @@
             <p class="content">No results found.</p>
         </section>
 
-        {% set label = query ? "Create a Course called "~query : "Create a new Course" %}
-        <a class='button submit expand' href="/course/new/{{ query | url_encode }}">{{ label }}</a>
+        {% set label = search ? "Create a Course called "~search : "Create a new Course" %}
+        <a class='button submit expand' href="/course/new/{{ search | url_encode }}">{{ label }}</a>
     {% endif %}
 </div>
 <script type="text/javascript">

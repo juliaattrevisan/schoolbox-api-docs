@@ -1,30 +1,52 @@
-{# Usage:
+{#
+This template is used in two different scenarios.
+1. CourseSpec List page
+2. CourseSpec Modal Selector
+
+In the first case, clicking the name of a CourseSpec should take you to the CourseSpec Modify page
+In the latter case, it should take the user to the Course Import page
+
+Usage:
     {% include '@course/courseListResult.twig' with {
-         courseSpec:     CourseSpecification,
-         folder:         Folder,
-         componentId:    int | null,
-         cparents:       Folder[]
-         hasTot:         bool,
-         currentUser:    User,
-         collapsePrefix: string | null
+         courseSpec:        CourseSpecification
+         folder.id:         int | null           - optional folder to insert in import links
+         linkToUnits:       bool                 - does title link to CourseSpec modify or Import Course page
+         component.id:      int | null
+         cparents:          Folder[]
+         hasTot:            bool
+         currentUser:       User
+         collapsePrefix:    string | null
+         returnUrlKey:      returnUrlKey
+         encodedReturnUrl:  encodedReturnUrl
     } only %}
 #}
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
-{% set linkhref =
-    folder.id
-        ? (componentId
-            ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: courseSpec.id, classCode: folder.id, componentId: componentId })
-            : routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id, classCode: folder.id }))
-        : routeLookup('course.modifyCourse', { id: courseSpec.id })
+
+{# Where should the 'Import to Classes' link point ? #}
+{% set importUrl = component.id
+    ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: courseSpec.id, classCode: folder.id, componentId: component.id })
+    : routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id, classCode: folder.id })
 %}
-    {% if hasTot %}
+
+{% if encodedReturnUrl | length %}
+    {% set importUrl = importUrl ~ '?' ~ returnUrlKey ~ '=' ~ encodedReturnUrl %}
+{% endif %}
+
+{# Where should CourseSpec title link point ? #}
+{% set titleUrl = linkToUnits
+        ? routeLookup('course.modifyCourse', { id: courseSpec.id })
+        : importUrl
+%}
+
+
+{% if hasTot %}
 <li class="actions-small-2">
-    {% else %}
+{% else %}
 <li class="actions-small-1">
-    {% endif %}
+{% endif %}
     <div class="list-item">
         <div class="compact card small-12">
-            <a href="{{ linkhref }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ componentId }}">
+            <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component.id }}">
                 <div class="icon-course icon-16"></div>
                 <h3>{{ courseSpec.folder.name }}</h3>
             </a>
@@ -61,7 +83,7 @@
         {% if hasTot %}
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         <li>
-            <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id }) }}" class="icon-download">Import into classes</a>
+            <a href="{{ importUrl }}" class="icon-download">Import into classes</a>
         </li>
         <li>
             {% if courseSpec.folder.hasHomepage %}

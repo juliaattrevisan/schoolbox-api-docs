@@ -9,6 +9,7 @@
  */
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use \Schoolbox\Learning\Assessment\Redirect;
 
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $folder = null;
@@ -354,6 +355,7 @@ $this->setVar(array(
     'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($folder->getCodeString())),
     'ID' => $folder->getId(),
+    'ENCODED_RETURN_URL' => Redirect::encode("/homepage/{$folder->getId()}"),
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
