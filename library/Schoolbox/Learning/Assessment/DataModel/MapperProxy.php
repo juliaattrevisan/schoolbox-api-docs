@@ -464,7 +464,7 @@ class MapperProxy
         $classFolderIds = $folderMapper->findForUser(
             $staff,
             true,
-            UserAccess::ACCESS_READ,
+            UserAccess::ACCESS_WRITE,
             false
         )->getColumnValues('id');
 
@@ -478,11 +478,8 @@ class MapperProxy
             }
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection(
-            $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
-            ),
-            $staff
+        return $this->translateToDomainModelCollection(
+            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
         );
     }
 
