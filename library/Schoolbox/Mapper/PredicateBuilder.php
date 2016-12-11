@@ -179,15 +179,6 @@ class PredicateBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
 
-    /**
-     * @param string     $columnName
-     * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
-     */
-    public function lessOrEqual($columnName, $columnValue)
-    {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
-    }
 
     /**
      * @param string     $columnName
@@ -197,16 +188,6 @@ class PredicateBuilder
     public function greaterThan($columnName, $columnValue)
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
-    }
-
-    /**
-     * @param string     $columnName
-     * @param int|string $columnValue  if string, must be datetime
-     * @return PredicateBuilder
-     */
-    public function greaterOrEqual($columnName, $columnValue)
-    {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
     }
 
     /**
