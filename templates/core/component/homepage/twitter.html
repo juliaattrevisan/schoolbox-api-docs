@@ -5,6 +5,28 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-twitter"></i>
+
+                <!-- BEGIN empty_config -->
+                <p>To use the twitter component you must <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a hashtag and/or author</a>.</p>
+                <!-- END empty_config -->
+
+                <!-- BEGIN empty_results -->
+                <p>No tweets found in the last 7 days.</p>
+                <!-- END empty_results -->
+
+                <!-- BEGIN empty_results_write -->
+                <p>No tweets found in the last 7 days. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different hashtag or author.</p>
+                <!-- END empty_results_write -->
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN twitter_feed -->
             <section>
                 <ul class="information-list">
                     <!-- BEGIN tweet -->
@@ -14,7 +36,6 @@
                                 <a href="https://twitter.com/{TWEET_AUTHOR}" title="View Profile">
                                     <img src="{TWEET_AVATAR}" alt="View Profile" />
                                     <p>{TWEET_FULLNAME}</p>
-
                                     <p class="meta">@{TWEET_AUTHOR}</p>
                                 </a>
 
@@ -22,14 +43,10 @@
                             </div>
                         </div>
                         <article>
-                            <p>
-                                {TWEET_TEXT}
-                            </p>
+                            <p>{TWEET_TEXT}</p>
 
                             <!-- BEGIN tweet_media -->
-                            <p>
-                                <img src="{TWEET_MEDIA_URL}:small" />
-                            </p>
+                            <p><img src="{TWEET_MEDIA_URL}:small" /></p>
                             <!-- END tweet_media -->
                         </article>
                     </li>
@@ -38,10 +55,12 @@
 
                 <div class="component-action">
                     <section>
-                        <a class="button" href="{SEARCH_URL}">Search on Twitter</a>
+                        <a class="button" href="{SEARCH_URL}">View on Twitter</a>
                     </section>
                 </div>
             </section>
+            <!-- END twitter_feed -->
+
         </div>
     </div>
 </div>
