@@ -156,18 +156,20 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
             // timestamp and filters are optional
             ->setTimestamp($article->getPostDate()->getUnixTimestamp())
-            ->addFilter('role', $roleIds)
-            ->addFilter('campus', $campusIds)
 
             // and then you build
             ->build();
-
-		$envelope->broadcastToRoleType($roleType, $instance);
 
         /** @var \Schoolbox\User $user */
         foreach ($article->getUsers() as $user) {
             $envelope->targetToUser($user->getId(), $instance);
         }
+
+        $instance = $bob->addFilter('role', $roleIds)
+            ->addFilter('campus', $campusIds)
+            ->build();
+
+        $envelope->broadcastToRoleType($roleType, $instance);
 
 		return $envelope ;
 	}
