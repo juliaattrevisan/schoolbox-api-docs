@@ -142,6 +142,21 @@ class Controller extends Base
             ->findAllByStudent($student, $term)
             ->sortBy('dueAt', 'asc');
 
+        // A little different for JSON requests
+        // TODO determine if it's appropriate to display in this way
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+            $response = $allWork->map(function(IAssessable $assessable) {
+                return [
+                    'id'          => $assessable->getId(),
+                    'title'       => $assessable->getTitle(),
+                    'folderId'    => $assessable->getBaseContext()->getFolder()->getId(),
+                    'folderTitle' => $assessable->getBaseContext()->getFolder()->getTitle(),
+                ];
+            });
+            $this->getResponse()->content->set($this->buildJsonOutput($response));
+            return;
+        }
+
         foreach ($this->folderMapper->findForUser($student) as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
