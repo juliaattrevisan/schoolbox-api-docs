@@ -119,7 +119,7 @@ class Controller extends Base
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
 
         // Also show the courses/units that are on this homepage
-        $courses = $this->getCourseImplementationDataSource()->findAllByFolderId($class->getId());
+        $courses = $this->getCourseImplementationDataSource()->findByFolderId($class->getId());
 
         // And the previous and next term
         $previousTerm = null;

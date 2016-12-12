@@ -14,13 +14,14 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  * Mapper for the data model for Course Implementations.
  *
  * @method Model createModel($idValue = null)
- * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
@@ -69,6 +70,17 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * @param int $identifierValue
+     * @return Model
+     */
+    public function findById($identifierValue)
+    {
+        /** @var Model $model */
+        $model = parent::findById($identifierValue);
+        return $this->loadUnits($model);
+    }
+
+    /**
      * Finds the unit spec for this folder.
      *
      * @param int   $folderId
@@ -77,7 +89,9 @@ class Mapper extends BaseMapper
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->findByColumn('folder_id', $folderId, $options);
+        return $this->loadUnitsForCollection(
+            $this->findByColumn('folder_id', $folderId, $options)
+        );
     }
 
     /**
@@ -113,12 +127,16 @@ class Mapper extends BaseMapper
 
             /** @var Folder $folder */
             $folder = $this->hydrateJoin($row, 'folder', 'f');
-            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            /** @var HomepageConfig $homepageConfig */
+            $homepageConfig = $this->hydrateJoin($row, 'folder.homepages', 'fh');
+            $folder->setHomepage($homepageConfig);
             $model->setFolder($folder);
 
             /** @var CourseSpecification $specification */
             $specification = $this->hydrateJoin($row, 'specification', 's');
-            $specification->setFolder($this->hydrateJoin($row, 'specification.folder', 'sf'));
+            /** @var Folder $folder */
+            $folder = $this->hydrateJoin($row, 'specification.folder', 'sf');
+            $specification->setFolder($folder);
             $model->setSpecification($specification);
 
             // Add
@@ -139,5 +157,49 @@ class Mapper extends BaseMapper
     public function findAllByCourseSpecificationId($courseSpecId, $options = [])
     {
         return $this->findByColumn('course_specification_id', $courseSpecId, $options);
+    }
+
+    /**
+     * Loads all units implementations into a course implementation.
+     *
+     * @param Model $implementation
+     * @return Model
+     */
+    protected function loadUnits(Model $implementation)
+    {
+        $collection = new Collection();
+        $collection->add($implementation);
+        $this->loadUnitsForCollection($collection);
+        return $collection->first();
+    }
+
+    /**
+     * Loads all units implementations into all the course implementations in a collection.
+     *
+     * @param Collection|Model[] $courseImpls
+     * @return Collection|Model[]
+     */
+    protected function loadUnitsForCollection(Collection $courseImpls)
+    {
+        $unitImplMapper = UnitImplementationMapper::getInstance();
+
+        // Load all the unit impls for all the supplied course impls
+        $ids = [];
+        foreach ($courseImpls as $courseImpl) {
+            $ids[] = $courseImpl->getId();
+        }
+        $unitImpls = $unitImplMapper->findAllByCourseId($ids, ['order' => ['open_date' => 'desc']])
+            ->groupByCallback(function ($v) {
+                /** @var UnitImplementation $v */
+                return $v->getCourse()->getId();
+            });
+
+        // Match unitImpls to their courseImpl
+        foreach ($courseImpls as $courseImpl) {
+            if (isset($unitImpls[$courseImpl->getId()])) {
+                $courseImpl->setUnits($unitImpls[$courseImpl->getId()]);
+            }
+        }
+        return $courseImpls;
     }
 }
