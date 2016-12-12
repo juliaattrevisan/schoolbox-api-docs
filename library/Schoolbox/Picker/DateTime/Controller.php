@@ -15,6 +15,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use \Calendar_Layout_Full_Ajax_JSON;
+use \Group;
 
 class Controller extends Base
 {
@@ -77,12 +79,9 @@ class Controller extends Base
 
             $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
             $end = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
-
-            // Retrieve all events
-
-            $api = new \Calendar_Api_EventType_Event_Schoolbox_All();
+            $user = $_SESSION['user'];
+            $api = new  \Calendar_Api_EventType_Event_Schoolbox_Default($user, array());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
-
             foreach ($events as $event) {
                 $appointments[] = [
                     'startDateTime' => $event->getStartTime()->getDatabase(),
