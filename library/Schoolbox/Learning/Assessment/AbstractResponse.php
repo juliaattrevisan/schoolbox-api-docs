@@ -192,7 +192,7 @@ abstract class AbstractResponse implements IResponse
      */
     public function requiresMarking()
     {
-        return $this->allFeedback->count() > 0;
+        return 0 == $this->allFeedback->count();
     }
 
     /**
