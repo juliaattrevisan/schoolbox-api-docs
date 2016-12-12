@@ -36,53 +36,51 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
 
-        <div class="empty-state">
-            <i class="icon-click-view"></i>
-            <p>No video available!</p>
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-click-view"></i>
+                <p>No video available!</p>
 
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select video</a>
-            </p>
-            <!-- END empty_modify -->
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select video</a>
+                </p>
+                <!-- END empty_modify -->
 
-        </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN clickview -->
-
-        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-            <div class="small-12 island">
-                <section>
-                    <div id="videohere{COMPONENT_INSTANCE_ID}">
-                    <!-- BEGIN has_clickview -->
-                        <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
-                    <!-- END has_clickview -->
-                    <!-- BEGIN online_clickview -->
-                        <script type="text/javascript" src="//online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
-                    <!-- END online_clickview -->
-                    <!-- BEGIN iframe_clickview -->
-                        <div class="flex-video widescreen">
-                            <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="//online.clickview.com.au/share/embed?shareCode={VIDEO_ID}{START}{END}&a=false"></iframe>
-                        </div>
-                    <!-- END iframe_clickview -->
-                    <!-- BEGIN select_video -->
-                    </div>
-
-                    <div class="component-action">
-                        <section>
-                            <a href="#" class="button" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select Video</a>
-                        </section>
-                    </div>
-                    <!-- END select_video -->
-                </section>
             </div>
-        </div>
+            <!-- END empty_state -->
 
-    <!-- END clickview -->
+            <!-- BEGIN clickview -->
+            <section>
+                <div id="videohere{COMPONENT_INSTANCE_ID}">
+                <!-- BEGIN has_clickview -->
+                    <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
+                <!-- END has_clickview -->
+                <!-- BEGIN online_clickview -->
+                    <script type="text/javascript" src="//online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
+                <!-- END online_clickview -->
+                <!-- BEGIN iframe_clickview -->
+                    <div class="flex-video widescreen">
+                        <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="//online.clickview.com.au/share/embed?shareCode={VIDEO_ID}{START}{END}&a=false"></iframe>
+                    </div>
+                <!-- END iframe_clickview -->
+                <!-- BEGIN select_video -->
+                </div>
+
+                <div class="component-action">
+                    <section>
+                        <a href="#" class="button" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select Video</a>
+                    </section>
+                </div>
+                <!-- END select_video -->
+            </section>
+            <!-- END clickview -->
+
+        </div>
+    </div>
 
     <div id="plugin{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
         <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//online.clickview.com.au/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
