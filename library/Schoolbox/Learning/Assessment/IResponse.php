@@ -19,17 +19,17 @@ interface IResponse
 
     /**
      * Find the most recent Feedback with a non-null Mark value,
-     * based on its Updated field
+     * based on its 'publishedAt' property
      *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
+     * @return IFeedback|null
      */
     public function findMostRecentFeedback();
 
     /**
      * Find the most recent Published Feedback with a non-null Mark value,
-     * based on its Updated field
+     * based on its 'publishedAt' property
      *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
+     * @return IFeedback|null
      */
     public function findMostRecentPublishedFeedback();
 
@@ -130,6 +130,13 @@ interface IResponse
      * @return bool
      */
     public function isSubmittedOnTime();
+
+    /**
+     * Does this IResponse have feedback?
+     *
+     * @return bool
+     */
+    public function hasFeedback();
 
     /**
      * Get the IAssessable to which this IResponse belongs

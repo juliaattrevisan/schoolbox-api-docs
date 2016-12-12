@@ -159,7 +159,7 @@ class Model extends AbstractAssessment
      * @param boolean $isSelfAssessed
      * @return $this;
      */
-    protected function setIsSelfAssessed($isSelfAssessed)
+    public function setIsSelfAssessed($isSelfAssessed)
     {
         $this->isSelfAssessed = $isSelfAssessed;
         return $this;

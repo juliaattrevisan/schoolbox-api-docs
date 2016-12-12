@@ -2,6 +2,20 @@
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Save form for task completion
+        $('form[data-progress-tick-form]').progressTickForm({
+            transitions: {
+                notAttempted: 'complete',
+                selfAssessed: 'complete',
+                complete:     'notAttempted'
+            }
+        });
+    });
+</script>
+
 {{ bread.crumbs(
     ['Learning', routeLookup('learning.getClasses')],
     ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id })]
@@ -57,16 +71,31 @@
                         {% for participant in assessment.allParticipants %}
                             {% if participant.isMarkingRequired %}
                                 {% set response = participant.findMostRecentResponse %}
-                                <li>
-                                    <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                                    {% if assessment is task %}
                                         <div class="compact card small-6">
                                             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                             <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
                                         </div>
-                                        <div class="small-6 columns">
+                                        <div class="small-5 columns">
                                             <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
                                         </div>
-                                    </a>
+                                        <div class="small-1 columns no-pad">
+                                            {# An icon that shows if the student has attempted the task or not #}
+                                            {% include '@learningAssessment/task/progressTickForm.twig' with {
+                                                participant: participant
+                                            } %}
+                                        </div>
+                                    {% else %}
+                                        <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                                            <div class="compact card small-6">
+                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+                                                <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                                            </div>
+                                            <div class="small-6 columns">
+                                                <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
+                                            </div>
+                                        </a>
+                                    {% endif %}
                                 </li>
                             {% endif %}
                         {% endfor %}

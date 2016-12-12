@@ -106,16 +106,14 @@ class Participant
      */
     public function isMarkingRequired()
     {
+        // No responses, or latest response has feedback already
         $latestResponse = $this->findMostRecentSubmittedResponse();
-        $latestFeedback = $this->findMostRecentFeedback();
-
-        /* If there is a feedback sans response, is ok
-         * No marking is required
-         */
-        if (!$latestResponse) {
+        if (!$latestResponse || $latestResponse->hasFeedback()) {
             return false;
         }
 
+        // No feedback
+        $latestFeedback = $this->findMostRecentFeedback();
         if (!$latestFeedback) {
             return true;
         }

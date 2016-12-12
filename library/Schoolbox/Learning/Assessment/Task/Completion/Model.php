@@ -35,49 +35,23 @@ class Model extends AbstractResponse implements ICompletion
         return $this->getCreatedAt();
     }
 
+    /**
+     * Does this IResponse have feedback?
+     *
+     * Special case for task completion - a teacher has given feedback if they've marked as completed.
+     *
+     * TODO this separate implementation should be removed when SA-1667 is implemented
+     *      (SA-1667 is the refactor of the task completion/feedback stack)
+     *
+     * @return bool
+     */
+    public function hasFeedback()
+    {
+        return $this->isMarkedAsCompleted();
+    }
+
     /* Tasks always return Null marks for Feedbacks
      */
-
-    /**
-     * Find the most recent Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     */
-    public function findMostRecentFeedback()
-    {
-        if ($this->getAllFeedback()->count()) {
-            return $this->getAllFeedback()->first();
-        }
-
-        return null;
-    }
-
-    /**
-     * Find the most recent Published Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     */
-    public function findMostRecentPublishedFeedback()
-    {
-        if ($this->getAllFeedback()->count()) {
-            $latest = $this->getAllFeedback()->first();
-
-            foreach ($this->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->getPublishedAt()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
-                        $latest = $currentFeedback;
-                    }
-                }
-            }
-
-            return $latest;
-        }
-
-        return null;
-    }
-
 
     /**
      * This response is submitted (no longer a draft)

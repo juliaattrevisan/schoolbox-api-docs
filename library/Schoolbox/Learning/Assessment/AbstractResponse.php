@@ -65,55 +65,35 @@ abstract class AbstractResponse implements IResponse
     }
 
     /**
-     * Find the most recent Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     *
-     * @return AbstractFeedback|null
+     * @inheritdoc
      */
     public function findMostRecentFeedback()
     {
-        if ($this->getAllFeedback()->count()) {
-            return $this->getAllFeedback()->first();
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+        foreach($this->getAllFeedback() as $feedback){
+            if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
+                $mostRecentFeedback = $feedback;
+            }
         }
-
-        return null;
+        return $mostRecentFeedback;
     }
 
     /**
-     * Find the most recent Published Feedback with a non-null Mark value,
-     * based on its Updated field
-     *
-     * Assumes getAllFeedback() is sorted in reverse chronological order
-     *
-     * @return AbstractFeedback|null
+     * @inheritdoc
      */
     public function findMostRecentPublishedFeedback()
     {
-        if ($this->getAllFeedback()->count()) {
-            $latest = $this->getAllFeedback()->first();
-
-            foreach ($this->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->isPublished()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
-                        $latest = $currentFeedback;
-                    }
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+        foreach($this->getAllFeedback() as $feedback){
+            if($feedback->isPublished()){
+                if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
+                    $mostRecentFeedback = $feedback;
                 }
             }
-
-            /* If the ->first() instance is actually null
-             * and all the other Feedbacks are also null
-             * return null
-             *
-             * Otherwise return the Feedback itself
-             */
-            if ($latest->isPublished()) {
-                return $latest;
-            }
         }
-
-        return null;
+        return $mostRecentFeedback;
     }
 
     /**
@@ -201,6 +181,16 @@ abstract class AbstractResponse implements IResponse
         }
         // assessment.dueAt > response.submittedAt
         return $this->getAssessable()->getDueAt()->gt($this->getSubmittedAt());
+    }
+
+    /**
+     * Does this IResponse have feedback?
+     *
+     * @return bool
+     */
+    public function hasFeedback()
+    {
+        return $this->allFeedback->count() > 0;
     }
 
     /**

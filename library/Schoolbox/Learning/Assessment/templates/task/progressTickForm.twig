@@ -5,18 +5,18 @@
  # * participant: The participant object
  #}
 
-{% set mostRecentFeedback = participant.findMostRecentPublishedFeedback %}
+{% set mostRecentResponse = participant.findMostRecentResponse %}
 <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: participant.assessable.id, studentId: participant.user.id}) }}"
       method="POST"
       class="progress-tick-form"
       data-progress-tick-form="{{ participant.assessable.isSelfAssessed ? 'selfAssessed' : 'teacherAssessed' }}">
-    {% if mostRecentFeedback.isMarkedAsCompleted %}
+    {% if mostRecentResponse.isMarkedAsCompleted %}
         <a href="#"
            disabled
            class="no-text progress-tick complete"
            title="Completed"
            data-progress-tick-status="complete"></a>
-    {% elseif mostRecentFeedback.isMarkedAsSelfAssessed %}
+    {% elseif mostRecentResponse.isMarkedAsSelfAssessed %}
         <a href="#"
            disabled
            class="no-text progress-tick pending"
