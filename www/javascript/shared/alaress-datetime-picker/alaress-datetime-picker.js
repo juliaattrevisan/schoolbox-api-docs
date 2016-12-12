@@ -138,9 +138,11 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 picker.data('status', 'loading');
 
-                // AJAX in the modal contents if they haven't already been loaded
 
-                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValue, function () {
+                // if datetime, pass date only
+                var originalValueSplit  = originalValue.split(' ');
+                // AJAX in the modal contents if they haven't already been loaded
+                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValueSplit[0], function () {
 
                     $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 
