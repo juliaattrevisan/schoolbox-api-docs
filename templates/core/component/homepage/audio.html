@@ -8,85 +8,83 @@
 
 	{CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="information-list" data-dz-container></ul>
-            </section>
-        </div>
-    </div>
-
-    <div data-dz-wrap class="dropzone-wrap">
-        <div data-dz-container="">
-        </div>
-        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
-        <div class="hide" data-dz-template>
-            <li>
-                <div class="card small-12">
-                    <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
-                    <h3 data-dz-name></h3>
-                    <p class="meta" data-dz-status>Uploading...</p>
-                    <div class="progress dz-progress">
-                        <span class="meter dz-upload" style="width:0;"></span>
-                    </div>
-                </div>
-            </li>
-        </div>
-
-        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
-            <i class="icon-audio"></i>
-            <p>No audio files available.</p>
-
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/cms/file/new/{SOURCE_ID}">Select an audio file</a> or drag them onto this component
-            </p>
-
-            <script type="text/javascript">
-
-                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                    wrapClass: 'dragging',
-                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                    dictDefaultMessage: 'You can drag audio files into this space.',
-                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                    tplWrap: '<li class="dz-preview" />',
-                    showIfEmpty: false,
-                    addedfile: function (file) {
-                        $(file.previewElement).addClass('category-{ID}').data('node', {ID});
-                    },
-                    sending: function (file, xhr, formData) {
-                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                        formData.append('category', $(file.previewElement).data('node'));
-                        formData.append('comment', '');
-                        formData.append('hidden', 0);
-                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
-
-                    },
-                    complete: function (file) {
-                        $(file.previewElement).find('img').remove();
-                    },
-                    error: function (file, response) {
-                        $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text('Error uploading file');
-                    }
-                });
-
-            </script>
-
-            <!-- END empty_modify -->
-
-        </div>
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN audio -->
-
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="row">
+                <div class="small-12 island">
+                    <section>
+                        <ul class="information-list" data-dz-container></ul>
+                    </section>
+                </div>
+            </div>
+
+            <div data-dz-wrap class="dropzone-wrap">
+                <div data-dz-container="">
+                </div>
+                <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+                <div class="hide" data-dz-template>
+                    <li>
+                        <div class="card small-12">
+                            <img data-dz-thumbnail class="mime" src="/images/foundation/preloader.gif"/>
+                            <h3 data-dz-name></h3>
+                            <p class="meta" data-dz-status>Uploading...</p>
+                            <div class="progress dz-progress">
+                                <span class="meter dz-upload" style="width:0;"></span>
+                            </div>
+                        </div>
+                    </li>
+                </div>
+
+                <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
+                    <i class="icon-audio"></i>
+                    <p>No audio files available.</p>
+
+                    <!-- BEGIN empty_modify -->
+                    <p>
+                        <a href="/cms/file/new/{SOURCE_ID}">Select an audio file</a> or drag them onto this component
+                    </p>
+
+                    <script type="text/javascript">
+
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                            dictDefaultMessage: 'You can drag audio files into this space.',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                            tplWrap: '<li class="dz-preview" />',
+                            showIfEmpty: false,
+                            addedfile: function (file) {
+                                $(file.previewElement).addClass('category-{ID}').data('node', {ID});
+                            },
+                            sending: function (file, xhr, formData) {
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                                $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
+
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img').remove();
+                            },
+                            error: function (file, response) {
+                                $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text('Error uploading file');
+                            }
+                        });
+
+                    </script>
+
+                    <!-- END empty_modify -->
+
+                </div>
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN audio -->
             <section>
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
@@ -211,8 +209,8 @@
                 <!-- END submit_file -->
                 <!-- END source_folder_exists -->
             </section>
+            <!-- END audio -->
+            
         </div>
     </div>
-
-    <!-- END audio -->
 </div>
