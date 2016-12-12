@@ -1,14 +1,17 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
+
 class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -20,9 +23,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             return false;
         }
 
-        /* Need rss name injected here
-         */
-        $this->parseConfig();
 
         // Initialise feed
         $rss = new Alaress_Rss_Stream($this->getConfig('url'));
@@ -39,6 +39,12 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
             $this->setVar('rss_block', '');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_modify_block', '');
+            } else {
+                $this->parse('empty_modify_block', 'empty_modify');
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
@@ -98,6 +104,11 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 $this->setVar('rss_block', '');
             }
         }
+
+        /* Need rss name injected here
+         */
+        $this->parseConfig();
+
 
         return true; // everything went according to plan
     }
