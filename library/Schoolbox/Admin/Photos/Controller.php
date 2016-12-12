@@ -174,7 +174,13 @@ class Controller extends Base
         else
             $surname = $this->getRequest()->query["surname"];
 
-        $allUsers = $this->getUserMapper()->findByColumn("!synergy_id", NULL)->sortBy('lastname', 'asc')->sortBy('firstname', 'asc');
+        $pb = $this->getUserMapper()->getPredicateBuilder();
+        $pb->notNull('synergy_id');
+        $options = ['order' => [
+            'lastname'  => 'asc',
+            'firstname' => 'asc'
+        ] ];
+        $allUsers = $this->getUserMapper()->findByPredicates($pb, $options);
 
         $users = [];
 

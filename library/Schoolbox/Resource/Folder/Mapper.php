@@ -741,8 +741,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /* Don't know why codeLike contained / and not a trailing %
          */
         $params = array(
-            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
-            'codeLike' => "%{$this->database->quoteForLike($keyword)}%",
+            'nameLike' => "%{$this->database->escapeForLike($keyword)}%",
+            'codeLike' => "%{$this->database->escapeForLike($keyword)}%",
         );
 
         $statement = $this->database->prepare($query);
@@ -892,7 +892,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         if (strlen($campusCode) === 0) {
             $query .= ' AND (cc.code = :code OR cc.code LIKE :codeLike)';
             $params['code']     = $code;
-            $params['codeLike'] = '%/' . $this->database->quoteForLike($code);
+            $params['codeLike'] = '%/' . $this->database->escapeForLike($code);
         } else {
             $query .= ' AND (cc.code = :code OR cc.code = :fullCode)';
             $params['code']     = $code;
@@ -938,7 +938,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $params["code_{$i}"] = $code;
             if (strlen($campusCode) === 0) {
                 $whereParts[]             = "cc.code LIKE :fullCode_{$i}";
-                $params[":fullCode_{$i}"] = '%/' . $this->database->quoteForLike($code);
+                $params[":fullCode_{$i}"] = '%/' . $this->database->escapeForLike($code);
             } else {
                 $whereParts[]             = "cc.code = :fullCode_{$i}";
                 $params[":fullCode_{$i}"] = $campusCode . '/' . $code;
@@ -1002,7 +1002,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
-                'code' => '%[%' . $this->database->quoteForLike($code) . '%]',
+                'code' => '%[%' . $this->database->escapeForLike($code) . '%]',
             )
         );
         return $this->hydrateList($statement);

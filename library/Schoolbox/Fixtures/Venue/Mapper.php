@@ -13,9 +13,7 @@ use Schoolbox\Fixtures\Venue\Model as Venue;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Class Mapper
- * @method Venue createModel(int $idValue = null)
- * @package Schoolbox\Fixtures\Venue
+ * @method Venue createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
@@ -68,6 +66,8 @@ class Mapper extends BaseMapper
      */
     public function findByName($keyword)
     {
-        return $this->findByColumn('~name', "%{$this->database->quoteForLike($keyword)}%");
+        $pb = $this->getPredicateBuilder();
+        $pb->like('name', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+        return $this->findByPredicates($pb);
     }
 }

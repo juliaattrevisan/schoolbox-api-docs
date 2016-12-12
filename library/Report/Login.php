@@ -171,7 +171,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     $sqlFilter[]     = "user.username LIKE :value
                                         OR user.firstname LIKE :value
                                         OR user.lastname LIKE :value";
-                    $params['value'] = '%'.$this->db->quoteForLike($value).'%';
+                    $params['value'] = '%'.$this->db->escapeForLike($value).'%';
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date            = date('Y-m-d H:i:s', $date);
@@ -186,7 +186,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     }
                 } else {
                     $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
-                    $params[$key] = '%'.$this->db->quoteForLike($value).'%';
+                    $params[$key] = '%'.$this->db->escapeForLike($value).'%';
                 }
             }
         }

@@ -154,12 +154,12 @@ OR mf.description LIKE :keyword
 OR mf.realname    LIKE :keyword
 OR ml.name        LIKE :keyword
 )";
-                    $params['keyword'] = '%'.$this->db->quoteForLike($value).'%';
+                    $params['keyword'] = '%'.$this->db->escapeForLike($value).'%';
                 }
                 // default filter key
                 else {
                     $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
-                    $params[$key] = '%'.$this->db->quoteForLike($value).'%';
+                    $params[$key] = '%'.$this->db->escapeForLike($value).'%';
                 }
             }
         }

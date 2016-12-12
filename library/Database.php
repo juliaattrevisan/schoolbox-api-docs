@@ -235,7 +235,7 @@ class Database implements IDatabase, Serializable
      * @param  string $string
      * @return string
      */
-    public function quoteForLike($string) {
+    public function escapeForLike($string) {
         return strtr(
             $string,
             array(

@@ -403,7 +403,7 @@ class Mapper extends BaseMapper
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->bindValue('searchLike', '%'.$this->getDatabase()->escapeForLike($keyword).'%');
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();
@@ -427,7 +427,7 @@ class Mapper extends BaseMapper
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->bindValue('searchLike', '%'.$this->getDatabase()->escapeForLike($keyword).'%');
         $statement->execute();
         return $statement->fetchColumn();
     }

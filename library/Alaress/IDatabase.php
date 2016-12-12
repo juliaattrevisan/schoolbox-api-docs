@@ -65,7 +65,7 @@ interface IDatabase
      * @param  string $string
      * @return string
      */
-    public function quoteForLike($string);
+    public function escapeForLike($string);
 
     /**
      * Begin transaction

@@ -18,7 +18,7 @@ use Schoolbox\Mapper\PredicateBuilder;
 
 /**
  * Class Mapper
- * @method Season createModel(int $idValue = null)
+ * @method Season createModel($idValue = null)
  * @method Season findById($identifierValue)
  * @package Schoolbox\Fixtures\Season
  */
@@ -73,19 +73,6 @@ class Mapper extends BaseMapper
             MatchMapper::getInstance()->delete($currentMatch);
         }
     }
-
-    /**
-     * Find all the Seasons whose names are like $keyword
-     *
-     * @param string $keyword
-     * @return \Schoolbox\Collection
-     * @throws MapperException
-     */
-    public function findByName($keyword)
-    {
-        return $this->findByColumn('~name', "%{$this->database->quoteForLike($keyword)}%");
-    }
-
 
     /**
      * Returns the number of divisions attached to each of the specified seasons.

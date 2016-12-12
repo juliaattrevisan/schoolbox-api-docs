@@ -48,7 +48,7 @@ class Result extends Base
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
         ";
 
-        $quotedLike = $mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword());
+        $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute(['%' . $quotedLike . '%']);
@@ -91,7 +91,7 @@ class Result extends Base
                 )
         ";
 
-        $quotedLike = $mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword());
+        $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute(['%' . $quotedLike . '%']);

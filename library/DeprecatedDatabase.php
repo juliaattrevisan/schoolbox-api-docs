@@ -507,7 +507,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return string
      */
-    public function quoteForLike($string)
+    public function escapeForLike($string)
     {
         return strtr(
             $this->quote($string),

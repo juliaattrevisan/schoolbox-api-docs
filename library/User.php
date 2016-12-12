@@ -214,7 +214,7 @@ class User extends DeprecatedModel
                 " OR CONCAT_WS(' ',title,firstname,lastname) LIKE '%1\$s'
                 OR CONCAT_WS(' ',title,lastname) LIKE '%1\$s'
                 OR username LIKE '%1\$s'",
-                $this->db->quote('%' . $this->db->quoteForLike($keyword) . '%')
+                $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
             );
         }
         $wherePart .= ') AND user.deleted_at IS NULL';
@@ -320,11 +320,11 @@ class User extends DeprecatedModel
                 $query .= "( synergy_id = $param OR year = $param ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $firstName = $this->db->quoteForLike($name[1]);
-                    $lastName  = $this->db->quoteForLike($name[2]);
+                    $firstName = $this->db->escapeForLike($name[1]);
+                    $lastName  = $this->db->escapeForLike($name[2]);
                     $query .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
                 } else {
-                    $param = $this->db->quoteForLike($keyword);
+                    $param = $this->db->escapeForLike($keyword);
                     $query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
                 }
             }

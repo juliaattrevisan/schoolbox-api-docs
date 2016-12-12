@@ -26,6 +26,9 @@ use \Schoolbox\Fixtures\Division\Helper\Translator;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
+/**
+ * @method TeamMapper getMapper()
+ */
 class Controller extends AbstractController
 {
 
@@ -126,13 +129,12 @@ class Controller extends AbstractController
         if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
             $query = $this->getRequest()->query->get('query');
 
-            /** @var TeamMapper $mapper */
-            $mapper   = $this->getMapper();
-
             if ($context == null) {
-                $allTeams = $mapper->findByColumn('~name', "%{$query}%");
+                $pb = $this->getMapper()->getPredicateBuilder();
+                $pb->like('name', "%{$this->getMapper()->getDatabase()->escapeForLike($query)}%");
+                $allTeams = $this->getMapper()->findByPredicates($pb);
             } else {
-                $allTeams = $mapper->findByName($context->getId(), $query);
+                $allTeams = $this->getMapper()->findByName($context->getId(), $query);
             }
 
             $teams = [];
@@ -169,7 +171,7 @@ class Controller extends AbstractController
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
             }
 
-            $allTeams = $this->getTeamMapper()->findByColumn(
+            $allTeams = $this->getMapper()->findByColumn(
                 'division_id',
                 $context->getId(),
                 [
@@ -288,12 +290,10 @@ class Controller extends AbstractController
      */
     public function postRemovePlayers(Team $team)
     {
-        $this->getTeamPlayerMapper()->delete(
-            $this->getTeamPlayerMapper()->findByColumnList([
-                'user_id' => $this->getRequest()->post->get('userId'),
-                'team_id' => $team->getId(),
-            ])
-        );
+        $this->getTeamPlayerMapper()->deleteByColumnList([
+            'user_id' => $this->getRequest()->post->get('userId'),
+            'team_id' => $team->getId(),
+        ]);
         $this->getTeamPositionMapper()->deleteByColumnList([
             'user_id' => $this->getRequest()->post->get('userId'),
             'team_id' => $team->getId(),
@@ -346,7 +346,7 @@ class Controller extends AbstractController
 
         // Save each coach in the tag cloud too, and add to the team.
         $team->setCoaches($this->getCoachCloud()->saveTagCloud($coaches));
-        $this->getTeamMapper()->save($team);
+        $this->getMapper()->save($team);
     }
 
     /**
@@ -422,14 +422,6 @@ class Controller extends AbstractController
     protected function setDivisionMapper($divisionMapper)
     {
         $this->divisionMapper = $divisionMapper;
-    }
-
-    /**
-     * @return TeamMapper
-     */
-    public function getTeamMapper()
-    {
-        return $this->mapper;
     }
 
     /**

@@ -51,7 +51,7 @@ class Result extends Base
 
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute([
-            'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+            'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
         ]);
 
         $results = new Collection();
@@ -109,7 +109,7 @@ class Result extends Base
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute([
-            'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+            'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
         ]);
 
         return $this->buildSearchCount($stmt, $user, 'id');

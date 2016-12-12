@@ -10,14 +10,19 @@ namespace Schoolbox\Mapper;
 
 use Alaress\IDatabase;
 use Countable;
-use InvalidArgumentException;
 use Traversable;
 use UnderflowException;
 
 class PredicateBuilder
 {
-    const NOT  = '!';
-    const LIKE = '~';
+    const OPERATOR_EQUALS     = '=';
+    const OPERATOR_NOT_EQUALS = '<>';
+    const OPERATOR_LIKE       = 'LIKE';
+    const OPERATOR_NOT_LIKE   = 'NOT LIKE';
+    const OPERATOR_LT         = '<';
+    const OPERATOR_LTE        = '<=';
+    const OPERATOR_GT         = '>';
+    const OPERATOR_GTE        = '>=';
 
     /** @var IDatabase */
     protected $database;
@@ -31,7 +36,6 @@ class PredicateBuilder
     /** @var array */
     protected $params = [];
 
-
     /**
      * PredicateBuilder constructor.
      *
@@ -43,7 +47,6 @@ class PredicateBuilder
         $this->setTable($table);
         $this->database = $db;
     }
-
 
     /**
      * Convenience method for adding directly from a Mapper column list
@@ -65,7 +68,6 @@ class PredicateBuilder
         return $this;
     }
 
-
     /**
      * @param string $columnName
      * @return PredicateBuilder
@@ -73,6 +75,15 @@ class PredicateBuilder
     public function isNull($columnName)
     {
         return $this->addPredicate($columnName, null);
+    }
+
+    /**
+     * @param string $columnName
+     * @return PredicateBuilder
+     */
+    public function notNull($columnName)
+    {
+        return $this->addPredicate($columnName, null, self::OPERATOR_NOT_EQUALS);
     }
 
     /**
@@ -120,18 +131,42 @@ class PredicateBuilder
      */
     public function notEquals($columnName, $columnValue)
     {
-        return $this->addPredicate(self::NOT.$columnName, $columnValue);
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
     }
 
     /**
+     * If $columnValue is an array, then the values are combined using 'OR'
+     * eg, get student names where 'name' LIKE ['A%', 'B%'] would match both 'Andy' and 'Bob'.
+     *
+     * To get student names that match ('A%' AND '%Y') you need to chain two calls to like()
+     *
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
-     *                            @see \Database::quoteForLike for escaping user input.
+     *                            @see \Database::escapeForLike for escaping user input.
      * @return PredicateBuilder
      */
     public function like($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, 'LIKE');
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LIKE);
+    }
+
+    /**
+     * If $columnValue is an array, then the values are combined using 'AND'
+     *
+     * This is because in boolean logic !(T || T) === (F && F)
+     *
+     * eg, get student names NOT LIKE ['A%', '%c'] would match 'Bob' but not match 'Andy'
+     *
+     * Semantically, if like() returns X items from N, then notLike() should return (N - X) items
+     *
+     * @param string $columnName
+     * @param string $columnValue Used directly in NOT LIKE statement.
+     *                            @see \Database::escapeForLike for escaping user input.
+     * @return PredicateBuilder
+     */
+    public function notLike($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_LIKE);
     }
 
     /**
@@ -141,7 +176,7 @@ class PredicateBuilder
      */
     public function lessThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, '<');
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
 
 
@@ -152,9 +187,8 @@ class PredicateBuilder
      */
     public function greaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, '>');
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
     }
-
 
     /**
      * @param string     $columnName
@@ -163,9 +197,8 @@ class PredicateBuilder
      */
     public function notLessThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, '>=');
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
     }
-
 
     /**
      * @param string     $columnName
@@ -174,30 +207,22 @@ class PredicateBuilder
      */
     public function notGreaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, '<=');
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
     }
 
 
     /**
      * @param string $columnName
      * @param mixed  $columnValue
-     * @param string $operand
+     * @param string $operator
      * @throws UnderflowException if an empty IN is attempted
      * @return self
      */
-    protected function addPredicate($columnName, $columnValue, $operand = '=')
+    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS)
     {
-        // check for valid column definition
-        if (!preg_match('`^([^a-z0-9_\.]*)([a-z0-9_\.]+)$`i', $columnName, $matches)) {
-            throw new InvalidArgumentException("Invalid column name '$columnName' given.");
-        }
-
-        // strip off any modifiers
-        list (, $modifiers, $columnName) = $matches;
-
-        // prepare known modifiers
-        $negate = strpos($modifiers, self::NOT)  !== false;
-        $fuzzy  = strpos($modifiers, self::LIKE) !== false;
+        // prepare operator modifiers
+        $negate = self::OPERATOR_NOT_EQUALS == $operator || self::OPERATOR_NOT_LIKE == $operator;
+        $fuzzy  = self::OPERATOR_LIKE == $operator || self::OPERATOR_NOT_LIKE == $operator;
 
         // accommodate joins
         $xpl = explode('.', $columnName) ?: [];
@@ -219,7 +244,6 @@ class PredicateBuilder
 
         if ($negate) {
             $whereNot = "NOT ";
-            $operand  = "<>";
         } else {
             $whereNot = "";
         }
@@ -249,14 +273,14 @@ class PredicateBuilder
                 }
 
                 if ($fuzzy) {
-                    // fuzzy match: use (LIKE :x OR LIKE :y)
+                    // fuzzy match: use (LIKE :x OR LIKE :y), or (NOT LIKE :x AND NOT LIKE :y)
                     $likeParts = [];
 
                     foreach ($this->getPlaceholders($columnValue, $columnName) as $option) {
-                        $likeParts[] = "$escaped_name {$whereNot}$option";
+                        $likeParts[] = "$escaped_name {$whereNot}LIKE $option";
                     }
-
-                    $this->where[] = '(' . implode(' OR ', $likeParts) . ')';
+                    $subOperator = $negate ? ' AND ' : ' OR ';
+                    $this->where[] = '(' . implode($subOperator, $likeParts) . ')';
 
                 } else {
                     // exact match: use IN
@@ -269,12 +293,7 @@ class PredicateBuilder
                 // alias the param
                 $a = $this->getNonCollidingParamAlias($columnName);
 
-                if ($fuzzy || ($operand == '=' && strpos($columnValue, '%') !== false)) {
-                    // if wildcards are in the value, do a LIKE search rather than equals
-                    $operand = "{$whereNot}LIKE";
-                }
-
-                $this->where[] = "$escaped_name $operand :$a";
+                $this->where[] = "$escaped_name $operator :$a";
                 $this->putParam($a, $columnValue);
             }
         }

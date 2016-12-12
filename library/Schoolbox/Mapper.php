@@ -1054,13 +1054,11 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string $columnName
      * @param string $columnValue
-     * @param array  $options @see findByColumnList() $options param
-     *
      * @return int
      */
-    public function deleteByColumn($columnName, $columnValue, $options = array())
+    public function deleteByColumn($columnName, $columnValue)
     {
-        return $this->deleteByColumnList(array($columnName => $columnValue), $options);
+        return $this->deleteByColumnList(array($columnName => $columnValue));
     }
 
 
@@ -1069,11 +1067,9 @@ abstract class Mapper implements IMapper, Serializable
      * Returns the number of records deleted.
      *
      * @param array $columnList
-     * @param array $options @see findByColumnList() $options param
-     *
      * @return int
      */
-    public function deleteByColumnList($columnList, $options = array())
+    public function deleteByColumnList($columnList)
     {
         return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
     }
@@ -1091,7 +1087,7 @@ abstract class Mapper implements IMapper, Serializable
     protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
     {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
-        if (empty($columnList)) {
+        if (empty($columnList) && empty($predicate->getWhere())) {
             return 0;
         }
 
@@ -1470,6 +1466,58 @@ abstract class Mapper implements IMapper, Serializable
         return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
+    /**
+     * Generates a custom query
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return Collection
+     */
+    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), $pb, [], $options);
+    }
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given Predicates
+     * Returns the number of records deleted.
+     *
+     * @param PredicateBuilder $pb
+     * @param  array $options
+     * @see $this->findByColumnList()
+     * @return int
+     */
+    public function countByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        try {
+            $stmt = $this->selectScalarByPredicates('COUNT(*)', $pb, $options);
+            return intval($stmt->fetchColumn());
+        } catch (UnderflowException $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given Predicates
+     * Returns the number of records deleted.
+     *
+     * @param PredicateBuilder $pb
+     * @return int
+     */
+    public function deleteByPredicates(PredicateBuilder $pb)
+    {
+        return $this->executeDelete($this->getDeleteString(), $pb, []);
+    }
+
+    /**
+     * Create a PredicateBuilder for this Mapper's table.
+     *
+     * @return PredicateBuilder
+     */
+    public function getPredicateBuilder()
+    {
+        return new PredicateBuilder($this->getDatabase(), $this->getTable());
+    }
 
     /**
      * @param string           $select
@@ -1743,6 +1791,29 @@ abstract class Mapper implements IMapper, Serializable
 
         $statement->execute();
 
+        return $statement;
+    }
+
+    /**
+     * Returns a statement that attempts to select the scalar given by $selection
+     *
+     * @param  string $selection
+     * @param  PredicateBuilder $pb
+     * @param  array  $options
+     *
+     * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
+     * @return PDOStatement
+     */
+    protected function selectScalarByPredicates($selection, PredicateBuilder $pb, array $options = [])
+    {
+        $select = "SELECT $selection";
+
+        // grab a from string if it hasn't been implemented yet
+        if (!($from = $this->getFromString())) {
+            $from = "FROM {$this->getTable()}";
+        }
+        $statement = $this->prepareSelect($select, $from, $pb, [], $options);
+        $statement->execute();
         return $statement;
     }
 

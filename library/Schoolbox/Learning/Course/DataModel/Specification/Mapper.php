@@ -179,7 +179,9 @@ class Mapper extends BaseMapper
         if (strlen($searchParam) === 0) {
             return $this->findAll($options);
         }
-        return $this->findByColumn('f.name', "%{$this->database->quoteForLike($searchParam)}%", $options);
+        $pb = $this->getPredicateBuilder();
+        $pb->like('f.name', "%{$this->database->escapeForLike($searchParam)}%");
+        return $this->findByPredicates($pb, $options);
     }
 
     /**
