@@ -1,12 +1,13 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
+
 class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -22,10 +23,19 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 
         $this->setBlock($templateHandle, 'podcast', 'podcast_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+        $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
 
         if (!$this->getConfig('url')) {
 
             $this->setVar('podcast_block', '');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_modify_block', '');
+            } else {
+                $this->parse('empty_modify_block', 'empty_modify');
+            }
+
             $this->parse('empty_state_block', 'empty_state');
 
         } else {

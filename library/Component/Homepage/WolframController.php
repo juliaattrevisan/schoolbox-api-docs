@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Enables embedding of wolfram alpha widgets into homepages
  *
@@ -7,6 +6,9 @@
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
+
 class Component_Homepage_WolframController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -44,6 +46,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 
                 $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
                 $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
                 $this->setVar('empty_state_block', '');
 
                 $this->setVar(
@@ -74,6 +77,13 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_modify_block', '');
+            } else {
+                $this->parse('empty_modify_block', 'empty_modify');
+            }
+
 
             $this->setVar('wolfram_block', '');
 
