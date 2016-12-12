@@ -112,14 +112,14 @@ class Participant
             return !$latestResponse->isMarkedAsCompleted();
         }
 
-        $latestFeedback = $this->findMostRecentFeedback();
-
-        /* If there is a feedback sans response, is ok
+        /* If this participant has no response, is ok
          * No marking is required
          */
         if (!$latestResponse) {
             return false;
         }
+
+        $latestFeedback = $this->findMostRecentFeedback();
 
         if (!$latestFeedback) {
             return true;
