@@ -1,26 +1,24 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-collab-docs"></i>
-        <p>No documents available!</p>
-
-        <!-- BEGIN empty_modify -->
-        <p>
-            <a href="/collabdoc/create/{SOURCE_ID}">Create Document</a>
-        </p>
-        <!-- END empty_modify -->
-
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN etherpad -->
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-collab-docs"></i>
+                <p>No documents available!</p>
+
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/collabdoc/create/{SOURCE_ID}">Create Document</a>
+                </p>
+                <!-- END empty_modify -->
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN etherpad -->
             <section>
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
@@ -57,9 +55,8 @@
 
                 <!-- END source_folder_exists -->
             </section>
+            <!-- END etherpad -->
+
         </div>
     </div>
-
-    <!-- END etherpad -->
-
 </div>

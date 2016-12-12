@@ -28,6 +28,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, "drop_student", "drop_student_block");
         $this->setBlock('drop_student', "drop_success", "drop_success_block");
         $this->setBlock($templateHandle, "drop_staff", "drop_staff_block");
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
         if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -55,6 +56,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
 
             if ($fileList->count()) {
                 $j = 0;
+                $this->setVar('empty_state_block','');
                 foreach ($fileList as $file) {
                     $output = array(
                         'DROPBOX_MIME_IMAGE'  => $file->getStorage()->getMimetype()->getIconFile(),
@@ -67,8 +69,10 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                     $this->setVar($output);
                     $this->parse("drop_file_block", "drop_file", true);
                 }
+
             } else {
                 $this->setVar("drop_file_block", "");
+                $this->parse('empty_state_block','empty_state');
             }
 
             $this->parse("drop_staff_block", "drop_staff");

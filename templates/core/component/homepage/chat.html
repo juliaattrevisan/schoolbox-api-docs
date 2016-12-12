@@ -49,27 +49,25 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-        <div class="empty-state">
-            <i class="icon-chat"></i>
-            <p>The chat is inactive!</p>
-
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> or
-                <a href="/homepage/chatArchive/{ID}/">view the archive</a>
-            </p>
-            <!-- END empty_modify -->
-
-        </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN chat -->
-
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-chat"></i>
+                <p>The chat is inactive!</p>
+
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> or
+                    <a href="/homepage/chatArchive/{ID}/">view the archive</a>
+                </p>
+                <!-- END empty_modify -->
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN chat -->
             <section>
                 <ul class="information-list chat-messages" data-chat-log></ul>
                 <!-- BEGIN chat_state_active -->
@@ -108,8 +106,8 @@
                     </div>
                 <!-- END chat_state_inactive -->
             </section>
+            <!-- END chat -->
+
         </div>
     </div>
-
-    <!-- END chat -->
 </div>

@@ -7,71 +7,67 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
 
-        <div class="empty-state">
-            <i class="icon-link"></i>
-            <p>No links available!</p>
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-link"></i>
+                <p>No links available!</p>
 
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/cms/link/new/{LINK_CAT_ID}">Add a link</a>
-            </p>
-            <!-- END empty_modify -->
-
-        </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN links -->
-
-        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-            <div class="small-12 island">
-                <section>
-                    <!-- BEGIN source_folder_deleted -->
-                    {SOURCE_FOLDER_UNAVAILABLE}
-                    <!-- END source_folder_deleted -->
-
-                    <!-- BEGIN source_folder_exists -->
-                    <ul class="action-list">
-                        <!-- BEGIN link -->
-                        <li class="actions-small-1">
-                            <div class="list-item {HIDDEN}">
-                                <div class="card small-12">
-                                    <h3><a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h3>
-
-                                    <p class="meta {COMPONENT_COMPACTMODE_HIDE}" >
-                                        Posted by
-                                        <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
-                                        on {LINK_POSTED_DATE}
-                                    </p>
-                                    <p class="{COMPONENT_COMPACTMODE_HIDE}">{LINK_COMMENT}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <!-- BEGIN modify_link -->
-                                <a class="icon-modify" href="/cms/link/{LINK_ID}" title="Edit link"></a>
-                                <!-- END modify_link -->
-                            </nav>
-                        </li>
-                        <!-- END link -->
-                    </ul>
-
-                    <div class="component-action">
-                        <section>
-                            <a href="/resources/{LINK_CAT_ID}" class="button">View All Links</a>
-
-                            <!-- BEGIN submit_link -->
-                            <a href="/cms/link/new/{LINK_CAT_ID}" class="button">Add Link</a>
-                            <!-- END submit_link -->
-                        </section>
-                    </div>
-
-                    <!-- END source_folder_exists -->
-                </section>
+                <!-- BEGIN empty_modify -->
+                <p>
+                    <a href="/cms/link/new/{LINK_CAT_ID}">Add a link</a>
+                </p>
+                <!-- END empty_modify -->
             </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN links -->
+            <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
+                <ul class="action-list">
+                    <!-- BEGIN link -->
+                    <li class="actions-small-1">
+                        <div class="list-item {HIDDEN}">
+                            <div class="card small-12">
+                                <h3><a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h3>
+
+                                <p class="meta {COMPONENT_COMPACTMODE_HIDE}" >
+                                    Posted by
+                                    <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
+                                    on {LINK_POSTED_DATE}
+                                </p>
+                                <p class="{COMPONENT_COMPACTMODE_HIDE}">{LINK_COMMENT}</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <!-- BEGIN modify_link -->
+                            <a class="icon-modify" href="/cms/link/{LINK_ID}" title="Edit link"></a>
+                            <!-- END modify_link -->
+                        </nav>
+                    </li>
+                    <!-- END link -->
+                </ul>
+
+                <div class="component-action">
+                    <section>
+                        <a href="/resources/{LINK_CAT_ID}" class="button">View All Links</a>
+
+                        <!-- BEGIN submit_link -->
+                        <a href="/cms/link/new/{LINK_CAT_ID}" class="button">Add Link</a>
+                        <!-- END submit_link -->
+                    </section>
+                </div>
+
+                <!-- END source_folder_exists -->
+            </section>
+            <!-- END links -->
+
         </div>
-
-    <!-- END links -->
-
+    </div>
 </div>

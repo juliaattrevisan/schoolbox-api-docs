@@ -1,83 +1,81 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="inline-list img-gallery information-list" data-dz-container></ul>
-            </section>
-        </div>
-    </div>
-
-    <div data-dz-wrap class="dropzone-wrap">
-        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
-        <div class="hide" data-dz-template>
-            <li>
-                <img data-dz-thumbnail src="/images/foundation/preloader.gif"/>
-                <div class="progress dz-progress">
-                    <span class="meter dz-upload" style="width:0;"></span>
-                </div>
-            </li>
-        </div>
-
-        <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
-            <i class="icon-image-gallery"></i>
-            <p>No images in this gallery</p>
-
-            <!-- BEGIN empty_modify -->
-            <p>
-                <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}">Post an image</a> or drag one onto this component
-            </p>
-
-            <script type="text/javascript">
-                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                    wrapClass: 'dragging',
-                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                    previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                    acceptedFiles: 'image/*',
-                    createImageThumbnails: true,
-                    dictDefaultMessage: 'You can drag images into this space.',
-                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                    refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
-                    showIfEmpty: false,
-
-                    addedfile: function (file) {
-                        $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                    },
-                    sending: function (file, xhr, formData) {
-
-                        $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
-
-
-                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                        formData.append('category', $(file.previewElement).data('node'));
-                        formData.append('comment', '');
-                        formData.append('hidden', 0);
-                    },
-                    complete: function (file) {
-                        $(file.previewElement).find('img.dz-pending').remove();
-                    }
-                });
-                $('[data-image-gallery] li').magnificPopup({
-                    delegate: 'a',
-                    type: 'image'
-                });
-            </script>
-
-            <!-- END empty_modify -->
-
-        </div>
-
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN gallery -->
-
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
+
+            <!-- BEGIN empty_state -->
+            <div class="row">
+                <div class="small-12 island">
+                    <section>
+                        <ul class="inline-list img-gallery information-list" data-dz-container></ul>
+                    </section>
+                </div>
+            </div>
+
+            <div data-dz-wrap class="dropzone-wrap">
+                <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+                <div class="hide" data-dz-template>
+                    <li>
+                        <img data-dz-thumbnail src="/images/foundation/preloader.gif"/>
+                        <div class="progress dz-progress">
+                            <span class="meter dz-upload" style="width:0;"></span>
+                        </div>
+                    </li>
+                </div>
+
+                <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
+                    <i class="icon-image-gallery"></i>
+                    <p>No images in this gallery</p>
+
+                    <!-- BEGIN empty_modify -->
+                    <p>
+                        <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}">Post an image</a> or drag one onto this component
+                    </p>
+
+                    <script type="text/javascript">
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                            acceptedFiles: 'image/*',
+                            createImageThumbnails: true,
+                            dictDefaultMessage: 'You can drag images into this space.',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
+                            showIfEmpty: false,
+
+                            addedfile: function (file) {
+                                $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
+                            },
+                            sending: function (file, xhr, formData) {
+
+                                $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
+
+
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img.dz-pending').remove();
+                            }
+                        });
+                        $('[data-image-gallery] li').magnificPopup({
+                            delegate: 'a',
+                            type: 'image'
+                        });
+                    </script>
+
+                    <!-- END empty_modify -->
+
+                </div>
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN gallery -->
             <section>
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
@@ -85,6 +83,7 @@
 
                 <!-- BEGIN source_folder_exists -->
                 <div class="dropzone-wrap">
+
                     <div class="content">
                         <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"
                               data-accepts="image"></form>
@@ -109,6 +108,7 @@
                             <!-- END image_gallery -->
                         </ul>
                     </div>
+
                     <div class="component-action">
                         <section>
                             <!-- BEGIN submit_image_gallery -->
@@ -148,11 +148,12 @@
                             <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button">View Full Gallery</a>
                         </section>
                     </div>
-                </div>
-            </section>
-        </div>
-        <!-- END source_folder_exists -->
-    </div>
 
-    <!-- END gallery -->
+                </div>
+                <!-- END source_folder_exists -->
+            </section>
+            <!-- END gallery -->
+
+        </div>
+    </div>
 </div>

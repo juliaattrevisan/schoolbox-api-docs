@@ -3,21 +3,20 @@
 
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-pinterest"></i>
-        <p>No pintrest activity!</p>
-
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN pinterest -->
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-pinterest"></i>
+                <p>No pintrest activity!</p>
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN pinterest -->
             <section class="content" data-pinterest-content>
+
                 <!-- BEGIN has_pinterest_user -->
                 <a data-pin-do="embedUser" href="{PINTEREST_URL}" id="pinterest{COMPONENT_INSTANCE_ID}"></a>
                 <script type="text/javascript">
@@ -39,9 +38,10 @@
                     });
                 </script>
                 <!-- END has_pinterest_board -->
+
             </section>
+            <!-- END pinterest -->
+
         </div>
     </div>
-
-    <!-- END pinterest -->
 </div>

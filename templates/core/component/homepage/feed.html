@@ -1,20 +1,18 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     {CONFIGURATION}
 
-    <!-- BEGIN empty_state -->
-
-    <div class="empty-state">
-        <i class="icon-homepagefeed"></i>
-        <p>No activity recorded!</p>
-
-    </div>
-
-    <!-- END empty_state -->
-
-    <!-- BEGIN feed -->
-
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-homepagefeed"></i>
+                <p>No activity recorded!</p>
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN feed -->
             <section>
                 <ul class="information-list">
                     <!-- BEGIN event -->
@@ -32,8 +30,8 @@
                     <!-- END event -->
                 </ul>
             </section>
+            <!-- END feed -->
+            
         </div>
     </div>
-
-    <!-- END feed -->
 </div>
