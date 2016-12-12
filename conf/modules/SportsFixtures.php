@@ -37,51 +37,56 @@ class SportsFixtures implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $namespace = 'fixtures';
+        $di = $kernel->getDependencyInjector();
 
-        $homepageModule = new HomepageModule($kernel->getDependencyInjector());
-        $homepageModule->init("/$namespace");
+        if ($di->get('config')->get('fixtures_enabled')) {
 
-        $dashboardModule = new DashboardModule($kernel->getDependencyInjector());
-        $dashboardModule->init("/$namespace");        
+            $namespace = 'fixtures';
 
-        $landingModule = new LandingModule($kernel->getDependencyInjector());
-        $landingModule->init("/$namespace");
+            $homepageModule = new HomepageModule($di);
+            $homepageModule->init("/$namespace");
 
-        $sportModule = new SportModule($kernel->getDependencyInjector());
-        $sportModule->init("/$namespace");
+            $dashboardModule = new DashboardModule($di);
+            $dashboardModule->init("/$namespace");
 
-        $schoolModule = new SchoolModule($kernel->getDependencyInjector());
-        $schoolModule->init("/$namespace/school");
+            $landingModule = new LandingModule($di);
+            $landingModule->init("/$namespace");
 
-        $seasonModule = new SeasonModule($kernel->getDependencyInjector());
-        $seasonModule->init("/$namespace");
+            $sportModule = new SportModule($di);
+            $sportModule->init("/$namespace");
 
-        $divisionModule = new DivisionModule($kernel->getDependencyInjector(), $sportModule);
-        $divisionModule->init("/$namespace");
+            $schoolModule = new SchoolModule($di);
+            $schoolModule->init("/$namespace/school");
 
-        $teamModule = new TeamModule($kernel->getDependencyInjector(), $divisionModule);
-        $teamModule->init("/$namespace");
+            $seasonModule = new SeasonModule($di);
+            $seasonModule->init("/$namespace");
 
-        $importModule = new ImportModule($kernel->getDependencyInjector());
-        $importModule->init("/$namespace");
+            $divisionModule = new DivisionModule($di, $sportModule);
+            $divisionModule->init("/$namespace");
 
-        $positionModule = new PositionModule($kernel->getDependencyInjector(), $sportModule);
-        $positionModule->init("/$namespace");
+            $teamModule = new TeamModule($di, $divisionModule);
+            $teamModule->init("/$namespace");
 
-        $matchModule = new MatchModule($kernel->getDependencyInjector(), $divisionModule);
-        $matchModule->init("/$namespace");
+            $importModule = new ImportModule($di);
+            $importModule->init("/$namespace");
 
-        $venueModule = new VenueModule($kernel->getDependencyInjector());
-        $venueModule->init("/$namespace");
+            $positionModule = new PositionModule($di, $sportModule);
+            $positionModule->init("/$namespace");
 
-        $itineraryItemModule = new ItineraryItemModule($kernel->getDependencyInjector(), $matchModule);
-        $itineraryItemModule->init("/$namespace");
+            $matchModule = new MatchModule($di, $divisionModule);
+            $matchModule->init("/$namespace");
 
-        $resultModule = new ResultModule($kernel->getDependencyInjector(), $matchModule);
-        $resultModule->init("/$namespace");
+            $venueModule = new VenueModule($di);
+            $venueModule->init("/$namespace");
 
-        $statusModule = new StatusModule($kernel->getDependencyInjector(), $resultModule);
-        $statusModule->init("/$namespace");
+            $itineraryItemModule = new ItineraryItemModule($di, $matchModule);
+            $itineraryItemModule->init("/$namespace");
+
+            $resultModule = new ResultModule($di, $matchModule);
+            $resultModule->init("/$namespace");
+
+            $statusModule = new StatusModule($di, $resultModule);
+            $statusModule->init("/$namespace");
+        }
     }
 }
