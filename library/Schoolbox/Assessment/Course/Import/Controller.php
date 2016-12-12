@@ -86,9 +86,6 @@ class Controller extends Base\Base
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var Course\ImplementationFactory */
-    private $courseImplementationFactory;
-
     /** @var Component_InstanceMapper */
     private $componentInstanceMapper;
 
@@ -1311,27 +1308,6 @@ class Controller extends Base\Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         return $this;
     }
-
-
-    /**
-     * @return Course\ImplementationFactory
-     */
-    public function getCourseImplementationFactory()
-    {
-        return $this->courseImplementationFactory;
-    }
-
-
-    /**
-     * @param Course\ImplementationFactory $unitImplementationFactory
-     * @return static
-     */
-    public function setCourseImplementationFactory(Course\ImplementationFactory $unitImplementationFactory)
-    {
-        $this->courseImplementationFactory = $unitImplementationFactory;
-        return $this;
-    }
-
 
     /**
      * @return CourseImplementationMapper
