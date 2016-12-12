@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -23,7 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 /**
  * Data domain model for Unit Specifications.
  */
-class Model implements ISoftDeletable, IAssessmentContextDataModel
+class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;
@@ -131,5 +132,23 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     {
         $this->unitImplementations = $unitImplementations;
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
+    }
+
+    /**
+     * Returns title of folder, for AssessmentContext Interface
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->getFolder()->getTitle();
     }
 }

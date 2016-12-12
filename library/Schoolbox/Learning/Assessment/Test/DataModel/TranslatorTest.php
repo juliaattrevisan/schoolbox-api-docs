@@ -14,11 +14,11 @@ use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+
+
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 
@@ -139,7 +139,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setContext((new UnitSpecification())->setId(3))
                     ->setId(1)
                     ->setCreator($this->teacher1),
-                UnitSpecificationModel::class,
+                UnitSpecification::class,
                 3
             ],
             [
@@ -147,7 +147,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setContext((new UnitImplementation())->setId(6))
                     ->setId(1)
                     ->setCreator($this->teacher1),
-                UnitImplementationModel::class,
+                UnitImplementation::class,
                 6
             ],
         ];
@@ -193,9 +193,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setAssessmentModel(
                         (new AssessmentModel())
                             ->setAssessmentContext(
-                                (new UnitSpecificationModel())
+                                (new UnitSpecification())
                                     ->setId(34)
-                                    ->setCourse((new CourseSpecificationModel())->setId(1))
+                                    ->setCourse((new CourseSpecification())->setId(1))
                             )
                     ),
                 UnitSpecification::class,
@@ -206,7 +206,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setId(2)
                     ->setAssessmentModel(
                         (new AssessmentModel())
-                            ->setAssessmentContext((new UnitImplementationModel())->setId(56))
+                            ->setAssessmentContext((new UnitImplementation())->setId(56))
                     ),
                 UnitImplementation::class,
                 56
@@ -242,15 +242,15 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setAssessmentModel(
                         (new AssessmentModel())
                             ->setId(2)
-                            ->setAssessmentContext((new UnitImplementationModel())->setId(12345))
+                            ->setAssessmentContext((new UnitImplementation())->setId(12345))
                             ->setSpecificationAssessment(
                                 (new AssessmentModel())
                                     ->setId(1)
                                     ->setAssessmentContext(
-                                        (new UnitSpecificationModel())
+                                        (new UnitSpecification())
                                             ->setId(67890)
                                             ->setCourse(
-                                                (new CourseSpecificationModel())
+                                                (new CourseSpecification())
                                                     ->setId(123)
                                             )
                                     )
@@ -274,15 +274,15 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setAssessmentModel(
                         (new AssessmentModel())
                             ->setId(2)
-                            ->setAssessmentContext((new UnitImplementationModel())->setId(12345))
+                            ->setAssessmentContext((new UnitImplementation())->setId(12345))
                             ->setSpecificationAssessment(
                                 (new AssessmentModel())
                                     ->setId(1)
                                     ->setAssessmentContext(
-                                        (new UnitSpecificationModel())
+                                        (new UnitSpecification())
                                             ->setId(6666)
                                             ->setCourse(
-                                                (new CourseSpecificationModel())
+                                                (new CourseSpecification())
                                                     ->setId(123)
                                             )
                                     )
@@ -388,7 +388,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 3,
                 TaskModel::class,
                 2,
-                UnitSpecificationModel::class,
+                UnitSpecification::class,
                 54321,
             ],
             [
@@ -407,7 +407,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 33,
                 QuizModel::class,
                 22,
-                UnitSpecificationModel::class,
+                UnitSpecification::class,
                 6666
             ],
             [

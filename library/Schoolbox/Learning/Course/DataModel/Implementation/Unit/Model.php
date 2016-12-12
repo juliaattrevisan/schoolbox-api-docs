@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -24,7 +25,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 /**
  * Data domain model for Unit Implementations.
  */
-class Model implements ISoftDeletable, IAssessmentContextDataModel
+class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;
@@ -268,5 +269,13 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
         $date = clone $this->getDueDate()->getDateTimeObject();
         $date->modify('23:59:59');
         return new Alaress_Date_Format($date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
     }
 }
