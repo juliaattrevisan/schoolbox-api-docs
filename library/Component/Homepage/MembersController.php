@@ -22,6 +22,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const MAX_MEMBERS = 100;
 
+    /**
+     * This appears in the empty state message
+     */
+    const TYPE_NAME = 'members';
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -44,7 +48,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock($templateHandle, 'members', 'members_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-            $this->setVar('members_block', '');
+            $this->setVar([
+                'TYPE_NAME' => self::TYPE_NAME,
+                'members_block' => ''
+            ]);
 
             $this->parse('empty_state_block', 'empty_state');
 
