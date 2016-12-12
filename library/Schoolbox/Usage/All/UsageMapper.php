@@ -77,39 +77,41 @@ class UsageMapper
         $query = "
             SELECT `groups`.name, COALESCE(SUM(bytes), 0) AS bytes
             FROM groups
-            LEFT JOIN
-            (
+              LEFT JOIN
+              (
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
-                FROM `file`
-                INNER JOIN `user` ON `user`.id = `file`.owner
-                INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                INNER JOIN `storage` ON `file`.`hash` = `storage`.`hash`
-                WHERE `file`.`deleted_at` IS NULL
-                GROUP BY `groups`.id)
+                 FROM `file`
+                   INNER JOIN `user` ON `user`.id = `file`.owner
+                   INNER JOIN `groups` ON `user`.group_id = `groups`.id
+                   INNER JOIN `storage` ON `file`.`hash` = `storage`.`hash`
+                 WHERE `file`.`deleted_at` IS NULL
+                 GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
-                FROM `myFile`
-                INNER JOIN `user` ON `user`.id = `myFile`.owner
-                INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
-                WHERE `myFile`.`deleted_at` IS NULL
-                GROUP BY `groups`.id)
+                 FROM `myFile`
+                   INNER JOIN `user` ON `user`.id = `myFile`.owner
+                   INNER JOIN `groups` ON `user`.group_id = `groups`.id
+                   INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
+                 WHERE `myFile`.`deleted_at` IS NULL
+                 GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
-                FROM `student_submission`
-                INNER JOIN `user` ON `user`.id = `student_submission`.owner
-                INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                INNER JOIN `storage` ON `student_submission`.`hash` = `storage`.`hash`
-                GROUP BY `groups`.id)
+                 FROM `submission_box`
+                   INNER JOIN `user` ON `user`.id = `submission_box`.owner
+                   INNER JOIN `groups` ON `user`.group_id = `groups`.id
+                   INNER JOIN `submission_box_file` ON `submission_box_file`.box_id = `submission_box`.id
+                   INNER JOIN `storage` ON `submission_box_file`.`storage_id` = `storage`.`storage_id`
+                 GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
-                FROM `submission_return`
-                INNER JOIN `user` ON `user`.id = `submission_return`.owner
-                INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                INNER JOIN `storage` ON `submission_return`.`hash` = `storage`.`hash`
-                WHERE `submission_return`.`deleted_at` IS NULL
-                GROUP BY `groups`.id)
-            ) allTotals ON `groups`.id = allTotals.id
+                 FROM `submission_return`
+                   INNER JOIN `user` ON `user`.id = `submission_return`.owner
+                   INNER JOIN `groups` ON `user`.group_id = `groups`.id
+                   INNER JOIN `submission_return_file` ON `submission_return_file`.`submission_return_id` = `submission_return`.`id`
+                   INNER JOIN `storage` ON `submission_return_file`.`hash` = `storage`.`hash`
+                 WHERE `submission_return`.`deleted_at` IS NULL
+                 GROUP BY `groups`.id)
+              ) allTotals ON `groups`.id = allTotals.id
             GROUP BY `groups`.name
             ORDER BY `groups`.id
         ";
@@ -236,37 +238,39 @@ class UsageMapper
     {
         $query = "
             SELECT
-                `user`.id AS userId, `user`.firstname, `user`.lastname,
-                CONCAT(`user`.firstname, ' ', `user`.lastname) AS fullname,
-                `groups`.name,
-                COALESCE(SUM(bytes), 0) AS bytes
+              `user`.id AS userId, `user`.firstname, `user`.lastname,
+              CONCAT(`user`.firstname, ' ', `user`.lastname) AS fullname,
+              `groups`.name,
+              COALESCE(SUM(bytes), 0) AS bytes
             FROM `user`
-            INNER JOIN `groups` ON `user`.group_id = `groups`.id
-            LEFT JOIN
-            (
+              INNER JOIN `groups` ON `user`.group_id = `groups`.id
+              LEFT JOIN
+              (
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
-                FROM `file` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
+                 FROM `file` `f`
+                   INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                 WHERE `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
-                FROM `myFile` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
+                 FROM `myFile` `f`
+                   INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                 WHERE `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
-                FROM `student_submission` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                GROUP BY `f`.`owner`)
+                 FROM `student_submission` `f`
+                   INNER JOIN `student_submission_file` ON `student_submission_file`.student_submission_id = `f`.id
+                   INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
-                FROM `submission_return` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
-            ) allTotals ON `user`.id = allTotals.userId
+                 FROM `submission_return` `f`
+                   INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                   INNER JOIN `storage` `s` ON `submission_return_file`.`hash` = `s`.`hash`
+                 WHERE `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
+              ) allTotals ON `user`.id = allTotals.userId
             GROUP BY `user`.id
         ";
 
