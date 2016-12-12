@@ -299,11 +299,7 @@
 	}
 
 	> ul{
-		margin: 0 0 0 (3 * rem-calc($base-font-size));
 		list-style: none;
-		@media #{$medium-up} {
-			margin: 0 0 0 (4 * rem-calc($base-font-size));
-		}
 	}
 
 	// if a <p/> is the last child of a card, whack a little spacing on the bottom
