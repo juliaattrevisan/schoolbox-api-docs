@@ -45,17 +45,21 @@ class House {
     private $housemaster = null;
 
     /**
-     * Constructor
+     * House constructor.
+     * @param bool $housemaster Flag indicating if housemaster should be setup, causes recursion when adding house to staff member
      */
-    public function __construct() {
-        $this->setup();
+    public function __construct($housemaster = true) {
+        $this->setup($housemaster);
     }
 
     /**
      * Hook method
+     * @param bool $housemaster Flag indicating if housemaster should be setup, causes recursion when adding house to staff member
      */
-    protected function setup() {
-        $this->setHousemaster(new Staff());
+    protected function setup($housemaster) {
+        if ($housemaster) {
+            $this->setHousemaster(new Staff());
+        }
     }
 
     /* Getters/Setters

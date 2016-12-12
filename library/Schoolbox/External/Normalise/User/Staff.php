@@ -11,6 +11,7 @@
 namespace Schoolbox\External\Normalise\User;
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
+use Schoolbox\External\Normalise\User\Common\House;
 use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Staff\Meta;
 use Schoolbox\External\Normalise\User\Staff\Year;
@@ -46,6 +47,13 @@ class Staff extends Base {
     protected $phoneWork = '';
 
     /**
+     * House
+     *
+     * @var House
+     */
+    protected $house = null;
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -63,6 +71,7 @@ class Staff extends Base {
         $this->setWorkEmail(new Collection());
         $this->setPhoneHome(new Phone());
         $this->setPhoneMobile(new Phone());
+        $this->setHouse(new House(false));
         $this->setPhoneWork(new Phone());
         $this->setCampus(new Collection());
         $this->setMeta(new Meta());
@@ -191,4 +200,26 @@ class Staff extends Base {
     {
         return $this->year;
     }
+    /**
+     * Set house
+     *
+     * @param House $house
+     * @return $this
+     */
+    public function setHouse($house)
+    {
+        $this->house = $house;
+        return $this;
+    }
+
+    /**
+     * Get house
+     *
+     * @return House
+     */
+    public function getHouse()
+    {
+        return $this->house;
+    }
+
 }
