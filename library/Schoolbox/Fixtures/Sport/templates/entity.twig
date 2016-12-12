@@ -91,7 +91,7 @@
                                 {% for team in division.teams %}
                                     <li>
                                         <span class="icon-team"></span>
-                                        <span>{{ team.name }}</span>
+                                        <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a>
                                         {% if team.coaches | length %}
                                             <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
                                         {% endif %}
