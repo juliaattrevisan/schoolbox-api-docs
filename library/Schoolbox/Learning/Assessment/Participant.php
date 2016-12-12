@@ -106,21 +106,14 @@ class Participant
      */
     public function isMarkingRequired()
     {
+        // No responses, or latest response does not require marking
         $latestResponse = $this->findMostRecentSubmittedResponse();
-
-        if($latestResponse instanceof TaskCompletion){
-            return !$latestResponse->isMarkedAsCompleted();
-        }
-
-        /* If this participant has no response, is ok
-         * No marking is required
-         */
-        if (!$latestResponse) {
+        if (!$latestResponse || !$latestResponse->requiresMarking()) {
             return false;
         }
 
+        // No feedback
         $latestFeedback = $this->findMostRecentFeedback();
-
         if (!$latestFeedback) {
             return true;
         }

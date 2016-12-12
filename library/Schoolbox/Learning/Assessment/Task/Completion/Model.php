@@ -35,6 +35,18 @@ class Model extends AbstractResponse implements ICompletion
         return $this->getCreatedAt();
     }
 
+    /**
+     * Does this TaskCompletion require Marking?
+     *
+     * Special case.
+     *
+     * @return bool
+     */
+    public function requiresMarking()
+    {
+        return !$this->isMarkedAsCompleted();
+    }
+
     /* Tasks always return Null marks for Feedbacks
      */
 
