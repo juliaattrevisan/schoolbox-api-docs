@@ -132,13 +132,11 @@ interface IResponse
     public function isSubmittedOnTime();
 
     /**
-     * Does this IResponse require Marking?
-     *
-     * This is not equivalent to Participant::isMarkingRequired() which considers floating IFeedback too.
+     * Does this IResponse have feedback?
      *
      * @return bool
      */
-    public function requiresMarking();
+    public function hasFeedback();
 
     /**
      * Get the IAssessable to which this IResponse belongs

@@ -36,15 +36,18 @@ class Model extends AbstractResponse implements ICompletion
     }
 
     /**
-     * Does this TaskCompletion require Marking?
+     * Does this IResponse have feedback?
      *
-     * Special case.
+     * Special case for task completion - a teacher has given feedback if they've marked as completed.
+     *
+     * TODO this separate implementation should be removed when SA-1667 is implemented
+     *      (SA-1667 is the refactor of the task completion/feedback stack)
      *
      * @return bool
      */
-    public function requiresMarking()
+    public function hasFeedback()
     {
-        return !$this->isMarkedAsCompleted();
+        return $this->isMarkedAsCompleted();
     }
 
     /* Tasks always return Null marks for Feedbacks

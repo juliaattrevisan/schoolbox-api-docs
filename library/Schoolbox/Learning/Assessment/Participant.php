@@ -106,9 +106,9 @@ class Participant
      */
     public function isMarkingRequired()
     {
-        // No responses, or latest response does not require marking
+        // No responses, or latest response has feedback already
         $latestResponse = $this->findMostRecentSubmittedResponse();
-        if (!$latestResponse || !$latestResponse->requiresMarking()) {
+        if (!$latestResponse || $latestResponse->hasFeedback()) {
             return false;
         }
 

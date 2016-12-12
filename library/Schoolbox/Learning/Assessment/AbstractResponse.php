@@ -184,15 +184,13 @@ abstract class AbstractResponse implements IResponse
     }
 
     /**
-     * Does this IResponse require Marking?
-     *
-     * This is not equivalent to Participant::isMarkingRequired() which considers floating IFeedback too.
+     * Does this IResponse have feedback?
      *
      * @return bool
      */
-    public function requiresMarking()
+    public function hasFeedback()
     {
-        return 0 == $this->allFeedback->count();
+        return $this->allFeedback->count() > 0;
     }
 
     /**
