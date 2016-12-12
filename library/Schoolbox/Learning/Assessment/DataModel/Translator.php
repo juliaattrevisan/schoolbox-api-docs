@@ -233,10 +233,10 @@ class Translator
             $assessable->setContext($context);
 
         } elseif ($context instanceof UnitSpecificationModel) {
-            $assessable->setContext($this->unitSpecificationTranslator->translateToDomainModel($context));
+            $assessable->setContext($context);
 
         } elseif ($context instanceof UnitImplementationModel) {
-            $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
+            $assessable->setContext($context);
 
         } elseif ($context instanceof ProjectModel) {
             // Need to be careful when translating project:

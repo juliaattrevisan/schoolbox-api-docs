@@ -70,11 +70,6 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      */
     public function __construct()
     {
-        $this->openDate    = new Alaress_Date_NullDate();
-        $this->dueDate     = new Alaress_Date_NullDate();
-        $this->createdAt   = new Alaress_Date_NullDate();
-        $this->updatedAt   = new Alaress_Date_NullDate();
-        $this->deletedAt   = new Alaress_Date_NullDate();
         $this->assessables = new Collection();
     }
 
