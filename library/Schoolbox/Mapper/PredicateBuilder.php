@@ -250,7 +250,7 @@ class PredicateBuilder
 
         $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
 
-        if ($columnValue === null) {
+        if (!isset($columnValue)) {
             $this->where[] = "$escaped_name IS {$whereNot}NULL";
 
         } elseif ($columnValue === true) {
