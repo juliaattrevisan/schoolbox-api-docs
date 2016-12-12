@@ -33,6 +33,8 @@ use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Application\WebRequest;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -44,6 +46,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
 use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
@@ -672,33 +675,44 @@ class Bootstrap implements BootstrapInterface {
         ];
         $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
 
-        // Register response data source
+        // Register constituent response data sources
+        $di->set('dueWorkSubmissionDataSource', $di->lazy( function () use ($mapperFactory) {
+            /** @var SubmissionMapper $mapper */
+            $mapper = $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class);
+            return new \Schoolbox\Learning\Assessment\Response\SubSource\DueWork(
+                new \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy($mapper)
+            );
+        }));
+        $di->set('quizAttemptDataSource', $di->lazy( function () use ($mapperFactory) {
+            /** @var QuizAttemptMapper $mapper */
+            $mapper = $mapperFactory->get(QuizAttemptMapper::class);
+            return new \Schoolbox\Learning\Assessment\Response\SubSource\Quiz(
+                new \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy($mapper)
+            );
+        }));
+        $di->set('taskCompletionDataSource', $di->lazy( function () use ($mapperFactory) {
+            /** @var CompletionMapper $mapper */
+            $mapper = $mapperFactory->get(CompletionMapper::class);
+            return new \Schoolbox\Learning\Assessment\Response\SubSource\Task(
+                new \Schoolbox\Learning\Assessment\Task\Completion\MapperProxy($mapper)
+            );
+        }));
+
+        // Register aggregate response data source
         $di->set(
             'responseDataSource',
             $di->lazy(
                 function () use ($di, $mapperFactory) {
+                    /** @var IResponseDataSource $dueWorkSubmissionDataSource */
+                    $dueWorkSubmissionDataSource = $di->get('dueWorkSubmissionDataSource');
+                    /** @var IResponseDataSource $quizAttemptDataSource */
+                    $quizAttemptDataSource = $di->get('quizAttemptDataSource');
+                    /** @var IResponseDataSource $taskCompletionDataSource */
+                    $taskCompletionDataSource = $di->get('taskCompletionDataSource');
                     return (new \Schoolbox\Learning\Assessment\Response\DataSource())
-                        ->addSubSource(
-                            new \Schoolbox\Learning\Assessment\Response\SubSource\DueWork(
-                                new \Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy(
-                                    $mapperFactory->get(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class)
-                                )
-                            )
-                        )
-                        ->addSubSource(
-                            new \Schoolbox\Learning\Assessment\Response\SubSource\Task(
-                                new \Schoolbox\Learning\Assessment\Task\Completion\MapperProxy(
-                                    $mapperFactory->get(\Schoolbox\Assessment\Course\Task\CompletionMapper::class)
-                                )
-                            )
-                        )
-                        ->addSubSource(
-                            new \Schoolbox\Learning\Assessment\Response\SubSource\Quiz(
-                                new \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy(
-                                    $mapperFactory->get(QuizAttemptMapper::class)
-                                )
-                            )
-                        );
+                        ->addSubSource( $dueWorkSubmissionDataSource )
+                        ->addSubSource( $quizAttemptDataSource )
+                        ->addSubSource( $taskCompletionDataSource );
                 }
             )
         );
