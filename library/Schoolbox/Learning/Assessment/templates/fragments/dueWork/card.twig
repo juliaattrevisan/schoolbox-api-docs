@@ -4,7 +4,7 @@
 <li class="actions-small-1">
     <div class="list-item">
         <div class="card wrap-down small-12">
-            <div class="{{ icon.renderClass(assessable) }} icon-32" title="{{ assessable.getTypeName }}"></div>
+            <div class="{{ icon.renderClass(assessable) }} size-32" title="{{ assessable.getTypeName }}"></div>
 
             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessable.id, studentId: student.id})}}">
                 <h3>{{ assessable.title }}</h3>

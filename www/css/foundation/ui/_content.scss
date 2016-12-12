@@ -198,14 +198,14 @@ $table-border-size: 0;
 
 // These control the table head styles
 $table-head-bg: $table-bg;
-$table-head-font-size: rem-calc(($base-font-size - 2));
+$table-head-font-size: rem-calc(($base-font-size - 3));
 $table-head-font-color: $black;
-$table-head-font-weight: $font-weight-bold;
+$table-head-font-weight: $font-weight-semibold;
 $table-head-padding: rem-calc(($base-font-size - 6));
 
 // These control the row padding and font styles
 $table-row-padding: rem-calc(($base-font-size - 6));
-$table-row-font-size: rem-calc(($base-font-size - 2));
+$table-row-font-size: rem-calc(($base-font-size - 3));
 $table-row-font-color: $black;
 // $table-line-height: rem-calc(18);
 
@@ -346,7 +346,7 @@ $container-bg: white !default;
 
 	[class^="icon-"],
 	[class*=" icon-"]{
-		@extend .icon-32;
+		@extend .size-32;
 		color: $aluminum;
 		&:before{ padding: 0; }
 	}
@@ -410,10 +410,8 @@ $container-bg: white !default;
 }
 
 section {
-	table tr > td,
-	table tr > th,
 	label {
-		@extend %p;
+		font-size: $paragraph-font-size;
 	}
 }
 
@@ -421,6 +419,7 @@ section {
 table{
 	border-collapse: collapse;
 	width: 100%;
+	line-height: 1.4;
 	.card{
 		padding: 0;
 		img{
@@ -436,9 +435,9 @@ table{
 		background-color: tint($alert-color, 74%);
 	}
 }
-thead tr th, .row-header, .island table.dataTable thead th {
+.row-header, .island table.dataTable thead th {
 	border-bottom: 2px solid $body-bg;
-	font-weight: $font-weight-bold;
+	font-weight: $font-weight-semibold;
 }
 
 // Override calendar default colour with accent colours
@@ -492,7 +491,7 @@ tr.sub-row {
 	.dataTables_wrapper {
 		.dataTables_info {
 			@extend .meta;
-			@extend %p;
+			font-size: $paragraph-font-size;
 			text-align: left;
 
 			margin-bottom: 1.5rem;
@@ -542,7 +541,7 @@ $rotate-th-width: $square-grid-td-size;
 			}
 		}
 
-		@extend %p;
+		font-size: $paragraph-font-size;
 		border-color: $vapor;
 		height: $rotate-width * 2 + 1;
 		min-width: $rotate-th-width;
@@ -722,7 +721,7 @@ $rotate-th-width: $square-grid-td-size;
 	display: inline-block;
 	position: relative;
 	margin-bottom: auto;
-	font-size: 0.75rem;
+	font-size: $small-font-size;
 	background-color: $content-ui-background;
 	border-radius: 0.5rem;
 
@@ -737,6 +736,7 @@ $rotate-th-width: $square-grid-td-size;
 .accordion{
 	// insane core foundation override
 	.accordion-navigation.active > a{
+		background: $off-canvas;
 		color: $accordion-navigation-font-color;
 	}
 	a {
@@ -770,24 +770,35 @@ nav {
   @extend .hide-for-print;
 }
 
+/*
+ * Uses .expander, .selector or .grip
+ * Use %placeholders to prevent the same CSS getting spat out over and over again.
+ */
+%interaction-li{
+	display: table;
+	width: calc(100% + 2rem);
+}
+%interaction-selector{
+	padding: 0 0.75rem;
+	display: table-cell;
+	vertical-align: middle;
+	width: 2rem;
+	&:before {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 0;
+	}
+}
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
 	> li{
-		display: table;
-		width: calc(100% + 2rem);
+		@extend %interaction-li;
 		.#{$selector} {
 			@if str-length($icon) > 0 {
 				@extend .icon-#{$icon};
 			}
-			@extend [class^="icon-"];
-			padding: 0 0.75rem;
+			@extend %interaction-selector;
 			cursor: $cursor;
-			display: table-cell;
-			vertical-align: middle;
-			width: 2rem;
 			&:before {
-				display: table-cell;
-				vertical-align: middle;
-				padding: 0;
 				color: $color;
 			}
 		}
@@ -797,18 +808,39 @@ nav {
 	}
 }
 
-@mixin information-list() {
+%information-list{
 	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	clear:both;
+}
+%information-li{
+	@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+	@include responsive-sides(-1, margin);
+	border-bottom: 1px solid $body-bg;
+	position: relative;
+	overflow: visible;
+	list-style: none;
+	@include single-transition(background-color, 0.3s, ease-in);
+}
+%card-article{
+	padding: 1rem 2rem 1rem 1rem;
+	clear: both;
+}
+%ui-sortable-helper{
+	border-bottom: none;
+	background-color: $row-action-hover-background;
+}
+@mixin information-list() {
+	@extend %information-list;
 
-	&.expandable {
-		@include list-interaction('expander', 'pointer');
+	&.expandable,
+	&.expandable-card{
+		@include list-interaction(expander, pointer);
 	}
 	&.card-selectable {
-		@include list-interaction('selector', 'pointer');
+		@include list-interaction(selector, pointer);
 		li .selector{
 			width: 3rem;
 			label{
@@ -817,97 +849,22 @@ nav {
 		}
 	}
     &.sortable, &.sortable-card {
-        .ui-sortable-helper {
-            border-bottom: none;
-            background-color: $row-action-hover-background;
-        }
-		@include list-interaction('grip', 'move', 'grip');
+		@include list-interaction(grip, move, grip);
+		.ui-sortable-helper {
+			@extend %ui-sortable-helper;
+		}
 	}
 	> li{
-		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
-		@include responsive-sides(-1, margin);
-		border-bottom: 1px solid $body-bg;
-		position: relative;
-		overflow: visible;
-		list-style: none;
-		@include single-transition(background-color, 0.3s, ease-in);
+		@extend %information-li;
 		> &:first-child{
 			padding-top: 0;
 		}
 		&:last-child{
 			border: 0;
 		}
-		[class^="icon-"]:before,
-		[class*=" icon-"]:before{
-			float: none;
-		}
 		input[type=radio]:not(.plain)+label.checkbox-label,
 		input[type=checkbox]:not(.plain)+label.checkbox-label {
 			margin-top: 0.5rem;
-		}
-		.one-column{
-			@media #{$small-up} { @include grid-column(1); }
-		}
-		.two-column{
-			@media #{$small-up} { @include grid-column(2); }
-		}
-		.three-column{
-			@media #{$small-up} { @include grid-column(3); }
-		}
-		.four-column{
-			@media #{$small-up} { @include grid-column(4); }
-		}
-		.five-column{
-			@media #{$small-up} { @include grid-column(5); }
-		}
-		.six-column{
-			@media #{$small-up} { @include grid-column(6); }
-		}
-		.seven-column{
-			@media #{$small-up} { @include grid-column(7); }
-		}
-		.eight-column{
-			@media #{$small-up} { @include grid-column(8); }
-		}
-		.nine-column{
-			@media #{$small-up} { @include grid-column(9); }
-		}
-		.ten-column{
-			@media #{$small-up} { @include grid-column(10); }
-		}
-		.eleven-column{
-			@media #{$small-up} { @include grid-column(11); }
-		}
-		.twelve-column{
-			@media #{$small-up} { @include grid-column(12); }
-		}
-		// Column with thumbnail - No Padding
-		.one-column.thumbnail{
-			padding: 0;
-			text-align: center;
-		}
-		// Responsive Column Padding
-		.one-column,
-		.two-column,
-		.three-column,
-		.four-column,
-		.five-column,
-		.six-column,
-		.seven-column,
-		.eight-column,
-		.nine-column,
-		.ten-column,
-		.eleven-column,
-		.twelve-column{
-			@media #{$small-up} {
-				padding: rem-calc(($base-font-size - 8));
-			}
-			@media #{$medium-up} {
-				padding: rem-calc(($base-font-size - 4));
-			}
-			@media #{$large-up} {
-				padding: rem-calc(($base-font-size));
-			}
 		}
 	}
 	form {
@@ -917,15 +874,12 @@ nav {
 		background-color: $row-action-hover-background;
 	}
 
-	/* <article> is no longer inside a .card instance due to .card buttons
-	 * unnecessarily occupying space, reducing article width unfairly
-	 * Reconstruct such that <article> immediately follows <nav> has a special
+	/* <article> immediately follows <nav> has a special
 	 * layout rule to display content
 	 */
 	.list-item ~ article,
 	.card ~ article{
-		padding: 1rem 2rem 1rem 1rem;
-		clear: both;
+		@extend %card-article;
 
 		P:last-child{
 			margin-bottom: 0;
@@ -936,12 +890,6 @@ nav {
 		 */
 		&:empty {
 			padding: 0;
-		}
-
-		@media #{$small-only} {
-			p {
-				font-size: (0.8125 * rem-calc($base-font-size));
-			}
 		}
 	}
 }
@@ -1114,10 +1062,6 @@ ul.flex-list {
 		> a {
 			width: 100%;
 			white-space: nowrap;
-			&.button {
-				height: 3rem;
-				line-height: 2rem;
-			}
 			&:empty:before {
 				float: none !important; // grrrr :(
 			}
@@ -1185,7 +1129,7 @@ ul.flex-list {
         a {
             color: $content-ui-foreground;
         }
-		.icon-32 {
+		.size-32 {
             color: $content-ui-foreground;
 			padding-top: 1rem;
 		}
@@ -1234,19 +1178,6 @@ ul.flex-list {
 		border-right: 1px solid $body-bg;
 		border-bottom: 1px solid $body-bg;
 	}
-}
-
-p{
-  @media #{$small-up} {
-    margin-bottom: rem-calc(($base-font-size - 8));
-  }
-  @media #{$medium-up} {
-    margin-bottom: rem-calc(($base-font-size - 4));
-  }
-  @media #{$large-up} {
-    margin-bottom: rem-calc(($base-font-size));
-  }
-
 }
 
 // Threaded / Social Stream
@@ -1425,7 +1356,6 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
     background-color: $base;
     margin: 0.25rem;
     @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-	@extend %iconify;
 	@extend .no-text;
 
     &:before{
@@ -1500,7 +1430,6 @@ ul.meta {
 dl {
 	&.inline-dl {
 		@include grid-row($behavior:nest);
-
         margin-bottom: 1rem;
 
         dt, dd {
@@ -1625,30 +1554,22 @@ $train-line-unvisited-color: $content-ui-background;
 @media #{$small-only} {
     // top level breadcrumbing: on mobile, only show current and previous
     #content > .breadcrumb li {
-
-        a {
-            //width: 0;
-        }
         display: none;
 
         &:nth-last-child(-n+2) {
             display: list-item;
-            a {
-                //width: auto;
-            }
         }
     }
 }
 
 @media #{$large-up} {
-  #content > .breadcrumb {
-	margin-left: -1rem;
-  }
+	#content > .breadcrumb {
+		margin-left: -1rem;
+	}
 }
 
-
 article {
-  @extend .clearfix;
+  	@extend .clearfix;
 }
 
 

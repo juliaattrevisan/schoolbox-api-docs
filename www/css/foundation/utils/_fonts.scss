@@ -1,11 +1,6 @@
-%iconify {
-	font-family: 'schoolbox', #{$body-font-family};
-}
-
 [class^="icon-"], [class*=" icon-"] {
 	@include contrast-bg();
 	&:before {
-		@extend %iconify;
 		speak: none;
 		font-size: 1rem;
 		font-style: normal;
@@ -40,22 +35,22 @@
 }
 
 // Icon sizes
-.icon-8:before{
+.size-8:before{
 	font-size: 0.5rem;
 	line-height: 0.5rem;
 }
 
-.icon-32:before{
+.size-32:before{
 	font-size: 2rem;
 	line-height: 2rem;
 }
 
-.icon-48:before{
+.size-48:before{
 	font-size: 3rem;
 	line-height: 3rem;
 }
 
-.icon-64:before{
+.size-64:before{
 	font-size: 4rem;
 	line-height: 4rem;
 }

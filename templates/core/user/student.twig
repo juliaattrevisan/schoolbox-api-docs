@@ -237,7 +237,7 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
                                 <li class="no-pad">
                                     <a href="/learning/due/{{ user.getId() }}"
-                                       class="no-margin button fat icon-fat icon-32 icon-due-work"
+                                       class="no-margin button fat icon-fat size-32 icon-due-work"
                                        data-equalizer-watch>Due Work</a>
                                 </li>
                             {% endif %}
@@ -249,7 +249,7 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                 <li class="no-pad">
                                     <a href="/learning/grades/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-tick"
+                                       class="no-margin fat button icon-fat size-32 icon-tick"
                                        data-equalizer-watch>Grades</a>
                                 </li>
                             {% endif %}
@@ -260,7 +260,7 @@
                         {% block buttons_eportfolio %}
                             <li class="no-pad">
                                 <a href="/eportfolio/{{ user.getId() }}/profile"
-                                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                   class="no-margin fat button icon-fat size-32 icon-eportfolio"
                                    data-equalizer-watch>ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
@@ -270,7 +270,7 @@
                         {% if isStaff or isParentOfStudent %}
                         <li class="no-pad">
                             <a href="/pastoral/{{ user.getId() }}"
-                               class="no-margin fat icon-fat button icon-32 icon-pastoral"
+                               class="no-margin fat icon-fat button size-32 icon-pastoral"
                                data-equalizer-watch>Pastoral Care</a>
                         </li>
                         {% endif %}
@@ -280,7 +280,7 @@
                         {% block buttons_calendar %}
                             <li class="no-pad">
                                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                   class="no-margin fat button icon-fat icon-32 icon-calendar"
+                                   class="no-margin fat button icon-fat size-32 icon-calendar"
                                    data-equalizer-watch>{TPL_LOCAL_CALENDAR_PC}</a>
                             </li>
                         {% endblock buttons_calendar %}
@@ -291,7 +291,7 @@
                             {% block buttons_timetable %}
                                 <li class="no-pad">
                                     <a href="/timetable/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-timetable"
+                                       class="no-margin fat button icon-fat size-32 icon-timetable"
                                        data-equalizer-watch>Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
@@ -303,7 +303,7 @@
                             {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
                                 <li class="no-pad">
                                     <a href="/modules/leave/student/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                                       class="no-margin fat button icon-fat size-32 icon-boarder-leave"
                                        data-equalizer-watch>Boarder Leave</a>
                                 </li>
                             {% endif %}
@@ -315,7 +315,7 @@
                             {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
                                 <li class="no-pad">
                                     <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-modify"
+                                       class="no-margin fat button icon-fat size-32 icon-modify"
                                        target="_blank"
                                        data-equalizer-watch>Pastoral Care</a>
                                 </li>
@@ -427,7 +427,7 @@
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <span class="icon-home icon-32"></span>
+                                        <span class="icon-home size-32"></span>
                                         {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
                                         <p>{{ contact.StudentContactAddress1 }}</p>
                                         <p>{{ contact.StudentContactAddress2 }}</p>
@@ -520,11 +520,11 @@
                                         <div class="card small-12">
                                             {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                             <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
-                                                <span class="icon-home icon-32 "></span>
+                                                <span class="icon-home size-32 "></span>
                                                 <h3>{{ subject.name }}</h3>
                                             </a>
                                             {% else %}
-                                            <span class="icon-home icon-32"></span>
+                                            <span class="icon-home size-32"></span>
                                             <h3>{{ subject.name }}</h3>
                                             {% endif %}
                                             <p class="meta">{{ subject.code }}</p>
@@ -588,11 +588,11 @@
                                         <div class="card small-12 ">
                                             {% if group.perms > 0 %}
                                                 <a href="/homepage/{{ group.id }}">
-                                                    <span class="icon-folder icon-32"></span>
+                                                    <span class="icon-folder size-32"></span>
                                                     <h3>{{ group.name }}</h3>
                                                 </a>
                                             {% else %}
-                                                <span class="icon-folder icon-32"></span>
+                                                <span class="icon-folder size-32"></span>
                                                 <h3>{{ group.name }}</h3>
                                             {% endif %}
                                         </div>

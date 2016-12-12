@@ -52,7 +52,7 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
         address {
             text-align: center;
             font-style: normal;
-            font-size: 0.75rem;
+            font-size: $small-font-size;
             margin-bottom: 2rem;
         }
     }

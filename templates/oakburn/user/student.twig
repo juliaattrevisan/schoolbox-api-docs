@@ -20,7 +20,7 @@
     {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
         <li class="no-pad">
             <a href="/learning/due/{{ user.getId() }}"
-               class="no-margin fat button icon-fat icon-32 icon-due-work"
+               class="no-margin fat button icon-fat size-32 icon-due-work"
             >Tasks/Assessments Due</a>
         </li>
     {% endif %}
@@ -30,7 +30,7 @@
     {% if not (config.restrict_parent_grades and session.user.isParent()) %}
         <li class="no-pad">
             <a href="/learning/grades/{{ user.getId() }}"
-               class="no-margin fat button icon-fat icon-32 icon-tick"
+               class="no-margin fat button icon-fat size-32 icon-tick"
             >Assessments</a>
         </li>
     {% endif %}

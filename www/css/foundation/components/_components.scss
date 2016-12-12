@@ -35,7 +35,6 @@
  */
 .component-titlebar {
     @include information-list;
-
 }
 
 .component-action{
@@ -282,10 +281,10 @@ ul.tileList {
         background-color: $accent-background;
     }
     .count{
-        @extend %h2;
+        font-size: $h2-font-size;
     }
     .labels{
-        @extend %p;
+        font-size: $paragraph-font-size;
         text-transform: uppercase;
         @media #{$small-only} {
             font-size: 0.625rem;

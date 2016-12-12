@@ -76,7 +76,7 @@
                         <ul class="information-list">
                             {% for topVisitor in topVisitors %}
                                 <li class="row">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <a href="/search/user/{{ topVisitor.user.id }}" title="View Profile">
                                             <img src="/portrait.php?userId={{ topVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
                                             <p>{{ topVisitor.user.fullName }}</p>
@@ -119,7 +119,7 @@
                         <ul class="information-list">
                             {% for topFile in topFiles %}
                                 <li class="row">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <a href="/send.php?id={{ topFile.info.id }}" title="{{ topFile.info.title }}">
                                             <img src="/images/mime/{{ topFile.iconFile }}" alt="{{ topFile.info.title }}" class="mime" />
 
@@ -170,7 +170,7 @@
                         <ul class="grid small-block-grid-1 medium-block-grid-2">
                             {% for recentVisitor in recentVisitors %}
                                 <li>
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <a href="/search/user/{{ recentVisitor.user.id }}" title="{{ recentVisitor.user.fullName }} (last visited {{ recentVisitor.lastAccessTime.relativeTime }})">
                                             <img src="/portrait.php?userId={{ recentVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
 
@@ -209,7 +209,7 @@
                         <ul class="grid small-block-grid-1 medium-block-grid-2">
                             {% for yetToVisitor in yetToVisit %}
                                 <li>
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <a href="/search/user/{{ yetToVisitor.user.id }}" title="View Profile">
                                             <img src="/portrait.php?userId={{ yetToVisitor.user.externalId }}&amp;size=square64" alt="View Profile">
 
@@ -248,9 +248,9 @@
                         <ul class="information-list">
                             {% for topLink in topLinks %}
                                 <li class="row">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <a href="/redir.php?id={{ topLink.info.id }}" title="{{ topLink.info.url }}">
-                                            <div class="icon-link icon-32"></div>
+                                            <div class="icon-link size-32"></div>
                                             <p>{{ topLink.info.description }}</p>
                                         </a>
                                         <span class="neutral label tally" title="Link access count">{{ topLink.accessCount }}</span>

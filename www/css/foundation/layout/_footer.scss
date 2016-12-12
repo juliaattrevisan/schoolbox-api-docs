@@ -1,7 +1,6 @@
 $footer-margin-bottom: 1rem;
 
 #footer {
-
     /* http://www.w3schools.com/cssref/pr_margin.asp
      * Three-argument margin: third arg is margin-bottom
      */
@@ -17,14 +16,11 @@ $footer-margin-bottom: 1rem;
         margin: 0 3rem 17rem;
     }
 
-    clear: both;
-
-    @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
         list-style: none;
         padding: 0;
-
+        font-size: $small-font-size;
         > li {
             margin: 0 1rem 0.25rem 0;
             display: inline-block;
@@ -32,10 +28,12 @@ $footer-margin-bottom: 1rem;
         }
     }
 
-    a {
-        color: inherit;
-        &:hover {
-            text-decoration: underline;
-        }
+    a:hover {
+        text-decoration: underline;
     }
+}
+
+#footer,
+#footer a{
+    @include contrast-bg();
 }

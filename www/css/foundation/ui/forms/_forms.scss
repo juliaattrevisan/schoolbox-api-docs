@@ -10,14 +10,14 @@ $form-spacing: rem-calc(($base-font-size));
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
 $form-label-font-size: rem-calc(($base-font-size - 2));
-$form-label-font-weight: $font-weight-bold;
+$form-label-font-weight: $font-weight-semibold;
 $form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
 $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
-$input-font-size: rem-calc(($base-font-size - 3));
+$input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 
 $input-bg-color: $white;
@@ -140,8 +140,7 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
-	@extend %p;
-	min-height: $input-height;
+	min-height: $global-button-input-height;
 	line-height: inherit;
 	font-weight: $font-weight-normal;
 	&:hover{
@@ -156,10 +155,6 @@ select{
 		outline: none;
 	}
 }
-input:not([type]), #{text-inputs(all, 'input')} {
-	// Ensure input height respects my settings
-	height: $global-button-input-height;
-}
 
 input[type="checkbox"],
 input[type="radio"]{
@@ -167,13 +162,14 @@ input[type="radio"]{
 }
 
 input[type="number"]{
-  padding: 0 0 0 $form-spacing / 2;
+  	padding: 0 0 0 $form-spacing / 2;
 }
 
 input,
 textarea{
 	padding-left: 0.75rem;
 }
+
 select {
 	padding-top: 0;
 	padding-bottom: 0;
@@ -210,33 +206,52 @@ th, td{
 		@include single-transition(opacity, $switch-paddle-transition-speed, $switch-paddle-transition-ease);
 	}
 }
-
+%fancy-check{
+	position: absolute;
+	width: 0;
+	height: 0;
+	min-height: 0;
+	opacity: 0;
+}
+%fancy-check-selector{
+	position: relative;
+	display: block;
+	cursor: pointer;
+}
+%fancy-check-before{
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	display: block;
+	content: "";
+}
+%fancy-check-after{
+	position: absolute;
+	display: block;
+	content: "\e604";
+	color: rgba($white, 0);
+	margin: 0;
+	text-align: center;
+}
 @mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
-
     $label-selector: "label";
 
+	@extend %fancy-check;
     // overwrite to append class if required
     @if($label-class) {
         $label-selector: "label.#{$label-class}";
     }
 
-    position: absolute;
-    width: 0;
-    height: 0;
-    min-height: 0;
-    opacity: 0;
-
     + #{$label-selector} {
         // this is where the magic happens
-        position: relative;
-        display: block;
+		@extend %fancy-check-selector;
         min-height: $checkbox-size;
         line-height: $checkbox-size;
         padding: 0 0 0 ($checkbox-size + $checkbox-margin);
         font-weight: $font-weight-normal;
-        cursor: pointer;
         margin: 0 0 $checkbox-margin 0;
 
         &:before, &:after {
@@ -245,31 +260,20 @@ th, td{
         }
 
         &:before {
-            display: block;
-            content: "";
+			@extend %fancy-check-before;
             width: $checkbox-size;
             height: $checkbox-size;
             background-color: $hover-color;
-            position: absolute;
-            top: 0;
-            left: 0;
-            margin: 0;
         }
 
         &:after {
-            @extend %iconify;
-            display: block;
-            content: "\e604";
-            color: rgba($white, 0);
+            @extend %fancy-check-after;
             width: $checkbox-inner-size;
             height: $checkbox-inner-size;
-            position: absolute;
             top: $input-border-width;
             left: $input-border-width;
             background-color: $input-bg-color;
-            margin: 0;
             line-height: $checkbox-size - $input-border-width;
-            text-align: center;
             font-size: $icon-size;
         }
 
@@ -324,10 +328,11 @@ input[type=radio]{
 		padding: ($base-font-size - 4);
 		width: 100%;
 		font-size: $base-font-size;
+		font-weight: $font-weight-normal;
 		line-height: 2;
 		@include transition(all, 0.1s, ease-in);
 		i{
-			@extend .icon-32;
+			@extend .size-32;
 			color: $content-ui-foreground;
 			padding-right: 0.35rem;
 			float: left;
@@ -374,10 +379,6 @@ input[type=radio]{
 			display: block;
 			float: none;
 		}
-	}
-
-	+ label {
-		font-weight: $font-weight-normal;
 	}
 
 	&:hover {
@@ -456,14 +457,14 @@ ul.filters {
 // Win7/IE11 fix for size of checkboxes
 // For now I'm just going to guess a pixel value
 html.no-pseudoelementlineheightinrems {
-  input[type=radio]:not(.plain),
-  input[type=checkbox]:not(.plain) {
-    + label {
-      &:after {
-        line-height: ($base-font-size * 1.25);
-      }
-    }
-  }
+	input[type=radio]:not(.plain),
+	input[type=checkbox]:not(.plain) {
+		+ label {
+			&:after {
+				line-height: ($base-font-size * 1.25);
+			}
+		}
+	}
 }
 
 input[type=radio]:not(.plain) + label {
@@ -475,12 +476,12 @@ input[type=radio]:not(.plain) + label {
 // Disabled
 input[type=checkbox]:not(.plain):disabled,
 input[type=radio]:not(.plain):disabled{
-  & + label{
-    opacity: 0.5;
-    &:after{
-      opacity: 0.5;
-    }
-  }
+	& + label{
+	opacity: 0.5;
+		&:after{
+			opacity: 0.5;
+		}
+	}
 }
 
 input[type=checkbox]:not(.plain):disabled:checked + label,
@@ -489,7 +490,6 @@ input[type=radio]:not(.plain):disabled:checked + label{
 }
 
 select.visibility {
-	@extend %iconify;
 	&.show-icon-only {
 		width: 3rem !important;
         padding: 0.5rem 1rem 0.5rem 0.3rem;
@@ -498,7 +498,6 @@ select.visibility {
 
 // Component Forms
 .editPanel{
-
     // Socialstreams-specific colouring
     &.socialstream-new-post {
         background-color: $asgard;
@@ -607,6 +606,7 @@ select.visibility {
              * selectize bangs it, so I have to bang it too
              */
             .selectize-input {
+				padding: 0;
                 input[type="text"] {
                     display: none !important;
                 }
@@ -651,7 +651,6 @@ section > fieldset {
 	}
 
 	> legend {
-		@extend %h3;
 		@extend .column;
 		margin: 0.2rem 0 0.5rem;
 		font-weight: $header-font-weight;
@@ -662,7 +661,7 @@ section > fieldset {
 		padding: 0;
 		margin: 0 0 0.5rem;
 		legend {
-			@extend %h4;
+			font-size: $h4-font-size;
 			font-weight: $header-font-weight;
 			margin-bottom: 0.5rem;
 		}

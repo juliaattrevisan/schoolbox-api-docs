@@ -27,7 +27,7 @@ $global-button-padding: rem-calc(($base-font-size / 2));
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
 // $button-med: rem-calc(12);
-$button-med: rem-calc(($base-font-size - 8));
+$button-med: $global-button-padding;
 // $button-lrg: rem-calc(18);
 
 // We use this to control the display property.
@@ -78,24 +78,18 @@ $alert-button-border-color: transparent;
 $button-disabled-opacity: 0.5;
 // $button-disabled-cursor: $cursor-default-value;
 
-
 // Override buttons with icons font-size
-.button[class^="icon-"]:before,
-.button[class*=" icon-"]:before{
-	font-size: 1rem;
-}
-
-.icon-32[class^="icon-"]:before,
-.icon-32[class*=" icon-"]:before{
+.size-32[class^="icon-"]:before,
+.size-32[class*=" icon-"]:before{
 	font-size: 2rem;
 }
 
-.icon-48[class^="icon-"]:before,
-.icon-48[class*=" icon-"]:before{
+.size-48[class^="icon-"]:before,
+.size-48[class*=" icon-"]:before{
 	font-size: 3rem;
 }
 
-.icon-64[class^="icon-"]:before,
-.icon-64[class*=" icon-"]:before{
+.size-64[class^="icon-"]:before,
+.size-64[class*=" icon-"]:before{
 	font-size: 4rem;
 }

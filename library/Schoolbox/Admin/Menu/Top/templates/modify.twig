@@ -76,7 +76,7 @@
                     <div class="small-1 columns">
                         <label>
                             Preview
-                            <div id="icon" style="margin-top:5px" class="icon-32 icon-{{ item.icon }}"></div>
+                            <div id="icon" style="margin-top:5px" class="size-32 icon-{{ item.icon }}"></div>
                         </label>
                     </div>
                 </fieldset>
@@ -164,10 +164,10 @@
         {# Icon preview#}
 
         $('[data-icon]').change(function() {
-            $('#icon').attr('class', 'icon-32 icon-' + $('#icon-select').val())
+            $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
         });
 
-        $('#icon').attr('class', 'icon-32 icon-' + $('#icon-select').val())
+        $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
 
         {# Check all checkboxes if everything was selected #}
 

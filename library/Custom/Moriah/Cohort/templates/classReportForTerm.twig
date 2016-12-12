@@ -272,7 +272,7 @@
                     {% for result in results %}
                         {% set otherUsageCount = max(0, (result.folders|length)-1) %}
                         <div class="card small-12">
-                            <span class="icon-course icon-32"></span>
+                            <span class="icon-course size-32"></span>
                             <p>{{ result.course.getNameWithCodes() }}</p>
                             {% if user.getRole().isStaff() %}
                             <p class="meta">
@@ -292,7 +292,7 @@
                         {% for baseUnitId, unitResult in result.units %}
                             <li>
                                 <div class="card small-12">
-                                    <span class="icon-folder icon-32"></span>
+                                    <span class="icon-folder size-32"></span>
                                     <p>{{ unitResult.unit.getTitle() }}</p>
                                 </div>
                                 <div data-unit-graph="{{ baseUnitId|e('html_attr') }}"

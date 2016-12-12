@@ -79,7 +79,7 @@ $notification-header-background: $navigation-background !default;
             @media #{$xlarge-up} {
                 &:after {
                     content: "\00BB";
-                    @include scale-font-size($h2-font-scale);
+                    font-size: $h2-font-size;
                     padding-left: 0.5rem;
                 }
                 &.raquo:after {
@@ -95,28 +95,15 @@ $notification-header-background: $navigation-background !default;
      * This is also the Mark All Read button.
      */
     .button {
-        @include button-dimensions();
-        @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-
-        color: $content-ui-foreground;
-        background-color: $content-ui-background;
         margin-bottom: 0;
-        overflow: hidden;
-
-        &:hover {
-            color: $content-ui-foreground;
-            background-color: $content-ui-hover;
-        }
     }
     section{
         margin: 0;
     }
-    .card {
-        a {
-            color: inherit;
-            &:hover {
-                background: inherit;
-            }
+    .card a {
+        color: inherit;
+        &:hover {
+            background: inherit;
         }
     }
     .list-item {
