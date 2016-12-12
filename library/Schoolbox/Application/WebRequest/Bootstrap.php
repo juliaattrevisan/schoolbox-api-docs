@@ -640,9 +640,7 @@ class Bootstrap implements BootstrapInterface {
             'assessmentTranslator',
             $di->lazy(function () use ($di) {
                 $translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
-                    new \Schoolbox\Learning\MarkScheme\Factory(),
-                    $di->newInstance(UnitSpecTranslator::class),
-                    $di->newInstance(UnitImplTranslator::class)
+                    new \Schoolbox\Learning\MarkScheme\Factory()
                 );
                 $translator
                     ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())

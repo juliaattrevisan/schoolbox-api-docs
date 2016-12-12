@@ -38,11 +38,7 @@ trait TestTrait
      */
     protected function setUp()
     {
-        $this->translator = new Translator(
-            new MarkSchemeFactory(),
-            new \Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator(),
-            new \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator()
-        );
+        $this->translator = new Translator(new MarkSchemeFactory());
         $this->translator
             ->addSubTranslator(new Translator\Task())
             ->addSubTranslator(new Translator\DueWork())

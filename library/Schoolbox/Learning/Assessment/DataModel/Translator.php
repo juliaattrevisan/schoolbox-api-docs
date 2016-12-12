@@ -36,24 +36,6 @@ class Translator
     protected $markSchemeFactory;
 
     /**
-     * Translator for unit specifications.
-     *
-     * Used in this class's translators to convert contexts.
-     *
-     * @var UnitSpecificationTranslator
-     */
-    protected $unitSpecificationTranslator;
-
-    /**
-     * Translator for unit implementations.
-     *
-     * Used in this class's translators to convert contexts.
-     *
-     * @var UnitImplementationTranslator
-     */
-    protected $unitImplementationTranslator;
-
-    /**
      * Sub-translators
      *
      * @var IAssessmentTypeTranslator[]
@@ -64,17 +46,10 @@ class Translator
      * Constructor
      *
      * @param MarkSchemeFactory            $markSchemeFactory
-     * @param UnitSpecificationTranslator  $unitSpecificationTranslator
-     * @param UnitImplementationTranslator $unitImplementationTranslator
      */
-    public function __construct(
-        MarkSchemeFactory $markSchemeFactory,
-        UnitSpecificationTranslator $unitSpecificationTranslator,
-        UnitImplementationTranslator $unitImplementationTranslator
-    ) {
-        $this->markSchemeFactory            = $markSchemeFactory;
-        $this->unitSpecificationTranslator  = $unitSpecificationTranslator;
-        $this->unitImplementationTranslator = $unitImplementationTranslator;
+    public function __construct(MarkSchemeFactory $markSchemeFactory)
+    {
+        $this->markSchemeFactory = $markSchemeFactory;
     }
 
     /**
@@ -135,8 +110,6 @@ class Translator
             $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof UnitSpecification) {
-            // Can't use translator here.
-            // UnitSpecificationTranslator->translateToDataModel requires a course spec I don't have.
             $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof UnitImplementation) {
