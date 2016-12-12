@@ -16,6 +16,25 @@
         altInput: true,
         altFormat: '{{ databaseFormat }}',
         enableTime: true,
+        onReady: function(selectedDates, dateStr, instance) {
+            if($('.hasTime')) {
+                $('.flatpickr-time').css('display', 'none');
+                $('.flatpickr-time').addClass('allDay');
+                $('.flatpickr-time').removeClass('hasTime');
+                $('.flatpickr-time').after('<div class="timeSwitch"><input id="hideTime" name="hideTime" type="checkbox" value="1" checked="checked"><label for="hideTime" class="checkbox-label">All Day</label></div>');
+            }
+            $('#hideTime').click(function () {
+                if ($('#hideTime').is(':checked')) {
+                    $('.flatpickr-time').css('display', 'none');
+                }
+                else {
+                    $('.flatpickr-time').css('display', 'block');
+                    $('.flatpickr-time').addClass('hasTime');
+                    $('.flatpickr-time').removeClass('allDay');
+                }
+            });
+
+        },
         onChange: function(selectedDates, dateString, instance) {
 
             {# Put the display date onto the calendar div so we can capture it when the modal is closed #}
