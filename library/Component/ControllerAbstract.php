@@ -142,6 +142,8 @@ abstract class Component_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
+        $this->setSitePage($sitepage);
+
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
         /** @var ErrorMapper $errorMapper */
@@ -152,7 +154,6 @@ abstract class Component_ControllerAbstract
         $this
             ->setInstance($instance)
             ->setUser($user)
-            ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
             ->setFolderMapper($folderMapper)
             ->setErrorMapper($errorMapper)
