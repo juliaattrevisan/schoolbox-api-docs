@@ -63,37 +63,39 @@ class UsageMapper
     {
         $query = "
             SELECT
-                COALESCE(SUM(bytes), 0) AS bytes,
-                COALESCE(SUM(num), 0) AS num
+              COALESCE(SUM(bytes), 0) AS bytes,
+              COALESCE(SUM(num), 0) AS num
             FROM
-            (
+              (
                 (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
-                FROM `file` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`owner` = :userId
-                AND `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
+                 FROM `file` `f`
+                   INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                 WHERE `f`.`owner` = :userId
+                       AND `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
-                FROM `myFile` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`owner` = :userId
-                AND `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
+                 FROM `myFile` `f`
+                   INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                 WHERE `f`.`owner` = :userId
+                       AND `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
-                FROM `student_submission` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`owner` = :userId
-                GROUP BY `f`.`owner`)
+                 FROM `student_submission` `f`
+                   INNER JOIN `student_submission_file` ON `student_submission_file`.student_submission_id = `f`.id
+                   INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
+                 WHERE `f`.`owner` = :userId
+                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
-                FROM `submission_return` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`owner` = :userId
-                AND `f`.`deleted_at` IS NULL
-                GROUP BY `f`.`owner`)
-            ) AS allTotals
+                 FROM `submission_return` `f`
+                   INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                   INNER JOIN `storage` `s` ON `submission_return_file`.`hash` = `s`.`hash`
+                 WHERE `f`.`owner` = :userId
+                       AND `f`.`deleted_at` IS NULL
+                 GROUP BY `f`.`owner`)
+              ) AS allTotals
         ";
         $statement = $this->database->prepare($query);
         $statement->execute(['userId' => $this->getUserId()]);
@@ -189,21 +191,24 @@ class UsageMapper
 
                 (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
-                $storageJoin
+                INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'image/%')
                 UNION
                 (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
-                $storageJoin
+                INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'video/%')
                 UNION
                 (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
-                $storageJoin
+                INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'audio/%')
@@ -212,7 +217,8 @@ class UsageMapper
 
                 (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `submission_return` `f`
-                $storageJoin
+                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `submission_return_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `f`.`deleted_at` IS NULL
@@ -220,7 +226,8 @@ class UsageMapper
                 UNION
                 (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `submission_return` `f`
-                $storageJoin
+                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `submission_return_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `f`.`deleted_at` IS NULL
@@ -228,7 +235,8 @@ class UsageMapper
                 UNION
                 (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `submission_return` `f`
-                $storageJoin
+                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `submission_return_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `f`.`deleted_at` IS NULL
@@ -297,13 +305,15 @@ class UsageMapper
                 UNION
                 (SELECT 'Submission'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
                 FROM `student_submission` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
+                INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
                 WHERE `f`.`owner` = :userId
                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT 'Returns'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
                 FROM `submission_return` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `submission_return_file`.`hash` = `s`.`hash`
                 WHERE `f`.`owner` = :userId
                 AND `f`.`deleted_at` IS NULL
                 GROUP BY `f`.`owner`)) AS allTotals
@@ -376,7 +386,7 @@ class UsageMapper
                 UNION
                 (SELECT
                     `f`.`id` AS id,
-                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
+                    COALESCE(`student_submission_file`.`realname`, `s`.`filename`) AS `name`,
                     'Submission' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
@@ -384,14 +394,15 @@ class UsageMapper
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
                 FROM `student_submission` `f`
-                $storageJoin
+                INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
                 $mimeJoin
                 $boxJoin
                 WHERE `f`.`owner` = :userId)
                 UNION
                 (SELECT
                     `f`.`id` AS id,
-                    COALESCE(`f`.`filename`, `s`.`filename`) AS `name`,
+                    COALESCE(`submission_return_file`.`realname`, `s`.`filename`) AS `name`,
                     'Return' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
@@ -399,7 +410,8 @@ class UsageMapper
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
                 FROM `submission_return` `f`
-                $storageJoin
+                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = `submission_return_file`.hash
                 $mimeJoin
                 $boxJoin
                 WHERE `f`.`owner` = :userId
