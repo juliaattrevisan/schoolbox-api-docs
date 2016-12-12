@@ -18,7 +18,7 @@
 {% block headerOptions %}
     <li class="separator">Bulk Actions</li>
     <li>
-        <a class="icon-approve" data-mass="publish">Publish visible drafts&hellip;</a>
+        <a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a>
     </li>
 {% endblock %}
 
@@ -73,6 +73,27 @@
 {% endblock %}
 
 {% block scripts %}
+
+<div id="mass-publish" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+    <h2>Publish Drafts</h2>
+    <p>The following drafts can be published:</p>
+    <section class="checklist" id="mass-publish-list">
+        <div data-template>{# this will get detached from the DOM on pageload #}
+            <input type="checkbox" data-participant-selected checked />
+            <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+        </div>
+    </section>
+    <div class="component-action">
+        <section>
+        {%- spaceless -%}
+            <a class="button">Cancel</a>
+            <a class="button" data-mass-publish>Publish All</a>
+        {%- endspaceless -%}
+        </section>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <div class="toast" data-alert data-save-draft></div>
 
     {# Dynamic Feedback
@@ -100,6 +121,74 @@
                 statusPending: '{{ statusPending }}',
                 statusComplete: '{{ statusComplete }}'
             });
+
+            var $massItemTpl = $('#mass-publish-list').find('[data-template]').removeAttr('data-template').detach();
+
+            var $participantList   = $('#assessment-status'),
+                $massPublishReveal = $('#mass-publish'),
+                $massPublishSubmit = $massPublishReveal.find('[data-mass-publish]');
+
+            $massPublishReveal.on('change', '[data-participant-selected]', function () {
+
+                var $checks = $massPublishReveal.find('[data-participant-selected]');
+
+                // see if the list has anything selected
+                var all = $checks.length;
+                var len = $checks.filter(':checked').length;
+
+                if (len == all) {
+                    $massPublishSubmit.removeAttr('disabled').text('Publish All');
+
+                } else if (len) {
+                    $massPublishSubmit.removeAttr('disabled').text('Publish ' + len + ' Selected');
+
+                } else {
+                    $massPublishSubmit.attr('disabled', 'disabled').text('None Selected');
+                }
+            });
+
+            $massPublishReveal.on('open.fndtn.reveal', function () {
+
+                $massPublishSubmit.removeAttr('disabled').text('Publish All');
+
+                $('#mass-publish-list').html(
+
+                        $participantList.find('[data-interaction-draft]:visible').closest('[data-participant-name]').map(function () {
+
+                            var $item = $massItemTpl.clone(),
+                                tag   = $item.prop("tagName").toLowerCase(),
+                                $lbl  = $item.find('[data-participant-name]'),
+                                $chk  = $item.find('[data-participant-selected]'),
+                                id    = $(this).find('[data-interaction-draft]').data('interactionDraft');
+
+                            $chk.attr('id', id);
+                            $lbl.attr('for', id);
+
+                            // apply the name
+                            $lbl.text($(this).data('participantName'));
+
+                            // because outerHtml doesn't exist as a thing
+                            return ['<', tag, '>', $item.html(), '</', tag, '>' ].join('');
+
+                        }).get().join('')
+
+                );
+
+            });
+
+            $massPublishSubmit.on('click', function (e) {
+                e.preventDefault();
+
+                $massPublishReveal.find(':checked').each(function () {
+                    $participantList.find('[data-interaction-draft='+this.id+']').find('[data-draft="publish"]').trigger('click');
+                });
+
+            });
+
+            $massPublishReveal.on('click', '.button', function () {
+                $massPublishReveal.foundation('reveal', 'close');
+            });
+
         });
     </script>
 {% endblock %}
