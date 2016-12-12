@@ -1,44 +1,35 @@
 {% if news is empty %}
-
     <div class="empty-state">
         <i class="icon-news"></i>
         <p>No news yet!</p>
         {% if modify %}
-            <p><a href="/news/homepage/new/{{ code }}">Post a news article</a>, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</a></p>
+            <p><a href="/news/homepage/new/{{ code }}">Post a news article</a>, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</p>
         {% else %}
             <p><a href="/homepage/newsArchive/{{ code }}">View the news archive</a>.</p>
         {%endif %}
     </div>
-
 {% else %}
-
     <section>
         <ul class="information-list">
-
             {% if compact %}
-
                 {# Compact view #}
-
                 {% for item in news %}
-                    <li {% if modify %}class="actions-small-1"{% endif %}>
+                    <li {% if ( moderate or ( modify and config.news_edit_other ) ) %}class="actions-small-1"{% endif %}>
                         <div class="list-item">
                             <div class="card small-12">
                                 <h3><a href="/homepage/news/{{ item.code }}/{{ item.id }}">{{ item.heading }}</a></h3>
                                 <p class="meta">Posted by <a href="/search/user/{{ item.synid }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
                             </div>
                         </div>
-                        {% if modify %}
+                        {% if ( moderate or ( modify and config.news_edit_other ) ) %}
                             <nav>
                                 <a class="icon-modify" href="/news/homepage/{{ item.id }}" title="Modify News"></a>
                             </nav>
                         {% endif %}
                     </li>
                {% endfor %}
-
             {% else %}
-
                 {# Non compact view #}
-
                 {% for item in news %}
                     <li {% if modify %}class="actions-small-1"{% endif %}>
                         <div class="list-item">
@@ -59,7 +50,6 @@
                     </li>
                 {% endfor %}
             {% endif %}
-
         </ul>
         <div class="component-action">
             <section>
@@ -69,7 +59,5 @@
                 {% endif %}
             </section>
         </div>
-
     </section>
-
 {% endif %}

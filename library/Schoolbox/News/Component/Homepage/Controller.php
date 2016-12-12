@@ -10,6 +10,7 @@ namespace Schoolbox\News\Component\Homepage;
 use CategoryNews;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Permission\Access\UserAccess;
 use Group;
 use News;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -90,8 +91,8 @@ class Controller extends Component_Homepage_ControllerAbstract
         else
             $news = $this->newsHandler->getAllForCategory($this->source->getId(), array('size' => $this->getConfig('size')));
 
-        $modify =   $news['owner'] == $_SESSION['user']->getId() ||
-                    $this->getContentPermission() >= FULL_ACCESS || ($this->getContentPermission() >= WRITE_ACCESS && $this->getConfig('news_edit_other'));
+        $moderate =  $this->getContentPermission() >= UserAccess::ACCESS_FULL;
+        $modify =  $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
 
         if (is_array($news)) {
             foreach ($news as &$item) {
@@ -108,6 +109,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentClass'        => $this->getComponentName(),
                 'news'                  => $news,
                 'modify'                => $modify,
+                'moderate'              => $moderate,
                 'code'                  => $this->source->getId(),
                 'compact'               => $this->getConfig('compactMode','value')
             ]
