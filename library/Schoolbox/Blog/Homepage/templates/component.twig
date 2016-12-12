@@ -44,19 +44,11 @@
 {% if blogs is empty %}
 
     <div class="empty-state">
-        <i class="icon-calendar"></i>
+        <i class="icon-blog"></i>
         <p>No blog posts!</p>
-
         <p>
-            {% if isRouteAuthorized('blog.getArchiveCurrent', { folder: folder }) %}
-                <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}">View blog archive</a>
-            {% endif %}
             {% if isRouteAuthorized('blog.getInsert', { folder: folder }) %}
-                {% if isRouteAuthorized('blog.getArchiveCurrent', { folder: folder }) %}
-                    or <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">post blog article</a>
-                {% else %}
-                    <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Post blog article</a>
-                {% endif %}
+                <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Post blog article</a>
             {% endif %}
         </p>
     </div>
