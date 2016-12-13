@@ -36,7 +36,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
-        $this->providerMapper = $sitepage->getDi()->get('providerMapper');
+        $this->providerMapper = $sitepage->getDi()->get('mapperFactory')->get(\Schoolbox\LTI\Provider\Mapper::class);
     }
 
     /**

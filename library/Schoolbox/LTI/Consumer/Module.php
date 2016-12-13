@@ -1,8 +1,6 @@
 <?php
 
 namespace Schoolbox\LTI\Consumer;
-
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -29,19 +27,13 @@ class Module extends BaseModule
     /** @var \Component_InstanceMapper $componentInstanceMapper */
     private $componentInstanceMapper;
 
-    /**
-     * Module constructor.
-     * @param ContainerInterface $injector
-     * @param string $basename
-     */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        parent::__construct($injector, $basename);
-
-        $this->folderMapper = FolderMapper::getInstance();
-        $this->providerMapper = ProviderMapper::getInstance();
-        $this->componentInstanceMapper = \Component_InstanceMapper::getInstance();
+        $this->folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
+        $this->providerMapper = $this->getMapperFactory()->get(ProviderMapper::class);
+        $this->componentInstanceMapper = $this->getMapperFactory()->get(\Component_InstanceMapper::class);
     }
+
 
     /**
      * {@inheritdoc}
