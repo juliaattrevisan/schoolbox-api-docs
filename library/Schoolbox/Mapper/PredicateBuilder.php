@@ -165,16 +165,6 @@ class PredicateBuilder
     }
 
     /**
-     * @param string $columnName
-     * @param array  $columnValues
-     * @return PredicateBuilder
-     */
-    public function anyOf($columnName, array $columnValues)
-    {
-        return $this->addPredicate($columnName, $columnValues);
-    }
-
-    /**
      * @param string     $columnName
      * @param string|int $columnValue
      * @return PredicateBuilder
