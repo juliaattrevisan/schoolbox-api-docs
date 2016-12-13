@@ -9,7 +9,18 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-pinterest"></i>
-                <p>No pintrest activity!</p>
+
+                <!-- BEGIN empty_config -->
+                <p>To use this component your must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a URL</a> of a Pinterest user or board.</p>
+                <!-- END empty_config -->
+
+                <!-- BEGIN empty_results -->
+                <p>No posts found.</p>
+                <!-- END empty_results -->
+
+                <!-- BEGIN empty_results_write -->
+                <p>No posts found with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different URL</a>.</p>
+                <!-- END empty_results_write -->
 
             </div>
             <!-- END empty_state -->
