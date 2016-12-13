@@ -342,6 +342,7 @@ class MapperProxy
             $this->baseMapper->findAllForFolderId(
                 $folderId,
                 $this->convertOptionsToPredicateBuilder($options),
+                [],
                 $options
             )
         );
@@ -364,6 +365,7 @@ class MapperProxy
                 $this->baseMapper->findAllForFolderId(
                     $folderId,
                     $this->convertOptionsToPredicateBuilder($options),
+                    [],
                     $options
                 )
             ),
@@ -484,9 +486,9 @@ class MapperProxy
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
         $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
-        if (!empty($uniqueAssessmentIds)) {
-            $builder = $builder->equals('id', $uniqueAssessmentIds);
-        }
+//        if (!empty($uniqueAssessmentIds)) {
+//            $builder = $builder->equals('id', $uniqueAssessmentIds);
+//        }
 
 //        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
 //
@@ -496,7 +498,11 @@ class MapperProxy
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $builder)
+                $this->baseMapper->findAllForFolderId(
+                    $classFolderIds,
+                    $builder,
+                    $uniqueAssessmentIds
+                )
             ),
             $student
         );
