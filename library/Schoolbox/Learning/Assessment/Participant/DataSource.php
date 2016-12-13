@@ -203,6 +203,11 @@ class DataSource
     ) {
         $participantCollection = new Collection();
 
+        // Short-circuit if no assessments
+        if (count($assessments) === 0) {
+            return $participantCollection;
+        }
+
         // Load basic list
         foreach ($assessments as $assessment) {
             $assessmentParticipants = new Collection();
