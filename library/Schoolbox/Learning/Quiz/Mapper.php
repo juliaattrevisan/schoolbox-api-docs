@@ -180,7 +180,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 
 
         /** @var Model $sourceQuiz */
-        $sourceQuiz = $this->findByColumn('assessment_id', $sourceAssessmentId)->first();
+        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
         $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
 
         foreach($sourceQuiz->getSections() as $section){
@@ -189,7 +189,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         }
 
         /** @var Model $destinationQuiz */
-        $destinationQuiz = $this->findByColumn('assessment_id', $destinationAssessmentId)->first();
+        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
 
         // Clone and Save Sections, Questions + Solutions
         foreach($sourceQuiz->getSections() as $section){
