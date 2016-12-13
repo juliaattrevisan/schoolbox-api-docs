@@ -483,7 +483,10 @@ class MapperProxy
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $builder = $builder->equals('id', $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to));
+        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
+        if (!empty($uniqueAssessmentIds)) {
+            $builder = $builder->equals('id', $uniqueAssessmentIds);
+        }
 
 //        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
 //
