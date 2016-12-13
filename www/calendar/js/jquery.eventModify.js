@@ -397,6 +397,15 @@
 							depends: validateCampusSelected
 						}
 					},
+					'roles[]': {
+						required: {
+							depends: validateCampusSelected
+						},
+						minlength: {
+							param: 1,
+							depends: validateCampusSelected
+						}
+					},
 					'ramsFile': {
 						required: {
 							depends: validateRamsFile
