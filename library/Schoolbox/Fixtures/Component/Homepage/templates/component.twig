@@ -31,10 +31,10 @@
     <div class="empty-state">
         <i class="icon-sport"></i>
 
-        {% if readOnly %}
-
+        {% if noInstall %}
+            <p>The sports fixtures module is currently not installed, please ask your System Administrator about how to enable this component.</p>
+        {% elseif readOnly %}
             <p>There are no upcoming matches to display at this time.</p>
-
         {% else %}
 
             {#
