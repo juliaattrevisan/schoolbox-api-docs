@@ -873,6 +873,42 @@ class Controller extends Base\Base
         $this->getResponse()->content->set($this->buildJsonOutput(['redirect' => $redirect]));
     }
 
+
+    /**
+     * @param IAssessable $assessmentImpl
+     * @return bool
+     */
+    protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
+    {
+        // Is this an INSERT rather than UPDATE?
+        $isNew = !$assessmentImpl->getId();
+
+        $this->getAssessmentMapperProxy()->save($assessmentImpl);
+
+        if($isNew){
+
+            // If Assessable was a Quiz, we have one Quiz.
+            // If Assessable was a Project, we may have many Quizzes
+            $quizImpls = new GenericCollection(QuizAssessable::class);
+
+            if($assessmentImpl instanceof QuizAssessable){
+                $quizImpls->add($assessmentImpl);
+            } elseif($assessmentImpl instanceof Project){
+                /** @var Project $assessmentImpl */
+                foreach($assessmentImpl->getAssessables() as $assessable){
+                    if($assessable instanceof QuizAssessable){
+                        $quizImpls->add($assessable);
+                    }
+                }
+            }
+
+            foreach($quizImpls as $quizImpl){
+                $this->copyQuizConstituents($quizImpl);
+            }
+        }
+        return true;
+    }
+
     /**
      * Clones the Sections, Questions and Solutions for the specified QuizImplementation from its Spec
      *
@@ -881,7 +917,7 @@ class Controller extends Base\Base
      * @param QuizAssessable $quizAssessableImpl
      * @return true
      */
-    protected function cloneQuizConstituents(QuizAssessable $quizAssessableImpl)
+    protected function copyQuizConstituents(QuizAssessable $quizAssessableImpl)
     {
         $quizAssessableSpec = $quizAssessableImpl->getSpecificationAssessment();
 
