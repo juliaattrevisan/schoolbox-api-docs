@@ -9,10 +9,19 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-rss"></i>
-                <p>No feed URL has been provided.</p>
-                <!-- BEGIN empty_modify -->
-                <p>To use this component your must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a RSS URL</a>.</p>
-                <!-- END empty_modify -->
+
+                <!-- BEGIN empty_config -->
+                <p>To use the RSS component you must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a URL for the RSS feed</a>.</p>
+                <!-- END empty_config -->
+
+                <!-- BEGIN empty_results -->
+                <p>No feed found.</p>
+                <!-- END empty_results -->
+
+                <!-- BEGIN empty_results_write -->
+                <p>No feed has been found with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different URL</a>.</p>
+                <!-- END empty_results_write -->
+
             </div>
             <!-- END empty_state -->
 

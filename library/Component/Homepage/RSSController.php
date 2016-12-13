@@ -23,6 +23,16 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             return false;
         }
 
+        $this->setBlock($templateHandle, 'rss', 'rss_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+        $emptyState = false;
+        $noConfig = false;
+
+        if (strlen($this->getConfig('url')) == 0) {
+            $emptyState = true;
+            $noConfig = true;
+        }
 
         // Initialise feed
         $rss = new Alaress_Rss_Stream($this->getConfig('url'));
@@ -30,20 +40,40 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
         $rss->stream();
 
         // Process each item in feed
-        $allRss      = $rss->getOutput();
+        $allRss = $rss->getOutput();
 
         if (count($allRss) == 0) {
+            $emptyState = true;
+        }
 
-            $this->setBlock($templateHandle, 'rss', 'rss_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+        if ($emptyState) {
 
             $this->setVar('rss_block', '');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
 
+            /**
+             * If the user has no write permission just go for a generic nothing found message
+             */
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('empty_modify_block', '');
+
+                $this->setVar('empty_config_block', '');
+                $this->setVar('empty_results_write_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+
             } else {
-                $this->parse('empty_modify_block', 'empty_modify');
+
+                if ($noConfig) {
+                    $this->setVar('empty_results_block', '');
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->setVar('empty_config_block', '');
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
+
             }
 
             $this->parse('empty_state_block', 'empty_state');
