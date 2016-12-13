@@ -453,6 +453,24 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Retrieves a predicate builder which matches any assessment that is in the folder.
+     *
+     * This fetches assessments that are either:
+     * * related to the folder directly (f.id)
+     * * related to the folder through a unit implementation in the folder (uicf.id)
+     *
+     * @param int|array $folderId  A folder ID or list thereof
+     * @return PredicateBuilder
+     */
+    public function getFindForFolderIdPredicate($folderId)
+    {
+        return $this->getPredicateBuilder()->addOrSubPredicates([
+            $this->getPredicateBuilder()->equals('f.id', $folderId),
+            $this->getPredicateBuilder()->equals('uicf.id', $folderId),
+        ]);
+    }
+
+    /**
      * Retrieves all assessable objects that are in this folder, whether they
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
