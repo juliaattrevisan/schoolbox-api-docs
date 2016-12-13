@@ -309,7 +309,7 @@ interface IAssessable extends ISoftDeletable
      * @param \Alaress_Date_Format $publishAt
      * @return $this
      */
-    public function setPublishAt($publishAt);
+    public function setPublishAt(\Alaress_Date_Format $publishAt);
 
     /**
      * Get the date when this IAssessable opens
@@ -329,7 +329,7 @@ interface IAssessable extends ISoftDeletable
      * @param \Alaress_Date_Format $openAt
      * @return $this
      */
-    public function setOpenAt($openAt);
+    public function setOpenAt(\Alaress_Date_Format $openAt);
 
     /**
      * Get the date when this IAssessable is due
@@ -350,7 +350,7 @@ interface IAssessable extends ISoftDeletable
      * @param \Alaress_Date_Format $dueAt
      * @return $this
      */
-    public function setDueAt($dueAt);
+    public function setDueAt(\Alaress_Date_Format $dueAt);
 
     /**
      * Get the date when this IAssessable closes
@@ -371,7 +371,7 @@ interface IAssessable extends ISoftDeletable
      * @param \Alaress_Date_Format $closeAt
      * @return $this
      */
-    public function setCloseAt($closeAt);
+    public function setCloseAt(\Alaress_Date_Format $closeAt);
 
     /**
      * Get the weight

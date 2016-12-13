@@ -248,14 +248,14 @@ class Factory
             );
 
         } else {
-            throw new \DomainException('select a valid assessment type');
+            throw new \DomainException('Select a valid assessment type');
         }
 
         /* Check required data
          */
         if (!strlen(trim($this->getTitle()))) {
             $typeName = $assessment->getTypeName();
-            throw new \InvalidArgumentException("Insufficient information. You need to set a title for this $typeName");
+            throw new \InvalidArgumentException("set a title for this $typeName");
         }
 
         if(!$assessment->getBaseContext() instanceof UnitSpecification) {
@@ -276,7 +276,7 @@ class Factory
                 try {
                     $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
                 } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('set a open date');
+                    throw new \InvalidArgumentException('set an open date');
                 }
             }
 
@@ -322,6 +322,11 @@ class Factory
         /* Decorate with Assessable-specific data
          */
         $decorator->decorate($assessment);
+
+        /** Last minute check all the dates are valid after everything has been configured */
+        if(!$assessment->isValidDates()) {
+            throw new \InvalidArgumentException('ensure that dates are in this order - Publish, Open, Due, Close');
+        }
 
         return $assessment;
     }

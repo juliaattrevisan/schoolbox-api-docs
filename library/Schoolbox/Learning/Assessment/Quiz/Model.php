@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -120,6 +121,35 @@ class Model extends AbstractAssessment
         }
 
         return [];
+    }
+
+    /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Check publish date against everything else
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+
+            if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+
+            /* Check open date against everything else
+             */
+            if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+
+            /* Check due date against everything else
+             */
+            if ($this->getDueAt()->gt($this->getCloseAt())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /* Getters/Setters

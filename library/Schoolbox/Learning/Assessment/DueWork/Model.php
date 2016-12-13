@@ -15,6 +15,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 class Model extends AbstractAssessment
 {
@@ -144,6 +145,45 @@ class Model extends AbstractAssessment
         if ($this->isAcceptSingle() && $responses->count()) {
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
+    }
+
+    /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Check publish date against everything else
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+
+            /* Only check publish date */
+            if($this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE) {
+                if ( $this->getPublishAt()->gt($this->getDueAt())) {
+                    return false;
+                }
+            }
+            else {
+
+                if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
+                    return false;
+                }
+
+                /* Check open date against everything else
+                 */
+                if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
+                    return false;
+                }
+
+                /* Check due date against everything else
+                 */
+                if ($this->getDueAt()->gt($this->getCloseAt())) {
+                    return false;
+                }
+            }
+
+        }
+        return true;
     }
 
     /**

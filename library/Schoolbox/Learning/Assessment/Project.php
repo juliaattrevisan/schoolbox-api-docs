@@ -20,9 +20,11 @@ namespace Schoolbox\Learning\Assessment;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
+
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
@@ -172,6 +174,21 @@ class Project extends AbstractAssessment implements AssessmentContext
         }
 
         return null;
+    }
+
+    /**
+     * Check the dates set on this model are valid
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Don't check dates if in course */
+        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
+            if ( $this->getPublishAt()->gt($this->getDueAt())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

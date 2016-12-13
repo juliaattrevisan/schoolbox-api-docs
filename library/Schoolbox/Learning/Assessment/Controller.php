@@ -150,7 +150,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
         }
         catch (DomainException $e) {
-            $this->sendError('could not save assessment', [ $e->getMessage() ]);
+            $this->sendError('Could not save assessment', [ $e->getMessage() ]);
 
             /* Return Early to let mage deal with error messages
              */
