@@ -126,6 +126,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     		";
         }
 
+        $query .= "ORDER BY PeriodNumber, BreakDuration DESC";
+
         $periods = $this->getDatabase()->getAll($query);
 
         /**
