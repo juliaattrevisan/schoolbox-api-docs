@@ -255,7 +255,7 @@ class Factory
          */
         if (!strlen(trim($this->getTitle()))) {
             $typeName = $assessment->getTypeName();
-            throw new \InvalidArgumentException("Insufficient information. You need to set a title for this $typeName");
+            throw new \InvalidArgumentException("set a title for this $typeName");
         }
 
         if(!$assessment->getBaseContext() instanceof UnitSpecification) {
@@ -266,7 +266,7 @@ class Factory
             try {
                 $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('Set a publish date');
+                throw new \InvalidArgumentException('set a publish date');
             }
 
             // Projects and tasks have only publish and due date
@@ -276,14 +276,14 @@ class Factory
                 try {
                     $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
                 } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('Set an open date');
+                    throw new \InvalidArgumentException('set an open date');
                 }
             }
 
             try {
                 $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('Set a due date');
+                throw new \InvalidArgumentException('set a due date');
             }
 
             if($assessment instanceof Task || $assessment instanceof Project) {
@@ -292,7 +292,7 @@ class Factory
                 try {
                     $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
                 } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('Set a close date');
+                    throw new \InvalidArgumentException('set a close date');
                 }
             }
         }
@@ -325,7 +325,7 @@ class Factory
 
         /** Last minute check all the dates are valid after everything has been configured */
         if(!$assessment->isValidDates()) {
-            throw new \InvalidArgumentException('The dates are not valid');
+            throw new \InvalidArgumentException('ensure that dates are in this order - Publish, Open, Due, Close');
         }
 
         return $assessment;
