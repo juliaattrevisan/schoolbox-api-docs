@@ -10,13 +10,28 @@
         $('input[data-mage-next]').mage();
 
         /**
-         * Function to check if open and close dates are visible
+         * Function to check if open and close dates are on the page and visible
          * Used for jq validation
          */
         var openCloseVisible = function() {
-            var openVisible = $('input[name="openDate"]').is(':visible');
-            var closeVisible = $('input[name="closeDate"]').is(':visible');
-            return openVisible && closeVisible;
+
+            if ($('input[name="openDate"]').length == 0) {
+                return false;
+            }
+
+            if ($('input[name="closeDate"]').length == 0) {
+                return false;
+            }
+
+            if ($('input[name="openDate"]').not(':visible')) {
+                return false;
+            }
+
+            if ($('input[name="closeDate"]').is(':visible')) {
+                return false;
+            }
+
+            return true;
         };
 
         /**
