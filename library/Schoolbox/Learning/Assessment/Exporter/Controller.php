@@ -16,6 +16,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 /**
  * Controller for assessment export actions.
@@ -38,20 +41,28 @@ class Controller extends BaseController
     private $unitImplementationMapper;
 
     /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
+
+    /**
      * Constructor
      *
      * @param Access                   $access
      * @param AssessmentDataSource     $assessmentDataSource
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param QuizMapper               $quizMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
-        UnitImplementationMapper $unitImplementationMapper
+        UnitImplementationMapper $unitImplementationMapper,
+        QuizMapper $quizMapper
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
+        $this->quizMapper                   = $quizMapper;
     }
 
     /**
@@ -86,67 +97,55 @@ class Controller extends BaseController
     /**
      * Processes the export assessment request.
      *
-     * GET vars:
-     * * returnUrl: a URL to return to once done
-     *
-     * POST vars:
-     * * unitImplementation: unit implementations to push this into.
-     *                       key:   unit implementation id
-     *                       value: true/false
-     *
-     *
      * @api POST /learning/export/assessment/:assessmentId
      * @level 165
      * @param IAssessable $assessment
+     * @var string $_GET['returnUrl']            a URL to return to once done
+     * @var int[] $_POST['unitImplementation']   unit implementations to push this into.
+     *                                           key:   unit implementation id
+     *                                           value: true/false
      */
     public function postExport(IAssessable $assessment)
     {
         $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
         $newImplementations      = $this->assessmentDataSource->createCollection();
-        $sequences               = [];
 
-        foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $implementation) {
-            /** @var UnitImplementation $unit */
-            $unit = $implementation['unit'];
+        foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $unitImplData) {
+            /** @var UnitImplementation $unitImpl */
+            $unitImpl = $unitImplData['unit'];
 
-            if (!empty($importedImplementations[$unit->getId()])) {
-                // This is being imported, so do stuff
-                $sequences[$unit->getId()] = $unit->getAssessables()->count() + 1;
+            if (!empty($importedImplementations[$unitImpl->getId()])) {
 
-                if ($implementation['imported']) {
+                if ($unitImplData['imported']) {
                     // This has already been exported between now and when the request was made.
                     // That is probably fine to ignore
                     continue;
                 }
 
-                if (!$implementation['allowed']) {
+                if (!$unitImplData['allowed']) {
                     // banhammer
-                    $this->sendError(
-                        'You do not have permission to write to the selected class',
-                        [],
-                        403
-                    );
+                    $this->sendError('You do not have permission to write to the selected class', [], 403);
                     return;
                 }
 
-                // clone $assessment for this implementation
+                // clone $assessment for this unitImplData
                 $newImplementation = $assessment->cloneForCopy();
                 $newImplementation
-                    ->setContext($unit)
+                    ->setContext($unitImpl)
                     ->setSpecificationAssessment($assessment)
                     // Set sensible defaults for dates
-                    ->setPublishAt($unit->getOpenDate())
-                    ->setOpenAt($unit->getOpenDate())
-                    ->setDueAt($unit->getDueDate())
-                    ->setCloseAt($unit->getDueDate())
+                    ->setPublishAt($unitImpl->getOpenDate())
+                    ->setOpenAt($unitImpl->getOpenDate())
+                    ->setDueAt($unitImpl->getDueDate())
+                    ->setCloseAt($unitImpl->getDueDate())
                 ;
-                $newImplementations->setOffset($unit->getId(), $newImplementation);
+                $newImplementations->add($newImplementation);
             }
         }
 
         // Save the newly created implementations (at the end of the unit)
-        foreach ($newImplementations as $unitId => $newImplementation) {
-            $this->assessmentDataSource->save($newImplementation);
+        foreach ($newImplementations as $newImplementation) {
+            $this->persistAssessmentImplementation($newImplementation);
         }
 
         // Decode the return URL, if it was set
@@ -166,6 +165,44 @@ class Controller extends BaseController
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
+    }
+
+    /**
+     * @param IAssessable $assessmentImpl
+     * @return bool
+     */
+    protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
+    {
+        // Is this an INSERT rather than UPDATE?
+        $isNew = !$assessmentImpl->getId();
+
+        $this->assessmentDataSource->save($assessmentImpl);
+
+        if($isNew){
+
+            // If Assessable was a Quiz, we have one Quiz.
+            // If Assessable was a Project, we may have many Quizzes
+            /** @var IAssessable[] $quizImpls */
+            $quizImpls = new GenericCollection(QuizAssessable::class);
+
+            if($assessmentImpl instanceof QuizAssessable){
+                $quizImpls->add($assessmentImpl);
+            } elseif($assessmentImpl instanceof Project){
+                /** @var Project $assessmentImpl */
+                foreach($assessmentImpl->getAssessables() as $assessable){
+                    if($assessable instanceof QuizAssessable){
+                        $quizImpls->add($assessable);
+                    }
+                }
+            }
+
+            foreach($quizImpls as $quizImpl){
+                $specId = $quizImpl->getSpecificationAssessment()->getId();
+                $implId = $quizImpl->getId();
+                $this->quizMapper->copyQuizConstituents($specId, $implId);
+            }
+        }
+        return true;
     }
 
     /**

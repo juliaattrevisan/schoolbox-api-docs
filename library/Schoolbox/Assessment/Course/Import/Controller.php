@@ -43,11 +43,9 @@ use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
 class Controller extends Base\Base
