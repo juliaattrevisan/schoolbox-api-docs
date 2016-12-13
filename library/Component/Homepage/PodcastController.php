@@ -59,7 +59,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 $this->setVar('empty_results_block', '');
 
                 if ($noConfig) {
-                    $this->setVar('empty_results_block', '');
+                    $this->setVar('empty_results_write_block', '');
                     $this->parse('empty_config_block', 'empty_config');
                 } else {
                     $this->setVar('empty_config_block', '');
