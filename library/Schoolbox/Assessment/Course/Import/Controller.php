@@ -713,7 +713,6 @@ class Controller extends Base\Base
                         if (!$aData['impl_id']) {
                             $assessmentImpl = $assessmentSpec->cloneForCopy();
                             // TODO need to implement __clone() on DueWork to clone Rubric correctly
-                            // TODO unify unit implementation data and domain model so this shenanigan isn't required
                             $assessmentImpl->setContext($unitImpl);
                             $unitImpl->getAssessables()->add($assessmentImpl);
                         } // Else we have been passed the Assessment Impl
@@ -724,7 +723,6 @@ class Controller extends Base\Base
                                 return $impl->getId() == $assessmentId;
                             };
                             $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
-
                         }
 
                         // Don't forget to set the spec assessment on the impl
