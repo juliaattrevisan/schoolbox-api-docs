@@ -23,20 +23,12 @@ class Renderer
     /** @var MenuTopMapper */
     protected $menuTopMapper;
 
-    /** @var MenuTopCampusMapper */
-    protected $menuTopCampusMapper;
-
-    /** @var MenuTopRoleMapper */
-    protected $menuTopRoleMapper;
-
     /**
      * Renderer constructor
      */
     public function __construct()
     {
         $this->setMenuTopMapper(MenuTopMapper::getInstance());
-        $this->setMenuTopCampusMapper(MenuTopCampusMapper::getInstance());
-        $this->setMenuTopRoleMapper(MenuTopRoleMapper::getInstance());
     }
 
     /**
@@ -114,39 +106,5 @@ class Renderer
         return $this;
     }
 
-    /**
-     * @return MenuTopRoleMapper
-     */
-    public function getMenuTopRoleMapper()
-    {
-        return $this->menuTopRoleMapper;
-    }
 
-    /**
-     * @param MenuTopRoleMapper $menuTopRoleMapper
-     * @return $this
-     */
-    public function setMenuTopRoleMapper($menuTopRoleMapper)
-    {
-        $this->menuTopRoleMapper = $menuTopRoleMapper;
-        return $this;
-    }
-
-    /**
-     * @return MenuTopCampusMapper
-     */
-    public function getMenuTopCampusMapper()
-    {
-        return $this->menuTopCampusMapper;
-    }
-
-    /**
-     * @param MenuTopCampusMapper $menuTopCampusMapper
-     * @return $this
-     */
-    public function setMenuTopCampusMapper($menuTopCampusMapper)
-    {
-        $this->menuTopCampusMapper = $menuTopCampusMapper;
-        return $this;
-    }
 }

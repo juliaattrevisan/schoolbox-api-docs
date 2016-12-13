@@ -10,6 +10,8 @@
 namespace Schoolbox\Menu\Side;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends BaseMapper
 {
@@ -32,6 +34,7 @@ class Mapper extends BaseMapper
     /**
      * @param \Schoolbox\User $user
      * @return \Schoolbox\Collection
+     * @throws MapperException
      */
     public function findNodesForUser($user)
     {
@@ -40,18 +43,22 @@ class Mapper extends BaseMapper
             $campusList[] = $campus->getId();
         }
 
+        if(count($campusList) < 1) {
+            throw new MapperException();
+        }
+
         $query = "
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_side
                 INNER JOIN menu_side_campus ON menu_side.id = menu_side_campus.menu_side_id
                 INNER JOIN menu_side_role ON menu_side.id = menu_side_role.menu_side_id
-                WHERE menu_side_campus.campus_id IN " . $this->getArrayPlaceholders($campusList, 'campus') . "
+                WHERE menu_side_campus.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($campusList, 'campus') . "
                 AND menu_side_role.role_id = :roleId
                 AND (menu_side.parent_id IN (SELECT id FROM menu_side) OR menu_side.parent_id = 0)
                 ORDER BY sort_order ASC
         ";
 
-        $params = $this->getArrayParameters($campusList, 'campus');
+        $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
         $params['roleId'] = $user->getRole()->getId();
 
         $statement = $this->getDatabase()->prepare($query);
@@ -61,17 +68,12 @@ class Mapper extends BaseMapper
 
     /**
      * @param \Schoolbox\User $user
-     * @return \Schoolbox\Collection
+     * @return array
      */
     public function findGroupsForUser($user) {
 
-        $campusList = array();
-        foreach ($user->getCampusCollection() as $campus) {
-            $campusList[] = $campus->getId();
-        }
-
         $query = "
-            SELECT `ua`.*, `f`.name
+            SELECT `ua`.sid, `f`.name
             FROM userAccess `ua`
             JOIN `folder` AS `f` ON `f`.id = `ua`.sid AND `f`.`deleted_at` IS NULL
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
@@ -80,16 +82,11 @@ class Mapper extends BaseMapper
 
         $params = [];
         $params['userId'] = $user->getId();
-        $params['service'] = HOMEPAGE_SERVICE;
+        $params['service'] = UserAccess::SERVICE_HOMEPAGE;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
-        $groups = [];
-        foreach ($statement as $row) {
-            $groups[] = $row;
-        }
-
-        return $groups;
+        return $statement->fetchAll();
     }
 }
