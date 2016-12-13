@@ -49,6 +49,66 @@ class PredicateBuilder
     }
 
     /**
+     * Adds this sub-predicate.
+     *
+     * @param PredicateBuilder $predicate
+     * @return $this
+     */
+    public function addSubPredicate(PredicateBuilder $predicate)
+    {
+        // Glue doesn't really matter, as there's only one where part
+        return $this->addPredicates('AND', [$predicate]);
+    }
+
+    /**
+     * Adds each sub-predicate as an AND predicate.
+     *
+     * @param PredicateBuilder[] $predicates
+     * @return $this
+     */
+    public function addAndSubPredicates($predicates)
+    {
+        return $this->addPredicates('AND', $predicates);
+    }
+
+    /**
+     * Adds each sub-predicate as an OR predicate.
+     *
+     * @param PredicateBuilder[] $predicates
+     * @return $this
+     */
+    public function addOrSubPredicates($predicates)
+    {
+        return $this->addPredicates('OR', $predicates);
+    }
+
+    /**
+     * Helper function for adding multiple predicates to this object.
+     *
+     * @param string             $glue
+     * @param PredicateBuilder[] $predicates
+     * @return $this
+     */
+    protected function addPredicates($glue, $predicates)
+    {
+        $subWhere = [];
+        foreach ($predicates as $subPredicate) {
+            if ($subPredicate instanceof PredicateBuilder) {
+                // Extract this object's where and params
+                $subWhere[]   = '('.implode(" AND ", $subPredicate->getWhere()).')';
+                $this->params = array_merge($this->getParams(), $subPredicate->getParams());
+            }
+        }
+
+        // Set the new where into action
+        if (!empty($subWhere)) {
+            $this->where[] = '('.implode(" $glue ", $subWhere).')';
+        }
+
+        return $this;
+    }
+
+    /**
      * Convenience method for adding directly from a Mapper column list
      *
      * @param array $columnList
