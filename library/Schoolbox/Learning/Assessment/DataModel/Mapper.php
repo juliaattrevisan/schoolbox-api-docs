@@ -457,13 +457,15 @@ class Mapper extends BaseMapper
      * are attached directly to this folder or through a course implementation
      * that is attached to this folder.
      *
-     * @param int|array $folderId   A folder ID or list thereof
-     * @param array     $columnList Any other columns to query on
-     *                              If "id" is one, these assessments are added to the final search.
-     * @param array     $options    Any other options to pass to the final search to `findByColumnList`.
+     * @param int|array        $folderId A folder ID or list thereof
+     * @param PredicateBuilder $builder  A PredicateBuilder which contains columns to query on.
+     *                                   If it queries on 'id', these assessments are added to the final search.
+     * @param array            $options  Any other options to pass to the final search to `findByColumnList`.
+
+     *
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, $columnList, $options = [])
+    public function findAllForFolderId($folderId, PredicateBuilder $builder, $options = [])
     {
         // Support stuff for query
         $folderList = BaseMapper\PredicateBuilder::canTraverse($folderId) ? $folderId : [$folderId];
@@ -505,16 +507,18 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-        $params = $columnList;
-        if (isset($params['id'])) {
-            if (!is_array($params['id'])) {
-                $params['id'] = [$params['id']];
-            }
-            $params['id'] = array_unique(array_merge($params['id'], $idList));
-        } else {
-            $params['id'] = $idList;
-        }
-        return $this->findByColumnList($params, $options);
+        // TODO need to add an OR search if any IDs exist in PB
+        $builder = $builder->anyOf('id', $idList);
+//        $params = $columnList;
+//        if (isset($params['id'])) {
+//            if (!is_array($params['id'])) {
+//                $params['id'] = [$params['id']];
+//            }
+//            $params['id'] = array_unique(array_merge($params['id'], $idList));
+//        } else {
+//            $params['id'] = $idList;
+//        }
+        return $this->findByPredicates($builder, $options);
     }
 
     /**

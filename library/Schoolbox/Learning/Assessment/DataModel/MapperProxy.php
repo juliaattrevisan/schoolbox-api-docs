@@ -341,7 +341,7 @@ class MapperProxy
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId(
                 $folderId,
-                $this->convertOptionsToColumnList($options),
+                $this->convertOptionsToPredicateBuilder($options),
                 $options
             )
         );
@@ -363,7 +363,7 @@ class MapperProxy
             $this->translateToDomainModelCollection(
                 $this->baseMapper->findAllForFolderId(
                     $folderId,
-                    $this->convertOptionsToColumnList($options),
+                    $this->convertOptionsToPredicateBuilder($options),
                     $options
                 )
             ),
@@ -479,23 +479,21 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
+        $builder = $this->convertOptionsToPredicateBuilder(['dueAfter' => $from, 'dueBefore' => $to]);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $columnList = [
-            'id' => $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to),
-        ];
+        $builder = $builder->equals('id', $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to));
 
-        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
-            $columnList['due_date >='] = $from->getDatabase();
-        }
-        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
-            $columnList['due_date <='] = $to->getDatabase();
-        }
+//        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
+//
+//        // Find assessments which this student is no longer in the class for,
+//        // but has created a response or feedback for.
+//        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId($classFolderIds, $columnList)
+                $this->baseMapper->findAllForFolderId($classFolderIds, $builder)
             ),
             $student
         );
