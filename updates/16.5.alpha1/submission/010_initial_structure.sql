@@ -237,6 +237,7 @@ CREATE TABLE `project` (
   `mark_type_id` INT(11) NOT NULL,
   `grade_group_id` INT(11) NULL DEFAULT NULL,
   `summator` ENUM('min', 'max', 'avg', 'weighted') NOT NULL DEFAULT 'weighted',
+  `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   -- owner would be a FK, but user is a MyISAM table
   INDEX `fk_project_owner_id_idx` (`owner_id` ASC),
