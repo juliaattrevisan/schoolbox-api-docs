@@ -28,7 +28,7 @@ class ArticleMapper extends Mapper implements Searchable
     protected function mapping()
     {
         $this->hasTable('news_items');
-        $this->hasModel(ArticleMapper::class);
+        $this->hasModel(Article::class);
 
         $this->hasMap(
             array(

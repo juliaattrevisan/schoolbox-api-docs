@@ -128,42 +128,50 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$bob = new Builder();
 
 		$notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
-		$envelope->broadcastToRoleType($roleType,
-			// title, params (if title :tokenised), icon, href, namespace, severity and topic are mandatory
 
-			$bob->setTitle(":user posted :title under :topic")
-				->setParams(array(
-					'user'  => new UserParam($user, Param::STACKING_REPLACE),
-					'title' => new Param($heading,   "/news/item/$articleId", Param::STACKING_APPEND),
-					'topic' => new Param($topicName, "/news/$topicSlug")
-				))
-				->setIcon($icon)
-				->setHref($href)
-				->setNamespace($this->getSlug())
-				->setSeverity(Logger::INFO)
-				->addTopic("news.$articleId.posted")
+        // title, params (if title :tokenised), icon, href, namespace, severity and topic are mandatory
 
-				// body and byline are optional, but recommended since they render out in emails
-                ->setMeta(array(
-                    'title'  => $heading,
-                    'author' => $authorName,
-                    'date'   => $article->getPostDate()->getLong(),
-                    'thumb'  => $thumb,
-                    'blurb'  => $article->getBlurb(),
-                ))
-				->setBody($notifBody)
-				->setByline("$shortDate by $authorName in $topicName")
+        $instance = $bob->setTitle(":user posted :title under :topic")
+            ->setParams(array(
+                'user'  => new UserParam($user, Param::STACKING_REPLACE),
+                'title' => new Param($heading,   "/news/item/$articleId", Param::STACKING_APPEND),
+                'topic' => new Param($topicName, "/news/$topicSlug")
+            ))
+            ->setIcon($icon)
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic("news.$articleId.posted")
 
-				// timestamp and filters are optional
-				->setTimestamp($article->getPostDate()->getUnixTimestamp())
-				->addFilter('role', $roleIds)
-				->addFilter('campus', $campusIds)
+            // body and byline are optional, but recommended since they render out in emails
+            ->setMeta(array(
+                'title'  => $heading,
+                'author' => $authorName,
+                'date'   => $article->getPostDate()->getLong(),
+                'thumb'  => $thumb,
+                'blurb'  => $article->getBlurb(),
+            ))
+            ->setBody($notifBody)
+            ->setByline("$shortDate by $authorName in $topicName")
 
-				// and then you build
-				->build()
-		);
+            // timestamp and filters are optional
+            ->setTimestamp($article->getPostDate()->getUnixTimestamp())
 
-		return $envelope;
+            // and then you build
+            ->build();
+
+        /** @var \Schoolbox\User $user */
+        foreach ($article->getUsers() as $user) {
+            $envelope->targetToUser($user->getId(), $instance);
+        }
+
+        $instance = $bob->addFilter('role', $roleIds)
+            ->addFilter('campus', $campusIds)
+            ->build();
+
+        $envelope->broadcastToRoleType($roleType, $instance);
+
+		return $envelope ;
 	}
 
 
