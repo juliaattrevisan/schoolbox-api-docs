@@ -26,6 +26,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -812,6 +813,62 @@ class MapperProxy
         }
 
         return $columnList;
+    }
+
+    /**
+     * Helper function for converting a list of options into a predicate builder.
+     *
+     * Currently:
+     * * converts "term" to a due date span
+     * * converts "dueBefore" and "dueAfter" to due date filters
+     * * converts "type" to a filter which matches only that assessment type
+     *   (see AssessmentType::TYPE_* constants)
+     *
+     * @param array $options
+     * @return PredicateBuilder
+     */
+    protected function convertOptionsToPredicateBuilder($options)
+    {
+        $builder = $this->baseMapper->getPredicateBuilder();
+
+        // Term filter (overrides due before/after)
+        if ($options['term'] instanceof Term) {
+            $term = $options['term'];
+            $options['dueAfter']  = $term->getStart();
+            $options['dueBefore'] = $term->getActualFinish();
+        }
+
+        // Due before / after filter (an ADF)
+        if ($options['dueBefore'] instanceof \Alaress_Date_Format && !$options['dueBefore']->isNull()) {
+            $builder->notGreaterThan('due_date', $options['dueBefore']->getDatabaseDate());
+        }
+        if ($options['dueAfter'] instanceof \Alaress_Date_Format && !$options['dueAfter']->isNull()) {
+            $builder->notLessThan('due_date', $options['dueAfter']->getDatabaseDate());
+        }
+
+        // Assessment type filter
+        switch ($options['type']) {
+            case AssessmentType::TYPE_DUE_WORK:
+                $builder->notNull('d.id');
+                break;
+
+            case AssessmentType::TYPE_TASK:
+                $builder->notNull('t.id');
+                break;
+
+            case AssessmentType::TYPE_QUIZ:
+                $builder->notNull('q.assess_id');
+                break;
+
+            case AssessmentType::TYPE_PROJECT:
+                $builder->notNull('p.id');
+                break;
+
+            default:
+                break;
+        }
+
+        return $builder;
     }
 
     /**
