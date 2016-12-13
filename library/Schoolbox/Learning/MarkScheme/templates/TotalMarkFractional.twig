@@ -42,8 +42,8 @@
                 <section>
                     <div style="{{ actionStyle }}" data-interaction-draft="{{ participant.user.id }}">
                         {%- spaceless %}
-                            <a class="button" href="#" data-interaction-delete="{{ attempt.id }}">Delete Attempt</a>
-                            <a class="button" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
+                            <a class="button" data-interaction-delete="{{ attempt.id }}" href="#" >Delete Attempt</a>
+                            <a class="button" data-interaction-review="{{ attempt.id }}" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
                         {% endspaceless -%}
                     </div>
                 </section>
