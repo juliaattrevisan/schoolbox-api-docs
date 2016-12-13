@@ -23,6 +23,8 @@ class PredicateBuilder
     const OPERATOR_LTE        = '<=';
     const OPERATOR_GT         = '>';
     const OPERATOR_GTE        = '>=';
+    const OPERATOR_INTERSECT  = 'AND';
+    const OPERATOR_UNION      = 'OR';
 
     /** @var IDatabase */
     protected $database;
@@ -49,61 +51,48 @@ class PredicateBuilder
     }
 
     /**
-     * Adds this sub-predicate.
+     * Query the intersection (AND) of the conditions in the given predicate builder
      *
      * @param PredicateBuilder $predicate
      * @return $this
      */
-    public function addSubPredicate(PredicateBuilder $predicate)
+    public function all(self $predicate)
     {
-        // Glue doesn't really matter, as there's only one where part
-        return $this->addPredicates('AND', [$predicate]);
+        return $this->addSubPredicate(self::OPERATOR_INTERSECT, $predicate);
     }
 
     /**
-     * Adds each sub-predicate as an AND predicate.
+     * Query the union (OR) of the conditions in the given predicate builder
      *
-     * @param PredicateBuilder[] $predicates
+     * @param PredicateBuilder $predicate
      * @return $this
      */
-    public function addAndSubPredicates($predicates)
+    public function any(self $predicate)
     {
-        return $this->addPredicates('AND', $predicates);
-    }
-
-    /**
-     * Adds each sub-predicate as an OR predicate.
-     *
-     * @param PredicateBuilder[] $predicates
-     * @return $this
-     */
-    public function addOrSubPredicates($predicates)
-    {
-        return $this->addPredicates('OR', $predicates);
+        return $this->addSubPredicate(self::OPERATOR_UNION, $predicate);
     }
 
     /**
      * Helper function for adding multiple predicates to this object.
      *
      * @param string             $glue
-     * @param PredicateBuilder[] $predicates
+     * @param PredicateBuilder $predicate
      * @return $this
      */
-    protected function addPredicates($glue, $predicates)
+    protected function addSubPredicate($glue, self $predicate)
     {
-        $subWhere = [];
-        foreach ($predicates as $subPredicate) {
-            if ($subPredicate instanceof PredicateBuilder) {
-                // Extract this object's where and params
-                $subWhere[]   = '('.implode(" AND ", $subPredicate->getWhere()).')';
-                $this->params = array_merge($this->getParams(), $subPredicate->getParams());
-            }
-        }
+        // Extract this object's where and params
+        $this->params  = array_merge($this->getParams(), $predicate->getParams());
 
         // Set the new where into action
-        if (!empty($subWhere)) {
-            $this->where[] = '('.implode(" $glue ", $subWhere).')';
+        $subquery = implode(" $glue ", $predicate->getWhere());
+
+        // wrap in brackets if it's a union
+        if ($glue == self::OPERATOR_UNION) {
+            $subquery = "($subquery)";
         }
+
+        $this->where[] = $subquery;
 
         return $this;
     }
