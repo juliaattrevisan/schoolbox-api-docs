@@ -53,4 +53,5 @@ INSERT INTO `submission_return_file` (
     `sr`.`deleted_at`
   FROM `submission_return` `sr`
     LEFT JOIN `student_submission_file` `ssf` ON  `sr`.`uuid` = `ssf`.`uuid`
+    INNER JOIN storage ON storage.hash = sr.hash
   WHERE `sr`.`hash` IS NOT NULL OR `sr`.`uuid` IS NOT NULL;
