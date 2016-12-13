@@ -94,8 +94,10 @@ Usage:
                     $restoreButton.remove();
                     $icon.removeClass('icon-archive').addClass('icon-course');
                     $name.removeClass('del');
+
+                    $componentList.removeClass('hide');
                     /** @var string data.componentName */
-                    $componentList.append('<li>'+data.componentName+'</li>');
+                    $componentList.html($componentList.html() + data.componentName);
                 }
                 else {
                     $restoreFeedback.toastTimeout({text: 'Restoration Failed!', css: 'alert'});
@@ -149,9 +151,11 @@ Usage:
                                 {% endfor %}
                             </p>
                             <p class="meta">Imported on {{ currentCourse.createdAt.long }}</p>
-                            {% if componentNames[currentCourse.id] | length %}
-                            <p class="meta">Displayed in <span data-component-names>{% for componentName in componentNames[currentCourse.id] %}{{ componentName }} {% endfor %}</p>
-                            {% endif %}
+                            <p class="meta{% if not componentNames[currentCourse.id] | length %} hide{% endif %}" data-component-names>Displayed in
+                                {% for componentName in componentNames[currentCourse.id] %}
+                                    {{ componentName }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
                         </div>
                     </div>
                     <nav>
