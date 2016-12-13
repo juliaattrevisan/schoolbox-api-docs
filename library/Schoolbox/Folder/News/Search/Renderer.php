@@ -15,6 +15,7 @@ use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 
 class Renderer extends Handler
@@ -61,37 +62,42 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $news) {
-                //TODO remove when folder is properly hydrate with blog
-                $folder = $folderMapper->findCheaplyById($news['ccde']);
+                try {
+                    $folder = $folderMapper->findCheaplyById($news['ccde']);
 
-                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                    $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">". Scrub::text( $breadcrumb->getName() ) ."</a>";
+                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                        $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                    }
+
+                    $now = Alaress_Date_Format::now();
+                    $expiryDate = new Alaress_Date_Format($news['datetime_expires'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                    $createdTime = new Alaress_Date_Format($news['datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                    if ($now->gt($expiryDate)) {
+                        $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
+                    } else {
+                        $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
+                    }
+
+                    $this->getPage()->setVar(
+                        array(
+                            'HOMEPAGENEWS_ID'         => $news['id'],
+                            'HOMEPAGENEWS_CODE'       => $news['code'],
+                            'HOMEPAGENEWS_LINK'       => $news['link'],
+                            'HOMEPAGENEWS_HEADING'    => Scrub::text($news['heading']),
+                            'HOMEPAGENEWS_BODY'       => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
+                            'HOMEPAGENEWS_OWNER'      => $news['uid'],
+                            'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
+                            'HOMEPAGENEWS_CREATED'    => $createdTime->getRelativeTime(),
+                            'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
+                            'HOMEPAGENEWS_COUNT'      => $this->getCount($this->getType()),
+                        )
+                    );
+
+                    $this->getPage()->parse('homepagenews_block', 'homepagenews', true);
+                } catch (MapperException $e) {
+                    //noop
                 }
-
-                $now = Alaress_Date_Format::now();
-                $expiryDate = new Alaress_Date_Format($news['datetime_expires'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $createdTime = new Alaress_Date_Format($news['datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
-
-                if ($now->gt($expiryDate)) {
-                    $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
-                } else {
-                    $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
-                }
-
-                $this->getPage()->setVar(array(
-                    'HOMEPAGENEWS_ID' => $news['id'],
-                    'HOMEPAGENEWS_CODE' => $news['code'],
-                    'HOMEPAGENEWS_LINK' => $news['link'],
-                    'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
-                    'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-                    'HOMEPAGENEWS_OWNER' => $news['uid'],
-                    'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
-                    'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
-                    'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
-                    'HOMEPAGENEWS_COUNT' => $this->getCount($this->getType()),
-                ));
-
-                $this->getPage()->parse('homepagenews_block', 'homepagenews', true);
             }
 
             $this->outputSeeMore();

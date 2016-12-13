@@ -15,6 +15,7 @@ use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 
 class Renderer extends Handler
@@ -54,28 +55,33 @@ class Renderer extends Handler
 
             foreach ($result as $blog) {
 
-                //TODO remove when folder is properly hydrate with blog
-                $folder = $folderMapper->findCheaplyById($blog['cid']);
+                try {
+                    $folder = $folderMapper->findCheaplyById($blog['cid']);
 
-                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                    $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">". Scrub::text( $breadcrumb->getName() ) ."</a>";
+                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                        $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                    }
+
+                    $createdTime = new Alaress_Date_Format($blog['created_at'], 'Y-m-d H:i:s');
+
+                    $this->getPage()->setVar(
+                        array(
+                            'BLOG_ID'         => $blog['id'],
+                            'BLOG_CID'        => $blog['folder_id'],
+                            'BLOG_HEADING'    => Scrub::text($blog['heading']),
+                            'BLOG_BODY'       => TextFormatter::cutSentence(Scrub::html2text($blog['body']), 150),
+                            'BLOG_OWNER'      => $blog['owner_id'],
+                            'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
+                            'BLOG_CREATED'    => $createdTime->getRelativeTime(),
+                            'BLOG_BREADCRUMB' => $blog['breadcrumb'],
+                            'BLOG_COUNT'      => $this->getCount($this->getType()),
+                        )
+                    );
+
+                    $this->getPage()->parse('blog_block', 'blog', true);
+                } catch (MapperException $e) {
+                    //noop
                 }
-
-                $createdTime = new Alaress_Date_Format($blog['created_at'], 'Y-m-d H:i:s');
-
-                $this->getPage()->setVar(array(
-                    'BLOG_ID' => $blog['id'],
-                    'BLOG_CID' => $blog['folder_id'],
-                    'BLOG_HEADING' => Scrub::text($blog['heading']),
-                    'BLOG_BODY' => TextFormatter::cutSentence(Scrub::html2text($blog['body']), 150),
-                    'BLOG_OWNER' => $blog['owner_id'],
-                    'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
-                    'BLOG_CREATED' => $createdTime->getRelativeTime(),
-                    'BLOG_BREADCRUMB' => $blog['breadcrumb'],
-                    'BLOG_COUNT' => $this->getCount($this->getType()),
-                ));
-
-                $this->getPage()->parse('blog_block', 'blog', true);
             }
 
             $this->outputSeeMore();

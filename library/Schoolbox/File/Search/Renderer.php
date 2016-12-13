@@ -16,6 +16,8 @@ use TextFormatter;
 use Alaress_Date_Format;
 use Alaress_Byte_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+
 
 class Renderer extends Handler
 {
@@ -55,34 +57,38 @@ class Renderer extends Handler
 
             foreach ($result as $file) {
 
-                //TODO remove when folder is properly hydrate with blog
-                $folder = $folderMapper->findCheaplyById($file['category']);
 
-                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
-                    $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                try {
+                    $folder = $folderMapper->findCheaplyById($file['category']);
+
+                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                        $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                    }
+                    $createdTime = new Alaress_Date_Format($file['submitted'], 'Y-m-d H:i:s');
+
+                    $this->getPage()->setVar(array(
+                        'FILE_ID' => $file['id'],
+                        'FILE_ICON' => $file['iconFile'],
+                        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
+                        'FILE_DESCRIPTION' => Scrub::text($file['description']),
+                        'FILE_COMMENT' => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
+                        'FILE_OWNER' => $file['uid'],
+                        'FILE_OWNER_NAME' => $userHandler->formatName($file),
+                        'FILE_CREATED' => $createdTime->getRelativeTime(),
+                        'FILE_BREADCRUMB' => $file['breadcrumb'],
+                        'FILE_COUNT' => $this->getCount($this->getType()),
+                    ));
+
+                    if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2) {
+                        $this->getPage()->setVar('modify_block');
+                    } else {
+                        $this->getPage()->parse('modify_block', 'modify');
+                    }
+
+                    $this->getPage()->parse('file_block', 'file', true);
+                } catch (MapperException $e) {
+                    //noop
                 }
-                $createdTime = new Alaress_Date_Format($file['submitted'], 'Y-m-d H:i:s');
-
-                $this->getPage()->setVar(array(
-                    'FILE_ID' => $file['id'],
-                    'FILE_ICON' => $file['iconFile'],
-                    'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
-                    'FILE_DESCRIPTION' => Scrub::text($file['description']),
-                    'FILE_COMMENT' => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
-                    'FILE_OWNER' => $file['uid'],
-                    'FILE_OWNER_NAME' => $userHandler->formatName($file),
-                    'FILE_CREATED' => $createdTime->getRelativeTime(),
-                    'FILE_BREADCRUMB' => $file['breadcrumb'],
-                    'FILE_COUNT' => $this->getCount($this->getType()),
-                ));
-
-                if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2) {
-                    $this->getPage()->setVar('modify_block');
-                } else {
-                    $this->getPage()->parse('modify_block', 'modify');
-                }
-
-                $this->getPage()->parse('file_block', 'file', true);
             }
 
             $this->outputSeeMore();
