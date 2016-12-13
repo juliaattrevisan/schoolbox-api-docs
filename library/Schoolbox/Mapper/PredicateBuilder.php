@@ -85,14 +85,7 @@ class PredicateBuilder
         $this->params  = array_merge($this->getParams(), $predicate->getParams());
 
         // Set the new where into action
-        $subquery = implode(" $glue ", $predicate->getWhere());
-
-        // wrap in brackets if it's a union
-        if ($glue == self::OPERATOR_UNION) {
-            $subquery = "($subquery)";
-        }
-
-        $this->where[] = $subquery;
+        $this->where[] = '('.implode(" $glue ", $predicate->getWhere()).')';
 
         return $this;
     }
