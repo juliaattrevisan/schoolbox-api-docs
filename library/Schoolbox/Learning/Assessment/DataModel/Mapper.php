@@ -25,6 +25,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -207,6 +208,24 @@ class Mapper extends BaseMapper
             $options['order']['sequence'] = 'asc';
         }
         return parent::findByColumnList($columnList, $options);
+    }
+
+    /**
+     * Override findByColumnList to always order by sequence.
+     *
+     * If another order is defined, the sequence ordering will apply as a lower
+     * priority to that order.
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return Collection
+     */
+    public function findByPredicates(PredicateBuilder $pb, array $options = [])
+    {
+        if (empty($options['order']['sequence'])) {
+            $options['order']['sequence'] = 'asc';
+        }
+        return parent::findByPredicates($pb, $options);
     }
 
     /**
