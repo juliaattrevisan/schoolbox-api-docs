@@ -136,12 +136,7 @@
 
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
-
-        /*$t.find(':input').each(function() {
-            console.log('disabled');
-            $(this).show();
-            $(this).attr('disabled', 'disabled');
-        });*/
+        
         $t.attr('disabled', 'disabled');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
