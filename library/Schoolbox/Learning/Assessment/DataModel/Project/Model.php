@@ -10,9 +10,11 @@ namespace Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
@@ -20,9 +22,10 @@ use Schoolbox\User;
 /**
  * Data Model for Projects
  */
-class Model implements IAssessableDataModel, IAssessmentContextDataModel
+class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftDeletable
 {
     use Id;
+    use DeletedAtDate;
 
     use AssessmentModelTrait;
 
