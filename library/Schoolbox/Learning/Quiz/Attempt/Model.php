@@ -85,7 +85,7 @@ class Model implements ISoftDeletable
      * @param  Quiz $quiz
      * @return $this
      */
-    public function setAssessment(Quiz $quiz)
+    public function setQuiz(Quiz $quiz)
     {
         $this->quiz = $quiz;
         return $this;
@@ -94,7 +94,7 @@ class Model implements ISoftDeletable
     /**
      * @return Quiz
      */
-    public function getAssessment()
+    public function getQuiz()
     {
         return $this->quiz;
     }

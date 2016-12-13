@@ -159,7 +159,7 @@ foreach($categoryList as $category) {
 
             // Pretending to be a mapper, even though I dont have one yet.
             $return = new \Schoolbox\Learning\Quiz\Attempt\Model();
-            $return->setAssessment($quiz);
+            $return->setQuiz($quiz);
             $return->setId($result[0]['attempt_id']);
             $return->setUser(new \Schoolbox\User);
             $return->getUser()->setId($studentID);

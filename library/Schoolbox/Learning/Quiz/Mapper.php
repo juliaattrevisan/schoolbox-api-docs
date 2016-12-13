@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper for the OnlineAssessment model.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -23,152 +21,61 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
+use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\UserMapper;
 
 /**
- * Formerly known as OnlineAssessmentMapper
- *
- * @package Schoolbox\Assessment\Component
- * @method Model createModel($id=null)
- * @method Collection|Model[] findByColumnList($columnList, $options = [])
+ * @method Model createModel($id = null)
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  */
-class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface {
-
-	protected function mapping () {
-		$this->hasTable('assess');
-		$this->hasModel(Model::class);
-		$this->hasMap(array(
-			'column'     => 'assess_id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'category_id',
-			'property'   => 'category',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'category',
-		));
-		$this->hasMap(array(
-			'column'     => 'user_id',
-			'property'   => 'user',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'user',
-		));
-		$this->hasMap(array(
-			'column'     => 'type',
-			'property'   => 'workType',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'work_type',
-		));
-		$this->hasMap(array(
-			'column'     => 'title',
-			'property'   => 'title',
-			'type'       => self::TYPE_STRING,
-		));
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->uses('completion_message', self::TYPE_STRING);
-		$this->hasMap(array(
-			'column'     => 'start',
-			'property'   => 'start',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'finish',
-			'property'   => 'finish',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'duration',
-			'property'   => 'duration',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'max_attempts',
-			'property'   => 'maxAttempts',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'weight',
-			'property'   => 'weight',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'availability',
-			'property'   => 'availability',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'anonymous_result',
-			'property'   => 'anonymousResult',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'notify_author',
-			'property'   => 'notifyAuthor',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'mark_visibility',
-            'property'   => 'markVisibility',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'created',
-			'type'       => self::TYPE_DATETIME,
-			'created_timestamp' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasJoin('category', array(
-			'mapper'    => FolderMapper::class,
-			'this_key'  => 'category_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('user', array(
-			'mapper'    => Schoolbox\UserMapper::class,
-			'this_key'  => 'user_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('work_type', array(
-			'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper::class,
-			'this_key'  => 'type',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('attempt', array(
-			'mapper'    => QuizAttemptMapper::class,
-			'multiple'  => true,
-			'this_key'  => 'assess_id',
-			'other_key' => 'assess_id',
-		));
-
-
-       $this->joinsVia(
-            'curriculum_node_for_assess',
-            Node\Mapper::class,
-            'id',
-            'curriculum_node_id',
-            'assess_id',
-            null,
-            null,
-            null,
-            'curriculumNodes'
-        );
-
+class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
+{
+    /**
+     * SQL map definition
+     */
+    protected function mapping()
+    {
+        $this->hasTable('assess');
+        $this->hasModel(Model::class);
+        $this->uses('assess_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'am');
+        $this->joins('category_id', FolderMapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('type', WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('completion_message', self::TYPE_STRING);
+        $this->uses('start', self::TYPE_DATETIME);
+        $this->uses('finish', self::TYPE_DATETIME);
+        $this->uses('duration', self::TYPE_INTEGER);
+        $this->uses('max_attempts', self::TYPE_INTEGER);
+        $this->uses('weight', self::TYPE_INTEGER);
+        $this->uses('availability', self::TYPE_STRING);
+        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
+        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
+        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
+        $this->joinsVia('curriculum_node_for_assess', Node\Mapper::class, 'id', 'curriculum_node_id', 'assess_id', null,
+            null, null, 'curriculumNodes');
 
-		$this->hasSoftDeleteDateField('deleted_at');
+        $this->hasJoin('sections', array(
+            'mapper'    => QuizSectionMapper::class,
+            'multiple'  => true,
+            'this_key'  => 'assess_id',
+            'other_key' => 'assess_id',
+        ));
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'preSave'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->hasJoin('attempt', array(
+            'mapper'    => QuizAttemptMapper::class,
+            'multiple'  => true,
+            'this_key'  => 'assess_id',
+            'other_key' => 'assess_id',
+        ));
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'updateExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
@@ -177,34 +84,38 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSections'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAttempts'));
-	}
+    }
 
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function softDeleteSections(Model $quiz)
     {
-        $quizSectionMapper = QuizSectionMapper::getInstance();
+        $quizSectionMapper = $this->getJoinMapper('sections');
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // However this will also updated the 'deleted_at' field for already deleted items.
         $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizSectionMapper->delete($sections);
+        return true;
     }
 
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
-	public function softDeleteAttempts(Model $quiz)
+    public function softDeleteAttempts(Model $quiz)
     {
-        $quizAttemptMapper = QuizAttemptMapper::getInstance();
+        $quizAttemptMapper = $this->getJoinMapper('attempt');
         // Force cascade on non-leaf nodes to ensure whole tree is deleted.
         // TODO - SA-1277 However this will also updated the 'deleted_at' field for already deleted items.
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->delete($attempts);
+        return true;
     }
 
 
@@ -212,101 +123,110 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function restoreSections(Model $quiz)
     {
-        $quizSectionMapper = QuizSectionMapper::getInstance();
+        $quizSectionMapper = $this->getJoinMapper('sections');
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizSectionMapper->restoreSoftDeleted($sections);
+        return true;
     }
 
     /**
      * Soft deletes all Attempts for the specified Quiz
      *
      * @param Model $quiz
+     * @return true
      */
     public function restoreAttempts(Model $quiz)
     {
-        $quizAttemptMapper = QuizAttemptMapper::getInstance();
+        $quizAttemptMapper = $this->getJoinMapper('attempt');
         // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
         $attempts = $quizAttemptMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
         $quizAttemptMapper->restoreSoftDeleted($attempts);
+        return true;
     }
 
-	/**
-	 * Pre-save callback.
-	 * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
-	 *
-	 * @param  Model $object
-	 * @return bool             Always returns true
-	 */
-	public function preSave(Model $object) {
-		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
-	}
+    /**
+     * Pre-save callback.
+     *
+     * Ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
+     *
+     * @param  Model $object
+     * @return true
+     */
+    protected function setWorkType(Model $object)
+    {
+        $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        return true;
+    }
 
     /**
      * Post-save callback.
-     * Creates record in external markbook system
+     *
+     * Saves a record in external markbook system
      *
      * @param  Model $object
      * @param  Model|null $previous
-     * @return bool             Always returns true
+     * @return true
      */
-    public function postSave(Model $object, $previous = null) {
-        /**
-         * This saves the assessment to the remote system
-         */
+    public function updateExternalMarkbook(Model $object, $previous = null)
+    {
         $externalMarkbook = new \External_Markbook();
-        $activityFactory = new \Schoolbox\Assessment\ActivityFactory();
-        if(is_null($previous)) {
-            $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object,'upcoming'));
+        $activityFactory = new ActivityFactory();
+        if (is_null($previous)) {
+            $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
+        } else {
+            $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
         }
-        else {
-            $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object,'upcoming'));
-        }
+        return true;
     }
 
     /**
-     * Removes this assessment from the markbook.
+     * Post-delete callback.
      *
-     * This is used as a post-delete hook.
+     * Removes this assessment from the external markbook.
      *
      * @param Model $object
+     * @return true
      */
     public function deleteFromMarkbook(Model $object)
     {
         $externalMarkbook = new \External_Markbook();
-        $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
+        $activityFactory = new ActivityFactory();
         $externalMarkbook->deleteAssessment(
             $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
         );
+        return true;
     }
 
-	/**
-	 * Gets the list of activities related to online assessments.
-	 *
-	 * The following activities are retrieved:
-	 *
-	 * * New assessments within the categories
-	 * * Closed assessments within the categories
-	 *
-	 * @param int   $user_id    The user for who activities are fetched for.
-	 *                          Currently isn't used for this query, but may
-	 *                          later be used to filter out assessments which a
-	 *                          user has already submitted.
-	 * @param int   $limit      The max number of activities to be fetched.
-	 * @param array $categories The categories to fetch activities for.
-	 *
-	 * @return ActivityCollection
-	 */
-	public function getActivities($user_id, $limit, array $categories) {
-		$factory    = new ActivityFactory();
-		$collection = new ActivityCollection();
-		$queries = array(
-			array(
-				'event' => 'new',
-				'query' => "
+    /**
+     * Gets the list of activities related to online assessments.
+     *
+     * The following activities are retrieved:
+     *
+     * * New assessments within the categories
+     * * Closed assessments within the categories
+     *
+     * @param int $user_id The user for who activities are fetched for.
+     *                          Currently isn't used for this query, but may
+     *                          later be used to filter out assessments which a
+     *                          user has already submitted.
+     * @param int $limit The max number of activities to be fetched.
+     * @param array $categories The categories to fetch activities for.
+     *
+     * @return ActivityCollection
+     */
+    public function getActivities($user_id, $limit, array $categories)
+    {
+        $factory = new ActivityFactory();
+        $collection = new ActivityCollection();
+        $queries = array(
+            array(
+                'event'      => 'new',
+                'query'      => "
 					SELECT
 						{$this->getColumnString('a')},
 						{$this->getJoinMapper('category')->getColumnString('c')}
@@ -318,12 +238,12 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 					ORDER BY a.start DESC
 					LIMIT :limit
 				",
-				'date_field' => 'start',
-				'limit'      => $limit,
-			),
-			array(
-				'event' => 'closed',
-				'query' => "
+                'date_field' => 'start',
+                'limit'      => $limit,
+            ),
+            array(
+                'event'      => 'closed',
+                'query'      => "
 					SELECT
 						{$this->getColumnString('a')},
 						{$this->getJoinMapper('category')->getColumnString('c')}
@@ -335,53 +255,54 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 					ORDER BY a.finish DESC
 					LIMIT :limit
 				",
-				'date_field' => 'finish',
-				'limit'      => $limit,
-			),
-		);
+                'date_field' => 'finish',
+                'limit'      => $limit,
+            ),
+        );
 
-		foreach ($queries as $query) {
-			$statement = $this->database->prepare($query['query']);
-			$params    = $this->getArrayParameters($categories, 'category');
-			if (!empty($query['limit'])) {
-				$params['limit'] = $query['limit'];
-			}
-			foreach ($params as $key => $value) {
-				$statement->bindParam($key, intval($value), PDO::PARAM_INT);
-			}
-			$statement->execute();
+        foreach ($queries as $query) {
+            $statement = $this->database->prepare($query['query']);
+            $params = $this->getArrayParameters($categories, 'category');
+            if (!empty($query['limit'])) {
+                $params['limit'] = $query['limit'];
+            }
+            foreach ($params as $key => $value) {
+                $statement->bindParam($key, intval($value), PDO::PARAM_INT);
+            }
+            $statement->execute();
 
-			//
-			// Pass to activity collection instead? createFromOnlineAssessment?
-			foreach ($statement as $row) {
-				$assess = $this->hydrate($row, 'a');
-				$assess->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
-				$collection->add($factory->buildFromOnlineAssessment($assess, $query['event']));
-			}
-		}
+            //
+            // Pass to activity collection instead? createFromOnlineAssessment?
+            foreach ($statement as $row) {
+                $assess = $this->hydrate($row, 'a');
+                $assess->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
+                $collection->add($factory->buildFromOnlineAssessment($assess, $query['event']));
+            }
+        }
 
-		return $collection;
-	}
+        return $collection;
+    }
 
-	/**
-	 * Gets all assessments that are due within the given date span.
-	 *
-	 * @param array $category_list  A list of category IDs to filter on.
-	 * @param int   $from_timestamp A Unix timestamp to search from
-	 * @param int   $to_timestamp   A Unix timestamp to search until
-	 *
-	 * @return ActivityCollection
-	 */
-	public function getDueActivities($category_list, $from_timestamp, $to_timestamp) {
-		$factory    = new ActivityFactory();
-		$collection = new ActivityCollection();
-		if (empty($category_list)) {
-			return $collection;
-		}
+    /**
+     * Gets all assessments that are due within the given date span.
+     *
+     * @param array $category_list A list of category IDs to filter on.
+     * @param int $from_timestamp A Unix timestamp to search from
+     * @param int $to_timestamp A Unix timestamp to search until
+     *
+     * @return ActivityCollection
+     */
+    public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
+    {
+        $factory = new ActivityFactory();
+        $collection = new ActivityCollection();
+        if (empty($category_list)) {
+            return $collection;
+        }
 
-		$cat_mapper  = $this->getJoinMapper('category');
-		$user_mapper = $this->getJoinMapper('user');
-		$query = "
+        $cat_mapper = $this->getJoinMapper('category');
+        $user_mapper = $this->getJoinMapper('user');
+        $query = "
 			SELECT
 				{$this->getColumnString('a')},
 				{$cat_mapper->getColumnString('c')},
@@ -396,49 +317,52 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			ORDER BY a.finish ASC
 		";
 
-		//
-		// Build parameters
-		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
-		$params    = $this->getArrayParameters($category_list, 'category');
-		$params['from_date'] = $from_date->getDatabaseDate();
-		$params['to_date']   = $to_date->getDatabaseDate();
-		$statement = $this->database->prepare($query);
-		$statement->execute($params);
+        //
+        // Build parameters
+        $from_date = new \Alaress_Date_Format($from_timestamp, 'U');
+        $to_date = new \Alaress_Date_Format($to_timestamp, 'U');
+        $params = $this->getArrayParameters($category_list, 'category');
+        $params['from_date'] = $from_date->getDatabaseDate();
+        $params['to_date'] = $to_date->getDatabaseDate();
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
 
-		//
-		// Hydrate as activity list, then add category codes
-		foreach ($statement as $row) {
-			$box = $this->hydrate($row, 'a');
-			$box->setUser($user_mapper->hydrate($row, 'u'))
-				->setCategory($cat_mapper->hydrate($row, 'c'));
-			$collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
-		}
-		$cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
-			$collection,
-			function($item) { return $item->getCategory(); }
-		);
-		return $collection;
-	}
+        //
+        // Hydrate as activity list, then add category codes
+        foreach ($statement as $row) {
+            $box = $this->hydrate($row, 'a');
+            $box->setUser($user_mapper->hydrate($row, 'u'))
+                ->setCategory($cat_mapper->hydrate($row, 'c'));
+            $collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
+        }
+        $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
+            $collection,
+            function ($item) {
+                return $item->getCategory();
+            }
+        );
+        return $collection;
+    }
 
-	/**
-	 * Gets the list of upcoming activities for submission boxes.
-	 *
-	 * The following activities are retrieved:
-	 *
-	 * * Upcoming assessments, which the user hasn't submitted work for
-	 *
-	 * @param int   $user_id    The user for who activities are fetched for.
-	 * @param int   $limit      The max number of activities to be fetched.
-	 * @param array $categories The categories to fetch activities for.
-	 *
-	 * @return ActivityCollection
-	 */
-	public function getUpcomingActivities($user_id, $limit, $categories) {
-		//
-		// All submission boxes that are due in the future.
-		$attempt_mapper = $this->getJoinMapper('attempt');
-		$query = "
+    /**
+     * Gets the list of upcoming activities for submission boxes.
+     *
+     * The following activities are retrieved:
+     *
+     * * Upcoming assessments, which the user hasn't submitted work for
+     *
+     * @param int $user_id The user for who activities are fetched for.
+     * @param int $limit The max number of activities to be fetched.
+     * @param array $categories The categories to fetch activities for.
+     *
+     * @return ActivityCollection
+     */
+    public function getUpcomingActivities($user_id, $limit, $categories)
+    {
+        //
+        // All submission boxes that are due in the future.
+        $attempt_mapper = $this->getJoinMapper('attempt');
+        $query = "
 			SELECT
 				{$this->getColumnString('a')},
 				{$this->getJoinMapper('category')->getColumnString('c')},
@@ -453,41 +377,41 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			ORDER BY a.start ASC
 			LIMIT :limit
 		";
-		$statement = $this->database->prepare($query);
-		$statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
-		$statement->bindValue('limit',   $limit,   PDO::PARAM_INT);
-		foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-			$statement->bindValue($param, $value, PDO::PARAM_INT);
-		}
-		$statement->execute();
-		$assessments = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
-			$model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
-			return $model;
-		});
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
+            $statement->bindValue($param, $value, PDO::PARAM_INT);
+        }
+        $statement->execute();
+        $assessments = $this->hydrateList($statement, 'sb', function ($mapper, $model, $row) {
+            $model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
+            return $model;
+        });
 
-		$factory    = new ActivityFactory();
-		$collection = new ActivityCollection();
-		foreach ($assessments as $assessment) {
-			$collection->add($factory->buildFromOnlineAssessment($assessment, 'upcoming'));
-		}
-		return $collection;
-	}
+        $factory = new ActivityFactory();
+        $collection = new ActivityCollection();
+        foreach ($assessments as $assessment) {
+            $collection->add($factory->buildFromOnlineAssessment($assessment, 'upcoming'));
+        }
+        return $collection;
+    }
 
-	/**
-	 * Calculates and returns the statistics for the given online assessment
-	 *
-	 * @param $assess
-	 * @return array
-	 */
-	public function getStatistics($assess) {
-		if($assess instanceof Model) {
-			$assess_id = $assess->getId();
-		}
-		else {
-			$assess_id = $assess;
-		}
+    /**
+     * Calculates and returns the statistics for the given online assessment
+     *
+     * @param $assess
+     * @return array
+     */
+    public function getStatistics($assess)
+    {
+        if ($assess instanceof Model) {
+            $assess_id = $assess->getId();
+        } else {
+            $assess_id = $assess;
+        }
 
-		$sql = "
+        $sql = "
 			SELECT
 			    AVG(sum_mark) AS `mean`,
 			    STDDEV(sum_mark) AS `stdev`,
@@ -517,65 +441,66 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			) t2;
 		";
 
-		$stmt = $this->database->prepare($sql);
-		$stmt->execute(array('assess_id' => $assess_id));
+        $stmt = $this->database->prepare($sql);
+        $stmt->execute(array('assess_id' => $assess_id));
 
-		return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
 
-	}
+    }
 
 
-	/**
-	 * Returns the progress of the given online assess, ie. the number of submissions made and returns given
-	 *
-	 * @param $assess
-	 * @return array
-	 */
-	public function getProgress($assess) {
-		if($assess instanceof Model) {
-			$assess_id = $assess->getId();
-		}
-		else {
-			$assess_id = $assess;
-		}
+    /**
+     * Returns the progress of the given online assess, ie. the number of submissions made and returns given
+     *
+     * @param $assess
+     * @return array
+     */
+    public function getProgress($assess)
+    {
+        if ($assess instanceof Model) {
+            $assess_id = $assess->getId();
+        } else {
+            $assess_id = $assess;
+        }
 
-		$stmt = $this->database->prepare("
+        $stmt = $this->database->prepare("
 			SELECT COUNT(DISTINCT(user_id))
 			FROM assess_attempt
 			WHERE assess_id = :assess_id
 		");
 
-		$stmt->execute(array('assess_id' => $assess_id));
-		$progress['submission_count'] = $stmt->fetchColumn(0);
+        $stmt->execute(array('assess_id' => $assess_id));
+        $progress['submission_count'] = $stmt->fetchColumn(0);
 
-		$progress['accepts_submissions'] = true;
+        $progress['accepts_submissions'] = true;
 
-		$stmt = $this->database->prepare("
+        $stmt = $this->database->prepare("
 			SELECT COUNT(DISTINCT(user_id))
 			FROM assess_attempt
 			WHERE assess_id = :assess_id
 			AND reviewed_at IS NOT NULL
 		");
 
-		$stmt->execute(array('assess_id' => $assess_id));
-		$progress['return_count'] = $stmt->fetchColumn(0);
+        $stmt->execute(array('assess_id' => $assess_id));
+        $progress['return_count'] = $stmt->fetchColumn(0);
 
-		return $progress;
-	}
+        return $progress;
+    }
 
-	/**
-	 * @param int $categoryId
-	 * @param int $limit
-	 * @param int $offset
-	 * @param int $time
-	 * @return Collection|Model[]
-	 */
-	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
-		$time = date('Y-m-d H:i:s', $time ?: time());
-		$limit = (int)$limit;
-		$offset = (int)$offset;
+    /**
+     * @param int $categoryId
+     * @param int $limit
+     * @param int $offset
+     * @param int $time
+     * @return Collection|Model[]
+     */
+    public function findForFeed($categoryId, $limit, $offset = 0, $time = 0)
+    {
+        $time = date('Y-m-d H:i:s', $time ?: time());
+        $limit = (int)$limit;
+        $offset = (int)$offset;
 
-		$stmt = $this->database->prepare("
+        $stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('a')},
 				{$this->getJoinColumnString('category', 'c')},
@@ -594,24 +519,24 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 			LIMIT $offset, $limit
 		");
 
-		$stmt->execute(array(
-			'cat_id' => $categoryId,
-			'time'   => $time
-		));
+        $stmt->execute(array(
+            'cat_id' => $categoryId,
+            'time'   => $time
+        ));
 
-		$c = $this->createCollection();
+        $c = $this->createCollection();
 
-		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			/** @var Model $quiz */
-			$quiz = $this->hydrate($r, 'a');
-			$quiz->setCategory($this->hydrateJoin($r, 'category',  'c'));
-			$quiz->setUser(    $this->hydrateJoin($r, 'user',      'u'));
-			$quiz->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
-			$c->add($quiz);
-		}
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Model $quiz */
+            $quiz = $this->hydrate($r, 'a');
+            $quiz->setCategory($this->hydrateJoin($r, 'category', 'c'));
+            $quiz->setUser($this->hydrateJoin($r, 'user', 'u'));
+            $quiz->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
+            $c->add($quiz);
+        }
 
-		return $c;
-	}
+        return $c;
+    }
 
 
     /**
@@ -658,7 +583,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
                 $quiz->setCategory($this->hydrateJoin($row, 'category', 'c'));
                 $quiz->setWorkType($this->hydrateJoin($row, 'work_type', 't'));
                 $quiz->setUser($this->hydrateJoin($row, 'user', 'u'));
-				$quiz->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'));
+                $quiz->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'));
             }
             // Hydrate curriculum nodes
             /** @var Node\Model $curriculumNode */

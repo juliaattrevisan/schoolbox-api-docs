@@ -11,7 +11,9 @@ namespace Schoolbox\Assessment\Component;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -172,6 +174,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     protected $deleted;
 
+    /**
+     * @var Submission[]|GenericCollection
+     */
+    private $submissions;
+
     public function __construct()
     {
         $this->setAttachments(new Collection());
@@ -185,6 +192,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         $this->setDueDate(new \Alaress_Date_NullDate());
         $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
+        $this->submissions = new GenericCollection(Submission::class);
     }
 
     /**
@@ -890,5 +898,24 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         }
 
         return false;
+    }
+
+    /**
+     * @return Submission[]|GenericCollection
+     */
+    public function getSubmissions()
+    {
+        return $this->submissions;
+    }
+
+    /**
+     * @param Submission[]|GenericCollection $submissions
+     * @return static
+     */
+    public function setSubmissions(GenericCollection $submissions)
+    {
+        $this->submissions->assertSameItemClass($submissions);
+        $this->submissions = $submissions;
+        return $this;
     }
 }

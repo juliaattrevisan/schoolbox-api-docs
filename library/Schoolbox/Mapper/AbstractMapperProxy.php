@@ -283,6 +283,14 @@ abstract class AbstractMapperProxy
         return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
     }
 
+    /**
+     * @return PredicateBuilder
+     */
+    public function getPredicateBuilder()
+    {
+        return new PredicateBuilder($this->database, $this->mapper->getTable());
+    }
+
     /* Getters / Setters
      */
 

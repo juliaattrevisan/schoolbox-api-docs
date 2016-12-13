@@ -39,9 +39,9 @@ foreach ($expiredAttempts as $attempt) {
     $log->info(
         sprintf(
             "Attempt quiz #%d (%s), homepage #%d",
-            $attempt->getAssessment()->getId(),
-            $attempt->getAssessment()->getTitle(),
-            $attempt->getAssessment()->getCategory()->getId()
+            $attempt->getQuiz()->getId(),
+            $attempt->getQuiz()->getTitle(),
+            $attempt->getQuiz()->getCategory()->getId()
         )
     );
     $log->info(
@@ -58,7 +58,7 @@ foreach ($expiredAttempts as $attempt) {
     // Figure out what the finish date ought to be.
     // If it's less than 5 minutes ago, allow some leeway.
     $attemptFinishDate = clone $attempt->getStart();
-    $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getAssessment()->getDuration());
+    $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getQuiz()->getDuration());
     if (Alaress_Date_Format::now()->diffInSeconds($attemptFinishDate) <= 300) {
         $log->warning(
             sprintf(
@@ -98,7 +98,7 @@ if (count($updatedAttempts) > 0) {
 
 // Complete associated tasks as well
 foreach ($expiredAttempts as $attempt) {
-    $taskId = $attempt->getAssessment()->getTaskInstance()->getId();
+    $taskId = $attempt->getQuiz()->getTaskInstance()->getId();
     $userId = $attempt->getUser()->getId();
     if (!empty($taskId) && !empty($userId)) {
         $log->notice(sprintf("Saving associated task completion for attempt #%d...", $attempt->getId()));

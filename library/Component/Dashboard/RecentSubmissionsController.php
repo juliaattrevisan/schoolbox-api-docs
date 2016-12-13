@@ -1,20 +1,33 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract {
 
-    private $submissionHandler;
-    private $max = 10;
-    private $submissions;
-    private $dump;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use \Schoolbox\GenericCollection;
+use \Schoolbox\Collection;
+use \Schoolbox\Learning\Assessment\IAssessable;
+use \Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
-    protected $componentName = 'Most Recent Submissions';
-    protected $componentHref = '/submission/listSubmission/';
+/**
+ * Staff-only component.
+ *
+ * Displays the most recent N days of DueWork Submissions + Quiz Attempts for DueWork
+ * and Quizzes that were created by current user.
+ */
+class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract
+{
+    /**
+     * Sorted by most recent student response first
+     *
+     * @var Collection|DueWork[]|Quiz[]
+     */
+    private $assessments;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -23,91 +36,81 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
      */
     public function execute()
     {
-        /* I guess this component is actually deprecated in favour
-         * of Pending Assessments screen?
-         */
-        return false;
-
-        // init handlers
-        $this->submissionHandler = new Submission();
-
         // don't try to parse data if we're not a teacher
         if (!$this->getUser()->getRole()->isStaff()) {
             return false;
         }
 
-        // TODO. SA-1309 - Disabled due to reliaance on old schema.
-        // Need to update to use new Mappers + Models + object graph
-        echo '<h3>Component_Dashboard_RecentSubmissionsController is disabled. See SA-1309</h3>';
-        return false;
+        $cutoffDate = Alaress_Date_Format::now();
+        $cutoffDate->addDays(-1 * $this->getConfig('days'));
 
-        // returns appropriately sorted and formatted data for this module
-        $this->submissions = $this->getSubmissionHandler()->getTotalSubmissionsByOwner($_SESSION['id']);
+        // Get most recent N months of DueWork Submissions
+        /** @var \Schoolbox\Learning\Assessment\Response\SubSource\DueWork $studentSubmissionDataSource */
+        $studentSubmissionDataSource = $this->getSitePage()->getDi()->get('dueWorkSubmissionDataSource');
+        $pb = $studentSubmissionDataSource->getPredicateBuilder();
+        $pb->equals('b.owner', $this->getUser()->getId());
+        $pb->greaterThan('submitted_at', $cutoffDate->getDatabase());
+        $studentSubmissions = $studentSubmissionDataSource->findByPredicates($pb);
 
+        // Get most recent N months of Quiz Attempts
+        /** @var \Schoolbox\Learning\Assessment\Response\SubSource\Quiz $quizAttemptDataSource */
+        $quizAttemptDataSource = $this->getSitePage()->getDi()->get('quizAttemptDataSource');
+        $pb = $quizAttemptDataSource->getPredicateBuilder();
+        $pb->equals('a.user_id', $this->getUser()->getId());
+        $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
+        $pb->greaterThan('finish', $cutoffDate->getDatabase());
+        $quizAttempts = $quizAttemptDataSource->findByPredicates($pb);
 
-        return true;
-    }
+        /** @var IResponse[] $responses */
+        $responses = (new GenericCollection(IResponse::class))->merge($studentSubmissions)->merge($quizAttempts);
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'recentSubmissions') ) {
-            return false;
-        }
+        // Group IResponses by IAssessable
 
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        $this->setBlock($templateHandle, 'work', 'work_block');
-        $this->setBlock('work', 'submission', 'submission_block');
-        $this->setBlock('work', 'assess', 'assess_block');
-
-        $this->setVar('work_block','');
-
-        // determine how many results to output
-        $count = 0;
-        $limit = $this->getConfig('size');
-
-        if(is_array($this->submissions)) {
-            foreach($this->submissions as $submit) {
-                // don't exceed the limit
-                if ($limit > 0 && $count >= $limit) {
-                    break;
-                }
-
-                $date = new Alaress_Date_Format($submit['datestamp'], 'Y-m-d H:i');
-
-                $output = array(
-                    'WORK_DATE'        => $date->getRelativeTime(),
-                    'WORK_SUBJECT'     => Scrub::Text($submit['category_name']),
-                    'WORK_SUBJECT_ID'  => $submit['cid'],
-                    'WORK_DESCRIPTION' => Scrub::Text($submit['name']),
-                    'WORK_COUNT'       => $submit['count'],
-                    'WORK_BOX_ID'      => $submit['id'],
-                    'ROW_COLOR'        => ++$count%2 ? 'dark' : ''
-                );
-
-                $this->setVar($output);
-
-                if($submit['availability'] == 'assess') {
-                    $this->parse('assess_block', 'assess', false);
-                    $this->setVar('submission_block', '');
-                } else {
-                    $this->parse('submission_block', 'submission', false);
-                    $this->setVar('assess_block', '');
-
-                }
-
-                $this->parse('work_block', 'work', true);
+        /** @var IAssessable[] $assessables */
+        $assessables = new GenericCollection(IAssessable::class);
+        foreach($responses as $response){
+            $assessmentId = $response->getAssessable()->getId();
+            if(!$assessables->getOffset($assessmentId) instanceof IAssessable){
+                $assessable = $assessmentMapperProxy->findById($assessmentId);
+                $assessables->setOffset($assessmentId, $assessable);
             }
+            $assessables[$assessmentId]->getResponses()->add($response);
+        }
 
-            return true;
+        // Sort responses most recent first
+        foreach($assessables as $assessable){
+            $assessable->getResponses()->sortBy('submittedAt', 'DESC');
         }
-        else {
-            return false;
-        }
+
+        // Sort by most recent first, in most recent first
+        $assessables->sortByCallback(function($assessmentA, $assessmentB){
+            /** @var IAssessable $assessmentA */
+            /** @var IAssessable $assessmentB */
+            $dateA = $assessmentA->getResponses()[0]->getSubmittedAt();
+            $dateB = $assessmentB->getResponses()[0]->getSubmittedAt();
+            return $dateB->compare($dateA);
+        });
+
+        $this->assessments = $assessables;
+        return $assessables->count() > 0;
     }
 
     /**
-     * @return Submission
+     * @param String $templateHandle
+     * @return bool
      */
-    public function getSubmissionHandler() {
-        return $this->submissionHandler;
+    public function renderTemplate($templateHandle)
+    {
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learning/component/recentSubmissions.twig',
+            [
+                'assessments'         => $this->assessments,
+                'limit'               => $limit = $this->getConfig('size'),
+            ]
+        );
     }
 }

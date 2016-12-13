@@ -8,10 +8,12 @@
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Mapper\AbstractMapperProxy;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\User;
 
 /**
@@ -83,5 +85,25 @@ abstract class AbstractSubSource implements IResponseDataSource
         if ($this->recognizes($response->getAssessable())) {
             $this->mapperProxy->delete($response);
         }
+    }
+
+    /**
+     * @return PredicateBuilder
+     */
+    public function getPredicateBuilder()
+    {
+        return $this->mapperProxy->getPredicateBuilder();
+    }
+
+    /**
+     * Gets a typed Collection of objects that match the specified predicates
+     *
+     * @param PredicateBuilder $pb
+     * @param array $options
+     * @return GenericCollection
+     */
+    public function findByPredicates(PredicateBuilder $pb, $options = array())
+    {
+        return $this->mapperProxy->findByPredicates($pb, $options);
     }
 }
