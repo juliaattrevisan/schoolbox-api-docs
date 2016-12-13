@@ -21,6 +21,9 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\UserMapper;
@@ -158,6 +161,51 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
     protected function setWorkType(Model $object)
     {
         $object->setWorkType((new WorkType())->setId(WorkType::TYPE_ONLINE_ASSESSMENT));
+        return true;
+    }
+
+
+    /**
+     * Copies Sections, Questions and Solutions from source Quiz to destination Quiz
+     *
+     * @param int $sourceAssessmentId
+     * @param int $destinationAssessmentId
+     * @return bool
+     */
+	public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
+    {
+        $sectionMapper = QuizSectionMapper::getInstance();
+        $questionMapper = QuizQuestionMapper::getInstance();
+        $solutionMapper = QuizSolutionMapper::getInstance();
+
+
+        /** @var Model $sourceQuiz */
+        $sourceQuiz = $this->findByColumn('assessment_id', $sourceAssessmentId)->first();
+        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+
+        foreach($sourceQuiz->getSections() as $section){
+            $questions = $questionMapper->findByColumn('section_id', $section->getId());
+            $section->setQuestions($questions);
+        }
+
+        /** @var Model $destinationQuiz */
+        $destinationQuiz = $this->findByColumn('assessment_id', $destinationAssessmentId)->first();
+
+        // Clone and Save Sections, Questions + Solutions
+        foreach($sourceQuiz->getSections() as $section){
+
+            $clonedSection = clone $section;
+            $clonedSection->setQuiz($destinationQuiz);
+            $destinationQuiz->getSections()->add($clonedSection);
+            $sectionMapper->save($clonedSection);
+
+            foreach($clonedSection->getQuestions() as $clonedQuestion){
+                $questionMapper->save($clonedQuestion);
+                if($clonedQuestion->getSolution() instanceof QuizSolution){
+                    $solutionMapper->save($clonedQuestion->getSolution());
+                }
+            }
+        }
         return true;
     }
 

@@ -889,6 +889,7 @@ class Controller extends Base\Base
 
             // If Assessable was a Quiz, we have one Quiz.
             // If Assessable was a Project, we may have many Quizzes
+            /** @var IAssessable[] $quizImpls */
             $quizImpls = new GenericCollection(QuizAssessable::class);
 
             if($assessmentImpl instanceof QuizAssessable){
@@ -903,49 +904,9 @@ class Controller extends Base\Base
             }
 
             foreach($quizImpls as $quizImpl){
-                $this->copyQuizConstituents($quizImpl);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Clones the Sections, Questions and Solutions for the specified QuizImplementation from its Spec
-     *
-     * Uses data models - for now.
-     *
-     * @param QuizAssessable $quizAssessableImpl
-     * @return true
-     */
-    protected function copyQuizConstituents(QuizAssessable $quizAssessableImpl)
-    {
-        $quizAssessableSpec = $quizAssessableImpl->getSpecificationAssessment();
-
-        /** @var Quiz $quizSpec */
-        $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $quizAssessableSpec->getId())->first();
-        $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
-
-        foreach($quizSpec->getSections() as $section){
-            $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
-            $section->setQuestions($questions);
-        }
-
-        // Copy to our implementation
-        /** @var Quiz $quizImpl */
-        $quizImpl = $this->getQuizMapper()->findByColumn('assessment_id', $quizAssessableImpl->getId())->first();
-        $clone = clone $quizSpec;
-        $quizImpl->setSections($clone->getSections());
-
-        // Save the whole tree
-        foreach($quizImpl->getSections() as $section){
-            $section->setQuiz($quizImpl);
-            $this->getQuizSectionMapper()->save($section);
-
-            foreach($section->getQuestions() as $question){
-                $this->getQuizQuestionMapper()->save($question);
-                if($question->getSolution() instanceof QuizSolution){
-                    $this->getQuizSolutionMapper()->save($question->getSolution());
-                }
+                $specId = $quizImpl->getSpecificationAssessment()->getId();
+                $implId = $quizImpl->getId();
+                $this->getQuizMapper()->copyQuizConstituents($specId, $implId);
             }
         }
         return true;
