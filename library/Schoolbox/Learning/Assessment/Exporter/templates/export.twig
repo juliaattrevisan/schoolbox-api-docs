@@ -66,6 +66,7 @@
                                         <h3>{{ implementation.unit.course.folder.title }}</h3>
                                     </a>
                                     <p class="meta">
+                                        {% spaceless %}
                                         <time title="{{ implementation.unit.openDate.short }}"
                                               datetime="{{ implementation.unit.openDate.databaseDate }}"
                                         >{{ implementation.unit.openDate.relativeTime }}</time>
@@ -73,6 +74,7 @@
                                         <time title="{{ implementation.unit.dueDate.short }}"
                                               datetime="{{ implementation.unit.dueDate.databaseDate }}"
                                         >{{ implementation.unit.dueDate.relativeTime }}</time>
+                                        {% endspaceless %}
                                     </p>
                                     <p class="meta">
                                         {% if implementation.allowed %}

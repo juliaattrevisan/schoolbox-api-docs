@@ -22,6 +22,10 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
      */
     const MAX_MANAGERS = 100;
 
+    /**
+     * This appears in the empty state message
+     */
+    const TYPE_NAME = 'managers';
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -35,7 +39,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
-// Get collection of members
+        // Get collection of members
         $userMapper = new UserMapper();
         $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), Array ('lastname' => 'asc'));
 
@@ -44,7 +48,10 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock($templateHandle, 'members', 'members_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-            $this->setVar('members_block', '');
+            $this->setVar([
+                'TYPE_NAME' => self::TYPE_NAME,
+                'members_block' => ''
+            ]);
 
             $this->parse('empty_state_block', 'empty_state');
 
