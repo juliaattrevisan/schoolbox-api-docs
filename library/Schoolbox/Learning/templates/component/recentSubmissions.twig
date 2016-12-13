@@ -10,16 +10,13 @@ Usage:
             <li class="list-item" data-equalizer>
                 <div class="small-2 columns">
                     {% set responseType = assessment is quiz ? 'attempt' : 'submission' %}
-                    {% if assessment.responses | length > 1 %}
-                        {% set responseType = responseType ~ 's' %}
-                    {% endif %}
-                    <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}">{{ assessment.responses | length }}</p>
+                    <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}{% if assessment.responses | length > 1%}s{% endif %}">{{ assessment.responses | length }}</p>
                 </div>
                 <div class="card small-10" data-equalizer-watch>
                     <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></h3>
 
                     <p class="meta">
-                        Last attempt {{ assessment.responses.first.submittedAt.relativeTime }} in
+                        Last {{ responseType }} {{ assessment.responses.first.submittedAt.relativeTime }} in
                         <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a>
                     </p>
                 </div>
