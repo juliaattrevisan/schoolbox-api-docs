@@ -171,11 +171,8 @@ abstract class Component_ControllerAbstract
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
             // source may be deleted
-            try {
-                $source = $this->getFolderMapper()->findById($folderId);
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                $source = $e->getDeletedObject();
-            }
+            $source = $this->getFolderMapper()->findByIdWithFallback($folderId);
+
             if (!($source instanceof Folder)) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
