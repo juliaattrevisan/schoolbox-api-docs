@@ -23,7 +23,16 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Data domain model for Unit Implementations.
+ * An Unit Implementation is a single import of a Unit Specification onto a Folder. It belongs to an
+ * Course Implementation.
+ *
+ * On creation, this object makes a copy of the Assessables in the Unit Specification it was
+ * created from, and adds them to itself - a teacher may then add, modify or remove individual
+ * Assessable objects inside this object.
+ *
+ * (Historically, this was known as a Unit Instance. It did not belong to a
+ *  Course Implementation - instead, it belonged directly to the Folder it was imported
+ *  onto, and was also linked to a component on that Folder.)
  */
 class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {

@@ -19,7 +19,15 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementa
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 /**
- * Data domain model for Course Specifications.
+ * A Course Specification is a collection of Unit Specifications. It exists on a Folder.
+ *
+ * It is intended to represent an entire subject's syllabus, and may be imported onto another Folder.
+ * This action will create a corresponding Course Implementation for this Course Specification,
+ * with whatever Unit Specifications were selected to be imported.
+ *
+ * (Historically, this was simply known as a Course, and was defined as a Folder
+ *  which had at least one child Folder which contained a Course Builder component.
+ *  This class puts this concept into a concrete class.)
  */
 class Model implements ISoftDeletable
 {

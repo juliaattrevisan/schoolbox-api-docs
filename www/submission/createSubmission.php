@@ -6,7 +6,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 

@@ -22,7 +22,15 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
- * Data domain model for Unit Specifications.
+ * A Unit Specification is a collection of Assessable objects. It exists on a Folder.
+ *
+ * It is intended to cover a single area of learning within a subject, and may be imported
+ * onto another Folder as part of the action of importing a Course onto that folder.
+ * This action creates an Unit Implementation for each Unit Specification that was chosen to be imported
+ * as part of that process.
+ *
+ * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
+ *  Course Builder component. This class puts this concept into a concrete class.)
  */
 class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {

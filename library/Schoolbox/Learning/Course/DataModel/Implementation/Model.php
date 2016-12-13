@@ -18,7 +18,14 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Data domain model for Course Implementations.
+ * An Course Implementation is an import of a Course Specification onto a Folder.
+ *
+ * This object will contain one or more Unit Implementations (whichever of the
+ * Course Specification's Unit Specifications were selected as part of the import process).
+ *
+ * (Historically, this did not exist as a separate concept. Unit Implementations were
+ *  related directly to the Folder the Course Specification was imported onto, and
+ *  linked to a component.)
  */
 class Model implements ISoftDeletable
 {
