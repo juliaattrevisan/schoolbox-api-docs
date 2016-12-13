@@ -175,7 +175,7 @@ class Mapper extends BaseMapper
      */
     protected function loadUnits(Model $specification)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
         $collection->add($specification);
         $this->loadUnitsForCollection($collection);
         return $collection->first();
@@ -205,7 +205,7 @@ class Mapper extends BaseMapper
         // Match unit specs to their course spec
         foreach ($allSpecs as $spec) {
             if (isset($allUnits[$spec->getId()])) {
-                $spec->setUnits($allUnits[$spec->getId()]);
+                $spec->setUnits($unitSpecMapper->createCollection()->merge($allUnits[$spec->getId()]));
             }
         }
         return $allSpecs;
