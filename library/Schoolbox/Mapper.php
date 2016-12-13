@@ -770,6 +770,7 @@ abstract class Mapper implements IMapper, Serializable
                 return $map['property'];
             }
         }
+        return null;
     }
 
     /**
@@ -1521,7 +1522,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param String|array $columnValue
      * @param array        $options @see findByColumnList() $options param
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function findByColumn($columnName, $columnValue, $options = array())
     {
@@ -2147,7 +2148,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param $object
      *
-     * @return array<int>
+     * @return int[]
      */
     public function create($object)
     {
@@ -2166,7 +2167,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param $object
      *
-     * @return array<int>|bool
+     * @return int[]|bool
      */
     public function save($object)
     {
