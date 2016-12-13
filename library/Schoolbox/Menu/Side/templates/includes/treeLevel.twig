@@ -4,7 +4,7 @@
 {% set first = true %}
 
 {# Iterate all child nodes #}
-
+{% spaceless %}
 {% for node in nodes if node.parentId == parent.id %}
 
     {% if first == true %}
@@ -37,3 +37,4 @@
 {% if first == false %}
     </ul>
 {% endif %}
+{% endspaceless %}

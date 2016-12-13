@@ -9,14 +9,9 @@
 
 namespace Schoolbox\Menu\Top;
 
-use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTopModel;
-use Schoolbox\Menu\Top\Campus\Mapper as MenuTopCampusMapper;
-use Schoolbox\Menu\Top\Campus\Model as MenuTopCampusModel;
-use Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
-use Schoolbox\Menu\Top\Role\Model as MenuTopRoleModel;
 
 class Renderer
 {
@@ -40,9 +35,6 @@ class Renderer
     public function menuTopRenderer(\Twig_Environment $twig, $tabCurrent = null, $user = null)
     {
         // Render this thing out
-
-        $tabsRendered = new Collection;
-
         $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
 
         /** @var MenuTopModel $tab */

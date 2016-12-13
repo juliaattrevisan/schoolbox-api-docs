@@ -114,7 +114,7 @@ class Renderer
                 $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
             }
         } catch (MapperException $e) {
-            //noop
+            $nodes = [];
         }
 
         // Render this thing out
