@@ -146,7 +146,7 @@ class Controller extends BaseController
 
         // Save the newly created implementations (at the end of the unit)
         foreach ($newImplementations as $unitId => $newImplementation) {
-            $this->assessmentDataSource->save($newImplementation, $sequences[$unitId]);
+            $this->assessmentDataSource->save($newImplementation);
         }
 
         // Decode the return URL, if it was set
