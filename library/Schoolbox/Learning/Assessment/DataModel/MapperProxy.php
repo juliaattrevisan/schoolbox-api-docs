@@ -236,9 +236,9 @@ class MapperProxy
     public function findAllImplementationsBySpecificationId($assessmentId, $options = [])
     {
         // Get all assessables which have this assessment as a spec
-        $params            = $this->convertOptionsToColumnList($options);
-        $params['spec.id'] = $assessmentId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('spec.id', $assessmentId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -284,9 +284,9 @@ class MapperProxy
      */
     public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
-        $params          = $this->convertOptionsToColumnList($options);
-        $params['us.id'] = $unitSpecId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('us.id', $unitSpecId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -300,9 +300,9 @@ class MapperProxy
      */
     public function findAllByUnitImplementationId($unitImplId, $options = [])
     {
-        $params          = $this->convertOptionsToColumnList($options);
-        $params['ui.id'] = $unitImplId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('ui.id', $unitImplId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -383,9 +383,9 @@ class MapperProxy
      */
     public function findAllByFolderIdExclusively($folderId, $options = [])
     {
-        $params         = $this->convertOptionsToColumnList($options);
-        $params['f.id'] = $folderId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('f.id', $folderId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -403,10 +403,10 @@ class MapperProxy
      */
     public function findAllByCourseImplementationFolderId($folderId, $options = [])
     {
-        $params            = $this->convertOptionsToColumnList($options);
         // uicf.id = Unit Implementation Course Folder ID
-        $params['uicf.id'] = $folderId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('uicf.id', $folderId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
@@ -421,9 +421,9 @@ class MapperProxy
      */
     public function findAllByProjectId($projectId, $options = [])
     {
-        $params                     = $this->convertOptionsToColumnList($options);
-        $params['pa.assessment_id'] = $projectId;
-        return $this->translateToDomainModelCollection($this->baseMapper->findByColumnList($params, $options));
+        $builder = $this->convertOptionsToPredicateBuilder($options)
+                        ->equals('pa.assessment_id', $projectId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
     /**
