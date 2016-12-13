@@ -139,6 +139,7 @@ class Controller extends BaseController
                     ->setDueAt($unitImpl->getDueDate())
                     ->setCloseAt($unitImpl->getDueDate())
                 ;
+                // TODO - test if project, and if so need to set dates on its Assessables too
                 $newImplementations->add($newImplementation);
             }
         }
