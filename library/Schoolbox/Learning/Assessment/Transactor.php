@@ -18,7 +18,7 @@ use Aura\Router\Router;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use \Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use \Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use \Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -37,9 +37,9 @@ class Transactor
     protected $folderMapper;
 
     /**
-     * @var UnitImplementationMapperProxy
+     * @var UnitImplementationMapper
      */
-    protected $unitImplementationMapperProxy;
+    private $unitImplementationMapper;
 
     /**
      * @var UnitSpecificationMapperProxy
@@ -59,20 +59,20 @@ class Transactor
     /**
      * Transactor constructor.
      * @param FolderMapper $folderMapper
-     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
      * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param $router
      */
     public function __construct(
         FolderMapper $folderMapper,
-        UnitImplementationMapperProxy $unitImplementationMapperProxy,
+        UnitImplementationMapper $unitImplementationMapper,
         UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
         AssessmentMapperProxy $assessmentMapperProxy,
         Router $router
     ) {
         $this->setFolderMapper($folderMapper);
-        $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
+        $this->setUnitImplementationMapper($unitImplementationMapper);
         $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setRouter($router);
@@ -161,7 +161,7 @@ class Transactor
      */
     private function transactUnitImplementationContext()
     {
-        $context   = $this->getUnitImplementationMapperProxy()->findById($this->getContextId());
+        $context   = $this->getUnitImplementationMapper()->findById($this->getContextId());
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return "/homepage/{$context->getId()}";
@@ -247,19 +247,19 @@ class Transactor
     }
 
     /**
-     * @return UnitImplementationMapperProxy
+     * @return UnitImplementationMapper
      */
-    protected function getUnitImplementationMapperProxy()
+    protected function getUnitImplementationMapper()
     {
-        return $this->unitImplementationMapperProxy;
+        return $this->unitImplementationMapper;
     }
 
     /**
-     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
-    protected function setUnitImplementationMapperProxy($unitImplementationMapperProxy)
+    protected function setUnitImplementationMapper($unitImplementationMapper)
     {
-        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
+        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
     /**

@@ -12,7 +12,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -33,25 +33,25 @@ class Controller extends BaseController
     protected $assessmentDataSource;
 
     /**
-     * @var UnitImplementationDataSource
+     * @var UnitImplementationMapper
      */
-    protected $unitImplementationDataSource;
+    private $unitImplementationMapper;
 
     /**
      * Constructor
      *
-     * @param Access                       $access
-     * @param AssessmentDataSource         $assessmentDataSource
-     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @param Access                   $access
+     * @param AssessmentDataSource     $assessmentDataSource
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
-        UnitImplementationDataSource $unitImplementationDataSource
+        UnitImplementationMapper $unitImplementationMapper
     ) {
-        $this->access                       = $access;
-        $this->assessmentDataSource         = $assessmentDataSource;
-        $this->unitImplementationDataSource = $unitImplementationDataSource;
+        $this->access                   = $access;
+        $this->assessmentDataSource     = $assessmentDataSource;
+        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
     /**
@@ -179,7 +179,7 @@ class Controller extends BaseController
     protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment)
     {
         $result              = [];
-        $unitImplementations = $this->unitImplementationDataSource->findAllByUnitSpecificationId(
+        $unitImplementations = $this->unitImplementationMapper->findAllByUnitSpecificationId(
             $assessment->getContext()->getId()
         );
 

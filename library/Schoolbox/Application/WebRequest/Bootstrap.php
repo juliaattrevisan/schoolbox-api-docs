@@ -51,7 +51,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplT
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
 
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
@@ -584,18 +583,6 @@ class Bootstrap implements BootstrapInterface {
 
         // Register External_Class service
         $di->set('externalClass', $di->lazyNew(\External_Class::class));
-
-        // Register course/unit implementation data sources
-        $di->set(
-            'unitImplementationDataSource',
-            $di->lazyNew(
-                UnitImplMapperProxy::class,
-                [
-                    'mapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
-                    'translator' => $di->lazyNew(UnitImplTranslator::class),
-                ]
-            )
-        );
 
         // Register course/unit specification data sources
         $di->set(

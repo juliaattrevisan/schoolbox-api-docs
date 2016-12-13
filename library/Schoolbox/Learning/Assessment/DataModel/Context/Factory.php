@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Context;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
@@ -22,9 +22,9 @@ class Factory
      */
     var $folderMapper;
     /**
-     * @var UnitImplMapperProxy
+     * @var UnitImplementationMapper
      */
-    var $unitImplMapperProxy;
+    var $unitImplementationMapper;
     /**
      * @var AssessmentMapperProxy
      */
@@ -36,12 +36,13 @@ class Factory
 
     public function __construct(
         FolderMapper $folderMapper,
-        UnitImplMapperProxy $unitImplMapperProxy,
+        UnitImplementationMapper $unitImplementationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        UnitSpecMapperProxy $unitSpecMapperProxy) {
+        UnitSpecMapperProxy $unitSpecMapperProxy
+    ) {
 
         $this->setFolderMapper($folderMapper);
-        $this->setUnitImplMapperProxy($unitImplMapperProxy);
+        $this->setUnitImplementationMapper($unitImplementationMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setUnitSpecMapperProxy($unitSpecMapperProxy);
     }
@@ -56,8 +57,8 @@ class Factory
     public function produce($type, $id)
     {
         // Remove that silly s
-        if(substr($type, -1) == 's') {
-            $type = substr($type,0,-1);
+        if (substr($type, -1) == 's') {
+            $type = substr($type, 0, -1);
         }
 
         switch ($type) {
@@ -65,7 +66,7 @@ class Factory
                 $mapper = $this->getFolderMapper();
                 break;
             case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION:
-                $mapper = $this->getUnitImplMapperProxy();
+                $mapper = $this->getUnitImplementationMapper();
                 break;
             case AssessmentContextType::TYPE_PROJECT:
                 $mapper = $this->getAssessmentMapperProxy();
@@ -98,19 +99,19 @@ class Factory
     }
 
     /**
-     * @return UnitImplMapperProxy
+     * @return UnitImplementationMapper
      */
-    public function getUnitImplMapperProxy()
+    public function getUnitImplementationMapper()
     {
-        return $this->unitImplMapperProxy;
+        return $this->unitImplementationMapper;
     }
 
     /**
-     * @param UnitImplMapperProxy $unitImplMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
-    public function setUnitImplMapperProxy(UnitImplMapperProxy $unitImplMapperProxy)
+    public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
     {
-        $this->unitImplMapperProxy = $unitImplMapperProxy;
+        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
     /**

@@ -11,7 +11,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 use Schoolbox\Learning\Assessment;
@@ -96,9 +96,9 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'access'                       => Access::getInstance(),
-                    'assessmentDataSource'         => $this->getAssessmentMapperProxy(),
-                    'unitImplementationDataSource' => $this->injector->get('unitImplementationDataSource'),
+                    'access'                   => Access::getInstance(),
+                    'assessmentDataSource'     => $this->getAssessmentMapperProxy(),
+                    'unitImplementationMapper' => $this->getUnitImplementationMapper()
                 ]
             )
         );
@@ -132,11 +132,13 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitImplMapperProxy
+     * @return UnitImplementationMapper
      */
-    protected function getUnitImplMapperProxy()
+    protected function getUnitImplementationMapper()
     {
-        return $this->injector->get('unitImplementationDataSource');
+        /** @var UnitImplementationMapper $unitImplementationMapper */
+        $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        return $unitImplementationMapper;
     }
 
     /**
