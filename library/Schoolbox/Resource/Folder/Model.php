@@ -54,13 +54,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $codes;
 
     /**
-     * Deleted at
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
-
-    /**
      * A group instance
      *
      * @var \Schoolbox\Resource\Group
