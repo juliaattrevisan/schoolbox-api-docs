@@ -77,14 +77,14 @@ switch ($_REQUEST['action']) {
             }
             /* Start and end dates
              */
-            $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])
-                ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
-                ->setMinute($_POST['startMinute'])
-            ;
-            $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])
-                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
-                ->setMinute($_POST['endMinute'])
-            ;
+            $startDate = Alaress_Date_Format::newDatabaseDate($_POST['startDate']);
+//                ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
+//                ->setMinute($_POST['startMinute'])
+//            ;
+            $endDate = Alaress_Date_Format::newDatabaseDate($_POST['endDate']);
+//                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
+//                ->setMinute($_POST['endMinute'])
+//            ;
         } catch (RuntimeException $e) {
             error(15);
             exit;

@@ -111,11 +111,11 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         // that will hold the date in a DB friendly format for form submission, and we put a readonly textbox in its place for
         // displaying a friendlier date format to the end users
 
-        element.after('<input type="hidden" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + '">');
+        element.after('<input type="hidden" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + ' ">');
         element.after('<input readonly data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue).formatFlatpickr(options.displayFormat) + '">');
         element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
         element.remove();
-        
+
         element = $('#pickerDisplay' + window.pickerCount);
 
         // Store the ID of the datetime picker on the element for use in the click event
@@ -140,9 +140,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
 
                 // if datetime, pass date only
-                var originalValueSplit  = originalValue.split(' ');
+
                 // AJAX in the modal contents if they haven't already been loaded
-                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + originalValueSplit[0], function () {
+                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + encodeURI(originalValue), function () {
 
                     $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 
@@ -174,7 +174,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
                 var pickerDisplay = $('#pickerDisplay' + pickerId);
                 var originalField = $('#' + pickerDisplay.data('originalId'));
-                
+
                 window.pickerInstance[pickerId].setDate(originalField.val());
 
                 $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());

@@ -6,8 +6,8 @@
 <!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>-->
 <!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>-->
 <!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>-->
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>-->
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
@@ -57,7 +57,7 @@
         	<input name="id" type="hidden" value="{EVENT_ID}" />
         	<input name="userId" type="hidden" value="{EVENT_USER_ID}" />
         	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
-        	<input name="allday" type="hidden" value="0" />
+        	<!--<input name="allday" type="hidden" value="0" />-->
         	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
         	<input id="efficacy" name="efficacy" type="hidden" value="self" />
         	<input id="action" name="action" type="hidden" value="" />
@@ -75,7 +75,7 @@
                         <label for="startDate">
                             From
                         </label>{EVENT_START_DATE}
-                        <input name="startDate" id="startDate"  type="text" size="15" maxlength="30" value="{EVENT_START_DATE} "/>
+                        <input name="startDate" id="startDate" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE} "/>
                     </div>
                     <!--<div class="small-12 large-6 columns" data-hide-watch="#allday" data-hide-watch-invert>-->
                         <!--<div class="row">-->
@@ -131,10 +131,10 @@
                             <!--</div>-->
                         <!--</div>-->
                     <!--</div>-->
-                    <div class="small-12 columns">
-                        <input id="allday" name="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED}>
-                        <label for="allday" class="checkbox-label">All Day</label>
-                    </div>
+                    <!--<div class="small-12 columns">-->
+                        <!--<input id="allday" name="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED}>-->
+                        <!--<label for="allday" class="checkbox-label">All Day</label>-->
+                    <!--</div>-->
                 </fieldset>
 
                 <fieldset class="content" data-collapsable-container>
