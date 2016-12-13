@@ -23,22 +23,53 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 
         $this->setBlock($templateHandle, 'podcast', 'podcast_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-        $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
 
-        if ($this->getConfig('url')) {
+        $emptyState = false;
+        $noConfig = false;
+
+        if (strlen($this->getConfig('url')) == 0) {
+            $emptyState = true;
+            $noConfig = true;
+        } else {
             $xml = new Xml($this->getConfig('url'));
+
+            if (!count($xml->channel->item)) {
+                $emptyState = true;
+            }
         }
 
-        if (!count($xml->channel->item)) {
-            $this->setVar('podcast_block', '');
+        if ($emptyState) {
 
+            $this->setVar('podcast_block', '');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
+
+            /**
+             * If the user has no write permission just go for a generic nothing found message
+             */
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('empty_modify_block', '');
+
+                $this->setVar('empty_config_block', '');
+                $this->setVar('empty_results_write_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+
             } else {
-                $this->parse('empty_modify_block', 'empty_modify');
+
+                if ($noConfig) {
+                    $this->setVar('empty_results_block', '');
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->setVar('empty_config_block', '');
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
+
             }
 
             $this->parse('empty_state_block', 'empty_state');
+
         } else {
             $this->setBlock('podcast', 'podcast_list', 'podcast_list_block');
             $this->setBlock('podcast', 'default_podcast', 'default_podcast_block');
