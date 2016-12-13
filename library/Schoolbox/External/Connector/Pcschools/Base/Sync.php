@@ -159,6 +159,7 @@ class Sync implements SyncInterface
                 T.CAMPUS         AS staff_campus,
                 T.CLASSIFICATION AS staff_category_type,
                 T.STATUS         AS staff_category,
+                ''               AS staff_house,
                 ''               AS staff_department,
                 ''               AS staff_year_level,
                 ''               AS staff_year_level_description

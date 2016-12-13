@@ -235,6 +235,7 @@ class Sync implements SyncInterface
                 t.school_email      AS work_email,
                 t.e_mail            AS email,
                 ''                  AS staff_campus,
+                ''                  AS staff_house,
                 ''                  AS staff_year_level,
                 ''                  AS staff_year_level_description,
                 CASE
