@@ -20,7 +20,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use \Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use \Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -42,9 +42,9 @@ class Transactor
     private $unitImplementationMapper;
 
     /**
-     * @var UnitSpecificationMapperProxy
+     * @var UnitSpecificationMapper
      */
-    protected $unitSpecificationMapperProxy;
+    private $unitSpecificationMapper;
 
     /**
      * @var AssessmentMapperProxy
@@ -60,20 +60,20 @@ class Transactor
      * Transactor constructor.
      * @param FolderMapper $folderMapper
      * @param UnitImplementationMapper $unitImplementationMapper
-     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param $router
      */
     public function __construct(
         FolderMapper $folderMapper,
         UnitImplementationMapper $unitImplementationMapper,
-        UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
+        UnitSpecificationMapper $unitSpecificationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Router $router
     ) {
         $this->setFolderMapper($folderMapper);
         $this->setUnitImplementationMapper($unitImplementationMapper);
-        $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
+        $this->setUnitSpecificationMapper($unitSpecificationMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setRouter($router);
     }
@@ -177,7 +177,7 @@ class Transactor
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getContextId());
+        $context   = $this->getUnitSpecificationMapper()->findById($this->getContextId());
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
@@ -263,19 +263,19 @@ class Transactor
     }
 
     /**
-     * @return UnitSpecificationMapperProxy
+     * @return UnitSpecificationMapper
      */
-    protected function getUnitSpecificationMapperProxy()
+    protected function getUnitSpecificationMapper()
     {
-        return $this->unitSpecificationMapperProxy;
+        return $this->unitSpecificationMapper;
     }
 
     /**
-     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      */
-    protected function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
+    protected function setUnitSpecificationMapper($unitSpecificationMapper)
     {
-        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
     }
 
     /**

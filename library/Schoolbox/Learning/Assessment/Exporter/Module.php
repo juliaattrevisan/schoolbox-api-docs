@@ -13,8 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
-use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Twig_Loader_Chain;
@@ -142,11 +141,13 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitSpecMapperProxy
+     * @return UnitSpecificationMapper
      */
-    protected function getUnitSpecMapperProxy()
+    protected function getUnitSpecificationMapper()
     {
-        return $this->injector->get('unitSpecificationDataSource');
+        /** @var UnitSpecificationMapper $unitSpecificationMapper */
+        $unitSpecificationMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        return $unitSpecificationMapper;
     }
 
     /**

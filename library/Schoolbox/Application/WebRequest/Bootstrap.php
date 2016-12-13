@@ -56,7 +56,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTr
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
 
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
@@ -583,18 +582,6 @@ class Bootstrap implements BootstrapInterface {
 
         // Register External_Class service
         $di->set('externalClass', $di->lazyNew(\External_Class::class));
-
-        // Register course/unit specification data sources
-        $di->set(
-            'unitSpecificationDataSource',
-            $di->lazyNew(
-                UnitSpecMapperProxy::class,
-                [
-                    'mapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
-                    'translator' => $di->lazyNew(UnitSpecTranslator::class),
-                ]
-            )
-        );
 
         // Register assessment data source
         $di->set(

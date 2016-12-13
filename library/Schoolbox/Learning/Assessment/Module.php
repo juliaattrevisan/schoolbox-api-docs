@@ -20,7 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\Task\Completion\MapperProxy as TaskResponseDataSource;
@@ -161,7 +161,7 @@ class Module extends BaseModule
                 $this->getFolderMapper(),
                 $this->getUnitImplementationMapper(),
                 $this->getAssessmentMapperProxy(),
-                $this->getUnitSpecMapperProxy()
+                $this->getUnitSpecificationMapper()
             );
             $c = $contextFactory->produce($params['contextType'],$params['contextId']);
         } catch (MapperException\Deleted $e) {
@@ -330,11 +330,13 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitSpecMapperProxy
+     * @return UnitSpecificationMapper
      */
-    protected function getUnitSpecMapperProxy()
+    protected function getUnitSpecificationMapper()
     {
-        return $this->injector->get('unitSpecificationDataSource');
+        /** @var UnitSpecificationMapper $unitSpecMapper */
+        $unitSpecMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        return $unitSpecMapper;
     }
 
     /**

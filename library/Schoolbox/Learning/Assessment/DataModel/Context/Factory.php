@@ -10,7 +10,7 @@ use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 
@@ -30,21 +30,27 @@ class Factory
      */
     var $assessmentMapperProxy;
     /**
-     * @var UnitSpecMapperProxy
+     * @var UnitSpecificationMapper
      */
-    var $unitSpecMapperProxy;
+    var $unitSpecificationMapper;
 
+    /**
+     * Factory constructor.
+     * @param FolderMapper $folderMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     */
     public function __construct(
         FolderMapper $folderMapper,
         UnitImplementationMapper $unitImplementationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        UnitSpecMapperProxy $unitSpecMapperProxy
+        UnitSpecificationMapper $unitSpecificationMapper
     ) {
-
         $this->setFolderMapper($folderMapper);
         $this->setUnitImplementationMapper($unitImplementationMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setUnitSpecMapperProxy($unitSpecMapperProxy);
+        $this->setUnitSpecificationMapper($unitSpecificationMapper);
     }
 
 
@@ -72,7 +78,7 @@ class Factory
                 $mapper = $this->getAssessmentMapperProxy();
                 break;
             case AssessmentContextType::TYPE_UNIT_SPECIFICATION:
-                $mapper = $this->getUnitSpecMapperProxy();
+                $mapper = $this->getUnitSpecificationMapper();
                 break;
             default:
                 throw new \InvalidArgumentException('Invalid context type string');
@@ -92,10 +98,12 @@ class Factory
 
     /**
      * @param FolderMapper $folderMapper
+     * @return static
      */
     public function setFolderMapper(FolderMapper $folderMapper)
     {
         $this->folderMapper = $folderMapper;
+        return $this;
     }
 
     /**
@@ -108,10 +116,12 @@ class Factory
 
     /**
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @return static
      */
     public function setUnitImplementationMapper(UnitImplementationMapper $unitImplementationMapper)
     {
         $this->unitImplementationMapper = $unitImplementationMapper;
+        return $this;
     }
 
     /**
@@ -124,26 +134,30 @@ class Factory
 
     /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @return static
      */
     public function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
+        return $this;
     }
 
     /**
-     * @return UnitSpecMapperProxy
+     * @return UnitSpecificationMapper
      */
-    public function getUnitSpecMapperProxy()
+    public function getUnitSpecificationMapper()
     {
-        return $this->unitSpecMapperProxy;
+        return $this->unitSpecificationMapper;
     }
 
     /**
-     * @param UnitSpecMapperProxy $unitSpecMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @return static
      */
-    public function setUnitSpecMapperProxy(UnitSpecMapperProxy $unitSpecMapperProxy)
+    public function setUnitSpecificationMapper(UnitSpecificationMapper $unitSpecificationMapper)
     {
-        $this->unitSpecMapperProxy = $unitSpecMapperProxy;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
+        return $this;
     }
 
 
