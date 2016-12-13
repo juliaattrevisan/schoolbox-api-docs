@@ -262,13 +262,14 @@ class UsageMapper
                  FROM `student_submission` `f`
                    INNER JOIN `student_submission_file` ON `student_submission_file`.student_submission_id = `f`.id
                    INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
+                   WHERE `student_submission_file`.deleted_at IS NULL
                  GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
                  FROM `submission_return` `f`
                    INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
                    INNER JOIN `storage` `s` ON `submission_return_file`.`hash` = `s`.`hash`
-                 WHERE `f`.`deleted_at` IS NULL
+                 WHERE `submission_return_file`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
               ) allTotals ON `user`.id = allTotals.userId
             GROUP BY `user`.id
