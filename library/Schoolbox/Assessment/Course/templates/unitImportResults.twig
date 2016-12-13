@@ -167,7 +167,7 @@
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment) }}"></span>
-                                                <span>{{ assessment.title }}</span> {{ assessment }}
+                                                <span>{{ assessment.title }}</span>
                                                 {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                 <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                 {% endif %}
