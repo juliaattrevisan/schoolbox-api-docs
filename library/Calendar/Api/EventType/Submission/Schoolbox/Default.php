@@ -10,6 +10,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
@@ -75,7 +76,16 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
-        foreach ($this->assessmentDataSource->findAllByStudent($this->getUser(), $term) as $assessment) {
+
+
+        if ($this->getUser()->getRole()->isStudent()) {
+            /** @var Collection|IAssessable[] $assessables */
+            $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), $term);
+        } else {
+            $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
+        }
+
+        foreach ($assessables as $assessment) {
             $event = new Event();
 
             $event->setAssessment($assessment);
@@ -109,6 +119,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
             $stack->add($event);
         }
+
         return $stack;
     }
 
