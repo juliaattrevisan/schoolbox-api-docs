@@ -422,27 +422,27 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         } elseif ($site_location=='sheldon') {
             $settings = array(
-                'baseUri' => 'https://sviisdev01.sheldoncollege.com/',
+                'baseUri' => 'https://ilinqdav.sheldoncollege.com/',
                 'userName' => $_SESSION['username'] . "@sheldoncollege.com",
                 'password' => $_SESSION['password'],
             );
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    $settings['baseUri'].'StaffHomesC/' . $_SESSION['username'] . '/',
-                    $settings['baseUri'].'CollegeShareC/',
+                    $settings['baseUri'].'staffhomes/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'collegeshare/',
                 );
                 $roleid = $_SESSION['user']->getRole()->getId();
                 if ($roleid != '3' and $roleid != '4') {
                     $paths = array_merge($paths, array(
-                        $settings['baseUri'].'AcademicShareC/',
-                        $settings['baseUri'].'StudentShareC/',
+                        $settings['baseUri'].'academicshare/',
+                        $settings['baseUri'].'studentshare/',
                     ));
                 }
             } elseif ($groupHandler->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'].'StudentHomesC/' . $_SESSION['username'] . '/',
-                    $settings['baseUri'].'StudentShareC/',
+                    $settings['baseUri'].'studenthomes/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'studentshare/',
                 );
             }
         } elseif ($site_location=='ngsl') {
