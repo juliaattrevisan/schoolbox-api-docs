@@ -12,15 +12,10 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
-use IMSGlobal\LTI\ToolProvider as LTI;
-use IMSGlobal\LTI\ToolProvider\ToolProvider as LTIToolProvider;
-use IMSGlobal\LTI\ToolProvider\Service as LTIService;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
-use Schoolbox\LTI\Provider\Model as Provider;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -36,7 +31,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
-        $this->providerMapper = $sitepage->getDi()->get('providerMapper');
+        $this->providerMapper = $sitepage->getDi()->get('mapperFactory')->get(ProviderMapper::class);
     }
 
     /**
@@ -70,7 +65,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentClass'        => $this->getComponentName(),
                 'providerId'            => $this->getConfig('ltiprovider'),
                 'providers'             => $providers,
-                'folderId'              => $this->getcontext()->getId(),
+                'folderId'              => $this->getContext()->getId(),
                 'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel'))
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
