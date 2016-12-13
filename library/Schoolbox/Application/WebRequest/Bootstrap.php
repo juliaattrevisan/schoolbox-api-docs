@@ -55,7 +55,6 @@ use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperPr
 
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
-use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
@@ -606,18 +605,6 @@ class Bootstrap implements BootstrapInterface {
                 [
                     'mapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
                     'translator' => $di->lazyNew(UnitSpecTranslator::class),
-                ]
-            )
-        );
-        $di->set(
-            'courseSpecificationDataSource',
-            $di->lazyNew(
-                CourseSpecMapperProxy::class,
-                [
-                    'mapper'         => $mapperFactory->getLazy(CourseSpecMapper::class),
-                    'translator'     => $di->lazyNew(CourseSpecTranslator::class),
-                    'unitMapper'     => $mapperFactory->getLazy(UnitSpecMapper::class),
-                    'unitTranslator' => $di->lazyNew(UnitSpecTranslator::class),
                 ]
             )
         );
