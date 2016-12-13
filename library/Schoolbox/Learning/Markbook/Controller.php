@@ -12,7 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplementationDataSource;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -37,9 +37,9 @@ class Controller extends Base
     protected $defaultGradeGroup;
 
     /**
-     * @var CourseImplementationDataSource
+     * @var CourseImplementationMapper
      */
-    protected $courseImplementationDataSource;
+    protected $courseImplementationMapper;
 
     /**
      * @var TermMapper
@@ -49,23 +49,23 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param ErrorMapper                    $errorMapper
-     * @param AssessmentMapperProxy          $assessmentMapperProxy
-     * @param GradeGroup                     $defaultGradeGroup
-     * @param CourseImplementationDataSource $courseImplementationDataSource
-     * @param TermMapper                     $termMapper
+     * @param ErrorMapper                $errorMapper
+     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * @param GradeGroup                 $defaultGradeGroup
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param TermMapper                 $termMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup $defaultGradeGroup,
-        CourseImplementationDataSource $courseImplementationDataSource,
+        CourseImplementationMapper $courseImplementationMapper,
         TermMapper $termMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setDefaultGradeGroup($defaultGradeGroup);
-        $this->setCourseImplementationDataSource($courseImplementationDataSource);
+        $this->setCourseImplementationMapper($courseImplementationMapper);
         $this->setTermMapper($termMapper);
     }
 
@@ -119,7 +119,7 @@ class Controller extends Base
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
 
         // Also show the courses/units that are on this homepage
-        $courses = $this->getCourseImplementationDataSource()->findByFolderId($class->getId());
+        $courses = $this->getCourseImplementationMapper()->findByFolderId($class->getId());
 
         // And the previous and next term
         $previousTerm = null;
@@ -211,20 +211,20 @@ class Controller extends Base
     }
 
     /**
-     * @return CourseImplementationDataSource
+     * @return CourseImplementationMapper
      */
-    public function getCourseImplementationDataSource()
+    public function getCourseImplementationMapper()
     {
-        return $this->courseImplementationDataSource;
+        return $this->courseImplementationMapper;
     }
 
     /**
-     * @param CourseImplementationDataSource $courseImplementationDataSource
+     * @param CourseImplementationMapper $courseImplementationMapper
      * @return static
      */
-    public function setCourseImplementationDataSource(CourseImplementationDataSource $courseImplementationDataSource)
+    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
     {
-        $this->courseImplementationDataSource = $courseImplementationDataSource;
+        $this->courseImplementationMapper = $courseImplementationMapper;
         return $this;
     }
 

@@ -49,7 +49,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\IResponseDataSource;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
-use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
 use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
@@ -595,18 +594,6 @@ class Bootstrap implements BootstrapInterface {
                 [
                     'mapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
                     'translator' => $di->lazyNew(UnitImplTranslator::class),
-                ]
-            )
-        );
-        $di->set(
-            'courseImplementationDataSource',
-            $di->lazyNew(
-                CourseImplMapperProxy::class,
-                [
-                    'mapper'         => $mapperFactory->getLazy(CourseImplMapper::class),
-                    'translator'     => $di->lazyNew(CourseImplTranslator::class),
-                    'unitMapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
-                    'unitTranslator' => $di->lazyNew(UnitImplTranslator::class),
                 ]
             )
         );
