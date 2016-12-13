@@ -69,7 +69,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $pb = $this->getMapper()->getPredicateBuilder();
         $pb->notNull('finish');
         $pb->notNull('reviewed_at');
-        $pb->addColumnList($columnList);
+
+        // Some of these columns could be empty - handle that predicament
+        try {
+            $pb->addColumnList($columnList);
+        } catch (\UnderflowException $e) {
+            return $this->getMapper()->createCollection();
+        }
+
         return $this->findByPredicates($pb, $options);
     }
 
