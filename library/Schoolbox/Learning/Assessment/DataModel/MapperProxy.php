@@ -767,62 +767,6 @@ class MapperProxy
     }
 
     /**
-     * Helper function for converting a list of options into a column list.
-     *
-     * Currently:
-     * * converts "term" to a due date span
-     * * converts "dueBefore" and "dueAfter" to due date filters
-     * * converts "type" to a filter which matches only that assessment type
-     *   (see AssessmentType::TYPE_* constants)
-     *
-     * @param array $options
-     * @return array
-     */
-    protected function convertOptionsToColumnList($options)
-    {
-        $columnList = [];
-
-        // Term filter (overrides due before/after)
-        if ($options['term'] instanceof Term) {
-            $term = $options['term'];
-            $options['dueAfter']  = $term->getStart();
-            $options['dueBefore'] = $term->getActualFinish();
-        }
-
-        // Due before / after filter (an ADF)
-        if ($options['dueBefore'] instanceof \Alaress_Date_Format && !$options['dueBefore']->isNull()) {
-            $columnList['due_date <='] = $options['dueBefore']->getDatabase();
-        }
-        if ($options['dueAfter'] instanceof \Alaress_Date_Format && !$options['dueAfter']->isNull()) {
-            $columnList['due_date >='] = $options['dueAfter']->getDatabase();
-        }
-
-        // Assessment type filter
-        switch ($options['type']) {
-            case AssessmentType::TYPE_DUE_WORK:
-                $columnList['!d.id'] = null;
-                break;
-
-            case AssessmentType::TYPE_TASK:
-                $columnList['!t.id'] = null;
-                break;
-
-            case AssessmentType::TYPE_QUIZ:
-                $columnList['!q.assess_id'] = null;
-                break;
-
-            case AssessmentType::TYPE_PROJECT:
-                $columnList['!p.id'] = null;
-                break;
-
-            default:
-                break;
-        }
-
-        return $columnList;
-    }
-
-    /**
      * Helper function for converting a list of options into a predicate builder.
      *
      * Currently:
