@@ -103,7 +103,7 @@ class Mapper extends BaseMapper
      * @param array     $options
      * @return Collection|Model[]
      */
-    public function findAllByUnitSpecId($unitSpecId, $options = [])
+    public function findAllByUnitSpecificationId($unitSpecId, $options = [])
     {
         return $this->findByColumn('course_unit_specification_id', $unitSpecId, $options);
     }
