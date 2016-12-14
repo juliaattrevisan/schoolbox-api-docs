@@ -174,34 +174,36 @@ class Controller extends BaseController
      */
     protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
     {
-        // Is this an INSERT rather than UPDATE?
-        $isNew = !$assessmentImpl->getId();
+        // Is this an UPDATE rather than INSERT?
+        $exists = !$assessmentImpl->getId();
 
         $this->assessmentDataSource->save($assessmentImpl);
 
-        if($isNew){
+        if($exists) {
+            return true;
+        }
 
-            // If Assessable was a Quiz, we have one Quiz.
-            // If Assessable was a Project, we may have many Quizzes
-            /** @var IAssessable[] $quizImpls */
-            $quizImpls = new GenericCollection(QuizAssessable::class);
+        // If Assessable was a Quiz, we have one Quiz.
+        // If Assessable was a Project, we may have many Quizzes
+        /** @var IAssessable[] $quizImpls */
+        $quizImpls = new GenericCollection(QuizAssessable::class);
 
-            if($assessmentImpl instanceof QuizAssessable){
-                $quizImpls->add($assessmentImpl);
-            } elseif($assessmentImpl instanceof Project){
-                /** @var Project $assessmentImpl */
-                foreach($assessmentImpl->getAssessables() as $assessable){
-                    if($assessable instanceof QuizAssessable){
-                        $quizImpls->add($assessable);
-                    }
+        if($assessmentImpl instanceof QuizAssessable){
+            $quizImpls->add($assessmentImpl);
+        } elseif($assessmentImpl instanceof Project){
+            /** @var Project $assessmentImpl */
+            foreach($assessmentImpl->getAssessables() as $assessable){
+                if($assessable instanceof QuizAssessable){
+                    $quizImpls->add($assessable);
                 }
             }
+        }
 
-            foreach($quizImpls as $quizImpl){
-                $specId = $quizImpl->getSpecificationAssessment()->getId();
-                $implId = $quizImpl->getId();
-                $this->quizMapper->copyQuizConstituents($specId, $implId);
-            }
+        // Copy Quiz Sections/Questions/Solutions
+        foreach($quizImpls as $quizImpl){
+            $specId = $quizImpl->getSpecificationAssessment()->getId();
+            $implId = $quizImpl->getId();
+            $this->quizMapper->copyQuizConstituents($specId, $implId);
         }
         return true;
     }
