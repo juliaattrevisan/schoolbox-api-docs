@@ -17,9 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 /**
- * Responsible for:
- * 1. Replicating Assessments in a new Context
- * 2. Moving Assessments between Contexts
+ * Responsible for replicating Assessments in a new Context
  */
 class Replicator
 {
@@ -45,6 +43,10 @@ class Replicator
 
     /**
      * Deep-clone and re-create the given assessments in a new context
+     *
+     * To aid processing, the caller should populate dates on source Assessments, even
+     * if the source Assessments are Specifications. This avoids needing to pass the dates in
+     * a custom DTO.
      *
      * @param ICollection|IAssessable[] $assessments the assessments to replicate
      * @param AssessmentContext         $destination the location into which to replicate the assessments
@@ -152,22 +154,5 @@ class Replicator
 
         // Base case #2
         // TODO - clone the Rubric correctly
-    }
-
-    /**
-     * Move the given assessments from their current context to a new context
-     *
-     * Assessments must be Implementations, not Specifications.
-     * That is, they cannot be moved from or to a UnitSpecification
-     *
-     * @param ICollection|IAssessable[] $assessments the assessments to move
-     * @param AssessmentContext         $destination the location into which to move the assessments
-     * @throws Mapper\Exception                      if any part of the move fails
-     * @return ICollection|IAssessable[]             the NEW assessments, as moved
-     */
-    public function moveToNewContext(ICollection $assessments, AssessmentContext $destination)
-    {
-        // TODO - implement me
-        throw new \BadMethodCallException('Not yet implemented.');
     }
 }
