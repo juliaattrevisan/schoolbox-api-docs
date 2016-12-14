@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
@@ -33,8 +34,8 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'viewOverview', $basePath, "/overview/{box_id}");
         $this->addGetRoute($router, 'downloadOverview', $basePath, "/overview/{box_id}/csv");
+        $this->addGetRoute($router, 'deleteFile', $basePath, "/delete-file/{box_id}/hash/{hash}");
     }
-
 
     /**
      * @param Authorizer $authorizer
@@ -99,9 +100,13 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(Controller::class, [
+                'submissionFileMapper' => $this->getMapperFactory()->getLazy(SubmissionFileMapper::class)
+            ])
         );
     }
+
+
 
     /* Getters / Setters
      */
