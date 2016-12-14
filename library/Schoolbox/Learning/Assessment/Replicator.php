@@ -59,7 +59,7 @@ class Replicator
             $newAssessment = $assessment->cloneForCopy();
             $newAssessment->setContext($destination);
 
-            // TODO need to implement __clone() on DueWork to clone Rubric correctly
+            // TODO SA-1698 need to implement __clone() on DueWork to clone Rubric correctly
             $this->replicateDueWorkRubric($newAssessment);
 
             $this->setProjectAssessableDates($newAssessment);
@@ -95,7 +95,7 @@ class Replicator
             foreach($assessable->getAssessables() as $subAssessable)
             {
                 $result = true;
-                // TODO - I think Doctor is working on something a bit more intelligent here?
+                // TODO - SA-1638 - Need to set some to null but out of scope for this PR
                 $subAssessable->setPublishAt($assessable->getPublishAt());
                 $subAssessable->setOpenAt($assessable->getPublishAt());
                 $subAssessable->setDueAt($assessable->getDueAt());
