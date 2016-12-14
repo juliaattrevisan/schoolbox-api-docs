@@ -183,9 +183,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'returnUrlName'        => Redirect::RETURN_URL,
             'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];
-
-
-        //var_dump($data);
+        
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/component.twig',
