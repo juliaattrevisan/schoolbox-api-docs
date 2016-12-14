@@ -88,7 +88,7 @@
         <div class="small-12 column no-pad">
             <div class="component-action">
                 <section>
-                    <div style="{{ actionStyle }}" data-interaction-draft>
+                    <div style="{{ actionStyle }}" data-interaction-draft="{{ participant.user.id }}">
                         {%- spaceless %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
                             <a class="button" data-draft="publish" {{ publishDisabled }}>Publish</a>

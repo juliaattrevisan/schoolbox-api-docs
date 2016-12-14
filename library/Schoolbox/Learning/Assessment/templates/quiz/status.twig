@@ -21,10 +21,10 @@
     </li>
     <li class="separator">Bulk Actions</li>
     <li>
-        <a class="icon-approve" data-mass="publish">Mark visible as reviewed&hellip;</a>
+        <a class="icon-approve" data-reveal-id="mass-review">Mark attempts as reviewed&hellip;</a>
     </li>
     <li>
-        <a class="icon-delete" data-mass="discard">Delete visible unreviewed&hellip;</a>
+        <a class="icon-delete" data-reveal-id="mass-delete">Delete unreviewed attempts&hellip;</a>
     </li>
 {% endblock %}
 
@@ -79,12 +79,109 @@
 
 
 {% block scripts %}
+    <script type="application/javascript" src="/javascript/shared/submissions/jquery.bulky.js"></script>
+    <div id="mass-review" class="reveal-modal" data-reveal data-list-id="mass-review-list" aria-hidden="true" role="dialog">
+        <h2>Mark Attempts as Reviewed</h2>
+        <p data-mass-unavailable>There are no unreviewed attempts for this activity currently visible.</p>
+        <p data-mass-available>The following attempts can be marked as reviewed:</p>
+        <div style="">
+            <section class="checklist" id="mass-review-list">
+                <div data-template>{# this will get detached from the DOM on pageload #}
+                    <input type="checkbox" data-selected checked />
+                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                </div>
+            </section>
+        </div>
+        <div class="component-action">
+            <section>
+                {%- spaceless -%}
+                    <a class="button">Cancel</a>
+                    <a class="button" data-submit>Mark All as Reviewed</a>
+                {%- endspaceless -%}
+            </section>
+        </div>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div id="mass-delete" class="reveal-modal" data-reveal data-list-id="mass-delete-list" aria-hidden="true" role="dialog">
+        <h2>Delete Attempts</h2>
+        <p data-mass-unavailable>There are no unreviewed attempts for this activity currently visible.</p>
+        <p data-mass-available>The following attempts can be deleted:</p>
+        <section class="checklist" id="mass-delete-list">
+            <div style="">
+                <div data-template>{# this will get detached from the DOM on pageload #}
+                    <input type="checkbox" data-selected checked />
+                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                </div>
+            </div>
+        </section>
+        <div class="component-action">
+            <section>
+                {%- spaceless -%}
+                    <a class="button">Cancel</a>
+                    <a class="button" data-submit>Delete All</a>
+                {%- endspaceless -%}
+            </section>
+        </div>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
     <script type="text/javascript">
         $(function () {
 
-            var assessmentList = $('#assessment-status');
+            var $participantList  = $('#assessment-status');
 
-            assessmentList.on('click', '[data-interaction-delete]', function (e) {
+            $('#mass-review').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len == all) {
+                        return 'Mark All as Reviewed';
+                    }
+                    return 'Mark ' + len + ' Selected as Reviewed';
+                },
+                userList: $participantList,
+                onSubmit: function (toReview) {
+                    var list = toReview.map(function () {
+                        return $(this).find('[data-interaction-review]').data('interactionReview');
+                    }).get();
+
+                    $.post(
+                        '/assess/reviewAttempt',
+                        { selectedIds: list }
+                    ).always(function () {
+                        location.reload();
+                    });
+                }
+            });
+
+            $('#mass-delete').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len == all) {
+                        return 'Delete All';
+                    }
+                    return 'Delete ' + len + ' Selected';
+                },
+                userList: $participantList,
+                onSubmit: function (toDelete) {
+                    var list = toDelete.map(function () {
+                        return $(this).find('[data-interaction-delete]').data('interactionDelete');
+                    }).get();
+
+                    $.post(
+                        '/assess/deleteAttempt',
+                        { attemptIds: list }
+                    ).always(function () {
+                        location.reload();
+                    });
+                }
+            });
+
+            $participantList.on('click', '[data-interaction-delete]', function (e) {
                 e.preventDefault();
 
                 var $a = $(this);

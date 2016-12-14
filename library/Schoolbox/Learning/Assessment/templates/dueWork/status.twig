@@ -18,7 +18,7 @@
 {% block headerOptions %}
     <li class="separator">Bulk Actions</li>
     <li>
-        <a class="icon-approve" data-mass="publish">Publish visible drafts&hellip;</a>
+        <a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a>
     </li>
 {% endblock %}
 
@@ -73,6 +73,29 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script type="application/javascript" src="/javascript/shared/submissions/jquery.bulky.js"></script>
+<div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true" role="dialog">
+    <h2>Publish Drafts</h2>
+    <p data-mass-unavailable>You have no unpublished drafts for this activity currently visible.</p>
+    <p data-mass-available>The following drafts can be published:</p>
+    <section class="checklist" id="mass-publish-list">
+        <div data-template>{# this will get detached from the DOM on pageload #}
+            <input type="checkbox" data-selected checked />
+            <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+        </div>
+    </section>
+    <div class="component-action">
+        <section>
+        {%- spaceless -%}
+            <a class="button">Cancel</a>
+            <a class="button" data-submit>Publish All</a>
+        {%- endspaceless -%}
+        </section>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <div class="toast" data-alert data-save-draft></div>
 
     {# Dynamic Feedback
@@ -99,6 +122,24 @@
                 statusIncomplete: '{{ statusIncomplete }}',
                 statusPending: '{{ statusPending }}',
                 statusComplete: '{{ statusComplete }}'
+            });
+
+            $('#mass-publish').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len == all) {
+                        return 'Publish All';
+                    }
+                    return 'Publish ' + len + ' Selected';
+                },
+                userList: $('#assessment-status'),
+                onSubmit: function (toPublish) {
+                    toPublish.each(function () {
+                        $(this).find('[data-draft="publish"]').trigger('click');
+                    });
+                }
             });
         });
     </script>
