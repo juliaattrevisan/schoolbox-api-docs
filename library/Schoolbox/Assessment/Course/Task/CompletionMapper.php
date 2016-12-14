@@ -64,8 +64,14 @@ class CompletionMapper extends Mapper {
             // I should never need to know the student here,
             // because this object should always be part of a participant's
             // response or feedback.
+
+            // Try to streamline task+assessment creation too
+            /** @var Task $task */
+            $task = $this->createJoinModel('task', $row['t.id']);
+            $task->setAssessmentModel($this->createJoinModel('task.assessment_id', $row['t.assessment_id']));
+
             $completion
-                ->setTask($this->hydrateJoin($row, 'task', 't'))
+                ->setTask($task)
                 ->setMarkingUser($this->hydrateJoin($row, 'marking_user', 'm'))
             ;
             $c->add($completion);
