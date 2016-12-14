@@ -42,11 +42,7 @@ use \Component_InstanceMapper;
 use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
+use Schoolbox\Learning\Assessment\Replicator;
 
 class Controller extends Base\Base
 {
@@ -101,17 +97,8 @@ class Controller extends Base\Base
     /** @var ErrorMapper */
     private $errorMapper;
 
-    /** @var QuizMapper */
-    private $quizMapper;
-
-    /** @var QuizSectionMapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestionMapper */
-    private $quizQuestionMapper;
-
-    /** @var QuizSolutionMapper */
-    private $quizSolutionMapper;
+    /** @var Replicator */
+    private $replicator;
 
     /**
      * @var ImportFactory
@@ -873,46 +860,6 @@ class Controller extends Base\Base
 
 
     /**
-     * @param IAssessable $assessmentImpl
-     * @return bool
-     */
-    protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
-    {
-        // Is this an UPDATE rather than INSERT?
-        $exists = $assessmentImpl->getId();
-
-        $this->getAssessmentMapperProxy()->save($assessmentImpl);
-
-        if($exists) {
-            return true;
-        }
-
-        // If Assessable was a Quiz, we have one Quiz.
-        // If Assessable was a Project, we may have many Quizzes
-        /** @var IAssessable[]|GenericCollection $quizImpls */
-        $quizImpls = $this->getAssessmentMapperProxy()->createCollection();
-
-        if($assessmentImpl instanceof QuizAssessable){
-            $quizImpls->add($assessmentImpl);
-        } elseif($assessmentImpl instanceof Project){
-            /** @var Project $assessmentImpl */
-            foreach($assessmentImpl->getAssessables() as $assessable){
-                if($assessable instanceof QuizAssessable){
-                    $quizImpls->add($assessable);
-                }
-            }
-        }
-
-        // Copy Quiz Sections/Questions/Solutions
-        foreach($quizImpls as $quizImpl){
-            $specId = $quizImpl->getSpecificationAssessment()->getId();
-            $implId = $quizImpl->getId();
-            $this->getQuizMapper()->copyQuizConstituents($specId, $implId);
-        }
-        return true;
-    }
-
-    /**
      * Attempts to find a Course Outline ComponentInstance on the specifed page
      * that is not currently linked to a CourseImport.
      *
@@ -1532,74 +1479,20 @@ class Controller extends Base\Base
     }
 
     /**
-     * @return QuizMapper
+     * @return Replicator
      */
-    public function getQuizMapper()
+    public function getReplicator()
     {
-        return $this->quizMapper;
+        return $this->replicator;
     }
 
     /**
-     * @param QuizMapper $quizMapper
+     * @param Replicator $replicator
      * @return static
      */
-    public function setQuizMapper(QuizMapper $quizMapper)
+    public function setReplicator(Replicator $replicator)
     {
-        $this->quizMapper = $quizMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizSectionMapper
-     */
-    public function getQuizSectionMapper()
-    {
-        return $this->quizSectionMapper;
-    }
-
-    /**
-     * @param QuizSectionMapper $quizSectionMapper
-     * @return static
-     */
-    public function setQuizSectionMapper(QuizSectionMapper $quizSectionMapper)
-    {
-        $this->quizSectionMapper = $quizSectionMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizQuestionMapper
-     */
-    public function getQuizQuestionMapper()
-    {
-        return $this->quizQuestionMapper;
-    }
-
-    /**
-     * @param QuizQuestionMapper $quizQuestionMapper
-     * @return static
-     */
-    public function setQuizQuestionMapper(QuizQuestionMapper $quizQuestionMapper)
-    {
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        return $this;
-    }
-
-    /**
-     * @return QuizSolutionMapper
-     */
-    public function getQuizSolutionMapper()
-    {
-        return $this->quizSolutionMapper;
-    }
-
-    /**
-     * @param QuizSolutionMapper $quizSolutionMapper
-     * @return static
-     */
-    public function setQuizSolutionMapper(QuizSolutionMapper $quizSolutionMapper)
-    {
-        $this->quizSolutionMapper = $quizSolutionMapper;
+        $this->replicator = $replicator;
         return $this;
     }
 }

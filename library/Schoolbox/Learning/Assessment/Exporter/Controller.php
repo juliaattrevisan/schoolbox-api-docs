@@ -18,7 +18,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Assessment\Replicator;
 
 /**
  * Controller for assessment export actions.
@@ -40,10 +40,9 @@ class Controller extends BaseController
      */
     private $unitImplementationMapper;
 
-    /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
+
+    /** @var Replicator */
+    private $replicator;
 
     /**
      * Constructor
@@ -51,18 +50,18 @@ class Controller extends BaseController
      * @param Access                   $access
      * @param AssessmentDataSource     $assessmentDataSource
      * @param UnitImplementationMapper $unitImplementationMapper
-     * @param QuizMapper               $quizMapper
+     * @param Replicator               $replicator
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementationMapper $unitImplementationMapper,
-        QuizMapper $quizMapper
+        Replicator $replicator
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
-        $this->quizMapper                   = $quizMapper;
+        $this->replicator               = $replicator;
     }
 
     /**
@@ -144,10 +143,7 @@ class Controller extends BaseController
             }
         }
 
-        // Save the newly created implementations (at the end of the unit)
-        foreach ($newImplementations as $newImplementation) {
-            $this->persistAssessmentImplementation($newImplementation);
-        }
+        $this->replicator->replicateInNewContext($newImplementations, $unitImpl);
 
         // Decode the return URL, if it was set
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
@@ -166,46 +162,6 @@ class Controller extends BaseController
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
-    }
-
-    /**
-     * @param IAssessable $assessmentImpl
-     * @return bool
-     */
-    protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
-    {
-        // Is this an UPDATE rather than INSERT?
-        $exists = $assessmentImpl->getId();
-
-        $this->assessmentDataSource->save($assessmentImpl);
-
-        if($exists) {
-            return true;
-        }
-
-        // If Assessable was a Quiz, we have one Quiz.
-        // If Assessable was a Project, we may have many Quizzes
-        /** @var IAssessable[] $quizImpls */
-        $quizImpls = new GenericCollection(QuizAssessable::class);
-
-        if($assessmentImpl instanceof QuizAssessable){
-            $quizImpls->add($assessmentImpl);
-        } elseif($assessmentImpl instanceof Project){
-            /** @var Project $assessmentImpl */
-            foreach($assessmentImpl->getAssessables() as $assessable){
-                if($assessable instanceof QuizAssessable){
-                    $quizImpls->add($assessable);
-                }
-            }
-        }
-
-        // Copy Quiz Sections/Questions/Solutions
-        foreach($quizImpls as $quizImpl){
-            $specId = $quizImpl->getSpecificationAssessment()->getId();
-            $implId = $quizImpl->getId();
-            $this->quizMapper->copyQuizConstituents($specId, $implId);
-        }
-        return true;
     }
 
     /**

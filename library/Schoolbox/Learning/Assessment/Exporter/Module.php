@@ -22,6 +22,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Assessment\Replicator;
 
 /**
  * Module for assessment export options.
@@ -99,7 +100,10 @@ class Module extends BaseModule
                     'access'                   => Access::getInstance(),
                     'assessmentDataSource'     => $this->getAssessmentMapperProxy(),
                     'unitImplementationMapper' => $this->getUnitImplementationMapper(),
-                    'quizMapper'                   => $this->getQuizMapper(),
+                    'replicator'               => $injector->lazyNew(Replicator::class, [
+                        'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                        'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                    ]),
                 ]
             )
         );
