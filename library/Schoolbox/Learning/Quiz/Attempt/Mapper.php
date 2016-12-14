@@ -125,8 +125,12 @@ class Mapper extends BaseMapper
                 $attempt->setReviewer($reviewer);
             }
 
+            // Try to streamline quiz+assessment creation too
+            // Yes I know that the quiz table is still called "assess",
+            // and that joins onto a table called "assessment" -_-
             /** @var Quiz $quiz */
-            $quiz = $this->hydrateJoin($row, 'quiz', 'a');
+            $quiz = $this->createJoinModel('quiz', $row['a.assess_id']);
+            $quiz->setAssessmentModel($this->createJoinModel('quiz.am', $row['a.assessment_id']));
             $attempt->setQuiz($quiz);
             $c->add($attempt);
         }
