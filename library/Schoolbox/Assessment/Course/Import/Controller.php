@@ -879,7 +879,7 @@ class Controller extends Base\Base
     protected function persistAssessmentImplementation(IAssessable $assessmentImpl)
     {
         // Is this an UPDATE rather than INSERT?
-        $exists = !$assessmentImpl->getId();
+        $exists = $assessmentImpl->getId();
 
         $this->getAssessmentMapperProxy()->save($assessmentImpl);
 
