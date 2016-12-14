@@ -30,8 +30,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$contextId]), $this->getMaximumPermission()));
-        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$sourceId]), $this->getMaximumPermission()));
+        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$sourceId]), $this->getMaximumPermission()));
+        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$contextId]), $this->getMaximumPermission()));
     }
 
 
