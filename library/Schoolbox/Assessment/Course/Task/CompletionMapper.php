@@ -42,11 +42,9 @@ class CompletionMapper extends Mapper {
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('task', 't')},
-                {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('marking_user', 'm')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
-            LEFT JOIN {$this->getJoinSql('student', '', 's', true)}
             LEFT JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
         ";
     }
@@ -62,9 +60,12 @@ class CompletionMapper extends Mapper {
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /** @var Completion $completion */
             $completion = $this->hydrate($row);
+
+            // I should never need to know the student here,
+            // because this object should always be part of a participant's
+            // response or feedback.
             $completion
                 ->setTask($this->hydrateJoin($row, 'task', 't'))
-                ->setStudent($this->hydrateJoin($row, 'student', 's'))
                 ->setMarkingUser($this->hydrateJoin($row, 'marking_user', 'm'))
             ;
             $c->add($completion);
