@@ -21,7 +21,7 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use \Schoolbox\Resource\Storage\Model as StorageFile;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 
 class Model extends AbstractAssessment

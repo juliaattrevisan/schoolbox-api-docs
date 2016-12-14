@@ -123,9 +123,6 @@ class Module extends \Alaress\Module\Module
                 'setImportFactory'                   => $injector->lazyNew(ImportFactory::class),
                 'setAssessmentMapper'                => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
                 'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
-                'setCourseImplementationFactory'     => $injector->lazyNew(Course\ImplementationFactory::class, [
-                    'unitImplementationFactory' => $injector->lazyNew(Unit\ImplementationFactory::class)
-                ])
             ])
         );
 

@@ -86,9 +86,6 @@ class Controller extends Base\Base
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var Course\ImplementationFactory */
-    private $courseImplementationFactory;
-
     /** @var Component_InstanceMapper */
     private $componentInstanceMapper;
 
@@ -716,16 +713,7 @@ class Controller extends Base\Base
                         if (!$aData['impl_id']) {
                             $assessmentImpl = $assessmentSpec->cloneForCopy();
                             // TODO need to implement __clone() on DueWork to clone Rubric correctly
-                            // TODO unify unit implementation data and domain model so this shenanigan isn't required
-                            $assessmentImpl->setContext(
-                                (new Course\Unit\Implementation())
-                                    ->setId($unitImpl->getId())
-                                    ->setCourse(
-                                        (new Course\Implementation())
-                                            ->setId($courseImpl->getId())
-                                            ->setFolder($courseImpl->getFolder())
-                                    )
-                            );
+                            $assessmentImpl->setContext($unitImpl);
                             $unitImpl->getAssessables()->add($assessmentImpl);
                         } // Else we have been passed the Assessment Impl
                         else {
@@ -735,7 +723,6 @@ class Controller extends Base\Base
                                 return $impl->getId() == $assessmentId;
                             };
                             $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
-
                         }
 
                         // Don't forget to set the spec assessment on the impl
@@ -1311,27 +1298,6 @@ class Controller extends Base\Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         return $this;
     }
-
-
-    /**
-     * @return Course\ImplementationFactory
-     */
-    public function getCourseImplementationFactory()
-    {
-        return $this->courseImplementationFactory;
-    }
-
-
-    /**
-     * @param Course\ImplementationFactory $unitImplementationFactory
-     * @return static
-     */
-    public function setCourseImplementationFactory(Course\ImplementationFactory $unitImplementationFactory)
-    {
-        $this->courseImplementationFactory = $unitImplementationFactory;
-        return $this;
-    }
-
 
     /**
      * @return CourseImplementationMapper

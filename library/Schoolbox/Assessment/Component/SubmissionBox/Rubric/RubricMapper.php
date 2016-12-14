@@ -24,7 +24,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder;
 

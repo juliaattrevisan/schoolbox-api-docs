@@ -210,8 +210,7 @@ class Model implements ISoftDeletable
      */
     public function setAnswers(GenericCollection $answers)
     {
-        $this->answers->assertSameItemClass($answers);
-        $this->answers = $answers;
+        $this->answers->replaceWith($answers);
         return $this;
     }
 }

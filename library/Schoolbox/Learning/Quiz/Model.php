@@ -641,8 +641,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function setSections(GenericCollection $sections)
     {
-        $this->sections->assertSameItemClass($sections);
-        $this->sections = $sections;
+        $this->sections->replaceWith($sections);
         return $this;
     }
 
@@ -661,8 +660,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function setAttempts(GenericCollection $attempts)
     {
-        $this->attempts->assertSameItemClass($attempts);
-        $this->attempts = $attempts;
+        $this->attempts->replaceWith($attempts);
         return $this;
     }
 }

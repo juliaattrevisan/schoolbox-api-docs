@@ -23,12 +23,9 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -436,15 +433,15 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         // The project is within a unit implementation
         // It also has unit specifications
-        $unitSpecModel = (new UnitSpecificationModel())
+        $unitSpecModel = (new UnitSpecification())
             ->setId(2)
-            ->setCourse((new CourseSpecificationModel())->setId(3));
+            ->setCourse((new CourseSpecification())->setId(3));
         $projectModel  = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(104)
-                    ->setAssessmentContext((new UnitImplementationModel())->setId(1))
+                    ->setAssessmentContext((new UnitImplementation())->setId(1))
                     ->setSpecificationAssessment(
                         (new AssessmentModel())
                             ->setId(4)

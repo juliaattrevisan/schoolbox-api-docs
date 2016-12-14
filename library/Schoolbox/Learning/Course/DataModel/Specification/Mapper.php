@@ -12,13 +12,14 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  * Mapper for the data model for Course Specifications.
  *
  * @method Model createModel($idValue = null)
- * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
@@ -142,7 +143,9 @@ class Mapper extends BaseMapper
 
             /** @var FolderModel $folder */
             $folder = $this->hydrateJoin($row, 'folder', 'f');
-            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            /** @var HomepageConfig $homepage */
+            $homepage = $this->hydrateJoin($row, 'folder.homepages', 'fh');
+            $folder->setHomepage($homepage);
             $model->setFolder($folder);
 
             // Add
@@ -151,6 +154,61 @@ class Mapper extends BaseMapper
 
         // TODO: consider whether units should be populated here
         return $modelList;
+    }
+
+    /**
+     * @param mixed $identifierValue
+     * @return Model
+     */
+    public function findById($identifierValue)
+    {
+        /** @var Model $model */
+        $model = parent::findById($identifierValue);
+        return $this->loadUnits($model);
+    }
+
+    /**
+     * Loads all units specifications into a course specification.
+     *
+     * @param Model $specification
+     * @return Model
+     */
+    protected function loadUnits(Model $specification)
+    {
+        $collection = $this->createCollection();
+        $collection->add($specification);
+        $this->loadUnitsForCollection($collection);
+        return $collection->first();
+    }
+
+    /**
+     * Loads all units specifications into all the course specifications in a collection.
+     *
+     * @param Collection|Model[] $allSpecs
+     * @return Collection|Model[]
+     */
+    protected function loadUnitsForCollection(Collection $allSpecs)
+    {
+        $unitSpecMapper = UnitSpecificationMapper::getInstance();
+
+        // Load all the unit specs for all the supplied course specs
+        $ids = [];
+        foreach ($allSpecs as $spec) {
+            $ids[] = $spec->getId();
+        }
+        $allUnits =$unitSpecMapper->findAllByCourseId($ids, ['order' => ['f.name' => 'asc']])
+            ->groupByCallback(function ($unitSpec) {
+                /** @var UnitSpecification $unitSpec */
+                return $unitSpec->getCourse()->getId();
+            });
+
+        // Match unit specs to their course spec
+        foreach ($allSpecs as $spec) {
+            if (isset($allUnits[$spec->getId()])) {
+                $spec->setUnits($unitSpecMapper->createCollection()->merge($allUnits[$spec->getId()]));
+            }
+        }
+        return $allSpecs;
     }
 
     /**
@@ -164,7 +222,9 @@ class Mapper extends BaseMapper
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->findOneByColumn('folder_id', $folderId, $options);
+        /** @var Model $model */
+        $model = $this->findOneByColumn('folder_id', $folderId, $options);
+        return $this->loadUnits($model);
     }
 
     /**

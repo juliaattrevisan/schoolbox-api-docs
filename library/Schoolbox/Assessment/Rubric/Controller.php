@@ -17,7 +17,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 class Controller extends BaseController

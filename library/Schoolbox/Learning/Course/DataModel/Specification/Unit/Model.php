@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -21,9 +22,17 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
- * Data domain model for Unit Specifications.
+ * A Unit Specification is a collection of Assessable objects. It exists on a Folder.
+ *
+ * It is intended to cover a single area of learning within a subject, and may be imported
+ * onto another Folder as part of the action of importing a Course onto that folder.
+ * This action creates an Unit Implementation for each Unit Specification that was chosen to be imported
+ * as part of that process.
+ *
+ * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
+ *  Course Builder component. This class puts this concept into a concrete class.)
  */
-class Model implements ISoftDeletable, IAssessmentContextDataModel
+class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;
@@ -58,9 +67,6 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      */
     public function __construct()
     {
-        $this->createdAt   = new Alaress_Date_NullDate();
-        $this->updatedAt   = new Alaress_Date_NullDate();
-        $this->deletedAt   = new Alaress_Date_NullDate();
         $this->assessables = new Collection();
     }
 
@@ -134,5 +140,23 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     {
         $this->unitImplementations = $unitImplementations;
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
+    }
+
+    /**
+     * Returns title of folder, for AssessmentContext Interface
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->getFolder()->getTitle();
     }
 }

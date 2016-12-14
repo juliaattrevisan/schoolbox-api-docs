@@ -34,7 +34,7 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class Factory
 {

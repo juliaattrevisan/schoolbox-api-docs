@@ -17,10 +17,10 @@ namespace Schoolbox\Learning\Assessment;
 use Aura\Router\Router;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use \Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationMapperProxy;
-use \Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use \Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -37,14 +37,14 @@ class Transactor
     protected $folderMapper;
 
     /**
-     * @var UnitImplementationMapperProxy
+     * @var UnitImplementationMapper
      */
-    protected $unitImplementationMapperProxy;
+    private $unitImplementationMapper;
 
     /**
-     * @var UnitSpecificationMapperProxy
+     * @var UnitSpecificationMapper
      */
-    protected $unitSpecificationMapperProxy;
+    private $unitSpecificationMapper;
 
     /**
      * @var AssessmentMapperProxy
@@ -59,21 +59,21 @@ class Transactor
     /**
      * Transactor constructor.
      * @param FolderMapper $folderMapper
-     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
-     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param $router
      */
     public function __construct(
         FolderMapper $folderMapper,
-        UnitImplementationMapperProxy $unitImplementationMapperProxy,
-        UnitSpecificationMapperProxy $unitSpecificationMapperProxy,
+        UnitImplementationMapper $unitImplementationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Router $router
     ) {
         $this->setFolderMapper($folderMapper);
-        $this->setUnitImplementationMapperProxy($unitImplementationMapperProxy);
-        $this->setUnitSpecificationMapperProxy($unitSpecificationMapperProxy);
+        $this->setUnitImplementationMapper($unitImplementationMapper);
+        $this->setUnitSpecificationMapper($unitSpecificationMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setRouter($router);
     }
@@ -161,7 +161,7 @@ class Transactor
      */
     private function transactUnitImplementationContext()
     {
-        $context   = $this->getUnitImplementationMapperProxy()->findById($this->getContextId());
+        $context   = $this->getUnitImplementationMapper()->findById($this->getContextId());
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return "/homepage/{$context->getId()}";
@@ -177,7 +177,7 @@ class Transactor
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context   = $this->getUnitSpecificationMapperProxy()->findById($this->getContextId());
+        $context   = $this->getUnitSpecificationMapper()->findById($this->getContextId());
         $this->getAssessmentMapperProxy()->save($this->getAssessment());
 
         return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
@@ -247,35 +247,35 @@ class Transactor
     }
 
     /**
-     * @return UnitImplementationMapperProxy
+     * @return UnitImplementationMapper
      */
-    protected function getUnitImplementationMapperProxy()
+    protected function getUnitImplementationMapper()
     {
-        return $this->unitImplementationMapperProxy;
+        return $this->unitImplementationMapper;
     }
 
     /**
-     * @param UnitImplementationMapperProxy $unitImplementationMapperProxy
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
-    protected function setUnitImplementationMapperProxy($unitImplementationMapperProxy)
+    protected function setUnitImplementationMapper($unitImplementationMapper)
     {
-        $this->unitImplementationMapperProxy = $unitImplementationMapperProxy;
+        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
     /**
-     * @return UnitSpecificationMapperProxy
+     * @return UnitSpecificationMapper
      */
-    protected function getUnitSpecificationMapperProxy()
+    protected function getUnitSpecificationMapper()
     {
-        return $this->unitSpecificationMapperProxy;
+        return $this->unitSpecificationMapper;
     }
 
     /**
-     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      */
-    protected function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
+    protected function setUnitSpecificationMapper($unitSpecificationMapper)
     {
-        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
     }
 
     /**

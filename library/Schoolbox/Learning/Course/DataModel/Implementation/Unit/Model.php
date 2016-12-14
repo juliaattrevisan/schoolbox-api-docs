@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -22,9 +23,18 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Data domain model for Unit Implementations.
+ * An Unit Implementation is a single import of a Unit Specification onto a Folder. It belongs to an
+ * Course Implementation.
+ *
+ * On creation, this object makes a copy of the Assessables in the Unit Specification it was
+ * created from, and adds them to itself - a teacher may then add, modify or remove individual
+ * Assessable objects inside this object.
+ *
+ * (Historically, this was known as a Unit Instance. It did not belong to a
+ *  Course Implementation - instead, it belonged directly to the Folder it was imported
+ *  onto, and was also linked to a component on that Folder.)
  */
-class Model implements ISoftDeletable, IAssessmentContextDataModel
+class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;
@@ -70,11 +80,6 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
      */
     public function __construct()
     {
-        $this->openDate    = new Alaress_Date_NullDate();
-        $this->dueDate     = new Alaress_Date_NullDate();
-        $this->createdAt   = new Alaress_Date_NullDate();
-        $this->updatedAt   = new Alaress_Date_NullDate();
-        $this->deletedAt   = new Alaress_Date_NullDate();
         $this->assessables = new Collection();
     }
 
@@ -273,5 +278,13 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
         $date = clone $this->getDueDate()->getDateTimeObject();
         $date->modify('23:59:59');
         return new Alaress_Date_Format($date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getBaseContext()
+    {
+        return $this;
     }
 }

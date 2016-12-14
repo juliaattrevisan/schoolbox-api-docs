@@ -20,8 +20,8 @@ use \Schoolbox\Learning\Assessment\Project;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Factory

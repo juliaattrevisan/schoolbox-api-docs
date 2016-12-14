@@ -142,14 +142,22 @@ abstract class Component_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
+        $this->setSitePage($sitepage);
+
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
+        /** @var ErrorMapper $errorMapper */
+        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+        /** @var ConfigMapper $configMapper */
+        $configMapper = $this->getMapperFactory()->get(ConfigMapper::class);
+
         $this
             ->setInstance($instance)
             ->setUser($user)
-            ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
-            ->setFolderMapper($this->getMapperFactory()->get(FolderMapper::class))
-            ->setErrorMapper($this->getMapperFactory()->get(ErrorMapper::class))
-            ->setConfigMapper($this->getMapperFactory()->get(ConfigMapper::class));
+            ->setFolderMapper($folderMapper)
+            ->setErrorMapper($errorMapper)
+            ->setConfigMapper($configMapper);
     }
 
     /**
@@ -206,7 +214,9 @@ abstract class Component_ControllerAbstract
      */
     protected function getMapperFactory()
     {
-        return $this->getSitePage()->getDi()->get('mapperFactory');
+        /** @var \Schoolbox\MapperFactory $mapperFactory */
+        $mapperFactory = $this->getSitePage()->getDi()->get('mapperFactory');
+        return $mapperFactory;
     }
 
     /**

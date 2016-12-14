@@ -9,8 +9,8 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 
 /**

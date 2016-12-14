@@ -15,7 +15,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class Model extends AbstractAssessment
 {

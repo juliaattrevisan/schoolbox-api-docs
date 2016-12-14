@@ -15,11 +15,9 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplementationTranslator;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -38,24 +36,6 @@ class Translator
     protected $markSchemeFactory;
 
     /**
-     * Translator for unit specifications.
-     *
-     * Used in this class's translators to convert contexts.
-     *
-     * @var UnitSpecificationTranslator
-     */
-    protected $unitSpecificationTranslator;
-
-    /**
-     * Translator for unit implementations.
-     *
-     * Used in this class's translators to convert contexts.
-     *
-     * @var UnitImplementationTranslator
-     */
-    protected $unitImplementationTranslator;
-
-    /**
      * Sub-translators
      *
      * @var IAssessmentTypeTranslator[]
@@ -66,17 +46,10 @@ class Translator
      * Constructor
      *
      * @param MarkSchemeFactory            $markSchemeFactory
-     * @param UnitSpecificationTranslator  $unitSpecificationTranslator
-     * @param UnitImplementationTranslator $unitImplementationTranslator
      */
-    public function __construct(
-        MarkSchemeFactory $markSchemeFactory,
-        UnitSpecificationTranslator $unitSpecificationTranslator,
-        UnitImplementationTranslator $unitImplementationTranslator
-    ) {
-        $this->markSchemeFactory            = $markSchemeFactory;
-        $this->unitSpecificationTranslator  = $unitSpecificationTranslator;
-        $this->unitImplementationTranslator = $unitImplementationTranslator;
+    public function __construct(MarkSchemeFactory $markSchemeFactory)
+    {
+        $this->markSchemeFactory = $markSchemeFactory;
     }
 
     /**
@@ -137,12 +110,10 @@ class Translator
             $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof UnitSpecification) {
-            // Can't use translator here.
-            // UnitSpecificationTranslator->translateToDataModel requires a course spec I don't have.
-            $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
+            $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof UnitImplementation) {
-            $assessmentModel->setAssessmentContext($this->unitImplementationTranslator->translateToDataModel($context));
+            $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof Project) {
             // Can't use translator for projects - it will attempt to translate its sub-assessments,
@@ -232,11 +203,11 @@ class Translator
         if ($context instanceof Folder) {
             $assessable->setContext($context);
 
-        } elseif ($context instanceof UnitSpecificationModel) {
-            $assessable->setContext($this->unitSpecificationTranslator->translateToDomainModel($context));
+        } elseif ($context instanceof UnitSpecification) {
+            $assessable->setContext($context);
 
-        } elseif ($context instanceof UnitImplementationModel) {
-            $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
+        } elseif ($context instanceof UnitImplementation) {
+            $assessable->setContext($context);
 
         } elseif ($context instanceof ProjectModel) {
             // Need to be careful when translating project:

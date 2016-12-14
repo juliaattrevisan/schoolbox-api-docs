@@ -7,8 +7,6 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\IDatabase;
-use Carbon\Carbon;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Task\ICompletion;
 use Schoolbox\Permission\Access\UserAccess;
@@ -17,10 +15,10 @@ use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Course\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use \Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;

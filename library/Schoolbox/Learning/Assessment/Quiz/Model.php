@@ -16,10 +16,9 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 
 class Model extends AbstractAssessment
 {
