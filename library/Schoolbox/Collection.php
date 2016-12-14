@@ -49,6 +49,15 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * @param ICollection $collection
+     * @return static
+     */
+    public function emptyClone(ICollection $collection)
+    {
+        return new static();
+    }
+
+    /**
      * Prepend an element to the start of the stack
      *
      * @param $element
@@ -629,7 +638,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function map($callback, $includeNull = true)
     {
-        $return = new static();
+        $return = $this->emptyClone($this);
         foreach ($this as $key => $item) {
             $result = call_user_func($callback, $item);
             if ($includeNull || !is_null($result)) {
@@ -648,7 +657,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function filter(callable $callback)
     {
-        $return = new static();
+        $return = $this->emptyClone($this);
         foreach ($this as $key => $item) {
             if (call_user_func($callback, $item)) {
                 $return->offsetSet($key, $item);
