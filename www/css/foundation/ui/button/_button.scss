@@ -144,7 +144,6 @@ input[type="submit"]{
  */
 a.submit {
 	@extend input[type="submit"];
-	width: auto;
 	.splash {
 		background-color: $submit-button-color;
 	}
