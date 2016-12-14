@@ -301,8 +301,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  * This can be summoned using the hamburger if it's not already visible
  */
 .left-off-canvas-menu {
-	/* We have to use slightly more specific queries because of
-	 * custom tabs as search can overlap.
+	/* A background colour specifically for the logo/crest
+	 * so a school logo won't be mashed by the off-canvas colour
+	 * set selections they are allowed to make
 	 */
 	.logo-wrapper {
 		background-color: $logo-background;
@@ -329,8 +330,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
      * precede the Side Menu
      */
 	.second-nav{
-		/* We have to use slightly more specific queries with the introduction
-		 * to custom tabs because of search overlapping.
+		/* We have to use slightly more specific queries because of
+		 * custom tabs as search can overlap.
 		 */
 		@media screen and (min-width: 93.75em){
 			display: none !important;
