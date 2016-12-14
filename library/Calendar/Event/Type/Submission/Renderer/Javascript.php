@@ -89,10 +89,9 @@ class Javascript extends Base
                         ['assessmentId' => $this->getEvent()->getEventId(),]
                     ),
                     'moreDetailsLink' => $this->getRouteIfAuthorized(
-                        'learningAssessment.getSummary',
+                        'learningAssessment.getAssessment',
                         [
-                            'assessmentId' => $this->getEvent()->getEventId(),
-                            'studentId'    => $this->getUser()->getId(),
+                            'assessmentId' => $this->getEvent()->getEventId()
                         ]
                     ),
                 )
