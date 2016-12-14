@@ -162,7 +162,7 @@ ul.flex-list {
          */
         white-space: normal;
         height: auto;
-
+		@extend .button;
         /* Also allow fake submit styles in flex list
          */
         &.submit {
