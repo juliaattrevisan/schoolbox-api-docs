@@ -111,8 +111,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                     'TWEET_DATE'     => $date->getShort(),
                     'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
                     'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
-                    'TWEET_AVATAR'   => Scrub::text($avatarUrl),
-                    'ON_OFF'         => $color,
+                    'TWEET_AVATAR'   => Scrub::text($avatarUrl)
                 ]);
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
