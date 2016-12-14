@@ -17,16 +17,16 @@
 {% if acceptingResponses %}
     {% set endDateSelector = '' %}
 {% else %}
-    {% set endDateSelector = 'input[name="dueDate"]' %}
+    {% set endDateSelector = '' %}
 {% endif %}
 
-{{ dateForm.dateField('publish', assessment.publishAt, endDateSelector) }}
+{{ dateForm.dateField('publish', assessment.publishAt, 'input[name="openDate"]') }}
 
 {% if acceptingResponses %}
-{{ dateForm.dateField('open', assessment.openAt) }}
+{{ dateForm.dateField('open', assessment.openAt, 'input[name="dueDate"]') }}
 {% endif %}
 
-{{ dateForm.dateField('due', assessment.dueAt) }}
+{{ dateForm.dateField('due', assessment.dueAt, 'input[name="closeDate"]') }}
 
 {% if acceptingResponses %}
 {{ dateForm.dateField('close', assessment.closeAt) }}
