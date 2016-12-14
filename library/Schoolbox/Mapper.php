@@ -2920,6 +2920,18 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Creates a model from the given join.
+     *
+     * @param string $join
+     * @param int    $idValue
+     * @return object
+     */
+    public function createJoinModel($join, $idValue = null)
+    {
+        return $this->getJoinMapper($join)->createModel($idValue);
+    }
+
+    /**
      * @brief Returns an SQL fragment containing a comma separated list of column names possibly aliased
      *
      * @param String $alias
