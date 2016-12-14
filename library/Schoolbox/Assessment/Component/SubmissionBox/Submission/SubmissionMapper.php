@@ -67,11 +67,9 @@ class SubmissionMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('box_id', 'b')},
-                {$this->getJoinColumnString('owner', 'u')}
+                {$this->getJoinColumnString('box_id', 'b')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('box_id', '', 'b')}
-            LEFT JOIN {$this->getJoinSql('owner', '', 'u')}
         ";
     }
 
@@ -91,10 +89,13 @@ class SubmissionMapper extends BaseMapper
         foreach ($statement as $row) {
             $result = $this->hydrate($row);
             $ids[]  = $result->getId();
+
+            // I should never need to know the student's specifics here,
+            // because this object should always be part of a participant's
+            // response or feedback.
             $resultSet->add(
                 $result
                     ->setSubmissionBox($this->hydrateJoin($row, 'box_id', 'b'))
-                    ->setOwner($this->hydrateJoin($row, 'owner', 'u'))
             );
         }
 
