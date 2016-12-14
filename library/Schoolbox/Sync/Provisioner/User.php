@@ -10,8 +10,7 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
-use Schoolbox\Campus;
-use Schoolbox\GenericCollection;
+use Schoolbox\CampusMapper;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -115,7 +114,7 @@ class User extends SchoolboxUser
      */
     public function setCampusCollectionRemove($campusCollectionRemove)
     {
-        $newCampusCollection = new GenericCollection(Campus::class);
+        $newCampusCollection = CampusMapper::getInstance()->createCollection();
         foreach ($this->getCampusCollection() as $existingCampus) {
             // $campusCollectionRemove is provided as a list of IDs
             $isCampusRemoved = false;

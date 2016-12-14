@@ -7,7 +7,7 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Schoolbox\GenericCollection;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
 
@@ -51,7 +51,7 @@ class Campus implements HydratorInterface
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {
             // Set based on code or name? Maybe name.
-            $campusList = new GenericCollection(\Schoolbox\Campus::class);
+            $campusList = CampusMapper::getInstance()->createCollection();
             foreach (explode(',', $row[$this->fieldname]) as $campusName) {
                 $campusName = trim($campusName);
                 if (strlen($campusName)) {

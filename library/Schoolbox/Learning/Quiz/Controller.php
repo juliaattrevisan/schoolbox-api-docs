@@ -233,7 +233,7 @@ class Controller extends AbstractController
          *
          * @var QuizQuestion[]|Collection $allQuestionsIndexedById
          */
-        $allQuestionsIndexedById = new GenericCollection(QuizQuestion::class);
+        $allQuestionsIndexedById = $this->quizQuestionMapper->createCollection();
 
         // Add answered Questions to Sections (historical view)
 

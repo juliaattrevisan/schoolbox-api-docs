@@ -493,7 +493,7 @@ class Controller extends Base\Base
 
 
         $importFactory = $this->getImportFactory();
-        $unitImpls = new GenericCollection(UnitImplementation::class);
+        $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($units as $unit) {
             if ($unit['import']) {
                 $unitImpl = new UnitImplementation();

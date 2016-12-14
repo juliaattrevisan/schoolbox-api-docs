@@ -102,7 +102,7 @@ class Controller extends BaseController
     public function postExport(IAssessable $assessment)
     {
         $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
-        $newImplementations      = new GenericCollection(IAssessable::class);
+        $newImplementations      = $this->assessmentDataSource->createCollection();
         $sequences               = [];
 
         foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $implementation) {

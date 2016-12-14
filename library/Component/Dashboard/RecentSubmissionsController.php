@@ -69,8 +69,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        /** @var IAssessable[] $assessables */
-        $assessables = new GenericCollection(IAssessable::class);
+        $assessables = $assessmentMapperProxy->createCollection();
         foreach($responses as $response){
             $assessmentId = $response->getAssessable()->getId();
             if(!$assessables->getOffset($assessmentId) instanceof IAssessable){
