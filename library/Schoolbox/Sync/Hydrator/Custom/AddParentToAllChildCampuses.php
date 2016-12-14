@@ -14,7 +14,6 @@ namespace Schoolbox\Sync\Hydrator\Custom;
 use External_User;
 use Monolog\Logger;
 use Schoolbox\Campus;
-use Schoolbox\CampusCollection;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;

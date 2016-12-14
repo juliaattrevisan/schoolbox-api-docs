@@ -105,7 +105,7 @@ class UserQueueFactoryTest extends PHPUnit_Framework_TestCase
         $usr = new \Schoolbox\User();
         $usr->setId(9001)
             ->setRole($role)
-            ->setCampusCollection(new \Schoolbox\CampusCollection(array($campus)))
+            ->setCampusCollection(new \Schoolbox\GenericCollection(\Schoolbox\Campus::class, [$campus]))
             ->setAccessList(new \Schoolbox\Collection(array(
                 $this->newUserAccess($usr, \Schoolbox\Permission\Access\UserAccess::ACCESS_DENY),
                 $this->newUserAccess($usr, \Schoolbox\Permission\Access\UserAccess::ACCESS_READ),

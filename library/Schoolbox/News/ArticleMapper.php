@@ -521,12 +521,12 @@ class ArticleMapper extends Mapper implements Searchable
          * and roles within campuses; and your associated categories
          */
         else {
-            $categoryMapper = new FolderMapper();
+            $categoryMapper = FolderMapper::getInstance();
             $allArticles    = new Collection();
 
             /* User campuses
              */
-            $campusMapper = new CampusMapper();
+            $campusMapper = CampusMapper::getInstance();
             $userCampuses = $campusMapper->getAvailableCampusesForUser($user);
             $user->setCampusCollection($userCampuses);
 

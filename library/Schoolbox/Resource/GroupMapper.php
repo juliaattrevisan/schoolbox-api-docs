@@ -9,6 +9,7 @@
 
 
 namespace Schoolbox\Resource;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 
 use \PDO;
@@ -58,11 +59,12 @@ class GroupMapper extends Mapper {
      * associated with userGroups
      *
      * @param $name
-     * @return \Schoolbox\Collection
+     * @return GenericCollection|Folder\Model[]
      */
-    public function findFolders($name = '') {
-        $allFolders = $this->getJoinMapper('folder')->createCollection();
-        $folderMapper = new FolderMapper();
+    public function findFolders($name = '')
+    {
+        $folderMapper = $this->getJoinMapper('folder');
+        $allFolders = $folderMapper->createCollection();
 
         /* if $name is empty, the LIKE returns everything anyway
          */

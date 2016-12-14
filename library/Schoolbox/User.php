@@ -105,7 +105,7 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Collection of campuses
      *
-     * @var CampusCollection|Campus[]
+     * @var GenericCollection|Campus[]
      */
     private $campusCollection;
 
@@ -203,7 +203,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function __construct()
     {
-        $this->setCampusCollection(new GenericCollection(Campus::class));
+        $this->campusCollection = new GenericCollection(Campus::class);
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
@@ -241,7 +241,7 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Returns a list of collections the user belongs in
      *
-     * @return CampusCollection|Campus[]
+     * @return GenericCollection|Campus[]
      */
     public function getCampusCollection()
     {

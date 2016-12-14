@@ -19,11 +19,11 @@ $query = $_GET['query'];
  * perhaps rename them both to findSimilar()
  */
 if ($_GET['type'] == 'groups') {
-    $mapper = new \Schoolbox\Resource\GroupMapper();
+    $mapper = \Schoolbox\Resource\GroupMapper::getInstance();
     $allResults = $mapper->findFolders($query);
 }
 else if ($_GET['type'] == 'campus') {
-    $mapper = new \Schoolbox\CampusMapper();
+    $mapper = \Schoolbox\CampusMapper::getInstance();
     $allResults = $mapper->findCampuses($query);
 }
 

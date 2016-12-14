@@ -38,7 +38,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         $user->setLastname($_POST['lastname']);
         $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
         $user->getRole()->setId($_POST['group']);
-        $user->setCampusCollection(new \Schoolbox\CampusCollection());
+        $user->setCampusCollection(new \Schoolbox\GenericCollection(\Schoolbox\Campus::class));
         foreach ($_POST['campus'] as $campusId) {
             /** @var \Schoolbox\Campus $campus */
             $campus = new \Schoolbox\Campus();

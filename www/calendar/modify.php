@@ -381,7 +381,7 @@ foreach ($allFolderList as $currentFolder) {
 
 /* Only provide Campus options if campuses have been defined
  */
-$campusMapper = new \Schoolbox\CampusMapper();
+$campusMapper = \Schoolbox\CampusMapper::getInstance();
 $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
 
 /* Event Access Levels
