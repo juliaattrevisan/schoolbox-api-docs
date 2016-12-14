@@ -68,5 +68,5 @@ interface AssessmentContext
      * @param GenericCollection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables($assessables);
+    public function setAssessables(GenericCollection $assessables);
 }

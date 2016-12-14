@@ -534,7 +534,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param GenericCollection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables($assessables)
+    public function setAssessables(GenericCollection $assessables)
     {
         $this->assessables->replaceWith($assessables);
         return $this;
