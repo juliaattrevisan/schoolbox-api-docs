@@ -201,8 +201,7 @@ class GenericCollection extends Collection
     }
 
     /**
-     * Convenience method available to setters to ensure the proposed new Collection
-     * has the same member-item type as the existing Collection
+     * Ensure the proposed new Collection has the same member-item type as this Collection
      *
      * @param GenericCollection $newCollection
      * @throws DomainException if the new Collection has a different item-type to this Collection
