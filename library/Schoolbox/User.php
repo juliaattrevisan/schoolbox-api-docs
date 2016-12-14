@@ -220,12 +220,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function isInCampus(Campus $campus)
     {
-        foreach($this->getCampusCollection() as $userCampus) {
-            if($userCampus->getId() == $campus->getId()) {
-                return true;
-            }
-        }
-        return false;
+        return $this->getCampusCollection()->getBy('id', $campus->getId()) instanceof Campus;
     }
 
     /**
