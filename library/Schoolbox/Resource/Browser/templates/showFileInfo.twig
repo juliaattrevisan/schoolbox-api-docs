@@ -74,16 +74,7 @@ These are its args, which is given for you
         {% endif %}
     </div>
     <div class="small-8 column">
-        <div class="actions-small-1">
-            <div class="list-item">
-                <a href="{{ send ~ file.id }}" target="_blank">
-                    <h3>{{ file.title }}</h3>
-                </a>
-            </div>
-            <nav>
-                <a href="#" class="icon-eye" data-reveal-id="modal-file-{{ file.id }}"></a>
-            </nav>
-        </div>
+        <h3><a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a><span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span></h3>
         {% if namespace == 'resourceBrowser' and file.description %}
             <p>{{ file.description }}</p>
         {% else %}
