@@ -633,31 +633,14 @@ abstract class Component_ControllerAbstract
      *
      * Call from $this->renderTemplate($templateHandle)
      *
-     * @param string $templateHandle    Some PHPLib BS which I don't understand.
-     *                                  Just pass $templateHandle from
-     *                                  $this->renderTemplate($templateHandle).
-     * @param string $twigTemplate      The path to a Twig template.
-     * @param array  $twigData          Data to pass into the Twig template.
-     * @param bool   $renderHeader      Set to false if you don't want the PHPLib
-     *                                  controlled header to show.
-     * @param bool   $renderConfig      Set to false if you don't want the PHPLib
-     *                                  controlled configuration to show.
-     *                                  (Dashboard components show the collapse
-     *                                  controls if this is true.)
-     * @param bool   $contentRaw        This is a flag that lets you dump the twig raw
-     *                                  rather than using standard header block
-     * @param string $templateHandle Some PHPLib BS which I don't understand.
-     *                               Just pass $templateHandle from
+     * @param string $templateHandle Some PHPLib BS which I don't understand. Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
      * @param string $twigTemplate   The path to a Twig template.
-     * @param array $twigData        Data to pass into the Twig template.
-     * @param bool $renderHeader     Set to false if you don't want the PHPLib
-     *                               controlled header to show.
-     * @param bool $renderConfig     Set to false if you don't want the PHPLib
-     *                               controlled configuration to show.
-     *                               (Dashboard components show the collapse
-     *                                controls if this is true.)
-     *
+     * @param array  $twigData       Data to pass into the Twig template.
+     * @param bool   $renderHeader   Set to false if you don't want the PHPLib controlled header to show.
+     * @param bool   $renderConfig   Set to false if you don't want the PHPLib controlled configuration to show.
+     *                               (Dashboard components show the collapse controls if this is true.)
+     * @param bool   $contentRaw     This is a flag that lets you dump the twig raw rather than using standard header block
      * @return bool Was the template renderable?
      * @throws Exception
      */
