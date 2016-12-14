@@ -349,8 +349,7 @@ class Participant
      */
     public function setAllResponses(GenericCollection $allResponses)
     {
-        $this->allResponses->assertSameItemClass($allResponses);
-        $this->allResponses = $allResponses;
+        $this->allResponses->replaceWith($allResponses);
         return $this;
     }
 
@@ -369,8 +368,7 @@ class Participant
      */
     public function setAllFeedbacks(GenericCollection $allFeedbacks)
     {
-        $this->allFeedbacks->assertSameItemClass($allFeedbacks);
-        $this->allFeedbacks = $allFeedbacks;
+        $this->allFeedbacks->replaceWith($allFeedbacks);
         return $this;
     }
 

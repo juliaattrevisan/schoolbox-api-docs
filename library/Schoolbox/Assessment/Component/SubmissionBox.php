@@ -914,8 +914,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      */
     public function setSubmissions(GenericCollection $submissions)
     {
-        $this->submissions->assertSameItemClass($submissions);
-        $this->submissions = $submissions;
+        $this->submissions->replaceWith($submissions);
         return $this;
     }
 }

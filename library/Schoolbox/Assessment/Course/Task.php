@@ -131,8 +131,7 @@ class Task implements IAssessableDataModel
      */
     public function setCompletions(GenericCollection $completions)
     {
-        $this->completions->assertSameItemClass($completions);
-        $this->completions = $completions;
+        $this->completions->replaceWith($completions);
         return $this;
     }
 }

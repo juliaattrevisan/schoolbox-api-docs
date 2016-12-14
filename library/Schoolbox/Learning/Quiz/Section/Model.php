@@ -211,8 +211,7 @@ class Model implements ISoftDeletable
      */
     public function setQuestions(GenericCollection $questions)
     {
-        $this->questions->assertSameItemClass($questions);
-        $this->questions = $questions;
+        $this->questions->replaceWith($questions);
         return $this;
     }
 }

@@ -86,8 +86,7 @@ class Model implements ISoftDeletable
      */
     public function setUnits(GenericCollection $unitSpecifications)
     {
-        $this->unitSpecifications->assertSameItemClass($unitSpecifications);
-        $this->unitSpecifications = $unitSpecifications;
+        $this->unitSpecifications->replaceWith($unitSpecifications);
         return $this;
     }
 
@@ -115,8 +114,7 @@ class Model implements ISoftDeletable
      */
     public function setCourseImplementations(GenericCollection $courseImplementations)
     {
-        $this->courseImplementations->assertSameItemClass($courseImplementations);
-        $this->courseImplementations = $courseImplementations;
+        $this->courseImplementations->replaceWith($courseImplementations);
         return $this;
     }
 }
