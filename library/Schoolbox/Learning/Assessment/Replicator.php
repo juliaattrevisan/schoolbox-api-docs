@@ -12,9 +12,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Learning\Assessment\Project as ProjectAssessable;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
 /**
@@ -63,7 +62,7 @@ class Replicator
             // TODO need to implement __clone() on DueWork to clone Rubric correctly
             $this->replicateDueWorkRubric($newAssessment);
 
-            // TODO - test if project, and if so need to set dates on its Assessables too
+            $this->setProjectAssessableDates($newAssessment);
             $this->assessmentMapperProxy->save($newAssessment);
 
             // Copy Quiz Sections/Questions/Solutions
@@ -73,6 +72,38 @@ class Replicator
             $newAssessments->add($newAssessment);
         }
         return $newAssessments;
+    }
+
+    /**
+     * Set the dates on any Assessables inside a Project
+     *
+     * Can recursively handle any project nesting
+     *
+     * @param IAssessable $assessable
+     * @return bool If we set any dates on Assessables inside a Project
+     */
+    protected function setProjectAssessableDates(IAssessable $assessable)
+    {
+        // Base case #1
+        if(!$assessable instanceof Project){
+            return false;
+        }
+
+        // Recursive case
+        $result = false;
+        if($assessable instanceof Project){
+            foreach($assessable->getAssessables() as $subAssessable)
+            {
+                $result = true;
+                // TODO - I think Doctor is working on something a bit more intelligent here?
+                $subAssessable->setPublishAt($assessable->getPublishAt());
+                $subAssessable->setOpenAt($assessable->getPublishAt());
+                $subAssessable->setDueAt($assessable->getDueAt());
+                $subAssessable->setCloseAt($assessable->getDueAt());
+                $this->setProjectAssessableDates($subAssessable);
+            }
+        }
+        return $result;
     }
 
     /**
@@ -86,16 +117,16 @@ class Replicator
     protected function replicateQuizConstituents(IAssessable $assessable)
     {
         // Recursive case
-        if($assessable instanceof ProjectAssessable){
+        if($assessable instanceof Project){
             $result = false;
-            foreach ($assessable as $projectAssessable) {
-                $result = $this->replicateQuizConstituents($projectAssessable);
+            foreach ($assessable->getAssessables() as $subAssessable) {
+                $result = $this->replicateQuizConstituents($subAssessable);
             }
             return $result;
         }
 
         // Base case #1
-        if(!$assessable instanceof QuizAssessable){
+        if(!$assessable instanceof Quiz){
             return false;
         }
 
@@ -117,16 +148,16 @@ class Replicator
     protected function replicateDueWorkRubric(IAssessable $assessable)
     {
         // Recursive case
-        if($assessable instanceof ProjectAssessable){
+        if($assessable instanceof Project){
             $result = false;
-            foreach ($assessable as $projectAssessable) {
+            foreach ($assessable->getAssessables() as $projectAssessable) {
                 $result = $this->replicateDueWorkRubric($projectAssessable);
             }
             return $result;
         }
 
         // Base case #1
-        if(!$assessable instanceof DueWorkAssessable){
+        if(!$assessable instanceof DueWork){
             return false;
         }
 

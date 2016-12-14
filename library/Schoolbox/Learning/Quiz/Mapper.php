@@ -177,7 +177,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      */
 	public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
     {
-        $sectionMapper = QuizSectionMapper::getInstance();
+        $sectionMapper = $this->getJoinMapper('sections');
         $questionMapper = QuizQuestionMapper::getInstance();
         $solutionMapper = QuizSolutionMapper::getInstance();
 
