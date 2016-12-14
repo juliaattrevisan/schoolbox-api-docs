@@ -45,6 +45,7 @@ class Module extends BaseModule
             'GET' => [
                 '/display/{display}/database/{database}/id/{id}/value/{value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
+                '/period/{period}' => 'getByPeriod',
                 '/date/{date}/class/{classCode}' => 'getByClassCode',
             ],
             'POST' => [

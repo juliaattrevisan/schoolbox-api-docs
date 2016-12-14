@@ -17,6 +17,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Calendar_Layout_Full_Ajax_JSON;
 use \Group;
+use \External_Timetable;
+use \Schoolbox\CampusMapper;
 
 class Controller extends Base
 {
@@ -41,7 +43,9 @@ class Controller extends Base
         $this->setUserMapper($userMapper);
         $this->setTermMapper($termMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
+
     }
+
 
     /**
      * Return the HTML picker for injecting into modal
@@ -49,6 +53,7 @@ class Controller extends Base
      * @param string $value Default date to display
      */
     public function getPicker($id, $display, $database, $value) {
+        $timetable = $this->getTimetable();
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -57,10 +62,26 @@ class Controller extends Base
                     'id' => $id,
                     'value' => $value,
                     'displayFormat' => urldecode($display),
-                    'databaseFormat' => urldecode($database)
+                    'databaseFormat' => urldecode($database),
+                    'timetable' => $timetable
                 ]
             )
         );
+    }
+
+    /**
+     * Return array of all timetables by campus id
+     * @param string $date
+     */
+    public function getTimetable() {
+        $user = $this->getUser();
+        $timetableHandler = new External_Timetable;
+        $timetable = array();
+        foreach ($user->getCampusCollection() as $campus) {
+            $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
+            $timetable[$campus->getId()] = $campusTimetable;
+        }
+        return $timetable;
     }
 
     /**
@@ -79,7 +100,7 @@ class Controller extends Base
 
             $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
             $end = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
-            $user = $_SESSION['user'];
+            $user = $this->getUser();
             $api = new  \Calendar_Api_EventType_Event_Schoolbox_Default($user, array());
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
             foreach ($events as $event) {
@@ -104,6 +125,10 @@ class Controller extends Base
                 ]
             )
         );
+    }
+
+    public function getByPeriod() {
+
     }
 
     /**

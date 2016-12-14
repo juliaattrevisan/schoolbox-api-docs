@@ -1,22 +1,7 @@
-<div class="row">
-    <div class="small-12 medium-4 columns">
-
-        {# Placeholder for calendar ot be rendered in #}
-        <div id="pickerCalendar{{ id }}"></div>
-
-
-    </div>
-    <div class="small-12 medium-8 columns">
-
-        {# Placeholder for appointments to be rendered in #}
-
-        <div id="pickerAppointments{{ id }}"></div>
-
-    </div>
-</div>
-
-{# Setup calendar #}
 <style>
+    .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
+        bottom: 0;
+    }
     .flatpickr-calendar.inline {
         max-height: 370px;
         border-radius: 0;
@@ -52,6 +37,70 @@
         margin: 5px 10px 1px;
     }
 </style>
+<div class="row">
+    <dl class="tabs" data-tab>
+        <dd class=""><a href="#byDate" aria-selected="true" tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
+        <dd class=""><a href="#byTimetable" aria-selected="false" tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
+    </dl>
+</div>
+<div class="row">
+    <div class="tabs-content">
+        <div class='content active' id="byDate">
+
+                <div class="small-12 medium-4 columns">
+
+                    {# Placeholder for calendar ot be rendered in #}
+                    <div id="pickerCalendar{{ id }}"></div>
+
+
+                </div>
+                <div class="small-12 medium-8 columns">
+
+                    {# Placeholder for appointments to be rendered in #}
+
+                    <div id="pickerAppointments{{ id }}"></div>
+
+                </div>
+        </div>
+     </div>
+        <div class='content' id="byTimetable">
+                <div class="small-12 medium-4 columns">
+
+                    {# Placeholder for timetable ot be rendered in #}
+                    <div id="timetable{{ id }}">
+                        {% set campus = 1 %}
+                        <table cellspacing="0" cellpadding="0" border="1">
+                            <tr>
+                                <td></td>
+                                {% for i in 1..timetable[campus].dayCount %}
+                                    <td>{{ i }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% set k=1 %}
+                        {% for period in timetable[campus].desc %}
+                            <tr><td>{{ period }}</td>
+
+                                {% for i in 1..timetable[campus].dayCount %}
+                                    <td data-timetable="{{ i }}-{{ k }}"></td>
+
+                                {% endfor %}
+                                {% set k=k+1 %}
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="small-12 medium-8 columns">
+
+                    {# Placeholder for appointments to be rendered in #}
+
+                    <div id="timetableAppointments{{ id }}"></div>
+
+                </div>
+        </div>
+    {#</div>#}
+</div>
+{# Setup calendar #}
 
 <script>
 
