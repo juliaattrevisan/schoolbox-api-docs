@@ -6,8 +6,22 @@
 
             <!-- BEGIN empty_state -->
             <div class="empty-state">
-                <i class="icon-rss"></i>
-                <p>No Wolfram|Alpha feed available!</p>
+                <i class="icon-wolfram-alpha"></i>
+
+                <!-- BEGIN empty_config -->
+                <p>To use this component you must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter the embed code</a> for a Wolfram Alpha widget.
+                <p>Widgets and their embed codes can be found on the <a href="http://www.wolframalpha.com/widgets/gallery/" target="_blank">Wolfram Alpha site</a>.</p>
+                <!-- END empty_config -->
+
+                <!-- BEGIN empty_results -->
+                <p>No widget found.</p>
+                <!-- END empty_results -->
+
+                <!-- BEGIN empty_results_write -->
+                <p>No widget has been found with the embed code provided.</p>
+                <p>Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">checking your embed code</a> or copy and pasting the embed from the <a href="http://www.wolframalpha.com/widgets/gallery/" target="_blank">Wolfram Alpha site</a> again.</p>
+                <!-- END empty_results_write -->
+
             </div>
             <!-- END empty_state -->
 

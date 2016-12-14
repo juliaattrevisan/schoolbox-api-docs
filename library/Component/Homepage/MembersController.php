@@ -49,8 +49,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar([
+                'members_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
-                'members_block' => ''
+                'COMPONENT_ICON' => 'group'
             ]);
 
             $this->parse('empty_state_block', 'empty_state');

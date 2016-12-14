@@ -1,14 +1,17 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
+
 class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -20,25 +23,61 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             return false;
         }
 
-        /* Need rss name injected here
-         */
-        $this->parseConfig();
+        $this->setBlock($templateHandle, 'rss', 'rss_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        // Initialise feed
-        $rss = new Alaress_Rss_Stream($this->getConfig('url'));
-        $rss->setLimit($this->getConfig('size'));
-        $rss->stream();
+        $emptyState = false;
+        $noConfig = false;
 
-        // Process each item in feed
-        $allRss      = $rss->getOutput();
+        if (strlen($this->getConfig('url')) == 0) {
 
-        if (count($allRss) == 0) {
+            $emptyState = true;
+            $noConfig = true;
 
-            $this->setBlock($templateHandle, 'rss', 'rss_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+        } else {
+
+            // Initialise feed
+            $rss = new Alaress_Rss_Stream($this->getConfig('url'));
+            $rss->setLimit($this->getConfig('size'));
+            $rss->stream();
+
+            // Process each item in feed
+            $allRss = $rss->getOutput();
+
+            if (count($allRss) == 0) {
+                $emptyState = true;
+            }
+        }
+
+        if ($emptyState) {
 
             $this->setVar('rss_block', '');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
+
+            /**
+             * If the user has no write permission just go for a generic nothing found message
+             */
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+
+                $this->setVar('empty_config_block', '');
+                $this->setVar('empty_results_write_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+
+            } else {
+
+                $this->setVar('empty_results_block', '');
+
+                if ($noConfig) {
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->setVar('empty_config_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
+
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
@@ -98,6 +137,11 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 $this->setVar('rss_block', '');
             }
         }
+
+        /* Need rss name injected here
+         */
+        $this->parseConfig();
+
 
         return true; // everything went according to plan
     }

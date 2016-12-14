@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Pinterest
  *
@@ -8,6 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_PinterestController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -23,34 +25,16 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        if (!strlen(trim($this->getConfig('url')))) {
+        $this->setBlock($templateHandle, 'pinterest', 'pinterest_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-            $this->setBlock($templateHandle, 'pinterest', 'pinterest_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+        $emptyState = false;
+        $noConfig = false;
 
-            $this->setVar('pinterest_block', '');
-
-            $this->parse('empty_state_block', 'empty_state');
-
+        if (strlen(trim($this->getConfig('url'))) == 0) {
+            $emptyState = true;
+            $noConfig = true;
         } else {
-
-            $this->setBlock($templateHandle, 'has_pinterest_user', 'has_pinterest_user_block');
-            $this->setBlock($templateHandle, 'has_pinterest_board', 'has_pinterest_board_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-
-            $this->setVar(
-                array(
-                    'empty_state_block' => '',
-                    'has_pinterest_user_block'  => '',
-                    'has_pinterest_board_block' => '',
-                )
-            );
-            $this->setVar(
-                array(
-                    'PINTEREST_URL' => $this->getConfig('url')
-                )
-            );
 
             /* Determine whether it's a user profile or a board
              * Remove domain, check how may parts there are
@@ -60,7 +44,62 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
             $parts = array_filter(explode('/', $url));
 
-            switch (count($parts)) {
+            $partCount = count($parts);
+
+            /**
+             * If there's zero or more than two parts -
+             * we can't handle this (most likely invalid url) so show empty state
+             */
+            if ($partCount != 1 && $partCount != 2) {
+                $emptyState = true;
+            }
+        }
+
+        if ($emptyState) {
+
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
+
+            $this->setVar('pinterest_block', '');
+
+            /**
+             * If the user has no write permission just go for a generic nothing found message
+             */
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+
+                $this->setVar('empty_config_block', '');
+                $this->setVar('empty_results_write_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+
+            } else {
+
+                $this->setVar('empty_results_block', '');
+
+                if ($noConfig) {
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->setVar('empty_config_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
+            }
+
+            $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock('pinterest', 'has_pinterest_user', 'has_pinterest_user_block');
+            $this->setBlock('pinterest', 'has_pinterest_board', 'has_pinterest_board_block');
+
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_pinterest_user_block'  => '',
+                'has_pinterest_board_block' => '',
+                'PINTEREST_URL' => $this->getConfig('url')
+            ]);
+
+            switch ($partCount) {
 
                 /* User
                  */
@@ -79,6 +118,9 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                 default:
                     break;
             }
+
+            $this->parse('pinterest_block', 'pinterest');
+
         }
 
         return true;

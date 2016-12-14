@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Enables embedding of wolfram alpha widgets into homepages
  *
@@ -7,6 +6,9 @@
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
+
 class Component_Homepage_WolframController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -23,11 +25,22 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+        $emptyState = false;
+        $noConfig = false;
 
         /* If no url is specified it might time out -_-
          * So just hide all this instead
          */
-        if (strlen(trim($this->getConfig('url')))) {
+        if (strlen(trim($this->getConfig('url'))) == 0) {
+
+            $emptyState = true;
+            $noConfig = true;
+
+        } else {
+
             /* Pattern match the necessary code out of a url given to us
              * by the Wolfram Alpha
              *
@@ -40,44 +53,65 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             $matches = array();
 
             $url = $this->getConfig('url');
-            if (preg_match($pattern, $url, $matches)) {
-
-                $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
-                $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-                $this->setVar('empty_state_block', '');
-
-                $this->setVar(
-                    array(
-                        'WIDGET_ID' => $matches[2],
-                    )
-                );
-
-                // Allow output type to be set too
-                $outputType = 'lightbox';
-                if (preg_match('/(?:\?|&)output=(?P<output>[a-zA-Z0-9]+)/', $url, $matches)) {
-                    $outputType = $matches['output'];
-                }
-                $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
-
-                $this->parse('has_wolfram_block', 'has_wolfram');
-
-            } else {
-                $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
-                $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-                $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
-
-                $this->setVar('wolfram_block', '');
-
-                $this->parse('empty_state_block', 'empty_state');
+            if (!preg_match($pattern, $url, $matches)) {
+                $emptyState = true;
             }
-        } else {
-            $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+        }
+
+        if ($emptyState) {
+
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
+            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
 
             $this->setVar('wolfram_block', '');
 
+            /**
+             * If the user has no write permission just go for a generic nothing found message
+             */
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+
+                $this->setVar('empty_config_block', '');
+                $this->setVar('empty_results_write_block', '');
+                $this->parse('empty_results_block', 'empty_results');
+
+            } else {
+
+                $this->setVar('empty_results_block', '');
+
+                if ($noConfig) {
+                    $this->setVar('empty_results_write_block', '');
+                    $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->setVar('empty_config_block', '');
+                    $this->parse('empty_results_write_block', 'empty_results_write');
+                }
+            }
+
             $this->parse('empty_state_block', 'empty_state');
+
+        } else {
+
+            $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
+            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+            $this->setVar('empty_state_block', '');
+
+            $this->setVar(
+                array(
+                    'WIDGET_ID' => $matches[2],
+                )
+            );
+
+            // Allow output type to be set too
+            $outputType = 'lightbox';
+            if (preg_match('/(?:\?|&)output=(?P<output>[a-zA-Z0-9]+)/', $url, $matches)) {
+                $outputType = $matches['output'];
+            }
+            $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
+
+            $this->parse('has_wolfram_block', 'has_wolfram');
+
         }
 
         return true; // everything went according to plan

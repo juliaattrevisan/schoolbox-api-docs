@@ -32,9 +32,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('clickview_block', '');
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("empty_modify_block", "");
+                $this->setVar('empty_modify_block', '');
             } else {
-                $this->parse("empty_modify_block", "empty_modify");
+                $this->parse('empty_modify_block', 'empty_modify');
             }
 
             $this->parse('empty_state_block', 'empty_state');

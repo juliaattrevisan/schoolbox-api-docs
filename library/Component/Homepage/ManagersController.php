@@ -49,8 +49,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar([
+                'members_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
-                'members_block' => ''
+                'COMPONENT_ICON' => 'group-managers'
             ]);
 
             $this->parse('empty_state_block', 'empty_state');
