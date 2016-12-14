@@ -158,9 +158,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             );*/
 
         } catch (MapperException $e) {
-            if ($this->readOnly) {
-                return false;
-            }
+            // noop
         }
 
         return true;
@@ -192,6 +190,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         ];
 
 
+        //var_dump($data);
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/component.twig',
