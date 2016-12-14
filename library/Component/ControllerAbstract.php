@@ -15,6 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use \Schoolbox\Config\ConfigMapper;
+use \Schoolbox\MapperFactory;
 
 abstract class Component_ControllerAbstract
 {
@@ -27,7 +28,6 @@ abstract class Component_ControllerAbstract
 
     /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
     const EMPTY_STATE_REASON_DELETED = 2;
-
 
     /**
      * @var Component_Instance
@@ -43,6 +43,11 @@ abstract class Component_ControllerAbstract
      * @var SitePage
      */
     private $sitepage;
+
+    /**
+     * @var MapperFactory
+     */
+    private $mapperFactory;
 
     /**
      * The folder|page the component is on, if any.
@@ -147,19 +152,21 @@ abstract class Component_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
-        $this->setSitePage($sitepage);
-
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $sitepage->getDi()->get('mapperFactory');
         /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
+        $folderMapper = $mapperFactory->get(FolderMapper::class);
         /** @var ErrorMapper $errorMapper */
-        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+        $errorMapper = $mapperFactory->get(ErrorMapper::class);
         /** @var ConfigMapper $configMapper */
-        $configMapper = $this->getMapperFactory()->get(ConfigMapper::class);
+        $configMapper = $mapperFactory->get(ConfigMapper::class);
 
         $this
             ->setInstance($instance)
             ->setUser($user)
+            ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
+            ->setMapperFactory($mapperFactory)
             ->setFolderMapper($folderMapper)
             ->setErrorMapper($errorMapper)
             ->setConfigMapper($configMapper);
@@ -207,18 +214,6 @@ abstract class Component_ControllerAbstract
     {
         // Default to no action
         return true;
-    }
-
-    /**
-     * Convenience method for Components to get the Injected MapperFactory
-     *
-     * @return \Schoolbox\MapperFactory
-     */
-    protected function getMapperFactory()
-    {
-        /** @var \Schoolbox\MapperFactory $mapperFactory */
-        $mapperFactory = $this->getSitePage()->getDi()->get('mapperFactory');
-        return $mapperFactory;
     }
 
     /**
@@ -960,6 +955,24 @@ abstract class Component_ControllerAbstract
     /*
      * Getters / Setters
      */
+
+    /**
+     * @return MapperFactory
+     */
+    protected function getMapperFactory()
+    {
+        return $this->mapperFactory;
+    }
+
+    /**
+     * @param MapperFactory $mapperFactory
+     * @return static
+     */
+    protected function setMapperFactory(MapperFactory $mapperFactory)
+    {
+        $this->mapperFactory = $mapperFactory;
+        return $this;
+    }
 
     /**
      * @return Folder|Eportfolio_Page_Instance|null
