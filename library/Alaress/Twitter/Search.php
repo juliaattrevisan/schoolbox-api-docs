@@ -85,7 +85,7 @@ class Alaress_Twitter_Search
                             'date'     => $result->created_at,
                             'fullname' => $result->user->name,
                             'author'   => $result->user->screen_name,
-                            'avatar'   => $result->user->profile_image_url,
+                            'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
                             'media'    => $result->entities->media,
                         );
                         $tweetText[] = $result->text;
