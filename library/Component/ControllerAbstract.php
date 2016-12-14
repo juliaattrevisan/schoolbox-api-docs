@@ -91,14 +91,19 @@ abstract class Component_ControllerAbstract
     private $maximumPermission = UserAccess::ACCESS_FULL;
 
     /**
-     * @var array
+     * Available sort fields for this component.
+     *
+     * @var string[]
      */
-    protected $sortFields = null;
+    protected $sortFields = [];
 
     /**
-     * @var array
+     * Available filters for this component.
+     *
+     * @see Component_Config_Filter for how this data is passed in/out of the database
+     * @var string[]
      */
-    protected $filterFields = null;
+    protected $filterFields = [];
 
     /**
      * Name of the component
