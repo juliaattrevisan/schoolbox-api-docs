@@ -762,15 +762,16 @@ abstract class Mapper implements IMapper, Serializable
      * Translates a column to a property field
      *
      * @param $column
-     * @return mixed
+     * @return string
      */
-    protected function getPropertyFromColumn($column) {
+    protected function getPropertyFromColumn($column)
+    {
         foreach($this->map as $map) {
             if($map['column'] == $column) {
                 return $map['property'];
             }
         }
-        return null;
+        throw new \InvalidArgumentException("Column not found: $column");
     }
 
     /**
