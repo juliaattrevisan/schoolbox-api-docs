@@ -323,7 +323,7 @@ class Controller extends Base\Base
 
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapper()->findAllByCourseId($courseSpecId);
-        $unitImpls = new Collection();
+        $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($unitSpecs as $spec) {
             $unitImpls->add((new UnitImplementation())
                 ->setTitle($spec->getFolder()->getName())
@@ -889,8 +889,8 @@ class Controller extends Base\Base
 
         // If Assessable was a Quiz, we have one Quiz.
         // If Assessable was a Project, we may have many Quizzes
-        /** @var IAssessable[] $quizImpls */
-        $quizImpls = new GenericCollection(QuizAssessable::class);
+        /** @var IAssessable[]|GenericCollection $quizImpls */
+        $quizImpls = $this->getAssessmentMapperProxy()->createCollection();
 
         if($assessmentImpl instanceof QuizAssessable){
             $quizImpls->add($assessmentImpl);
