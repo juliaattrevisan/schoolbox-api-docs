@@ -1175,8 +1175,8 @@ class SitePage extends Page
     }
 
     /**
-     * @param $handle
-     * @param $data
+     * @param string $handle
+     * @param array|Traversable $data
      * @param array $selected
      * @param string $template
      * @param array $mapping
