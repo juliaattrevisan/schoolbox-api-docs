@@ -13,6 +13,7 @@ use PDOStatement;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
@@ -93,9 +94,15 @@ class SubmissionMapper extends BaseMapper
             // I should never need to know the student's specifics here,
             // because this object should always be part of a participant's
             // response or feedback.
+
+            // Try to streamline duework+assessment creation too
+            /** @var SubmissionBox $dueWork */
+            $dueWork = $this->createJoinModel('box_id', $row['b.id']);
+            $dueWork->setAssessmentModel($this->createJoinModel('box_id.assessment_id', $row['b.assessment_id']));
+
             $resultSet->add(
                 $result
-                    ->setSubmissionBox($this->hydrateJoin($row, 'box_id', 'b'))
+                    ->setSubmissionBox($dueWork)
             );
         }
 
