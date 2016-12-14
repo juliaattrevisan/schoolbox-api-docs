@@ -772,16 +772,15 @@ abstract class Component_ControllerAbstract
     /**
      * Renders empty state into twig-based Components
      *
-     * Normally, this should not be called directly, instead use convenience methods which
+     * Private to prevent direct calls. Instead use convenience methods which
      * define a consistent message.
      *
      * @param string $templateHandle
      * @param int $reason Why we are unable to display this component's content.
      * @return bool
      */
-    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    private function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
@@ -817,15 +816,14 @@ abstract class Component_ControllerAbstract
     /**
      * Renders empty state into PHPLib-based Components
      *
-     * Normally, this should not be called directly, instead use convenience methods which
+     * Private to prevent direct calls. Instead use convenience methods which
      * define a consistent message.
      *
      * @param int $reason Why we are unable to display this component's content.
      * @return true
      */
-    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    private function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
