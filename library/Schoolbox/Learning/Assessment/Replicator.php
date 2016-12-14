@@ -80,21 +80,18 @@ class Replicator
      * Can recursively handle any project nesting
      *
      * @param IAssessable $assessable
-     * @return bool If we set any dates on Assessables inside a Project
      */
     protected function setProjectAssessableDates(IAssessable $assessable)
     {
         // Base case #1
         if(!$assessable instanceof Project){
-            return false;
+            return;
         }
 
         // Recursive case
-        $result = false;
         if($assessable instanceof Project){
             foreach($assessable->getAssessables() as $subAssessable)
             {
-                $result = true;
                 // TODO - SA-1638 - Need to set some to null but out of scope for this PR
                 $subAssessable->setPublishAt($assessable->getPublishAt());
                 $subAssessable->setOpenAt($assessable->getPublishAt());
@@ -103,7 +100,6 @@ class Replicator
                 $this->setProjectAssessableDates($subAssessable);
             }
         }
-        return $result;
     }
 
     /**
@@ -112,29 +108,25 @@ class Replicator
      * Can handle when $assessable is a Quiz, or any level of Project (via Recursion)
      *
      * @param IAssessable $assessable
-     * @return bool Did we replicate any Quiz constituents?
      */
     protected function replicateQuizConstituents(IAssessable $assessable)
     {
         // Recursive case
         if($assessable instanceof Project){
-            $result = false;
             foreach ($assessable->getAssessables() as $subAssessable) {
-                $result = $this->replicateQuizConstituents($subAssessable);
+                $this->replicateQuizConstituents($subAssessable);
             }
-            return $result;
         }
 
         // Base case #1
         if(!$assessable instanceof Quiz){
-            return false;
+            return;
         }
 
         // Base case #2
         $specId = $assessable->getSpecificationAssessment()->getId();
         $implId = $assessable->getId();
         $this->quizMapper->copyQuizConstituents($specId, $implId);
-        return true;
     }
 
     /**
@@ -143,27 +135,23 @@ class Replicator
      * Can handle when $assessable is a DueWork, or any level of Project (via Recursion)
      *
      * @param IAssessable $assessable
-     * @return bool
      */
     protected function replicateDueWorkRubric(IAssessable $assessable)
     {
         // Recursive case
         if($assessable instanceof Project){
-            $result = false;
             foreach ($assessable->getAssessables() as $projectAssessable) {
-                $result = $this->replicateDueWorkRubric($projectAssessable);
+                $this->replicateDueWorkRubric($projectAssessable);
             }
-            return $result;
         }
 
         // Base case #1
         if(!$assessable instanceof DueWork){
-            return false;
+            return;
         }
 
         // Base case #2
         // TODO - clone the Rubric correctly
-        return true;
     }
 
     /**
