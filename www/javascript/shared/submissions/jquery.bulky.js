@@ -8,6 +8,8 @@
 
     var pluginName = 'bulky';
 
+    var currentlyOpenModal = null;
+
     var defaults = {
         onSubmit: $.noop,
         submitText: $.noop, // checkedCount, totalCount
@@ -65,6 +67,9 @@
 
             var $checks;
 
+            // cache this value before we inject the contents
+            $(this).data('fixedContentHeight', $(this).outerHeight());
+
             bulky.list.html(
 
                 opt.userList.find(opt.actionBarSelector + ':visible').closest(opt.labelSelector).map(function () {
@@ -106,7 +111,19 @@
 
         });
 
+        this.element.on('opened.fndtn.reveal', function () {
+            currentlyOpenModal = $(this);
+            // start listening
+            $(window).on('resize', refreshModalHeight);
+            refreshModalHeight.call(window);
+        });
+
         this.element.on('closed.fndtn.reveal', function () {
+            currentlyOpenModal = null;
+
+            // stop listening
+            $(window).off('resize', refreshModalHeight);
+
             // clear the list
             bulky.list.html('');
         });
@@ -132,6 +149,22 @@
             this.submitButton.text(text.trim());
         }
 
+    }
+
+
+
+    /**
+     * Will be called when the viewport is resized
+     * Private method; expects to be applied to window
+     */
+    function refreshModalHeight() {
+        if (!currentlyOpenModal) {
+            return;
+        }
+
+        var maxHeight = parseInt($(window).height() / 5 * 4) - currentlyOpenModal.data('fixedContentHeight');
+
+        $('#' + currentlyOpenModal.data('listId')).css('maxHeight', maxHeight);
     }
 
 
