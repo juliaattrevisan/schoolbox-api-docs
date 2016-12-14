@@ -1264,6 +1264,7 @@ tr:hover{
 
 // Headers: don't overlap the close X
 .reveal-modal {
+	margin-top: 10vh !important; // foundation hardcodes an inline 100px -_-
 	&:focus {
 		outline: none;
 	}
