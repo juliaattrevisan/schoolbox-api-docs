@@ -18,16 +18,24 @@
 {# Setup calendar #}
 <style>
     .flatpickr-calendar.inline {
-        max-height: 360px;
+        max-height: 370px;
+        border-radius: 0;
     }
-    .timeSwitch {
+    .flatpickr-innerContainer{
+        border-bottom: 1px solid #e6e6e6;
+    }
+    .dateIsPicked .flatpickr-innerContainer+.flatpickr-time {
+        border-top: none;
+        border-bottom: 1px solid #e6e6e6;
+    }
+    .time-switch {
         width: 100px;
-        margin: 0 80px;
+        margin: 13px 10px;
     }
-    .hasTime .timeSwitch {
+    .hasTime .time-switch {
         opacity: 0.3;
     }
-    .allDay .timeSwitch {
+    .allDay .time-switch {
         opacity: 1;
     }
     .flatpickr-month {
@@ -38,6 +46,10 @@
     }
     .flatpickr-current-month .numInputWrapper {
         width: 70px;
+    }
+    .submit-calendar {
+        float: right;
+        margin: 5px 10px 1px;
     }
 </style>
 
@@ -52,6 +64,7 @@
         altInput: true,
         altFormat: '{{ databaseFormat }}',
         enableTime: true,
+        allowInput: true,
         disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
 
@@ -59,8 +72,15 @@
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
 
-            timeDiv.after('<div class="timeSwitch"><input id="hideTime{{ id }}" name="hideTime" type="checkbox" value="1" checked><label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>');
-
+            timeDiv.after(
+                '<div class="row"><div class="small-6 columns">' +
+                '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
+                '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
+                '</div><div class="small-6 columns">' +
+                '<div class="submit-calendar"><a href="#" class="button submit">Update</a><div>' +
+                '</div></div>'
+            );
+            
             {# Hide time picker if enableTime option set equals false or no event time set #}
             if(calendarDiv.hasClass('hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
                 timeDiv.css('display', 'none');
