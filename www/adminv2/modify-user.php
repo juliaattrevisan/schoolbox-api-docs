@@ -1,13 +1,25 @@
 <?php
 
 use Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Campus;
+use \Schoolbox\CampusMapper;
+use \Schoolbox\MapperFactory;
 
+/** @var SitePage $this */
 $userHandler = new User();
 $groupHandler = new Group();
+
+/** @var MapperFactory $mapperFactory */
+$mapperFactory = $this->getDi()->get('mapperFactory');
+
+/** @var CampusMapper $campusMapper */
+$campusMapper = $mapperFactory->get(CampusMapper::class);
 
 /* Superusers only */
 if(!$_SESSION['user']->isSuperuser())
     error(19);
+
+$availableCampuses = $campusMapper->findAll();
 
 if(is_numeric($this->arg[0])) {
     $this->setTitle('Admin - Modify User');
@@ -56,10 +68,6 @@ if(is_numeric($this->arg[0])) {
     $userObj = \Schoolbox\UserMapper::getInstance()->findById($this->arg[0]);
 
     if (is_array($user)) {
-
-        /* Prepend a please select at the start of every campus list
-		 */
-        $campusList = $userHandler->getCampusList();
 
         /* User data
 		 */
@@ -114,17 +122,17 @@ if(is_numeric($this->arg[0])) {
             error(31);
         }
 
-        $allCampuses = \Schoolbox\CampusMapper::getInstance()->findCampusInvolvement($currentUser);
+        $involvedCampuses = $campusMapper->findCampusInvolvement($currentUser);
 
-        foreach($userHandler->getCampusList() as $campus) {
-            $outcampus = array(
-                'CAMPUS_ID'              => $campus['id'],
-                'CAMPUS_NAME'            => Scrub::text($campus['name']),
+        foreach($availableCampuses as $campus) {
+            $outcampus = [
+                'CAMPUS_ID'              => $campus->getId(),
+                'CAMPUS_NAME'            => Scrub::text($campus->getName()),
                 'CAMPUS_ID_CHECKED'      => '',
                 'CAMPUS_DEFAULT_CHECKED' => '',
-            );
+            ];
 
-            if ($allCampuses->offsetExists($campus['id'])) {
+            if ($involvedCampuses->offsetExists($campus->getId())) {
 
                 /* Mark them as "Involved"
                  */
@@ -132,9 +140,12 @@ if(is_numeric($this->arg[0])) {
 
                 /* Find out if the campus is their default campus
                  */
-                $offset = $allCampuses->offsetGet($campus['id']);
+                /** @var Campus $involvedCampus */
+                $involvedCampus = $involvedCampuses->offsetGet($campus->getId());
 
-                if ($offset['defaultCampus']) {
+                $defaultCampus = $currentUser->getDefaultCampus();
+
+                if ($defaultCampus instanceof Campus && $defaultCampus->getId() == $involvedCampus->getId()) {
                     $outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
                 }
             }
@@ -188,7 +199,7 @@ if(is_numeric($this->arg[0])) {
         /* Clone-able permissions dropdown
 		 * Remove existing options
 		 */
-        $this->dropDown('perm_campus', $campusList, 0, 'campusPermsList', array(
+        $this->dropDown('perm_campus', $availableCampuses, 0, 'campusPermsList', array(
              'id' => 'PERM_CAMPUS_ID',
              'name' => 'PERM_CAMPUS_NAME'
         ));
@@ -233,9 +244,9 @@ if(is_numeric($this->arg[0])) {
                 switch ($perm['service']) {
                     case CALENDAR_SERVICE:
                     case NEWS_SERVICE:
-                        foreach ($campusList as $campus) {
-                            if ($campus['id'] == $perm['sid']) {
-                                $this->setVar('PERM_CAMPUS_NAME', $campus['name']);
+                        foreach ($availableCampuses as $campus) {
+                            if ($campus->getId() == $perm['sid']) {
+                                $this->setVar('PERM_CAMPUS_NAME', $campus->getName());
                                 break;
                             }
                         }
@@ -391,13 +402,14 @@ if(is_numeric($this->arg[0])) {
 
     /* Output campus list */
      $this->setBlock(TEMPLATE_content, 'campus','campus_block');
-     $campusList = $userHandler->getCampusList();
-     foreach($campusList as $campus ) {
+     foreach($availableCampuses as $campus ) {
 
-         $outcampus = array('CAMPUS_ID'         => $campus['id'],
-                        'CAMPUS_NAME'           => Scrub::text($campus['name']),
-                        'CAMPUS_ID_CHECKED'     => '',
-                        'CAMPUS_DEFAULT_CHECKED'    => '',);
+         $outcampus = [
+            'CAMPUS_ID'               => $campus->getId(),
+            'CAMPUS_NAME'             => Scrub::text($campus->getName()),
+            'CAMPUS_ID_CHECKED'       => '',
+            'CAMPUS_DEFAULT_CHECKED'  => '',
+         ];
 
          $this->setVar($outcampus);
          $this->parse('campus_block','campus',true);

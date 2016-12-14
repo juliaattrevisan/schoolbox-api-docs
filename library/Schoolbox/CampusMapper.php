@@ -11,6 +11,10 @@ namespace Schoolbox;
 
 use \PDO;
 
+/**
+ * @method GenericCollection|Campus[] findAll($options = array())
+ * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
+ */
 class CampusMapper extends Mapper {
 
     protected function mapping ()
@@ -36,7 +40,7 @@ class CampusMapper extends Mapper {
 	 * @param int $accessType
 	 * @return GenericCollection|Campus[]
 	 */
-	public function getAvailableCampusesForUser(\Schoolbox\User $user, $accessType = 1)
+	public function getAvailableCampusesForUser(User $user, $accessType = 1)
     {
 		$calendarService = CALENDAR_SERVICE;
 
