@@ -103,7 +103,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             b.BreakDuration
             FROM AttendancePeriods p
             LEFT JOIN PeriodNames n ON p.AcademicYear = n.AcademicYear AND p.DayOfWeek = 1 AND p.PeriodID = n.PeriodNumber and n.yeargroupid = p.yeargroup
-            LEFT JOIN AttendanceBreaks b ON b.AcademicYear = n.AcademicYear AND b.DayOfWeek = 1 AND b.BreakPeriodID = p.PeriodID  AND b.YearGroup = p.yeargroup 
+            LEFT JOIN AttendanceBreaks b ON b.AcademicYear = p.AcademicYear AND b.DayOfWeek = 1 AND b.BreakPeriodID = p.PeriodID  AND b.YearGroup = p.yeargroup 
 	    ";
 
         if ($type == 'student') {
