@@ -1283,6 +1283,10 @@ tr:hover{
 			margin-top: 2rem;
 		}
 	}
+
+	.checklist {
+		overflow-y: auto;
+	}
 }
 
 // Fix stupid foundation bug
