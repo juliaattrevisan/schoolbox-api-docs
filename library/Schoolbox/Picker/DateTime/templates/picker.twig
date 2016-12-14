@@ -1,12 +1,45 @@
-{# Placeholder for calendar ot be rendered in #}
+<div class="row">
+    <div class="small-12 medium-4 columns">
 
-<div id="pickerCalendar{{ id }}"></div>
+        {# Placeholder for calendar ot be rendered in #}
+        <div id="pickerCalendar{{ id }}"></div>
 
-{# Placeholder for appointments to be rendered in #}
 
-<div id="pickerApointments{{ id }}"></div>
+    </div>
+    <div class="small-12 medium-8 columns">
+
+        {# Placeholder for appointments to be rendered in #}
+
+        <div id="pickerAppointments{{ id }}"></div>
+
+    </div>
+</div>
 
 {# Setup calendar #}
+<style>
+    .flatpickr-calendar.inline {
+        max-height: 360px;
+    }
+    .timeSwitch {
+        width: 100px;
+        margin: 0 80px;
+    }
+    .hasTime .timeSwitch {
+        opacity: 0.3;
+    }
+    .allDay .timeSwitch {
+        opacity: 1;
+    }
+    .flatpickr-month {
+        height: 44px;
+    }
+    .flatpickr-prev-month, .flatpickr-next-month {
+        top: 18px;
+    }
+    .flatpickr-current-month .numInputWrapper {
+        width: 70px;
+    }
+</style>
 
 <script>
 
@@ -19,32 +52,40 @@
         altInput: true,
         altFormat: '{{ databaseFormat }}',
         enableTime: true,
+        disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
+
+            var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
+            var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
-            $('#picker{{ id }} > .flatpickr-calendar').children('.flatpickr-time').after('<div class="timeSwitch"><input id="hideTime{{ id }}" name="hideTime" type="checkbox" value="1" checked><label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>');
+
+            timeDiv.after('<div class="timeSwitch"><input id="hideTime{{ id }}" name="hideTime" type="checkbox" value="1" checked><label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>');
 
             {# Hide time picker if enableTime option set equals false or no event time set #}
-            if($('#picker{{ id }} > .hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
-                $('#picker{{ id }} > .flatpickr-calendar').children('.flatpickr-time').css('display', 'none');
-                $('#picker{{ id }} > .flatpickr-calendar').addClass('allDay');
-                $('#picker{{ id }} > .flatpickr-calendar').removeClass('hasTime');
+            if(calendarDiv.hasClass('hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
+                timeDiv.css('display', 'none');
+                calendarDiv.addClass('allDay');
+                calendarDiv.removeClass('hasTime');
             }
             else {
                 $('#hideTime{{ id }}').prop('checked', false);
             }
             $('#hideTime{{ id }}').click(function () {
                 if ($('#hideTime{{ id }}').is(':checked')) {
-                    $('#picker{{ id }} > .flatpickr-calendar').children('.flatpickr-time').css('display', 'none');
+                    timeDiv.css('display', 'none');
+                    calendarDiv.addClass('allDay');
+                    calendarDiv.removeClass('hasTime');
+
                     var dateObj = new Date(instance.altInput.value);
                     dateObj.setMinutes(0);
                     dateObj.setHours(0);
                     instance.setDate(dateObj);
-                    alert(instance.altInput.value);
+//                    alert(instance.altInput.value);
                 }
                 else {
-                    $('#picker{{ id }} > .flatpickr-calendar').children('.flatpickr-time').css('display', 'block');
-                    $('#picker{{ id }} > .flatpickr-calendar').addClass('hasTime');
-                    $('#picker{{ id }} > .flatpickr-calendar').removeClass('allDay');
+                    timeDiv.css('display', 'block');
+                    calendarDiv.addClass('hasTime');
+                    calendarDiv.removeClass('allDay');
                 }
             });
 
@@ -64,9 +105,9 @@
 
                 {# AJAX in appointments for the selected date #}
 
-                var pickerApointments = $('#pickerApointments{{ id }}');
+                var pickerAppointments = $('#pickerAppointments{{ id }}');
 
-                pickerApointments.html('Loading events');
+                pickerAppointments.html('Loading events');
 
                 $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(instance.altInput.value)))
                         .done(function (data) {
@@ -75,18 +116,18 @@
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerApointments.html('No events found');
+                                pickerAppointments.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
 
-                                pickerApointments.html('');
+                                pickerAppointments.html('');
 
                                 {# Populate with appointments for the selected date #}
 
                                 for (var i = 0; i < data.appointments.length; i++) {
-                                    pickerApointments.append(
+                                    pickerAppointments.append(
                                             data.appointments[i].title + '<br>' +
                                             data.appointments[i].startDateTime + '<br>'
                                     )
