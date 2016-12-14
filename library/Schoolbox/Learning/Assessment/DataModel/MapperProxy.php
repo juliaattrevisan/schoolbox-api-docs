@@ -6,8 +6,8 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Schoolbox\Assessment\Rubric\Rubric;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -19,7 +19,6 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
@@ -59,6 +58,14 @@ class MapperProxy
      */
     protected $participantDataSource;
 
+
+    /**
+     * Class name of the model to associate with this mapper.
+     *
+     * @var string
+     */
+    private $model;
+
     /**
      * Constructor
      *
@@ -74,6 +81,7 @@ class MapperProxy
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
+        $this->model                 = IAssessable::class;
     }
 
     /**
@@ -238,7 +246,7 @@ class MapperProxy
         if ($context instanceof ProjectObject) {
             return $this->findAllByProjectId($context->getId(), $options);
         }
-        return new Collection();
+        return $this->createCollection();
     }
 
     /**
@@ -636,7 +644,7 @@ class MapperProxy
      */
     public function translateToDomainModelCollection(Collection $collection)
     {
-        $newCollection = new Collection();
+        $newCollection = $this->createCollection();
         foreach ($collection as $model) {
             if ($model instanceof Model) {
                 try {
@@ -764,5 +772,25 @@ class MapperProxy
         return $collection->map(function(IAssessable $assessable) use ($user, $includeResponses, $includeFeedbacks) {
             return $this->loadParticipantsIntoAssessment($assessable, $user, $includeResponses, $includeFeedbacks);
         });
+    }
+
+    /**
+     * Override base mapper to always return new collection object
+     *
+     * @param array $contents
+     *
+     * @return GenericCollection|IAssessable[]
+     */
+    public function createCollection($contents = array())
+    {
+        return new GenericCollection($this->getModel(), $contents);
+    }
+
+    /**
+     * @return string
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 }
