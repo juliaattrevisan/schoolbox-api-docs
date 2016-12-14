@@ -538,6 +538,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'router'                        => $di->lazyGet('router'),
         ];
 
+        $di->set('transactor', $di->lazyNew(Transactor::class));
+
         // Register default grade group
         $di->set(
             'defaultGradeGroup',
