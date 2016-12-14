@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as ReturnedWorkFileMapper;
 use Schoolbox\Collection;
@@ -146,7 +147,12 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             $ids[]  = $return->getId();
             $return->setSubmission($submissionMapper->hydrate($row, 's'));
             $return->setMarker($markerMapper->hydrate($row, 'm'));
-            $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
+
+            // Try to streamline duework+assessment creation
+            /** @var SubmissionBox $dueWork */
+            $dueWork = $this->createJoinModel('submission_box', $row['b.id']);
+            $dueWork->setAssessmentModel($this->createJoinModel('submission_box.assessment_id', $row['b.assessment_id']));
+            $return->setSubmissionBox($dueWork);
 
             $collection->add($return);
         }
