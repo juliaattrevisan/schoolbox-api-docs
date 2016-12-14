@@ -94,11 +94,9 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')},
                 {$this->getJoinColumnString('user', 'r')},
                 {$this->getJoinColumnString('quiz', 'a')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
             LEFT JOIN {$this->getJoinSql('reviewer', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('quiz', '', 'a')}
         ";
@@ -116,9 +114,9 @@ class Mapper extends BaseMapper
             /** @var Model $attempt */
             $attempt = $this->hydrate($row);
 
-            /** @var User $user */
-            $user = $this->hydrateJoin($row, 'user', 'u');
-            $attempt->setUser($user);
+            // I should never need to know the student's specifics here,
+            // because this object should always be part of a participant's
+            // response or feedback.
 
             /** @var User $user */
             $reviewer = $this->hydrateJoin($row, 'reviewer', 'r');
