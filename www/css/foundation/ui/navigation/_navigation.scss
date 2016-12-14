@@ -213,8 +213,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		li:nth-child(n+5){
 			@extend .show-for-large-up;
 		}
-		li:nth-child(n+9){
-			@extend .show-for-xlarge-up;
+		/* We have to use slightly more specific queries because of
+		 * custom tabs as search can overlap.
+		 */
+		li:nth-child(n+8){
+			@media screen and (max-width: 84em){
+				display: none !important;
+			}
 		}
 
 		li {
@@ -325,10 +330,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
      * precede the Side Menu
      */
 	.second-nav{
-		@extend .hide-for-xlarge-up;
-
-		li:nth-child(-n+6){
-			@extend .hide-for-large-only;
+		/* We have to use slightly more specific queries because of
+		 * custom tabs as search can overlap.
+		 */
+		@media screen and (min-width: 84em){
+			display: none !important;
+		}
+		li:nth-child(-n+7){
+			@media screen and (min-width: 64em) and (max-width: 84em){
+				display: none !important;
+			}
 		}
 		li:nth-child(-n+4){
 			@extend .hide-for-medium-down;
