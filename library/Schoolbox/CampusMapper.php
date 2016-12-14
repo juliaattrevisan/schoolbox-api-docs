@@ -144,31 +144,24 @@ class CampusMapper extends Mapper {
 	 */
 	public function findCampusInvolvement(User $user)
 	{
+	    $pb = $this->getPredicateBuilder();
+        $pb->equals('userCampus.uid', $user->getId());
 		$query = "
             SELECT
             	userCampus.*,
             	{$this->getColumnString('c')}
             FROM userCampus
             INNER JOIN luCampus c ON userCampus.campus = c.id
-            WHERE userCampus.uid = :userId
         ";
+        $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'userId' => $user->getId()
-		]);
+        $statement = $this->getDatabase()->query($query, $pb->getParams());
 
-		$collection = $this->createCollection();
-
+        $campusCollection = $this->createCollection();
 		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 			$campus = $this->hydrate($row, 'c');
-
-			$collection->setOffset($campus->getId(), [
-				'defaultCampus' => $row['defaultCampus'],
-				'campus' => $campus,
-			]);
+			$campusCollection->setOffset($campus->getId(), $campus);
 		}
-
-		return $collection;
+		return $campusCollection;
 	}
 }
