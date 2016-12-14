@@ -81,7 +81,7 @@
                             <tr><td>{{ period }}</td>
 
                                 {% for i in 1..timetable[campus].dayCount %}
-                                    <td data-timetable="{{ i }}-{{ k }}"></td>
+                                    <td class="has-period" data-timetable="{{ i }}-{{ k }}"></td>
 
                                 {% endfor %}
                                 {% set k=k+1 %}
@@ -103,6 +103,42 @@
 {# Setup calendar #}
 
 <script>
+    var timetableAppointments = $('#timetableAppointments{{ id }}');
+
+    $('.has-period').click(function(){
+        $.get('{{ routeLookup('pickerDatetime.getByPeriod', {period:'1_2' }) }}')
+                .done(function (data) {
+
+                    console.log(data);
+                    if (data.appointments.length == 0) {
+
+                        timetableAppointments.html('No events found');
+
+                    } else {
+
+                        {# Clear out any old appointments #}
+
+                        timetableAppointments.html('');
+
+                        {# Populate with appointments for the selected date #}
+                        for (var i = 0; i < data.appointments.length; i++) {
+                            timetableAppointments.append(
+                                    data.appointments[i].title + '<br>' +
+                                    data.appointments[i].startDateTime + '<br>'
+                            )
+                        }
+                    }
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
+    });
+
+
+
+
+
+
 
     var newDate, latestDate;
 

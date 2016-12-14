@@ -129,6 +129,15 @@ class Controller extends Base
 
     public function getByPeriod() {
 
+        $appointments = $this->loadDummyAppointments();
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data' => [
+                    'appointments' => $appointments
+                ]
+            )
+        );
     }
 
     /**
