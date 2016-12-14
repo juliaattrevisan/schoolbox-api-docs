@@ -10,35 +10,9 @@
         $('input[data-mage-next]').mage();
 
         /**
-         * Function to check if open and close dates are on the page and visible
-         * Used for jq validation
+         * Set jquery validate rules
          */
-        var openCloseVisible = function() {
-
-            if ($('input[name="openDate"]').length == 0) {
-                return false;
-            }
-
-            if ($('input[name="closeDate"]').length == 0) {
-                return false;
-            }
-
-            if ($('input[name="openDate"]').not(':visible')) {
-                return false;
-            }
-
-            if ($('input[name="closeDate"]').is(':visible')) {
-                return false;
-            }
-
-            return true;
-        };
-
-        /**
-         * Set a default set of validation rules
-         * An activity specific set of rules can be set below
-         */
-        var defaultRules = {
+        var validateRules = {
             title: {required: true},
             weight: {
                 required: true,
@@ -52,22 +26,6 @@
                 required: true,
                 timepickerTime: true
             },
-            openDate: {
-                required: {
-                    depends: openCloseVisible
-                },
-                datepickerDate: {
-                    depends: openCloseVisible
-                }
-            },
-            openTime: {
-                required: {
-                    depends: openCloseVisible
-                },
-                timepickerTime: {
-                    depends: openCloseVisible
-                }
-            },
             dueDate: {
                 required: true,
                 datepickerDate: true
@@ -75,92 +33,60 @@
             dueTime: {
                 required: true,
                 timepickerTime: true
-            },
-            closeDate: {
-                required: {
-                    depends: openCloseVisible
-                },
-                datepickerDate: {
-                    depends: openCloseVisible
-                }
-            },
-            closeTime: {
-                required: {
-                    depends: openCloseVisible
-                },
-                timepickerTime: {
-                    depends: openCloseVisible
-                }
             }
-        };
-
-        /**
-         * alaressValidate options for each assessment type form
-         */
-        var validationRules = {
-            project: defaultRules,
-            dueWork: defaultRules,
-            task: defaultRules,
-            quiz: defaultRules
         };
 
         /**
          * These rules can't go in above because they have selectors that need to be
          * run on the content that's ajax'd in.
          */
-        var defaultBeforeSubmit = function() {
-            var dueDate = $('input[name="dueDate"]');
-            var dueTime = $('input[name="dueTime"]');
+        var beforeSubmit = function() {
+
             var publishDate = $('input[name="publishDate"]');
             var publishTime = $('input[name="publishTime"]');
-            dueDate.rules('add', {
-                datepickerDateNotBefore: publishDate,
-                messages: {
-                    timepickerNotBefore: 'This should not be before the publish date above'
-                }
-            });
-            // if the dates are the same - need to check due time isn't before publish time
-            if (dueDate.val() == publishDate.val()) {
-                dueTime.rules('add', {
-                    timepickerNotBefore: publishTime,
-                    messages: {
-                        timepickerNotBefore: 'This should not be before the publish time above'
-                    }
-                });
-            }
-        };
+            var openDate = $('input[name="openDate"]');
+            var openTime = $('input[name="openTime"]');
+            var dueDate = $('input[name="dueDate"]');
+            var dueTime = $('input[name="dueTime"]');
+            var closeDate = $('input[name="closeDate"]');
+            var closeTime = $('input[name="closeTime"]');
 
-        var beforeSubmit = {
-            project: defaultBeforeSubmit,
-            duework: defaultBeforeSubmit,
-            task: defaultBeforeSubmit,
-            quiz: function() {
-                var publishDate = $('input[name="publishDate"]');
-                var publishTime = $('input[name="publishTime"]');
-                var openDate = $('input[name="openDate"]');
-                var openTime = $('input[name="openTime"]');
-                var dueDate = $('input[name="dueDate"]');
-                var dueTime = $('input[name="dueTime"]');
-                var closeDate = $('input[name="closeDate"]');
-                var closeTime = $('input[name="closeTime"]');
-                openDate.rules('add', {
+            //var openExists = openDate.length > 0;
+            var openVisible = openDate.is(':visible');
+           // var closeExists = closeDate.length > 0;
+            var closeVisible = closeDate.is(':visible');
+
+            if (openVisible && closeVisible) {
+
+               openDate.rules('add', {
+                    required: true,
+                    datepickerDate: true,
                     datepickerDateNotBefore: publishDate,
                     messages: {
                         datepickerDateNotBefore: 'This should not be before the publish date above'
                     }
                 });
+
                 dueDate.rules('add', {
                     datepickerDateNotBefore: openDate,
                     messages: {
                         datepickerDateNotBefore: 'This should not be before the open date above'
                     }
                 });
+
                 closeDate.rules('add', {
+                    required: true,
                     datepickerDateNotBefore: dueDate,
                     messages: {
                         datepickerDateNotBefore: 'This should not be before the due date above'
                     }
                 });
+
+                openTime.rules('add', {
+                    required: true,
+                    timepickerTime: true
+                });
+
                 // check the times aren't earlier than the one above (if the dates are the same)
                 if (openDate.val() == publishDate.val()) {
                     openTime.rules('add', {
@@ -170,6 +96,7 @@
                         }
                     });
                 }
+
                 if (dueDate.val() == openDate.val()) {
                     dueTime.rules('add', {
                         timepickerNotBefore: openTime,
@@ -178,6 +105,13 @@
                         }
                     });
                 }
+
+                closeTime.rules('add', {
+                    required: true,
+                    timepickerTime: true
+
+                });
+
                 if (closeDate.val() == dueDate.val()) {
                     closeTime.rules('add', {
                         timepickerNotBefore: dueTime,
@@ -186,6 +120,26 @@
                         }
                     });
                 }
+
+            } else {
+
+                dueDate.rules('add', {
+                    datepickerDateNotBefore: publishDate,
+                    messages: {
+                        datepickerDateNotBefore: 'This should not be before the publish date above'
+                    }
+                });
+
+                // if the dates are the same - need to check due time isn't before publish time
+                if (dueDate.val() == publishDate.val()) {
+                    dueTime.rules('add', {
+                        timepickerNotBefore: publishTime,
+                        messages: {
+                            timepickerNotBefore: 'This should not be before the publish time above'
+                        }
+                    });
+                }
+
             }
         };
 
@@ -197,9 +151,9 @@
 
             $('input[data-mage-next="end"]').mage({
                 validateOptions: {
-                    rules: validationRules[assessmentType]
+                    rules: validateRules
                 },
-                beforeSubmit: beforeSubmit[assessmentType],
+                beforeSubmit: beforeSubmit,
                 setFormData: function(data) {
                     if (CKEDITOR.instances['description'] != undefined) {
                         data.push({
@@ -223,7 +177,7 @@
              */
             setupAssessmentEnd('{{ assessmentType }}');
 
-            {% else %}
+        {% else %}
 
             /**
              * Update new form action url
