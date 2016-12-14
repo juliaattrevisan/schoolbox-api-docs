@@ -168,16 +168,18 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
     /**
      * Copies Sections, Questions and Solutions from source Quiz to destination Quiz
      *
+     * For now, this call will throw an exception if the destination Quiz already has Sections.
+     *
      * @param int $sourceAssessmentId
      * @param int $destinationAssessmentId
      * @return bool
+     * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
 	public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
     {
         $sectionMapper = QuizSectionMapper::getInstance();
         $questionMapper = QuizQuestionMapper::getInstance();
         $solutionMapper = QuizSolutionMapper::getInstance();
-
 
         /** @var Model $sourceQuiz */
         $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
@@ -190,6 +192,12 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 
         /** @var Model $destinationQuiz */
         $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+
+        // Ensure that we don't clobber destination Sections
+        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
+        if($destinationQuiz->getSections()->count()){
+            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
+        }
 
         // Clone and Save Sections, Questions + Solutions
         foreach($sourceQuiz->getSections() as $section){
