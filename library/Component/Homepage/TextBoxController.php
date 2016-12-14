@@ -45,10 +45,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
         }
 
-        if (!$this->getTextbox()->getHeading()) {
-            $this->getTextbox()->setHeading('Text Box');
-        }
-
         $this->setComponentName(Scrub::text($this->getTextbox()->getHeading()));
 
         return true;
