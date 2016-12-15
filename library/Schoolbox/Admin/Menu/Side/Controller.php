@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Menu\Side;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\GenericCollection;
 use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
 use \Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
 use \Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
@@ -70,14 +71,14 @@ class Controller extends Base
     {
         // Grab all the menu items
 
-        $collection = $this->getMenuSideMapper()->findAll()->sortBy('sortOrder', 'asc');
+        /** @var MenuSide[]|GenericCollection $sideMenus */
+        $sideMenus = $this->getMenuSideMapper()->findAll()->sortBy('sortOrder', 'asc');
 
-        // Polulate kids where appropriate
+        // Populate kids where appropriate
 
         $treeList = new Collection();
 
-        /** @var MenuSide $node */
-        foreach ($collection as $node) {
+        foreach ($sideMenus as $node) {
             $nodeId   = $node->getId();
             $parentId = $node->getParentId();
 
@@ -85,7 +86,7 @@ class Controller extends Base
                 $treeList->add($node);
             }
 
-            $node->setChildren($collection->filterBy('parentId', $nodeId));
+            $node->setChildren($sideMenus->filterBy('parentId', $nodeId));
         }
 
         // Create root node

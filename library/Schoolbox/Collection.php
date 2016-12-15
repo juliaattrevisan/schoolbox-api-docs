@@ -604,7 +604,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function diff(Collection $otherCollection, $diffMethod = null)
     {
-        $diff = new static();
+        $diff = $this->emptyClone($this);
 
         if (!is_callable($diffMethod)) {
             $diffMethod = function ($a, $b) {
@@ -744,13 +744,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function filterByCallback($callback)
     {
-        $result = array();
+        $result = $this->emptyClone($this);
         foreach ($this as $item) {
             if (call_user_func($callback, $item)) {
-                $result[] = $item;
+                $result->add($item);
             }
         }
-        return new static($result);
+        return $result;
     }
 
     /**
@@ -784,7 +784,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $new[$keys[$i]] = $this->stack[$i];
         }
 
-        $this->setStack($new);
+        // Bypass GenericCollection type-check in setStack()
+        $this->stack = $new;
 
         return $this;
     }
@@ -796,7 +797,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function deepClone()
     {
-        $clone = new static();
+        $clone = $this->emptyClone($this);
         foreach ($this as $key => $value) {
             if (is_object($value)) {
                 $clone[$key] = clone $value;

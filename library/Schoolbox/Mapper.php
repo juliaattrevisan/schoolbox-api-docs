@@ -1331,7 +1331,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param array $options @see findByColumnList() $options param
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function findAll($options = array())
     {
@@ -1459,7 +1459,7 @@ abstract class Mapper implements IMapper, Serializable
      *                   cannot be created (this should never happen in practise
      *                   as columnList would have to contain a field named
      *                   'limit' or 'offset')
-     * @return Collection
+     * @return GenericCollection
      */
     public function findByColumnList($columnList, $options = array())
     {
@@ -1471,7 +1471,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param PredicateBuilder $pb
      * @param array $options
-     * @return Collection
+     * @return GenericCollection
      */
     public function findByPredicates(PredicateBuilder $pb, array $options = [])
     {
@@ -1525,7 +1525,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param PredicateBuilder $predicate
      * @param array            $columnList
      * @param array            $options
-     * @return Collection
+     * @return GenericCollection
      */
     protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
@@ -1685,7 +1685,7 @@ abstract class Mapper implements IMapper, Serializable
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -2317,7 +2317,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param string            $alias    The prefix of this mapper's table cells in $row
      * @param callable          $callback A callback to apply on all models (@see $this->hydrate)
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function hydrateList($rowList, $alias = '', $callback = null)
     {
