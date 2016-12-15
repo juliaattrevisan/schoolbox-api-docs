@@ -1,5 +1,6 @@
-<div class="content">
-    {% if node %}
+{% if node %}
+
+    <div class="content">
         <h3>
             {% if node.code %}
                 {% if isRouteAuthorized('curriculum.browse') %}
@@ -14,16 +15,32 @@
         {% if node.description %}
         <article>{{ node.description|purify }}</article>
         {% endif %}
-    {% else %}
-        <div class="alert-box warning">
-            No curriculum codes have been set for this folder.
-        </div>
-    {% endif %}
-</div>
-{% if not readonly %}
-    <div class="component-action">
-        <section>
-            <a href="/resource/folder/modify/{{ context.id }}" class="button">Set curriculum codes</a>
-        </section>
     </div>
+
+{% else %}
+
+    <div class="empty-state">
+        <i class="icon-curriculum-details"></i>
+
+        {% if readonly %}
+
+            <p>Nothing found.</p>
+
+        {% else %}
+
+            {% if not curriculumTagging %}
+
+                {% if currentUser.isSuperuser %}
+                    <p>Curriculum tagging is not enabled. This needs to be enabled in <a href="/adminv2/setting/LMS+Policy">Adminstration under Settings -> LMS Policy</a> before you can set curriculum codes for this folder.</p>
+                {% else %}
+                    <p>Curriculum tagging is not enabled. This will need to be enabled by a superuser in Administration before you can use this component.</p>
+                {% endif %}
+
+            {% else %}
+                <p>Before anything will display here you need to first <a href="/resource/folder/modify/{{ context.id }}">set curriculum codes</a> for this folder.</p>
+            {% endif %}
+
+        {% endif %}
+    </div>
+
 {% endif %}
