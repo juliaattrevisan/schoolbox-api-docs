@@ -694,17 +694,17 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function groupByCallback($callback)
     {
-        $result = array();
+        $result = new Collection();
 
         foreach ($this as $item) {
             $key = call_user_func($callback, $item);
-            if (!array_key_exists($key, $result)) {
+            if (!isset($result[$key])) {
                 $result[$key] = $this->emptyClone($this);
             }
             $result[$key]->add($item);
         }
 
-        return new Collection($result);
+        return $result;
     }
 
     /**
