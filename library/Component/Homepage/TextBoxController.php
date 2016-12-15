@@ -63,24 +63,46 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->parseConfig();
 
-        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty(Scrub::text($this->getTextbox()->getBody()))) {
+        $textBoxContent = Scrub::text($this->getTextbox()->getBody());
+
+        if (
+            $this->getSitePage()->arg[2] != $this->getInstance()->getId() and
+            (empty($this->getTextbox()->getId()) or empty($textBoxContent))
+        ) {
 
             $this->setBlock($templateHandle, 'textbox', 'textbox_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_create', 'empty_create_block');
 
             $this->setVar('textbox_block', '');
 
-            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_create_block', 'empty_create');
-            }
-            else {
-                $this->setVar('empty_create_block', '');
+            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
+            $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
+            $this->setBlock('empty_state', 'empty_content', 'empty_content_block');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_id_block', '');
+                $this->setVar('empty_content_block', '');
+                $this->parse('empty_read_only_block', 'empty_read_only');
+            } else {
+                $this->setVar('empty_read_only_block', '');
+
+                if ($this->getTextbox()->getId()) {
+                    /**
+                     * They submitted the form with nothing or just a heading
+                     */
+                    $this->setVar('empty_id_block', '');
+                    $this->parse('empty_content_block', 'empty_content');
+                } else {
+                    $this->setVar('empty_content_block', '');
+                    $this->parse('empty_id_block', 'empty_id');
+                }
             }
 
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
+
+            $this->setVar('empty_state_block', '');
 
             $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
@@ -89,8 +111,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
             $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
             $this->setBlock('text_locked', 'create_text', 'create_text_block');
-
-            $this->setVar('empty_state_block', '');
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
@@ -103,11 +123,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * inadvertently steal ownership of it
                  */
                 $heading = Scrub::text($this->getTextbox()->getHeading());
-
+                $body = Scrub::html($this->getTextbox()->getBody());
 
                 $this->setVar(array(
                     'TEXTBOX_HEADING' => $heading,
-                    'TEXTBOX_BODY' => Scrub::html($this->getTextbox()->getBody()),
+                    'TEXTBOX_BODY' => $body,
                     'TEXTBOX_ID' => $this->getTextbox()->getId(),
                     'ID' => $this->getContext()->getId(),
                     'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
@@ -121,24 +141,21 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * To just edit one homepage's textbox, you need write access to that homepage.
                  */
                 $editing = false;
+
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
                     if ($this->getSitePage()->arg[1] == 'textBoxModify') {
                         $editing = true;
-                        $this->setVar(
-                            array(
-                                'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
-                            )
-                        );
+                        $this->setVar([
+                            'TEXTBOX_BODY' => $body,
+                        ]);
                     } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
                         $editing = true;
-                        $this->setVar(
-                            array(
-                                'TEXTBOX_HEADING' => '',
-                                'TEXTBOX_BODY' => '',
-                                'TEXTBOX_ID' => '',
-                                'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
-                            )
-                        );
+                        $this->setVar([
+                            'TEXTBOX_HEADING' => '',
+                            'TEXTBOX_BODY' => '',
+                            'TEXTBOX_ID' => '',
+                            'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
+                        ]);
                     }
                     $this->parse('text_editable_block', 'text_editable');
                 } else {
