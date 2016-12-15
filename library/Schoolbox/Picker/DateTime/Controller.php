@@ -54,6 +54,7 @@ class Controller extends Base
      */
     public function getPicker($id, $display, $database, $value) {
         $timetable = $this->getTimetable();
+        $terms = $this->getTerms();
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -63,7 +64,8 @@ class Controller extends Base
                     'value' => $value,
                     'displayFormat' => urldecode($display),
                     'databaseFormat' => urldecode($database),
-                    'timetable' => $timetable
+                    'timetable' => $timetable,
+                    'terms' => $terms
                 ]
             )
         );
@@ -77,11 +79,25 @@ class Controller extends Base
         $user = $this->getUser();
         $timetableHandler = new External_Timetable;
         $timetable = array();
+        $campusInfo = array();
+        //Return campus and i
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
-            $timetable[$campus->getId()] = $campusTimetable;
+            $campusInfo['campusId'] = $campus->getId();
+            $campusInfo['campusName'] = $campus->getName();
+            $campusInfo['campusCode'] = $campus->getExtTimetableCode();
+
+            //Return campus and it's timetable in one array
+            $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
+
         }
         return $timetable;
+    }
+
+    public function getTerms() {
+        $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
+//new \Alaress_Probe($terms);
+        return $terms;
     }
 
     /**

@@ -36,11 +36,45 @@
         float: right;
         margin: 5px 10px 1px;
     }
+    table.timetablePicker {
+        padding: 0;
+        margin: 0;
+        border: 1px solid rgb(230, 230, 230);
+    }
+    table.timetablePicker td {
+        padding: 0;
+        margin: 0;
+        vertical-align: middle;
+        text-align: center;
+    }
+    table.timetablePicker tr {
+    }
+    table.timetablePicker th {
+        width: 36px;
+        height: 36px;
+        border: none;
+    }
+    .has-period {
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        border-radius: 150px;
+        border-color: #fff;
+        border-width: 10px;
+        border: 10px solid #fff;
+    }
+    .has-period:hover, td.period-hover {
+        background: rgb(230, 230, 230);
+    }
+    .has-period.period-selected, td.period-selected {
+        background: #569ff7;
+        color: #fff;
+    }
 </style>
 <div class="row">
     <dl class="tabs" data-tab>
-        <dd class=""><a href="#byDate" aria-selected="true" tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
-        <dd class=""><a href="#byTimetable" aria-selected="false" tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
+        <dd class=""><a href="#" id="1"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
+        <dd class=""><a href="#" id="2"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
     </dl>
 </div>
 <div class="row">
@@ -63,25 +97,42 @@
                 </div>
         </div>
      </div>
-        <div class='content' id="byTimetable">
+        <div class='content' id="byTimetable" style="display: none;">
                 <div class="small-12 medium-4 columns">
 
                     {# Placeholder for timetable ot be rendered in #}
                     <div id="timetable{{ id }}">
-                        {% set campus = 1 %}
-                        <table cellspacing="0" cellpadding="0" border="1">
-                            <tr>
-                                <td></td>
-                                {% for i in 1..timetable[campus].dayCount %}
-                                    <td>{{ i }}</td>
+                        <form>
+                            <select name="campus">
+                                {% for campus in timetable %}
+                                    <option value = {{ campus.campusId }}>{{ campus.campusName }}</option>
                                 {% endfor %}
-                            </tr>
+                            </select>
+                            <select name = "term">
+                                {% for term in terms %}
+                                    <option value = {{ term.id }}>{{ term.title }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name = "week">
+                                <option value = 1>Week/Cycle 1</option>
+                                <option value = 2>Week/Cycle 2</option>
+                                <option value = 3>Week/Cycle 3</option>
+                                <option value = 4>Week/Cycle 4</option>
+                            </select>
+                        </form>
+                        {% set campus = 1 %}
+                        <table class="timetablePicker">
+                            <th>
+                                {% for i in 1..timetable[campus].dayCount %}
+                                    <td class="day-{{ i }}">{{ i }}</td>
+                                {% endfor %}
+                            </th>
                             {% set k=1 %}
-                        {% for period in timetable[campus].desc %}
-                            <tr><td>{{ period }}</td>
+                        {% for description in timetable[campus].desc %}
+                            <tr><td class="period-description description-{{ k }}">{{ description }}</td>
 
                                 {% for i in 1..timetable[campus].dayCount %}
-                                    <td class="has-period" data-timetable="{{ i }}-{{ k }}"></td>
+                                    <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}"></div></td>
 
                                 {% endfor %}
                                 {% set k=k+1 %}
@@ -103,10 +154,47 @@
 {# Setup calendar #}
 
 <script>
+
+    $('#1').click(function(){
+        $('#byDate').css('display', 'block');
+        $('#byTimetable').css('display', 'none');
+
+    });
+
+    $('#2').click(function(){
+        $('#byDate').css('display', 'none');
+        $('#byTimetable').css('display', 'block');
+
+    });
+
     var timetableAppointments = $('#timetableAppointments{{ id }}');
 
+    $('table.timetablePicker').mouseout(function(){
+        $('.period-hover').removeClass('period-hover');
+    });
+
+    $('.has-period').hover(function(){
+
+        $('.period-hover').removeClass('period-hover');
+        var day = $(this).attr('data-day');
+        var period = $(this).attr('data-period');
+        $('.day-'+day).addClass('period-hover');
+        $('.description-'+period).addClass('period-hover');
+
+    });
+
     $('.has-period').click(function(){
-        $.get('{{ routeLookup('pickerDatetime.getByPeriod', {period:'1_2' }) }}')
+
+        var day = $(this).attr('data-day');
+        var period = $(this).attr('data-period');
+
+        $('.period-selected').removeClass('period-selected');
+        $(this).addClass('period-selected');
+        $('.day-'+day).addClass('period-selected');
+        $('.description-'+period).addClass('period-selected');
+        periodClicked = 'period'+day+'_'+period;
+
+        $.get(('{{ routeLookup('pickerDatetime.getByPeriod', { period: '_params_' }) }}').replace(/_params_/g, encodeURIComponent(day+'_'+period)))
                 .done(function (data) {
 
                     console.log(data);
@@ -120,6 +208,8 @@
 
                         timetableAppointments.html('');
 
+                        {#timetableAppointments.append('<h3>Day '+ day +'{{ timetable[campus].desc[period] }}</h3>');#}
+
                         {# Populate with appointments for the selected date #}
                         for (var i = 0; i < data.appointments.length; i++) {
                             timetableAppointments.append(
@@ -130,7 +220,7 @@
                     }
                 })
                 .fail(function () {
-                    console.log('Failed to retrieve appointments for specified date');
+                    console.log('Failed to retrieve appointments for specified period');
                 });
     });
 
