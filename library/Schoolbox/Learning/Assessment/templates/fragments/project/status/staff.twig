@@ -183,9 +183,9 @@
 <div class="row">
     <div class="small-12 column">
         {% if baseContext is unitSpecification %}
-        <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit full-width">Return to course</a>
+        <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
         {% else %}
-        <a href="/homepage/{{ baseContext.folder.id }}" class="button submit full-width">Return to homepage</a>
+        <a href="/homepage/{{ baseContext.folder.id }}" class="button submit">Return to homepage</a>
         {% endif %}
     </div>
 </div>
