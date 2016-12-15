@@ -16,6 +16,7 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 {
@@ -25,6 +26,13 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
      * @var Node\Model
      */
     protected $curriculumNode = null;
+
+    /**
+     * Is curriculum tagging turned on
+     *
+     * @var bool
+     */
+    protected $curriculumTagging = null;
 
     /**
      * Loads the component's configuration.
@@ -38,6 +46,12 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
+
+        /**
+         * Check if curriculum tagging has been turnt on
+         */
+        $config = new ConfigLoader();
+        $this->curriculumTagging = $config->get('curriculum_tagging_enabled');
 
         // Show first curriculum for now
         /** @var Folder\Model $context */
@@ -76,6 +90,8 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'context'  => $this->getContext(),
                 'node'     => $this->curriculumNode,
                 'readonly' => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
+                'curriculumTagging' => $this->curriculumTagging,
+                'currentUser' => $_SESSION['user']
             )
         );
     }
