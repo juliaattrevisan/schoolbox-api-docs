@@ -9,25 +9,15 @@
 
 namespace Schoolbox\Menu\Top;
 
-use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTopModel;
-use Schoolbox\Menu\Top\Campus\Mapper as MenuTopCampusMapper;
-use Schoolbox\Menu\Top\Campus\Model as MenuTopCampusModel;
-use Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
-use Schoolbox\Menu\Top\Role\Model as MenuTopRoleModel;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Renderer
 {
     /** @var MenuTopMapper */
     protected $menuTopMapper;
-
-    /** @var MenuTopCampusMapper */
-    protected $menuTopCampusMapper;
-
-    /** @var MenuTopRoleMapper */
-    protected $menuTopRoleMapper;
 
     /**
      * Renderer constructor
@@ -35,8 +25,6 @@ class Renderer
     public function __construct()
     {
         $this->setMenuTopMapper(MenuTopMapper::getInstance());
-        $this->setMenuTopCampusMapper(MenuTopCampusMapper::getInstance());
-        $this->setMenuTopRoleMapper(MenuTopRoleMapper::getInstance());
     }
 
     /**
@@ -48,10 +36,11 @@ class Renderer
     public function menuTopRenderer(\Twig_Environment $twig, $tabCurrent = null, $user = null)
     {
         // Render this thing out
-
-        $tabsRendered = new Collection;
-
-        $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
+        try {
+            $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
+        } catch (MapperException $e) {
+            $tabs = [];
+        }
 
         /** @var MenuTopModel $tab */
         foreach ($tabs as $tab) {
@@ -114,39 +103,5 @@ class Renderer
         return $this;
     }
 
-    /**
-     * @return MenuTopRoleMapper
-     */
-    public function getMenuTopRoleMapper()
-    {
-        return $this->menuTopRoleMapper;
-    }
 
-    /**
-     * @param MenuTopRoleMapper $menuTopRoleMapper
-     * @return $this
-     */
-    public function setMenuTopRoleMapper($menuTopRoleMapper)
-    {
-        $this->menuTopRoleMapper = $menuTopRoleMapper;
-        return $this;
-    }
-
-    /**
-     * @return MenuTopCampusMapper
-     */
-    public function getMenuTopCampusMapper()
-    {
-        return $this->menuTopCampusMapper;
-    }
-
-    /**
-     * @param MenuTopCampusMapper $menuTopCampusMapper
-     * @return $this
-     */
-    public function setMenuTopCampusMapper($menuTopCampusMapper)
-    {
-        $this->menuTopCampusMapper = $menuTopCampusMapper;
-        return $this;
-    }
 }

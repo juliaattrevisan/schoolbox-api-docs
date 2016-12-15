@@ -10,6 +10,7 @@
 namespace Schoolbox\Menu\Top;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends BaseMapper
 {
@@ -35,12 +36,17 @@ class Mapper extends BaseMapper
     /**
      * @param \Schoolbox\User $user
      * @return \Schoolbox\Collection
+     * @throws MapperException
      */
     public function findTabsForUser($user)
     {
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
+        }
+
+        if (count($campusList) < 1) {
+            throw new MapperException('User has no campus, and therefore has no menu');
         }
 
         $webmail = "";
@@ -54,13 +60,13 @@ class Mapper extends BaseMapper
                 FROM menu_top
                 INNER JOIN menu_top_campus ON menu_top.id = menu_top_campus.menu_top_id
                 INNER JOIN menu_top_role ON menu_top.id = menu_top_role.menu_top_id
-                WHERE menu_top_campus.campus_id IN " . $this->getArrayPlaceholders($campusList, 'campus') . "
+                WHERE menu_top_campus.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($campusList, 'campus') . "
                 AND menu_top_role.role_id = :roleId                
                 {$webmail}
                 ORDER BY sort_order ASC
         ";
 
-        $params = $this->getArrayParameters($campusList, 'campus');
+        $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
         $params['roleId'] = $user->getRole()->getId();
 
         $statement = $this->getDatabase()->prepare($query);
