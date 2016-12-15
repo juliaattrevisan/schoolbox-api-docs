@@ -198,7 +198,7 @@ class Controller extends Base
                 ]
             ])->first();
 
-            if ($itemOrder) {
+            if ($itemOrder instanceof MenuTop) {
                 $item->setSortOrder($itemOrder->getSortOrder() + 1);
             } else {
                 $item->setSortOrder(1);
