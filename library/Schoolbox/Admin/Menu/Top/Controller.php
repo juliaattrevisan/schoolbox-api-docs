@@ -198,7 +198,11 @@ class Controller extends Base
                 ]
             ])->first();
 
-            $item->setSortOrder($itemOrder->getSortOrder() + 1);
+            if ($itemOrder) {
+                $item->setSortOrder($itemOrder->getSortOrder() + 1);
+            } else {
+                $item->setSortOrder(1);
+            }
         }
 
         $item->setTitle($post['title']);
