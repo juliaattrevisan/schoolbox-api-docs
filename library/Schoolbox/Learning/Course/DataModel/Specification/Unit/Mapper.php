@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
@@ -22,8 +23,9 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method Model findOneByColumn($columnName, $columnValue, $order = array())
  */
-class Mapper extends BaseMapper
+class Mapper extends AbstractUnitMapper
 {
     /**
      * Setup data source, model and data mappings.

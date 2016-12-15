@@ -7,18 +7,15 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
-use Alaress_Date_NullDate;
 use Schoolbox\Collection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Course\DataModel\AbstractUnit;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
@@ -32,7 +29,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
  * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
  *  Course Builder component. This class puts this concept into a concrete class.)
  */
-class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
+class Model extends AbstractUnit
 {
     use Id;
     use CreatedAtDate;
@@ -40,56 +37,53 @@ class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextData
     use DeletedAtDate;
 
     /**
-     * @var CourseSpecificationModel
+     * @var CourseSpecification
      */
-    private $course;
+    private $courseSpecification;
 
     /**
-     * @var FolderModel
+     * @var Folder
      */
     private $folder;
 
     /**
-     * The assessables that are a part of this unit spec.
-     *
-     * @var IAssessable[]|Collection
-     */
-    private $assessables;
-
-
-    /**
-     * @var UnitImplementation[]|Collection
+     * @var UnitImplementation[]|GenericCollection
      */
     private $unitImplementations;
 
     /**
-     * Constructor
+     * Returns title of folder, for AssessmentContext Interface
+     *
+     * @return string
      */
-    public function __construct()
+    public function getTitle()
     {
-        $this->assessables = new Collection();
+        return $this->getFolder()->getTitle();
     }
 
+    /* Getters / Setters
+     */
+
     /**
-     * @return CourseSpecificationModel
+     * @return CourseSpecification
      */
     public function getCourse()
     {
-        return $this->course;
+        return $this->courseSpecification;
     }
 
     /**
-     * @param CourseSpecificationModel $course
+     * @param CourseSpecification $courseSpecification
      * @return static
      */
-    public function setCourse(CourseSpecificationModel $course)
+    public function setCourse(CourseSpecification $courseSpecification)
     {
-        $this->course = $course;
+        $this->courseSpecification = $courseSpecification;
         return $this;
     }
 
     /**
-     * @return FolderModel
+     * @return Folder
      */
     public function getFolder()
     {
@@ -97,30 +91,12 @@ class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextData
     }
 
     /**
-     * @param FolderModel $folder
+     * @param Folder $folder
      * @return static
      */
-    public function setFolder(FolderModel $folder)
+    public function setFolder(Folder $folder)
     {
         $this->folder = $folder;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IAssessable[]
-     */
-    public function getAssessables()
-    {
-        return $this->assessables;
-    }
-
-    /**
-     * @param Collection|IAssessable[] $assessables
-     * @return static
-     */
-    public function setAssessables(Collection $assessables)
-    {
-        $this->assessables = $assessables;
         return $this;
     }
 
@@ -140,23 +116,5 @@ class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextData
     {
         $this->unitImplementations = $unitImplementations;
         return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function getBaseContext()
-    {
-        return $this;
-    }
-
-    /**
-     * Returns title of folder, for AssessmentContext Interface
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->getFolder()->getTitle();
     }
 }
