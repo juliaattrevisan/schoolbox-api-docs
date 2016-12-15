@@ -13,6 +13,7 @@ use \ICollection;
 
 /**
  * Responsible for moving Assessments between Contexts
+ * @todo SA-1343
  */
 class Transplantor
 {
@@ -28,7 +29,7 @@ class Transplantor
      */
     public function moveToNewContext(ICollection $assessments, AssessmentContext $destination)
     {
-        // TODO - implement me - then split me off to new class named 'Transplantor' or similiar
+        // TODO - SA-1343 implement me
         throw new \BadMethodCallException('Not yet implemented.');
     }
 }
