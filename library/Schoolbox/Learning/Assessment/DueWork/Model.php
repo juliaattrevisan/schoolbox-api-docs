@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
@@ -111,6 +112,23 @@ class Model extends AbstractAssessment
         $this->setAttachedFiles(new Collection());
     }
 
+
+    /**
+     * The friendly, uninformative version of assertAcceptSubmissions.
+     *
+     * @param Collection $responses
+     * @return bool
+     */
+    public function isAcceptingSubmissions(\Schoolbox\Collection $responses)
+    {
+        try {
+            $this->assertAcceptSubmission($responses);
+            return true;
+        } catch (DomainException $e) {
+            return false;
+        }
+    }
+
     /**
      * Work out if we are going to accept responses
      *
@@ -122,26 +140,26 @@ class Model extends AbstractAssessment
      *      - You're not a student of this assessment's class (folder)
      *
      * @param Collection $responses
-     * @throws \DomainException
+     * @throws DomainException
      */
     public function assertAcceptSubmission(\Schoolbox\Collection $responses)
     {
         if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
         if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
 
         if ($this->isAcceptNone()) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
         /* Allow draft responses in single submission assessments
          */
         if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
 
