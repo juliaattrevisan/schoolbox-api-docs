@@ -15,6 +15,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  * Mapper for the data model for Unit Specifications.
@@ -126,12 +127,16 @@ class Mapper extends BaseMapper
 
             /** @var FolderModel $folder */
             $folder = $this->hydrateJoin($row, 'folder', 'f');
-            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            /** @var HomepageConfig $homepageConfig */
+            $homepageConfig = $this->hydrateJoin($row, 'folder.homepages', 'fh');
+            $folder->setHomepage($homepageConfig);
             $model->setFolder($folder);
 
             /** @var CourseSpecificationModel $course */
             $course = $this->hydrateJoin($row, 'course', 'c');
-            $course->setFolder($this->hydrateJoin($row, 'course.folder', 'cf'));
+            /** @var FolderModel $courseFolder */
+            $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
+            $course->setFolder($courseFolder);
             $model->setCourse($course);
 
             // Add to list

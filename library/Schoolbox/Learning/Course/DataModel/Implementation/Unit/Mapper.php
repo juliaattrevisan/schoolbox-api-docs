@@ -14,7 +14,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  * Mapper for the data model for Unit Implementations.
@@ -143,14 +145,19 @@ class Mapper extends BaseMapper
 
             /** @var CourseImplementationModel $course */
             $course = $this->hydrateJoin($row, 'course', 'c');
+            /** @var Folder $courseFolder */
             $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
-            $courseFolder->setHomepage($this->hydrateJoin($row, 'course.folder.homepages', 'cfh'));
+            /** @var HomepageConfig $homepageConfig */
+            $homepageConfig = $this->hydrateJoin($row, 'course.folder.homepages', 'cfh');
+            $courseFolder->setHomepage($homepageConfig);
             $course->setFolder($courseFolder);
             $model->setCourse($course);
 
             /** @var UnitSpecificationModel $specification */
             $specification = $this->hydrateJoin($row, 'specification', 's');
-            $specification->setFolder($this->hydrateJoin($row, 'specification.folder', 'sf'));
+            /** @var Folder $specFolder */
+            $specFolder = $this->hydrateJoin($row, 'specification.folder', 'sf');
+            $specification->setFolder($specFolder);
             $model->setSpecification($specification);
 
             // Add
