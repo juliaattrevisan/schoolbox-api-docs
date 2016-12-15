@@ -628,17 +628,17 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Applies a callabale to all items in this collection, and returns a new
+     * Applies a callable to all items in this collection, and returns a new
      * collection with the result. If $includeNull == false, iterations that
      * return explicitly null will be omitted from the final result
      *
      * @param  callback $callback
      * @param  bool $includeNull
-     * @return static
+     * @return Collection
      */
     public function map($callback, $includeNull = true)
     {
-        $return = $this->emptyClone($this);
+        $return = new Collection();
         foreach ($this as $key => $item) {
             $result = call_user_func($callback, $item);
             if ($includeNull || !is_null($result)) {
@@ -687,24 +687,24 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @param  callable $callback A callback which takes each item within $this
      *                            as its only parameter, and returns a key.
-     * @return static|static[]
+     * @return Collection|static[]
      *   A collection of collections.
      *   * key:   result of $item->$callback()
      *   * value: a collection of all items in $this where $item->$callback() = $key
      */
     public function groupByCallback($callback)
     {
-        $result = array();
+        $result = new Collection();
 
         foreach ($this as $item) {
             $key = call_user_func($callback, $item);
-            if (!array_key_exists($key, $result)) {
-                $result[$key] = new static();
+            if (!isset($result[$key])) {
+                $result[$key] = $this->emptyClone($this);
             }
             $result[$key]->add($item);
         }
 
-        return new static($result);
+        return $result;
     }
 
     /**
