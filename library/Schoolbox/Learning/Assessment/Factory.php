@@ -15,6 +15,9 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use InvalidArgumentException;
 use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 
@@ -185,7 +188,7 @@ class Factory
      *
      * @return IAssessable
      * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      */
     private function produceNew()
@@ -208,7 +211,7 @@ class Factory
      * @param IAssessable $assessment
      * @return IAssessable
      * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      */
     private function produceFromExistingAssessment(IAssessable $assessment)
@@ -255,54 +258,8 @@ class Factory
          */
         if (!strlen(trim($this->getTitle()))) {
             $typeName = $assessment->getTypeName();
-            throw new \InvalidArgumentException("set a title for this $typeName");
+            throw new InvalidArgumentException("set a title for this $typeName");
         }
-
-        if(!$assessment->getBaseContext() instanceof UnitSpecification) {
-            /* Check dates are provided
-             * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
-             */
-
-            try {
-                $publishAt = \Alaress_Date_Format::newLocal($this->getPublishAt());
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a publish date');
-            }
-
-            // Projects and tasks have only publish and due date
-            if($assessment instanceof Task || $assessment instanceof Project) {
-                $openAt = new \Alaress_Date_NullDate();
-            } else {
-                try {
-                    $openAt = \Alaress_Date_Format::newLocal($this->getOpenAt());
-                } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('set an open date');
-                }
-            }
-
-            try {
-                $dueAt = \Alaress_Date_Format::newLocal($this->getDueAt());
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('set a due date');
-            }
-
-            if($assessment instanceof Task || $assessment instanceof Project) {
-                $closeAt = new \Alaress_Date_NullDate();
-            } else {
-                try {
-                    $closeAt = \Alaress_Date_Format::newLocal($this->getCloseAt());
-                } catch (\InvalidArgumentException $e) {
-                    throw new \InvalidArgumentException('set a close date');
-                }
-            }
-        }
-        else {
-            $publishAt = new \Alaress_Date_NullDate();
-            $openAt = new \Alaress_Date_NullDate();
-            $dueAt = new \Alaress_Date_NullDate();
-            $closeAt = new \Alaress_Date_NullDate();
-        }
-
 
         /* Start manufacturing
          */
@@ -312,23 +269,44 @@ class Factory
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
             ->setMarkVisibility($this->getMarkVisibility())
-            ->setPublishAt($publishAt)
-            ->setOpenAt($openAt)
-            ->setDueAt($dueAt)
-            ->setCloseAt($closeAt)
-            ->setCreatedAt(\Alaress_Date_Format::now())
-            ->setUpdatedAt(\Alaress_Date_Format::now());
+            ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
+            ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
+            ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
+            ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        // find out if the dates are all g - if not, a mage-friendly exception will be thrown
+        $assessment->assertValidDates();
 
         /* Decorate with Assessable-specific data
          */
         $decorator->decorate($assessment);
 
-        /** Last minute check all the dates are valid after everything has been configured */
-        if(!$assessment->isValidDates()) {
-            throw new \InvalidArgumentException('ensure that dates are in this order - Publish, Open, Due, Close');
+        return $assessment;
+    }
+
+
+    /**
+     * @param AssessmentContext $context
+     * @param string            $dateString
+     * @return Alaress_Date_Format
+     */
+    private function deriveDate(AssessmentContext $context, $dateString)
+    {
+        // no dates exist in spec-land
+        if ($context instanceof UnitSpecification) {
+            return new Alaress_Date_NullDate();
         }
 
-        return $assessment;
+        try {
+            // attempt to parse the date
+            return Alaress_Date_Format::newLocal($dateString);
+
+        } catch (InvalidArgumentException $e) {
+            // unparseable - safely return null
+            return new Alaress_Date_NullDate();
+        }
     }
 
     /* Getters/Setters

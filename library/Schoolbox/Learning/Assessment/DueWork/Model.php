@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
@@ -144,43 +145,35 @@ class Model extends AbstractAssessment
         }
     }
 
+
     /**
      * Check the dates set on this model are valid
-     * @return bool
+     * @throws InvalidArgumentException if the dates are not validly set
+     * @return void
      */
-    public function isValidDates()
+    public function assertValidDates()
     {
         /* Check publish date against everything else
         /* Don't check dates if in course */
-        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
-
-            /* Only check publish date */
-            if($this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE) {
-                if ( $this->getPublishAt()->gt($this->getDueAt())) {
-                    return false;
-                }
-            }
-            else {
-
-                if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-
-                /* Check open date against everything else
-                 */
-                if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-
-                /* Check due date against everything else
-                 */
-                if ($this->getDueAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-            }
-
+        if ($this->getBaseContext() instanceof UnitSpecification) {
+            return;
         }
-        return true;
+
+        /* Only check publish date */
+        if ($this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE) {
+            $this->assertDateSequence([
+                'publish' => $this->getPublishAt(),
+                'due'     => $this->getDueAt()
+            ]);
+
+        } else {
+            $this->assertDateSequence([
+                'publish' => $this->getPublishAt(),
+                'open'    => $this->getOpenAt(),
+                'due'     => $this->getDueAt(),
+                'late'    => $this->getCloseAt()
+            ]);
+        }
     }
 
     /**

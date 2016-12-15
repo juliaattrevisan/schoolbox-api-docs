@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
@@ -502,6 +503,53 @@ abstract class AbstractAssessment implements IAssessable
                 return $role->isStaff();
         }
     }
+
+
+    /**
+     * The friendly, uninformative version of assertValidDates
+     *
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        try {
+            $this->assertValidDates();
+            return true;
+
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Verify the given dates are all non-null and all in the given sequence
+     *
+     * @param Alaress_Date_Format[] $dates, indexed by their display name, sequenced in expected order
+     * @throws InvalidArgumentException if any value is absent, or values are out of order
+     * @return void
+     */
+    protected function assertDateSequence(array $dates)
+    {
+        /** @var Alaress_Date_Format $previousAdf */
+        $previousAdf = null;
+        $previousLabel = '';
+
+        foreach ($dates as $label => $adf) {
+            if ($adf->isNull()) {
+                throw new InvalidArgumentException("set a $label date");
+            }
+
+            if ($previousAdf && $previousAdf->gt($adf)) {
+                throw new InvalidArgumentException("set the $previousLabel date to be earlier than the $label date");
+            }
+
+            // cache the previous iteration
+            $previousAdf = $adf;
+            $previousLabel = $label;
+        }
+    }
+
 
     /* Getters/Setters
      */
