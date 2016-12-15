@@ -628,17 +628,17 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Applies a callabale to all items in this collection, and returns a new
+     * Applies a callable to all items in this collection, and returns a new
      * collection with the result. If $includeNull == false, iterations that
      * return explicitly null will be omitted from the final result
      *
      * @param  callback $callback
      * @param  bool $includeNull
-     * @return static
+     * @return Collection
      */
     public function map($callback, $includeNull = true)
     {
-        $return = $this->emptyClone($this);
+        $return = new Collection();
         foreach ($this as $key => $item) {
             $result = call_user_func($callback, $item);
             if ($includeNull || !is_null($result)) {
