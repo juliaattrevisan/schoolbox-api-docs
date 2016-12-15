@@ -99,9 +99,11 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             1 AS PeriodNumberSeq, 
             CASE WHEN n.PeriodName IS NULL THEN CONCAT('Lesson ', p.PeriodID) ELSE n.PeriodName END AS Description,
             1 AS DayNumber, 
-            p.PeriodDuration
+            p.PeriodDuration,
+            b.BreakDuration
             FROM AttendancePeriods p
             LEFT JOIN PeriodNames n ON p.AcademicYear = n.AcademicYear AND p.DayOfWeek = 1 AND p.PeriodID = n.PeriodNumber and n.yeargroupid = p.yeargroup
+            LEFT JOIN AttendanceBreaks b ON b.AcademicYear = p.AcademicYear AND b.DayOfWeek = 1 AND b.BreakPeriodID = p.PeriodID  AND b.YearGroup = p.yeargroup 
 	    ";
 
         if ($type == 'student') {
@@ -120,9 +122,11 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 "
 		        WHERE
                     p.AcademicYear = '{$fileYear}' AND
-                    p.YearGroup IN ({$yearGroups})                     
+                    p.YearGroup IN ({$yearGroups})            
     		";
         }
+
+        $query .= "ORDER BY PeriodNumber, BreakDuration DESC";
 
         $periods = $this->getDatabase()->getAll($query);
 
@@ -189,7 +193,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 $time_current += $period['PeriodDuration'];
 
-                // And the break duration that follows this period
+                // And the break duration
 
                 $time_current += $period['BreakDuration'];
             }
