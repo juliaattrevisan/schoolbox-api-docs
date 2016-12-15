@@ -123,11 +123,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * inadvertently steal ownership of it
                  */
                 $heading = Scrub::text($this->getTextbox()->getHeading());
-
+                $body = Scrub::html($this->getTextbox()->getBody());
 
                 $this->setVar(array(
                     'TEXTBOX_HEADING' => $heading,
-                    'TEXTBOX_BODY' => Scrub::html($this->getTextbox()->getBody()),
+                    'TEXTBOX_BODY' => $body,
                     'TEXTBOX_ID' => $this->getTextbox()->getId(),
                     'ID' => $this->getContext()->getId(),
                     'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
@@ -141,24 +141,21 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * To just edit one homepage's textbox, you need write access to that homepage.
                  */
                 $editing = false;
+
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
                     if ($this->getSitePage()->arg[1] == 'textBoxModify') {
                         $editing = true;
-                        $this->setVar(
-                            array(
-                                'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
-                            )
-                        );
+                        $this->setVar([
+                            'TEXTBOX_BODY' => $body,
+                        ]);
                     } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
                         $editing = true;
-                        $this->setVar(
-                            array(
-                                'TEXTBOX_HEADING' => '',
-                                'TEXTBOX_BODY' => '',
-                                'TEXTBOX_ID' => '',
-                                'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
-                            )
-                        );
+                        $this->setVar([
+                            'TEXTBOX_HEADING' => '',
+                            'TEXTBOX_BODY' => '',
+                            'TEXTBOX_ID' => '',
+                            'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
+                        ]);
                     }
                     $this->parse('text_editable_block', 'text_editable');
                 } else {
