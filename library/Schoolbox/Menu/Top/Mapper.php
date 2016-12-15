@@ -10,6 +10,7 @@
 namespace Schoolbox\Menu\Top;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends BaseMapper
 {
@@ -35,12 +36,17 @@ class Mapper extends BaseMapper
     /**
      * @param \Schoolbox\User $user
      * @return \Schoolbox\Collection
+     * @throws MapperException
      */
     public function findTabsForUser($user)
     {
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
+        }
+
+        if (count($campusList) < 1) {
+            throw new MapperException('User has no campus, and therefore has no menu');
         }
 
         $webmail = "";

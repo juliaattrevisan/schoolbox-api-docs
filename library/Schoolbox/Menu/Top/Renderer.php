@@ -12,6 +12,7 @@ namespace Schoolbox\Menu\Top;
 use Schoolbox\User;
 use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTopModel;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Renderer
 {
@@ -35,7 +36,11 @@ class Renderer
     public function menuTopRenderer(\Twig_Environment $twig, $tabCurrent = null, $user = null)
     {
         // Render this thing out
-        $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
+        try {
+            $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
+        } catch (MapperException $e) {
+            $tabs = [];
+        }
 
         /** @var MenuTopModel $tab */
         foreach ($tabs as $tab) {

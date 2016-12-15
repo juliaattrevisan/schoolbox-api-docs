@@ -44,7 +44,7 @@ class Mapper extends BaseMapper
         }
 
         if(count($campusList) < 1) {
-            throw new MapperException();
+            throw new MapperException('User has no campus, and therefore has no menu');
         }
 
         $query = "
