@@ -26,10 +26,18 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-textbox"></i>
-                <p>No content available!</p>
-                <!-- BEGIN empty_create -->
-                <p>To use first <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}">create content</a>.</p>
-                <!-- END empty_create -->
+
+                <!-- BEGIN empty_read_only -->
+                <p>Nothing found.</p>
+                <!-- END empty_read_only -->
+
+                <!-- BEGIN empty_content -->
+                <p>No content found. <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}">Modify this text box</a>.</p>
+                <!-- END empty_content -->
+
+                <!-- BEGIN empty_id -->
+                <p>To use this component you first need to <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}">create content</a> to display in this text box.</p>
+                <!-- END empty_id -->
             </div>
             <!-- END empty_state -->
 
