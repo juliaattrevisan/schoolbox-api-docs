@@ -87,7 +87,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         return [
             [new \Schoolbox\Calendar\EventLevelCollection([], new Collection())],
             [new EOTC\ListGroup\Collection()],
-            [new \Schoolbox\CampusCollection()],
+            [\Schoolbox\CampusMapper::getInstance()->createCollection()],
             [new \Schoolbox\MappingCollection()],
             [new \Schoolbox\External\SubjectCollection()],
             [new \Schoolbox\Assessment\ActivityCollection()],

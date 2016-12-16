@@ -234,7 +234,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         $configInstanceCollection   = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
         $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
-        $finalCollection = new GenericCollection(Component_Instance::class);
+        $finalCollection = $finalCollection = $this->createCollection();
 
         // map the definitions into their instances
         foreach ($instanceCollection as $i => $instance) {

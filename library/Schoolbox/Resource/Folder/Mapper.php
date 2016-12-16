@@ -749,7 +749,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement->execute($params);
 
         /** @var Model[] $folderCache */
-        $folderCache = new GenericCollection(Model::class);
+        $folderCache = $this->createCollection();
 
         // No need to hydrate groups
         foreach ($statement as $row) {

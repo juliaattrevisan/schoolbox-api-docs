@@ -134,7 +134,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     protected $max_mark;
 
     /**
-     * @var int
+     * @var MarkType
      */
     protected $mark_type;
 

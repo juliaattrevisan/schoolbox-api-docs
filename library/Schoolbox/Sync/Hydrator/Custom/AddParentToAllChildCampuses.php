@@ -14,9 +14,7 @@ namespace Schoolbox\Sync\Hydrator\Custom;
 use External_User;
 use Monolog\Logger;
 use Schoolbox\Campus;
-use Schoolbox\CampusCollection;
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
 use Schoolbox\User as InternalUser;
@@ -35,13 +33,19 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
     protected $userMapper;
 
     /**
+     * @var CampusMapper
+     */
+    private $campusMapper;
+
+    /**
      * Constructor (obviously)
      */
     public function __construct()
     {
         // TODO these should be injectable for all custom hydrators
         $this->externalUserHandler = new External_User();
-        $this->userMapper          = new UserMapper();
+        $this->userMapper          = UserMapper::getInstance();
+        $this->campusMapper        = CampusMapper::getInstance();
     }
 
     /**
@@ -58,7 +62,7 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
 
                 $oldCampuses = $newCampuses = $previous->getCampusCollection()->getColumnValues('id');
 
-                $children = new Collection();
+                $children = $this->userMapper->createCollection();
 
                 foreach ($childIds as $childId) {
                     try {
@@ -77,7 +81,7 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                     }
                 }
 
-                $previous->setCampusCollection(CampusMapper::getInstance()->findByColumn('id', $newCampuses));
+                $previous->setCampusCollection($this->campusMapper->findByColumn('id', $newCampuses));
 
                 if (empty($newCampuses)) {
                     $message = "No child campuses found to assign to parent";

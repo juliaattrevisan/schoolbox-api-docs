@@ -105,7 +105,7 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Collection of campuses
      *
-     * @var CampusCollection|Campus[]
+     * @var GenericCollection|Campus[]
      */
     private $campusCollection;
 
@@ -203,7 +203,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function __construct()
     {
-        $this->setCampusCollection(new CampusCollection(array()));
+        $this->campusCollection = new GenericCollection(Campus::class);
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
@@ -220,7 +220,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function isInCampus(Campus $campus)
     {
-        return $this->getCampusCollection()->find($campus);
+        return $this->getCampusCollection()->getBy('id', $campus->getId()) instanceof Campus;
     }
 
     /**
@@ -236,7 +236,7 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Returns a list of collections the user belongs in
      *
-     * @return CampusCollection|Campus[]
+     * @return GenericCollection|Campus[]
      */
     public function getCampusCollection()
     {
@@ -845,12 +845,12 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
-     * @param Collection $campusCollection
+     * @param GenericCollection|Campus[] $campusCollection
      * @return self
      */
-    public function setCampusCollection(CampusCollection $campusCollection)
+    public function setCampusCollection(GenericCollection $campusCollection)
     {
-        $this->campusCollection = $campusCollection;
+        $this->campusCollection->replaceWith($campusCollection);
         return $this;
     }
 

@@ -8,38 +8,24 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
+
 use \PDO;
 
+/**
+ * @method GenericCollection|Campus[] findAll($options = array())
+ * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
+ */
 class CampusMapper extends Mapper {
 
-    protected function mapping () {
-
+    protected function mapping ()
+    {
         $this->hasTable('luCampus');
         $this->hasModel(Campus::class);
 
-		$this->hasMap(array(
-			'column' => 'id',
-			'property' => 'id',
-			'type' => Mapper::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column' => 'name',
-			'property' => 'name',
-			'type' => Mapper::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'ext_timetable_code',
-			'property' => 'extTimetableCode',
-			'type' => Mapper::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'timetable_day',
-			'property' => 'timetableDay',
-			'type' => Mapper::TYPE_STRING,
-		));
+        $this->uses('id', Mapper::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', Mapper::TYPE_STRING);
+        $this->uses('ext_timetable_code', Mapper::TYPE_STRING);
+        $this->uses('timetable_day', Mapper::TYPE_STRING);
     }
 
 	/**
@@ -52,9 +38,10 @@ class CampusMapper extends Mapper {
 	 *
 	 * @param User $user
 	 * @param int $accessType
-	 * @return array
+	 * @return GenericCollection|Campus[]
 	 */
-	public function getAvailableCampusesForUser(\Schoolbox\User $user, $accessType = 1) {
+	public function getAvailableCampusesForUser(User $user, $accessType = 1)
+    {
 		$calendarService = CALENDAR_SERVICE;
 
 		/* Superusers get access to all campuses
@@ -79,7 +66,7 @@ class CampusMapper extends Mapper {
 			$statement->bindParam(':accessType', $accessType);
 			$statement->execute();
 
-			$collection = new Collection();
+			$collection = $this->createCollection();
 
 			foreach ($statement as $row) {
 				$campus = $this->hydrate($row);
@@ -94,7 +81,7 @@ class CampusMapper extends Mapper {
 
     /**
      * @param Campus $campus
-     * @return Collection|User[]
+     * @return GenericCollection|User[]
      */
     public function findUsersInCampus(Campus $campus)
     {
@@ -111,7 +98,7 @@ class CampusMapper extends Mapper {
             'campus' => $campus->getId()
         ));
 
-        $c = new Collection();
+        $c = $uMap->createCollection();
 
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $c->add($uMap->hydrate($r, 'u'));
@@ -124,9 +111,10 @@ class CampusMapper extends Mapper {
 	 * Find all campuses matching a certain name
 	 *
 	 * @param $name
-	 * @return \Schoolbox\Collection
+	 * @return GenericCollection|Campus[]
 	 */
-	public function findCampuses($name = '') {
+	public function findCampuses($name = '')
+    {
 		$allCampuses = $this->createCollection();
 
 		/* if $name is empty, the LIKE returns everything anyway
@@ -156,35 +144,28 @@ class CampusMapper extends Mapper {
 	 * Find the campuses with which this user is involved
 	 *
 	 * @param User $user
-	 * @return Collection
+	 * @return GenericCollection|Campus[]
 	 */
 	public function findCampusInvolvement(User $user)
 	{
+	    $pb = $this->getPredicateBuilder();
+        $pb->equals('userCampus.uid', $user->getId());
 		$query = "
             SELECT
             	userCampus.*,
             	{$this->getColumnString('c')}
             FROM userCampus
             INNER JOIN luCampus c ON userCampus.campus = c.id
-            WHERE userCampus.uid = :userId
         ";
+        $query .= ' WHERE ' . implode(' AND ', $pb->getWhere());
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'userId' => $user->getId()
-		]);
+        $statement = $this->getDatabase()->query($query, $pb->getParams());
 
-		$collection = new Collection();
-
+        $campusCollection = $this->createCollection();
 		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 			$campus = $this->hydrate($row, 'c');
-
-			$collection->setOffset($campus->getId(), [
-				'defaultCampus' => $row['defaultCampus'],
-				'campus' => $campus,
-			]);
+			$campusCollection->setOffset($campus->getId(), $campus);
 		}
-
-		return $collection;
+		return $campusCollection;
 	}
 }
