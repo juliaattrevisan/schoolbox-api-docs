@@ -104,7 +104,7 @@ class Queue extends ResourceVideo
     {
         $executable = $this->getConverterExecutable();
 
-        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100 -pix_fmt yuv420p"
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100"
             . ' -timelimit ' . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
@@ -221,7 +221,7 @@ class Queue extends ResourceVideo
 
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
-            " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
+            " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -pix_fmt yuv420p -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
             " -timelimit " . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
