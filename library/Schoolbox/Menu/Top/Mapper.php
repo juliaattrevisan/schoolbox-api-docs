@@ -61,7 +61,8 @@ class Mapper extends BaseMapper
                 INNER JOIN menu_top_campus ON menu_top.id = menu_top_campus.menu_top_id
                 INNER JOIN menu_top_role ON menu_top.id = menu_top_role.menu_top_id
                 WHERE menu_top_campus.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($campusList, 'campus') . "
-                AND menu_top_role.role_id = :roleId                
+                AND menu_top_role.role_id = :roleId    
+                AND menu_top.deleted_at IS NULL
                 {$webmail}
                 ORDER BY sort_order ASC
         ";
