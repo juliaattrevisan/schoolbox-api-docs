@@ -56,8 +56,7 @@ abstract class AbstractCourseMapper extends BaseMapper
             $ids[] = $course->getId();
         }
         $units = $unitMapper->findAllByCourseId($ids, ['order' => $this->getUnitOrderByClause()])
-            ->groupByCallback(function ($v) {
-                /** @var AbstractUnit $v */
+            ->groupByCallback(function (AbstractUnit $v) {
                 return $v->getCourse()->getId();
             });
 

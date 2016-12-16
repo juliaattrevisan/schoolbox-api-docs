@@ -24,6 +24,8 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends AbstractCourseMapper
 {
@@ -80,7 +82,6 @@ class Mapper extends AbstractCourseMapper
      */
     public function findByFolderId($folderId, $options = [])
     {
-        /** @var GenericCollection|Model[] $models */
         $models = $this->findByColumn('folder_id', $folderId, $options);
         return $this->loadUnitsForCollection($models);
     }
