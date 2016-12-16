@@ -7,15 +7,11 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation;
 
-use Alaress_Date_NullDate;
 use Schoolbox\Collection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Course\DataModel\AbstractCourse;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
  * An Course Implementation is an import of a Course Specification onto a Folder.
@@ -27,73 +23,45 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *  related directly to the Folder the Course Specification was imported onto, and
  *  linked to a component.)
  */
-class Model implements ISoftDeletable
+class Model extends AbstractCourse
 {
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
-
-    /**
-     * @var FolderModel
-     */
-    protected $folder;
-
     /**
      * The Course Specification model that this model belongs to.
      *
-     * @var CourseSpecificationModel
+     * @var CourseSpecification
      */
-    protected $specification;
+    private $courseSpecification;
 
     /**
      * The unit spec models for this model.
      *
-     * @var Unit\Model[]|Collection
+     * @var Unit\Model[]|GenericCollection
      */
-    protected $units;
+    private $unitImplementations;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->units = new Collection();
+        $this->unitImplementations = new GenericCollection(UnitImplementation::class);
     }
 
     /**
-     * @return FolderModel
-     */
-    public function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param FolderModel $folder
-     * @return static
-     */
-    public function setFolder(FolderModel $folder = null)
-    {
-        $this->folder = $folder;
-        return $this;
-    }
-
-    /**
-     * @return CourseSpecificationModel
+     * @return CourseSpecification
      */
     public function getSpecification()
     {
-        return $this->specification;
+        return $this->courseSpecification;
     }
 
     /**
-     * @param CourseSpecificationModel $specification
+     * @param CourseSpecification $courseSpecification
      * @return static
      */
-    public function setSpecification($specification)
+    public function setSpecification(CourseSpecification $courseSpecification)
     {
-        $this->specification = $specification;
+        $this->courseSpecification = $courseSpecification;
         return $this;
     }
 
@@ -102,16 +70,16 @@ class Model implements ISoftDeletable
      */
     public function getUnits()
     {
-        return $this->units;
+        return $this->unitImplementations;
     }
 
     /**
-     * @param Unit\Model[]|Collection $units
+     * @param Unit\Model[]|GenericCollection $unitImplementations
      * @return static
      */
-    public function setUnits(Collection $units)
+    public function setUnits(GenericCollection $unitImplementations)
     {
-        $this->units = $units;
+        $this->unitImplementations->replaceWith($unitImplementations);
         return $this;
     }
 }

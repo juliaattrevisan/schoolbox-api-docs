@@ -9,12 +9,15 @@ namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  * Mapper for the data model for Unit Implementations.
@@ -22,7 +25,7 @@ use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  */
-class Mapper extends BaseMapper
+class Mapper extends AbstractUnitMapper
 {
     /**
      * Setup data source, model and data mappings.
@@ -32,23 +35,12 @@ class Mapper extends BaseMapper
         $this->hasTable('course_unit_implementation');
         $this->hasModel(Model::class);
 
-        // Identifier
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-
-        // Course Implementation
         $this->joins('course_implementation_id', CourseImplementationMapper::class, 'id', null, null, 'course', 'course');
-
-        // Unit Specification
         $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, 'specification', 'specification');
-
-        // Title
         $this->uses('title', self::TYPE_STRING);
-
-        // Open/close date
         $this->uses('open_date', self::TYPE_DATETIME);
         $this->uses('due_date', self::TYPE_DATETIME);
-
-        // Datestamps
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -81,8 +73,6 @@ class Mapper extends BaseMapper
         $assessments = $assessmentMapper->findByColumn('v_ui.course_unit_implementation_id', $unitImpl->getId(), ['deleted' => true]);
         $assessmentMapper->restoreSoftDeleted($assessments);
     }
-
-
 
     /**
      * Finds all unit implementations for this course implementation.
@@ -143,14 +133,19 @@ class Mapper extends BaseMapper
 
             /** @var CourseImplementationModel $course */
             $course = $this->hydrateJoin($row, 'course', 'c');
+            /** @var Folder $courseFolder */
             $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
-            $courseFolder->setHomepage($this->hydrateJoin($row, 'course.folder.homepages', 'cfh'));
+            /** @var HomepageConfig $homepageConfig */
+            $homepageConfig = $this->hydrateJoin($row, 'course.folder.homepages', 'cfh');
+            $courseFolder->setHomepage($homepageConfig);
             $course->setFolder($courseFolder);
             $model->setCourse($course);
 
             /** @var UnitSpecificationModel $specification */
             $specification = $this->hydrateJoin($row, 'specification', 's');
-            $specification->setFolder($this->hydrateJoin($row, 'specification.folder', 'sf'));
+            /** @var Folder $specFolder */
+            $specFolder = $this->hydrateJoin($row, 'specification.folder', 'sf');
+            $specification->setFolder($specFolder);
             $model->setSpecification($specification);
 
             // Add

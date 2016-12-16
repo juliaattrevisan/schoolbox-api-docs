@@ -9,12 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Course\DataModel\AbstractCourse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
@@ -29,27 +24,17 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
  *  which had at least one child Folder which contained a Course Builder component.
  *  This class puts this concept into a concrete class.)
  */
-class Model implements ISoftDeletable
+class Model extends AbstractCourse
 {
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
-
-    /**
-     * @var FolderModel
-     */
-    private $folder;
-
     /**
      * The unit spec models for this model.
      *
-     * @var Unit\Model[]|Collection
+     * @var Unit\Model[]|GenericCollection
      */
     private $unitSpecifications;
 
     /**
-     * @var CourseImplementation[]|Collection
+     * @var CourseImplementation[]|GenericCollection
      */
     private $courseImplementations;
 
@@ -63,25 +48,20 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return FolderModel
+     * Gets name of folder on which this UnitSpec resides
+     *
+     * @return string
      */
-    public function getFolder()
+    public function getTitle()
     {
-        return $this->folder;
+        return $this->getFolder()->getName();
     }
 
-    /**
-     * @param FolderModel $folder
-     * @return static
+    /* Getters / Setters
      */
-    public function setFolder(FolderModel $folder)
-    {
-        $this->folder = $folder;
-        return $this;
-    }
 
     /**
-     * @return Unit\Model[]|Collection
+     * @return Unit\Model[]|GenericCollection
      */
     public function getUnits()
     {
@@ -96,16 +76,6 @@ class Model implements ISoftDeletable
     {
         $this->unitSpecifications->replaceWith($unitSpecifications);
         return $this;
-    }
-
-    /**
-     * Gets name of folder on which this UnitSpec resides
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->getFolder()->getName();
     }
 
     /**

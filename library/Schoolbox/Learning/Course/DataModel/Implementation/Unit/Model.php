@@ -8,19 +8,10 @@
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
-use Schoolbox\Collection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Course\DataModel\AbstractUnit;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * An Unit Implementation is a single import of a Unit Specification onto a Folder. It belongs to an
@@ -34,180 +25,33 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *  Course Implementation - instead, it belonged directly to the Folder it was imported
  *  onto, and was also linked to a component on that Folder.)
  */
-class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextDataModel
+class Model extends AbstractUnit
 {
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
+    /**
+     * @var CourseImplementation
+     */
+    private $courseImplementation;
 
     /**
-     * @var CourseImplementationModel
+     * @var UnitSpecification
      */
-    protected $course;
-
-    /**
-     * @var UnitSpecificationModel
-     */
-    protected $specification;
+    private $unitSpecification;
 
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $openDate;
+    private $openDate;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $dueDate;
+    private $dueDate;
 
-    /**
-     * The assessables that are a part of this unit implementation.
-     *
-     * TODO figure out whether they need to be translated or not
-     *
-     * @var IAssessable[]|Collection
-     */
-    protected $assessables;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->assessables = new Collection();
-    }
-
-    /**
-     * @return FolderModel
-     */
-    public function getFolder()
-    {
-        return $this->getCourse()->getFolder();
-    }
-
-    /**
-     * @param FolderModel $folder
-     * @return static
-     */
-    public function setFolder(FolderModel $folder)
-    {
-        $this->getCourse()->setFolder($folder);
-        return $this;
-    }
-
-    /**
-     * @return CourseImplementationModel
-     */
-    public function getCourse()
-    {
-        return $this->course;
-    }
-
-    /**
-     * @param CourseImplementationModel $course
-     * @return static
-     */
-    public function setCourse($course)
-    {
-        $this->course = $course;
-        return $this;
-    }
-
-    /**
-     * @return UnitSpecificationModel
-     */
-    public function getSpecification()
-    {
-        return $this->specification;
-    }
-
-    /**
-     * @param UnitSpecificationModel $specification
-     * @return static
-     */
-    public function setSpecification($specification)
-    {
-        $this->specification = $specification;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string $title
-     * @return static
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getOpenDate()
-    {
-        return $this->openDate;
-    }
-
-    /**
-     * @param Alaress_Date_Format $openDate
-     * @return static
-     */
-    public function setOpenDate($openDate)
-    {
-        $this->openDate = $openDate;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDueDate()
-    {
-        return $this->dueDate;
-    }
-
-    /**
-     * @param Alaress_Date_Format $dueDate
-     * @return static
-     */
-    public function setDueDate($dueDate)
-    {
-        $this->dueDate = $dueDate;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IAssessable[]
-     */
-    public function getAssessables()
-    {
-        return $this->assessables;
-    }
-
-    /**
-     * @param Collection|IAssessable[] $assessables
-     * @return static
-     */
-    public function setAssessables($assessables)
-    {
-        $this->assessables = $assessables;
-        return $this;
-    }
 
     /**
      * This unit is open if the current date is after the open date, and before
@@ -280,11 +124,114 @@ class Model implements ISoftDeletable, AssessmentContext, IAssessmentContextData
         return new Alaress_Date_Format($date);
     }
 
-    /**
-     * @return $this
+    /* Getters / Setters
      */
-    public function getBaseContext()
+
+    /**
+     * @return Folder
+     */
+    public function getFolder()
     {
+        return $this->getCourse()->getFolder();
+    }
+
+    /**
+     * @param Folder $folder
+     * @return static
+     */
+    public function setFolder(Folder $folder)
+    {
+        $this->getCourse()->setFolder($folder);
+        return $this;
+    }
+
+    /**
+     * @return CourseImplementation
+     */
+    public function getCourse()
+    {
+        return $this->courseImplementation;
+    }
+
+    /**
+     * @param CourseImplementation $courseImplementation
+     * @return static
+     */
+    public function setCourse($courseImplementation)
+    {
+        $this->courseImplementation = $courseImplementation;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecification
+     */
+    public function getSpecification()
+    {
+        return $this->unitSpecification;
+    }
+
+    /**
+     * @param UnitSpecification $unitSpecification
+     * @return static
+     */
+    public function setSpecification($unitSpecification)
+    {
+        $this->unitSpecification = $unitSpecification;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return static
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getOpenDate()
+    {
+        return $this->openDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $openDate
+     * @return static
+     */
+    public function setOpenDate($openDate)
+    {
+        $this->openDate = $openDate;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDueDate()
+    {
+        return $this->dueDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $dueDate
+     * @return static
+     */
+    public function setDueDate($dueDate)
+    {
+        $this->dueDate = $dueDate;
         return $this;
     }
 }

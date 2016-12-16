@@ -9,12 +9,13 @@ namespace Schoolbox\Learning\Course\DataModel\Implementation;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Resource\HomepageConfig;
 
@@ -22,8 +23,11 @@ use Schoolbox\Resource\HomepageConfig;
  * Mapper for the data model for Course Implementations.
  *
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
-class Mapper extends BaseMapper
+class Mapper extends AbstractCourseMapper
 {
     /**
      * Setup data source, model and data mappings.
@@ -70,17 +74,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param int $identifierValue
-     * @return Model
-     */
-    public function findById($identifierValue)
-    {
-        /** @var Model $model */
-        $model = parent::findById($identifierValue);
-        return $this->loadUnits($model);
-    }
-
-    /**
      * Finds the unit spec for this folder.
      *
      * @param int   $folderId
@@ -89,9 +82,8 @@ class Mapper extends BaseMapper
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->loadUnitsForCollection(
-            $this->findByColumn('folder_id', $folderId, $options)
-        );
+        $models = $this->findByColumn('folder_id', $folderId, $options);
+        return $this->loadUnitsForCollection($models);
     }
 
     /**
@@ -142,8 +134,6 @@ class Mapper extends BaseMapper
             // Add
             $modelList->add($model);
         }
-
-        // TODO: consider whether units should be populated here
         return $modelList;
     }
 
@@ -160,46 +150,19 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Loads all units implementations into a course implementation.
-     *
-     * @param Model $implementation
-     * @return Model
+     * @return UnitImplementationMapper
      */
-    protected function loadUnits(Model $implementation)
+    protected function getUnitMapper()
     {
-        $collection = new Collection();
-        $collection->add($implementation);
-        $this->loadUnitsForCollection($collection);
-        return $collection->first();
+        return UnitImplementationMapper::getInstance();
     }
 
     /**
-     * Loads all units implementations into all the course implementations in a collection.
-     *
-     * @param Collection|Model[] $courseImpls
-     * @return Collection|Model[]
+     * Get an ORDER BY clause for sorting units
+     * @return string[]
      */
-    protected function loadUnitsForCollection(Collection $courseImpls)
+    protected function getUnitOrderByClause()
     {
-        $unitImplMapper = UnitImplementationMapper::getInstance();
-
-        // Load all the unit impls for all the supplied course impls
-        $ids = [];
-        foreach ($courseImpls as $courseImpl) {
-            $ids[] = $courseImpl->getId();
-        }
-        $unitImpls = $unitImplMapper->findAllByCourseId($ids, ['order' => ['open_date' => 'desc']])
-            ->groupByCallback(function ($v) {
-                /** @var UnitImplementation $v */
-                return $v->getCourse()->getId();
-            });
-
-        // Match unitImpls to their courseImpl
-        foreach ($courseImpls as $courseImpl) {
-            if (isset($unitImpls[$courseImpl->getId()])) {
-                $courseImpl->setUnits($unitImpls[$courseImpl->getId()]);
-            }
-        }
-        return $courseImpls;
+        return ['open_date' => 'desc'];
     }
 }
