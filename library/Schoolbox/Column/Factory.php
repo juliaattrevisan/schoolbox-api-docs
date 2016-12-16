@@ -13,12 +13,37 @@ use Schoolbox\Mapper;
 
 class Factory implements IFactory
 {
+    /** @var IColumnType[] */
+    protected $cache;
+
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->cache = [];
+    }
+
+
     /**
     * @param $type
     *
     * @return IColumnType
     */
     public function build($type)
+    {
+        if (empty($this->cache[$type])) {
+            $this->cache[$type] = $this->get($type);
+        }
+        return $this->cache[$type];
+    }
+
+
+    /**
+     * @param string $type
+     * @return IColumnType
+     */
+    private function get($type)
     {
         $column = null;
         switch ($type) {

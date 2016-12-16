@@ -159,6 +159,9 @@ abstract class Mapper implements IMapper, Serializable
      */
     static protected $instance;
 
+    /** @var ColumnFactory */
+    static private $columnFactory;
+
     /**
      * Factory for building column hydrators.
      *
@@ -183,6 +186,21 @@ abstract class Mapper implements IMapper, Serializable
     /** @var array */
     protected $sessionData;
 
+    /** @var GenericCollection[] */
+    private $selectCache = [];
+
+    /** @var array */
+    private $joinMapperCache = [];
+
+    /** @var array */
+    protected $foreignBodyCache = [];
+
+    /** @var array */
+    protected $localBodyCache = [];
+
+
+
+
     /**
      * Retreives the singleton instance of this class.
      *
@@ -190,6 +208,11 @@ abstract class Mapper implements IMapper, Serializable
      */
     public static function getInstance()
     {
+        if (empty(self::$columnFactory)) {
+            // we want this to exist once ever
+            self::$columnFactory = new ColumnFactory();
+        }
+
         $class_name = get_called_class();
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
@@ -208,7 +231,7 @@ abstract class Mapper implements IMapper, Serializable
         $this->map      = new MappingCollection();
         $this->setConfigLoader(new ConfigLoader());
         $this->setup();
-        $this->setColumnFactory(new ColumnFactory());
+        $this->setColumnFactory(self::$columnFactory);
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
     }
@@ -1530,10 +1553,24 @@ abstract class Mapper implements IMapper, Serializable
     protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
         try {
+            // fold the column list into the predicate builder
             $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
-            $statement->execute();
 
-            return $this->hydrateSelect($statement);
+            $params = $predicate->getParams();
+            asort($params);
+
+            // the query itself gets cached by the DB class, but we also want to cache the params
+            $hash = sha1(sprintf('%s%s',
+                $statement->queryString,
+                implode($params)
+            ));
+
+            if (empty($this->selectCache[$hash])) {
+                $statement->execute();
+                $this->selectCache[$hash] = $this->hydrateSelect($statement);
+            }
+
+            return $this->selectCache[$hash];
 
         } catch (UnderflowException $e) {
             return $this->hydrateList([]);
@@ -2231,25 +2268,43 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getJoinMapper($name)
     {
+        if (empty($this->joinMapperCache[$name])) {
+            $this->joinMapperCache[$name] = $this->locateJoinMapper($name);
+        }
+
+        return $this->joinMapperCache[$name];
+    }
+
+    /**
+     * @param $name, which can be nested, delimited by periods (eg. 'join.subjoin.subsubjoin')
+     * @throws Mapper\DefinitionException if the mapper requested does not exist
+     * @return Mapper
+     */
+    private function locateJoinMapper($name)
+    {
         $parts    = explode('.', $name, 2);
         $basename = array_shift($parts);
+
         if (!array_key_exists($basename, $this->joins)) {
-            throw new Mapper\DefinitionException("Join \"$basename\" does not exist on class \"" . get_called_class(
-            ) . "\"");
+            throw new Mapper\DefinitionException("Join '$basename' does not exist on class '" . get_called_class() . "'");
         }
+
         $mapperClass = $this->joins[$basename]['mapper'];
+
         if (!($mapperClass instanceof Mapper) && class_exists($mapperClass)) {
             /** @var Mapper $mapper */
             $mapper = call_user_func(array($mapperClass, 'getInstance'));
             $mapper->setConfigLoader($this->getConfigLoader());
+
         } else {
             $mapper = $this->joins[$basename]['mapper'];
         }
+
         if (empty($parts)) {
             return $mapper;
-        } else {
-            return $mapper->getJoinMapper(array_shift($parts));
         }
+
+        return $mapper->getJoinMapper(array_shift($parts));
     }
 
     /**
@@ -2345,26 +2400,55 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
+        $idKey = trim("$alias.{$this->getIdentifierColumn()}", '.');
+
+        if (empty($this->localBodyCache[$row[$idKey]])) {
+            $this->localBodyCache[$row[$idKey]] = $this->hydrateSelf($row, $alias);
+        }
+
+        $model = $this->localBodyCache[$row[$idKey]];
+
+        // don't cache this part
+        if (!empty($callback) && is_callable($callback)) {
+            $model = call_user_func($callback, $this, $model, $row);
+        }
+
+        return $model;
+    }
+
+
+    /**
+     * @param array    $row
+     * @param string   $alias
+     * @return object
+     * @throws Exception
+     */
+    private function hydrateSelf(array $row, $alias = '')
+    {
         $model = $this->createModel();
+
         foreach ($this->map as $map) {
             $propertyName = $map['property'];
+
             if (empty($map['column'])) {
                 // check for multijoin
                 if (!(isset($map['join']) && isset($this->joins[$map['join']]['multi']))) {
                     throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                 }
+
             } else {
                 $columnName = $map['column'];
+
                 if (!empty($alias)) {
                     $columnName = "$alias.$columnName";
                 }
+
                 $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+
                 $this->setModelProperty($model, $propertyName, $columnValue);
             }
         }
-        if (!empty($callback) && is_callable($callback)) {
-            $model = call_user_func($callback, $this, $model, $row);
-        }
+
         return $model;
     }
 
@@ -2383,11 +2467,15 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hydrateJoin($row, $join, $alias = '', $callback = null)
     {
-        $mapper = $this->getJoinMapper($join);
-        if ($mapper instanceof Mapper) {
-            return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+        $foreignMapper = $this->getJoinMapper($join);
+
+        $idKey = trim("$alias.{$foreignMapper->getIdentifierColumn()}", '.');
+
+        if (empty($this->foreignBodyCache[$join][$row[$idKey]])) {
+            $this->foreignBodyCache[$join][$row[$idKey]] = $foreignMapper->hydrate($row, $alias, $callback);
         }
-        return null;
+
+        return $this->foreignBodyCache[$join][$row[$idKey]];
     }
 
 

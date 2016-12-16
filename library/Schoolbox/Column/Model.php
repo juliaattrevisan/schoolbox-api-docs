@@ -13,6 +13,9 @@ use Schoolbox\Mapper;
 
 class Model implements IColumnType {
 
+    /** @var object[] */
+    private $cache = [];
+
 	/**
 	 * The property to set on the model when hydrating, or get when dehydrating.
 	 * If not set, then the mapper's ID property is used.
@@ -52,18 +55,28 @@ class Model implements IColumnType {
 	 *
 	 * @return object
 	 */
-	public function hydrate($value, $mapper = null) {
-		/** @var Mapper $mapper */
-		$model = $mapper->createModel();
-		//
-		// Figure out the identifier property to set on the model.
-		$id_property = $this->getIdentifierProperty();
-		$identifier_method  = isset($id_property) ?
-			$mapper->getSetMethodName($id_property):
-			$mapper->getSetIdentifierMethodName();
-		$model->$identifier_method($value);
-		return $model;
-	}
+    public function hydrate($value, $mapper = null)
+    {
+        $t = $mapper->getTable();
+
+        if (empty($this->cache[$t][$value])) {
+
+            $model = $mapper->createModel();
+
+            // Figure out the identifier property to set on the model.
+            $id_property = $this->getIdentifierProperty();
+
+            $identifier_method  = isset($id_property)
+                ? $mapper->getSetMethodName($id_property)
+                : $mapper->getSetIdentifierMethodName();
+
+            $model->$identifier_method($value);
+
+            $this->cache[$t][$value] = $model;
+        }
+
+        return $this->cache[$t][$value];
+    }
 
 	/**
 	 * @param mixed             $value

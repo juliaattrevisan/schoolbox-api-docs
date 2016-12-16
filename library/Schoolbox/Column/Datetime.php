@@ -15,7 +15,10 @@ class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
 
-	/**
+	/** @var DateWrapper[] */
+	private $cache = [];
+
+    /**
 	 * @param string            $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
@@ -25,8 +28,16 @@ class Datetime implements IColumnType {
         if (!isset($value)) {
             return new \Alaress_Date_NullDate();
         }
+
         try {
-            return new DateWrapper($value, $this->input_format);
+            if (empty($this->cache[$value])) {
+                // only construct this if we ABSOLUTELY have to (it's spensy)
+                $this->cache[$value] = new DateWrapper($value, $this->input_format);
+                return $this->cache[$value];
+            }
+            // skip the computation, just duplicate the thing
+            return clone $this->cache[$value];
+
         } catch (\Exception $e) {
             return new \Alaress_Date_NullDate();
         }
