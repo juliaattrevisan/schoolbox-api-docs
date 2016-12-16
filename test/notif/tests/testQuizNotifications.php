@@ -316,7 +316,7 @@ class QuizNotifications extends AbstractNotificationTest
     {
         $student = $this->getUser($attempt->getUser()->getId());
 
-        $this->log->notice("Marking quiz {$attempt->getAssessment()->getId()} for {$student->formatName()} as {$as->formatName()}", [ 'char' => '+' ]);
+        $this->log->notice("Marking quiz {$attempt->getQuiz()->getId()} for {$student->formatName()} as {$as->formatName()}", [ 'char' => '+' ]);
 
         $attempt->setReviewed(Alaress_Date_Format::now());
 
