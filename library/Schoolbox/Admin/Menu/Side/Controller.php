@@ -219,6 +219,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
+                'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
