@@ -538,7 +538,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'router'                        => $di->lazyGet('router'),
         ];
 
-        $di->set('transactor', $di->lazyNew(Transactor::class));
+        $di->set('transactor', $di->lazyNew(\Schoolbox\Learning\Assessment\Transactor::class));
 
         // Register default grade group
         $di->set(
