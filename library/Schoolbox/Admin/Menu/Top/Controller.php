@@ -196,10 +196,10 @@ class Controller extends Base
                 'order' => [
                     'sort_order' => 'DESC'
                 ]
-            ])->first();
+            ]);
 
-            if ($itemOrder instanceof MenuTop) {
-                $item->setSortOrder($itemOrder->getSortOrder() + 1);
+            if ($itemOrder->count()) {
+                $item->setSortOrder($itemOrder->first()->getSortOrder() + 1);
             } else {
                 $item->setSortOrder(1);
             }
