@@ -196,9 +196,13 @@ class Controller extends Base
                 'order' => [
                     'sort_order' => 'DESC'
                 ]
-            ])->first();
+            ]);
 
-            $item->setSortOrder($itemOrder->getSortOrder() + 1);
+            if ($itemOrder->count()) {
+                $item->setSortOrder($itemOrder->first()->getSortOrder() + 1);
+            } else {
+                $item->setSortOrder(1);
+            }
         }
 
         $item->setTitle($post['title']);
