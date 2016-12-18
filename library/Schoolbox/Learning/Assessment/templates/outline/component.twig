@@ -35,25 +35,36 @@
 </script>
 {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
 <section>
+
     {% if courseImplementation.units|length %}
+
         <p class="component-titlebar meta">
             <a class="icon-course" href="/homepage/{{ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
         </p>
+
         {% include '@learningAssessment/outline/unit.twig' %}
+
         {% if not readOnly %}
         <div class="component-action">
             <section>
-
                 <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}{{ urlSuffix }}" class="button">Modify</a>
             </section>
         </div>
         {% endif %}
-    {% else %}
-        <div class="content">
-            <p>To get started with courses you need to first import an existing course to display</p>
 
-            <a href="#" class="button icon-course" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import New Course</a>
-            <a href="{{ routeLookup('courseImport.getManagement', { folderId: context.id }) }}" class="button icon-export">Manage Courses</a>
+    {% else %}
+
+        <div class="empty-state">
+            <i class="icon-course-outline"></i>
+
+            {% if readOnly %}
+            <p>No course found.</p>
+            {% else %}
+            <p>To get started with courses you first need to <a href="#" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">import an existing course to display</a>.</p>
+            {% endif %}
+
         </div>
+
     {% endif %}
+
 </section>

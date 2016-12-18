@@ -111,11 +111,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-        // If current user can't view component's source, only display the
-        // component if the user has context WRITE+ permission
-        if (!$this->isSourceRenderable()) {
-            return $this->hasContextWriteAccess();
-        }
         $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         // Get the list of units for this course, as well as who has actually
@@ -158,9 +153,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             );*/
 
         } catch (MapperException $e) {
-            if ($this->readOnly) {
-                return false;
-            }
+            // noop
         }
 
         return true;
@@ -190,8 +183,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'returnUrlName'        => Redirect::RETURN_URL,
             'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];
-
-
+        
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/component.twig',
