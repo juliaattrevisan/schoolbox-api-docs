@@ -1,0 +1,60 @@
+{# Render a term selector #}
+{# Figure out next and last term #}
+<nav>
+    {% if previousTerm %}
+        <a href="{{ routeLookup('learningMastery.getMastery', {classId: class.id, termCode: previousTerm.code}) }}"
+           data-interaction="previous-term" class="icon-previous"></a>
+    {% else %}
+        <a href="#" data-interaction="previous-term" class="icon-previous" disabled></a>
+    {% endif %}
+</nav>
+<div class="semester">
+    <select data-term-selector>
+        <option disabled>Select a term</option>
+        {% for term in terms %}
+            <option value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
+                {% if term.archived %}(archived){% endif %}
+                {{ term.title }}
+                ({{ term.start.dateOnly }}—{{ term.displayFinish.dateOnly }})
+            </option>
+        {% endfor %}
+    </select>
+</div>
+<nav>
+    {% if nextTerm %}
+        <a href="{{ routeLookup('learningMastery.getMastery', {classId: class.id, termCode: nextTerm.code}) }}"
+           data-interaction="next-term" class="icon-next"></a>
+    {% else %}
+        <a href="#" data-interaction="next-term" class="icon-next" disabled></a>
+    {% endif %}
+</nav>
+
+{# Render unit selector too #}
+{% if courses|length %}
+    <select data-unit-selector>
+        <option disabled selected>All assessments</option>
+        {% for course in courses %}
+            <optgroup label="Course: {{ course.specification.folder.title }}">
+                {% for unit in course.units %}
+                    <option>{{ unit.specification.folder.title }}</option>
+                {% endfor %}
+            </optgroup>
+        {% endfor %}
+    </select>
+{% endif %}
+
+{# JS that makes it all run #}
+<script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Term selector
+        $.fn.contextSelector({
+            href: 'learning/mastery/{{ class.id|e('js') }}/term',
+            selector: {
+                semester: 'select[data-term-selector]',
+                nextSemester: '[data-interaction="next-term"]',
+                previousSemester: '[data-interaction="previous-term"]'
+            }
+        });
+    });
+</script>
