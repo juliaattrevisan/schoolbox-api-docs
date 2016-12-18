@@ -74,7 +74,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testUnweightedAverage0()
     {
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables(new Collection());
+        $project->setAssessables((new GenericCollection(IAssessable::class)));
 
         /* Most Recent Published Average is null
          */
@@ -127,7 +127,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testUnweightedAverage2()
     {
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -174,7 +174,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
@@ -209,7 +209,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
             ->add($this->spawnDueWork())
@@ -245,7 +245,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -274,7 +274,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testWeightedAverage1()
     {
         $project = $this->spawnProject(new SummatorWeightedAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -309,7 +309,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testWeightedAverage2()
     {
         $project = $this->spawnProject(new SummatorWeightedAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -356,7 +356,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorWeightedAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
@@ -393,7 +393,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorWeightedAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
             ->add($this->spawnDueWork())
@@ -431,7 +431,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorWeightedAverage());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -634,7 +634,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMaximum1()
     {
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -669,7 +669,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMaximum2()
     {
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -712,7 +712,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
             ->add($this->spawnQuiz()));
@@ -741,7 +741,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork3())
             ->add($this->spawnDueWork2())
@@ -771,7 +771,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -990,7 +990,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())->add($dueWork));
+        $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
         $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
@@ -1157,7 +1157,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())->add($dueWork1)->add($dueWork2));
+        $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork1)->add($dueWork2));
 
         $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
@@ -1171,7 +1171,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMinimum1()
     {
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -1206,7 +1206,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMinimum2()
     {
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -1246,7 +1246,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /* There are three assessables for Hodes
          */
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
             ->add($this->spawnQuiz()));
@@ -1271,7 +1271,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMinimum4()
     {
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork3())
             ->add($this->spawnDueWork2()));
@@ -1294,7 +1294,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     public function testMinimum5()
     {
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())
+        $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -1526,7 +1526,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())->add($dueWork));
+        $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
         $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
@@ -1691,7 +1691,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $project = $this->spawnProject(new SummatorMinimum());
-        $project->setAssessables((new Collection())->add($dueWork)->add($dueWork2));
+        $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork)->add($dueWork2));
 
         $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
@@ -1700,11 +1700,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Mass produce a giant Due Work set
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function massProduce()
     {
-        $collection = new Collection();
+        $collection = new GenericCollection(IAssessable::class);
 
         /**
          * A Due Work with one floating feedback
