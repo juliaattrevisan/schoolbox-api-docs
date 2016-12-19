@@ -92,18 +92,17 @@
                 events: function(start, end, timezone, callback) {
                     $.ajax({
                         dataType: 'json',
-                        url:      '/submission/ajax/events',
+                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id})|e('js') }}',
                         data: {
                             start: Calendar.reOffsetTimestamp(start.unix()),
-                            end:   Calendar.reOffsetTimestamp(end.unix()),
-                            userId: Number('{{ student.id|escape('js') }}')
+                            end:   Calendar.reOffsetTimestamp(end.unix())
                         },
                         cache: false
                     })
                     .done(
                         function(data) {
                             callback(data.filter(function(v) {
-                                return 'start' in v;
+                                return 'start' in v && 'end' in v;
                             }));
                         }
                     );
@@ -119,7 +118,7 @@
                 // Does FC support nested groups?
                 resources: {
                     dataType: 'json',
-                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
                 },
                 resourceOrder: 'folderTitle,title',
                 resourceGroupField: "folderTitle",
