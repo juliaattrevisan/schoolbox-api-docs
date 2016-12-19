@@ -101,6 +101,7 @@
                                 {% if assessment.isParticipant(student) %}
 
                                     {% set humanMark = assessment.getHumanReadableMark(student, true) %}
+                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
                                     {% set participant = assessment.getParticipant(student) %}
 
@@ -131,7 +132,7 @@
 
                                     {% endif %}
 
-                                {% elseif humanMark >= 70 %}
+                                {% elseif normalisedMark >= 70 %}
                                     {% set className = 'mastered' %}
                                 {% else %}
                                     {% set className = 'fail' %}
