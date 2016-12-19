@@ -97,6 +97,7 @@
                             {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
 
                                 {% set className = '' %}
+                                {% set url = '#' %}
 
                                 {% if assessment.isParticipant(student) %}
 
@@ -104,6 +105,10 @@
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
                                     {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
                                     {% set participant = assessment.getParticipant(student) %}
+
+                                    {% if participant.isResponded %}
+                                        {% set url = routeLookup('learningAssessment.getSummary', {studentId: student.id, assessmentId: assessment.id}) %}
+                                    {% endif %}
 
                                 {% else %}
 
@@ -151,9 +156,9 @@
                                 {% if className != 'mastered' and assessment.dueAt.isPast %}
                                     {% set value = '<i class="icon-clock" title="Next ">' %}
                                 {% endif %}
-                                
+
                                 <td class="text-center {{ className }}">
-                                    {{ value | purify }}
+                                    <a href="{{ url }}">{{ value | purify }}</a>
                                 </td>
 
                             {% endfor %}
