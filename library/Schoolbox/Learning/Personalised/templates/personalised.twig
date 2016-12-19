@@ -79,7 +79,6 @@
 
                 },
                 height: 'auto',
-                timeFormat: 'h(:mm)a',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
