@@ -278,38 +278,30 @@ class Controller extends AbstractController
         // What are the users in this upload?
         foreach ($list as $key) {
             $key = trim($key);
-            // Try ID, then username, then external ID
+
             $user = null;
+
+            // Try external ID, then username
 
             if(!empty($key)) {
                 try {
-                    if(is_numeric($key)) {
-                        $user = $this->getUserMapper()->findByExternalId($key);
+                    $user = $this->getUserMapper()->findByExternalId($key);
+                }
+                catch (MapperException $e) {
+                    try {
+                        $user = $this->getUserMapper()->findOneByColumn('username', $key);
                     }
-                    elseif(is_string($key)) {
-                        // First assume it is non-numeric external id
-                        try {
-                            $user = $this->getUserMapper()->findByExternalId($key);
-                        }
-                        catch(\Schoolbox\Mapper\Exception $e){
-                            // Then assume it is a username
-                            $user = $this->getUserMapper()->findOneByColumn('username', $key);
-                        }
-                    }
-                    else {
-                        continue;
+                    catch (MapperException $e) {
+                        // noop
                     }
                 }
-                catch(MapperException $e) {
-                    // noop
-                }
+            }
 
-                if ($user instanceof User) {
-                    $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                        ->setDivision($division)
-                        ->setUser($user)
-                        ->setSequence(0);
-                }
+            if ($user instanceof User) {
+                $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
+                    ->setDivision($division)
+                    ->setUser($user)
+                    ->setSequence(0);
             }
         }
 
