@@ -667,7 +667,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Concatenates
+     * Concatenates all collections within this collection into a single collection.
      *
      * @return Collection
      */
@@ -682,6 +682,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Reduces this collection into a single value.
+     *
      * @param callable $callback
      * @param mixed    $initial
      * @return mixed
