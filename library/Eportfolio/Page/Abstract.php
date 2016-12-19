@@ -156,9 +156,6 @@ abstract class Eportfolio_Page_Abstract {
             $this->getPage()->parse('can_add_page_block', 'can_add_page');
         }
 
-        /** @var \Schoolbox\User $sessionUser */
-        $sessionUser = $_SESSION["user"];
-
         /* Only show the showcase tab if there is something to see */
         $this->getPage()->setBlock(TEMPLATE_content, 'showcase_page', 'showcase_page_block');
 
