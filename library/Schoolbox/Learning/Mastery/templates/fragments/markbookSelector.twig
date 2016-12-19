@@ -2,7 +2,7 @@
 {# Figure out next and last term #}
 <nav>
     {% if previousTerm %}
-        <a href="{{ routeLookup('learningMastery.getMastery', {classId: class.id, termCode: previousTerm.code}) }}"
+        <a href="{{ routeLookup('learningMastery.getMasteryForTerm', {classId: class.id, termCode: previousTerm.code}) }}"
            data-interaction="previous-term" class="icon-previous"></a>
     {% else %}
         <a href="#" data-interaction="previous-term" class="icon-previous" disabled></a>
@@ -22,7 +22,7 @@
 </div>
 <nav>
     {% if nextTerm %}
-        <a href="{{ routeLookup('learningMastery.getMastery', {classId: class.id, termCode: nextTerm.code}) }}"
+        <a href="{{ routeLookup('learningMastery.getMasteryForTerm', {classId: class.id, termCode: nextTerm.code}) }}"
            data-interaction="next-term" class="icon-next"></a>
     {% else %}
         <a href="#" data-interaction="next-term" class="icon-next" disabled></a>

@@ -39,7 +39,8 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/{classId}/term/{termCode}' => 'getMastery'
+                '/{classId}' => 'getMastery',
+                '/{classId}/term/{termCode}' => 'getMasteryForTerm'
             ],
             'POST' => []
         ];

@@ -74,12 +74,20 @@ class Controller extends Base
         $this->setTermMapper($termMapper);
     }
 
+    /**
+     * @param Folder $class
+     * @param Term $term
+     */
+    public function getMastery($class)
+    {
+        $this->getMasteryForTerm($class, $this->getTermMapper()->findForToday());
+    }
 
     /**
      * @param Folder $class
      * @param Term $term
      */
-    public function getMastery($class, $term)
+    public function getMasteryForTerm($class, $term)
     {
         // Does this class exist ?
         if (!$class->getId()) {
