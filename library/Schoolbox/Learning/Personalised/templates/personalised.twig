@@ -120,13 +120,18 @@
                     url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
                 },
                 resourceOrder: 'folderTitle',
-//                resourceGroupField: "folderTitle",
                 resourceColumns: [{
                     labelText: 'Assessment',
                     render: function(resource, el) {
                         el.find('.fc-cell-text').empty().text(resource.title);
                     }
                 }],
+                resourceRender: function(resource, label, body, view) {
+                    // Collapse resource by default?
+                    if (resource.children && resource.children.length > 0) {
+                        view.getResourceRow(resource.id).collapse();
+                    }
+                },
 
                 loading: function(isLoading) {
                     /* Show loading div right in the middle
