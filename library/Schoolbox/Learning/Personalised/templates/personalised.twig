@@ -126,11 +126,14 @@
                         el.find('.fc-cell-text').empty().text(resource.title);
                     }
                 }],
-                resourceRender: function(resource, label, body, view) {
-                    // Collapse resource by default?
-                    if (resource.children && resource.children.length > 0) {
-                        view.getResourceRow(resource.id).collapse();
-                    }
+
+                eventAfterAllRender: function(view) {
+                    // On expand of a resource: collapse everything
+                    $.each(view.resourceRowHash, function(key, resourceRow) {
+                        if (resourceRow.children && resourceRow.children.length > 0) {
+                            resourceRow.collapse();
+                        }
+                    });
                 },
 
                 loading: function(isLoading) {
