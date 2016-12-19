@@ -120,7 +120,7 @@
                     dataType: 'json',
                     url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
                 },
-                resourceOrder: 'folderTitle,title',
+                resourceOrder: 'folderTitle',
                 resourceGroupField: "folderTitle",
                 resourceColumns: [{
                     labelText: 'Assessment',
