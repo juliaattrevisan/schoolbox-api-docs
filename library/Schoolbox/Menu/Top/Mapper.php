@@ -23,6 +23,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('sort_order', self::TYPE_INTEGER);
+        $this->uses('webmail', self::TYPE_BOOLEAN);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
         $this->uses('token', self::TYPE_STRING);

@@ -103,7 +103,7 @@ class Controller extends Base
         foreach ($selections as $selection) {
             $campusesSelected[$selection->getCampusId()] = true;
         }
-        
+
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
