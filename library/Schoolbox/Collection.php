@@ -667,6 +667,35 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Concatenates
+     *
+     * @return Collection
+     */
+    public function concat()
+    {
+        return $this->reduce(
+            function(Collection $return, Collection $item) {
+                return $return->merge($item);
+            },
+            new Collection()
+        );
+    }
+
+    /**
+     * @param callable $callback
+     * @param mixed    $initial
+     * @return mixed
+     */
+    public function reduce(callable $callback, $initial)
+    {
+        $return = $initial;
+        foreach ($this as $item) {
+            $return = $callback($return, $item);
+        }
+        return $return;
+    }
+
+    /**
      * Groups all results by a field value.
      *
      * @param  string $field The field to search by.
