@@ -98,7 +98,16 @@ class Controller extends Base
         $resultSet = [];
 
         foreach ($this->folderMapper->findForUser($student) as $folder) {
+
+            // Resource for folder
+            $resultSet[] = [
+                'id'          => $folder->getId(),
+                'title'       => $folder->getTitle(),
+                'folderTitle' => $folder->getTitle(),
+            ];
+
             $baseResult = [
+                'parentId'    => $folder->getId(),
                 'folderId'    => $folder->getId(),
                 'folderTitle' => $folder->getTitle(),
             ];
