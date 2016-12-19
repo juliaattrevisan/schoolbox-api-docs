@@ -39,39 +39,33 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF)
         );
 
+        $studentPreload = function ($params) {
+            return [
+                'student' => $this->getUserMapper()->findById($params['studentId']),
+            ];
+        };
+
         $this->register('GET', '', 'getPersonalised', new Rule\IsLoggedIn());
         $this->register(
             'GET',
             '/{studentId}',
             'getPersonalisedForStudent',
             $access,
-            function ($params) {
-                return [
-                    'student' => $this->getUserMapper()->findById($params['studentId']),
-                ];
-            }
+            $studentPreload
         );
         $this->register(
             'GET',
             '/resources/{studentId}',
             'getResourcesForStudent',
             $access,
-            function ($params) {
-                return [
-                    'student' => $this->getUserMapper()->findById($params['studentId']),
-                ];
-            }
+            $studentPreload
         );
         $this->register(
             'GET',
             '/calendar/{studentId}',
             'getCalendarForStudent',
             $access,
-            function ($params) {
-                return [
-                    'student' => $this->getUserMapper()->findById($params['studentId']),
-                ];
-            }
+            $studentPreload
         );
     }
 
