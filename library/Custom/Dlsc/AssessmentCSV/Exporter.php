@@ -58,6 +58,7 @@ class Exporter
             INNER JOIN      `user` AS u ON 
                             sr.owner = u.id
             WHERE           YEAR(sr.created_at) = :currentYear
+                            AND sr.deleted_at IS NULL
                             AND sb.name LIKE '%[%]%'
                             AND sr.mark != ''
                             AND sr.published_at IS NOT NULL
