@@ -206,6 +206,14 @@ class Controller extends Base
             })
             ->concat();
 
-        $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
+        // Filter out non-unique values
+        $newResultSet = new Collection();
+        foreach ($resultSet as $row) {
+            if (!isset($newResultSet[$row['id']])) {
+                $newResultSet[$row['id']] = $row;
+            }
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($newResultSet->reindex()));
     }
 }
