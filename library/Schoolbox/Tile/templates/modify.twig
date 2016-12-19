@@ -249,14 +249,12 @@
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
                         </label>
                     </div>
-                    <div class="small-12 medium-8 columns">
+                    <div class="small-12 columns input-group">
                         <label>
-                        <input name="link" id="link" type="text"
+                            <input name="link" id="link" type="text"
                                value="{{ item.link|e('html_attr') }}"
                                placeholder="http://" />
                         </label>
-                    </div>
-                    <div class="small-12 medium-4 columns">
                         <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
 
                         {# Dialog for resource browser #}
