@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Personalised;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -50,6 +51,17 @@ class Module extends BaseModule
                 ];
             }
         );
+        $this->register(
+            'GET',
+            '/resources/{studentId}',
+            'getResourcesForStudent',
+            $access,
+            function ($params) {
+                return [
+                    'student' => $this->getUserMapper()->findById($params['studentId']),
+                ];
+            }
+        );
     }
 
     /**
@@ -67,7 +79,10 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                ['folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),]
+            )
         );
     }
 

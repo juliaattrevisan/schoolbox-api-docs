@@ -110,12 +110,16 @@
                 },
 
                 // Resources:
-                // * each assessment is a resource
+                // * all of this student's classes
+                // ** Units (any unit imported onto this class)
+                // ** Content Areas (any duework/quiz in one of these units)
+                // ** Projects (any project in one of these units)
+                // ** Activities (any assessment in one of those projects)
                 // * each folder is a resource group
                 // Does FC support nested groups?
                 resources: {
                     dataType: 'json',
-                    url:      '{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: student.id, date: "now"|date('d-m-Y')}) }}'
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
                 },
                 resourceOrder: 'folderTitle,title',
                 resourceGroupField: "folderTitle",
