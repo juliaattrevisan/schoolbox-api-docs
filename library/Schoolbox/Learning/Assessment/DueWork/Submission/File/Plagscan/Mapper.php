@@ -47,21 +47,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function setup()
     {
-        parent::setup();
-
         $plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
         $plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
         /* If plagscan credentials exist, set up all the other stuff
          */
         if (strlen($plagscanApiKey) && strlen($plagscanUsername)) {
-            $this->gateway = new Gateway($plagscanUsername, $plagscanApiKey);
-        }
-        else {
-
-            /* Otherwise die magnificently
-             */
-            throw new \DomainException('Plagscan credentials are not specified.');
+            $this->setGateway(new Gateway($plagscanUsername, $plagscanApiKey));
         }
     }
 
@@ -69,30 +61,34 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
-     * @return array|null
+     * @return array
      */
     public function saveNewPlagscan(SubmissionFile $file)
     {
         /* No existing Plagscan found for $dirtyDocument
          * Spawn new and ship it to Plagscan Gateway
          */
-        $documentId = $this->gateway->submit($file);
-
-        if (!empty($documentId)) {
-            $this->gateway->check($documentId);
-
-            /** @var Plagscan $plagscan */
-            $plagscan = $this->createModel();
-            $plagscan->setPlagscanId($documentId);
-            $plagscan->setStatus(Plagscan::STATUS_QUEUED);
-            $plagscan->setStudentSubmissionFileId($file->getId());
-            $plagscan->setCreatedAt(\Alaress_Date_Format::now());
-            $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
-
-            return parent::save($plagscan);
+        if (!$this->getGateway()) {
+            return [];
         }
 
-        return null;
+        $documentId = $this->getGateway()->submit($file);
+
+        if (empty($documentId)) {
+            return [];
+        }
+
+        $this->getGateway()->check($documentId);
+
+        /** @var Plagscan $plagscan */
+        $plagscan = $this->createModel();
+        $plagscan->setPlagscanId($documentId);
+        $plagscan->setStatus(Plagscan::STATUS_QUEUED);
+        $plagscan->setStudentSubmissionFileId($file->getId());
+        $plagscan->setCreatedAt(\Alaress_Date_Format::now());
+        $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
+
+        return parent::save($plagscan);
     }
 
     /* Getters/Setters
