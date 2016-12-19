@@ -146,6 +146,12 @@
                                     {% endif %}
                                 {% endif %}
 
+                                {# If mastery not achieved and past due date, show clock icon #}
+
+                                {% if className != 'mastered' and assessment.dueAt.isPast %}
+                                    {% set value = '<i class="icon-clock" title="Next ">' %}
+                                {% endif %}
+                                
                                 <td class="text-center {{ className }}">
                                     {{ value | purify }}
                                 </td>
