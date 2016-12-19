@@ -63,7 +63,7 @@
                             <input name='title' type="text" value="{{ item.title }}">
                         </label>
                     </div>
-                    <div class="small-11 columns">
+                    <div class="small-10 columns">
                         <label>
                             Icon
                             <select id="icon-select" name="icon" data-icon>
@@ -73,7 +73,7 @@
                             </select>
                         </label>
                     </div>
-                    <div class="small-1 columns">
+                    <div class="small-2 columns">
                         <label>
                             Preview
                         </label>
@@ -81,13 +81,13 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-12 columns">
+                    <div class="small-12 columns input-group">
                         <label>
                             Destination URL
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [externalId], [username] in your URLs, these will be replaced for the user">?</span>
                                 <input name="url" required type="text" value="{{ item.url }}">
-                                <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
                         </label>
+                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
                     </div>
                     <div class="small-6 columns">
                         <label>
