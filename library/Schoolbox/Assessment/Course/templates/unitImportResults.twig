@@ -149,7 +149,7 @@
                                     {% set assessmentImpl = assessmentPair.implementation %}
                                     {% set assessment = assessmentImpl ?: assessmentSpec %}
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
-                                    {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
+                                    {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
                                     {% set isChecked = assessmentImpl or 'import' == action %}
 
@@ -175,6 +175,7 @@
 
                                         </div>
                                         <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
+
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
                                                 assessmentDate: assessment.publishAt,
@@ -205,7 +206,7 @@
                                                 unitDate: unitImpl.dueDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'due',
-                                                dateSyncProperty: 'late',
+                                                dateSyncProperty: 'close',
                                                 assessmentId: assessmentSpec.id
                                             } only %}
 
