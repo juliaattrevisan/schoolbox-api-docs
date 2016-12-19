@@ -96,9 +96,6 @@ class Controller extends Base
         // And what is required for a context selector
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
 
-        // Also show the courses/units that are on this homepage
-        $courses = $this->getCourseImplementationMapper()->findByFolderId($class->getId());
-
         // And the previous and next term
         $previousTerm = null;
         $nextTerm     = null;
@@ -122,8 +119,7 @@ class Controller extends Base
                 'terms'        => $terms,
                 'currentTerm'  => $term,
                 'previousTerm' => $previousTerm,
-                'nextTerm'     => $nextTerm,
-                'courses'      => $courses,
+                'nextTerm'     => $nextTerm
             ]
         ]);
     }

@@ -29,19 +29,6 @@
     {% endif %}
 </nav>
 
-{# Render unit selector too #}
-{% if courses|length %}
-    <select data-unit-selector>
-        <option disabled selected>All assessments</option>
-        {% for course in courses %}
-            <optgroup label="Course: {{ course.specification.folder.title }}">
-                {% for unit in course.units %}
-                    <option>{{ unit.specification.folder.title }}</option>
-                {% endfor %}
-            </optgroup>
-        {% endfor %}
-    </select>
-{% endif %}
 
 {# JS that makes it all run #}
 <script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
