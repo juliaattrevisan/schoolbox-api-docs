@@ -26,6 +26,7 @@ use Schoolbox\RoleMapper;
  */
 class Controller extends Base
 {
+    const PAGE_CURRENT = 'menu-top';
 
     /** @var MenuIconMapper $menuIconMapper */
     private $menuIconMapper;
@@ -66,7 +67,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'pageCurrent' => self::PAGE_CURRENT,
                 'menu' => $this->getMenuTopMapper()->findAll()->sortBy('sortOrder', 'asc')
             ],
             'title' => 'Admin - Top Menu'
@@ -107,7 +108,7 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'pageCurrent' => self::PAGE_CURRENT,
                 'item' => $this->getMenuTopMapper()->findById($id),
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
@@ -131,7 +132,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'pageCurrent' => self::PAGE_CURRENT,
                 'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
