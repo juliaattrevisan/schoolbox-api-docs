@@ -312,9 +312,9 @@
 		max-width: #{'calc(100% - 4rem)'};
 	}
 
-	[type="text"] {
-		margin-top: rem-calc(($base-font-size - 10));
-		margin-bottom: rem-calc(($base-font-size - 10));
+	[type="text"],
+	select{
+		margin-bottom: rem-calc(($base-font-size / 2));
 	}
 }
 

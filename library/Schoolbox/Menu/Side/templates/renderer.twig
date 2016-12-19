@@ -48,7 +48,7 @@
 
             {% elseif section.section == 'bookmarks' and section.visible %}
 
-                <li><h3>{{ section.title }}</h3></li>
+                <h3><a href="/cms/myLinks" class="icon-modify" title="Modify">{{ section.title }}</a></h3>
                 <div class="nav-wrapper my-links">
                     <ul class="off-canvas-list">
                         {% if bookmarks | length > 0 %}
@@ -58,9 +58,6 @@
                                 </li>
                             {% endfor %}
                         {% endif %}
-                        <li>
-                            <a href="/cms/myLinks" class="icon-modify">Edit</a>
-                        </li>
                     </ul>
                 </div>
 
