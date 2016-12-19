@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Personalised;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
@@ -22,13 +23,20 @@ class Controller extends Base
     protected $folderMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
      * Constructor
      *
-     * @param FolderMapper $folderMapper
+     * @param FolderMapper         $folderMapper
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function __construct(FolderMapper $folderMapper)
+    public function __construct(FolderMapper $folderMapper, AssessmentDataSource $assessmentDataSource)
     {
-        $this->folderMapper = $folderMapper;
+        $this->folderMapper         = $folderMapper;
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
     /**
@@ -106,5 +114,17 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
+    }
+
+    /**
+     * Gets the resource calendar for this student (at this time).
+     *
+     * @param User $student
+     */
+    public function getCalendarForStudent(User $student)
+    {
+        // This will contain a from and to date.
+        // Use the calendar renderer classes here?
+
     }
 }

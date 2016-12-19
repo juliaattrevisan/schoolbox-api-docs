@@ -62,6 +62,17 @@ class Module extends BaseModule
                 ];
             }
         );
+        $this->register(
+            'GET',
+            '/calendar/{studentId}',
+            'getCalendarForStudent',
+            $access,
+            function ($params) {
+                return [
+                    'student' => $this->getUserMapper()->findById($params['studentId']),
+                ];
+            }
+        );
     }
 
     /**
@@ -81,7 +92,10 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),]
+                [
+                    'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+                ]
             )
         );
     }
