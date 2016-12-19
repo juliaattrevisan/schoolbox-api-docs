@@ -147,8 +147,10 @@ class Controller extends Base
                 if ($assessable->getContext() instanceof UnitImplementation) {
                     /** @var UnitImplementation $context */
                     $context = $assessable->getContext();
+
+                    // TODO fix UnitImplementation::getBaseContext
                     /** @var Folder $folder */
-                    $folder  = $assessable->getBaseContext();
+                    $folder  = $context->getCourse()->getFolder();
 
                     // The unit itself
                     $result->add([
