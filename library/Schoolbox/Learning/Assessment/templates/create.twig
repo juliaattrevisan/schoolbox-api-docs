@@ -12,7 +12,7 @@
         /**
          * Set jquery validate rules
          */
-        var validateRules = {
+        var validateOptions = {
             rules: {
                 title: {required: true},
                 weight: {
@@ -56,10 +56,8 @@
             var dueTime = $('input[name="dueTime"]');
             var closeDate = $('input[name="closeDate"]');
             var closeTime = $('input[name="closeTime"]');
-
-            //var openExists = openDate.length > 0;
+            
             var openVisible = openDate.is(':visible');
-           // var closeExists = closeDate.length > 0;
             var closeVisible = closeDate.is(':visible');
 
             if (openVisible && closeVisible) {
