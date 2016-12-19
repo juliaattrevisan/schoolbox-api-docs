@@ -25,7 +25,7 @@
 <script type="text/javascript">
     // Do stuff here
     $(function() {
-        var calendarView = {{ calendar.view|json_encode|raw }};
+//        var calendarView = 'timelineMonth';
         var calendarDate = moment({{ calendar.date|json_encode|raw }});
 
         if (calendarDate.isValid()) {
@@ -33,18 +33,18 @@
         } else {
             calendarDate = new Date();
         }
-        switch (calendarView) {
-            case 'day':
-                calendarView = 'timelineDay';
-                break;
-            case 'week':
-                calendarView = 'timelineWeek';
-                break;
-            case 'month':
-            default:
-                calendarView = 'timelineMonth';
-                break;
-        }
+//        switch (calendarView) {
+//            case 'day':
+//                calendarView = 'timelineDay';
+//                break;
+//            case 'week':
+//                calendarView = 'timelineWeek';
+//                break;
+//            case 'month':
+//            default:
+//                calendarView = 'timelineMonth';
+//                break;
+//        }
 
         c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
@@ -83,7 +83,7 @@
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
-                defaultView: 'timelineDay',
+                defaultView: 'timelineMonth',
                 header: {
                     left: 'prev,today,next',
                     center: 'title',
