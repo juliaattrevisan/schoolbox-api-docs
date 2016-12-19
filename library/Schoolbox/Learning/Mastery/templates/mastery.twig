@@ -39,17 +39,8 @@
     .mastered {
         background-color: rgb(213, 231, 212);
     }
-    .upcoming {
+    .notmarked {
         background-color: rgb(255, 242, 205);
-    }
-    .notsubmitted {
-        background: repeating-linear-gradient(
-                45deg,
-                #fff,
-                #fff 10px,
-                #eee 10px,
-                #eee 20px
-        )
     }
 </style>
 
@@ -62,24 +53,22 @@
                     <tr class="rotate-headers">
                         <th></th>
                         {% for assessment in markbook.assessments.sortBy('dueAt', 'asc') %}
-                            <th>
-                                <div>
-                                    <span>
-                                        <a href="#">{{ assessment.title }}</a><br>
-                                        <span class="meta">
-                                            {% if assessment is project %}
-                                                Project
-                                            {% elseif assessment is task %}
-                                                Task
-                                            {% elseif assessment is quiz %}
-                                                Quiz
-                                            {% elseif assessment is dueWork %}
-                                                Due Work
-                                            {% endif %}
+                            {% if assessment is not task and assessment is not project %}
+                                <th>
+                                    <div>
+                                        <span>
+                                            <a href="#">{{ assessment.title }}</a><br>
+                                            <span class="meta">
+                                                {% if assessment is quiz %}
+                                                    Quiz
+                                                {% elseif assessment is dueWork %}
+                                                    Due Work
+                                                {% endif %}
+                                            </span>
                                         </span>
-                                    </span>
-                                </div>
-                            </th>
+                                    </div>
+                                </th>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                     </thead>
@@ -98,41 +87,47 @@
 
                             {% for assessment in markbook.assessments.sortBy('dueAt', 'asc') %}
 
-                                {% set humanMark = assessment.getHumanReadableMark(student, true) %}
+                                {% if assessment is not task and assessment is not project %}
+                                    {% set className = '' %}
+                                    {% set humanMark = assessment.getHumanReadableMark(student, true) %}
+                                    {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
 
-                                {% set className = '' %}
-                                {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
-
-                                {% if assessment is task %}
-                                    {% if humanMark == 'Teacher-Assessed' or humanMark == 'Student-Assessed' %}
-                                        {% set className = 'mastered' %}
-                                    {% else %}
-                                        {% if upcoming == 0 %}
-                                            {% set upcoming = 1 %}
-                                            {% set className = 'upcoming' %}
-                                        {% else %}
-                                            {% set className = '' %}
-                                        {% endif %}
-                                        {% set value = '–' %}
-                                    {% endif %}
-                                {% else %}
                                     {% if humanMark is empty %}
+
+                                        {# No mark available #}
+
                                         {% if upcoming == 0 %}
+
+                                            {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
+
                                             {% set upcoming = 1 %}
-                                            {% set className = 'upcoming' %}
+                                            {% set value = '<i class="icon-clock">' %}
                                         {% else %}
+
+                                            {# Otherwise just leave the cell blank and unstyled #}
+
                                             {% set className = '' %}
+                                            {% set value = '' %}
                                         {% endif %}
+
                                     {% elseif humanMark >= 70 %}
                                         {% set className = 'mastered' %}
                                     {% else %}
                                         {% set className = 'fail' %}
                                     {% endif %}
-                                {% endif %}
 
-                                <td class="text-center {{ className }}">
-                                    {{ value }}
-                                </td>
+                                    {# If student has submitted work but has not received a mark, style the cell appropriately #}
+
+                                    {% if assessment.isParticipant(student) %}
+                                        {% if not assessment.getParticipant(student).isMarked and assessment.getParticipant(student).isResponded %}
+                                            {% set className = 'notmarked' %}
+                                        {% endif %}
+                                    {% endif %}
+
+                                    <td class="text-center {{ className }}">
+                                        {{ value | purify }}
+                                    </td>
+                                {% endif %}
 
                             {% endfor %}
                         </tr>

@@ -81,11 +81,6 @@ class Controller extends Base
      */
     public function getMastery($class, $term)
     {
-        // Replaces /submission/listSubmission/{termSlug}/{folderId}
-        //       eg /submission/listSubmission/{termSlug}/{folderId}
-        // Replaces /submission/viewSubmission/{dueWorkId}
-        //       eg /submission/viewSubmission/56
-
         // Does this class exist ?
         if (!$class->getId()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
@@ -119,32 +114,6 @@ class Controller extends Base
             }
         }
 
-        //var_dump($markbook->getAssessmentsWithProjectContents()->current());
-        //var_dump($markbook->getStudentStatistics());
-        //var_dump($markbook->getAssessmentStatistics());
-        //var_dump($markbook->getStudents());
-
-//
-//        /** @var IAssessable $a */
-//        $a = $markbook->getAssessments()->first();
-//
-//
-//        /** @var Participant $b */
-//        $b = $a->getAllParticipants()->first();
-//        $t = new Task\Instance();
-//
-//
-//        /** @var Completion $tc */
-//        $tc = $t->getCompletionList()->first();
-//
-//        //$b->getAllResponses()->count()
-//        /** @var IFeedback $c */
-//        $c = $b->findMostRecentFeedback();
-//
-
-        //var_dump($c->getHumanReadableMark());
-
-        //exit;
         $this->getResponse()->content->set([
             'template' => '@learningMastery/mastery.twig',
             'data' => [
