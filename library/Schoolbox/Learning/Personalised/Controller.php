@@ -7,9 +7,18 @@
 
 namespace Schoolbox\Learning\Personalised;
 
+use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -124,7 +133,77 @@ class Controller extends Base
     public function getCalendarForStudent(User $student)
     {
         // This will contain a from and to date.
-        // Use the calendar renderer classes here?
+        $term = (new Term())
+            ->setStart(new Alaress_Date_Format($this->getRequest()->query->get('start'), Alaress_Date_Format::TIMESTAMP))
+            ->setActualFinish(new Alaress_Date_Format($this->getRequest()->query->get('end'), Alaress_Date_Format::TIMESTAMP))
+        ;
 
+        // Use the calendar renderer classes here?
+        $resultSet = $this->assessmentDataSource->findAllByStudent($student, $term)
+            ->map(function(IAssessable $assessable) {
+                $result = new Collection();
+
+                // Process unit implementations only
+                if ($assessable->getContext() instanceof UnitImplementation) {
+                    /** @var UnitImplementation $context */
+                    $context = $assessable->getContext();
+                    /** @var Folder $folder */
+                    $folder  = $assessable->getBaseContext();
+
+                    // The unit itself
+                    $result->add([
+                        'id'         => 'unit-'.$context->getId(),
+                        'title'      => $context->getTitle(),
+                        'editable'   => false,
+                        'start'      => $context->getOpenDate()->getDatabase(),
+                        'end'        => $context->getDueDate()->getDatabase(),
+                        'allDay'     => false,
+                        'resourceId' => $folder->getId().'-units',
+                    ]);
+
+                    // If this is a quiz or due work - it's a content area
+                    if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
+                        $result->add([
+                            'id'         => 'contentArea-'.$assessable->getId(),
+                            'title'      => $assessable->getTitle(),
+                            'editable'   => true,
+                            'start'      => $assessable->getOpenAt()->getDatabase(),
+                            'end'        => $assessable->getDueAt()->getDatabase(),
+                            'allDay'     => false,
+                            'resourceId' => $folder->getId().'-contentAreas',
+                        ]);
+                    }
+
+                    // If this is a project - get it and its constituents
+                    if ($assessable instanceof Project) {
+                        $result->add([
+                            'id'         => 'project-'.$assessable->getId(),
+                            'title'      => $assessable->getTitle(),
+                            'editable'   => true,
+                            'start'      => $assessable->getOpenAt()->getDatabase(),
+                            'end'        => $assessable->getDueAt()->getDatabase(),
+                            'allDay'     => false,
+                            'resourceId' => $folder->getId().'-projects',
+                        ]);
+
+                        foreach ($assessable->getAssessables() as $activity) {
+                            $result->add([
+                                'id'         => 'activity-'.$assessable->getId(),
+                                'title'      => $activity->getTitle(),
+                                'editable'   => true,
+                                'start'      => $activity->getOpenAt()->getDatabase(),
+                                'end'        => $activity->getDueAt()->getDatabase(),
+                                'allDay'     => false,
+                                'resourceId' => $folder->getId().'-activities',
+                            ]);
+                        }
+                    }
+                }
+
+                return $result;
+            })
+            ->concat();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
     }
 }
