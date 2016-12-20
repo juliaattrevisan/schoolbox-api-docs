@@ -54,20 +54,6 @@
                     timelineTwoMonth: {
                         type: 'timeline',
                         duration: { months: 2 }
-                    },
-                    timelineMonth: {
-                        slotLabelFormat: ['ddd D']
-                    },
-                    timelineWeek: {
-                        slotLabelFormat: ['ddd D/M', 'h'],
-                        scrollTime: '32:00',
-                        slotWidth: '20'
-
-                    },
-                    timelineDay: {
-                        slotLabelFormat: ['ha'],
-                        scrollTime: '08:00',
-                        slotWidth: '20'
                     }
                 },
                 height: 'auto',
@@ -78,7 +64,7 @@
                 header: {
                     left: 'prevMonth,today,nextMonth',
                     center: 'title',
-                    right: 'timelineTwoMonth'
+                    right: ''
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
