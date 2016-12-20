@@ -73,6 +73,12 @@
 		}
 	}
 
+	i[class^="icon-"],
+	i[class*=" icon-"]{
+		padding: 0 rem-calc($base-font-size - 6) 0 0;
+		margin: 0;
+	}
+
 	/* The rare case of a mime file icon.
 	 * 60x60px
 	 * Needs diff margin to look correct

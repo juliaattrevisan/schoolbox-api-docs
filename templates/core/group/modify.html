@@ -271,116 +271,97 @@ $(document).ready(function() {
                     <!-- BEGIN msg_enabled_followth -->
 
                     <!-- END msg_enabled_followth -->
-                    <ul class="information-list">
+                    <ul class="information-list card-selectable">
                         <!-- BEGIN hide_no_members -->
-                            <li class="actions">
-                                <div class="small-1 columns no-pad">
-                                    <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
-                                    <label for="delete-all" class="checkbox-label"></label>
-                                </div>
-                            </li>
-                        <!-- END hide_no_members -->
-                        <!-- BEGIN groupOwner -->
-                        <li class="actions" data-relation="member">
-                            <div class="small-1 columns no-pad">
-                                &nbsp;
+                        <li class="actions-small-4">
+                            <div class="selector">
+                                <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
+                                <label for="delete-all" class="checkbox-label"></label>
                             </div>
-                            <div class="card small-11 medium-5 ">
-                                <!-- BEGIN msg_enabled_followadmin -->
-
-                                <!-- END msg_enabled_followadmin -->
-                                <a href="/search/user/{OWNER_ID}">
-                                    <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                    {GROUP_OWNER}
-                                </a>
-                                <p class="meta icon-favourite">Group Admins</p>
-                            </div>
-                            <div class="small-12 medium-6 columns no-pad">
-                                <div class="actions-small-4">
-                                    <nav>
-                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                            <input id="accessLevel-{OWNER_ID}-1" type="radio" name="accessLevel[{OWNER_ID}]" value="1" />
-                                            <label for="accessLevel-{OWNER_ID}-1" class="radio-toggle">
-                                                <span class="icon-view" title="Grant Read Access"></span>
-                                            </label>
-                                            <input id="accessLevel-{OWNER_ID}-2" type="radio" name="accessLevel[{OWNER_ID}]" value="2" />
-                                            <label for="accessLevel-{OWNER_ID}-2" class="radio-toggle">
-                                                <span class="icon-modify" title="Grant Write Access"></span>
-                                            </label>
-                                            <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
-                                            <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
-                                                <span class="icon-favourite" title="Make Admin"></span>
-                                            </label>
-                                            <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
-                                            <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
-                                                <span class="icon-close alert" title="Remove From Group"></span>
-                                            </label>
-                                        </form>
-                                    </nav>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <!-- BEGIN msg_enabled_followadmin -->
+                                    <!-- END msg_enabled_followadmin -->
+                                    <a href="/search/user/{OWNER_ID}">
+                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                        {GROUP_OWNER}
+                                    </a>
+                                    <p class="meta"><i class="icon-favourite"></i>Group Admins</p>
                                 </div>
                             </div>
+                            <!-- BEGIN groupOwner -->
+                            <nav>
+                                <form action="/group/modifyForm.php" method="post">
+                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                    <input id="accessLevel-{OWNER_ID}-1" type="radio" name="accessLevel[{OWNER_ID}]" value="1" />
+                                    <label for="accessLevel-{OWNER_ID}-1" class="input-toggle">
+                                        <a class="icon-view" title="Grant Read Access"></a>
+                                    </label>
+                                    <input id="accessLevel-{OWNER_ID}-2" type="radio" name="accessLevel[{OWNER_ID}]" value="2" />
+                                    <label for="accessLevel-{OWNER_ID}-2" class="input-toggle">
+                                        <a class="icon-modify" title="Grant Write Access"></a>
+                                    </label>
+                                    <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
+                                    <label for="accessLevel-{OWNER_ID}-3" class="input-toggle">
+                                        <a class="icon-favourite" title="Make Admin"></a>
+                                    </label>
+                                    <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
+                                    <label for="accessLevel-{OWNER_ID}-0" class="input-toggle">
+                                        <a class="icon-close alert" title="Remove From Group"></a>
+                                    </label>
+                                </form>
+                            </nav>
                             <div class="toast" data-alert data-relation="save-label"></div>
+                            <!-- END groupOwner -->
                         </li>
-                        <!-- END groupOwner -->
+                        <!-- END hide_no_members -->
+
 
                         <!-- BEGIN member -->
-                        <li class="actions" data-relation="member">
-                            <div class="small-1 columns no-pad">
+                        <li data-relation="member" class="actions-small-4">
+                            <div class="selector">
                                 <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
                                 <label for="delete-{USER_ID}" class="checkbox-label"></label>
                             </div>
-                            <div class="card small-11 medium-5 ">
-                                <a href="/search/user/{USER_ID}">
-                                    <!-- BEGIN show_photo -->
-                                    <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
-                                    <!-- END show_photo -->
-
-                                    {USER_NAME}
-                                </a>
-                                <p class="meta {USER_ICON}">
-                                    {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
-                                    <!-- BEGIN msg_enabled_userfollow -->
-                                    <!-- END msg_enabled_userfollow -->
-                                </p>
-                            </div>
-                            <div class="small-11 medium-6 columns no-pad">
-                                <div class="actions-small-4">
-                                    <nav>
-                                        <!-- BEGIN make_owner -->
-                                        <!-- END make_owner -->
-                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                            <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
-                                            <label for="accessLevel-{USER_ID}-1" class="radio-toggle">
-                                                <span class="icon-view" title="Grant Read Access"></span>
-                                            </label>
-                                            <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
-                                            <label for="accessLevel-{USER_ID}-2" class="radio-toggle">
-                                                <span class="icon-modify" title="Grant Write Access"></span>
-                                            </label>
-                                            <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
-                                            <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
-                                                <span class="icon-favourite" title="Make Admin"></span>
-                                            </label>
-                                            <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
-                                            <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
-                                                <span class="icon-close alert" title="Remove From Group"></span>
-                                            </label>
-                                        </form>
-                                    </nav>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="/search/user/{USER_ID}">
+                                        <!-- BEGIN show_photo -->
+                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                                        <!-- END show_photo -->
+                                        {USER_NAME}
+                                    </a>
+                                    <p class="meta">
+                                        <i class="{USER_ICON}"></i>
+                                        {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
+                                        <!-- BEGIN msg_enabled_userfollow -->
+                                        <!-- END msg_enabled_userfollow -->
+                                    </p>
                                 </div>
-
-                               <!--
-                               <div class="actions-small-3">
-                                    <nav>
-                                        <a href="#" class="icon-modify {WRITE_SELECTED}" title="Grant Write Access"></a>
-                                        <a href="#" class="icon-favourite {ADMIN_ALLOWED}" title="Make Admin"></a>
-                                        <a href="#" class="icon-close alert" title="Remove From Group"></a>
-                                    </nav>
-                                </div>
-                                -->
                             </div>
+                            <nav>
+                                <!-- BEGIN make_owner -->
+                                <!-- END make_owner -->
+                                <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                    <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
+                                    <label for="accessLevel-{USER_ID}-1" class="input-toggle">
+                                        <a class="icon-view" title="Grant Read Access"></a>
+                                    </label>
+                                    <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
+                                    <label for="accessLevel-{USER_ID}-2" class="input-toggle">
+                                        <a class="icon-modify" title="Grant Write Access"></a>
+                                    </label>
+                                    <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
+                                    <label for="accessLevel-{USER_ID}-3" class="input-toggle">
+                                        <a class="icon-favourite" title="Make Admin"></a>
+                                    </label>
+                                    <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
+                                    <label for="accessLevel-{USER_ID}-0" class="input-toggle">
+                                        <a class="icon-close alert" title="Remove From Group"></a>
+                                    </label>
+                                </form>
+                            </nav>
                             <div class="toast" data-alert data-relation="save-label"></div>
                         </li>
                         <!-- END member -->
