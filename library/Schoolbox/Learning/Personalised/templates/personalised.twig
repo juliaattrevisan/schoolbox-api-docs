@@ -53,7 +53,13 @@
                 views: {
                     timelineTwoMonth: {
                         type: 'timeline',
-                        duration: { months: 2 }
+                        duration: { months: 2 },
+                        buttonText: 'Month'
+                    },
+                    timelineTwoWeek: {
+                        type: 'timeline',
+                        duration: { weeks: 2 },
+                        buttonText: 'Week'
                     }
                 },
                 height: 'auto',
@@ -64,7 +70,7 @@
                 header: {
                     left: 'prevMonth,today,nextMonth',
                     center: 'title',
-                    right: ''
+                    right: 'timelineTwoMonth,timelineTwoWeek'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
