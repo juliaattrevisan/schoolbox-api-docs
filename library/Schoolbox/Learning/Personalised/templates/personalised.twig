@@ -89,20 +89,19 @@
                     prevWindow: {
                         icon: 'left-single-arrow',
                         click: function() {
-                            // Start of two months ago, then to start of one month ago:
-                            // this ensures that last and this month's events load.
+                            // Rewind one window from now
                             var date = calendar.fullCalendar('getDate').clone();
-                            calendar.fullCalendar('gotoDate', date.subtract(2, 'months').endOf('month'));
-                            calendar.fullCalendar('gotoDate', date.add(1, 'months').endOf('month'));
+                            calendar.fullCalendar('gotoDate', date.subtract(1, 'months'));
                         }
                     },
                     nextWindow: {
                         icon: 'right-single-arrow',
                         click: function() {
-                            // Start of two months from now, then to start of one month from now
+                            // Start of two windows from now, then to start of one window from now.
+                            // This ensures that events that are in the next window but not this one get loaded.
                             var date = calendar.fullCalendar('getDate').clone();
-                            calendar.fullCalendar('gotoDate', date.add(2, 'months').startOf('month'));
-                            calendar.fullCalendar('gotoDate', date.subtract(1, 'months').startOf('month'));
+                            calendar.fullCalendar('gotoDate', date.add(2, 'months'));
+                            calendar.fullCalendar('gotoDate', date.subtract(1, 'months'));
                         }
                     }
                 },
