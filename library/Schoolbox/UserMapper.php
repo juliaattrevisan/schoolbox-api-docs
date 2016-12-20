@@ -19,6 +19,7 @@ use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class UserMapper
