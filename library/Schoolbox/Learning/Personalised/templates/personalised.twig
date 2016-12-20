@@ -54,6 +54,11 @@
                         type: 'timeline',
                         duration: { weeks: 2 },
                         buttonText: 'Week'
+                    },
+                    timelineTwoDay: {
+                        type: 'timeline',
+                        duration: { days: 2 },
+                        buttonText: 'Day'
                     }
                 },
                 height: 'auto',
@@ -64,7 +69,7 @@
                 header: {
                     left: 'prevWindow,today,nextWindow',
                     center: 'title',
-                    right: 'timelineTwoMonth,timelineTwoWeek'
+                    right: 'timelineTwoMonth,timelineTwoWeek,timelineTwoDay'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
