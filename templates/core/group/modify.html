@@ -158,19 +158,18 @@ $(document).ready(function() {
                  */
                 form.find(':input').prop('disabled', false);
 
+                var $response = $(response);
+
                 // success stuff. Reload memberlist and waitlist
+                waitingList.empty().append($response.find('#waitingList').children());
+                memberList.empty().append($response.find('#members').children());
+
+                $('[data-delete-members]').off('click').click(deleteMembers);
+                $('[data-toggle-all]').off('change').change(deleteAllToggled);
+
+                $('input[name="delete[]"]').off('change').change(deleteToggled);
+
                 label.toastTimeout({text: 'Done'});
-                label.on('toastTimeout', function() {
-                    var $response = $(response);
-
-                    waitingList.empty().append($response.find('#waitingList').children());
-                    memberList.empty().append($response.find('#members').children());
-
-                    $('[data-delete-members]').off('click').click(deleteMembers);
-                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
-
-                    $('input[name="delete[]"]').off('change').change(deleteToggled);
-                });
             })
             .fail(function() {
                 // failure stuff
