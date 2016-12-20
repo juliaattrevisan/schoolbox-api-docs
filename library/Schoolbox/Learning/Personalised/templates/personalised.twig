@@ -127,19 +127,23 @@
                     }
                 }],
 
-                resourceRender: function(resource, label, body, view) {
-                    // Collapse resource by default
-                    if (resource.children && resource.children.length > 0) {
-                        view.getResourceRow(resource.id).collapse();
-                    }
-                },
-
-                eventRender: function(event, element, view) {
-                    // Expand the folder for any resource which contains an event
-                    var parentRow = view.getResourceRow(event.resourceId).parent;
-                    if (!parentRow.isExpanded) {
-                        parentRow.expand();
-                    }
+                eventAfterAllRender: function(view) {
+                    // Any resource whose children contain no events should be collapsed
+                    $.each(view.resourceRowHash, function(key, resourceRow) {
+                        var hasChildren = false;
+                        for (var i in resourceRow.children) {
+                            var childId = resourceRow.children[i].resource.id;
+                            if (view.calendar.getResourceEvents(childId).length > 0) {
+                                hasChildren = true;
+                                break;
+                            }
+                        }
+                        if (hasChildren) {
+                            resourceRow.expand();
+                        } else {
+                            resourceRow.collapse();
+                        }
+                    });
                 },
 
                 loading: function(isLoading) {
