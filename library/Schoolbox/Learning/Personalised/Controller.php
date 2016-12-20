@@ -203,7 +203,7 @@ class Controller extends Base
                         $result->add([
                             'id'         => 'project-'.$assessable->getId(),
                             'title'      => $assessable->getTitle(),
-                            'editable'   => true,
+                            'editable'   => false,
                             'start'      => $assessable->getPublishAt()->getDatabase(),
                             'end'        => $assessable->getDueAt()->getDatabase(),
                             'allDay'     => false,
