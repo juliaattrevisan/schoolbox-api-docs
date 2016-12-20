@@ -283,7 +283,7 @@ class UserMapper extends Mapper
 
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (\Schoolbox\User $model) {
 
             /** @var User $model */
             if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
