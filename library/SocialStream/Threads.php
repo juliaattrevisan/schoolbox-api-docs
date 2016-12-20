@@ -73,7 +73,7 @@ class Threads
      * @param $start
      * @param $offset
      */
-    public function __construct($di, $instance, $homepageId, $start, $offset)
+    public function __construct($instance, $homepageId, $start, $offset)
     {
         $this->setInstance($instance);
         $this->setHomepageId($homepageId);
