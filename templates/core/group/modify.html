@@ -141,8 +141,9 @@ $(document).ready(function() {
 
                 // Check if the action was redirect, and if so send them to the appropriate URL
 
-                if (response.action == 'redirect')
+                if (response.action == 'redirect') {
                     window.location.href = response.url;
+                }
             } catch (e) {
 
                 // Noop. Will fall through to the .done() functio
