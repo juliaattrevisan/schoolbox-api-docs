@@ -34,6 +34,25 @@
             calendarDate = new Date();
         }
 
+        /**
+         * Retrieves the duration unit from the type of the custom view.
+         *
+         * @param view
+         */
+        var getDurationUnitFromView = function(view) {
+            switch (view.type) {
+                case 'timelineTwoMonth':
+                    return 'month';
+
+                case 'timelineTwoWeek':
+                    return 'week';
+
+                case 'timelineTwoDay':
+                    return 'day';
+            }
+            throw new Error('Unrecognised view type "'+String(view.type)+'"');
+        };
+
         var calendar = $('#calendar');
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
@@ -94,19 +113,31 @@
                     prevWindow: {
                         icon: 'left-single-arrow',
                         click: function() {
-                            // Rewind one window from now
-                            var date = calendar.fullCalendar('getDate').clone();
-                            calendar.fullCalendar('gotoDate', date.subtract(1, 'months'));
+                            try {
+                                // Step back one window from now
+                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                                var date = calendar.fullCalendar('getDate').clone();
+                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                            } catch (e) {
+                                // Just go to previous step
+                                calendar.fullCalendar('prev');
+                            }
                         }
                     },
                     nextWindow: {
                         icon: 'right-single-arrow',
                         click: function() {
-                            // Start of two windows from now, then to start of one window from now.
-                            // This ensures that events that are in the next window but not this one get loaded.
-                            var date = calendar.fullCalendar('getDate').clone();
-                            calendar.fullCalendar('gotoDate', date.add(2, 'months'));
-                            calendar.fullCalendar('gotoDate', date.subtract(1, 'months'));
+                            try {
+                                // Step forward two windows from now, then back one window from that.
+                                // This ensures that events that are in the next window but not this one get loaded.
+                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                                var date = calendar.fullCalendar('getDate').clone();
+                                calendar.fullCalendar('gotoDate', date.add(2, unit));
+                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                            } catch (e) {
+                                // Just go to next step
+                                calendar.fullCalendar('next');
+                            }
                         }
                     }
                 },
