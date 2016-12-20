@@ -127,13 +127,19 @@
                     }
                 }],
 
-                eventAfterAllRender: function(view) {
-                    // On expand of a resource: collapse everything
-                    $.each(view.resourceRowHash, function(key, resourceRow) {
-                        if (resourceRow.children && resourceRow.children.length > 0) {
-                            resourceRow.collapse();
-                        }
-                    });
+                resourceRender: function(resource, label, body, view) {
+                    // Collapse resource by default
+                    if (resource.children && resource.children.length > 0) {
+                        view.getResourceRow(resource.id).collapse();
+                    }
+                },
+
+                eventRender: function(event, element, view) {
+                    // Expand the folder for any resource which contains an event
+                    var parentRow = view.getResourceRow(event.resourceId).parent;
+                    if (!parentRow.isExpanded) {
+                        parentRow.expand();
+                    }
                 },
 
                 loading: function(isLoading) {
