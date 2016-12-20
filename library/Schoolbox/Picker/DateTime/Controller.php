@@ -19,6 +19,7 @@ use \Calendar_Layout_Full_Ajax_JSON;
 use \Group;
 use \External_Timetable;
 use \Schoolbox\CampusMapper;
+use \External_Synergetic_Timetable;
 
 class Controller extends Base
 {
@@ -72,15 +73,14 @@ class Controller extends Base
     }
 
     /**
-     * Return array of all timetables by campus id
-     * @param string $date
+     * Return an array of all timetables and campus data
      */
     public function getTimetable() {
         $user = $this->getUser();
         $timetableHandler = new External_Timetable;
         $timetable = array();
         $campusInfo = array();
-        //Return campus and i
+
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
             $campusInfo['campusId'] = $campus->getId();
@@ -89,15 +89,77 @@ class Controller extends Base
 
             //Return campus and it's timetable in one array
             $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
-
         }
         return $timetable;
     }
 
+    /**
+     * Return all terms
+     */
     public function getTerms() {
+
         $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
-//new \Alaress_Probe($terms);
+
         return $terms;
+    }
+
+    /**
+     * Return a first timetable day for a term
+     * @param object $campus
+     * @param string $termStartDate
+     */
+    public function  getFirstDayOfTerm($campus, $termStartDate) {
+
+        $timetable = new \External_Synergetic_Timetable;
+
+        $termStartTimestamp = new \Alaress_Date_Format($termStartDate, 'd/m/Y h:iA');
+
+        $date =  $timetable->getDayNumber ($campus, $termStartTimestamp->getUnixTimeStamp());
+
+        return $date;
+    }
+
+    //http://192.168.36.10/picker/datetime/campus/1/term/8/cycle/2/day/5
+    /**
+     * Return a a list of events for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
+     */
+    public function getByTimetableDay($campusId, $termId, $cycle, $day){
+
+        $user = $this->getUser();
+
+        //Get Campus object
+        $campus = $user->getCampusCollection()->getBy('id', $campusId);
+
+        //Get particular term
+        $term = $this->getTerms()->getBy('id', $termId);
+
+        //When this term starts?
+        $termStartDate = $term->getStart()->getLocal();
+
+        //What's it's first timetabe day? (TODO: this is using the current timetable, needs to use a proper one for the term)
+        $termFirstDay = $this->getFirstDayOfTerm($campus, $termStartDate);
+
+        $timetableHandler = new External_Timetable;
+        $campusTimetable = $timetableHandler->getTimetableDefinition(null, $campus);
+        $daysInCycle = $campusTimetable['dayCount'];
+
+        $date = $this->getDateForTimetableDay($termStartDate, $termFirstDay, $daysInCycle, $cycle, $day);
+        return $this->getByDate($date);
+
+    }
+
+    /**
+     * Converting timetable cycle and day into a calendar date
+     */
+    public function getDateForTimetableDay($termStartDate, $termFirstDay, $daysInCycle, $cycle, $day) {
+
+        $termStartDate = new \Alaress_Date_Format($termStartDate, 'd/m/Y h:iA');
+
+        //Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
+        $shiftTimetableDays = $daysInCycle*($cycle-1)+$day-$termFirstDay;
+        $date = $termStartDate->addWeekdays($shiftTimetableDays)->getDatabase();
+
+        return $date;
     }
 
     /**
@@ -133,19 +195,6 @@ class Controller extends Base
             var_dump($e->getMessage());
         }
 
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data' => [
-                    'appointments' => $appointments
-                ]
-            )
-        );
-    }
-
-    public function getByPeriod() {
-
-        $appointments = $this->loadDummyAppointments();
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',

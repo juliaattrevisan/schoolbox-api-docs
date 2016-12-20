@@ -113,7 +113,7 @@
                                     <option value = {{ term.id }}>{{ term.title }}</option>
                                 {% endfor %}
                             </select>
-                            <select name = "week">
+                            <select name = "cycle">
                                 <option value = 1>Week/Cycle 1</option>
                                 <option value = 2>Week/Cycle 2</option>
                                 <option value = 3>Week/Cycle 3</option>
@@ -194,10 +194,13 @@
         $('.description-'+period).addClass('period-selected');
         periodClicked = 'period'+day+'_'+period;
 
-        $.get(('{{ routeLookup('pickerDatetime.getByPeriod', { period: '_params_' }) }}').replace(/_params_/g, encodeURIComponent(day+'_'+period)))
+        var campus = $('select[name*="campus"]').val();
+        var term = $('select[name*="term"]').val();
+        var cycle = $('select[name*="cycle"]').val();
+
+        $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
 
-                    console.log(data);
                     if (data.appointments.length == 0) {
 
                         timetableAppointments.html('No events found');
@@ -207,8 +210,6 @@
                         {# Clear out any old appointments #}
 
                         timetableAppointments.html('');
-
-                        {#timetableAppointments.append('<h3>Day '+ day +'{{ timetable[campus].desc[period] }}</h3>');#}
 
                         {# Populate with appointments for the selected date #}
                         for (var i = 0; i < data.appointments.length; i++) {
@@ -223,12 +224,6 @@
                     console.log('Failed to retrieve appointments for specified period');
                 });
     });
-
-
-
-
-
-
 
     var newDate, latestDate;
 
