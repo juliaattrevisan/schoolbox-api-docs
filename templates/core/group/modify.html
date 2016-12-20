@@ -16,13 +16,11 @@ $(document).ready(function() {
     });
 
     var deleteAllToggled = function(event) {
-        console.log('deleteAll');
         $('input[name="delete[]"]').prop('checked', $(this)[0].checked);
         $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
     };
 
     var deleteToggled = function(event) {
-        console.log('delete');
         $('[data-toggle-all]').prop('checked', false);
         $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
     };
