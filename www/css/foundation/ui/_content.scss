@@ -774,15 +774,17 @@ nav {
  * Uses .expander, .selector or .grip
  * Use %placeholders to prevent the same CSS getting spat out over and over again.
  */
+$selector-width: 2rem;
+
 %interaction-li{
 	display: table;
-	width: calc(100% + 2rem);
+	width: calc(100% + #{$selector-width});
 }
 %interaction-selector{
 	padding: 0 0.75rem;
 	display: table-cell;
 	vertical-align: middle;
-	width: 2rem;
+	width: $selector-width;
 	&:before {
 		display: table-cell;
 		vertical-align: middle;
@@ -816,7 +818,7 @@ nav {
 	clear:both;
 }
 %information-li{
-	@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+	//@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
 	@include responsive-sides(-1, margin);
 	border-bottom: 1px solid $body-bg;
 	position: relative;
