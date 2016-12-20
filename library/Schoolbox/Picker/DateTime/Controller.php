@@ -119,11 +119,10 @@ class Controller extends Base
         return $date;
     }
 
-    //http://192.168.36.10/picker/datetime/campus/1/term/8/cycle/2/day/5
     /**
      * Return a a list of events for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day){
+    public function getByTimetableDay($campusId, $termId, $cycle, $day) {
 
         $user = $this->getUser();
 

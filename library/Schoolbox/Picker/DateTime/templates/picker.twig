@@ -105,19 +105,16 @@
                         <form>
                             <select name="campus">
                                 {% for campus in timetable %}
-                                    <option value = {{ campus.campusId }}>{{ campus.campusName }}</option>
+                                    <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
                                 {% endfor %}
                             </select>
                             <select name = "term">
                                 {% for term in terms %}
-                                    <option value = {{ term.id }}>{{ term.title }}</option>
+                                    <option value="{{ term.id }}" data-duration="{{ term.duration }}">{{ term.title }} </option>
                                 {% endfor %}
                             </select>
-                            <select name = "cycle">
-                                <option value = 1>Week/Cycle 1</option>
-                                <option value = 2>Week/Cycle 2</option>
-                                <option value = 3>Week/Cycle 3</option>
-                                <option value = 4>Week/Cycle 4</option>
+                            <select name="cycle">
+                                {# Options will be appended here #}
                             </select>
                         </form>
                         {% set campus = 1 %}
@@ -151,9 +148,11 @@
         </div>
     {#</div>#}
 </div>
-{# Setup calendar #}
+
 
 <script>
+
+    {# Tabs #}
 
     $('#1').click(function(){
         $('#byDate').css('display', 'block');
@@ -167,8 +166,35 @@
 
     });
 
+    {# Timtable picker #}
+
+    {# Build cycles dynamically #}
+    function buildCycles() {
+
+        var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
+        var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
+        var optionsHtml = '';
+        for (i = 1; i <= (termDuration / daysInCycle); i++) {
+            optionsHtml += '<option value="' + i + '">Week ' + i + '</option>';
+        }
+        $('select[name*="cycle"]').empty().append(optionsHtml);
+    }
+
+    {# Put cycles on load #}
+    buildCycles();
+
+    {# Update cycles on Campus or Term change #}
+    $('select[name*="campus"]').change(function(){
+        buildCycles();
+    });
+
+    $('select[name*="term"]').change(function(){
+        buildCycles();
+    });
+
     var timetableAppointments = $('#timetableAppointments{{ id }}');
 
+    {# Timetable picker behaviour #}
     $('table.timetablePicker').mouseout(function(){
         $('.period-hover').removeClass('period-hover');
     });
@@ -182,6 +208,8 @@
         $('.description-'+period).addClass('period-hover');
 
     });
+
+    {# Loading events on timetable picker click #}
 
     $('.has-period').click(function(){
 
@@ -225,6 +253,7 @@
                 });
     });
 
+    {# Setup calendar #}
     var newDate, latestDate;
 
     window.pickerInstance[{{ id }}] = flatpickr("#pickerCalendar{{ id }}", {

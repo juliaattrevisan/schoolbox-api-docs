@@ -181,6 +181,14 @@ class Model implements \IComparable
     }
 
     /**
+     * @return number of working (timetable) days in a term
+     */
+    public function getDuration()
+    {
+        return $this->getStart()->diffInWeekdays($this->getDisplayFinish());
+    }
+
+    /**
      * @param  Alaress_Date_Format $start
      * @return $this
      */
