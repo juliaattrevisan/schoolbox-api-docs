@@ -12,6 +12,10 @@ namespace Schoolbox;
 
 use Schoolbox;
 use \Alaress\Lumberjack\Logger;
+use \Schoolbox\User;
+use \Schoolbox\Role;
+use \Schoolbox\RoleMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
 
 class UserBulkMapper extends UserMapper
 {
@@ -284,7 +288,7 @@ class UserBulkMapper extends UserMapper
     /**
      * Mass Modify 3
      *
-     * @param $user
+     * @param User $user
      * @param $defaultCampusId
      * @param $allCampusIds
      * @param $roleId
@@ -294,9 +298,12 @@ class UserBulkMapper extends UserMapper
      * @param $externalMailClient
      * @param $webmail
      * @param $enabled
+     * @param $hideContacts
+     * @param $hideTimetable
+     * @param $positionTitle
      */
     public function bulkModifyUpdate(
-        $user,
+        User $user,
         $defaultCampusId,
         $allCampusIds,
         $roleId,
@@ -314,7 +321,16 @@ class UserBulkMapper extends UserMapper
         /* Update group settings
          */
         if ($roleId != $this->getUnchanged()) {
-            $user->setRole($roleId);
+            try {
+                /** @var Role $role */
+                $role = RoleMapper::getInstance()->findById($roleId);
+                $user->setRole($role);
+            }
+            catch (MapperException $e) {
+                $message = "{$user->getFullname()} ({$user->getId()}) was skipped - unknown role";
+                $this->log($message, []);
+                return;
+            }
         }
 
         /* Update year settings
