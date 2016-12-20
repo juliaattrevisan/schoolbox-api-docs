@@ -531,17 +531,10 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
-        $extraParams['id'] = [];
-
-        foreach ($classFolderIds as $id) {
-            foreach ($this->baseMapper->findAllForFolderId($id, []) as $assessable) {
-                $extraParams['id'][] = $assessable->getId();
-            }
-        }
+        $predicate = $this->convertOptionsToPredicateBuilder(['term' => $term,]);
 
         return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId($classFolderIds, $extraParams)
+            $this->baseMapper->findAllForFolderId($classFolderIds, $predicate)
         );
     }
 
