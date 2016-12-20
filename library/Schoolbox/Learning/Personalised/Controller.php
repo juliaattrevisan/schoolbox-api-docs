@@ -194,6 +194,7 @@ class Controller extends Base
                             'end'        => $assessable->getDueAt()->getDatabase(),
                             'allDay'     => false,
                             'resourceId' => $folder->getId().'-contentAreas',
+                            'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
                         ]);
                     }
 
@@ -230,6 +231,7 @@ class Controller extends Base
                                 'end'        => $activity->getDueAt()->getDatabase(),
                                 'allDay'     => false,
                                 'resourceId' => $folder->getId().'-activities',
+                                'constraint' => 'activity-'.$activity->getId().'-bounds',
                             ]);
                         }
                     }
