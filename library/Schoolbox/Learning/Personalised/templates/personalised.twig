@@ -103,15 +103,21 @@
                     prevMonth: {
                         icon: 'left-single-arrow',
                         click: function() {
-                            calendar.fullCalendar('incrementDate', {month: -2});
-                            calendar.fullCalendar('incrementDate', {month: 1});
+                            // Start of two months ago, then to start of one month ago:
+                            // this ensures that last and this month's events load.
+                            // I know these are the wrong way around. For some reason it seems to work!
+                            var date = calendar.fullCalendar('getDate');
+                            calendar.fullCalendar('gotoDate', date.clone().add(2, 'months').startOf('month'));
+                            calendar.fullCalendar('gotoDate', date.clone().subtract(1, 'months').startOf('month'));
                         }
                     },
                     nextMonth: {
                         icon: 'right-single-arrow',
                         click: function() {
-                            calendar.fullCalendar('incrementDate', {month: 2});
-                            calendar.fullCalendar('incrementDate', {month: -1});
+                            // Start of two months from now, then to start of one month from now
+                            var date = calendar.fullCalendar('getDate');
+                            calendar.fullCalendar('gotoDate', date.clone().subtract(2, 'months').startOf('month'));
+                            calendar.fullCalendar('gotoDate', date.clone().add(1, 'months').startOf('month'));
                         }
                     }
                 },
