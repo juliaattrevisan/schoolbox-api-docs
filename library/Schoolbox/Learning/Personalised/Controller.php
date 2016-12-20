@@ -174,6 +174,18 @@ class Controller extends Base
 
                     // If this is a quiz or due work - it's a content area
                     if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
+                        // A background event for the bounds
+                        $result->add([
+                            'id'         => 'contentArea-'.$assessable->getId().'-bounds',
+                            'editable'   => false,
+                            'start'      => $assessable->getPublishAt()->getDatabase(),
+                            'end'        => $assessable->getDueAt()->getDatabase(),
+                            'allDay'     => false,
+                            'resourceId' => $folder->getId().'-contentAreas',
+                            'rendering'  => 'background'
+                        ]);
+
+                        // A foreground event for the actual quiz/duework
                         $result->add([
                             'id'         => 'contentArea-'.$assessable->getId(),
                             'title'      => $assessable->getTitle(),
@@ -198,6 +210,18 @@ class Controller extends Base
                         ]);
 
                         foreach ($assessable->getAssessables() as $activity) {
+                            // Background for the bounds
+                            $result->add([
+                                'id'         => 'activity-'.$activity->getId().'-bounds',
+                                'editable'   => false,
+                                'start'      => $activity->getPublishAt()->getDatabase(),
+                                'end'        => $activity->getDueAt()->getDatabase(),
+                                'allDay'     => false,
+                                'resourceId' => $folder->getId().'-activities',
+                                'rendering'  => 'background'
+                            ]);
+
+                            // A foreground event for the actual activity
                             $result->add([
                                 'id'         => 'activity-'.$assessable->getId(),
                                 'title'      => $activity->getTitle(),
