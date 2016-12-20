@@ -486,15 +486,6 @@ class MapperProxy
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
         $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
-//        if (!empty($uniqueAssessmentIds)) {
-//            $builder = $builder->equals('id', $uniqueAssessmentIds);
-//        }
-
-//        $extraParams = $this->convertOptionsToColumnList(['term' => $term,]);
-//
-//        // Find assessments which this student is no longer in the class for,
-//        // but has created a response or feedback for.
-//        $extraParams['id'] = $this->baseMapper->findUniqueAssessmentIdsForStudent($student, $term);
 
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection(
@@ -511,7 +502,7 @@ class MapperProxy
     /**
      * Finds all assessables for a staff member.
      *
-     * This method loads participation for $staff only.
+     * This method does not loads participation.
      *
      * @param User $staff
      * @param Term $term    Restrict results to this term
