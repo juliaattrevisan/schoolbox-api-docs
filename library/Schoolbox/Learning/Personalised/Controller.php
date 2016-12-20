@@ -223,7 +223,7 @@ class Controller extends Base
 
                             // A foreground event for the actual activity
                             $result->add([
-                                'id'         => 'activity-'.$assessable->getId(),
+                                'id'         => 'activity-'.$activity->getId(),
                                 'title'      => $activity->getTitle(),
                                 'editable'   => true,
                                 'start'      => $activity->getPublishAt()->getDatabase(),
