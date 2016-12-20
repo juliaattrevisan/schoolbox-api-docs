@@ -271,13 +271,17 @@ $(document).ready(function() {
                     <!-- BEGIN msg_enabled_followth -->
 
                     <!-- END msg_enabled_followth -->
+
                     <ul class="information-list card-selectable">
-                        <!-- BEGIN hide_no_members -->
                         <li class="actions-small-4">
+                            <!-- BEGIN hide_no_members -->
                             <div class="selector">
                                 <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
                                 <label for="delete-all" class="checkbox-label"></label>
                             </div>
+                            <!-- END hide_no_members -->
+
+                            <!-- BEGIN groupOwner -->
                             <div class="list-item">
                                 <div class="card small-12">
                                     <!-- BEGIN msg_enabled_followadmin -->
@@ -289,7 +293,6 @@ $(document).ready(function() {
                                     <p class="meta"><i class="icon-favourite"></i>Group Admins</p>
                                 </div>
                             </div>
-                            <!-- BEGIN groupOwner -->
                             <nav>
                                 <form action="/group/modifyForm.php" method="post">
                                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
@@ -311,11 +314,8 @@ $(document).ready(function() {
                                     </label>
                                 </form>
                             </nav>
-                            <div class="toast" data-alert data-relation="save-label"></div>
                             <!-- END groupOwner -->
                         </li>
-                        <!-- END hide_no_members -->
-
 
                         <!-- BEGIN member -->
                         <li data-relation="member" class="actions-small-4">
@@ -362,10 +362,12 @@ $(document).ready(function() {
                                     </label>
                                 </form>
                             </nav>
-                            <div class="toast" data-alert data-relation="save-label"></div>
                         </li>
                         <!-- END member -->
                     </ul>
+
+                    <div class="toast" data-alert data-relation="save-label"></div>
+
                     <hr>
                     <button disabled data-delete-members class="expand">Remove Selected Members From Group</button>
                 </div>
