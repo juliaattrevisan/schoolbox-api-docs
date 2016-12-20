@@ -283,7 +283,20 @@ class UserMapper extends Mapper
 
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (\Schoolbox\User $model) {
+
+            /* In some places, a User's Role may not be hydrated
+             */
+            if (is_numeric($model->getRole())) {
+                try {
+                    $model->setRole(\Schoolbox\RoleMapper::getInstance()->findById($model->getRole()));
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+
+                    /* Unknown role
+                     */
+                }
+            }
 
             /** @var User $model */
             if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
