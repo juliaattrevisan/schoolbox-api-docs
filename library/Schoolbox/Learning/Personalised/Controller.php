@@ -168,7 +168,7 @@ class Controller extends Base
                         'editable'   => false,
                         'start'      => $context->getOpenDate()->getDatabase(),
                         'end'        => $context->getDueDate()->getDatabase(),
-                        'allDay'     => false,
+                        'allDay'     => true,
                         'resourceId' => $folder->getId().'-units',
                     ]);
 
