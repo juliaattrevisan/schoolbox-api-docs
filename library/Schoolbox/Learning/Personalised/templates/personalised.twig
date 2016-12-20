@@ -37,13 +37,7 @@
         var calendar = $('#calendar');
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
-                enabled: true,
-                ajax: false,
-                // This AJAX lookup should always be a GET request
-                parentSelector: '#calendar-controls',
-                exportButtonSelector: true,
-                checkboxSelector: false,
-                applyFiltersSelector: false,
+                enabled: false,
                 listViewButton: false
             },
             fullCalendar: {
