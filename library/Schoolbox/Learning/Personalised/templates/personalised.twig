@@ -33,20 +33,9 @@
         } else {
             calendarDate = new Date();
         }
-//        switch (calendarView) {
-//            case 'day':
-//                calendarView = 'timelineDay';
-//                break;
-//            case 'week':
-//                calendarView = 'timelineWeek';
-//                break;
-//            case 'month':
-//            default:
-//                calendarView = 'timelineMonth';
-//                break;
-//        }
 
-        c = new Calendar('calendar', 'calendar-bubble', {
+        var calendar = $('#calendar');
+        var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
                 ajax: false,
@@ -62,6 +51,10 @@
                 allDaySlot: false,
                 defaultDate: calendarDate,
                 views: {
+                    timelineTwoMonth: {
+                        type: 'timeline',
+                        duration: { months: 2 }
+                    },
                     timelineMonth: {
                         slotLabelFormat: ['ddd D']
                     },
@@ -76,17 +69,16 @@
                         scrollTime: '08:00',
                         slotWidth: '20'
                     }
-
                 },
                 height: 'auto',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
-                defaultView: 'timelineMonth',
+                defaultView: 'timelineTwoMonth',
                 header: {
-                    left: 'prev,today,next',
+                    left: 'prevMonth,today,nextMonth',
                     center: 'title',
-                    right: 'timelineMonth,timelineWeek,timelineDay'
+                    right: 'timelineTwoMonth'
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
@@ -105,6 +97,23 @@
                             }));
                         }
                     );
+                },
+
+                customButtons: {
+                    prevMonth: {
+                        icon: 'left-single-arrow',
+                        click: function() {
+                            calendar.fullCalendar('incrementDate', {month: -2});
+                            calendar.fullCalendar('incrementDate', {month: 1});
+                        }
+                    },
+                    nextMonth: {
+                        icon: 'right-single-arrow',
+                        click: function() {
+                            calendar.fullCalendar('incrementDate', {month: 2});
+                            calendar.fullCalendar('incrementDate', {month: -1});
+                        }
+                    }
                 },
 
                 // Resources:
