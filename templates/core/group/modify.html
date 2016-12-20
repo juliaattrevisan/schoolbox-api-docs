@@ -154,6 +154,10 @@ $(document).ready(function() {
         $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
             .done(function(response) {
 
+                /* Re-enable inputs
+                 */
+                form.find(':input').prop('disabled', false);
+
                 // success stuff. Reload memberlist and waitlist
                 label.toastTimeout({text: 'Done'});
                 label.on('toastTimeout', function() {
@@ -166,10 +170,6 @@ $(document).ready(function() {
                     $('[data-toggle-all]').off('change').change(deleteAllToggled);
 
                     $('input[name="delete[]"]').off('change').change(deleteToggled);
-
-                    /* Re-enable inputs
-                     */
-                    form.find(':input').prop('disabled', false);
                 });
             })
             .fail(function() {
