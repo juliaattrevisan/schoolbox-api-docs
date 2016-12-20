@@ -47,10 +47,7 @@
                         $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
                             url: $('#learningfieldUrl').val()
                         }).success(function () {
-                            $('#modal-learningfield').foundation('reveal', 'close');
-                            $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, {{ learningfieldProviderId }}));
-                            $('#lti-select-provider').remove();
-                            $('#lti-frame').show();
+                            window.location.reload();
                         });
                     });
                 {% endif %}
@@ -60,9 +57,7 @@
                     var providerId = $(this).data('provider');
                     $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, providerId))
                     .success(function() {
-                        $('#lti-frame').attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
-                        $('#lti-select-provider').remove();
-                        $('#lti-frame').show();
+                        window.location.reload();
                     });
                 });
 
