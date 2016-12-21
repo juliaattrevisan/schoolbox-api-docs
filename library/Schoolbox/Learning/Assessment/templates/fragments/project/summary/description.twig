@@ -1,8 +1,9 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <ul class="meta">
     {% if assessment.baseContext is not unitSpecification %}
-    <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
+    <li class="icon-calendar">{{ dueDate.dueDate(assessment, currentUser) }}</li>
     {% endif %}
     {% if currentUser.role.isStaff %}
         <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
