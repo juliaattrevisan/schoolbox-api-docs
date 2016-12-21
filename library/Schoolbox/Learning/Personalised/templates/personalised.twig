@@ -13,6 +13,28 @@
     </div>
 </div>
 
+<div id="assessmentModal" class="reveal-modal" data-reveal aria-labelledby="assessmentModalTitle" aria-hidden="true" role="dialog">
+    <h3 class="note" id="assessmentModalTitle" data-value="text"></h3>
+
+    {# Metadata #}
+    <ul class="meta">
+        <li class="icon-calendar date">
+            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+        </li>
+    </ul>
+
+    {# Description? #}
+    <article class="detail" data-value="description"></article>
+
+    {# Buttons #}
+    <dl>
+        <dd>
+            <a class="button icon-due-work" data-value="href" href="#">View More Details</a>
+        </dd>
+    </dl>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 {# FullCalendar setup #}
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
@@ -38,6 +60,8 @@
          * Retrieves the duration unit from the type of the custom view.
          *
          * @param view
+         * @returns {String}
+         * @throws Error if view type not recognized
          */
         var getDurationUnitFromView = function(view) {
             switch (view.type) {
@@ -51,6 +75,21 @@
                     return 'day';
             }
             throw new Error('Unrecognised view type "'+String(view.type)+'"');
+        };
+
+        /**
+         * Helper function for determining if a calendar event ID is for an assessment,
+         * and returns the ID if it is.
+         *
+         * @param id
+         * @returns {boolean|Number}
+         */
+        var getAssessmentId = function(id) {
+            var match = id.match(/^\w+-(\d+)$/);
+            if (!match) {
+                return false;
+            }
+            return Number(match[1]);
         };
 
         var calendar = $('#calendar');
@@ -113,6 +152,49 @@
                             }));
                         }
                     );
+                },
+
+                eventClick: function(calEvent, jsEvent, view) {
+                    var assessmentId = getAssessmentId(calEvent.id);
+
+                    if (assessmentId) {
+
+                        // Update contents
+                        var modal = $('#assessmentModal');
+                        modal.find('[data-value]').each(function() {
+                            var $this = $(this),
+                                valueTag = $this.data('value');
+
+                            switch (valueTag) {
+                                case 'text':
+                                    $this.text(calEvent.title);
+                                    break;
+
+//                                case 'description':
+//                                    $this.html(calEvent.meta.description);
+//                                    break;
+
+                                case 'start':
+                                case 'end':
+                                    // Output in our configured format
+                                    var date = calEvent[valueTag];
+                                    $this
+                                        .text(date.format(dateDisplayFormats.momentJs+', h:mm a'))
+                                        .attr('datetime', date.toISOString());
+                                    break;
+
+                                case 'href':
+                                    $this.attr('href', '/learning/assessments/'+String(assessmentId));
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        });
+
+                        modal.foundation('reveal', 'open');
+                    }
+                    return true;
                 },
 
                 customButtons: {
