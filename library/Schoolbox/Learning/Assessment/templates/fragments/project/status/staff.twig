@@ -63,6 +63,7 @@
     });
 </script>
 
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -109,9 +110,7 @@
                                         </a>
 
                                         {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
-                                                Due {{ assessable.getDueAt.getRelativeTime }}
-                                            </p>
+                                            <p class="meta">{{ dueDate.dueDate(assessable, currentUser) }}</p>
                                         {% endif %}
 
                                         {% if assessable.weight %}
