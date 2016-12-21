@@ -1504,17 +1504,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Compares dates of two Alaress_Date_Format objects, ignoring the time
-     * and timezone components completely.
+     * Compare two Alaress_Date_Format objects by a specified format
      *
      * @param Alaress_Date_Format $other
-     *
-     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
+     * @param string $format
+     * @return int
      */
-    public function compareDateOnly($other)
+    private function compareByFormat(Alaress_Date_Format $other, $format)
     {
-        $thisDate  = $this->getUsingFormat('Ymd');
-        $otherDate = $other->getUsingFormat('Ymd');
+        $thisDate  = $this->getUsingFormat($format);
+        $otherDate = $other->getUsingFormat($format);
         if ($thisDate === $otherDate) {
             return 0;
         }
@@ -1525,6 +1524,30 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * Compares dates of two Alaress_Date_Format objects, ignoring the time
+     * and timezone components completely.
+     *
+     * @param Alaress_Date_Format $other
+     *
+     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
+     */
+    public function compareDateOnly(Alaress_Date_Format $other)
+    {
+        return $this->compareByFormat($other, 'Ymd');
+    }
+
+    /**
+     * Compare the year of two Alaress_Date_Format objects.
+     *
+     * @param Alaress_Date_Format $other
+     * @return int
+     */
+    public function compareYearOnly(Alaress_Date_Format $other)
+    {
+        return $this->compareByFormat($other, 'Y');
     }
 
 
