@@ -8,8 +8,6 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox\Test\TestCase;
-use Schoolbox\Test\SoftDeleteTestMapper;
 use Schoolbox\Mapper\Exception;
 
 class SoftDeleteTest extends TestCase {
@@ -28,20 +26,20 @@ class SoftDeleteTest extends TestCase {
     }
 
     public function testSoftDeleteNotDeleted() {
-        $this->object->getDatabase()->setNextFetchAll(array(array(
+        $this->object->getDatabase()->setNextFetch(array(
             'id'      => 1,
             'name'    => 'something',
             'deleted' => false,
-        )));
+        ));
         $this->assertFalse($this->object->findById(1)->isDeleted());
     }
 
     public function testSoftDeleteDeletedResult() {
-        $this->object->getDatabase()->setNextFetchAll(array(array(
+        $this->object->getDatabase()->setNextFetch(array(
             'id'      => 1,
             'name'    => 'something',
             'deleted' => true,
-        )));
+        ));
         try {
             $this->object->findById(1);
             $this->fail('Exception\Deleted expected, but not thrown');

@@ -1801,9 +1801,22 @@ abstract class Mapper implements IMapper, Serializable
     protected function hydrateSelect(PDOStatement $statement)
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        return $this->hydrateList($statement);
+        return $this->hydrateList($this->iterateStatement($statement));
     }
 
+
+    /**
+     * This method exists as a shim to make tests work, because testing PDO is freaking hard... -_-'
+     *
+     * @param PDOStatement $stmt
+     * @return Traversable
+     */
+    private function iterateStatement(PDOStatement $stmt)
+    {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            yield $r;
+        }
+    }
 
     /**
      * @see $this->findAll()
