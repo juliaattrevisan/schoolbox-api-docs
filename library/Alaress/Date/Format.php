@@ -1695,6 +1695,52 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Get a relative day and time
+     * e.g Today at 2:00pm, Tomorrow at 8:00am, Saturday at 3:30pm (if within a week)
+     * Defaults back to getDateOnly() at getTimeOnly() if date is a week or further from $now
+     *
+     * @param bool $lowercase
+     * @param Alaress_Date_Format $now
+     * @return string
+     */
+    public function getRelativeDay($lowercase = false, Alaress_Date_Format $now = null)
+    {
+        if (!$now instanceof Alaress_Date_Format) {
+            $now = Alaress_Date_Format::now();
+        }
+
+        $diffInDays = $this->diffInDays($now);
+
+        if ($this->isSameDay($now)) {
+            $relativeTime = 'today';
+        } else {
+            if ($this->isTomorrow()) {
+                $relativeTime = 'tomorrow';
+            } else {
+                if ($this->isYesterday()) {
+                    $relativeTime = 'yesterday';
+                } else {
+                    if ($diffInDays < 7) {
+                        $relativeTime = $this->getUsingFormat('l');
+                    } else {
+                        $relativeTime = $this->getDateOnly();
+                    }
+                }
+            }
+        }
+
+        if (!$lowercase) {
+            $relativeTime = ucfirst($relativeTime);
+        }
+
+        if ($diffInDays <= 30 && $this->getUsingFormat('h:ia') != '11:59pm') {
+            $relativeTime .= ' at ' . $this->getTimeOnly();
+        }
+
+        return $relativeTime;
+    }
+
+    /**
      * Outputs this string as a recognisable string representation of a date,
      * including timezone data.
      *
