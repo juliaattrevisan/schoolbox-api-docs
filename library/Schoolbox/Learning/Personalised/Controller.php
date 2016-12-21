@@ -282,6 +282,6 @@ class Controller extends Base
      */
     protected function generateLink(IAssessable $assessable)
     {
-        return $this->getRouter()->generate('learningAssessment.getSummary', ['assessment' => $assessable->getId()]);
+        return $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessable->getId()]);
     }
 }
