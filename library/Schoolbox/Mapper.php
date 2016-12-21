@@ -2487,7 +2487,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param callable $callback
      * @return object
      */
-    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', callable $callback = null)
+    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
     {
         $idKey = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
