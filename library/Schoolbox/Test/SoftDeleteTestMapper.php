@@ -10,6 +10,12 @@
 namespace Schoolbox\Test;
 use Schoolbox\Mapper;
 
+/**
+ * Class SoftDeleteTestMapper
+ *
+ * @package Schoolbox\Test
+ * @method MockDatabase getDatabase()
+ */
 class SoftDeleteTestMapper extends Mapper {
 	protected function mapping() {
 		$this->hasModel(SoftDeleteTestModel::class);

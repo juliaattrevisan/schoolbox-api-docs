@@ -18,20 +18,22 @@ namespace Schoolbox\Test;
 use Alaress\IDatabase;
 use PDO;
 use PDOStatement;
+use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
+use Traversable;
 
 class MockDatabase implements IDatabase
 {
 
     /**
      * The test case, required for creating mocks
-     * @var \PHPUnit_Framework_TestCase
+     * @var PHPUnit_Framework_TestCase
      */
     protected $test_case;
 
     /**
      * The mock statement
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var PHPUnit_Framework_MockObject_MockObject|PDOStatement
      */
     protected $mock_statement;
 
@@ -95,7 +97,7 @@ class MockDatabase implements IDatabase
      * @param string $query Ignored
      * @param array  $args  Ignored
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return PDOStatement|PHPUnit_Framework_MockObject_MockObject
      */
     public function prepare($query, array $args = []) {
         return $this->mock_statement;
