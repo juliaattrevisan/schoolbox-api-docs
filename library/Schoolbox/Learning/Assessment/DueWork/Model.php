@@ -111,18 +111,13 @@ class Model extends AbstractAssessment
     }
 
     /**
-
-     */
-
-    /**
      * Work out if we are going to accept responses
-     * TODO an 'is' method should safely return a boolean; this logic should be in an 'assertAcceptSubmission()' method
      *
      * It's not accepting submissions if:
      *      - If it's not open
      *      - If the close date has passed
      *      - If the assessment is set to Accept None
-     *      - If the assessment only accepts single, and a response already exists for this participant
+     *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
      * @param Collection $responses
@@ -142,7 +137,9 @@ class Model extends AbstractAssessment
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
-        if ($this->isAcceptSingle() && $responses->count()) {
+        /* Allow draft responses in single submission assessments
+         */
+        if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
             throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
