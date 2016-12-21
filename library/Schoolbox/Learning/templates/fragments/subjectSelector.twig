@@ -1,9 +1,11 @@
 {#
+Generic Subject selector.
+
 Usage:
-    term:    Term                      - the current selected Term
-    subject: Folder                    - the current selected Subject Folder
-    folders: Collection|Folder[]       - the subjects to render in dropdown
-    student: User                      - the relevant student
+    currentSubject: Folder               - (optional) the current selected Subject Folder
+    subjects:       Collection|Folder[]  - the subjects to render in dropdown
+    route:          string               - Aura route
+    routeArgs:      JSON object          - Aura route args to be merged with subjectId inside loop
 #}
 
 <script type="text/javascript">
@@ -21,8 +23,8 @@ Usage:
 <div class="subject">
     <select id="context-selector-subject" title="Select a subject">
         <option disabled="" selected="" label="Select a subject">Select a subject</option>
-        {% for folder in folders %}
-            <option data-href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: term.code, subjectId: folder.id }) }}" {% if folder.id == subject.id %}selected{% endif %} value="{{ folder.id }}">
+        {% for folder in subjects %}
+            <option data-href="{{ routeLookup('learning.getGradesForSubject', routeArgs|merge({subjectId: folder.id})) }}" {% if folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
                 {#- dessicate -#}{{ folder.name }} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %}, {% endif %}{% endfor %}){#- dessicate -#}
             </option>
         {% endfor %}

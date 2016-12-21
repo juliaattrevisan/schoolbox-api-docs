@@ -1,8 +1,11 @@
 {#
+Generic Term (aka Semester) selector.
+
 Usage:
-    term:    Term                    - the current selected Term
-    terms:   Collection|Term[]       - all Terms to render in dropdown
-    student: User                    - the relevant student
+    currentTerm: Term                    - (optional) the current selected Term
+    terms:       Collection|Term[]       - all Terms to render in dropdown
+    route:       string                  - Aura route
+    routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
 #}
 
 <script type="text/javascript">
@@ -34,18 +37,18 @@ Usage:
 </script>
 
 <nav>
-    <a data-semester-switch="previous" href="#" {% if term.code == terms[0].code %}disabled{% endif %}></a>
+    <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
 </nav>
 <div class="semester">
     <select id="context-selector-semester" title="Select a Term">
-        <option disabled {% if term is empty %}selected{% endif %} label="Select a term">Select a term</option>
-        {% for termCurrent in terms %}
-            <option data-href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: termCurrent.code }) }}" value="{{ termCurrent.code }}" {% if term.code == termCurrent.code %}selected{% endif %}>
-                {#- dessicate -#}{{ termCurrent.title }} ({{ termCurrent.start.dateOnly }} - {{ termCurrent.displayFinish.dateOnly }}){#- dessicate -#}
+        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a term">Select a term</option>
+        {% for term in terms %}
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
+                {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}
     </select>
 </div>
 <nav>
-    <a data-semester-switch="next" href="#" {% if term.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+    <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
 </nav>
