@@ -1663,9 +1663,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `submission_box` AS `d` ON `a`.`id` = `d`.`assessment_id`
               LEFT JOIN `task_completion` AS `tc` ON `t`.`id` = `tc`.`task_id`
               LEFT JOIN `assess_attempt` AS `qa` ON `q`.`assess_id` = `qa`.`assess_id`
-              LEFT JOIN `submission_return` AS `sr` ON `sr`.`box_id` = `d`.id
+              LEFT JOIN `student_submission` AS `ss` ON `ss`.`box_id` = `d`.id
               WHERE 
-                (`tc`.`student_id` = :studentId OR `sr`.`owner` = :studentId OR `qa`.`user_id` = :studentId) AND
+                (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId) AND
                 (`a`.`due_date` BETWEEN :startDate AND :endDate)
             )
             ORDER BY c.name
