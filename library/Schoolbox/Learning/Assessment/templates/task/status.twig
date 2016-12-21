@@ -15,8 +15,15 @@
 #}
 {% extends '@learningAssessment/status.twig' %}
 
-{% block config %}
+{% block headerOptions %}
+    {% set viewRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbook', {class: assessment.context, classId: assessment.context.id}) %}
+    {% if viewRoute %}
+        <li class="separator">Grading</li>
+        <li><a class="icon-approve" href="{{ viewRoute }}">Markbook</a></li>
+    {% endif %}
+{% endblock %}
 
+{% block config %}
     {% set latestFeedback    = participant.findMostRecentFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
