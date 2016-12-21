@@ -10,8 +10,8 @@
         Due
         <span title="{{ assessment.dueAt.long }}">
             <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.getRelativeDay(true, true) }}</time>
-            {% if date.diffInDays(now) < 7 %}
-                <span>(<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ date.getRelativeTime(null, true) }} remaining</time>)</span>
+            {% if assessment.dueAt.diffInDays(now) < 7 %}
+                <span>(<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)</span>
             {% endif %}
         </span>
     </span>
