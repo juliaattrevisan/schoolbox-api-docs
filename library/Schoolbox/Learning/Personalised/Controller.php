@@ -170,6 +170,7 @@ class Controller extends Base
                         'end'        => $context->getDueDate()->getDatabase(),
                         'allDay'     => true,
                         'resourceId' => $folder->getId().'-units',
+                        'meta'       => ['description' => '',]
                     ]);
 
                     // If this is a quiz or due work - it's a content area
@@ -195,6 +196,7 @@ class Controller extends Base
                             'allDay'     => false,
                             'resourceId' => $folder->getId().'-contentAreas',
                             'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
+                            'meta'       => ['description' => \Scrub::html($assessable->getDescription()),]
                         ]);
                     }
 
@@ -208,6 +210,7 @@ class Controller extends Base
                             'end'        => $assessable->getDueAt()->getDatabase(),
                             'allDay'     => false,
                             'resourceId' => $folder->getId().'-projects',
+                            'meta'       => ['description' => \Scrub::html($assessable->getDescription()),]
                         ]);
 
                         foreach ($assessable->getAssessables() as $activity) {
@@ -232,6 +235,7 @@ class Controller extends Base
                                 'allDay'     => false,
                                 'resourceId' => $folder->getId().'-activities',
                                 'constraint' => 'activity-'.$activity->getId().'-bounds',
+                                'meta'       => ['description' => \Scrub::html($activity->getDescription()),]
                             ]);
                         }
                     }
