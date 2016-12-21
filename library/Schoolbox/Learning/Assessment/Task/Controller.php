@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -89,6 +90,15 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
+        /* Block students seeing other students' outcomes
+         */
+        $currentUserIsStudent = $this->getUser()->getRole()->isStudent();
+        $currentUserIsParticipant = $this->getUser()->getId() == $participant->getUser()->getId();
+
+        if ($currentUserIsStudent && !$currentUserIsParticipant) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         /** @var Task $task */
         $task = $participant->getAssessable();
         $previewFragment = [];
