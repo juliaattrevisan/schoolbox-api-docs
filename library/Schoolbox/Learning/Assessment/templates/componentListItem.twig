@@ -1,8 +1,9 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
 {% if assessable is quiz %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.NgetQuizSummary', {assessmentId: assessable.id}) %}
 {% else %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
 {% endif %}
@@ -16,11 +17,7 @@
             {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
-            <p class="meta">
-                <span class="{{ urgency.datetime(assessment, user) }}">
-                    {% include 'sub/dueDate.twig' with {date: assessable.dueAt} %}
-                </span>
-            </p>
+            <p class="meta">{{ dueDate.dueDate(assessable, user) }}</p>
         </div>
     </div>
     {% if actionCount %}

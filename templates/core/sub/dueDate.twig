@@ -1,9 +1,0 @@
-{% if date.isFuture %}
-    Due
-    <span title="{{ date.long }}">
-        <time datetime="{{ date }}">{{ date.getRelativeDay(true, true) }}</time>
-        {% if date.diffInDays(now) < 7 %}
-            <span>(<time datetime="{{ date }}" data-due-countdown>{{ date.getRelativeTime(null, true) }} left</time>)</span>
-        {% endif %}
-    </span>
-{% endif %}

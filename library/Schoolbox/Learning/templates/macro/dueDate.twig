@@ -1,0 +1,19 @@
+{##
+ # Display the due date for an assessment
+ #
+ # Will throw in a relative time for time remaining with a data-due-countdown attr
+ # That can be used to attach miniCountdown and update on the page via JS
+ #}
+{% macro dueDate(assessment, user) %}
+    {% import urgency.twig as urgency %}
+
+    <span class="{{ urgency.datetime(assessment, user) }}">
+        Due
+        <span title="{{ assessment.dueAt.long }}">
+            <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.getRelativeDay(true, true) }}</time>
+            {% if date.diffInDays(now) < 7 %}
+                <span>(<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ date.getRelativeTime(null, true) }} left</time>)</span>
+            {% endif %}
+        </span>
+    </span>
+{% endmacro %}
