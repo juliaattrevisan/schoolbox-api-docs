@@ -70,6 +70,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         $user->setSuperuser(isset($_POST['superuser']));
         $user->setEnabled(!empty($_POST['account_enabled']));
         $user->setPositionTitle($_POST['position_title']);
+        $user->setWebmail(!empty($_POST['webmail']));
 
         $userMapper->save($user);
         SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
@@ -92,6 +93,8 @@ elseif ($_POST['modusername']) {
     $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
     $user->setAltEmail($_POST['alt_email']);
     $user->setPositionTitle($_POST['position_title']);
+    $user->setWebmail(!empty($_POST['webmail']));
+
     $user->getRole()->setId($_POST['group']);
     foreach ($_POST['campus'] as $campusId) {
         /** @var \Schoolbox\Campus $campus */
@@ -178,6 +181,7 @@ elseif (is_numeric($_GET['deleteUserLink']) && is_numeric($_GET['linkedUser']) )
     /* Deletes linked users */
 
     try {
+        /** @var \Schoolbox\User $originalUser */
         $originalUser = \Schoolbox\UserMapper::getInstance()->findById($_GET['deleteUserLink']);
     }
     catch(\Schoolbox\Mapper\Exception $e)  {
@@ -209,6 +213,7 @@ elseif (is_array($_POST['linkUser'])) {
         try{
             $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($userId);
 
+            /** @var \Schoolbox\User $originalUser */
             $originalUser->getLinkedUser()->add($linkedUser);
         } catch (\Schoolbox\Mapper\Exception $e) {
             //noop on user not found
