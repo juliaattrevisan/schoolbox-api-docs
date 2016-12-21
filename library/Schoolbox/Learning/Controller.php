@@ -9,7 +9,6 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Rubric;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -188,11 +187,11 @@ class Controller extends Base
     /**
      * Displays a list of classes for the current logged in user
      *
-     * @api GET /learning/classes
+     * @api GET /learning/classes{/term}
      * @level 165
      *
      */
-    public function getClasses() {
+    public function getClasses(Term $term) {
 
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
@@ -212,7 +211,7 @@ class Controller extends Base
                 }
                 $folderList->add($folder);
                 $classTypes[$folder->getId()] = $subject['classType'];
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (MapperException $e) {
                 //not found
             }
         }
@@ -230,10 +229,10 @@ class Controller extends Base
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      * @param Term $term
      */
-    public function getGrades(User $student, Term $term)
+    public function getGrades(User $viewee, Term $term)
     {
         // Storage for each folders markbook
         $markbooks = [];
@@ -241,7 +240,7 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($student, $term);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
 
         $folders = new Collection();
 
@@ -265,13 +264,13 @@ class Controller extends Base
         foreach ($markbooksFolders as $folderId => $assessments) {
             $markbooks[$folderId] =
                 (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
-                    ->getStudentStatistics()[$student->getId()];
+                    ->getStudentStatistics()[$viewee->getId()];
         }
 
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
-            'student'       => $student,
+            'student'       => $viewee,
             'term'          => $term,
             'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'       => $folders,
@@ -285,11 +284,11 @@ class Controller extends Base
      *
      * @api   GET /learning/grades/{userId}/{termCode}/{subjectId}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      * @param Term $term
      * @param Folder $subject
      */
-    public function getGradesForSubject(User $student, Term $term, Folder $subject)
+    public function getGradesForSubject(User $viewee, Term $term, Folder $subject)
     {
         // Despite the fact that this is displaying grades for a single student,
         // ALL participants are still required (because the student is compared
@@ -324,14 +323,14 @@ class Controller extends Base
 
             $showcase[$assessment->getId()] = $this->getShowcaseMapper()->findByColumnList(
                 array(
-                    'uid'               => $student->getId(),
+                    'uid'               => $viewee->getId(),
                     'submission_box_id' => $assessment->getId()
                 )
             );
 
             $graphAssessments[] = $assessment->getTitle();
 
-            $feedback = $assessment->getParticipant($student)->findMostRecentVisibleFeedback($this->getUser());
+            $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
 
             if ($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
@@ -392,15 +391,15 @@ class Controller extends Base
 
         // Grab the students conversation history
 
-        $conversation = new Conversation($student, $subject);
+        $conversation = new Conversation($viewee, $subject);
 
         // Squeeze it on out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
-            'student'           => $student,
+            'student'           => $viewee,
             'term'              => $term,
             'terms'             => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'           => $this->getFolderMapper()->findFoldersWithSubmissions($student, $term),
+            'folders'           => $this->getFolderMapper()->findFoldersWithSubmissions($viewee, $term),
             'subject'           => $subject,
             'markbook'          => $markbook,
             'graphInfo'         => json_encode($graphInfo),
@@ -412,7 +411,7 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
-            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student, $term)
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
         ]));
     }
 

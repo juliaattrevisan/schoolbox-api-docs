@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \External_UserInterface;
 
 class Module extends BaseModule
 {
@@ -28,6 +27,18 @@ class Module extends BaseModule
      * @inheritdoc
      */
     protected $basename = 'learning';
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var FolderMapper */
+    private $folderMapper;
+
+    /** @var TermMapper */
+    private $termMapper;
+
+    /** @var ErrorMapper */
+    private $errorMapper;
 
     /**
      * @inheritdoc
@@ -38,7 +49,7 @@ class Module extends BaseModule
             'GET' => [
                 '/pending'                                => 'getPendingAssessments',
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
-                '/classes'                                => 'getClasses',
+                '/classes{/termCode}'                     => 'getClasses',
                 '/grades/{userId}{/termCode}'             => 'getGrades',
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
@@ -59,7 +70,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getMarkbook|getPendingAssessments|getClasses)';
+        $ruleRegexp = '(?:getPendingAssessments|getClasses)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 
@@ -97,44 +108,14 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            'getPendingAssessmentsForUser',
+            '(?:getPendingAssessmentsForUser|getClasses|getGrades|getGradesForSubject)',
             function ($params) {
+                if (array_key_exists('userId', $params)) {
                     try {
-                        $viewee = $this->getUserMapper()->findById($params['userId']);
+                        $args['viewee'] = $this->getUserMapper()->findById($params['userId']);
                     } catch (MapperException $e) {
-                        $viewee = null;
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
                     }
-                return [
-                    'viewee' => $viewee,
-                ];
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getMarkbook)',
-            function ($params) {
-                try {
-                    $class = $this->getFolderMapper()->findById($params['classId']);
-                } catch (MapperException $e) {
-                    $class = $this->getFolderMapper()->createModel();
-                }
-                return [
-                    'class' => $class,
-                ];
-            }
-        );
-
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getGrades|getGradesForSubject)',
-            function ($params) {
-                try {
-                    $args['student'] = $this->getUserMapper()->findById($params['userId']);
-                } catch (MapperException $e) {
-                    /* If nonexistent user is specified, 404
-                     */
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
                 try {
                     if($params['termCode']) {
@@ -144,7 +125,6 @@ class Module extends BaseModule
                         $args['term'] = $this->getTermMapper()->findForToday();
                     }
                 } catch (MapperException $e) {
-
                     /* If nonexistent term is specified, 404
                      */
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -159,7 +139,6 @@ class Module extends BaseModule
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }
-
                 return $args;
             }
         );
@@ -198,7 +177,10 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        if(!$this->userMapper instanceof UserMapper){
+            $this->userMapper = $this->getMapperFactory()->get(UserMapper::class);
+        }
+        return $this->userMapper;
     }
 
     /**
@@ -206,7 +188,10 @@ class Module extends BaseModule
      */
     protected function getFolderMapper()
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        if(!$this->folderMapper instanceof FolderMapper){
+            $this->folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
+        }
+        return $this->folderMapper;
     }
 
     /**
@@ -214,7 +199,10 @@ class Module extends BaseModule
      */
     protected function getTermMapper()
     {
-        return $this->getMapperFactory()->get(TermMapper::class);
+        if(!$this->termMapper instanceof TermMapper){
+            $this->termMapper = $this->getMapperFactory()->get(TermMapper::class);
+        }
+        return $this->termMapper;
     }
 
     /**
@@ -222,6 +210,9 @@ class Module extends BaseModule
      */
     protected function getErrorMapper()
     {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        if(!$this->errorMapper instanceof ErrorMapper){
+            $this->errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+        }
+        return $this->errorMapper;
     }
 }
