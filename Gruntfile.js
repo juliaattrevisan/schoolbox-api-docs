@@ -92,6 +92,7 @@ module.exports = function(grunt) {
 
                     // DateTime
                     'www/javascript/components/moment/moment.js',
+                    'node_modules/moment-precise-range-plugin/moment-precise-range.js',
 
                     // Calendar-related popups
                     // (included in main because this can be used outside of a fullcalendar)
