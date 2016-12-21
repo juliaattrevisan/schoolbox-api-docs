@@ -19,14 +19,17 @@
     $.fn.miniCountdown = function(options) {
         var self = this;
 
-        var settings = $.extend({
-            destroyOnComplete: true,
-            futureSuffix: 'remaining',
-            pastSuffix: '',
-            onDestroy: $.noop
-        }, options);
+        return self.each(function() {
 
-        self.updateCountdown(settings);
+            var settings = $.extend({
+                destroyOnComplete: true,
+                futureSuffix: 'remaining',
+                pastSuffix: '',
+                onDestroy: $.noop
+            }, options);
+
+            self.updateCountdown(this, settings);
+        });
     };
 
 
@@ -34,9 +37,9 @@
      * Update the countdown
      * @param settings
      */
-    $.fn.updateCountdown = function(settings) {
+    $.fn.updateCountdown = function(element, settings) {
 
-        var datetime = moment($(this).attr('datetime')),
+        var datetime = moment($(element).attr('datetime')),
             now = moment(),
             diff = datetime.diff(now),
             preciseDiff = moment.preciseDiff(datetime, now, true),
@@ -46,7 +49,7 @@
          * Check if the countdown has been reached and run destroy stuff if applicable
          */
         if (diff < 0 && settings.destroyOnComplete) {
-            $(this).text('');
+            $(element).text('');
             this.stopCountdown();
             settings.onDestroy.call(this);
             return;
@@ -96,14 +99,14 @@
         /**
          * Update the text
          */
-        $(this).text(timeLeft);
+        $(element).text(timeLeft);
 
 
         /**
          * Set an interval to update this periodically
          * This runs on every update to check if this should start updating more or less frequently
          */
-        this.updateCountdownInterval(settings, datetime);
+        this.updateCountdownInterval(element, settings, datetime);
     };
 
 
@@ -112,13 +115,13 @@
      * @param settings
      * @param datetime
      */
-    $.fn.updateCountdownInterval = function(settings, datetime) {
+    $.fn.updateCountdownInterval = function(element, settings, datetime) {
 
         // Kill the existing interval
         this.stopCountdown();
 
         // Set the interval again
-        this.setCountdownInterval(settings, datetime);
+        this.setCountdownInterval(element, settings, datetime);
     };
 
 
@@ -127,16 +130,18 @@
      * @param settings
      * @param datetime
      */
-    $.fn.setCountdownInterval = function(settings, datetime) {
+    $.fn.setCountdownInterval = function(element, settings, datetime) {
 
         var self = this;
 
         // Check the difference in times, we'll use it to determine how often to update this bad boy
         var updateInterval = self.getUpdateInterval(settings, datetime);
 
-        self.data('interval', setInterval(function() {
-            self.updateCountdown(settings);
-        }, updateInterval));
+        this.each(function() {
+            self.data('interval', setInterval(function () {
+                self.updateCountdown(element, settings);
+            }, updateInterval));
+        });
     };
 
 
