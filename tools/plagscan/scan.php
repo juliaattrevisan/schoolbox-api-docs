@@ -19,10 +19,9 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
 $log = $kernel->logger();
 
-try {
-    $mapper = PlagscanMapper::getInstance();
-}
-catch (\DomainException $e) {
+$mapper = PlagscanMapper::getInstance();
+
+if (!$mapper->getGateway()) {
 
     /* Plagscan not configured - nothing to do
      */
