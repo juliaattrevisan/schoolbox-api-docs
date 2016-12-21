@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
-
 use Schoolbox\Learning\Quiz\Model as QuizDataObject;
 use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -17,7 +16,6 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponseDomainObject;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
-use Schoolbox\User;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -122,8 +120,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                         ->setId($attempt->getId())
                 )
                 ->setReviewee($attempt->getUser())
-                // TODO implement reviewer for quizzes
-                ->setReviewer(new User())
+                ->setReviewer($attempt->getReviewer())
                 ->setPublishedAt($attempt->getReviewed())
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
@@ -171,6 +168,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setStart($domainObject->getCreatedAt())
                 ->setFinish($domainObject->getUpdatedAt())
                 ->setDeleted($domainObject->getDeletedAt())
+                ->setReviewer($domainObject->getReviewer())
                 ->setReviewed($domainObject->getPublishedAt());
             $dataModels->add($dataModel);
         }
