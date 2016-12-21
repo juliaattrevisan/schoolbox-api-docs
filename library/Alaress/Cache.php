@@ -42,23 +42,51 @@ class Cache
 
     /**
      *
-     * @param string|int $key        a scalar value that represents the key of the particular datum you want
-     * @param array      $fetchArgs  must be an array that matches the signature provided in the fetch callback and contains
-     *                               the data required to execute said callback in the event of a cache-miss for the given key
+     * @param string|int $key              a scalar value that represents the key of the particular datum you want
+     * @param array      $fetchArgs        must be an array that matches the signature provided in the fetch callback and contains
+     *                                     the data required to execute said callback in the event of a cache-miss for the given key
+     * @param bool       $invalidateCache  if true, any cached value for the given key will be deleted and re-fetched
      * @return mixed
      */
-    public function get($key, array $fetchArgs = [])
+    public function get($key, array $fetchArgs = [], $invalidateCache = false)
     {
         if (!is_scalar($key)) {
             throw new InvalidArgumentException("Key must be scalar, got ".gettype($key));
         }
 
+        if ($invalidateCache) {
+            $this->invalidate($key);
+        }
+
         if (!array_key_exists($key, $this->cache)) {
             // cache miss: execute fetch
-            $this->cache[$key] = call_user_func_array($this->fetch, $fetchArgs);
+            $this->cache[$key] = $this->fetch($fetchArgs);
         }
 
         return $this->cache[$key];
+    }
+
+
+    /**
+     * @param string $key
+     * @return $this
+     */
+    public function invalidate($key)
+    {
+        unset ($this->cache[$key]);
+        return $this;
+    }
+
+
+    /**
+     * Will fetch the result of the given args DIRECTLY. The cache will be completely bypassed.
+     *
+     * @param array $fetchArgs
+     * @return mixed
+     */
+    public function fetch(array $fetchArgs = [])
+    {
+        return call_user_func_array($this->fetch, $fetchArgs);
     }
 
 }
