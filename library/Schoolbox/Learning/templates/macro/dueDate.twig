@@ -5,8 +5,7 @@
  # That can be used to attach miniCountdown and update on the page via JS
  #}
 {% macro dueDate(assessment, user) %}
-    {% import urgency.twig as urgency %}
-
+    {% import '@learning/macro/urgency.twig' as urgency %}
     <span class="{{ urgency.datetime(assessment, user) }}">
         Due
         <span title="{{ assessment.dueAt.long }}">
