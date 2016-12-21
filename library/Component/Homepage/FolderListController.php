@@ -147,7 +147,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                             'FOLDER_COVER_IMAGE' => $folderCoverImage,
                         );
 
-                        if ($maxFolders > 0 && $j > $maxFolders) {
+                        if ($maxFolders > 0 && $j >= $maxFolders) {
                             break;
                         }
 
@@ -164,6 +164,8 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                         } else {
                             $this->parse('list_folders_block', 'list_folders', true);
                         }
+
+                        $j++;
                     }
                 }
 
