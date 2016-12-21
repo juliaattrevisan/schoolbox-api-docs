@@ -28,32 +28,32 @@ class Model implements ISoftDeletable
     /**
      * @var Quiz
      */
-    protected $quiz;
+    private $quiz;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $start;
+    private $start;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $finish;
+    private $finish;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $reviewed;
+    private $reviewed;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $deleted;
+    private $deleted;
 
     /**
      * @var QuizAnswer[]|GenericCollection<QuizAnswer>
