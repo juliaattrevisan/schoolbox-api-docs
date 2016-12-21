@@ -1,4 +1,5 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
@@ -264,10 +265,7 @@
                             {{ upcoming.typeName }}
                         </p>
 
-                        <p class="meta">
-                            <span class="{{ urgency.datetime(upcoming, student) }}">Due {{ upcoming.dueAt.relativeTime }}</span>
-                            on {{ upcoming.dueAt.isAtEndOfDay ? upcoming.dueAt.dateOnly : upcoming.dueAt.short }}
-                        </p>
+                        <p class="meta">{{ dueDate.dueDate(upcoming, student) }}</p>
                     </div>
                 </li>
                 {% endfor %}
