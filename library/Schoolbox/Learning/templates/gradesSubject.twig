@@ -39,7 +39,12 @@
     </div>
     <div class="small-12 medium-7 columns">
         <div class="content">
-            {% include '@learning/fragments/contextSelector.twig' with {folders: folders, terms: terms} %}
+            <div class="context-switch clearfix">
+                {% include '@learning/fragments/semesterSelector.twig' with {term: term, terms: terms, student: student} only %}
+                {% if folders | length >= 2 %}
+                    {% include '@learning/fragments/subjectSelector.twig' with {folders: folders, subject: subject, term: term, student: student} only %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
