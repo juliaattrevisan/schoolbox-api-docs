@@ -18,10 +18,26 @@
     });
 </script>
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ assessment.title }}</h1>
+        </div>
+    </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbook', {class: assessment.context, classId: assessment.context.id}) %}
+    {% if viewRoute %}
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Grading</li>
+        <li><a class="icon-approve" href="{{ viewRoute }}">Markbook</a></li>
+    </ul>
+    {% endif %}
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ assessment.title }}</h1>
-
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, currentUser: currentUser} %}
 
         {% if assessment.assessables|length %}
