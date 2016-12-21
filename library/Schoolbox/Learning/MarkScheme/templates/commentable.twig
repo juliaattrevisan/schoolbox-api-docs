@@ -40,19 +40,21 @@
             <script type="text/javascript">
                 $(function () {
 
-                    var $rb = $('#rb-{{ rubricContext.rubric.id }}');
+                    // cache this stuff, it doesn't change
+                    var $status                 = $('#assessment-status'),
+                        $markInput              = $status.find('[data-mark-input]'),
+                        $assignFromRubricButton = $('#use-rubric-value'),
+                        $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
+                        $finalSummary           = $rb.find('[data-final-summary]');
 
-                    $rb.on('change', '[data-rubric], [data-rubric-group]', function(e) {
-                        var currentRubricValue = $.trim($rb.find('[data-final-summary]').text());
-                        var currentMarkInput = $('#assessment-status').find('[data-mark-input]').val();
 
-                        if (currentRubricValue === currentMarkInput) {
-                            $('#use-rubric-value').prop('disabled', true);
-                        }
-                        else {
-                            $('#use-rubric-value').prop('disabled', false);
-                        }
-                    });
+                    function refreshAssignFromRubricButton() {
+                        var currentRubricValue = $.trim($finalSummary.text());
+                        var currentMarkInput   = $markInput.val();
+
+                        $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
+                    }
+
 
                     {##
                      # Use the rubric value in the mark input field
@@ -61,17 +63,24 @@
                      # at this point in time. Also disables when copying
                      # the rubric mark value in.
                      #}
-                    $('#use-rubric-value').prop('disabled', true).on('click', function(event) {
+                    $assignFromRubricButton.on('click', function() {
                         $(this).prop('disabled', true);
 
-                        $('#assessment-status')
+                        $status
                             .find('[data-mark-input]')
-                            .val($.trim($('[data-final-summary]').text()))
+                            .val($.trim($finalSummary.text()))
                             .change();
                     });
+
+                    // listen for this
+                    $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
+                    $markInput.on('change', refreshAssignFromRubricButton);
+
+                    // do it on pageload anyway
+                    refreshAssignFromRubricButton();
                 });
             </script>
-            <p><button id="use-rubric-value" class="full-width">Assign Grade From Rubric</button></p>
+            <p><button id="use-rubric-value" class="full-width">Assign Grade from Rubric</button></p>
             {% endif %}
         </div>
         <div class="small-12 medium-9 column">

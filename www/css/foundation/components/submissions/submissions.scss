@@ -170,6 +170,21 @@ table.rubric {
     }
 }
 
+.mark-scheme {
+    section.content {
+        padding-bottom: 0;
+    }
+    form {
+        margin-bottom: 0;
+    }
+    table.rb {
+        margin-bottom: 1rem;
+    }
+    .scrollable {
+        margin: -1rem -1rem 0;
+    }
+}
+
 [class^="icon-"].off {
     opacity: 0.3;
 }
