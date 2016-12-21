@@ -212,9 +212,14 @@
                                 case 'start':
                                 case 'end':
                                     // Output in our configured format
-                                    var date = calEvent[valueTag];
+                                    var date = calEvent[valueTag],
+                                        format = dateDisplayFormats.momentJs;
+
+                                    if (!calEvent.allDay) {
+                                        format = format+', h:mm a'
+                                    }
                                     $this
-                                        .text(date.format(dateDisplayFormats.momentJs+', h:mm a'))
+                                        .text(date.format(format))
                                         .attr('datetime', date.toISOString());
                                     break;
 
