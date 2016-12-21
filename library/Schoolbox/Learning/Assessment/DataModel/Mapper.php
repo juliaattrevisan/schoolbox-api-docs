@@ -361,6 +361,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
                 {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
@@ -379,6 +381,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
@@ -522,6 +526,12 @@ class Mapper extends BaseMapper
                             ->setFolder(
                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
                             )
+                    )
+                    ->setSpecification(
+                        $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
+                             ->setFolder(
+                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
+                             )
                     );
             } elseif ($row['pa.id']) {
                 // Project
