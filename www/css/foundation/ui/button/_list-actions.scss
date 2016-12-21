@@ -11,6 +11,8 @@
 
 			> .list-item {
 				padding-right: 0.5 + ($i * $button-size) !important;
+				display: table;
+				width: calc(100% + 2rem);
 			}
 
 			> nav {
@@ -33,13 +35,15 @@
 					right: 1rem;
 				}
 
-				a[class*="icon-"] {
+				a[class*="icon-"],
+				a[class^="icon-"]{
 					padding: 0;
 					display: inline-block;
 					text-align: center;
 					width: $button-size;
 					line-height: strip-unit($button-size);
 					color: $button-color;
+					background: red;
 
 					&:before {
 						padding-right: 0;

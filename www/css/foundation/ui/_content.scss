@@ -776,10 +776,10 @@ nav {
  */
 $selector-width: 2rem;
 
-%interaction-li{
-	display: table;
-	width: calc(100% + #{$selector-width});
-}
+//%interaction-li{
+//	display: table;
+//	width: calc(100% + #{$selector-width});
+//}
 %interaction-selector{
 	padding: 0 0.75rem;
 	display: table-cell;
@@ -793,7 +793,7 @@ $selector-width: 2rem;
 }
 @mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
 	> li{
-		@extend %interaction-li;
+		//@extend %interaction-li;
 		.#{$selector} {
 			@if str-length($icon) > 0 {
 				@extend .icon-#{$icon};
@@ -803,9 +803,6 @@ $selector-width: 2rem;
 			&:before {
 				color: $color;
 			}
-		}
-		> div:nth-child(2){
-			width: 100%;
 		}
 	}
 }
@@ -818,7 +815,7 @@ $selector-width: 2rem;
 	clear:both;
 }
 %information-li{
-	//@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+	@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
 	@include responsive-sides(-1, margin);
 	border-bottom: 1px solid $body-bg;
 	position: relative;
