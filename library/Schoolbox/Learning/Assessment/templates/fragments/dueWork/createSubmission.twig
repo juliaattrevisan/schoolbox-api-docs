@@ -171,12 +171,13 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
+            <li class="icon-calendar">{{ dueDate.dueDate(assessment, currentUser) }}</li>
             <li class="icon-due-work">{{ assessment.typeName }}</li>
         </ul>
 
