@@ -4,10 +4,11 @@
  # student      the student currently being viewed
  # icon         a css class representing the assessable
  #}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <ul class="meta">
-    <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, currentUser) }}">{{ assessment.dueAt.short }}</span></li>
+    <li class="icon-calendar">{{ dueDate.dueDate(assessment, currentUser) }}</li>
     <li class="{{ icon }}">{{ assessment.typeName }}</li>
 
     {% if currentUser.role.isStaff %}

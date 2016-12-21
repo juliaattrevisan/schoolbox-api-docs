@@ -1,9 +1,16 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script type="text/javascript" src="/javascript/shared/jquery.mini-countdown.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-plugin="preview"]').preview();
+
+        $('time[data-due-countdown]').miniCountdown({
+            onDestroy: function() {
+                this.parent().remove();
+            }
+        });
     });
 </script>
 
