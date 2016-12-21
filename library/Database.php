@@ -9,6 +9,7 @@
  *
  */
 
+use Alaress\Cache;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
@@ -57,7 +58,7 @@ class Database implements IDatabase, Serializable
      */
     private $connection;
 
-    /** @var PDOStatement[] */
+    /** @var Cache|PDOStatement[] */
     private $qCache = [];
 
     /**
@@ -81,7 +82,18 @@ class Database implements IDatabase, Serializable
 		self::$instance->reconnect();
 	}
 
-	/**
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->qCache = new Cache(function ($statement, array $driverOptions = []) {
+            return $this->connection->prepare($statement, $driverOptions);
+        });
+    }
+
+
+    /**
 	 * Establishes the database connection
 	 *
 	 * @param string $dsn
@@ -184,13 +196,7 @@ class Database implements IDatabase, Serializable
      */
     public function prepare($statement, array $driverOptions = array())
     {
-        $hash = sha1($statement);
-
-        if (empty($this->qCache[$hash])) {
-            $this->qCache[$hash] = $this->connection->prepare($statement, $driverOptions);
-        }
-
-        return $this->qCache[$hash];
+        return $this->qCache->get(sha1($statement), [ $statement, $driverOptions ]);
     }
 
     /**

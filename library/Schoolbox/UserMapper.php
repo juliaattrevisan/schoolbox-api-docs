@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Cache;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\External\Connector\CommunityPortalFactory;
@@ -377,6 +378,27 @@ class UserMapper extends Mapper
         ";
     }
 
+    /** @var Cache|User[] */
+    protected $userCache;
+
+    /**
+     * @return void
+     */
+    protected function initCaches()
+    {
+        parent::initCaches();
+
+        $this->userCache = new Cache(function ($row) {
+
+            /** @var Role $role */
+            $role = $this->hydrateJoin($row, 'role', 'g');
+
+            return $this->hydrate($row, 'user')
+                ->setSuperuser($row['user.superuser'] == 1)
+                ->setRole($role);
+        });
+    }
+
 
     /**
      * @param PDOStatement $statement
@@ -391,12 +413,9 @@ class UserMapper extends Mapper
 
             $userId = $row['user.id'];
 
-            if (empty($users[$userId])) {
-                $users[$userId] = $this->hydrate($row, 'user');
-                $users[$userId]->setSuperUser($row['user.superuser'] == 1);
-                $users[$userId]->setRole($this->hydrateJoin($row, 'role', 'g'));
-            }
+            $users[$userId] = $this->userCache->get($row['user.id'], [ $row ]);
 
+            /** @var Campus $campus */
             $campus = $this->hydrateJoin($row, 'userCampus', 'c');
 
             /* If the campus object has no id, then it spawned a campus
@@ -448,76 +467,16 @@ class UserMapper extends Mapper
      * @throws Mapper\Exception
      */
     public function findByExternalId($id, $roleType = null) {
-        $user = false;
-        $roleMapper = new RoleMapper;
-        $campusMapper = new CampusMapper;
-        $linkedUserList = array();
 
-        $query = "
-            SELECT
-                {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
-                {$roleMapper->getColumnString('g')},
-                {$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`,
-                {$this->getColumnString('lu')}
-            FROM `user` u
-            LEFT JOIN `groups` g ON group_id = g.`id`
-            LEFT JOIN userCampus uc ON uc.`uid`=u.id
-            LEFT JOIN superusers su ON su.id = u.id
-            LEFT JOIN luCampus c ON c.id = uc.`campus`
-            LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
-            WHERE u.synergy_id = ? AND u.deleted_at is null
-        ";
-        $params = [$id];
-        if (isset($roleType)) {
-            $query .= ' AND g.group_type = ?';
-            $params[] = $roleType;
+        $pb = $this->getPredicateBuilder();
+
+        $pb->equals('synergy_id', $id);
+
+        if ($roleType) {
+            $pb->equals('g.group_type', $roleType);
         }
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        /** @var User $user */
-        foreach ($statement as $row) {
-            if (!($user instanceof User)) {
-                $user = $this->hydrate($row, 'u');
-                $user->setSuperUser($row['u.superuser'] == 1);
-                $user->setRole($roleMapper->hydrate($row, 'g'));
-
-                $accessList = $this->findAccessList($user);
-
-                $user->setAccessList($accessList);
-            }
-
-            $campus = $campusMapper->hydrate($row, 'c');
-
-            /* If the campus object has no id, then it spawned a campus
-             * object from nonexistent data (e.g. a user with no campus)
-             * In this case, the campus object will be totally empty but
-             * still occupy slots in the user's campus collection stack
-             */
-            if ($campus->getId()) {
-                $user->getCampusCollection()->add($campus);
-
-                if ($row['uc.defaultCampus'] == 1) {
-                    $user->setDefaultCampus($campus);
-                }
-            }
-
-            $linkedUser = $this->hydrate($row,'lu');
-            if ($linkedUser->getId()) {
-                $linkedUserList[$linkedUser->getId()] = $linkedUser;
-            }
-        }
-
-        if (count($linkedUserList)) {
-            $linkedCollection = new Collection($linkedUserList);
-            $user->setLinkedUser($linkedCollection);
-        }
-
-        if (!($user instanceof User)) {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
-        }
-        return $user;
+        return $this->findByPredicates($pb)->first();
     }
 
     /**

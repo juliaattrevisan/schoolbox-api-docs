@@ -8,6 +8,7 @@
  */
  
 namespace Schoolbox\Column;
+use Alaress\Cache;
 use \DateTime as DateObject;
 use \Alaress_Date_Format as DateWrapper;
 
@@ -15,8 +16,19 @@ class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
 
-	/** @var DateWrapper[] */
+	/** @var Cache|DateWrapper[] */
 	private $cache = [];
+
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->cache = new Cache(function ($value, $inputFormat) {
+            return new DateWrapper($value, $inputFormat);
+        });
+    }
+
 
     /**
 	 * @param string            $value
@@ -30,13 +42,7 @@ class Datetime implements IColumnType {
         }
 
         try {
-            if (empty($this->cache[$value])) {
-                // only construct this if we ABSOLUTELY have to (it's spensy)
-                $this->cache[$value] = new DateWrapper($value, $this->input_format);
-                return $this->cache[$value];
-            }
-            // skip the computation, just duplicate the thing
-            return clone $this->cache[$value];
+            return clone $this->cache->get($value, [ $value, $this->input_format ]);
 
         } catch (\Exception $e) {
             return new \Alaress_Date_NullDate();

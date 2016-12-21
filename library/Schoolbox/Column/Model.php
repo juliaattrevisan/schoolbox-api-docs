@@ -9,12 +9,35 @@
  */
  
 namespace Schoolbox\Column;
+use Alaress\Cache;
 use Schoolbox\Mapper;
 
 class Model implements IColumnType {
 
-    /** @var object[] */
+    /** @var Cache|object[] */
     private $cache = [];
+
+
+    /**
+     * Model Column constructor.
+     */
+    public function __construct()
+    {
+        $this->cache = new Cache(function (Mapper $mapper, $value) {
+            $model = $mapper->createModel();
+
+            // Figure out the identifier property to set on the model.
+            $id_property = $this->getIdentifierProperty();
+
+            $identifier_method  = isset($id_property)
+                ? $mapper->getSetMethodName($id_property)
+                : $mapper->getSetIdentifierMethodName();
+
+            $model->$identifier_method($value);
+
+            return $model;
+        });
+    }
 
 	/**
 	 * The property to set on the model when hydrating, or get when dehydrating.
@@ -57,25 +80,7 @@ class Model implements IColumnType {
 	 */
     public function hydrate($value, $mapper = null)
     {
-        $t = $mapper->getTable();
-
-        if (empty($this->cache[$t][$value])) {
-
-            $model = $mapper->createModel();
-
-            // Figure out the identifier property to set on the model.
-            $id_property = $this->getIdentifierProperty();
-
-            $identifier_method  = isset($id_property)
-                ? $mapper->getSetMethodName($id_property)
-                : $mapper->getSetIdentifierMethodName();
-
-            $model->$identifier_method($value);
-
-            $this->cache[$t][$value] = $model;
-        }
-
-        return $this->cache[$t][$value];
+        return $this->cache->get("'{$mapper->getTable()}'.'$value'", [ $mapper, $value ]);
     }
 
 	/**
