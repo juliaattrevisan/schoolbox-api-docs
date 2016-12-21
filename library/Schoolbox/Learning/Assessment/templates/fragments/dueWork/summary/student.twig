@@ -7,11 +7,24 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ participant.assessable.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, student: participant.user, user: currentUser, icon: 'icon-due-work'} %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ participant.assessable.title }}</h1>
+            {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, student: participant.user, user: currentUser, icon: 'icon-due-work'} %}
+
+        </div>
     </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbook', {class: participant.assessable.context, classId: participant.assessable.context.id}) %}
+    {% if viewRoute %}
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Grading</li>
+        <li><a class="icon-approve" href="{{ viewRoute }}">Markbook</a></li>
+    </ul>
+    {% endif %}
 </div>
 
 <div class="row">
