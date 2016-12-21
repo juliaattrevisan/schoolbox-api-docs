@@ -86,6 +86,15 @@ interface IAssessable extends ISoftDeletable
     public function setSpecificationAssessment(IAssessable $specification = null);
 
     /**
+     * Returns a readable family name for this object.
+     *
+     * This will be the same for all objects of the same type.
+     *
+     * @return string
+     */
+    public function getFamilyName();
+
+    /**
      * Return the name of the "type" of Assessable this is
      *
      * For Due Works, it'll be "Essay, Homework, etc"
