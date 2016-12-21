@@ -5,14 +5,17 @@
  # That can be used to attach miniCountdown and update on the page via JS
  #}
 {% macro dueDate(assessment, user) %}
+{% spaceless %}
+
     {% import '@learning/macro/urgency.twig' as urgency %}
-    <span class="{{ urgency.datetime(assessment, user) }}">
-        Due
+    <span class="{{ urgency.datetime(assessment, user) }}">Due
         <span title="{{ assessment.dueAt.long }}">
             <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.getRelativeDay(true, true) }}</time>
             {% if assessment.dueAt.diffInDays(now) < 7 %}
-                <span>(<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)</span>
+                <span> (<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)</span>
             {% endif %}
         </span>
     </span>
+
+{% endspaceless %}
 {% endmacro %}
