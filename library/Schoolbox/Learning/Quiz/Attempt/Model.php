@@ -46,6 +46,13 @@ class Model implements ISoftDeletable
     private $finish;
 
     /**
+     * The teacher who reviewed this attempt. Null if not yet reviewed.
+     *
+     * @var User|null
+     */
+    private $reviewer;
+
+    /**
      * @var Alaress_Date_Format
      */
     private $reviewed;
@@ -211,6 +218,24 @@ class Model implements ISoftDeletable
     public function setAnswers(GenericCollection $answers)
     {
         $this->answers->replaceWith($answers);
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getReviewer()
+    {
+        return $this->reviewer;
+    }
+
+    /**
+     * @param User|null $reviewer
+     * @return static
+     */
+    public function setReviewer(User $reviewer = null)
+    {
+        $this->reviewer = $reviewer;
         return $this;
     }
 }

@@ -40,6 +40,7 @@ class Mapper extends BaseMapper
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('start', self::TYPE_DATETIME);
         $this->uses('finish', self::TYPE_DATETIME);
+        $this->joins('reviewer_id', UserMapper::class, 'id', null, null, 'reviewer', 'reviewer');
         $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -95,9 +96,11 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user', 'r')},
                 {$this->getJoinColumnString('quiz', 'a')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN {$this->getJoinSql('user', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('quiz', '', 'a')}
         ";
     }
@@ -113,9 +116,18 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /** @var Model $attempt */
             $attempt = $this->hydrate($row);
-            $user = $this->hydrateJoin($row, 'user', 'u');
+
             /** @var User $user */
+            $user = $this->hydrateJoin($row, 'user', 'u');
             $attempt->setUser($user);
+
+            /** @var User $user */
+            $reviewer = $this->hydrateJoin($row, 'reviewer', 'r');
+            // TODO, second part of test should not be required. see https://github.com/alaress/schoolbox/pull/11281
+            if($reviewer instanceof User && $reviewer->getId()){
+                $attempt->setReviewer($reviewer);
+            }
+
             /** @var Quiz $quiz */
             $quiz = $this->hydrateJoin($row, 'quiz', 'a');
             $attempt->setQuiz($quiz);
