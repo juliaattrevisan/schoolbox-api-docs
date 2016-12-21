@@ -53,7 +53,7 @@ class Cache
             throw new InvalidArgumentException("Key must be scalar, got ".gettype($key));
         }
 
-        if (empty ($this->cache[$key])) {
+        if (!array_key_exists($key, $this->cache)) {
             // cache miss: execute fetch
             $this->cache[$key] = call_user_func_array($this->fetch, $fetchArgs);
         }
