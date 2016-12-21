@@ -407,7 +407,7 @@ class Controller extends Base
             'student'           => $viewee,
             'term'              => $term,
             'terms'             => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'           => $this->getFolderMapper()->findFoldersWithSubmissions($viewee, $term),
+            'folders'           => $this->getFolderMapper()->findFoldersWithResponses($viewee, $term),
             'subject'           => $subject,
             'markbook'          => $markbook,
             'graphInfo'         => json_encode($graphInfo),

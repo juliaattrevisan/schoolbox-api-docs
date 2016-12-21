@@ -1634,7 +1634,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Term $term
      * @return Collection|Model[]
      */
-    public function findFoldersWithSubmissions(User $student, Term $term)
+    public function findFoldersWithResponses(User $student, Term $term)
     {
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
