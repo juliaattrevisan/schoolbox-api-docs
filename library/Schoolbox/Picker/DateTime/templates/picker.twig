@@ -73,13 +73,13 @@
 </style>
 <div class="row">
     <dl class="tabs" data-tab>
-        <dd class=""><a href="#" id="1"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
-        <dd class=""><a href="#" id="2"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
+        <dd class=""><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
+        <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
     </dl>
 </div>
 <div class="row">
     <div class="tabs-content">
-        <div class='content active' id="byDate">
+        <div class='content active' id="byDate-{{ id }}">
 
                 <div class="small-12 medium-4 columns">
 
@@ -97,7 +97,7 @@
                 </div>
         </div>
      </div>
-        <div class='content' id="byTimetable" style="display: none;">
+        <div class='content' id="byTimetable-{{ id }}" style="display: none;">
                 <div class="small-12 medium-4 columns">
 
                     {# Placeholder for timetable ot be rendered in #}
@@ -154,15 +154,15 @@
 
     {# Tabs #}
 
-    $('#1').click(function(){
-        $('#byDate').css('display', 'block');
-        $('#byTimetable').css('display', 'none');
+    $('#tab-1-{{ id }}').click(function(){
+        $('#byDate-{{ id }}').css('display', 'block');
+        $('#byTimetable-{{ id }}').css('display', 'none');
 
     });
 
-    $('#2').click(function(){
-        $('#byDate').css('display', 'none');
-        $('#byTimetable').css('display', 'block');
+    $('#tab-2-{{ id }}').click(function(){
+        $('#byDate-{{ id }}').css('display', 'none');
+        $('#byTimetable-{{ id }}').css('display', 'block');
 
     });
 
