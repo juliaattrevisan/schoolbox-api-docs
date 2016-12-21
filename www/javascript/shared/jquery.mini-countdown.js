@@ -21,7 +21,7 @@
 
         var settings = $.extend({
             destroyOnComplete: true,
-            futureSuffix: 'left',
+            futureSuffix: 'remaining',
             pastSuffix: '',
             onDestroy: $.noop
         }, options);
