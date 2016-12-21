@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use \Timetable_ColourMapper;
 
 class Module extends BaseModule
 {
@@ -133,9 +134,6 @@ class Module extends BaseModule
                     try {
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
-
-                        /* If nonexistent subject is specified, 404
-                         */
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }
@@ -164,7 +162,8 @@ class Module extends BaseModule
                 'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class)
+                'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             ])
         );
     }

@@ -30,48 +30,52 @@ class Controller extends Base
     /**
      * @var ShowcaseMapper
      */
-    protected $showcaseMapper;
+    private $showcaseMapper;
 
     /**
      * @var TermMapper
      */
-    protected $termMapper;
+    private $termMapper;
 
     /**
      * @var GradeGroup
      */
-    protected $defaultGradeGroup;
+    private $defaultGradeGroup;
 
     /**
      * @var FolderMapper
      */
-    protected $folderMapper;
+    private $folderMapper;
 
     /**
      * @var ErrorMapper
      */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * @var AssessmentMapperProxy
      */
-    protected $assessmentMapperProxy;
+    private $assessmentMapperProxy;
     /**
      * @var RubricMapper
      */
     private $rubricMapper;
 
+    /** @var Timetable_ColourMapper */
+    private $timetableColourMapper;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper           $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param FolderMapper          $folderMapper
-     * @param TermMapper            $termMapper
-     * @param GradeGroup            $defaultGradeGroup
-     * @param ShowcaseMapper        $showcaseMapper
-     * @param RubricMapper          $rubricMapper
+     * @param ErrorMapper            $errorMapper
+     * @param AssessmentMapperProxy  $assessmentMapperProxy
+     * @param FolderMapper           $folderMapper
+     * @param TermMapper             $termMapper
+     * @param GradeGroup             $defaultGradeGroup
+     * @param ShowcaseMapper         $showcaseMapper
+     * @param RubricMapper           $rubricMapper
+     * @param Timetable_ColourMapper $timetableColourMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -80,7 +84,8 @@ class Controller extends Base
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
-        RubricMapper $rubricMapper
+        RubricMapper $rubricMapper,
+        Timetable_ColourMapper $timetableColourMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -89,6 +94,7 @@ class Controller extends Base
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setRubricMapper($rubricMapper);
+        $this->timetableColourMapper = $timetableColourMapper;
     }
 
     /**
@@ -190,20 +196,21 @@ class Controller extends Base
      * @api GET /learning/classes{/term}
      * @level 165
      *
+     * @param Term $term
      */
     public function getClasses(Term $term) {
 
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
+        $colourList = $this->getTimetableColourMapper()->findAll();
         $colourIndex = 0;
 
-        $folderList = new Collection();
+        $folderList = $this->getFolderMapper()->createCollection();
         $classTypes = Array();
 
         /* Convert external subjects to folders */
         foreach($this->getUser()->getSubjectCollection() as $subject ) {
             try {
-                $folder = FolderMapper::getInstance()->findByCode($subject['code']);
+                $folder = $this->getFolderMapper()->findByCode($subject['code']);
                 if (!$folder->getColour()) {
                     /* Apply colour from list if no colour exists */
                     $folder->setColour($colourList[$colourIndex]->getHexColour());
@@ -216,11 +223,12 @@ class Controller extends Base
             }
         }
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
-            'currentUser'    => $this->getUser(),
-            'currentSemester'=> TermMapper::getInstance()->findForToday(),
-            'classList'      => $folderList,
-            'classTypes'     => $classTypes
-
+            'currentUser' => $this->getUser(),
+            'terms'       => $this->getTermMapper()->findAll(),
+            'now'         => \Alaress_Date_Format::now(),
+            'term'        => $term,
+            'classList'   => $folderList,
+            'classTypes'  => $classTypes,
         ]));
     }
 
@@ -562,6 +570,24 @@ class Controller extends Base
     protected function setShowcaseMapper(ShowcaseMapper $showcaseMapper)
     {
         $this->showcaseMapper = $showcaseMapper;
+        return $this;
+    }
+
+    /**
+     * @return Timetable_ColourMapper
+     */
+    public function getTimetableColourMapper()
+    {
+        return $this->timetableColourMapper;
+    }
+
+    /**
+     * @param Timetable_ColourMapper $timetableColourMapper
+     * @return static
+     */
+    public function setTimetableColourMapper(Timetable_ColourMapper $timetableColourMapper)
+    {
+        $this->timetableColourMapper = $timetableColourMapper;
         return $this;
     }
 }
