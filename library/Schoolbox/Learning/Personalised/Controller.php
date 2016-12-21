@@ -171,10 +171,12 @@ class Controller extends Base
                         'allDay'     => true,
                         'resourceId' => $folder->getId().'-units',
                         'meta'       => [
+                            'type'        => 'unit',
                             'description' => '',
-                            'folderId'    => $context->getSpecification()->getFolder()->getId(),
+                            'link'        => '/homepage/'.$context->getSpecification()->getFolder()->getId(),
                         ],
                     ]);
+
 
                     // If this is a quiz or due work - it's a content area
                     if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
@@ -186,7 +188,8 @@ class Controller extends Base
                             'end'        => $assessable->getDueAt()->getDatabase(),
                             'allDay'     => false,
                             'resourceId' => $folder->getId().'-contentAreas',
-                            'rendering'  => 'background'
+                            'rendering'  => 'background',
+                            'meta'       => [],
                         ]);
 
                         // A foreground event for the actual quiz/duework
@@ -200,14 +203,14 @@ class Controller extends Base
                             'resourceId' => $folder->getId().'-contentAreas',
                             'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
                             'meta'       => [
-                                'description'  => \Scrub::html($assessable->getDescription()),
-                                'assessmentId' => $assessable->getId(),
+                                'type'        => $assessable->getFamilyName(),
+                                'description' => \Scrub::html($assessable->getDescription()),
+                                'link'        => $this->generateLink($assessable),
                             ],
                         ]);
-                    }
 
-                    // If this is a project - get it and its constituents
-                    if ($assessable instanceof Project) {
+                    } elseif ($assessable instanceof Project) {
+                        // If this is a project - get it and its constituents
                         $result->add([
                             'id'         => 'project-'.$assessable->getId(),
                             'title'      => $assessable->getTitle(),
@@ -217,8 +220,9 @@ class Controller extends Base
                             'allDay'     => false,
                             'resourceId' => $folder->getId().'-projects',
                             'meta'       => [
-                                'description'  => \Scrub::html($assessable->getDescription()),
-                                'assessmentId' => $assessable->getId(),
+                                'type'        => $assessable->getFamilyName(),
+                                'description' => \Scrub::html($assessable->getDescription()),
+                                'link'        => $this->generateLink($assessable),
                             ],
                         ]);
 
@@ -231,7 +235,8 @@ class Controller extends Base
                                 'end'        => $activity->getDueAt()->getDatabase(),
                                 'allDay'     => false,
                                 'resourceId' => $folder->getId().'-activities',
-                                'rendering'  => 'background'
+                                'rendering'  => 'background',
+                                'meta'       => [],
                             ]);
 
                             // A foreground event for the actual activity
@@ -245,8 +250,9 @@ class Controller extends Base
                                 'resourceId' => $folder->getId().'-activities',
                                 'constraint' => 'activity-'.$activity->getId().'-bounds',
                                 'meta'       => [
-                                    'description'  => \Scrub::html($activity->getDescription()),
-                                    'assessmentId' => $activity->getId(),
+                                    'type'        => $activity->getFamilyName(),
+                                    'description' => \Scrub::html($activity->getDescription()),
+                                    'link'        => $this->generateLink($activity),
                                 ],
                             ]);
                         }
@@ -266,5 +272,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($newResultSet->reindex()));
+    }
+
+    /**
+     * Helper for generating a link to an assessable.
+     *
+     * @param IAssessable $assessable
+     * @return string
+     */
+    protected function generateLink(IAssessable $assessable)
+    {
+        return $this->getRouter()->generate('learningAssessment.getSummary', ['assessment' => $assessable->getId()]);
     }
 }
