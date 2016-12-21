@@ -1,0 +1,1 @@
+INSERT INTO `error` (id, message) VALUES (188, 'An error occurred while trying to process the uploaded file. Please ensure the file you have uploaded is a valid ZIP file.');
