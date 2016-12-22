@@ -2663,6 +2663,23 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
+        // $alias is bad if there are NO fields in $row that match it
+        // (Consider the amount of overhead this check may add)
+        if (!empty($alias)) {
+            $aliasFound = false;
+            $prefix     = $alias . '.';
+            foreach ($row as $columnName => $value) {
+                // Check if columnName matches this alias
+                if (strpos($columnName, $prefix) === 0) {
+                    $aliasFound = true;
+                    break;
+                }
+            }
+            if (!$aliasFound) {
+                throw new Exception(sprintf('Alias "%s" not found in row - are you hydrating the correct alias?', $alias));
+            }
+        }
+
         return $this->performHydration($this->localBodyCache, $this, $row, $alias, $callback);
     }
 
