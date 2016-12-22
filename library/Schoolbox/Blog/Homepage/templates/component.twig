@@ -45,12 +45,11 @@
 
     <div class="empty-state">
         <i class="icon-blog"></i>
-        <p>No blog posts!</p>
-        <p>
-            {% if isRouteAuthorized('blog.getInsert', { folder: folder }) %}
-                <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Post blog article</a>
-            {% endif %}
-        </p>
+        {% if readonly %}
+            <p>There are no blog posts to view at this time.</p>
+        {% else %}
+            <p><a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Add a blog post</a> to share content which can notify group members and allow them to comment.</p>
+        {% endif %}
     </div>
 
 {% else %}
