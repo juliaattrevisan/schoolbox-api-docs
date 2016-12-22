@@ -85,7 +85,14 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
 
+        $visibility = new \Schoolbox\Learning\Assessment\Visibility();
+
         foreach ($assessables as $assessment) {
+
+            if (!$visibility->isUpcomingVisibleToUser($assessment, $this->getUser())) {
+                continue;
+            }
+
             $event = new Event();
 
             $event->setAssessment($assessment);
