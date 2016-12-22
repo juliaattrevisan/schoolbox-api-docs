@@ -66,6 +66,7 @@
 <script type="text/javascript">
     // Do stuff here
     $(function() {
+        var calendar = $('#calendar');
 
         /**
          * Convert duration unit to FullCalendar view type name
@@ -119,7 +120,6 @@
                 view: convertDurationUnitToViewType(viewAlias, 'timelineTwoMonth')
             }
         };
-        var calendarParams = getCalendarParams(window.location.hash);
 
         /**
          * Retrieves the duration unit from the type of the custom view.
@@ -142,7 +142,27 @@
             throw new Error('Unrecognised view type "'+String(view.type)+'"');
         };
 
-        var calendar = $('#calendar');
+        /**
+         * Push calendar's current state (view + date) to history
+         */
+        var pushCurrentCalendarState = function() {
+            try {
+                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                var date = calendar.fullCalendar('getDate');
+                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
+            } catch (e) {
+                // Can't recognize view - ignore
+            }
+        };
+
+        // On hash change - update calendar based on hash contents
+        $(window).on('hashchange', function() {
+            var calendarParams = getCalendarParams(window.location.hash);
+            calendar.fullCalendar('changeView', convertDurationUnitToViewType(calendarParams.view, 'timelineTwoMonth'));
+            calendar.fullCalendar('gotoDate', calendarParams.date);
+        });
+
+        var calendarParams = getCalendarParams(window.location.hash);
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: false,
@@ -294,6 +314,7 @@
                                 var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
                                 var date = calendar.fullCalendar('getDate').clone();
                                 calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to previous step
                                 calendar.fullCalendar('prev');
@@ -311,6 +332,7 @@
                                 // This triggers a second viewRender - I don't want that
                                 calendar.fullCalendar('gotoDate', date.add(2, unit));
                                 calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                pushCurrentCalendarState();
                             } catch (e) {
                                 // Just go to next step
                                 calendar.fullCalendar('next');
@@ -320,13 +342,7 @@
                 },
 
                 viewRender: function() {
-                    try {
-                        var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
-                        var date = calendar.fullCalendar('getDate');
-                        window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
-                    } catch (e) {
-                        // Can't recognize view - ignore
-                    }
+                    // Only if the calendar view has changed
                 },
 
                 // Resources:
@@ -391,12 +407,5 @@
             },
             x: false
         }).init();
-
-        // On hash change - update calendar based on hash contents
-        $(window).on('hashchange', function() {
-            var calendarParams = getCalendarParams(window.location.hash);
-            calendar.fullCalendar('changeView', convertDurationUnitToViewType(calendarParams.view, 'timelineTwoMonth'));
-            calendar.fullCalendar('gotoDate', calendarParams.date);
-        });
     });
 </script>
