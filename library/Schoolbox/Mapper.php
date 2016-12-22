@@ -2666,17 +2666,33 @@ abstract class Mapper implements IMapper, Serializable
         // $alias is bad if there are NO fields in $row that match it
         // (Consider the amount of overhead this check may add)
         if (!empty($alias)) {
+            // Search for rows where columnName matches this alias
             $aliasFound = false;
             $prefix     = $alias . '.';
             foreach ($row as $columnName => $value) {
-                // Check if columnName matches this alias
                 if (strpos($columnName, $prefix) === 0) {
                     $aliasFound = true;
                     break;
                 }
             }
+
             if (!$aliasFound) {
                 throw new Exception(sprintf('Alias "%s" not found in row - are you hydrating the correct alias?', $alias));
+            }
+
+        } else {
+            // Search for rows without an alias
+            $aliasFound = false;
+            foreach ($row as $columnName => $value) {
+                // Check if columnName has no alias
+                if (strpos($columnName, '.') === false) {
+                    $aliasFound = true;
+                    break;
+                }
+            }
+
+            if (!$aliasFound) {
+                throw new Exception('Column without alias not found in row - did you forget to specify the correct alias?');
             }
         }
 
