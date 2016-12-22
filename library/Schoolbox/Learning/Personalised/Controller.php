@@ -120,19 +120,19 @@ class Controller extends Base
 
             // Resources for: units, content areas, projects, activities
             $resultSet[] = [
-                'id'    => $folder->getId().'-units',
+                'id'    => $folder->getId().'-unit',
                 'title' => 'Units',
             ] + $baseResult;
             $resultSet[] = [
-                'id'    => $folder->getId().'-contentAreas',
+                'id'    => $folder->getId().'-contentArea',
                 'title' => 'Content Areas',
             ] + $baseResult;
             $resultSet[] = [
-                'id'    => $folder->getId().'-projects',
+                'id'    => $folder->getId().'-project',
                 'title' => 'Projects',
             ] + $baseResult;
             $resultSet[] = [
-                'id'    => $folder->getId().'-activities',
+                'id'    => $folder->getId().'-activity',
                 'title' => 'Activities',
             ] + $baseResult;
         }

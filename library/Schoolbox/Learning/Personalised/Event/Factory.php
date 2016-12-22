@@ -48,9 +48,10 @@ class Factory
      */
     public function buildFromAssessmentCollection(Collection $assessments, Collection $participation = null)
     {
+        // At this time assume all $participation is for the same student
         return $assessments
-            ->map(function (IAssessable $assessment) {
-                return $this->buildFromAssessment($assessment);
+            ->map(function (IAssessable $assessment) use ($participation) {
+                return $this->buildFromAssessment($assessment, $participation);
             })
             ->concat();
     }
@@ -58,11 +59,11 @@ class Factory
     /**
      * Builds a set of FullCalendar-compatible events from $assessable.
      *
-     * @param IAssessable       $assessable
-     * @param Participant\Model $participant Add this participant record, if requested
+     * @param IAssessable                    $assessable
+     * @param Collection|Participant\Model[] $participation Student participation
      * @return Collection|array[]
      */
-    public function buildFromAssessment(IAssessable $assessable, Participant\Model $participant = null)
+    public function buildFromAssessment(IAssessable $assessable, Collection $participation = null)
     {
         $result = new Collection();
 
@@ -82,7 +83,7 @@ class Factory
                 'start'      => $context->getOpenDate()->getDatabase(),
                 'end'        => $context->getDueDate()->getDatabase(),
                 'allDay'     => true,
-                'resourceId' => $folder->getId().'-units',
+                'resourceId' => $folder->getId().'-unit',
                 'meta'       => [
                     'type'        => 'unit',
                     'description' => '',
@@ -100,7 +101,7 @@ class Factory
                     'start'      => $assessable->getPublishAt()->getDatabase(),
                     'end'        => $assessable->getDueAt()->getDatabase(),
                     'allDay'     => false,
-                    'resourceId' => $folder->getId().'-contentAreas',
+                    'resourceId' => $folder->getId().'-contentArea',
                     'rendering'  => 'background',
                     'meta'       => [],
                 ]);
@@ -113,7 +114,7 @@ class Factory
                     'start'      => $assessable->getPublishAt()->getDatabase(),
                     'end'        => $assessable->getDueAt()->getDatabase(),
                     'allDay'     => false,
-                    'resourceId' => $folder->getId().'-contentAreas',
+                    'resourceId' => $folder->getId().'-contentArea',
                     'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
                     'meta'       => [
                         'type'         => $assessable->getFamilyName(),
@@ -132,7 +133,7 @@ class Factory
                     'start'      => $assessable->getPublishAt()->getDatabase(),
                     'end'        => $assessable->getDueAt()->getDatabase(),
                     'allDay'     => false,
-                    'resourceId' => $folder->getId().'-projects',
+                    'resourceId' => $folder->getId().'-project',
                     'meta'       => [
                         'type'         => $assessable->getFamilyName(),
                         'assessmentId' => $assessable->getId(),
@@ -149,7 +150,7 @@ class Factory
                         'start'      => $activity->getPublishAt()->getDatabase(),
                         'end'        => $activity->getDueAt()->getDatabase(),
                         'allDay'     => false,
-                        'resourceId' => $folder->getId().'-activities',
+                        'resourceId' => $folder->getId().'-activity',
                         'rendering'  => 'background',
                         'meta'       => [],
                     ]);
@@ -162,7 +163,7 @@ class Factory
                         'start'      => $activity->getPublishAt()->getDatabase(),
                         'end'        => $activity->getDueAt()->getDatabase(),
                         'allDay'     => false,
-                        'resourceId' => $folder->getId().'-activities',
+                        'resourceId' => $folder->getId().'-activity',
                         'constraint' => 'activity-'.$activity->getId().'-bounds',
                         'meta'       => [
                             'type'         => $activity->getFamilyName(),
