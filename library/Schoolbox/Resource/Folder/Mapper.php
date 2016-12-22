@@ -39,6 +39,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Resource\Folder\Code\Model as FolderCode;
 
 /**
  * Class Mapper
@@ -1704,6 +1705,105 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return $collection;
+    }
+
+    /**
+     * Return a set of folders where the teacher has provided feedback in the specified term
+     *
+     * Includes:
+     * 1. assessments directly in folders
+     * 2. assessments in UnitImpls on class folders
+     * 3. assessments in Project directly on Folders
+     * 4. assessments in Projects in UnitImpls on class Folders
+     *
+     * @param User $teacher
+     * @param Term|null $term
+     * @return GenericCollection|Model[]
+     */
+    public function findFoldersWithFeedbacks(User $teacher, Term $term = null)
+    {
+        $codeMapper = $this->getJoinMapper('codes');
+
+        $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
+        $whereParams = [
+            ':userId' => $teacher->getId(),
+        ];
+
+        if($term instanceof Term){
+            $whereClause .= "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
+            $whereParams = array_merge($whereParams, [
+                ':startDate' => $term->getStart(),
+                ':endDate' => $term->getActualFinish(),
+            ]);
+        }
+
+        $query = "
+            SELECT
+                {$this->getColumnString('f')},
+                {$codeMapper->getColumnString('fc')}
+            FROM {$this->getTable()} f
+            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
+            WHERE f.deleted_at IS NULL AND f.id IN
+            (
+              SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`, `apf`.`folder_id`, `pci`.`folder_id`) AS `folder_id`
+              FROM      `assessment`                            AS `a`
+
+              LEFT JOIN `assessment_folder`                     AS `af`   ON `af`.`assessment_id` = `a`.`id`
+
+              LEFT JOIN `assessment_course_unit_implementation` AS `aui`  ON `a`.`id` = `aui`.`assessment_id`
+              LEFT JOIN `course_unit_implementation`            AS `ui`   ON `ui`.`id` = `aui`.`course_unit_implementation_id`
+              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id` = `ui`.`course_implementation_id`
+
+              LEFT JOIN `project_assessment`                    AS `pa`   ON `pa`.`assessment_id` = `a`.`id`
+              LEFT JOIN `project`                               AS `p`    ON `p`.`id` = `pa`.`project_id`
+              LEFT JOIN `assessment`                            AS `ap`   ON `ap`.`id` = `p`.`assessment_id`
+              LEFT JOIN `assessment_folder`                     AS `apf`  ON `apf`.`assessment_id` = `ap`.`id`
+
+              LEFT JOIN `project_assessment`                    AS `uipa` ON `uipa`.`assessment_id` = `a`.`id`
+              LEFT JOIN `project`                               AS `uip`  ON `uip`.`id` = `uipa`.`project_id`
+              LEFT JOIN `assessment`                            AS `uiap` ON `uiap`.`id` = `uip`.`assessment_id`
+              LEFT JOIN `assessment_course_unit_implementation` AS `paui` ON `paui`.`assessment_id` = `uiap`.`id`
+              LEFT JOIN `course_unit_implementation`            AS `pui`  ON `pui`.`id` = `paui`.`course_unit_implementation_id`
+              LEFT JOIN `course_implementation`                 AS `pci`  ON `pci`.`id` = `pui`.`course_implementation_id`
+
+              LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id`
+              LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id`
+              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
+              LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id`
+              LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id`
+              LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id
+              WHERE $whereClause
+            )
+            ORDER BY f.name
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($whereParams);
+
+        // Maintain separate cache so we can preserve query result ordering
+        $folderCache = [];
+        $folders = $this->createCollection();
+
+        foreach ($statement as $row) {
+
+            $folderId = $row["f.{$this->getIdentifierColumn()}"];
+
+            if(!$folderCache[$folderId] instanceof Model){
+                $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folders->add($folderCache[$folderId]);
+            }
+
+            $folder = $folderCache[$folderId];
+
+            /** @var FolderCode $code */
+            $code = $codeMapper->hydrate($row, 'fc');
+            // TODO the second part of this check should not be required. Hydrating a null row should return null
+            if($code instanceof FolderCode && $code->getCode()){
+                $folder->addCode($code);
+                $code->setFolder($folder);
+            }
+        }
+        return $folders;
     }
 
     /**
