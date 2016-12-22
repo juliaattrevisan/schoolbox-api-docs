@@ -70,6 +70,14 @@
         background: #569ff7;
         color: #fff;
     }
+    .reveal-modal a.picker-submit.close-reveal-modal {
+        border: none;
+        color: #fff;
+        background-color: #0066b0;
+        font-size: 16px;
+        top: inherit;
+        line-height: inherit;
+    }
 </style>
 <div class="row">
     <dl class="tabs" data-tab>
@@ -276,7 +284,7 @@
                 '<div class="time-switch"><input id="hideTime{{ id }}" type="checkbox" value="1" checked>' +
                 '<label for="hideTime{{ id }}" class="checkbox-label">All Day</label></div>' +
                 '</div><div class="small-6 columns">' +
-                '<div class="submit-calendar"><a href="#" class="button submit">Update</a><div>' +
+                '<div class="submit-calendar"><a href="#" class="button submit picker-submit close-reveal-modal" >Update</a><div>' +
                 '</div></div>'
             );
             
