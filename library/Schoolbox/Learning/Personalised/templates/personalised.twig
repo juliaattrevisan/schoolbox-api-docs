@@ -66,14 +66,60 @@
 <script type="text/javascript">
     // Do stuff here
     $(function() {
-//        var calendarView = 'timelineMonth';
-        var calendarDate = moment({{ calendar.date|json_encode|raw }});
 
-        if (calendarDate.isValid()) {
-            calendarDate = calendarDate.toDate();
-        } else {
-            calendarDate = new Date();
-        }
+        /**
+         * Convert duration unit to FullCalendar view type name
+         *
+         * @param durationUnit
+         * @param defaultView
+         * @returns {String}
+         */
+        var convertDurationUnitToViewType = function(durationUnit, defaultView) {
+            switch (durationUnit) {
+                case 'week':
+                    return 'timelineTwoWeek';
+
+                case 'day':
+                    return 'timelineTwoDay';
+
+                case 'month':
+                    return 'timelineTwoMonth';
+
+                default:
+                    return defaultView;
+            }
+        };
+
+        /**
+         * Extract calendar params out of hash
+         *
+         * @param hash
+         * @returns {object} with "date" and "view" keys
+         */
+        var getCalendarParams = function(hash) {
+            // Valid hash: #view/DD/MM/YYYY (URL date format)
+            var hashParts = hash.match(/^#(\w+)\/?(.*)/),
+                viewAlias,
+                calendarDate;
+            if (hashParts) {
+                viewAlias      = hashParts[1];
+                var momentDate = moment(hashParts[2], dateDisplayFormats.momentJs);
+                if (momentDate.isValid()) {
+                    calendarDate = momentDate.toDate();
+                } else {
+                    calendarDate = new Date();
+                }
+            } else {
+                viewAlias    = 'month';
+                calendarDate = new Date();
+            }
+
+            return {
+                date: calendarDate,
+                view: convertDurationUnitToViewType(viewAlias, 'timelineTwoMonth')
+            }
+        };
+        var calendarParams = getCalendarParams(window.location.hash);
 
         /**
          * Retrieves the duration unit from the type of the custom view.
@@ -105,7 +151,7 @@
             fullCalendar: {
                 firstHour: 9,
                 allDaySlot: false,
-                defaultDate: calendarDate,
+                defaultDate: calendarParams.date,
                 views: {
                     timelineTwoMonth: {
                         type: 'timeline',
@@ -133,7 +179,7 @@
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
-                defaultView: 'timelineTwoMonth',
+                defaultView: calendarParams.view,
                 header: {
                     left: 'prevWindow,today,nextWindow',
                     center: 'title',
