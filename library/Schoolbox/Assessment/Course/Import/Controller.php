@@ -518,8 +518,8 @@ class Controller extends Base\Base
         }
 
 
-        // Don't know that this is right, but the project doesn't have any assessables in it so I'm shoving them in about as elegantly as the least
-        // elegant thing you can think of...
+        // Don't know that this is right, but the project doesn't have any assessables in it so I'm shoving them in about as elegantly as the
+        // Americans shoved Trump into power...
 
         $assessmentPairs = $dto->getAssessmentPairs();
 
@@ -846,8 +846,6 @@ class Controller extends Base\Base
             $this->sendError($e->getMessage());
             return;
         }
-
-        exit;
 
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
