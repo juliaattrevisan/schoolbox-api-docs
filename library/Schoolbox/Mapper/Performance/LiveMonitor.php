@@ -34,4 +34,27 @@ class LiveMonitor implements IMonitor
         // noop
     }
 
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    {
+        // noop
+    }
+
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    {
+        // noop
+    }
+
+
 }

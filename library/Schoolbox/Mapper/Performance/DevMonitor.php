@@ -155,4 +155,50 @@ class DevMonitor implements IMonitor
     }
 
 
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    {
+        $query = $this->deriveQuery($mapper, $predicateBuilder);
+        $key   = sha1($query);
+
+        $this->debugBar['time']->startMeasure($key, $query);
+    }
+
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    {
+        $key = sha1($this->deriveQuery($mapper, $predicateBuilder));
+
+        $this->debugBar['time']->stopMeasure($key);
+    }
+
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return string
+     */
+    private function deriveQuery(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder)
+    {
+        $query  = "SELECT ... FROM {$mapper->getTable()} ... ";
+        $params = $predicateBuilder->getParams();
+
+        if (count($params)) {
+            $query .= "WHERE " . implode(' AND ', $predicateBuilder->getWhere());
+            $query  = str_replace(array_map(function ($v) { return ":$v"; }, array_keys($params)), $params, $query);
+        }
+
+        return str_replace('`', '', $query);
+    }
+
+
 }

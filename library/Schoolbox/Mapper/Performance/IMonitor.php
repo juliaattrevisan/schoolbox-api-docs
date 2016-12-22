@@ -28,4 +28,20 @@ interface IMonitor
      */
     public function assessPredicate(Mapper\PredicateBuilder $predicate, $selectFrom);
 
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function startExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder);
+
+
+    /**
+     * @param Mapper                  $mapper
+     * @param Mapper\PredicateBuilder $predicateBuilder
+     * @return void
+     */
+    public function stopExecuteSelectTimer(Mapper $mapper, Mapper\PredicateBuilder $predicateBuilder);
+
 }

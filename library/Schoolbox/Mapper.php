@@ -1661,16 +1661,26 @@ abstract class Mapper implements IMapper, Serializable
             // fold the column list into the predicate builder
             $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
 
-            $params = $predicate->getParams();
-            asort($params);
+            if (array_key_exists('cache', $options) && $options['cache'] === false) {
+                // cache bypass is EXPLICITLY defined
+                $c = $this->selectCache->fetch([ $statement ]);
 
-            // the query itself gets cached by the DB class, but we also want to cache the params
-            $hash = sha1(sprintf('%s[%s]',
-                $statement->queryString,
-                implode(',', $params)
-            ));
+            } else {
+                $params = $predicate->getParams();
+                asort($params);
 
-            return $this->selectCache->get($hash, [ $statement ]);
+                // the query itself gets cached by the DB class, but we also want to cache the params
+                $hash = sha1(sprintf('%s[%s]',
+                    $statement->queryString,
+                    implode(',', $params)
+                ));
+
+                $c = $this->selectCache->get($hash, [ $statement ]);
+            }
+
+            $this->monitor->stopExecuteSelectTimer($this, $predicate);
+
+            return $c;
 
         } catch (UnderflowException $e) {
             return $this->hydrateList([]);
@@ -1762,6 +1772,9 @@ abstract class Mapper implements IMapper, Serializable
             $limit  = PHP_INT_MAX;
             $offset = $options['offset'];
         }
+
+        $this->monitor->startExecuteSelectTimer($this, $predicate);
+
         $statement = $this->database->prepare($query);
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
