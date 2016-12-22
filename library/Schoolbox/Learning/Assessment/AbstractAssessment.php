@@ -17,8 +17,6 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -189,56 +187,6 @@ abstract class AbstractAssessment implements IAssessable
         return $clone;
     }
 
-    /**
-     * Determines whether this upcoming IAssessable is visible to $user
-     * at its most basic level. For students, the Publish Date must be
-     * in the past; for Staff, it is always visible and does not require
-     * a past Publish Date
-     *
-     * IAssessables won't appear if their due dates are in the past
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isUpcomingVisibleToUser(User $user)
-    {
-        /* Closed IAssessables don't show
-         */
-        if ($this->getCloseAt()->isPast()) {
-            return false;
-        }
-
-        /* Folder perms
-         */
-        $folderAccessLevel = Access::getInstance()->getFolderAccess($user, [$this->getContext()->getFolder()->getId()]);
-
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
-            return true;
-        }
-        else if ($folderAccessLevel == UserAccess::ACCESS_READ) {
-
-            /* Unpublished IAssessables don't show
-             */
-            if ($this->getPublishAt()->isFuture()) {
-                return false;
-            }
-
-            /* Decide whether $user can create a response to this IAssessable
-             */
-            return $this->canCreateResponse($user);
-        }
-
-        return false;
-    }
-
-    /**
-     * Decide whether $user can create a response to this IAssessable
-     *
-     * @param User $user
-     * @return bool
-     */
-    abstract protected function canCreateResponse(User $user);
-
     /* Delegation Methods
      */
 
@@ -393,8 +341,6 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->getAllParticipants()->count();
     }
-
-
 
     /**
      * Returns the number of Participants who have Responses to this Assessment
