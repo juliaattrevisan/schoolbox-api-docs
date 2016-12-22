@@ -2,12 +2,13 @@
 
     <div class="empty-state">
         <i class="icon-tiles"></i>
-        <p>No tiles available!</p>
-        <p>
-            {% if showButtons %}
-                <a href="/tile/add/{{ tile_component_instance_id }}">Add a tile</a> or <a href="/tile/layout/{{ tile_component_instance_id }}">modify layout</a>.
-            {% endif %}
-        </p>
+
+        {% if writeAccess %}
+            <p><a href="/tile/add/{{ tile_component_instance_id }}">Add a tile</a> to create fun buttons or banners that link to other pages.</p>
+        {% else %}
+            <p>There are no tiles available at this time.</p>
+        {% endif %}
+
     </div>
 
 {% else %}
@@ -19,14 +20,14 @@
             editable: false
         }
     %}
-    {% if showButtons %}
 
-    <div class="component-action">
-        <section>
-            <a href="/tile/add/{{ tile_component_instance_id }}" class="button">Add Tile</a>
-            <a href="/tile/layout/{{ tile_component_instance_id }}" class="button">Modify Layout</a>
-        </section>
-    </div>
+    {% if writeAccess %}
+        <div class="component-action">
+            <section>
+                <a href="/tile/add/{{ tile_component_instance_id }}" class="button">Add Tile</a>
+                <a href="/tile/layout/{{ tile_component_instance_id }}" class="button">Modify Layout</a>
+            </section>
+        </div>
     {% endif %}
 
 {% endif %}
