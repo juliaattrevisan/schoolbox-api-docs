@@ -167,6 +167,16 @@ class Model extends AbstractAssessment
         return true;
     }
 
+    /**
+     * Decide whether $user can create a response to this IAssessable
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canCreateResponse(User $user)
+    {
+    }
+
     /* Getters/Setters
      */
 

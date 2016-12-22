@@ -228,6 +228,24 @@ class Model extends AbstractAssessment
         return $this->getMark($user, $publishedOnly, $normalised);
     }
 
+    /**
+     * Decide whether $user can create a response to this IAssessable
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canCreateResponse(User $user)
+    {
+        if ($this->isAcceptSingle() && $this->getParticipant($user)->isResponded()) {
+            return false;
+        }
+
+        /* What about isAcceptNone() - should students still be able to see it?
+         */
+
+        return true;
+    }
+
     /* Getters/Setters
      */
 
