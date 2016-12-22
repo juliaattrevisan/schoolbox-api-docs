@@ -144,7 +144,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         foreach ($statement as $row) {
             $return = $this->hydrate($row);
             $ids[]  = $return->getId();
-            $return->setSubmission($submissionMapper->hydrate($row, 'ss'));
+            $return->setSubmission($submissionMapper->hydrate($row, 's'));
             $return->setMarker($markerMapper->hydrate($row, 'm'));
             $return->setSubmissionBox($this->hydrateJoin($row, 'submission_box', 'b'));
 
