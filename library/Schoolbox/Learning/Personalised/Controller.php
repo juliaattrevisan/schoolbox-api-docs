@@ -12,13 +12,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -147,118 +142,11 @@ class Controller extends Base
             ->setActualFinish(new Alaress_Date_Format($this->getRequest()->query->get('end'), Alaress_Date_Format::TIMESTAMP))
         ;
 
-        // Use the calendar renderer classes here?
-        $resultSet = $this->assessmentDataSource->findAllByStudent($student, $term)
-            ->map(function(IAssessable $assessable) {
-                $result = new Collection();
-
-                // Process unit implementations only
-                if ($assessable->getContext() instanceof UnitImplementation) {
-                    /** @var UnitImplementation $context */
-                    $context = $assessable->getContext();
-
-                    /** @var Folder $folder */
-                    $folder = $context->getCourse()->getFolder();
-
-                    // The unit itself
-                    $result->add([
-                        'id'         => 'unit-'.$context->getId(),
-                        'title'      => $context->getTitle(),
-                        'editable'   => false,
-                        'start'      => $context->getOpenDate()->getDatabase(),
-                        'end'        => $context->getDueDate()->getDatabase(),
-                        'allDay'     => true,
-                        'resourceId' => $folder->getId().'-units',
-                        'meta'       => [
-                            'type'        => 'unit',
-                            'description' => '',
-                            'link'        => '/homepage/'.$context->getSpecification()->getFolder()->getId(),
-                        ],
-                    ]);
-
-
-                    // If this is a quiz or due work - it's a content area
-                    if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
-                        // A background event for the bounds
-                        $result->add([
-                            'id'         => 'contentArea-'.$assessable->getId().'-bounds',
-                            'editable'   => false,
-                            'start'      => $assessable->getPublishAt()->getDatabase(),
-                            'end'        => $assessable->getDueAt()->getDatabase(),
-                            'allDay'     => false,
-                            'resourceId' => $folder->getId().'-contentAreas',
-                            'rendering'  => 'background',
-                            'meta'       => [],
-                        ]);
-
-                        // A foreground event for the actual quiz/duework
-                        $result->add([
-                            'id'         => 'contentArea-'.$assessable->getId(),
-                            'title'      => $assessable->getTitle(),
-                            'editable'   => true,
-                            'start'      => $assessable->getPublishAt()->getDatabase(),
-                            'end'        => $assessable->getDueAt()->getDatabase(),
-                            'allDay'     => false,
-                            'resourceId' => $folder->getId().'-contentAreas',
-                            'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
-                            'meta'       => [
-                                'type'        => $assessable->getFamilyName(),
-                                'description' => \Scrub::html($assessable->getDescription()),
-                                'link'        => $this->generateLink($assessable),
-                            ],
-                        ]);
-
-                    } elseif ($assessable instanceof Project) {
-                        // If this is a project - get it and its constituents
-                        $result->add([
-                            'id'         => 'project-'.$assessable->getId(),
-                            'title'      => $assessable->getTitle(),
-                            'editable'   => false,
-                            'start'      => $assessable->getPublishAt()->getDatabase(),
-                            'end'        => $assessable->getDueAt()->getDatabase(),
-                            'allDay'     => false,
-                            'resourceId' => $folder->getId().'-projects',
-                            'meta'       => [
-                                'type'        => $assessable->getFamilyName(),
-                                'description' => \Scrub::html($assessable->getDescription()),
-                                'link'        => $this->generateLink($assessable),
-                            ],
-                        ]);
-
-                        foreach ($assessable->getAssessables() as $activity) {
-                            // Background for the bounds
-                            $result->add([
-                                'id'         => 'activity-'.$activity->getId().'-bounds',
-                                'editable'   => false,
-                                'start'      => $activity->getPublishAt()->getDatabase(),
-                                'end'        => $activity->getDueAt()->getDatabase(),
-                                'allDay'     => false,
-                                'resourceId' => $folder->getId().'-activities',
-                                'rendering'  => 'background',
-                                'meta'       => [],
-                            ]);
-
-                            // A foreground event for the actual activity
-                            $result->add([
-                                'id'         => 'activity-'.$activity->getId(),
-                                'title'      => $activity->getTitle(),
-                                'editable'   => true,
-                                'start'      => $activity->getPublishAt()->getDatabase(),
-                                'end'        => $activity->getDueAt()->getDatabase(),
-                                'allDay'     => false,
-                                'resourceId' => $folder->getId().'-activities',
-                                'constraint' => 'activity-'.$activity->getId().'-bounds',
-                                'meta'       => [
-                                    'type'        => $activity->getFamilyName(),
-                                    'description' => \Scrub::html($activity->getDescription()),
-                                    'link'        => $this->generateLink($activity),
-                                ],
-                            ]);
-                        }
-                    }
-                }
-
-                return $result;
+        // Build the list
+        $eventFactory = new EventFactory($this->getRouter());
+        $resultSet    = $this->assessmentDataSource->findAllByStudent($student, $term)
+            ->map(function (IAssessable $assessable) use ($eventFactory) {
+                return $eventFactory->buildFromAssessment($assessable);
             })
             ->concat();
 
@@ -271,16 +159,5 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($newResultSet->reindex()));
-    }
-
-    /**
-     * Helper for generating a link to an assessable.
-     *
-     * @param IAssessable $assessable
-     * @return string
-     */
-    protected function generateLink(IAssessable $assessable)
-    {
-        return $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessable->getId()]);
     }
 }
