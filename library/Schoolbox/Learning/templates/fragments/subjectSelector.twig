@@ -1,0 +1,32 @@
+{#
+Generic Subject selector.
+
+Usage:
+    currentSubject: Folder               - (optional) the current selected Subject Folder
+    subjects:       Collection|Folder[]  - the subjects to render in dropdown
+    route:          string               - Aura route
+    routeArgs:      JSON object          - Aura route args to be merged with subjectId inside loop
+#}
+
+<script type="text/javascript">
+    $(function() {
+
+        var $subjectSelector = $('#context-selector-subject');
+
+        {# Wire up context selector #}
+        $subjectSelector.change(function() {
+            window.location.href = $subjectSelector.find(':selected').data('href');
+        });
+    });
+</script>
+
+<div class="subject">
+    <select id="context-selector-subject" title="Select a subject">
+        <option disabled="" selected="" label="Select a subject">Select a subject</option>
+        {% for folder in subjects %}
+            <option data-href="{{ routeLookup('learning.getGradesForSubject', routeArgs|merge({subjectId: folder.id})) }}" {% if folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
+                {#- dessicate -#}{{ folder.nameWithCodes }}{#- dessicate -#}
+            </option>
+        {% endfor %}
+    </select>
+</div>

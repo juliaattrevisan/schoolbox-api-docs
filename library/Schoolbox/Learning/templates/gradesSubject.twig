@@ -39,7 +39,20 @@
     </div>
     <div class="small-12 medium-7 columns">
         <div class="content">
-            {% include '@learning/fragments/contextSelector.twig' with {folders: folders, terms: terms} %}
+            <div class="context-switch clearfix">
+                {% include '@learning/fragments/semesterSelector.twig' with {
+                    currentTerm: term,
+                    terms: terms,
+                    route: 'learning.getGradesForSubject',
+                    routeArgs: {userId: student.id, subject: subject}
+                } only %}
+                {% include '@learning/fragments/subjectSelector.twig' with {
+                    currentSubject: subject,
+                    subjects: folders,
+                    route: 'learning.getGradesForSubject',
+                    routeArgs: {userId: student.id, termCode: term.code}
+                } only %}
+            </div>
         </div>
     </div>
 </div>
