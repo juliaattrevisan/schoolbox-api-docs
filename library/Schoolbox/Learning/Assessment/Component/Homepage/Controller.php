@@ -14,6 +14,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -63,6 +64,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
+
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
             $this->assessments = $this->getAssessmentMapper()
@@ -70,8 +72,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->filter(
                     function (IAssessable $assessment)
                     {
-
-                        return $this->filterAssessment($assessment) && $assessment->isUpcomingVisibleToUser($this->getUser());
+                        $visibility = new \Schoolbox\Learning\Assessment\Visibility();
+                        return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
                 ->limit($this->getConfig('size'));
