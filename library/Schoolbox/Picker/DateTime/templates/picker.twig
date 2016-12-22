@@ -125,25 +125,27 @@
                                 {# Options will be appended here #}
                             </select>
                         </form>
-                        {% set campus = 1 %}
-                        <table class="timetablePicker">
-                            <th>
-                                {% for i in 1..timetable[campus].dayCount %}
-                                    <td class="day-{{ i }}">{{ i }}</td>
-                                {% endfor %}
-                            </th>
-                            {% set k=1 %}
-                        {% for description in timetable[campus].desc %}
-                            <tr><td class="period-description description-{{ k }}">{{ description }}</td>
+                        {# Build all, hide, reveal one later #}
+                        {% for campus in timetable %}
+                            <table class="timetablePicker" id="timetable-{{ campus.campusId }}" style="display:none;">
+                                <th>
+                                    {% for i in 1..timetable[campus.campusId].dayCount %}
+                                        <td class="day-{{ i }}">{{ i }}</td>
+                                    {% endfor %}
+                                </th>
+                                {% set k=1 %}
+                            {% for description in timetable[campus.campusId].desc %}
+                                <tr><td class="period-description description-{{ k }}">{{ description }}</td>
 
-                                {% for i in 1..timetable[campus].dayCount %}
-                                    <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}"></div></td>
+                                    {% for i in 1..timetable[campus.campusId].dayCount %}
+                                        <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}"></div></td>
 
-                                {% endfor %}
-                                {% set k=k+1 %}
-                            </tr>
+                                    {% endfor %}
+                                    {% set k=k+1 %}
+                                </tr>
+                            {% endfor %}
+                            </table>
                         {% endfor %}
-                        </table>
                     </div>
                 </div>
                 <div class="small-12 medium-8 columns">
@@ -188,12 +190,21 @@
         $('select[name*="cycle"]').empty().append(optionsHtml);
     }
 
+    {# Reveal Timetable#}
+    function revealTimetable() {
+        var campus = $('select[name*="campus"]').find(':selected').val();
+        $('.timetablePicker').css('display', 'none');
+        $('#timetable-'+campus).css('display', 'table');
+    }
+
     {# Put cycles on load #}
     buildCycles();
+    revealTimetable();
 
     {# Update cycles on Campus or Term change #}
     $('select[name*="campus"]').change(function(){
         buildCycles();
+        revealTimetable();
     });
 
     $('select[name*="term"]').change(function(){
