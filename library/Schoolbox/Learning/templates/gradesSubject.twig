@@ -46,14 +46,12 @@
                     route: 'learning.getGradesForSubject',
                     routeArgs: {userId: student.id, subject: subject}
                 } only %}
-                {% if folders | length >= 2 %}
-                    {% include '@learning/fragments/subjectSelector.twig' with {
-                        currentSubject: subject,
-                        subjects: folders,
-                        route: 'learning.getGradesForSubject',
-                        routeArgs: {userId: student.id, termCode: term.code}
-                    } only %}
-                {% endif %}
+                {% include '@learning/fragments/subjectSelector.twig' with {
+                    currentSubject: subject,
+                    subjects: folders,
+                    route: 'learning.getGradesForSubject',
+                    routeArgs: {userId: student.id, termCode: term.code}
+                } only %}
             </div>
         </div>
     </div>
