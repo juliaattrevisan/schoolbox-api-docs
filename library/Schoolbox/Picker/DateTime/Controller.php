@@ -56,6 +56,9 @@ class Controller extends Base
     public function getPicker($id, $display, $database, $value) {
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
+
+//        new \Alaress_Probe($timetable);
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pickerDatetime/picker.twig',
@@ -198,7 +201,8 @@ class Controller extends Base
             array(
                 'format' => 'json',
                 'data' => [
-                    'appointments' => $appointments
+                    'appointments' => $appointments,
+                    'date' => $date
                 ]
             )
         );
