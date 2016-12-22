@@ -146,11 +146,6 @@ class DevMonitor implements IMonitor
 
         }
 
-        if (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
-            // only output to HTML
-            echo $output;
-        }
-
         return;
     }
 
