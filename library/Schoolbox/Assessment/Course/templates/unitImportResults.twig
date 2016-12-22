@@ -75,6 +75,7 @@
                 aid    = $input.data('assessment'),
                 $tgt   = $('[data-assessment-dates=' + aid + ']'),
                 $unit  = $input.closest('[data-unit]'),
+                $p = $('[data-project=' + aid + ']'),
                 $count = $unit.find('[data-show-count]');
 
             $count.attr('data-show-count', $unit.find(':checked').length);
@@ -82,9 +83,13 @@
             if ($input.prop('checked')) {
                 $tgt.find('input').prop('disabled', false);
                 $tgt.show();
+                $p.find('input').prop('disabled', false);
+                $p.show();
             } else {
                 $tgt.hide();
                 $tgt.find('input').prop('disabled', true);
+                $p.hide();
+                $p.find('input').prop('disabled', true);
             }
         });
     });
@@ -225,6 +230,84 @@
                                             {% endif %}
                                         </div>
                                     </li>
+
+                                    {# If the assessable is a project allow the user to enter dates for each subassessment #}
+
+                                    {% if assessment is project %}
+                                        {% for assessable in assessment.assessables %}
+
+                                            {% set inputPrefix %}unit[{{ unitSpec.id }}][p][{{ assessment.id }}][a][{{ assessable.id }}]{% endset %}
+
+                                            <li data-type="unit_row" data-assessment-dates="{{ assessment.id }}">
+
+                                                <div class="compact card small-12 large-4">
+                                                    <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
+                                                    <input type="checkbox"
+                                                           data-project="{{ assessment.id }}"
+                                                           id="a_import-{{ assessable.id}}"
+                                                            {% if isChecked %} checked="checked"{% endif %}
+                                                           data-assessment="{{ assessable.id }}"
+                                                           name="{{ inputPrefix }}[checked]"
+                                                           value="1"
+                                                    />
+                                                    <label style="margin-left:25px;" for="a_import-{{ assessable.id}}" class="checkbox-label">
+                                                        <span class="{{ icon.renderClass(assessable) }}"></span>
+                                                        <span>{{ assessable.title }}</span>
+                                                        {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
+                                                            <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+
+                                                <div data-assessment-dates="{{ assessable.id }}" {% if not isChecked %} style="display: none;"{% endif %}>
+                                                    {# publish date is always relevant #}
+                                                    {% include '@course/import/date.twig' with {
+                                                    assessmentDate: assessment.publishAt,
+                                                    unitDate: unitImpl.openDate,
+                                                    inputPrefix: inputPrefix,
+                                                    dateProperty: 'publish',
+                                                    dateSyncProperty: publishDateSync
+                                                    } only %}
+
+                                                    {# open date is relevant when accepting responses #}
+                                                    {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
+                                                        {% include '@course/import/date.twig' with {
+                                                        assessmentDate: assessment.openAt,
+                                                        unitDate: unitImpl.openDate,
+                                                        inputPrefix: inputPrefix,
+                                                        dateProperty: 'open',
+                                                        dateSyncProperty: 'due'
+                                                        } only %}
+                                                    {% else %}
+                                                        <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
+                                                    {% endif %}
+
+                                                    {# due date is always relevant #}
+                                                    {% include '@course/import/date.twig' with {
+                                                    assessmentDate: assessment.dueAt,
+                                                    unitDate: unitImpl.dueDate,
+                                                    inputPrefix: inputPrefix,
+                                                    dateProperty: 'due',
+                                                    dateSyncProperty: 'late'
+                                                    } only %}
+
+                                                    {# close (late) date is relevant when accepting responses #}
+                                                    {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
+                                                        {% include '@course/import/date.twig' with {
+                                                        assessmentDate: assessment.closeAt,
+                                                        unitDate: unitImpl.dueDate,
+                                                        inputPrefix: inputPrefix,
+                                                        dateProperty: 'close',
+                                                        dateLabel: 'Late'
+                                                        } only %}
+                                                    {% else %}
+                                                        <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
+                                                    {% endif %}
+                                                </div>
+                                            </li>
+
+                                        {% endfor %}
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                             {% else %}

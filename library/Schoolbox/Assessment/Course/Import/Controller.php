@@ -14,6 +14,8 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -515,6 +517,21 @@ class Controller extends Base\Base
             throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
 
+
+        // Don't know that this is right, but the project doesn't have any assessables in it so I'm shoving them in about as elegantly as the least
+        // elegant thing you can think of...
+
+        $assessmentPairs = $dto->getAssessmentPairs();
+
+        foreach ($assessmentPairs as $assessmentPair) {
+            foreach ($assessmentPair as $pair) {
+                $specification = $pair->getSpecification();
+                if ($specification instanceof Project) {
+                    $specification->setAssessables($this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId()));
+                }
+            }
+        }
+
         // respond with stage 4: coursework list
         $this->tpl('unitImportResults', [
             'action'           => $action,
@@ -772,6 +789,35 @@ class Controller extends Base\Base
                                 }
                             }
                         }
+
+                        // If this is a project we need to store the dates for each assessment inside it
+
+                        if (!$aData['impl_id'] && $assessmentImpl instanceof Project){
+                            $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
+
+                            foreach ($pData as $assessmentId => $aData) {
+
+                                try {
+                                    $assessmentImpl = $assessmentMapperProxy->findById($assessmentId);
+                                    // Set/Update Dates
+                                    foreach ($aData['dates'] as $property => $localShort) {
+                                        $method = "set{$property}At";
+                                        echo $method;
+                                        if (!method_exists($assessmentImpl, $method)) {
+                                            $this->sendError("Invalid date property: $property");
+                                            return;
+                                        }
+                                        $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
+                                    }
+
+                                    $assessmentMapperProxy->save($assessmentImpl);
+
+                                } catch (MapperException $e) {
+
+                                    // Can't see how we would ever end up here, but I'm sure stranger things have happened... like... Donald Trump?
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -800,6 +846,8 @@ class Controller extends Base\Base
             $this->sendError($e->getMessage());
             return;
         }
+
+        exit;
 
         /* Redirect back to wherever you came from...
          * ...hopefully (...your confidence is inspiring)
