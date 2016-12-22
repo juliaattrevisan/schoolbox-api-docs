@@ -33,15 +33,25 @@ class Controller extends Base
     protected $assessmentDataSource;
 
     /**
+     * @var Participant\Mapper
+     */
+    protected $participantMapper;
+
+    /**
      * Constructor
      *
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param Participant\Mapper   $participantMapper
      */
-    public function __construct(FolderMapper $folderMapper, AssessmentDataSource $assessmentDataSource)
-    {
+    public function __construct(
+        FolderMapper $folderMapper,
+        AssessmentDataSource $assessmentDataSource,
+        Participant\Mapper $participantMapper
+    ) {
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->participantMapper    = $participantMapper;
     }
 
     /**
@@ -237,6 +247,12 @@ class Controller extends Base
         }
 
         // All is valid - save the participation
+        $participant = $this->participantMapper->createModel()
+            ->setAssessment($assessment)
+            ->setStudent($student)
+            ->setOpenDate($openDate)
+            ->setDueDate($dueDate);
+        $this->participantMapper->save($participant);
 
         $this->buildJsonResponse('ok');
     }

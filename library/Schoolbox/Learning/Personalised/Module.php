@@ -10,11 +10,11 @@ namespace Schoolbox\Learning\Personalised;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
-use Twig_Loader_Chain;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use Twig_Loader_Chain;
 
 /**
  * Sub-module for a student's personalised learning view.
@@ -96,6 +96,7 @@ class Module extends BaseModule
                 [
                     'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+                    'participantMapper'    => $this->getParticipantMapper(),
                 ]
             )
         );
@@ -110,5 +111,13 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return Participant\Mapper
+     */
+    protected function getParticipantMapper()
+    {
+        return $this->getMapperFactory()->get(Participant\Mapper::class);
     }
 }
