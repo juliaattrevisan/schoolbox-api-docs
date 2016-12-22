@@ -747,8 +747,9 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function slice($offset, $count = null)
     {
-        $this->stack = array_slice($this->stack, $offset, $count, false);
-        return $this;
+        $copy = clone $this;
+        $copy->setStack(array_slice($copy->stack, $offset, $count, false));
+        return $copy;
     }
 
     public function filterBy($field, $value)
