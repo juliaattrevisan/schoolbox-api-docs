@@ -308,6 +308,7 @@
                                 // This ensures that events that are in the next window but not this one get loaded.
                                 var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
                                 var date = calendar.fullCalendar('getDate').clone();
+                                // This triggers a second viewRender - I don't want that
                                 calendar.fullCalendar('gotoDate', date.add(2, unit));
                                 calendar.fullCalendar('gotoDate', date.subtract(1, unit));
                             } catch (e) {
@@ -390,5 +391,12 @@
             },
             x: false
         }).init();
+
+        // On hash change - update calendar based on hash contents
+        $(window).on('hashchange', function() {
+            var calendarParams = getCalendarParams(window.location.hash);
+            calendar.fullCalendar('changeView', convertDurationUnitToViewType(calendarParams.view, 'timelineTwoMonth'));
+            calendar.fullCalendar('gotoDate', calendarParams.date);
+        });
     });
 </script>
