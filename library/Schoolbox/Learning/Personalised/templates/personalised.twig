@@ -162,6 +162,7 @@
             calendar.fullCalendar('gotoDate', calendarParams.date);
         });
 
+        var previousView   = {};
         var calendarParams = getCalendarParams(window.location.hash);
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
@@ -329,7 +330,8 @@
                                 // This ensures that events that are in the next window but not this one get loaded.
                                 var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
                                 var date = calendar.fullCalendar('getDate').clone();
-                                // This triggers a second viewRender - I don't want that
+                                // Handle pushstate here because this triggers a second viewRender event.
+                                // I don't want to pushstate twice.
                                 calendar.fullCalendar('gotoDate', date.add(2, unit));
                                 calendar.fullCalendar('gotoDate', date.subtract(1, unit));
                                 pushCurrentCalendarState();
@@ -343,6 +345,11 @@
 
                 viewRender: function() {
                     // Only if the calendar view has changed
+                    var currentView = calendar.fullCalendar('getView');
+                    if (previousView.type != currentView.type) {
+                        pushCurrentCalendarState();
+                    }
+                    previousView = currentView;
                 },
 
                 // Resources:
