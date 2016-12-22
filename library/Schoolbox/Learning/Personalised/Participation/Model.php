@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised\AssessmentDate;
+namespace Schoolbox\Learning\Personalised\Participation;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -13,9 +13,13 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
- * Representation for a personalised assessment open/due date for a student.
+ * Representation for a personalised assessment participation for a student.
  *
- * Eventually, this may be expanded to be the record for whether a student is
+ * Currently, it is not the source of truth for whether the student is actually
+ * participating in an assessment - it only allows a student to override the
+ * open and due date for an assessment.
+ *
+ * Eventually, it may be expanded to be the record for whether a student is
  * participating in an assessment.
  */
 class Model
