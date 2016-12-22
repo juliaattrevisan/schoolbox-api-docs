@@ -12,6 +12,7 @@ use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
 use Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
@@ -20,6 +21,22 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var ComponentDelegate
      */
     private $delegate;
+
+    /**
+     * @var bool
+     */
+    private $readOnly;
+
+    /**
+     * @var bool
+     */
+    private $fixtureAdmin;
+
+    /**
+     * Whether a team has been set in component config
+     * @var bool
+     */
+    private $noConfig;
 
     /**
      * Injectable constructor
@@ -41,6 +58,22 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
+        /*
+         * Check access to this page
+         */
+        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
+
+        /**
+         * Check if user is a fixture admin
+         */
+        $this->fixtureAdmin = (UserAccess::SERVICE_SPORTS_ADMINISTRATOR) ? true : false;
+
+        /**
+         * Check if a team has been set in the component config
+         */
+        $this->noConfig = $this->getConfig('team') ? false : true;
+
+
         return true;
     }
 
@@ -61,6 +94,9 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
                 'matches'             => $matches,
+                'readOnly'            => $this->readOnly,
+                'fixtureAdmin'        => $this->fixtureAdmin,
+                'noConfig'            => $this->noConfig
             ]
         );
     }

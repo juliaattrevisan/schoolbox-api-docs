@@ -30,7 +30,24 @@
 
     <div class="empty-state">
         <i class="icon-sport"></i>
-        <p>You have no upcoming matches scheduled.</p>
+
+        {% if readOnly %}
+
+            <p>There are no upcoming matches at this time.</p>
+
+        {% else %}
+
+            {#
+            TODO:   Allow fixture admins to go straight to a create match form
+                    Can't happen at the moment because the route needs a division
+                    if fixtureAdmin and !noConfig
+                        <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm') }}">Create a match</a> to show users the upcoming matches for this team.</p>
+            #}
+
+            <p><a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Choose a team</a> to display their results and upcoming matches.</p>
+
+        {% endif %}
+
     </div>
 
 {% endif %}
