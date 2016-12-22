@@ -108,9 +108,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                     /* Icon map
                      */
                     $icons = [
-                        'home' => 'home',
+                        'home'   => 'home',
                         'folder' => 'folder',
-                        'course' => 'course-builder'
+                        'course' => 'course-builder',
+                        'unit'   => 'unit',
                     ];
 
                     $colourList = Timetable_ColourMapper::getInstance()->findAll();
