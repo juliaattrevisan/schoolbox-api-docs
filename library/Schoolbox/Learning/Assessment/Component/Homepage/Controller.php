@@ -70,7 +70,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->filter(
                     function (IAssessable $assessment)
                     {
-                        return $this->filterAssessment($assessment) && $assessment->getDueAt()->isFuture();
+                        $isVisibleToStudent = $this->getUser()->getRole()->isStudent() && $assessment->getPublishAt()->isPast();
+                        $isVisibleToStaff = $this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser();
+
+                        return $this->filterAssessment($assessment) && $assessment->getDueAt()->isFuture() && ($isVisibleToStaff || $isVisibleToStudent);
                     }
                 )
                 ->limit($this->getConfig('size'));
