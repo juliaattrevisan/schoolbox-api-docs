@@ -160,4 +160,20 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($newResultSet->reindex()));
     }
+
+    /**
+     * Saves the participation for this assessment.
+     *
+     * POST vars:
+     * * openDate, dueDate: The open/due date the student sets for themselves
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     */
+    public function postUpdateParticipation(IAssessable $assessment, User $student)
+    {
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(['result' => 'ok',])
+        );
+    }
 }

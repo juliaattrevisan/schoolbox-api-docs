@@ -67,6 +67,16 @@ class Module extends BaseModule
             $access,
             $studentPreload
         );
+        $this->register(
+            'POST',
+            '/update/{assessmentId}/student/{studentId}/',
+            'postUpdateParticipation',
+            $access,
+            function ($params) use ($studentPreload) {
+                return $studentPreload($params)
+                    + ['assessment' => $this->getInjector()->get('assessmentDataSource'),];
+            }
+        );
     }
 
     /**
