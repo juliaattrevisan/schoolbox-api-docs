@@ -802,7 +802,6 @@ class Controller extends Base\Base
                                     // Set/Update Dates
                                     foreach ($aData['dates'] as $property => $localShort) {
                                         $method = "set{$property}At";
-                                        echo $method;
                                         if (!method_exists($assessmentImpl, $method)) {
                                             $this->sendError("Invalid date property: $property");
                                             return;
