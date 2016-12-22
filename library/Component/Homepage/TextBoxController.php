@@ -63,6 +63,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'textbox_form', 'textbox_form_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $textBoxContent = Scrub::text($this->getTextbox()->getBody());
 
         if (
@@ -70,10 +73,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             (empty($this->getTextbox()->getId()) or empty($textBoxContent))
         ) {
 
-            $this->setBlock($templateHandle, 'textbox', 'textbox_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-
-            $this->setVar('textbox_block', '');
+            $this->setVar('textbox_form_block', '');
 
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
             $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
@@ -104,9 +104,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
             $this->setVar('empty_state_block', '');
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('textbox_form', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('textbox_form', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
             $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
             $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
@@ -188,6 +187,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->setVar('header_block', '');
                 $this->setVar('dashboard_header_block', '');
             }
+
+            $this->parse('textbox_form_block', 'textbox_form');
         }
 
 
