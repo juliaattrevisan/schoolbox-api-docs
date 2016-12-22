@@ -174,7 +174,8 @@ class Controller extends Base
 
         // Only show work that isn't yet due
         $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student) {
-            return $assessable->isUpcomingVisibleToUser($student);
+            $visibility = new \Schoolbox\Learning\Assessment\Visibility();
+            return $visibility->isUpcomingVisibleToUser($assessable, $student);
         });
 
         // TODO Populate $_SESSION[children] properly
