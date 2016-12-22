@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
@@ -167,13 +168,92 @@ class Controller extends Base
      * POST vars:
      * * assessmentId:      The assessment to update for
      * * openDate, dueDate: The open/due date the student sets for themselves
+     *                      Format: timestamps
      *
      * @param User $student
      */
     public function postUpdateParticipation(User $student)
     {
+        $post = $this->getRequest()->post;
+        try {
+            $assessment = $this->assessmentDataSource->findByIdForReview($post->get('assessmentId'), $student);
+
+            if (!$assessment->isParticipant($student)) {
+                $this->buildJsonResponse('Student is not a participant', 403);
+                return;
+            }
+
+            // Validate this assessment can even be moved.
+            // Special case: due works with no online submission have no open date.
+            // Use their publish date instead.
+            $assessmentOpenDate = $assessment->getOpenAt();
+            if ($assessmentOpenDate->isNull()) {
+                $assessmentOpenDate = $assessment->getPublishAt();
+            }
+            if ($assessmentOpenDate->isNull()) {
+                $this->buildJsonResponse('This assessment does not have an open date', 403);
+                return;
+            }
+
+            $assessmentDueDate = $assessment->getDueAt();
+            if ($assessmentDueDate->isNull()) {
+                $this->buildJsonResponse('This assessment does not have a due date', 403);
+                return;
+            }
+
+        } catch (MapperException $e) {
+            $this->buildJsonResponse('Assessment not found', 404);
+            return;
+        }
+
+
+        // Build and validate open and due date
+        try {
+            $openDate = new Alaress_Date_Format($post->get('openDate'), Alaress_Date_Format::DATABASE_FORMAT);
+
+        } catch (\InvalidArgumentException $e) {
+            $this->buildJsonResponse('Invalid format for open date - provide as timestamp', 400);
+            return;
+        }
+
+        try {
+            $dueDate = new Alaress_Date_Format($post->get('dueDate'), Alaress_Date_Format::DATABASE_FORMAT);
+
+        } catch (\InvalidArgumentException $e) {
+            $this->buildJsonResponse('Invalid format for due date - provide as timestamp', 400);
+            return;
+        }
+
+        // We have a valid assessment and date objects.
+        // Check the dates are valid for the assessment.
+        if ($openDate->lt($assessmentOpenDate)) {
+            $this->buildJsonResponse('Open date cannot be moved outside of assessment\'s open date', 400);
+            return;
+        }
+
+        if ($dueDate->gt($assessmentDueDate)) {
+            $this->buildJsonResponse('Due date cannot be moved outside of assessment\'s due date', 400);
+            return;
+        }
+
+        // All is valid - save the participation
+
+        $this->buildJsonResponse('ok');
+    }
+
+    /**
+     * Helper for building a JSON response
+     *
+     * @param string $resultString
+     * @param int    $code
+     */
+    protected function buildJsonResponse($resultString, $code = 200)
+    {
+        $this->getResponse()->status->setCode($code);
         $this->getResponse()->content->set(
-            $this->buildJsonOutput(['result' => 'ok',])
+            $this->buildJsonOutput([
+                'result' => $resultString,
+            ])
         );
     }
 }

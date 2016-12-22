@@ -154,10 +154,11 @@
          *                   Sets event back to original state.
          */
         var updateAssessment = function(calEvent, delta, revertFunc) {
+            var format = 'Y-MM-DD HH:mm:ss';
             var data = {
                 assessmentId: calEvent.meta.assessmentId,
-                start: calEvent.start.format(),
-                end: calEvent.end.format()
+                openDate: calEvent.start.format(format),
+                dueDate: calEvent.end.format(format)
             };
 
             calEvent.className.push('loading');
