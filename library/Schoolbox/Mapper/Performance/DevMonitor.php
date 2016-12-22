@@ -1,0 +1,158 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Mapper\Performance;
+
+
+use DebugBar\DebugBar;
+use Schoolbox\Mapper;
+
+class DevMonitor implements IMonitor
+{
+    /** @var array */
+    protected $indexByIndex = [];
+
+    /** @var array */
+    protected $indexByColumn = [];
+
+    /** @var array */
+    protected $indexByColumnComposite = [];
+
+    /** @var DebugBar */
+    protected $debugBar;
+
+
+    /**
+     * @param DebugBar $debugBar
+     */
+    public function __construct(DebugBar $debugBar)
+    {
+        $this->debugBar = $debugBar;
+    }
+
+
+    /**
+     * @param Mapper $mapper
+     * @return void
+     */
+    public function cacheIndices(Mapper $mapper)
+    {
+        $t = $mapper->getTable();
+
+        if (empty($t)) {
+            // happens on external "mappers", it seems
+            return;
+        }
+
+        $db   = $mapper->getDatabase();
+        $stmt = $db->query("SHOW INDEX FROM $t");
+
+        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
+            list (
+                $table, $nonUnique, $keyName, $seqInIndex, $columnName,
+                // $collation, $cardinality, $subPart, $packed, $null, $indexType, $comment, $indexComment
+            ) = array_slice($r, 0, 5);
+
+            $this->indexByIndex[$table][$keyName][$seqInIndex - 1] = $columnName;
+            $this->indexByColumn[$table][$columnName][] = $keyName;
+        }
+
+        foreach ($this->indexByIndex as $table => $keys) {
+            foreach ($keys as $keyName => $columns) {
+                $this->indexByColumnComposite[$table][implode('-', $columns)] = $keyName;
+            }
+        }
+        return;
+    }
+
+
+    /**
+     * @param Mapper\PredicateBuilder $predicate
+     * @param string                  $selectFrom
+     * @return void
+     */
+    public function assessPredicate(Mapper\PredicateBuilder $predicate, $selectFrom)
+    {
+        $where = $predicate->getWhere();
+
+        $checks  = [];
+        $aliases = [];
+
+        if (preg_match_all('#`([a-z_]+)`(?: AS)? `([a-z_]+)`#', $selectFrom, $matches)) {
+            for ($i = 0; $i < count($matches[0]); ++$i) {
+                $aliases[$matches[2][$i]] = $matches[1][$i];
+            }
+            true;
+        }
+
+        foreach ($where as $clause) {
+            if (!preg_match('#`([a-z_]+)`\.`([a-z_]+)`#i', $clause, $matches)) {
+                // this *shouldn't* happen
+                continue;
+            }
+
+            list ($table, $column) = array_slice($matches, 1);
+
+            $t = array_key_exists($table, $aliases) ? $aliases[$table] : $table;
+
+            // dedupe
+            $checks[$t][$column] = $column;
+        }
+
+        $output = '';
+
+        foreach ($checks as $table => $columns) {
+
+            if (!array_key_exists($table, $this->indexByColumn)) {
+                // this *shouldn't* happen
+                continue;
+            }
+
+            $impl = implode('-', $columns);
+            if (array_key_exists($impl, $this->indexByColumnComposite[$table])) {
+                // exact index match
+                $msg = count($columns) > 1
+                    ? "Exact composite index match for $table($impl)"
+                    : "Index match for $table($impl)"
+                ;
+
+                $this->debugBar['messages']->debug($msg);
+                continue;
+            }
+
+            // test for full overlap of single keys
+            if (array_intersect_key($checks[$table], $this->indexByColumn[$table]) == $checks[$table]) {
+                $impl = implode(', ', $checks[$table]);
+                $this->debugBar['messages']->info("Matched all indices for $table($impl)");
+                continue;
+            }
+
+            // didn't get full / composite match: try for partials
+            foreach ($columns as $column) {
+
+                if (array_key_exists($column, $this->indexByColumn[$table])) {
+                    $impl = implode(', ', $checks[$table]);
+                    $this->debugBar['messages']->warning("Partial index match for `$column` within $table($impl)");
+                } else {
+                    $this->debugBar['messages']->error("Searched on unindexed field: $table.$column");
+                }
+
+            }
+
+        }
+
+        if (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
+            // only output to HTML
+            echo $output;
+        }
+
+        return;
+    }
+
+
+}
