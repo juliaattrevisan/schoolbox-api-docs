@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Personalised\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 
@@ -39,12 +40,29 @@ class Factory
     }
 
     /**
+     * Builds a set of FullCalendar-compatible events from all $assessments.
+     *
+     * @param Collection|IAssessable[]       $assessments
+     * @param Collection|Participant\Model[] $participation Student participation
+     * @return Collection|array
+     */
+    public function buildFromAssessmentCollection(Collection $assessments, Collection $participation = null)
+    {
+        return $assessments
+            ->map(function (IAssessable $assessment) {
+                return $this->buildFromAssessment($assessment);
+            })
+            ->concat();
+    }
+
+    /**
      * Builds a set of FullCalendar-compatible events from $assessable.
      *
-     * @param IAssessable $assessable
+     * @param IAssessable       $assessable
+     * @param Participant\Model $participant Add this participant record, if requested
      * @return Collection|array[]
      */
-    public function buildFromAssessment(IAssessable $assessable)
+    public function buildFromAssessment(IAssessable $assessable, Participant\Model $participant = null)
     {
         $result = new Collection();
 

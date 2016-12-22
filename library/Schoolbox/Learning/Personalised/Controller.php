@@ -154,12 +154,14 @@ class Controller extends Base
         ;
 
         // Build the list
-        $eventFactory = new Event\Factory($this->getRouter());
-        $resultSet    = $this->assessmentDataSource->findAllByStudent($student, $term)
-            ->map(function (IAssessable $assessable) use ($eventFactory) {
-                return $eventFactory->buildFromAssessment($assessable);
-            })
-            ->concat();
+        $eventFactory  = new Event\Factory($this->getRouter());
+        $assessments   = $this->assessmentDataSource->findAllByStudent($student, $term);
+        $participation = $this->participantMapper->findByColumnList([
+            'assessment_id' => $assessments->getColumnValues('id'),
+            'student_id'    => $student->getId(),
+        ]);
+
+        $resultSet = $eventFactory->buildFromAssessmentCollection($assessments, $participation);
 
         // Filter out non-unique values
         $newResultSet = new Collection();
