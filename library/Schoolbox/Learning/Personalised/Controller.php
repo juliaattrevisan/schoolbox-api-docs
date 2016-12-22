@@ -143,7 +143,7 @@ class Controller extends Base
         ;
 
         // Build the list
-        $eventFactory = new EventFactory($this->getRouter());
+        $eventFactory = new Event\Factory($this->getRouter());
         $resultSet    = $this->assessmentDataSource->findAllByStudent($student, $term)
             ->map(function (IAssessable $assessable) use ($eventFactory) {
                 return $eventFactory->buildFromAssessment($assessable);

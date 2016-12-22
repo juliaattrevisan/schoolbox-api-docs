@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised;
+namespace Schoolbox\Learning\Personalised\Event;
 
 use Aura\Router\Router;
 use Schoolbox\Collection;
@@ -21,7 +21,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  * Factory for building a set of FullCalendar-compatible events from an
  * IAssessable.
  */
-class EventFactory
+class Factory
 {
     /**
      * @var Router
