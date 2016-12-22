@@ -143,6 +143,41 @@
         };
 
         /**
+         * Update assessment method.
+         *
+         * * Gives event a "loading" style
+         * * Removes that style when update finishes (regardless of result)
+         *
+         * @param calEvent   The event to update
+         * @param delta      The amount of change
+         * @param revertFunc called if update failed for whatever reason.
+         *                   Sets event back to original state.
+         */
+        var updateAssessment = function(calEvent, delta, revertFunc) {
+            var data = {
+                assessmentId: calEvent.meta.assessmentId,
+                start: calEvent.start.format(),
+                end: calEvent.end.format()
+            };
+
+            calEvent.className.push('loading');
+            var post = $.post(
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id})|e('js') }}',
+                data,
+                null,
+                'json'
+            );
+            post.fail(revertFunc)
+                .always(function() {
+                    // Remove the loading class
+                    calEvent.className = calEvent.className.filter(function (value) {
+                        return value != 'loading';
+                    });
+                    calendar.fullCalendar('rerenderEvents');
+                });
+        };
+
+        /**
          * Push calendar's current state (view + date) to history
          */
         var pushCurrentCalendarState = function() {
@@ -351,6 +386,10 @@
                     }
                     previousView = currentView;
                 },
+
+                eventResize: updateAssessment,
+
+                eventDrop: updateAssessment,
 
                 // Resources:
                 // * all of this student's classes
