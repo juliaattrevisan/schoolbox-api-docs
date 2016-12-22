@@ -25,7 +25,7 @@ Usage:
         <option disabled="" selected="" label="Select a subject">Select a subject</option>
         {% for folder in subjects %}
             <option data-href="{{ routeLookup('learning.getGradesForSubject', routeArgs|merge({subjectId: folder.id})) }}" {% if folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
-                {#- dessicate -#}{{ folder.name }} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %}, {% endif %}{% endfor %}){#- dessicate -#}
+                {#- dessicate -#}{{ folder.nameWithCodes }}{#- dessicate -#}
             </option>
         {% endfor %}
     </select>
