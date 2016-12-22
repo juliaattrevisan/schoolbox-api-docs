@@ -60,6 +60,13 @@
     </select>
 </label>
 
+{% if context.baseContext is unitSpecification %}
+    <label>
+        Expected Completion Duration (Days)
+        <input type="number" name="duration" value="{{ assessment.duration }}">
+    </label>
+{% endif %}
+
 <script type="text/javascript">
     $(function() {
         $('#hasDuration').on('click', function(event) {

@@ -80,6 +80,14 @@
         </select>
     </div>
 </div>
+
+{% if context.baseContext is unitSpecification %}
+<label>
+    Expected Completion Duration (Days)
+    <input type="number" name="duration" value="{{ assessment.duration }}">
+</label>
+{% endif %}
+
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}

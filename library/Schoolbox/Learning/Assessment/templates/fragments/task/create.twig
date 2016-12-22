@@ -22,6 +22,7 @@
     Description
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
+
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
@@ -101,5 +102,12 @@
         </div>
     </div>
 </div>
+
+{% if context.baseContext is unitSpecification %}
+    <label>
+        Expected Completion Duration (Days)
+        <input type="number" name="duration" value="{{ assessment.duration }}">
+    </label>
+{% endif %}
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
