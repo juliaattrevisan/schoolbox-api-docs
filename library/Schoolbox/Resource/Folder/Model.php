@@ -118,6 +118,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Does this folder have a unit specification?
+     *
+     * @return bool
+     */
+    public function hasUnitSpecification()
+    {
+        return ($this->unitSpecification instanceof UnitSpecification && $this->unitSpecification->getId());
+    }
+
+    /**
      * Get name of category with list of class codes (eg. 'Chemistry (CH123)')
      *
      * @return string
@@ -266,9 +276,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getFolderType()
     {
-        // I'd also like to say this is a course
-        if ($this->hasCourseSpecification()) {
+        if($this->hasCourseSpecification()){
             return 'course';
+        }
+        if($this->hasUnitSpecification()){
+            return 'unit';
         }
         return $this->hasHomepage() ? 'home' : 'folder';
     }
