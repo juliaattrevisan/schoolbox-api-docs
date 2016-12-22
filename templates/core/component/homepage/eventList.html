@@ -25,21 +25,14 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-calendar"></i>
-                <p>No upcoming events!</p>
 
-                <!-- BEGIN empty_modify -->
+                <!-- BEGIN empty_read -->
+                <p>There are no upcoming events at this time.</p>
+                <!-- END empty_read -->
 
-                <p>
-                    <!-- BEGIN submit_event -->
-                        <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage">Add an event</a>
-                    <!-- END submit_event -->
-                    or
-                    <!-- BEGIN import_events -->
-                        <a href="/calendar/import/{ID}">import events</a> to this page.
-                    <!-- END import_events -->
-                </p>
-
-                <!-- END empty_modify -->
+                <!-- BEGIN empty_write -->
+                <p><a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage">Add an event</a> or <a href="/calendar/import/{ID}">import events in bulk</a> which can notify group members and appear on their calendars.</p>
+                <!-- END empty_write -->
 
             </div>
             <!-- END empty_state -->
