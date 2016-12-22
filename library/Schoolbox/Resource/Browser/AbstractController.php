@@ -202,7 +202,6 @@ abstract class AbstractController extends BaseController
 
     /**
      * Display embeddable file picker
-     * @param int $folderId
      * @param $sourceSlug
      */
     public function picker($sourceSlug)
