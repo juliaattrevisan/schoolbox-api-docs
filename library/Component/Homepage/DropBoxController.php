@@ -23,7 +23,6 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-
         //output drop box
         $this->setBlock($templateHandle, "drop_student", "drop_student_block");
         $this->setBlock('drop_student', "drop_success", "drop_success_block");
@@ -32,7 +31,10 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
         if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+
             $this->setVar('drop_success_block', '');
+            $this->setVar('empty_state_block','');
+
             if ($_SESSION['dropSuccess']) {
                 $this->parse('drop_success_block', 'drop_success', true);
                 unset($_SESSION['dropSuccess']);
@@ -49,14 +51,17 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             $this->parse('drop_student_block', 'drop_student');
             $this->setVar('drop_staff_block', '');
         } else {
+
             $this->setVar('drop_student_block', '');
 
             /** @var Collection|Schoolbox\Dropbox\Model[] $fileList */
             $fileList = Schoolbox\Dropbox\Mapper::getInstance()->findByColumn('category', $this->getContext()->getId());
 
             if ($fileList->count()) {
-                $j = 0;
+
                 $this->setVar('empty_state_block','');
+
+                $j = 0;
                 foreach ($fileList as $file) {
                     $output = array(
                         'DROPBOX_MIME_IMAGE'  => $file->getStorage()->getMimetype()->getIconFile(),
