@@ -1,74 +1,43 @@
 // To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
 
-(function (m) {
-    var formatMap = {
-            d: 'DD',
-            D: 'ddd',
-            j: 'D',
-            J: 'Do',
-            l: 'dddd',
-            N: 'E',
-            K: 'A',
-            S: function () {
-                return '[' + this.format('Do').replace(/\d*/g, '') + ']';
+convertFormat = function (format) {
+        var formatMap = {
+                d: 'DD',
+                D: 'ddd',
+                j: 'D',
+                J: 'Do',
+                l: 'dddd',
+                N: 'E',
+                K: 'A',
+                S: 'SS',
+                w: 'd',
+                W: 'W',
+                F: 'MMMM',
+                m: 'MM',
+                M: 'MMM',
+                n: 'M',
+                o: 'GGGG',
+                Y: 'YYYY',
+                y: 'YY',
+                a: 'a',
+                A: 'A',
+                g: 'h',
+                G: 'H',
+                h: 'hh',
+                H: 'HH',
+                i: 'mm',
+                s: 'ss',
+                O: 'ZZ',
+                P: 'Z',
             },
-            w: 'd',
-            z: function () {
-                return this.format('DDD') - 1;
-            },
-            W: 'W',
-            F: 'MMMM',
-            m: 'MM',
-            M: 'MMM',
-            n: 'M',
-            t: function () {
-                return this.daysInMonth();
-            },
-            L: function () {
-                return this.isLeapYear() ? 1 : 0;
-            },
-            o: 'GGGG',
-            Y: 'YYYY',
-            y: 'YY',
-            a: 'a',
-            A: 'A',
-            B: function () {
-                var thisUTC = this.clone().utc(),
-                    // Shamelessly stolen from http://javascript.about.com/library/blswatch.htm
-                    swatch = ((thisUTC.hours() + 1) % 24) + (thisUTC.minutes() / 60) + (thisUTC.seconds() / 3600);
-                return Math.floor(swatch * 1000 / 24);
-            },
-            g: 'h',
-            G: 'H',
-            h: 'hh',
-            H: 'HH',
-            i: 'mm',
-            s: 'ss',
-            u: '[u]', // not sure if moment has this
-            e: '[e]', // moment does not have this
-            I: function () {
-                return this.isDST() ? 1 : 0;
-            },
-            O: 'ZZ',
-            P: 'Z',
-            T: '[T]', // deprecated in moment
-            Z: function () {
-                return parseInt(this.format('ZZ'), 10) * 36;
-            },
-            c: 'YYYY-MM-DD[T]HH:mm:ssZ',
-            r: 'ddd, DD MMM YYYY HH:mm:ss ZZ',
-            U: 'X'
-        },
+
         formatEx = /[dDjlNSwzWFmMntLoYyaABgGhHisueIOPTZcrUJK]/g;
-
-    moment.fn.formatFlatpickr = function (format) {
         var that = this;
-
-        return this.format(format.replace(formatEx, function (phpStr) {
-            return typeof formatMap[phpStr] === 'function' ? formatMap[phpStr].call(that) : formatMap[phpStr];
-        }));
-    };
-}(moment));
+        // Just return the converted format
+        return format.replace(formatEx, function (format) {
+            return formatMap[format];
+        });
+};
 
 // Extend jQuery with our datepicker function
 
@@ -78,7 +47,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
     var options = {
         databaseFormat: 'Y-m-d H:i:S',
-        displayFormat: 'd/m/Y h:iK'
+        displayFormat: 'd/m/Y h:i K',
     };
 
     // Override with user any options
@@ -112,7 +81,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         // displaying a friendlier date format to the end users
 
         element.after('<input type="hidden" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + ' ">');
-        element.after('<input readonly data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue).formatFlatpickr(options.displayFormat) + '">');
+        element.after('<input data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue, convertFormat(options.databaseFormat)).format(convertFormat(options.displayFormat)) + '">');
         element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
         element.remove();
 
@@ -153,7 +122,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                         // Update the elements value with the selected date
 
                         var pickerDisplay = $('#pickerDisplay' + pickerId);
-                        pickerDisplay.val($('#pickerCalendar' + pickerId).data('dateDisplay'));
+                        pickerDisplay.val(moment(window.pickerInstance[pickerId].altInput.value, convertFormat(options.databaseFormat)).format(convertFormat(options.displayFormat)));
 
                         var originalField = $('#' + pickerDisplay.data('originalId'));
                         originalField.val(window.pickerInstance[pickerId].altInput.value);

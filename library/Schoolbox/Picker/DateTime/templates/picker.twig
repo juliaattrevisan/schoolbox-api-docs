@@ -294,12 +294,10 @@
                     timeDiv.css('display', 'none');
                     calendarDiv.addClass('allDay');
                     calendarDiv.removeClass('hasTime');
-
-                    var dateObj = new Date(instance.altInput.value);
-                    dateObj.setMinutes(0);
-                    dateObj.setHours(0);
-                    instance.setDate(dateObj);
-//                    alert(instance.altInput.value);
+                    {# Set time to 00:00:00#}
+                    var allDay = moment(instance.altInput.value, convertFormat('{{ databaseFormat }}')).hours(0).minutes(0).format(convertFormat('{{ databaseFormat }}'));
+                    $('#pickerDisplay{{ id }}').val(allDay);
+                    instance.setDate(allDay);
                 }
                 else {
                     timeDiv.css('display', 'block');
