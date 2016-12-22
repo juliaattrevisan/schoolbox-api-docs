@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use Alaress\Cache;
+use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use PDO;
 use PDOException;
@@ -19,7 +20,9 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
+use Schoolbox\Mapper\Performance\LiveMonitor;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -218,6 +221,14 @@ abstract class Mapper implements IMapper, Serializable
             self::$columnFactory = new ColumnFactory();
         }
 
+        if (empty(self::$perfmon)) {
+            // we want this to exist once ever, and only functional in development
+            self::$perfmon = INSTANCE_ID == 'vagrantx'
+                ? new DevMonitor(DebugBar::getInstance())
+                : new LiveMonitor()
+            ;
+        }
+
         $class_name = get_called_class();
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
@@ -240,8 +251,11 @@ abstract class Mapper implements IMapper, Serializable
         $this->setConfigLoader(new ConfigLoader());
         $this->setup();
         $this->setColumnFactory(self::$columnFactory);
+        $this->setMonitor(self::$perfmon);
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
+
+        $this->monitor->cacheIndices($this);
     }
 
     /**
@@ -1698,6 +1712,8 @@ abstract class Mapper implements IMapper, Serializable
 
         // If this underflows, someone passed an empty column value - return an empty set.
         $where = $this->buildWherePart($predicate, $columnList, $options);
+
+        $this->monitor->assessPredicate($predicate, $query);
 
         // capture this regardless of emptiness
         $params = $where['params'];
