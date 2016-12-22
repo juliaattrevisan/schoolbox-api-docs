@@ -134,9 +134,7 @@
     </ul>
     <div class="component-action">
         <section>
-            {% if isRouteAuthorized('blog.getArchiveCurrent', { folder: folder }) %}
-                <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button">View Archive</a>
-            {% endif %}
+            <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button">View Archive</a>}
             {% if not readonly %}
                 <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}" class="button">Post Blog</a>
             {% endif %}
