@@ -193,39 +193,58 @@ class Controller extends Base
     /**
      * Displays a list of classes for the current logged in user
      *
+     * If the term includes now (ie is current) then we use current enrollment.
+     * Else term is historical, so we display classes for which the user has LMS activity.
+     *
      * @api GET /learning/classes{/term}
      * @level 165
      *
      * @param Term $term
      */
-    public function getClasses(Term $term) {
+    public function getClasses(Term $term)
+    {
+        $folderList = $this->getFolderMapper()->createCollection();
+        $classTypes = [];
+        $now = \Alaress_Date_Format::now();
+
+        // Are we looking at current Classes, or historical ?
+        if($term->contains($now)){
+
+            /* Convert external subjects to folders */
+            foreach($this->getUser()->getSubjectCollection() as $subject ) {
+                try {
+                    $folder = $this->getFolderMapper()->findByCode($subject['code']);
+                    $folderList->add($folder);
+                    $classTypes[$folder->getId()] = $subject['classType'];
+                } catch (MapperException $e) {
+                    //not found
+                }
+            }
+        } else {
+            // Is user a teacher or student ?
+            if($this->getUser()->getRole()->isStaff()){
+                $folderList = $this->getFolderMapper()->findFoldersWithFeedbacks($this->getUser(), $term);
+            } elseif($this->getUser()->getRole()->isStudent()){
+                $folderList = $this->getFolderMapper()->findFoldersWithResponses($this->getUser(), $term);
+            }
+        }
 
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = $this->getTimetableColourMapper()->findAll();
         $colourIndex = 0;
 
-        $folderList = $this->getFolderMapper()->createCollection();
-        $classTypes = Array();
-
-        /* Convert external subjects to folders */
-        foreach($this->getUser()->getSubjectCollection() as $subject ) {
-            try {
-                $folder = $this->getFolderMapper()->findByCode($subject['code']);
-                if (!$folder->getColour()) {
-                    /* Apply colour from list if no colour exists */
-                    $folder->setColour($colourList[$colourIndex]->getHexColour());
-                    $colourIndex = ($colourIndex + 1) % $colourList->count();
-                }
-                $folderList->add($folder);
-                $classTypes[$folder->getId()] = $subject['classType'];
-            } catch (MapperException $e) {
-                //not found
+        foreach($folderList as $folder){
+            if (!$folder->getColour()) {
+                /* Apply colour from list if no colour exists */
+                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
         }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser' => $this->getUser(),
             'terms'       => $this->getTermMapper()->findAll(),
-            'now'         => \Alaress_Date_Format::now(),
+            'now'         => $now,
             'term'        => $term,
             'classList'   => $folderList,
             'classTypes'  => $classTypes,
