@@ -3,7 +3,7 @@
 <li class="actions-small-1">
     <div class="list-item">
         <div class="card wrap-down small-12">
-            <div class="{{ icon.renderClass(assessable) }} size-32" title="{{ assessable.getTypeName }}"></div>
+            <div class="{{ icon.renderClass(assessable) }} size-64" title="{{ assessable.getTypeName }}"></div>
 
             <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id}) }}">
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
@@ -12,12 +12,8 @@
             <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
                 Due {{ assessable.getDueAt.getRelativeTime }}
             </p>
+            <p class="meta"><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessable.id})}}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a></p>
         </div>
     </div>
-    <nav>
-        {% if assessable.isParticipant(student) %}
-            {% include '@learningAssessment/task/progressTickForm.twig' with {participant: assessable.getParticipant(student)} %}
-        {% endif %}
-    </nav>
 </li>
 
