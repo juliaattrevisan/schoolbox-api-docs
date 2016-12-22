@@ -98,9 +98,10 @@ class Factory
                     'resourceId' => $folder->getId().'-contentAreas',
                     'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
                     'meta'       => [
-                        'type'        => $assessable->getFamilyName(),
-                        'description' => \Scrub::html($assessable->getDescription()),
-                        'link'        => $this->generateLink($assessable),
+                        'type'         => $assessable->getFamilyName(),
+                        'assessmentId' => $assessable->getId(),
+                        'description'  => \Scrub::html($assessable->getDescription()),
+                        'link'         => $this->generateLink($assessable),
                     ],
                 ]);
 
@@ -115,9 +116,10 @@ class Factory
                     'allDay'     => false,
                     'resourceId' => $folder->getId().'-projects',
                     'meta'       => [
-                        'type'        => $assessable->getFamilyName(),
-                        'description' => \Scrub::html($assessable->getDescription()),
-                        'link'        => $this->generateLink($assessable),
+                        'type'         => $assessable->getFamilyName(),
+                        'assessmentId' => $assessable->getId(),
+                        'description'  => \Scrub::html($assessable->getDescription()),
+                        'link'         => $this->generateLink($assessable),
                     ],
                 ]);
 
@@ -145,9 +147,10 @@ class Factory
                         'resourceId' => $folder->getId().'-activities',
                         'constraint' => 'activity-'.$activity->getId().'-bounds',
                         'meta'       => [
-                            'type'        => $activity->getFamilyName(),
-                            'description' => \Scrub::html($activity->getDescription()),
-                            'link'        => $this->generateLink($activity),
+                            'type'         => $activity->getFamilyName(),
+                            'assessmentId' => $activity->getId(),
+                            'description'  => \Scrub::html($activity->getDescription()),
+                            'link'         => $this->generateLink($activity),
                         ],
                     ]);
                 }
