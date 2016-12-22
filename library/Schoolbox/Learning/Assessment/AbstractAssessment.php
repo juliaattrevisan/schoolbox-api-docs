@@ -17,6 +17,8 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -198,13 +200,44 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return bool
      */
-    public function isUpcomingVisibleToUser(\Schoolbox\User $user)
+    public function isUpcomingVisibleToUser(User $user)
     {
-        $isVisibleToStudent = $user->getRole()->isStudent() && $this->getPublishAt()->isPast() && !$this->getParticipant($user)->isResponded();
-        $isVisibleToStaff = $user->getRole()->isStaff() || $user->isSuperuser();
+        /* Closed IAssessables don't show
+         */
+        if ($this->getCloseAt()->isPast()) {
+            return false;
+        }
 
-        return $this->getDueAt()->isFuture() && ($isVisibleToStaff || ($isVisibleToStudent));
+        /* Folder perms
+         */
+        $folderAccessLevel = Access::getInstance()->getFolderAccess($user, [$this->getContext()->getFolder()->getId()]);
+
+        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+            return true;
+        }
+        else if ($folderAccessLevel == UserAccess::ACCESS_READ) {
+
+            /* Unpublished IAssessables don't show
+             */
+            if ($this->getPublishAt()->isFuture()) {
+                return false;
+            }
+
+            /* Decide whether $user can create a response to this IAssessable
+             */
+            return $this->canCreateResponse($user);
+        }
+
+        return false;
     }
+
+    /**
+     * Decide whether $user can create a response to this IAssessable
+     *
+     * @param User $user
+     * @return bool
+     */
+    abstract protected function canCreateResponse(User $user);
 
     /* Delegation Methods
      */
