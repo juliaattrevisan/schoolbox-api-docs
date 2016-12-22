@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -156,8 +157,19 @@ class Controller extends Base
         // Build the list
         $eventFactory  = new Event\Factory($this->getRouter());
         $assessments   = $this->assessmentDataSource->findAllByStudent($student, $term);
+
+        // All participations, including for projects
+        $assessmentIds = [];
+        foreach ($assessments as $assessment) {
+            $assessmentIds[] = $assessment->getId();
+            if ($assessment instanceof Project) {
+                foreach ($assessment->getAssessables() as $activity) {
+                    $assessmentIds[] = $activity->getId();
+                }
+            }
+        }
         $participation = $this->participantMapper->findByColumnList([
-            'assessment_id' => $assessments->getColumnValues('id'),
+            'assessment_id' => $assessmentIds,
             'student_id'    => $student->getId(),
         ]);
 
