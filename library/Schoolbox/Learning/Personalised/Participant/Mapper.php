@@ -5,14 +5,16 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised\Participation;
+namespace Schoolbox\Learning\Personalised\Participant;
 
-use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 
 /**
  * Data definition for a personalised participation for a student in an assessment.
+ *
+ * @method Model createModel($id=null)
  */
 class Mapper extends BaseMapper
 {
