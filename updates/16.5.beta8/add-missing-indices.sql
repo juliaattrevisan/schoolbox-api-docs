@@ -14,7 +14,8 @@ ALTER TABLE `task_completion`
   ADD INDEX (`deleted_at`);
 
 ALTER TABLE `assessment`
-  ADD INDEX (`deleted_at`);
+  ADD INDEX (`deleted_at`),
+  ADD INDEX (`due_date`);
 
 ALTER TABLE `user`
   ADD INDEX (`deleted_at`);
