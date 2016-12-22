@@ -318,6 +318,16 @@
                     }
                 },
 
+                viewRender: function() {
+                    try {
+                        var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                        var date = calendar.fullCalendar('getDate');
+                        window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
+                    } catch (e) {
+                        // Can't recognize view - ignore
+                    }
+                },
+
                 // Resources:
                 // * all of this student's classes
                 // ** Units (any unit imported onto this class)
