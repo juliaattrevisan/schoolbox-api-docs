@@ -95,88 +95,84 @@ class Factory
             // If this is a quiz or due work - it's a content area
             if ($assessable instanceof Quiz || $assessable instanceof DueWork) {
                 // A background event for the bounds
-                $result->add([
-                    'id'         => 'contentArea-'.$assessable->getId().'-bounds',
-                    'editable'   => false,
-                    'start'      => $assessable->getPublishAt()->getDatabase(),
-                    'end'        => $assessable->getDueAt()->getDatabase(),
-                    'allDay'     => false,
-                    'resourceId' => $folder->getId().'-contentArea',
-                    'rendering'  => 'background',
-                    'meta'       => [],
-                ]);
+                $result->add($this->buildAssessableEventBackground($assessable, $folder, 'contentArea'));
 
                 // A foreground event for the actual quiz/duework
-                $result->add([
-                    'id'         => 'contentArea-'.$assessable->getId(),
-                    'title'      => $assessable->getTitle(),
-                    'editable'   => true,
-                    'start'      => $assessable->getPublishAt()->getDatabase(),
-                    'end'        => $assessable->getDueAt()->getDatabase(),
-                    'allDay'     => false,
-                    'resourceId' => $folder->getId().'-contentArea',
-                    'constraint' => 'contentArea-'.$assessable->getId().'-bounds',
-                    'meta'       => [
-                        'type'         => $assessable->getFamilyName(),
-                        'assessmentId' => $assessable->getId(),
-                        'description'  => \Scrub::html($assessable->getDescription()),
-                        'link'         => $this->generateLink($assessable),
-                    ],
-                ]);
+                $result->add($this->buildAssessableEvent($assessable, $folder, 'contentArea', $participation));
 
             } elseif ($assessable instanceof Project) {
                 // If this is a project - get it and its constituents
-                $result->add([
-                    'id'         => 'project-'.$assessable->getId(),
-                    'title'      => $assessable->getTitle(),
-                    'editable'   => false,
-                    'start'      => $assessable->getPublishAt()->getDatabase(),
-                    'end'        => $assessable->getDueAt()->getDatabase(),
-                    'allDay'     => false,
-                    'resourceId' => $folder->getId().'-project',
-                    'meta'       => [
-                        'type'         => $assessable->getFamilyName(),
-                        'assessmentId' => $assessable->getId(),
-                        'description'  => \Scrub::html($assessable->getDescription()),
-                        'link'         => $this->generateLink($assessable),
-                    ],
-                ]);
+                $result->add(
+                    $this->buildAssessableEvent($assessable, $folder, 'project', $participation)
+                    + ['editable' => false,]
+                );
 
                 foreach ($assessable->getAssessables() as $activity) {
                     // Background for the bounds
-                    $result->add([
-                        'id'         => 'activity-'.$activity->getId().'-bounds',
-                        'editable'   => false,
-                        'start'      => $activity->getPublishAt()->getDatabase(),
-                        'end'        => $activity->getDueAt()->getDatabase(),
-                        'allDay'     => false,
-                        'resourceId' => $folder->getId().'-activity',
-                        'rendering'  => 'background',
-                        'meta'       => [],
-                    ]);
+                    $result->add($this->buildAssessableEventBackground($activity, $folder, 'activity'));
 
                     // A foreground event for the actual activity
-                    $result->add([
-                        'id'         => 'activity-'.$activity->getId(),
-                        'title'      => $activity->getTitle(),
-                        'editable'   => true,
-                        'start'      => $activity->getPublishAt()->getDatabase(),
-                        'end'        => $activity->getDueAt()->getDatabase(),
-                        'allDay'     => false,
-                        'resourceId' => $folder->getId().'-activity',
-                        'constraint' => 'activity-'.$activity->getId().'-bounds',
-                        'meta'       => [
-                            'type'         => $activity->getFamilyName(),
-                            'assessmentId' => $activity->getId(),
-                            'description'  => \Scrub::html($activity->getDescription()),
-                            'link'         => $this->generateLink($activity),
-                        ],
-                    ]);
+                    $result->add($this->buildAssessableEvent($activity, $folder, 'activity', $participation));
                 }
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Helper for building an event background
+     *
+     * @param IAssessable $assessable
+     * @param Folder      $folder
+     * @param string      $resourceType
+     * @return array
+     */
+    protected function buildAssessableEventBackground(IAssessable $assessable, Folder $folder, $resourceType)
+    {
+        return [
+            'id'         => $resourceType.'-'.$assessable->getId().'-bounds',
+            'editable'   => false,
+            'start'      => $assessable->getPublishAt()->getDatabase(),
+            'end'        => $assessable->getDueAt()->getDatabase(),
+            'allDay'     => false,
+            'resourceId' => $folder->getId().'-'.$resourceType,
+            'rendering'  => 'background',
+            'meta'       => [],
+        ];
+    }
+
+    /**
+     * Helper for building an event
+     *
+     * @param IAssessable $assessable
+     * @param Folder      $folder
+     * @param string      $resourceType
+     * @param Collection  $participation
+     * @return array
+     */
+    protected function buildAssessableEvent(
+        IAssessable $assessable,
+        Folder $folder,
+        $resourceType,
+        Collection $participation
+    ) {
+        return [
+            'id'         => $resourceType.'-'.$assessable->getId(),
+            'title'      => $assessable->getTitle(),
+            'editable'   => true,
+            'start'      => $assessable->getPublishAt()->getDatabase(),
+            'end'        => $assessable->getDueAt()->getDatabase(),
+            'allDay'     => false,
+            'resourceId' => $folder->getId().'-'.$resourceType,
+            'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
+            'meta'       => [
+                'type'         => $assessable->getFamilyName(),
+                'assessmentId' => $assessable->getId(),
+                'description'  => \Scrub::html($assessable->getDescription()),
+                'link'         => $this->generateLink($assessable),
+            ],
+        ];
     }
 
     /**
