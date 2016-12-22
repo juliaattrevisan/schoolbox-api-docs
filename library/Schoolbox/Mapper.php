@@ -19,6 +19,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -160,8 +161,11 @@ abstract class Mapper implements IMapper, Serializable
      */
     static protected $instance;
 
-    /** @var ColumnFactory */
+    /** @var IFactory */
     static private $columnFactory;
+
+    /** @var IMonitor */
+    private static $perfmon;
 
     /**
      * Factory for building column hydrators.
@@ -199,8 +203,8 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Cache */
     protected $localBodyCache = [];
 
-
-
+    /** @var IMonitor */
+    protected $monitor;
 
     /**
      * Retreives the singleton instance of this class.
@@ -474,6 +478,14 @@ abstract class Mapper implements IMapper, Serializable
         return $this->sessionData['user'];
     }
 
+
+    /**
+     * @param IMonitor $monitor
+     */
+    protected function setMonitor(IMonitor $monitor)
+    {
+        $this->monitor = $monitor;
+    }
 
     /**
      * Gets a single object as a collection, if it isn't one already.
