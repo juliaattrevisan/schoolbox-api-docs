@@ -200,10 +200,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isUpcomingVisibleToUser(\Schoolbox\User $user)
     {
-        $isVisibleToStudent = $user->getRole()->isStudent() && $this->getPublishAt()->isPast();
+        $isVisibleToStudent = $user->getRole()->isStudent() && $this->getPublishAt()->isPast() && !$this->getParticipant($user)->isResponded();
         $isVisibleToStaff = $user->getRole()->isStaff() || $user->isSuperuser();
 
-        return $this->getDueAt()->isFuture() && ($isVisibleToStaff || $isVisibleToStudent);
+        return $this->getDueAt()->isFuture() && ($isVisibleToStaff || ($isVisibleToStudent));
     }
 
     /* Delegation Methods
