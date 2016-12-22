@@ -68,6 +68,19 @@ interface IAssessable extends ISoftDeletable
     public function setContext(AssessmentContext $assessmentContext);
 
     /**
+     * Determines whether this upcoming IAssessable is visible to $user
+     * at its most basic level. For students, the Publish Date must be
+     * in the past; for Staff, it is always visible and does not require
+     * a past Publish Date
+     *
+     * IAssessables won't appear if their due dates are in the past
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isUpcomingVisibleToUser(User $user);
+
+    /**
      * Retrieve the specification this assessment was created from, if any.
      *
      * When an assessment is created as part of creating a new unit implementation,

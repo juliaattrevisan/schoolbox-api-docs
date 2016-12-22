@@ -187,6 +187,25 @@ abstract class AbstractAssessment implements IAssessable
         return $clone;
     }
 
+    /**
+     * Determines whether this upcoming IAssessable is visible to $user
+     * at its most basic level. For students, the Publish Date must be
+     * in the past; for Staff, it is always visible and does not require
+     * a past Publish Date
+     *
+     * IAssessables won't appear if their due dates are in the past
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isUpcomingVisibleToUser(\Schoolbox\User $user)
+    {
+        $isVisibleToStudent = $user->getRole()->isStudent() && $this->getPublishAt()->isPast();
+        $isVisibleToStaff = $user->getRole()->isStaff() || $user->isSuperuser();
+
+        return $this->getDueAt()->isFuture() && ($isVisibleToStaff || $isVisibleToStudent);
+    }
+
     /* Delegation Methods
      */
 
