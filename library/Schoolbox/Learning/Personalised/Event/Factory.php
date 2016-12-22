@@ -157,12 +157,28 @@ class Factory
         $resourceType,
         Collection $participation
     ) {
+        // Find participation
+        $start = $assessable->getPublishAt()->getDatabase();
+        $end   = $assessable->getDueAt()->getDatabase();
+        foreach ($participation as $participant) {
+            /** @var Participant\Model $participant */
+            if ($assessable->getId() == $participant->getAssessment()->getId()) {
+                // Set times from participation
+                if (!$participant->getOpenDate()->isNull()) {
+                    $start = $participant->getOpenDate();
+                }
+                if (!$participant->getDueDate()->isNull()) {
+                    $end = $participant->getDueDate();
+                }
+            }
+        }
+
         return [
             'id'         => $resourceType.'-'.$assessable->getId(),
             'title'      => $assessable->getTitle(),
             'editable'   => true,
-            'start'      => $assessable->getPublishAt()->getDatabase(),
-            'end'        => $assessable->getDueAt()->getDatabase(),
+            'start'      => $start->getDatabase(),
+            'end'        => $end->getDatabase(),
             'allDay'     => false,
             'resourceId' => $folder->getId().'-'.$resourceType,
             'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
