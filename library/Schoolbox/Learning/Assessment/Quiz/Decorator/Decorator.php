@@ -9,6 +9,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
+use Assess_Main;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
@@ -34,12 +35,16 @@ class Decorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
-        /* TODO: Work out $numSeconds from $this->getDurationHours() and $this->getDurationMinutes()
+        /* Use unlimited duration if a specific duration isn't provided
          */
-        $duration = (3600 * $this->getDurationHours()) + (60 * $this->getDurationMinutes());
+        if (!$this->getDurationHours() && !$this->getDurationMinutes()) {
+            $duration = Assess_Main::UNLIMITED_DURATION;
+        }
+        else {
+            $duration = (3600 * $this->getDurationHours()) + (60 * $this->getDurationMinutes());
+        }
 
         $assessment->setDuration($duration);
-
         $assessment->setMaxAttempts($this->getMaxAttempts());
     }
 }
