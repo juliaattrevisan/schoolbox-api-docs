@@ -16,17 +16,17 @@
             <div class="empty-state">
                 <i class="icon-podcast"></i>
 
+                <!-- BEGIN empty_read -->
+                <p>There are no podcasts available to listen to at this time.</p>
+                <!-- END empty_read -->
+
                 <!-- BEGIN empty_config -->
-                <p>To use the podcast component your must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a podcast URL</a>.</p>
+                <p><a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a URL for a podcast series</a> to show a feed of podcasts in the series which can be played directly on this page.</p>
                 <!-- END empty_config -->
 
-                <!-- BEGIN empty_results -->
-                <p>No podcasts found.</p>
-                <!-- END empty_results -->
-
-                <!-- BEGIN empty_results_write -->
-                <p>No podcasts found with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different URL</a>.</p>
-                <!-- END empty_results_write -->
+                <!-- BEGIN empty_invalid -->
+                <p>We couldn't find a podcast series with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">checking your URL is correct</a> or <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">entering a different URL</a>.</p>
+                <!-- END empty_invalid -->
 
             </div>
             <!-- END empty_state -->
