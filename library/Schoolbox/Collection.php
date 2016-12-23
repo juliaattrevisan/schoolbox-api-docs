@@ -743,12 +743,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @param int $offset
      * @param int $count
+     * @param bool $preserve_keys Whether to preserver array keys or re-index from 0
      * @return static
      */
-    public function slice($offset, $count = null)
+    public function slice($offset, $count = null, $preserve_keys = false)
     {
         $copy = clone $this;
-        $copy->setStack(array_slice($copy->stack, $offset, $count, false));
+        $copy->setStack(array_slice($copy->stack, $offset, $count, $preserve_keys));
         return $copy;
     }
 
