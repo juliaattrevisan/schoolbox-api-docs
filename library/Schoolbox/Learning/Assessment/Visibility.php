@@ -17,6 +17,20 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Visibility
 {
+    /**
+     * @var Access
+     */
+    private $access;
+
+    /**
+     * Visibility constructor.
+     *
+     * @param Access $access
+     */
+    public function __construct(Access $access)
+    {
+        $this->setAccess($access);
+    }
 
     /**
      * Determines whether this upcoming IAssessable is visible to $user
@@ -40,7 +54,7 @@ class Visibility
 
         /* Folder perms
          */
-        $folderAccessLevel = Access::getInstance()->getFolderAccess($user, [$assessment->getContext()->getFolder()->getId()]);
+        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getContext()->getFolder()->getId()]);
 
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
             return true;
@@ -59,5 +73,26 @@ class Visibility
         }
 
         return false;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return Access
+     */
+    private function getAccess()
+    {
+        return $this->access;
+    }
+
+    /**
+     * @param Access $access
+     * @return $this
+     */
+    private function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
     }
 }

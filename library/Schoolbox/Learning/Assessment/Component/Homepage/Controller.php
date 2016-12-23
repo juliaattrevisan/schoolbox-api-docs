@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use SitePage;
 
@@ -72,7 +73,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 ->filter(
                     function (IAssessable $assessment)
                     {
-                        $visibility = new \Schoolbox\Learning\Assessment\Visibility();
+                        $visibility = new Visibility(Access::getInstance());
                         return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
