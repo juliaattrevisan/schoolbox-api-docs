@@ -57,32 +57,23 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         if ($emptyState) {
 
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
-            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
-            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
+            $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
-            $this->setVar('pinterest_block', '');
+            $this->setVar([
+                'pinterest_block' => '',
+                'empty_read_block' => '',
+                'empty_config_block' => '',
+                'empty_invalid_block' => '',
+            ]);
 
-            /**
-             * If the user has no write permission just go for a generic nothing found message
-             */
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-
-                $this->setVar('empty_config_block', '');
-                $this->setVar('empty_results_write_block', '');
-                $this->parse('empty_results_block', 'empty_results');
-
+                $this->parse('empty_read_block', 'empty_read');
+            } else if ($noConfig) {
+                $this->parse('empty_config_block', 'empty_config');
             } else {
-
-                $this->setVar('empty_results_block', '');
-
-                if ($noConfig) {
-                    $this->setVar('empty_results_write_block', '');
-                    $this->parse('empty_config_block', 'empty_config');
-                } else {
-                    $this->setVar('empty_config_block', '');
-                    $this->parse('empty_results_write_block', 'empty_results_write');
-                }
+                $this->parse('empty_invalid_block', 'empty_invalid');
             }
 
             $this->parse('empty_state_block', 'empty_state');
