@@ -290,6 +290,30 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * @param SocialStream_Post_Abstract $post
+     * @param User $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentPosted($post, $author, $diff = null)
+    {
+        return $this->notifyPosted(Role::PARENT, $post, $author, $diff);
+    }
+
+
+    /**
+     * @param SocialStream_Post_Abstract $post
+     * @param User $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentReplied($post, $author, $diff = null)
+    {
+        return $this->notifyReplied($post, $author, $diff);
+    }
+
+
+    /**
      * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
      *
      * @param int    $context  - most likely a category ID or ignored
