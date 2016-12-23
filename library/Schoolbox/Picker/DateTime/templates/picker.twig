@@ -135,10 +135,10 @@
                                 </th>
                                 {% set k=1 %}
                             {% for description in timetable[campus.campusId].desc %}
-                                <tr><td class="period-description description-{{ k }}" data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
+                                <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
 
                                     {% for i in 1..timetable[campus.campusId].dayCount %}
-                                        <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}"></div></td>
+                                        <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
 
                                     {% endfor %}
                                     {% set k=k+1 %}
@@ -204,6 +204,9 @@
     {# Update cycles on Campus or Term change #}
     $('select[name*="campus"]').change(function(){
         buildCycles();
+        {# Clear selected #}
+        $('.period-selected').removeClass('period-selected');
+        $('table').find('[data-selected=1]').attr('data-selected', 0);
         revealTimetable();
     });
 
@@ -236,7 +239,9 @@
         var period = $(this).attr('data-period');
 
         $('.period-selected').removeClass('period-selected');
+        $('table').find('[data-selected=1]').attr('data-selected', 0);
         $(this).addClass('period-selected');
+        $(this).attr('data-selected', 1);
         $('.day-'+day).addClass('period-selected');
         $('.description-'+period).addClass('period-selected');
         periodClicked = 'period'+day+'_'+period;
@@ -278,9 +283,11 @@
     {# Submit timetable datetime #}
 
     $('.timetable-submit').click(function() {
-        var newTime; //TODO get period time
-        var newDate = moment(timetableDate).format(convertFormat('Y-m-d'));
-        //TODO pass date and time to the datepicker
+        var periodSelected = $('table').find('[data-selected=1]').attr('data-period');
+        var newTime = moment($('[data-period-number='+periodSelected+']').attr('data-period-start'), 'HH:mmA');
+        var newDate = (timetableDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0)).format(convertFormat('{{ databaseFormat }}'));
+        window.pickerInstance[{{ id }}].setDate(newDate);
+
     });
 
     {# Setup calendar #}
