@@ -55,14 +55,16 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-chat"></i>
-                <p>The chat is inactive!</p>
 
-                <!-- BEGIN empty_modify -->
+                <!-- BEGIN empty_read -->
+                <p>There is no active chat at this time. <a href="/homepage/chatArchive/{ID}/">View the chat archive</a> or <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants">view the chat participants</a>.</p>
+                <!-- END empty_read -->
+
+                <!-- BEGIN empty_write -->
                 <p>
-                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> or
-                    <a href="/homepage/chatArchive/{ID}/">view the archive</a>
+                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> to allow users to have conversations on this page, or <a href="/homepage/chatArchive/{ID}/">view the chat archive</a> or <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants">the chat participants</a>.
                 </p>
-                <!-- END empty_modify -->
+                <!-- END empty_write -->
 
             </div>
             <!-- END empty_state -->

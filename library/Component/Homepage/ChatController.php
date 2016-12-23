@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ChatController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -37,8 +39,18 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
 
             $this->setBlock($templateHandle, 'chat', 'chat_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar('chat_block', '');
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('empty_write_block', '');
+                $this->parse('empty_read_block', 'empty_read');
+            } else {
+                $this->setVar('empty_read_block', '');
+                $this->parse('empty_write_block', 'empty_write');
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
