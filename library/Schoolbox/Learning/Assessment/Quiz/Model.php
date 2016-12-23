@@ -159,17 +159,31 @@ class Model extends AbstractAssessment
      */
     public function canCreateResponse(User $user)
     {
-
         /* Unlimited Attempts
          */
         if ($this->getMaxAttempts() == 0) {
             return true;
         }
 
+        $participant = $this->getParticipant($user);
+
         /* Responses less than maximum allowed
          */
-        if ($this->getParticipant($user)->getAllResponses()->count() < $this->getMaxAttempts()) {
+        if ($participant->getAllResponses()->count() < $this->getMaxAttempts()) {
             return true;
+        }
+
+        /* Response count is the same as the maximum allowed
+         */
+        if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
+            $mostRecentResponse = $participant->findMostRecentResponse();
+
+            /* Check whether the most recent response is officially submitted
+             * You should be allowed to resume the draft/in-progress attempt
+             */
+            if (!$mostRecentResponse->isSubmitted()) {
+                return true;
+            }
         }
 
         return false;
