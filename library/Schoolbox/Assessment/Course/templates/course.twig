@@ -128,14 +128,6 @@ Usage:
             }
         });
 
-        // 'Save Course' Button
-        $mageSaveCourseButton.mage({
-            submittable: '#main-course',
-            onXhrDone: function () {
-                window.location = '{{ routeLookup('course.courseList') }}';
-            }
-        });
-
         // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
             var unitSpecId = window.location.hash.slice(1);
@@ -173,112 +165,114 @@ Usage:
 </div>
 <div class="row">
     <div class="small-12 island" id="main-course">
-        <section>
-            <fieldset class="content" data-mage="course-info">
-                <legend>Course Information</legend>
-                <div class="small-12 column">
-                    <label>Name
-                        <input type="text"
-                               name="name"
-                               value="{{ courseSpec.folder.name }}"
-                               placeholder="What's this course called?"
-                               required
-                        />
-                    </label>
-                </div>
-                <div class="small-12 column">
-                    <label>
-                        Faculty / Subject
-                        <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
-                        <a data-course-parent-selector data-source="parent"
-                           title="Click to change the faculty / subject this course belongs to"
-                           class="source-select icon-folder"
-                           href="#" >{{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
-                        </a>
-                    </label>
-                </div>
-
-                {% if curriculumEnabled %}
+        <form method="post" action="{{ routeLookup('course.updateCourse', {id: courseSpec.id}) }}">
+            <section>
+                <fieldset class="content" data-mage="course-info">
+                    <legend>Course Information</legend>
                     <div class="small-12 column">
-                        <label>Curriculum Codes
-                            {% include 'sub/curriculumCodeSelector.twig' with {
-                                renderButton: false,
-                                codeList:     courseSpec.folder.curriculumNodes
-                            } only %}
+                        <label>Name
+                            <input type="text"
+                                   name="name"
+                                   value="{{ courseSpec.folder.name }}"
+                                   placeholder="What's this course called?"
+                                   required
+                            />
                         </label>
                     </div>
-                {% endif %}
-
-                {% if not courseSpec.id %}
-                    <div data-mage-submitrow>
-                        <div class="small-12 medium-8 column">
-                            {# Don't delete the inline style, it's needed -#}
-                            <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-                        </div>
-                        <div class="small-12 medium-4 column">
-                            <input type="submit" class="button" value="Next" data-mage-next="unit-info"
-                                   data-mage-working="Working..."
-                                   formaction="{{ courseSpec.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}"/>
-                        </div>
+                    <div class="small-12 column">
+                        <label>
+                            Faculty / Subject
+                            <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+                            <a data-course-parent-selector data-source="parent"
+                               title="Click to change the faculty / subject this course belongs to"
+                               class="source-select icon-folder"
+                               href="#" >{{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+                            </a>
+                        </label>
                     </div>
-                {% endif %}
-            </fieldset>
-            <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec.id %} disabled="disabled"{% endif %}>
-                <legend>Units</legend>
-                {# Don't delete the inline style, it's needed -#}
-                <div class="small-12 column no-pad"{% if not courseSpec.id %} style="display:none;"{% endif %} data-mage-collapsed>
-                    <ul class="information-list">
-                        {% for unitSpec in courseSpec.units %}
-                            {% if folderAccess[unitSpec.folder.id] > 0 %}
-                                {% include '@course/unit.twig' with {
-                                    unitSpec:         unitSpec,
-                                    encodedReturnUrl: encodedReturnUrls[unitSpec.id],
-                                    '_expanded':      false,
-                                    '_writable':      folderAccess[unitSpec.folder.id] > 1
-                                } only %}
-                            {% endif %}
-                        {% endfor %}
 
-                        {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
-                        {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
-                            <li class="actions-small-1" data-new-unit>
-                                <div class="list-item content">
-                                    <div class="small-1 column">
-                                        <span class="icon-add"></span>
+                    {% if curriculumEnabled %}
+                        <div class="small-12 column">
+                            <label>Curriculum Codes
+                                {% include 'sub/curriculumCodeSelector.twig' with {
+                                    renderButton: false,
+                                    codeList:     courseSpec.folder.curriculumNodes
+                                } only %}
+                            </label>
+                        </div>
+                    {% endif %}
+
+                    {% if not courseSpec.id %}
+                        <div data-mage-submitrow>
+                            <div class="small-12 medium-8 column">
+                                {# Don't delete the inline style, it's needed -#}
+                                <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" class="button" value="Next" data-mage-next="unit-info"
+                                       data-mage-working="Working..."
+                                       formaction="{{ courseSpec.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}"/>
+                            </div>
+                        </div>
+                    {% endif %}
+                </fieldset>
+                <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec.id %} disabled="disabled"{% endif %}>
+                    <legend>Units</legend>
+                    {# Don't delete the inline style, it's needed -#}
+                    <div class="small-12 column no-pad"{% if not courseSpec.id %} style="display:none;"{% endif %} data-mage-collapsed>
+                        <ul class="information-list">
+                            {% for unitSpec in courseSpec.units %}
+                                {% if folderAccess[unitSpec.folder.id] > 0 %}
+                                    {% include '@course/unit.twig' with {
+                                        unitSpec:         unitSpec,
+                                        encodedReturnUrl: encodedReturnUrls[unitSpec.id],
+                                        '_expanded':      false,
+                                        '_writable':      folderAccess[unitSpec.folder.id] > 1
+                                    } only %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
+                            {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
+                                <li class="actions-small-1" data-new-unit>
+                                    <div class="list-item content">
+                                        <div class="small-1 column">
+                                            <span class="icon-add"></span>
+                                        </div>
+                                        <div class="small-11 column">
+                                            <label>
+                                                <input type="text" value="" placeholder="New Unit" id="noonit-name"/>
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="small-11 column">
-                                        <label>
-                                            <input type="text" value="" placeholder="New Unit" id="noonit-name"/>
-                                        </label>
+                                    <div>
+                                        <div class="small-12 medium-8 column">
+                                            {# Don't delete the inline style, it's needed -#}
+                                            <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                                        </div>
+                                        <div class="small-12 medium-4 column">
+                                            <input type="submit" class="button" value="Create Unit"
+                                                   data-mage-next="spawn-unit" data-mage-working="Working..."
+                                                   formaction="{{ routeLookup('course.newUnit', { id: courseSpec.Id }) }}"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <div class="small-12 medium-8 column">
-                                        {# Don't delete the inline style, it's needed -#}
-                                        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-                                    </div>
-                                    <div class="small-12 medium-4 column">
-                                        <input type="submit" class="button" value="Create Unit"
-                                               data-mage-next="spawn-unit" data-mage-working="Working..."
-                                               formaction="{{ routeLookup('course.newUnit', { id: courseSpec.Id }) }}"/>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                    <input type="hidden" data-mage-next="none" name="unit-info" value="1"/>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                        <input type="hidden" data-mage-next="none" name="unit-info" value="1"/>
+                    </div>
+                </fieldset>
+            </section>
+            {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
+                <div class="row" data-mage="unit-info">
+                    {# Don't delete the inline style, it's needed -#}
+                    <div class="small-12 column" {% if not courseSpec.id %}data-mage-collapsed style="display: none;"{% endif %}>
+                        <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
+                    </div>
                 </div>
-            </fieldset>
-        </section>
-        {% if not courseSpec.id or folderAccess[courseSpec.folder.id] > 1 %}
-            <div class="row" data-mage="unit-info">
-                {# Don't delete the inline style, it's needed -#}
-                <div class="small-12 column" {% if not courseSpec.id %}data-mage-collapsed style="display: none;"{% endif %}>
-                    <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
-                </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </form>
     </div>
 </div>
 <div id="parent-select" data-reveal class="reveal-modal"></div>

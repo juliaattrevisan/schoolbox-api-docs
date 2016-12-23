@@ -70,31 +70,14 @@ Usages:
         var initStage1 = function() {
             {# Init stage 1 mage #}
             var stageOne = $('input[data-mage-next="part-ownership"]');
-            stageOne.bind('validate', function () {
-                {# Stage 1 validation #}
-                if ($('#course_spec_id').val()) {
-                    if ($('#import_folders').val()) {
-                        {# Everything okay #}
-                        return {'result': true};
-                    }
-                    else {
-                        {# Class was missing #}
-                        return {
-                            'result': false,
-                            'message': 'You must specify at least one class before you can proceed.'
-                        };
-                    }
-                }
-                else {
-                    {# Course was missing #}
-                    return {
-                        'result': false,
-                        'message': 'You must select a course to import before you can proceed.'
-                    };
-                }
-            });
 
             stageOne.mage({
+                validateOptions: {
+                    rules: {
+                        importCourse: {required: true},
+                        importFolders: {required: true}
+                    }
+                },
                 onXhrDone: function (data) {
                     $('#ownership_assignment').html(data);
                     initStage2();
@@ -122,6 +105,31 @@ Usages:
 
             stageThree.mage({
                 confirmRevert: confirmRevert,
+                validateOptions: {
+                    ignore: ':disabled'
+                },
+                beforeSubmit: function() {
+                    // make sure at least one unit is selected
+                    $('input[data-checkbox-group="unit"]').rules('add', {
+                        oneCheckbox: 'unit'
+                    });
+                    // check any visible open date fields
+                    $('input[data-role="open_date"]:visible').each(function() {
+                        $(this).rules('add', {
+                            datepickerDate: true,
+                            required: true
+                        });
+                    });
+                    // check any due date fields
+                    $('input[data-role="due_date"]:visible').each(function() {
+                        var index = $(this).data('index');
+                        var openDate = $('input[data-role="open_date"][data-index="' + index + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: openDate
+                        });
+                    });
+                },
                 onRevert: function () {
                     $('#import_units').find(':checkbox').closest('li').slideDown();
                 },
@@ -135,61 +143,6 @@ Usages:
                     $('#import_assessments').html(data);
                     initStage4();
                 }
-            })
-            .bind('validate', function() {
-
-                {# Stage 3 validation #}
-                var $importUnits = $('#import_units');
-                if ($importUnits.find('input[type=checkbox]').filter(':checked').length > 0)
-                {
-                    {# Check both dates are entered for each checked unit #}
-
-                    var dateFields = $importUnits
-                            .find('input[type=checkbox]')
-                            .filter(':checked')
-                            .closest('li')
-                            .find('input[type=text]');
-
-                    var blankFound = false;
-
-                    $.each(dateFields, function(index, field) {
-                        if (!$(field).val()) {
-
-                            {# Date field was blank #}
-
-                            blankFound = true;
-                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                            $(field).addClass('error');
-                        } else {
-                            $(field).removeClass('error');
-                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                        }
-                    });
-
-                    if (blankFound) {
-                        return {
-                            'result': false,
-                            'message': 'You must specify a valid open and close date for each unit you are importing.'
-                        };
-                    }
-
-                    {# All dates were specified #}
-
-                    return {
-                        'result': true
-                    };
-
-                }
-                else
-                {
-                    {# No units were ticked #}
-
-                    return {
-                        'result': false,
-                        'message': 'You must select at least one unit before you can proceed.'
-                    };
-                }
-
             });
         };
 
@@ -200,6 +153,53 @@ Usages:
             var stageFour = $('input[data-mage-next="part-results-select"]');
 
             stageFour.mage({
+                validateOptions: {},
+                beforeSubmit: function() {
+                    // check at least one lesson has been selected
+                    $('input[data-checkbox-group="lesson"]').rules('add', {
+                        oneCheckbox: 'lesson'
+                    });
+                    // check every visible publish date field
+                    $('input[data-role="publish_date"]:visible:enabled').each(function() {
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDate: true
+                        });
+                    });
+                    // check every visible open date field
+                    $('input[data-role="open_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        var publishDate = $('input[data-role="publish_date"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: publishDate
+                        });
+                    });
+                    // check every visible due date field
+                    $('input[data-role="due_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        // if an open date exists then it needs to be before then, otherwise before publish date
+                        if ($('input[data-role="open_date"][data-assessment-id="' + lessonId + '"]').length > 0) {
+                            var dateRole = 'open_date';
+                        } else {
+                            var dateRole = 'publish_date';
+                        }
+                        var otherDate = $('input[data-role="' + dateRole + '"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: otherDate
+                        });
+                    });
+                    // check every visible close date field
+                    $('input[data-role="close_date"]:visible:enabled').each(function() {
+                        var lessonId = $(this).data('assessment-id');
+                        var dueDate = $('input[data-role="due_date"][data-assessment-id="' + lessonId + '"]');
+                        $(this).rules('add', {
+                            required: true,
+                            datepickerDateNotBefore: dueDate
+                        });
+                    });
+                },
                 onXhrDone: function(data) {
 
                     if (typeof data == 'object' && 'redirect' in data && data.redirect) {
@@ -208,45 +208,6 @@ Usages:
                     }
                     // If something goes wrong, DO NOT redirect. Stay here to enable debugging.
                     // TODO this should display an error message in mage, but there's no documentation on how to do that.
-                }
-            }).bind('validate', function() {
-
-                {# Stage 4 validation #}
-
-                if ($('#import_units').find('input[type=checkbox]').filter(':checked').length > 0) {
-
-                    {# Make sure every date has been entered #}
-
-                    var dateFields = $('input[data-mage-next="part-results-select"]')
-                            .closest('fieldset')
-                            .find('input[type=text]');
-
-                    var blankFound = false;
-
-                    $.each(dateFields, function (index, field) {
-                        if (!$(field).val()) {
-
-                            {# Date field was blank #}
-
-                            blankFound = true;
-                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
-                            $(field).addClass('error');
-                        } else {
-                            $(field).removeClass('error');
-                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
-                        }
-                    });
-
-                    if (blankFound) {
-                        return {
-                            'result': false,
-                            'message': 'You must supply dates for each unit of work in this unit before you can proceed.'
-                        };
-                    }
-
-                    {# Everything okay #}
-
-                    return { 'result': true };
                 }
             });
         };

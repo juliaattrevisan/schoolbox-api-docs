@@ -22,10 +22,10 @@
            value="{% if assessmentDate.valid %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
+           data-assessment-id="{{ assessmentId }}"
             {% if dateSyncProperty %}
            data-datepicker-sync
-           data-datepicker-sync-enddate="#{{ inputPrefix }}_{{ dateSyncProperty }}_date"
+           data-datepicker-sync-enddate="#{{ id }}_{{ dateSyncProperty }}_date"
            {% endif %}
     />
-    <label for="{{ inputPrefix }}_{{ dateProperty }}_date" class="hide error">This field is required.</label>
 </div>

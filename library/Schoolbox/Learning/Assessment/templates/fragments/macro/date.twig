@@ -1,11 +1,13 @@
-{%  macro dateField(dateProperty, dateValue) %}
+{%  macro dateField(dateProperty, dateValue, syncEndDate) %}
 <div class="row" id="{{ dateProperty }}">
+
     <div class="column small-12 medium-6">
         <label>
             {{ dateProperty|capitalize }} Date
-            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.localShort }}" data-datepicker />
+            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.localShort }}" data-datepicker {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate="{{ syncEndDate }}"{% endif %} />
         </label>
     </div>
+
     <div class="column small-12 medium-6">
         <div class="timepick">
             <label>
@@ -14,5 +16,6 @@
             </label>
         </div>
     </div>
+
 </div>
 {% endmacro %}

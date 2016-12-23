@@ -59,6 +59,7 @@
         return getDateFromString(dateDisplayFormats.momentJs, date, hour, minute, 0)
     }
 
+
     /**
      * Gets a momentJS date given a format and date.
      *
@@ -77,12 +78,14 @@
         ;
     }
 
+
     /**
      * Validator for a datepicker (format: dd/mm/yyyy)
      */
     $.validator.addMethod('datepickerDate', function(value, element) {
         return getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0).isValid();
     }, 'Please enter a valid date');
+
 
     /**
      * Extension of datepickerDate for checking that the date is not earlier
@@ -97,6 +100,27 @@
         ;
     }, 'Please enter a valid date');
 
+
+    /**
+     * Validator for a timepicker (format: h:mma)
+     */
+    $.validator.addMethod('timepickerTime', function(value, element) {
+        return moment(value, 'h:mma', true).isValid();
+    }, 'Please enter a valid time');
+
+
+    /**
+     * timepickerTime rule - checks that the field's time is not earlier
+     * than another one.
+     */
+    $.validator.addMethod('timepickerNotBefore', function(value, element, other_element_selector) {
+
+        var time = moment(value, 'h:mma', true);
+        var otherTime = moment(other_element_selector.val(), 'h:mma', true);
+        return time.valueOf() >= otherTime.valueOf();
+    }, 'Please enter a valid time');
+
+
     /**
      * Date-time validation method - works with a time selector as well, and
      * uses some guesswork to find the datetime fields.
@@ -107,6 +131,7 @@
         return getNormalizedDate(element).isValid();
     }, 'Please enter a valid date');
 
+
     /**
      * dateValid extension - checks that this field's date is not earlier than
      * than another one.
@@ -116,6 +141,7 @@
         var form = item.closest('form');
         return getNormalizedDate(element).valueOf() >= getNormalizedDate(other_date_field, form).valueOf();
     }, 'Please enter a date that is after');
+
 
     /**
      * Hour and minute validation rules
@@ -148,6 +174,7 @@
         'Please enter a valid minute'
     );
 
+
     /**
      * selected extension - checks that you've selected something.
      */
@@ -158,6 +185,7 @@
         var selected = $(element).find(':selected[value]')
         return (selected.length > 0)
     }, 'Please select a value');
+
 
     /**
      * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
@@ -172,10 +200,21 @@
         return regExURL.test(value.trim().toLowerCase());
     }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with '/', '#', or '?')");
 
+
     /**
      * equalsOther extension - checks that the value of this field equals that of some other field.
      */
     $.validator.addMethod('equalsOtherField', function(value, element, otherElement) {
         return $(element).val() == $(otherElement).val();
     }, 'Values do not match');
+
+
+    /**
+     * oneCheckbox extension - checks that at least one checkbox has been selected in a group
+     * Set a checkbox as in a group with data-checkbox-group="GROUPNAME"
+     */
+    $.validator.addMethod('oneCheckbox', function(value, element, checkboxGroup) {
+        return $('input[data-checkbox-group="' + checkboxGroup + '"]:checked').length > 0;
+    }, 'You must select at least one option below');
+
 }(jQuery));

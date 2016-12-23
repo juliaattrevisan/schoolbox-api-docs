@@ -13,16 +13,17 @@
     var pluginName = 'mage';
 
     var defaults = {
-
         submittable: 'fieldset',
         currentStopClass: 'current-stop',
         reenablePrevious: false,
+        beforeSubmit: $.noop,
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
         onRevert: $.noop,
         confirmRevert: $.noop,
-        setFormData: $.noop
+        setFormData: $.noop,
+        validateOptions: false
     };
 
     function Mage(element, options) {
@@ -135,7 +136,7 @@
 
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
-
+        
         $t.attr('disabled', 'disabled');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
@@ -154,8 +155,9 @@
     Mage.prototype.enableSection = function () {
 
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
 
-        $e.closest(this.options.submittable).removeAttr('disabled');
+        $t.removeAttr('disabled');
 
         if ($e.data('mage-reset')) {
             // reset the submit button text and re-enable it
@@ -177,15 +179,21 @@
      */
     Mage.prototype.closeSection = function () {
 
-        this.disableSection();
-
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        this.disableSection();
 
         // slide away the submit for this section
         $e.closest('[data-mage-submitrow]').slideUp(slideSlow);
 
         // also slide away this section's helptext
-        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
+        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow, function() {
+            // disable all inputs in the closed section
+            $t.find(':input').attr('disabled', 'disabled');
+        });
+
+
     };
 
     /**
@@ -197,6 +205,10 @@
     Mage.prototype.openSection = function () {
 
         var $e = $(this.element);
+        var $t = $e.closest(this.options.submittable);
+
+        // enable all inputs in the section
+        $t.find(':input').removeAttr('disabled');
 
         // slide out the main content wrapper
         var $content = $e.closest('[data-mage-collapsed]');
@@ -287,33 +299,31 @@
      * @param {jQuery} elem
      * @param {jQuery} [form] optional
      */
-    function clickIntercept (e, self, elem, form) {
+    function clickIntercept(e, self, elem, form) {
         e.preventDefault();
 
+        // destroy any existing alaressValidate options
+        $(form).removeData('validator');
 
-        // Perform validation if required
+        // set alaressValidate with new options
+        if (self.options.validateOptions !== false) {
+            form.alaressValidate(self.options.validateOptions);
+        }
 
-        // We cannot use a simple triggerHandler('validate') as that
-        // only returns the value of the last handler to execute.
-        // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
+        // call beforeSubmit
+        self.options.beforeSubmit.call();
 
-        var allValid = true;
+        /**
+         * Validate the form
+         * Will use alaressValidate if set on the form or any required attributes on fields
+         * If the form has neither - it will pass through without any validation
+         */
+        if (form.valid() == false) {
 
-        $.each(getEventHandlers(e.target, 'validate'), function (idx, obj) {
-            // Quit as soon as we know data is invalid (don't merge errors)
-            if (allValid && undefined !== obj['type'] && 'validate' === obj['type']) {
-                var validator = obj.handler.call(e.target);
-                if (validator !== undefined) {
-                    if (!validator['result']) {
-                        // Validation failed, show message and bomb out
-                        form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
-                        allValid = false;
-                    }
-                }
-            }
-        });
+            // focus user to first invalid field
+            $(form).find(':input.error').first().focus();
 
-        if (!allValid) {
+            // prevent submit
             return;
         }
 
@@ -331,7 +341,7 @@
         xhrBefore.call(self);
 
         // send it off
-        xhrSend.call(self, method, action, target)
+        xhrSend.call(self, method, action, target);
     }
 
 

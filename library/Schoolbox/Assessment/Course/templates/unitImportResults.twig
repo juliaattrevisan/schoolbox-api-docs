@@ -149,7 +149,7 @@
                                     {% set assessmentImpl = assessmentPair.implementation %}
                                     {% set assessment = assessmentImpl ?: assessmentSpec %}
                                     {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
-                                    {% set publishDateSync      = (assessment is dueWork and assessment.acceptNone) ? 'due' : 'open' %}
+                                    {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
                                     {% set inputPrefix %}unit[{{ unitSpec.id }}][a][{{ assessment.id }}]{% endset %}
                                     {% set isChecked = assessmentImpl or 'import' == action %}
 
@@ -158,13 +158,12 @@
                                         <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                         <div class="compact card small-12 large-4">
-                                            <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                             <input type="checkbox"
                                                    id="a_import-{{ assessment.id}}"
                                                    {% if isChecked %} checked="checked"{% endif %}
                                                    data-assessment="{{ assessment.id }}"
+                                                   data-checkbox-group="lesson"
                                                    name="{{ inputPrefix }}[checked]"
-                                                   value="1"
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment) }}"></span>
@@ -173,15 +172,18 @@
                                                 <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                 {% endif %}
                                             </label>
+
                                         </div>
                                         <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
+
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
                                                 assessmentDate: assessment.publishAt,
                                                 unitDate: unitImpl.openDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'publish',
-                                                dateSyncProperty: publishDateSync
+                                                dateSyncProperty: publishDateSync,
+                                                assessmentId: assessmentSpec.id
                                             } only %}
 
                                             {# open date is relevant when accepting responses #}
@@ -191,7 +193,8 @@
                                                     unitDate: unitImpl.openDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'open',
-                                                    dateSyncProperty: 'due'
+                                                    dateSyncProperty: 'due',
+                                                    assessmentId: assessmentSpec.id
                                                 } only %}
                                             {% else %}
                                                 <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -203,7 +206,8 @@
                                                 unitDate: unitImpl.dueDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'due',
-                                                dateSyncProperty: 'late'
+                                                dateSyncProperty: 'close',
+                                                assessmentId: assessmentSpec.id
                                             } only %}
 
                                             {# close (late) date is relevant when accepting responses #}
@@ -213,7 +217,8 @@
                                                 unitDate: unitImpl.dueDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'close',
-                                                dateLabel: 'Late'
+                                                dateLabel: 'Late',
+                                                assessmentId: assessmentSpec.id
                                                 } only %}
                                             {% else %}
                                                 <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>

@@ -468,7 +468,7 @@ class Controller extends Base\Base
         try {
             $countImportedUnits = 0;
             foreach ($units as $idx => $unit) {
-                if ($unit['import']) {
+                if (isset($unit['import'])) {
                     $countImportedUnits++;
                     $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
                     $closeDate = \Alaress_Date_Format::newLocalShort($unit['close_date']);
@@ -495,7 +495,7 @@ class Controller extends Base\Base
         $importFactory = $this->getImportFactory();
         $unitImpls = $this->getUnitImplementationMapper()->createCollection();
         foreach ($units as $unit) {
-            if ($unit['import']) {
+            if (isset($unit['import'])) {
                 $unitImpl = new UnitImplementation();
                 $unitImpl->setId($unit['unit_impl_id']); // ID will be null if UnitSpec not yet imported
                 $unitSpec = new UnitSpecification();
@@ -636,7 +636,7 @@ class Controller extends Base\Base
                         // Is this Assessment a impl or spec? (we ignore specs, nothing to delete)
                         if ($assessmentImplData['impl_id']) {
                             // Did user de-select this Assessment ?
-                            if (!$assessmentImplData['checked']) {
+                            if (!isset($assessmentImplData['checked'])) {
                                 $this->getAssessmentMapperProxy()->delete($assessableImpl);
                             }
                         }
@@ -696,7 +696,7 @@ class Controller extends Base\Base
                     // Create/Update AssessmentImpls
                     foreach ($unitPair['a'] as $assessmentId => $aData) {
                         // Ignore unchecked items. ( If they were already imported, they were deleted above.)
-                        if (!$aData['checked']) {
+                        if (!isset($aData['checked'])) {
                             continue;
                         }
 
