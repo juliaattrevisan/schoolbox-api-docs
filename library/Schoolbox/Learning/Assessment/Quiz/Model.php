@@ -159,12 +159,6 @@ class Model extends AbstractAssessment
      */
     public function canCreateResponse(User $user)
     {
-        /* Quiz not open yet
-         * Quiz has no publish dates ><
-         */
-        if ($this->getOpenAt()->isFuture()) {
-            return false;
-        }
 
         /* Unlimited Attempts
          */
