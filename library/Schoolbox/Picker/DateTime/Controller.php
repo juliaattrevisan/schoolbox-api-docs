@@ -56,6 +56,7 @@ class Controller extends Base
     public function getPicker($id, $display, $database, $value) {
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
+        $timetableDayNumber = $this->getTimetableDay($value);
 
 //        new \Alaress_Probe($timetable);
 
@@ -69,7 +70,8 @@ class Controller extends Base
                     'displayFormat' => urldecode($display),
                     'databaseFormat' => urldecode($database),
                     'timetable' => $timetable,
-                    'terms' => $terms
+                    'terms' => $terms,
+                    'timetableDay' => $timetableDayNumber
                 ]
             )
         );
@@ -113,7 +115,7 @@ class Controller extends Base
      */
     public function  getFirstDayOfTerm($campus, $termStartDate) {
 
-        $timetable = new \External_Synergetic_Timetable;
+        $timetable = new External_Timetable;
 
         $termStartTimestamp = new \Alaress_Date_Format($termStartDate, 'd/m/Y h:iA');
 
@@ -162,6 +164,21 @@ class Controller extends Base
         $date = $termStartDate->addWeekdays($shiftTimetableDays)->getDatabase();
 
         return $date;
+    }
+
+    public function getTimetableDay($date) {
+
+        $date = new \Alaress_Date_Format($date, 'Y-m-d H:i:S');
+
+        //Get term for given date
+        $term = $this->getTermMapper()->findForDate($date);
+        $term->getStart();
+
+        $timetableDay = Array();
+        $timetableDay['term'] = $term->getId();
+        $timetableDay['daysUntilDate']= $term->getDuration($date);
+
+        return $timetableDay;
     }
 
     /**

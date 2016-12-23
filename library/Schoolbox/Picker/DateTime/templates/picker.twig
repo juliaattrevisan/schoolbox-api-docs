@@ -118,7 +118,7 @@
                             </select>
                             <select name = "term">
                                 {% for term in terms %}
-                                    <option value="{{ term.id }}" data-duration="{{ term.duration }}">{{ term.title }} </option>
+                                    <option value="{{ term.id }}" data-duration="{{ term.duration }}" {% if term.id == timetableDay.term %} selected {% endif %}>{{ term.title }} </option>
                                 {% endfor %}
                             </select>
                             <select name="cycle">
@@ -136,7 +136,7 @@
                                 {% set k=1 %}
                             {% for description in timetable[campus.campusId].desc %}
                                 <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
-
+                                    {# TODO on load: highlight pariod according to event date and time #}
                                     {% for i in 1..timetable[campus.campusId].dayCount %}
                                         <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
 
@@ -159,7 +159,6 @@
         </div>
 </div>
 
-
 <script>
 
     {# Tabs #}
@@ -179,13 +178,22 @@
     {# Timtable picker #}
 
     {# Build cycles dynamically #}
-    function buildCycles() {
+    function buildCycles(onFirstLoad) {
 
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
         var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
         var optionsHtml = '';
+        //Select cycle number on first load
+        if(onFirstLoad === true) {
+            cycleSelected = parseInt({{ timetableDay.daysUntilDate }}/daysInCycle);
+        }
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
-            optionsHtml += '<option value="' + i + '">Week ' + i + '</option>';
+            var selected = '';
+
+            if(onFirstLoad && cycleSelected == i ){
+                selected = 'selected';
+            }
+            optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
         }
         $('select[name*="cycle"]').empty().append(optionsHtml);
     }
@@ -198,7 +206,7 @@
     }
 
     {# Put cycles on load #}
-    buildCycles();
+    buildCycles(true);
     revealTimetable();
 
     {# Update cycles on Campus or Term change #}
