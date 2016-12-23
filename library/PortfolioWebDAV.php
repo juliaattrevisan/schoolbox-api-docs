@@ -422,7 +422,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         } elseif ($site_location=='sheldon') {
             $settings = array(
-                'baseUri' => 'https://ilinqdav.sheldoncollege.com/',
+                'baseUri' => 'http://svwebdav01.sheldoncollege.com/',
                 'userName' => $_SESSION['username'] . "@sheldoncollege.com",
                 'password' => $_SESSION['password'],
             );
