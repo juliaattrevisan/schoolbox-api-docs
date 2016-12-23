@@ -65,15 +65,15 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
         // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
+            $visibility = new Visibility(Access::getInstance());
 
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview($this->getSource()->getId(), $this->getUser())
                 ->filter(
-                    function (IAssessable $assessment)
+                    function (IAssessable $assessment) use ($visibility)
                     {
-                        $visibility = new Visibility(Access::getInstance());
                         return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
                 )
