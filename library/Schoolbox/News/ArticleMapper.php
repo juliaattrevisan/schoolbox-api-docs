@@ -435,7 +435,7 @@ class ArticleMapper extends Mapper implements Searchable
             }
         );
 
-        $collection->slice($offset, $limit)->sortBy('publishDate', 'DESC');
+        $collection = $collection->slice($offset, $limit)->sortBy('publishDate', 'DESC');
 
         return $collection;
     }
