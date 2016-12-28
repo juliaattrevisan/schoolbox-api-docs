@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\AssessmentContext;
@@ -227,11 +228,18 @@ interface IAssessable extends ISoftDeletable
     public function getPercentagePublished();
 
     /**
-     * Check that all four dates are set validly
+     * The friendly, uninformative version of assertValidDates
      *
      * @return bool
      */
     public function isValidDates();
+
+    /**
+     * Check that all four dates are set validly
+     *
+     * @throws InvalidArgumentException if the dates are not validly set
+     */
+    public function assertValidDates();
 
     /**
      * Is feedback on this Assessment visible to this user?

@@ -17,6 +17,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use InvalidArgumentException;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -154,17 +155,20 @@ class Model extends AbstractAssessment
 
     /**
      * Check the dates set on this model are valid
-     * @return bool
+     * @throws InvalidArgumentException if the dates are not validly set
+     * @return void
      */
-    public function isValidDates()
+    public function assertValidDates()
     {
         /* Don't check dates if in course */
-        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
-            if ( $this->getPublishAt()->gt($this->getDueAt())) {
-                return false;
-            }
+        if ($this->getBaseContext() instanceof UnitSpecification) {
+            return;
         }
-        return true;
+
+        $this->assertDateSequence([
+            'publish' => $this->getPublishAt(),
+            'due'     => $this->getDueAt()
+        ]);
     }
 
     /* Getters/Setters

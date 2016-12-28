@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use DomainException;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
@@ -110,6 +112,23 @@ class Model extends AbstractAssessment
         $this->setAttachedFiles(new Collection());
     }
 
+
+    /**
+     * The friendly, uninformative version of assertAcceptSubmissions.
+     *
+     * @param Collection $responses
+     * @return bool
+     */
+    public function isAcceptingSubmissions(\Schoolbox\Collection $responses)
+    {
+        try {
+            $this->assertAcceptSubmission($responses);
+            return true;
+        } catch (DomainException $e) {
+            return false;
+        }
+    }
+
     /**
      * Work out if we are going to accept responses
      *
@@ -121,66 +140,58 @@ class Model extends AbstractAssessment
      *      - You're not a student of this assessment's class (folder)
      *
      * @param Collection $responses
-     * @throws \DomainException
+     * @throws DomainException
      */
     public function assertAcceptSubmission(\Schoolbox\Collection $responses)
     {
         if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
         if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
 
         if ($this->isAcceptNone()) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
         }
 
         /* Allow draft responses in single submission assessments
          */
         if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
-            throw new \DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
         }
     }
 
+
     /**
      * Check the dates set on this model are valid
-     * @return bool
+     * @throws InvalidArgumentException if the dates are not validly set
+     * @return void
      */
-    public function isValidDates()
+    public function assertValidDates()
     {
         /* Check publish date against everything else
         /* Don't check dates if in course */
-        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
-
-            /* Only check publish date */
-            if($this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE) {
-                if ( $this->getPublishAt()->gt($this->getDueAt())) {
-                    return false;
-                }
-            }
-            else {
-
-                if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-
-                /* Check open date against everything else
-                 */
-                if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-
-                /* Check due date against everything else
-                 */
-                if ($this->getDueAt()->gt($this->getCloseAt())) {
-                    return false;
-                }
-            }
-
+        if ($this->getBaseContext() instanceof UnitSpecification) {
+            return;
         }
-        return true;
+
+        /* Only check publish date */
+        if ($this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE) {
+            $this->assertDateSequence([
+                'publish' => $this->getPublishAt(),
+                'due'     => $this->getDueAt()
+            ]);
+
+        } else {
+            $this->assertDateSequence([
+                'publish' => $this->getPublishAt(),
+                'open'    => $this->getOpenAt(),
+                'due'     => $this->getDueAt(),
+                'late'    => $this->getCloseAt()
+            ]);
+        }
     }
 
     /**

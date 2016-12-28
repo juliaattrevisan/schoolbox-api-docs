@@ -17,6 +17,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use InvalidArgumentException;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
@@ -178,17 +179,20 @@ class Project extends AbstractAssessment implements AssessmentContext
 
     /**
      * Check the dates set on this model are valid
-     * @return bool
+     * @throws InvalidArgumentException if the dates are not validly set
+     * @return void
      */
-    public function isValidDates()
+    public function assertValidDates()
     {
         /* Don't check dates if in course */
-        if(! $this->getBaseContext() instanceof  UnitSpecification ) {
-            if ( $this->getPublishAt()->gt($this->getDueAt())) {
-                return false;
-            }
+        if ($this->getBaseContext() instanceof UnitSpecification) {
+            return;
         }
-        return true;
+
+        $this->assertDateSequence([
+            'publish' => $this->getPublishAt(),
+            'due'     => $this->getDueAt()
+        ]);
     }
 
     /**
@@ -278,13 +282,13 @@ class Project extends AbstractAssessment implements AssessmentContext
 
     /**
      * @param AssessmentContext $context
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return static
      */
     public function setContext(AssessmentContext $context = null)
     {
         if($context instanceof Project){
-            throw new \InvalidArgumentException('For now, a Project cannot reside inside another Project');
+            throw new InvalidArgumentException('For now, a Project cannot reside inside another Project');
         }
         parent::setContext($context);
         return $this;
