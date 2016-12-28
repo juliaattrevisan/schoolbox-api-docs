@@ -31,7 +31,7 @@ interface IFolder {
 
 
     /**
-     * A folder type. This will probably map to a class name.
+     * A folder type. This will probably map to a CSS class name.
      *
      * @return string
      */

@@ -148,9 +148,9 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * Builds a list of child nodes for $categoryId
+     * Builds a list of child nodes for $folderId
      *
-     * @param mixed $folderId
+     * @param int|string $folderId
      * @param array $mustInclude
      * @param string $mime
      * @return array
@@ -526,7 +526,7 @@ abstract class AbstractTreeBuilder
      * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected abstract function getNodeFiles($nodeId, $mime);
+    protected abstract function getNodeFiles($nodeId, $mime = "*/*");
 
 
     /**

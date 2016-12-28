@@ -104,8 +104,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                     $j = 0;
                     $colourIndex = 0;
-
-                    $icons = array('homepage' => 'home', 'folder' => 'folder', 'course' => 'course-builder');
                     $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
                     foreach ($allFolders as $currentFolder) {
@@ -142,7 +140,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                         $output = array(
                             'FOLDER_ID' => $currentFolder['id'],
                             'FOLDER_NAME' => Scrub::text($currentFolder['text']),
-                            'FOLDER_ICON' => $icons[$currentFolder['type']],
+                            'FOLDER_ICON' => $currentFolder['type'],
                             'FOLDER_COLOUR' => $folderColour,
                             'FOLDER_COVER_IMAGE' => $folderCoverImage,
                         );

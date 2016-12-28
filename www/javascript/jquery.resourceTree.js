@@ -189,6 +189,9 @@
                     course: {
                         icon: 'icon-course-builder'
                     },
+                    unit: {
+                        icon: 'icon-unit'
+                    },
                     noaccess: {
                         icon: 'icon-locked'
                     }
