@@ -90,15 +90,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
-        /* Block students seeing other students' outcomes
-         */
-        $currentUserIsStudent = $this->getUser()->getRole()->isStudent();
-        $currentUserIsParticipant = $this->getUser()->getId() == $participant->getUser()->getId();
-
-        if ($currentUserIsStudent && !$currentUserIsParticipant) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
         /** @var Task $task */
         $task = $participant->getAssessable();
         $previewFragment = [];

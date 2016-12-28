@@ -11,6 +11,8 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\Pastoral\Authorizer\Rule\IsParentOfStudent;
+use Schoolbox\Role;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -19,6 +21,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment;
@@ -68,7 +71,18 @@ class Module extends BaseModule
         $isSuper   = $this->getAuthRule('isSuperuser');
         $loggedIn  = $this->getAuthRule('isLoggedIn');
         $isStaff   = $this->getAuthRule('isStaffOrSuper');
-        $canSubmit = $this->getAuthRule('isStaffOrStudent');
+        $participantView =  new Rule\Any(
+                                new Rule\IsSuperuser(),
+                                new Rule\HasRole(Role::STAFF),
+                                new IsParticipant(),
+                                new IsParentOfStudent()
+        );
+        $canSubmit =  new Rule\Any(
+                                new Rule\IsSuperuser(),
+                                new Rule\HasRole(Role::STAFF),
+                                new IsParticipant()
+                            );
+
 
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
@@ -92,7 +106,7 @@ class Module extends BaseModule
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $isStaff,  $preloadAssessment);
         $this->register('GET',  "$assRoute/status", 'getStatus',                $isStaff,  $preloadAssessment);
 
-        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $canSubmit, $preloadParticipant);
+        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $participantView, $preloadParticipant);
         $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant);
         $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant);
     }
@@ -144,7 +158,8 @@ class Module extends BaseModule
         }
 
         return [
-            'participant' => $participant
+            'participant' => $participant,
+            'student'     => $participant->getUser() //IsParentOfStudent accesses this
         ];
     }
 
