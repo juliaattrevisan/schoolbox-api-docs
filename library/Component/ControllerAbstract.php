@@ -15,6 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use \Schoolbox\Config\ConfigMapper;
+use \Schoolbox\MapperFactory;
 
 abstract class Component_ControllerAbstract
 {
@@ -27,7 +28,6 @@ abstract class Component_ControllerAbstract
 
     /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
     const EMPTY_STATE_REASON_DELETED = 2;
-
 
     /**
      * @var Component_Instance
@@ -43,6 +43,11 @@ abstract class Component_ControllerAbstract
      * @var SitePage
      */
     private $sitepage;
+
+    /**
+     * @var MapperFactory
+     */
+    private $mapperFactory;
 
     /**
      * The folder|page the component is on, if any.
@@ -91,14 +96,19 @@ abstract class Component_ControllerAbstract
     private $maximumPermission = UserAccess::ACCESS_FULL;
 
     /**
-     * @var array
+     * Available sort fields for this component.
+     *
+     * @var string[]
      */
-    protected $sortFields = null;
+    protected $sortFields = [];
 
     /**
-     * @var array
+     * Available filters for this component.
+     *
+     * @see Component_Config_Filter for how this data is passed in/out of the database
+     * @var string[]
      */
-    protected $filterFields = null;
+    protected $filterFields = [];
 
     /**
      * Name of the component
@@ -142,19 +152,21 @@ abstract class Component_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
-        $this->setSitePage($sitepage);
-
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $sitepage->getDi()->get('mapperFactory');
         /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
+        $folderMapper = $mapperFactory->get(FolderMapper::class);
         /** @var ErrorMapper $errorMapper */
-        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+        $errorMapper = $mapperFactory->get(ErrorMapper::class);
         /** @var ConfigMapper $configMapper */
-        $configMapper = $this->getMapperFactory()->get(ConfigMapper::class);
+        $configMapper = $mapperFactory->get(ConfigMapper::class);
 
         $this
             ->setInstance($instance)
             ->setUser($user)
+            ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
+            ->setMapperFactory($mapperFactory)
             ->setFolderMapper($folderMapper)
             ->setErrorMapper($errorMapper)
             ->setConfigMapper($configMapper);
@@ -202,18 +214,6 @@ abstract class Component_ControllerAbstract
     {
         // Default to no action
         return true;
-    }
-
-    /**
-     * Convenience method for Components to get the Injected MapperFactory
-     *
-     * @return \Schoolbox\MapperFactory
-     */
-    protected function getMapperFactory()
-    {
-        /** @var \Schoolbox\MapperFactory $mapperFactory */
-        $mapperFactory = $this->getSitePage()->getDi()->get('mapperFactory');
-        return $mapperFactory;
     }
 
     /**
@@ -628,31 +628,14 @@ abstract class Component_ControllerAbstract
      *
      * Call from $this->renderTemplate($templateHandle)
      *
-     * @param string $templateHandle    Some PHPLib BS which I don't understand.
-     *                                  Just pass $templateHandle from
-     *                                  $this->renderTemplate($templateHandle).
-     * @param string $twigTemplate      The path to a Twig template.
-     * @param array  $twigData          Data to pass into the Twig template.
-     * @param bool   $renderHeader      Set to false if you don't want the PHPLib
-     *                                  controlled header to show.
-     * @param bool   $renderConfig      Set to false if you don't want the PHPLib
-     *                                  controlled configuration to show.
-     *                                  (Dashboard components show the collapse
-     *                                  controls if this is true.)
-     * @param bool   $contentRaw        This is a flag that lets you dump the twig raw
-     *                                  rather than using standard header block
-     * @param string $templateHandle Some PHPLib BS which I don't understand.
-     *                               Just pass $templateHandle from
+     * @param string $templateHandle Some PHPLib BS which I don't understand. Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
      * @param string $twigTemplate   The path to a Twig template.
-     * @param array $twigData        Data to pass into the Twig template.
-     * @param bool $renderHeader     Set to false if you don't want the PHPLib
-     *                               controlled header to show.
-     * @param bool $renderConfig     Set to false if you don't want the PHPLib
-     *                               controlled configuration to show.
-     *                               (Dashboard components show the collapse
-     *                                controls if this is true.)
-     *
+     * @param array  $twigData       Data to pass into the Twig template.
+     * @param bool   $renderHeader   Set to false if you don't want the PHPLib controlled header to show.
+     * @param bool   $renderConfig   Set to false if you don't want the PHPLib controlled configuration to show.
+     *                               (Dashboard components show the collapse controls if this is true.)
+     * @param bool   $contentRaw     This is a flag that lets you dump the twig raw rather than using standard header block
      * @return bool Was the template renderable?
      * @throws Exception
      */
@@ -789,16 +772,15 @@ abstract class Component_ControllerAbstract
     /**
      * Renders empty state into twig-based Components
      *
-     * Normally, this should not be called directly, instead use convenience methods which
+     * Private to prevent direct calls. Instead use convenience methods which
      * define a consistent message.
      *
      * @param string $templateHandle
      * @param int $reason Why we are unable to display this component's content.
      * @return bool
      */
-    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    private function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
@@ -834,15 +816,14 @@ abstract class Component_ControllerAbstract
     /**
      * Renders empty state into PHPLib-based Components
      *
-     * Normally, this should not be called directly, instead use convenience methods which
+     * Private to prevent direct calls. Instead use convenience methods which
      * define a consistent message.
      *
      * @param int $reason Why we are unable to display this component's content.
      * @return true
      */
-    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    private function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
@@ -972,6 +953,24 @@ abstract class Component_ControllerAbstract
     /*
      * Getters / Setters
      */
+
+    /**
+     * @return MapperFactory
+     */
+    protected function getMapperFactory()
+    {
+        return $this->mapperFactory;
+    }
+
+    /**
+     * @param MapperFactory $mapperFactory
+     * @return static
+     */
+    protected function setMapperFactory(MapperFactory $mapperFactory)
+    {
+        $this->mapperFactory = $mapperFactory;
+        return $this;
+    }
 
     /**
      * @return Folder|Eportfolio_Page_Instance|null

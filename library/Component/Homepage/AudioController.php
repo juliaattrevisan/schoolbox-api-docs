@@ -83,6 +83,22 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->outputList = new \Schoolbox\Collection(array());
         }
 
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+        $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
+        $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
+        $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
+
+        $this->setVar('empty_state_block', '');
+
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailable();
+        } else {
+            $this->setVar('source_folder_deleted_block', '');
+        }
+
+
         if (!count($this->outputList)) {
 
             $this->setBlock($templateHandle, 'audio', 'audio_block');
@@ -101,97 +117,80 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
+            $this->setVar(
+                array(
+                    'default_audio_block' => '',
+                    'audio_list_block' => '',
+                    'audio_pending_list_block' => '',
+                )
+            );
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
-            $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
-            $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
+            $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
 
-            $this->setVar('empty_state_block', '');
+            $j = 0;
+            foreach ($this->outputList as $audio) {
 
-            if(!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
-                $this->setVar('source_folder_deleted_block', '');
+                /**
+                 * We can be assured that files here are SBFS files
+                 * @var Model $file
+                 */
+                $file = $audio->getFile();
 
-                $this->setVar(
-                    array(
-                        'default_audio_block' => '',
-                        'audio_list_block' => '',
-                        'audio_pending_list_block' => '',
-                    )
-                );
+                if ($j === 0) {
+                    // output the default audio, and audio player
+                    $this->setVar(
+                        array(
+                            'DEFAULT_AUDIO_TITLE' => Scrub::text($file->getTitle()),
+                            'DEFAULT_AUDIO_ID' => $file->getId(),
+                        )
+                    );
+                    $this->parse('default_audio_block', 'default_audio');
+                }
+                if (count($this->outputList) >= 1) {
+                    $output = array(
+                        'AUDIO_LIST_ID' => $file->getId(),
+                        'AUDIO_LIST_TITLE' => Scrub::text($file->getTitle()),
+                        'AUDIO_LIST_DURATION' => $audio->getDuration() >= 3600
+                            ? gmdate('H:i:s', $audio->getDuration())
+                            : gmdate('i:s', $audio->getDuration()),
+                        'AUDIO_LIST_COMMENT' => Scrub::text($file->getDescription()),
+                        'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'hidden' : '',
+                        'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
+                        'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
+                        'ON_OFF' => ++$j % 2 ? '' : 'dark'
+                    );
 
-                $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
-
-                $j = 0;
-                foreach ($this->outputList as $audio) {
-
-                    /**
-                     * We can be assured that files here are SBFS files
-                     * @var Model $file
-                     */
-                    $file = $audio->getFile();
-
-                    if ($j === 0) {
-                        // output the default audio, and audio player
+                    $this->setVar($output);
+                    if ($audio->getStatus() == "completed") {
+                        if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                            $this->parse('audio_edit_block', 'audio_edit', true);
+                        } else {
+                            $this->setVar('audio_edit_block', '');
+                        }
+                        $this->parse('audio_list_block', 'audio_list', true);
+                    } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->setVar(
                             array(
-                                'DEFAULT_AUDIO_TITLE' => Scrub::text($file->getTitle()),
-                                'DEFAULT_AUDIO_ID' => $file->getId(),
+                                'AUDIO_LIST_STATUS' => $audio->getStatus(),
+                                'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
                             )
                         );
-                        $this->parse('default_audio_block', 'default_audio');
-                    }
-                    if (count($this->outputList) >= 1) {
-                        $output = array(
-                            'AUDIO_LIST_ID' => $file->getId(),
-                            'AUDIO_LIST_TITLE' => Scrub::text($file->getTitle()),
-                            'AUDIO_LIST_DURATION' => $audio->getDuration() >= 3600
-                                ? gmdate('H:i:s', $audio->getDuration())
-                                : gmdate('i:s', $audio->getDuration()),
-                            'AUDIO_LIST_COMMENT' => Scrub::text($file->getDescription()),
-                            'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'hidden' : '',
-                            'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
-                            'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
-                            'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                        );
-
-                        $this->setVar($output);
-                        if ($audio->getStatus() == "completed") {
-                            if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                                $this->parse('audio_edit_block', 'audio_edit', true);
-                            } else {
-                                $this->setVar('audio_edit_block', '');
-                            }
-                            $this->parse('audio_list_block', 'audio_list', true);
-                        } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                            $this->setVar(
-                                array(
-                                    'AUDIO_LIST_STATUS' => $audio->getStatus(),
-                                    'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
-                                )
-                            );
-                            $this->parse('audio_pending_list_block', 'audio_pending_list', true);
-                        }
+                        $this->parse('audio_pending_list_block', 'audio_pending_list', true);
                     }
                 }
-
-
-                //setup block for submission button
-                $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
-                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar("submit_file_block", "");
-                } else {
-                    $this->setVar('SOURCE_ID', $this->getSource()->getId());
-                    $this->parse("submit_file_block", "submit_file");
-                }
-
-                $this->parse('source_folder_exists_block','source_folder_exists');
             }
 
+
+            //setup block for submission button
+            $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("submit_file_block", "");
+            } else {
+                $this->setVar('SOURCE_ID', $this->getSource()->getId());
+                $this->parse("submit_file_block", "submit_file");
+            }
+
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;
