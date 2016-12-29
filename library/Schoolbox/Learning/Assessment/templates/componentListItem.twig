@@ -2,7 +2,7 @@
 
 {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
 {% if assessable is quiz %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.NgetQuizSummary', {assessmentId: assessable.id}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
 {% else %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
 {% endif %}
