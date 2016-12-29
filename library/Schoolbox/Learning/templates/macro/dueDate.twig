@@ -1,8 +1,7 @@
 {##
- # Display the due date for an assessment
+ # Display the due date for an assessment activity
  #
- # Will throw in a relative time for time remaining with a data-due-countdown attr
- # That can be used to attach miniCountdown and update on the page via JS
+ # TODO: attach some JS to the relative time to countdown to the due date
  #}
 {% macro dueDate(assessment, user) %}
 {% spaceless %}
@@ -12,7 +11,7 @@
         <span title="{{ assessment.dueAt.long }}">
             <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.getRelativeDay(true, true) }}</time>
             {% if assessment.dueAt.diffInDays(now) < 7 %}
-                <span> (<time datetime="{{ assessment.dueAt }}" data-due-countdown>{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)</span>
+                <span> (<time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)</span>
             {% endif %}
         </span>
     </span>
