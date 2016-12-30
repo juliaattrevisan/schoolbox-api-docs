@@ -50,39 +50,47 @@ class Browser extends Source\BrowserAbstract
      */
     public function getLearningAreas()
     {
-        if (count($savedAreas = $this->getSavedLearningAreas())) {
-            return $savedAreas;
-        }
+
         // Fetch a list of all standard documents.
         // Then, group by available education levels?
         $sparql = <<<SPARQL
 prefix asn: <http://purl.org/ASN/schema/core/>
 prefix dct: <http://purl.org/dc/terms/>
-SELECT * WHERE {
+SELECT *
+       WHERE {
     ?doc a asn:StandardDocument .
-    ?doc dct:description ?description .
     ?doc dct:source ?source .
     ?doc dct:modified ?modified .
     ?doc dct:subject ?subject .
     OPTIONAL { ?doc dct:abstract ?abstract } .
+    OPTIONAL { ?doc dct:description ?description } .
+    OPTIONAL { ?doc dct:title ?title . } .
 }
 SPARQL
         ;
         $models = array();
         foreach ($this->getClient()->query($sparql) as $row) {
-            $desc = $row->description->getValue();
-            if (!array_key_exists($desc, $models)) {
-                $modified = new Alaress_Date_Format($row->modified->getValue());
-                $area = new LearningArea\Model();
-                $area
-                    ->setSource($this->getSource())
-                    ->setName($desc)
-                    ->setCreatedAt($modified)
-                    ->setModifiedAt($modified)
-                    ->setReference($row->doc->getUri())
-                    ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
-                $models[$desc] = $area;
+            if(is_object($row->title)) {
+                $desc = $row->title->getValue();
             }
+            else if(is_object($row->description)) {
+                $desc = $row->description->getValue();
+            }
+            else {
+                continue;
+            }
+
+            $modified = new Alaress_Date_Format($row->modified->getValue());
+            $area = new LearningArea\Model();
+            $area
+                ->setSource($this->getSource())
+                ->setName($desc)
+                ->setCreatedAt($modified)
+                ->setModifiedAt($modified)
+                ->setReference($row->doc->getUri())
+                ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
+            $models[$desc] = $area;
+
             // Use an existing area if possible.
             // Otherwise, use a new one.
             // Build a description for this item, consisting of desc, abstracts
@@ -109,9 +117,6 @@ SPARQL
      */
     public function getLearningLevels()
     {
-        if (count($savedLevels = $this->getSavedLearningLevels())) {
-            return $savedLevels;
-        }
         // Fetch all unique learning levels from the curriculum here.
         // I'd like to fetch the label from the level document too, but I don't
         // know how.
@@ -180,9 +185,7 @@ SPARQL
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
-        if (count($savedOutcomes = $this->getSavedOutcomes($area, $level))) {
-            return $savedOutcomes;
-        }
+
         $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
@@ -190,10 +193,8 @@ SPARQL
         if (!count($curl->getErrors())) {
             $manifest = json_decode($curl->getResult());
             foreach ($manifest as $part) {
-                if ($part->dcterms_educationLevel->uri === $level->getReference()) {
-                    // This is the right year level within this learning area.
-                    // Build an outcome tree out of it.
-                    $collection->add($this->buildOutputTree($part));
+                if(($nodes = $this->buildOutputTree($part, $level)) != false) {
+                    $collection->add($nodes);
                 }
             }
         }
@@ -206,12 +207,34 @@ SPARQL
      * @param  object $jsonTree
      * @return Node\Model
      */
-    protected function buildOutputTree($jsonTree)
+    protected function buildOutputTree($jsonTree, $level)
     {
-        $node = $this->buildSingleNode($jsonTree);
+
+        if ($jsonTree->dcterms_educationLevel->uri === $level->getReference()) {
+            // This is the right year level within this learning area.
+            // Build an outcome tree out of it.
+            $node = $this->buildSingleNode($jsonTree);
+
+        }
+        else if(is_array($jsonTree->dcterms_educationLevel)) {
+            if(count(array_filter($jsonTree->dcterms_educationLevel, function($v) use ($level) {
+                    return $v->uri ==  $level->getReference(); }
+                ))>0 ) {
+                $node = $this->buildSingleNode($jsonTree);
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
         if ($jsonTree->children) {
             foreach ($jsonTree->children as $child) {
-                $node->addChild($this->buildOutputTree($child));
+                if(($nodes = $this->buildOutputTree($child, $level)) != false) {
+                    $node->addChild($nodes);
+                };
             }
         }
         return $node;
