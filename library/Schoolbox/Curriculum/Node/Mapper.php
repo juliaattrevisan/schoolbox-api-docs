@@ -134,7 +134,14 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      */
     public function saveTree(Model $model)
     {
-        $this->save($model);
+        try {
+            //Avoid saving duplicates if possible
+            $this->findOneByColumn('reference', $model->getReference());
+        }
+        catch(\Schoolbox\Mapper\Exception $e) {
+            $this->save($model);
+        }
+
         $i = 0;
         foreach ($model->getChildren() as $child) {
             $child

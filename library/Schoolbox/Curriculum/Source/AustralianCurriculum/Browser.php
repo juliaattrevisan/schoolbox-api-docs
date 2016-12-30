@@ -80,33 +80,21 @@ SPARQL
                 continue;
             }
 
+            try {
+                $area = $this->getAreaMapper()->findOneByColumn('reference', $row->doc->getUri());
+            } catch(\Schoolbox\Mapper\Exception $e) {
+                $area = new LearningArea\Model();
+            }
+
             $modified = new Alaress_Date_Format($row->modified->getValue());
-            $area = new LearningArea\Model();
             $area
                 ->setSource($this->getSource())
                 ->setName($desc)
                 ->setCreatedAt($modified)
                 ->setModifiedAt($modified)
-                ->setReference($row->doc->getUri())
-                ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
+                ->setReference($row->doc->getUri());
             $models[$desc] = $area;
 
-            // Use an existing area if possible.
-            // Otherwise, use a new one.
-            // Build a description for this item, consisting of desc, abstracts
-            // and the subject.
-            $abstract   = $row->abstract->getValue();
-            $titleParts = explode('/', $abstract);
-            $title      = array_pop($titleParts);
-            $desc       = $area->getDescription();
-            $area->setDescription(
-                sprintf(
-                    "%s\n<a href=\"%s\">%s</a>",
-                    $desc,
-                    htmlspecialchars($abstract, ENT_QUOTES),
-                    htmlspecialchars($title, ENT_QUOTES)
-                )
-            );
         }
         $collection = new Collection(array_values($models));
         return $collection;
@@ -135,10 +123,16 @@ SPARQL
         ;
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
-            $level = new LearningLevel\Model();
-            $level
-                ->setSource($this->getSource())
-                ->setReference($row->level->getUri());
+
+            try {
+                $level = $this->getLevelMapper()->findOneByColumn('reference', $row->level->getUri());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $level = new LearningLevel\Model();
+                $level
+                    ->setSource($this->getSource())
+                    ->setReference($row->level->getUri());
+            }
+
             $label    = null;
             $created  = null;
             $modified = null;
@@ -165,18 +159,22 @@ SPARQL
                     }
                 }
             }
-            if ($created) {
-                $level->setCreatedAt(new Alaress_Date_Format(new DateTime($created)));
-            }
-            if ($modified) {
-                $level->setModifiedAt(new Alaress_Date_Format(new DateTime($modified)));
-            }
+
             // No label - don't add
             if (isset($label)) {
+
                 $level->setName($label);
+                if ($created) {
+                    $level->setCreatedAt(new Alaress_Date_Format(new DateTime($created)));
+                }
+                if ($modified) {
+                    $level->setModifiedAt(new Alaress_Date_Format(new DateTime($modified)));
+                }
+
                 $collection->add($level);
             }
         }
+
         return $collection;
     }
 

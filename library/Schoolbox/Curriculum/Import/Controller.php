@@ -109,17 +109,23 @@ class Controller extends Base
         $data = array();
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
             /** @var Node\Model $rootNode */
-            $rootNode = $this->getNodeMapper()->createModel();
-            $rootNode
-                ->setLearningLevel($thisLevel)
-                ->setLearningArea($thisArea)
-                ->setName($post['name'])
-                ->setReference('')
-                ->setChildren($browser->getOutcomes($thisArea, $thisLevel));
+            try {
+                $rootNode = $this->getNodeMapper()->findOneByColumn('reference', $thisArea->getReference());
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                $rootNode = $this->getNodeMapper()->createModel();
+                $rootNode
+                    ->setLearningLevel($thisLevel)
+                    ->setLearningArea($thisArea)
+                    ->setName($thisArea->getName())
+                    ->setReference($thisArea->getReference());
+            }
+            $rootNode->setChildren($browser->getOutcomes($thisArea, $thisLevel));
             $this->getNodeMapper()->saveTree($rootNode);
             $outcomes = new Collection();
             $outcomes->add($rootNode);
             $data['outcomes'] = $outcomes;
+
         } else {
             $code = 400;
             $data['message'] = 'Area or level not found';
