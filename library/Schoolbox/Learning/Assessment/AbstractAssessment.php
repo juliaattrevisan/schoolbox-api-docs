@@ -64,9 +64,14 @@ abstract class AbstractAssessment implements IAssessable
     protected $closeAt;
 
     /**
-     * @var float
+     * @var int
      */
     protected $weight;
+
+    /**
+     * @var int
+     */
+    protected $duration;    
 
     /**
      * A Collection of Participant instances
@@ -675,6 +680,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     * @return $this
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
         return $this;
     }
 

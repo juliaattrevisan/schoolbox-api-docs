@@ -390,6 +390,17 @@ interface IAssessable extends ISoftDeletable
     public function setCloseAt(\Alaress_Date_Format $closeAt);
 
     /**
+     * @return int
+     */
+    public function getDuration();
+
+    /**
+     * @param int $duration
+     * @return $this
+     */
+    public function setDuration($duration);
+
+    /**
      * Get the weight
      *
      * A multiplier applied to a Normalised Mark
