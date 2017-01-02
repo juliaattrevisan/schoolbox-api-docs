@@ -71,7 +71,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var int
      */
-    protected $duration;    
+    protected $duration;
 
     /**
      * A Collection of Participant instances

@@ -131,6 +131,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     /**
      * @var int
      */
+    protected $duration = 0;
+
+    /**
+     * @var int
+     */
     protected $max_mark;
 
     /**
@@ -734,6 +739,24 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     * @return $this
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
         return $this;
     }
 
