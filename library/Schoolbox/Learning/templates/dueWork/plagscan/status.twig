@@ -4,11 +4,14 @@
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
             <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
-            <span class="meta" title="Plagiarism check completed.">plagiarised</span>
+            <span title="Plagiarism check completed.">plagiarised</span>
         {% elseif currentFile.plagscan.isProcessing %}
-            <span class="meta" title="Plagiarism check is currently processing - check back again soon.">Plagiarism check processing</span>
+            <span title="Plagiarism check is currently processing - check back again soon.">Plagiarism check processing</span>
         {% elseif currentFile.plagscan.isPending %}
-            <span class="meta" title="Plagiarism check is pending.">Plagiarism check pending</span>
+            <span title="Plagiarism check is pending.">Plagiarism check pending</span>
+        {% elseif currentFile.plagscan.isUnscannable %}
+            <span title="Plagiarism check is unavailable.">Plagiarism check unavailable</span>
+            <span class='hint has-tip tip-top' title="Plagiarism check is unavailable. This filetype cannot be checked for plagiarism." data-tooltip="">?</span>
         {% endif %}
     </p>
 {% endif %}

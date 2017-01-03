@@ -122,11 +122,15 @@ class Model
     /**
      * This document is unplaggable
      *
+     * Documents which can't be plagscanned won't have a record in the db
+     * Because of hydration, it will be attached with an empty Plagscan/Model
+     * instance - so check for legacy STATUS_UNSCANNABLE or null
+     *
      * @return bool
      */
     public function isUnscannable()
     {
-        return $this->getStatus() == self::STATUS_UNSCANNABLE;
+        return $this->getStatus() == self::STATUS_UNSCANNABLE || $this->getStatus() == null;
     }
 
     /* Getters/Setters
