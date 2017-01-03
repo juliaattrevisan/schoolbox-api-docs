@@ -6,25 +6,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-{# Conditional bread?? -_-
- #}
-{% if assessment.context is project %}
-    {% set nodes = [
-        ['Learning', routeLookup('learning.getClasses')],
-        ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.folder.id})],
-        [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
-        [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Inline Grader']
-    ] %}
-{% else %}
-    {% set nodes = [
-        ['Learning', routeLookup('learning.getClasses')],
-        ['Markbook', routeLookup('learningMarkbook.getMarkbook', {classId: assessment.context.id})],
-        [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-        ['Inline Grader'],
-    ] %}
-{% endif %}
-
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
