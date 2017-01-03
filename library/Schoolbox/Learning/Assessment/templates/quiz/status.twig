@@ -17,15 +17,9 @@
 
 {% block headerOptions %}
 
-    <li class="separator">Grading</li>
     <li>
         <a class="icon-class-list" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}">Review horizontally</a>
     </li>
-
-    {% set viewRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbook', {class: assessment.context, classId: assessment.context.id}) %}
-    {% if viewRoute %}
-        <li><a class="icon-approve" href="{{ viewRoute }}">Markbook</a></li>
-    {% endif %}
 
     <li class="separator">Bulk Actions</li>
     <li>

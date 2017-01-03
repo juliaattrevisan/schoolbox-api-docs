@@ -48,12 +48,13 @@ class Factory
      * determine a meaningful trail of crumbs
      *
      * @param IAssessable $assessment
+     * @param User $user
      * @return Collection
      */
-    public function produceFromAssessment(IAssessable $assessment)
+    public function produceFromAssessment(IAssessable $assessment, User $user)
     {
         $trail = new Collection;
-        $trail->add(['Learning'], $this->router->generate('learning.getClasses'));
+        $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
         $context = $assessment->getContext();
 
@@ -62,6 +63,18 @@ class Factory
         }
         elseif ($context instanceof UnitSpecification) {
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
+        }
+        elseif ($context instanceof UnitImplementation) {
+            if($user->getRole()->isStaff()) {
+                $path = $this->router->generate('learningMarkbook.getMarkbook', ['class' => $context->getFolder(), 'classId' => $context->getFolder()->getId()]);
+            }
+            else if( $user->getRole()->isStudent() ){
+                $path = "/homepage/{$context->getFolder()->getId()}";
+            } else {
+                $path = '#';
+            }
+            $trail->add([$context->getFolder()->getTitle(), $path]);
+            $path = "/homepage/{$context->getFolder()->getId()}";
         }
         else {
             $path = "/homepage/{$context->getFolder()->getId()}";
