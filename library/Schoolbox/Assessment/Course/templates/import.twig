@@ -184,7 +184,6 @@ Usages:
                         } else {
                             var dateRole = 'publish_date';
                         }
-                        console.log('input[data-role="' + dateRole + '"][data-assessment-id="' + lessonId + '"]');
                         var otherDate = $('input[data-role="' + dateRole + '"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {
                             required: true,
