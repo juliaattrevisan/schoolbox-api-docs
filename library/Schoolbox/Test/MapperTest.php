@@ -8,9 +8,6 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox\Test\TestCase;
-use Schoolbox\Test\TestModel;
-use Schoolbox\Test\TestMapper;
 
 class MapperTest extends TestCase {
 
@@ -21,9 +18,14 @@ class MapperTest extends TestCase {
 	 */
 	protected $object;
 
+	/** @var MockDatabase */
+	protected $db;
+
 	public function setUp() {
 		parent::setUp();
-		$this->object = new TestMapper();
+		$this->object = new TestMapper($this);
+		$this->db = new MockDatabase($this);
+        $this->object->setDatabase($this->db);
 	}
 
 	/**
@@ -179,4 +181,58 @@ class MapperTest extends TestCase {
 	public function testGetJoin() {
 		$this->assertInstanceOf('Schoolbox\\Test\\TestMapper', $this->object->getJoinMapper('parent'));
 	}
+
+
+    /**
+     * If an object is retrieved more than once from DB, its result should be cached.
+     * The glaring exception to this is when you're saving and retrieving the previous version of the object.
+     *
+     * @dataProvider getHydrateData
+     * @param array    $expected
+     * @param array    $data
+     * @param string   $alias
+     * @param callable $callback
+     */
+	public function testObjectIdempotence($expected, $data, $alias = null, $callback = null)
+    {
+        if (!empty($alias)) {
+            $this->markTestSkipped("Cannot test idempotence with an alias expected");
+        }
+
+        $id = isset($data['storage_id']) ? $data['storage_id'] : ( isset($data['i.storage_id']) ? $data['i.storage_id'] : null );
+
+        $models = [];
+
+        for ($i = 0; $i < 2; ++$i) {
+            $this->db->setNextFetch($data);
+            $models[] = $this->object->findById($id);
+        }
+
+        // assert that the two objects point to the same memory space
+        $this->assertSame($models[0], $models[1]);
+
+        // reset the statement, because the save() method will do a fetch to retrieve "previous"
+        $this->db->setNextFetch($data);
+
+        // "persist" our first model
+        $ids = $this->object->save($models[0]);
+
+        // ensure (strictly) that we did not receive FALSE back from the save operation
+        $this->assertNotSame(false, $ids);
+    }
+
+
+    /**
+     * Called from the Mapper::postSave() callback
+     *
+     * @param TestModel $model
+     * @param TestModel $previous
+     */
+    public function internalTestNotSame(TestModel $model, TestModel $previous = null)
+    {
+        // we don't care about the actual content of these two objects, but if
+        // these two variables point to the same memory address, this test must fail
+        $this->assertNotSame($model, $previous);
+    }
+
 }
