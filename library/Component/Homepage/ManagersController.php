@@ -43,8 +43,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $userMapper = new UserMapper();
         $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), Array ('lastname' => 'asc'));
 
-        $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
-
         if (count($managerList) == 0) {
 
             $this->setBlock($templateHandle, 'members', 'members_block');
@@ -53,6 +51,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
             $this->setBlock('empty_state', 'empty_not_group', 'empty_not_group_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
+
+            $folderId = $this->getSource()->getFolder()->getId();
 
             $this->setVar([
                 'members_block' => '',
@@ -63,8 +63,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group-managers',
                 'ALT_COMPONENT' => 'class teachers',
-                'CREATE_GROUP_MESSAGE' => 'to give specific users group management permissions and display them in this component.',
-                'READ_ONLY_MESSAGE' => 'There are no group managers set at this time.'
+                'READ_ONLY_MESSAGE' => 'There are no group managers set at this time.',
+                'NOT_GROUP_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group managers</a>  to convert this page to a group, give specific users group management permissions, and display them in this component.',
+                'EMPTY_MEMBERS_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group managers</a> to give specific users group management permissions and display them in this component.',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -90,12 +91,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
-            $this->setVar('people_hidden_block', '');
-            $this->setVar('MAX_MEMBERS', self::MAX_MANAGERS);
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+                'people_hidden_block' => '',
+                'MAX_MEMBERS' => self::MAX_MANAGERS,
+            ]);
+
 
             /* Display options
              */

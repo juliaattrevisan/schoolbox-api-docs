@@ -43,8 +43,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         $userMapper = new UserMapper();
         $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), Array('lastname' => 'asc'));
 
-        $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
-
         if (count($userList) == 0) {
 
             $this->setBlock($templateHandle, 'members', 'members_block');
@@ -53,6 +51,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
             $this->setBlock('empty_state', 'empty_not_group', 'empty_not_group_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
+
+            $folderId = $this->getSource()->getFolder()->getId();
 
             $this->setVar([
                 'members_block' => '',
@@ -63,8 +63,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group',
                 'ALT_COMPONENT' => 'class list',
-                'CREATE_GROUP_MESSAGE' => 'to give specific users group membership to this page and display them in this component.',
-                'READ_ONLY_MESSAGE' => 'There are no group members added at this time.'
+                'READ_ONLY_MESSAGE' => 'There are no group members added at this time.',
+                'NOT_GROUP_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group members</a> to convert this page to a group to give specific users group membership to this page and display them in this component.',
+                'EMPTY_MEMBERS_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group members</a> to give specific users group membership to this page and display them in this component.',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -90,12 +91,14 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
-            $this->setVar('people_hidden_block', '');
-            $this->setVar('MAX_MEMBERS', self::MAX_MEMBERS);
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+                'people_hidden_block' => '',
+                'MAX_MEMBERS' => self::MAX_MEMBERS,
+            ]);
 
             /* Display options
              */
