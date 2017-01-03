@@ -492,48 +492,50 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-     * Merges contents of another collection with this one - appends all
-     * elements in the other collection to this one.
+     * Returns a new Collection containing the other collection's items merged to this one.
+     *
+     * Does NOT mutate either this or the other Collection.
      *
      * @param Collection $other
-     *
-     * @return $this
+     * @return static
      */
     public function merge(Collection $other)
     {
-        $this->setStack(array_merge($this->getStack(), $other->getStack()));
-        return $this;
+        $merged = $this->emptyClone($this);
+        $merged->setStack(array_merge($this->getStack(), $other->getStack()));
+        return $merged;
     }
 
 
     /**
-     * Merges contents of another collection with this one where duplicate elements
-     * are ignored. Preference is given to the collection on which the method is called.
+     * Returns a new collection containing this collection's items, plus any
+     * items from in the other collection not found in this collection.
      *
      * @param Collection $other - the second collection
      * @param string $column - a column on which to test uniqueness (ie. an ID)
      *                            If omitted, the entire object will be tested
-     * @return $this
+     * @return Collection
      */
     public function mergeUnique(Collection $other, $column = null)
     {
+        $merged = clone $this;
         if ($column) {
-            $getColumn = $this->getGetMethodName($column);
-            $testValues = $this->getColumnValues($column);
+            $getColumn = $other->getGetMethodName($column);
+            $testValues = $other->getColumnValues($column);
             foreach ($other as $item) {
                 $value = $item->$getColumn();
                 if (!in_array($value, $testValues)) {
-                    $this->add($item);
+                    $merged->add($item);
                 }
             }
         } else {
             foreach ($other as $item) {
-                if (!in_array($item, $this->stack)) {
-                    $this->add($item);
+                if (!in_array($item, $merged->stack)) {
+                    $merged->add($item);
                 }
             }
         }
-        return $this;
+        return $merged;
     }
 
     /**
