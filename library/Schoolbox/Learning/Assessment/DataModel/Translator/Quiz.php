@@ -58,7 +58,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
                 ->setMaxAttempts($model->getMaxAttempts())
                 ->setMarkVisibility($model->getMarkVisibility())
-                ->setDuration(is_null($model->getDuration()) ? 0 : $model->getDuration())
+                ->setDuration($model->getDuration())
                 ->setCompletionMessage($model->getCompletionMessage())
                 ->setCreator($model->getUser())
             ;
