@@ -794,7 +794,8 @@ class Controller extends Base\Base
 
                         // If this is a project we need to store the dates for each assessment inside it
 
-                        if (!$aData['impl_id'] && $assessmentImpl instanceof Project){
+                        if ($assessmentImpl instanceof Project){
+
                             $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
 
                             foreach ($pData as $assessmentId => $aData) {
