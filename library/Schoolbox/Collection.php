@@ -492,7 +492,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-     * Returns a new Collection containing the other collection's items merged to this one.
+     * Returns a new Collection containing the other collection's items merged with this one's.
      *
      * Does NOT mutate either this or the other Collection.
      *
@@ -509,7 +509,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
     /**
      * Returns a new collection containing this collection's items, plus any
-     * items from in the other collection not found in this collection.
+     * items from the other collection not found in this collection.
      *
      * @param Collection $other - the second collection
      * @param string $column - a column on which to test uniqueness (ie. an ID)

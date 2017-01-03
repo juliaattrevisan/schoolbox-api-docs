@@ -67,7 +67,7 @@ class Conversation {
 		 * merely acting as observers of the dialog, so they are excluded from this
 		 * list of participants
 		 */
-		$this->participants = (new Collection())
+        $this->participants = (new Collection())
             ->add($student)
             ->merge($student->getParents())
             ->merge($category->getTeachers());
