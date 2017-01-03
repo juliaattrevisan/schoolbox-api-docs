@@ -192,19 +192,19 @@ abstract class Mapper implements IMapper, Serializable
     protected $notif;
 
     /** @var array */
-    protected $sessionData;
+    protected $sessionData = [];
 
     /** @var Cache|GenericCollection[] */
-    private $selectCache = [];
+    private $selectCache;
 
     /** @var Cache */
-    private $joinMapperCache = [];
+    private $joinMapperCache;
 
     /** @var Cache */
-    protected $foreignBodyCache = [];
+    protected $foreignBodyCache;
 
     /** @var Cache */
-    protected $localBodyCache = [];
+    protected $localBodyCache;
 
     /** @var IMonitor */
     protected $monitor;
