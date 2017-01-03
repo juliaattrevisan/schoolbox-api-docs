@@ -12,7 +12,7 @@ use Calendar\Event\Type\Submission\Event;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\Access;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {

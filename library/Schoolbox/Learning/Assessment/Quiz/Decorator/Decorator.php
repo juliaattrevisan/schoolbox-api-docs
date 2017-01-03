@@ -39,8 +39,8 @@ class Decorator implements DecoratorInterface
          */
         if (!$this->getDurationHours() && !$this->getDurationMinutes()) {
             $duration = Assess_Main::UNLIMITED_DURATION;
-        }
-        else {
+
+        } else {
             $duration = (3600 * $this->getDurationHours()) + (60 * $this->getDurationMinutes());
         }
 

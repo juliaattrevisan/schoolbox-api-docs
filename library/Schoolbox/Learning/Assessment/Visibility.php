@@ -58,9 +58,8 @@ class Visibility
 
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
             return true;
-        }
-        else if ($folderAccessLevel == UserAccess::ACCESS_READ) {
 
+        } elseif ($folderAccessLevel == UserAccess::ACCESS_READ) {
             /* Unpublished IAssessables don't show
              */
             if ($assessment->getPublishAt()->isFuture()) {
