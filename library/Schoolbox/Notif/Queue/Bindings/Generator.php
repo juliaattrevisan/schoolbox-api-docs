@@ -288,9 +288,9 @@ class Generator implements GeneratorInterface
         }
 
         // combine with all other services user has access to
-        $accessList->mergeUnique($user->getAccessList());
+        $accessList = $accessList->mergeUnique($user->getAccessList());
 
-        foreach ($user->getAccessList() as $access) {
+        foreach ($accessList as $access) {
             $baseBinding = $access->getService() . '.' . $access->getServiceIdentifier();
             $accessLevel = $access->getAccessLevel();
             if ($accessLevel >= UserAccess::ACCESS_FULL) {
