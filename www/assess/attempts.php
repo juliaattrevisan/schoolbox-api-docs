@@ -158,7 +158,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'Y-m-d H:i:s');
             $reviewed = $reviewedAt->getShort();
 
-            if ($available && $canReview) {
+            if ($available && ($canReview || $canStudentReview)) {
                 $marks = round($currentAttempt['totalMarks'],2).' / '.round($available);
             }
             else {
@@ -172,7 +172,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
             $reviewed = 'Not reviewed ('.(100 - round(($valueUnmarkedQuestions / $available ) * 100)).'% graded)';
 
-            if($canReview) {
+            if($canReview || $canStudentReview) {
                 $marks = round($currentAttempt['totalMarks']).'/'.round($available);
             }
         }
