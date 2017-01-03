@@ -105,6 +105,10 @@ class MockDatabase implements IDatabase
                                  }
                                  return null;
                              }));
+
+        $this->mock_statement->expects($this->test_case->any())
+                             ->method('execute')
+                             ->will($this->test_case->returnValue(true));
     }
 
     /**
