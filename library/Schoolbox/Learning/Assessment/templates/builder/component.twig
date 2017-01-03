@@ -7,49 +7,55 @@ $data = [
 ];
 #}
 
-<script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
-<script type="text/javascript">
-    $(function () {
-        $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
-    });
-</script>
+{% set activityUrl = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) %}
 
-{% if breadcrumbs | length %}
-<ul class="breadcrumb">
-    <li>
-        {% for node in breadcrumbs %}
-            <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
-        {% endfor %}
-    </li>
-</ul>
-{% endif %}
+{% if unitSpec.assessables | length %}
 
-<div data-unit-spec="{{ unitSpec.id }}">
-    <ul class="information-list sortable"
-        data-sortable
-        data-assessment-list
-        data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
-        {% for assessment in unitSpec.assessables %}
-            {% include '@learningAssessment/builder/assessment.twig' with {
+    <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder();
+        });
+    </script>
+
+    {% if breadcrumbs | length %}
+        <ul class="breadcrumb">
+            <li>
+                {% for node in breadcrumbs %}
+                    <a href="/homepage/{{ node.id }}/">{{ node.name }}</a>
+                {% endfor %}
+            </li>
+        </ul>
+    {% endif %}
+
+    <div data-unit-spec="{{ unitSpec.id }}">
+        <ul class="information-list sortable"
+            data-sortable
+            data-assessment-list
+            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+            {% for assessment in unitSpec.assessables %}
+                {% include '@learningAssessment/builder/assessment.twig' with {
                 '_writable': true,
                 assessment:  assessment,
                 returnUrl: encodedReturnUrl,
                 returnUrlName: returnUrlName
-            } only %}
-        {% else %}
-            <li>
-                <div class="empty-state">
-                    <i class="icon-course"></i>
-                    <p>No coursework in this unit yet.</p>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
+                } only %}
+            {% endfor %}
+        </ul>
+    </div>
 
-<div class="component-action">
-    <section>
-        {% set url = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id}) %}
-        <a class="button" href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Create a new activity">Create Activity</a>
-    </section>
-</div>
+    <div class="component-action">
+        <section>
+            <a class="button" href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Create a new activity">Create Activity</a>
+        </section>
+    </div>
+
+
+{% else %}
+
+    <div class="empty-state">
+        <i class="icon-course"></i>
+        <p><a href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}">Create a task, due work, quiz, or project</a> for this unit that you can import into classes and reuse again.</p>
+    </div>
+
+{% endif %}
