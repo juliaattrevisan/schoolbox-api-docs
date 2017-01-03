@@ -87,6 +87,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
     foreach ($allAttempts as $currentAttempt) {
         $i++;
         $canReview = false;
+        $finishDateValue = null;
+        $timeTaken = null;
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
@@ -173,8 +175,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
         if ($currentAttempt['finish']) {
             if ($canReview) {
                 $this->setVar(array(
-                        'attempt_resume_block' => ''
-                    ));
+                    'attempt_resume_block' => ''
+                ));
 
                 $this->parse('attempt_review_block', 'attempt_review');
             }
