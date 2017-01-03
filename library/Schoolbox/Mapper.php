@@ -223,7 +223,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty(self::$perfmon)) {
             // we want this to exist once ever, and only functional in development
-            self::$perfmon = INSTANCE_ID == 'vagrantx'
+            self::$perfmon = (INSTANCE_ID == 'vagrantx' && count($_REQUEST))
                 ? new DevMonitor(DebugBar::getInstance())
                 : new LiveMonitor()
             ;
