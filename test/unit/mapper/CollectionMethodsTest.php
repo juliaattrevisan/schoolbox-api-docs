@@ -1,0 +1,324 @@
+<?php
+/**
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+use \Schoolbox\Collection;
+
+/**
+ * Logic tests for various Collection methods
+ */
+class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider provider_slice_once
+     * @param Collection $input
+     * @param Collection $expected
+     * @param int        $offset
+     * @param int        $count
+     * @param bool       $preserveKeys
+     */
+    public function test_slice_once(Collection $input, Collection $expected, $offset, $count, $preserveKeys)
+    {
+        $beforeSlice = new Collection($input->getAll());
+
+        $actual = $input->slice($offset, $count, $preserveKeys);
+        $this->assertEquals($expected->getAll(), $actual->getAll());
+
+        // Ensure we didn't mutate operand collections
+        $this->assertEquals($beforeSlice->getAll(), $input->getAll());
+    }
+
+    /**
+     * @dataProvider provider_slice_once
+     * @param Collection $input
+     * @param Collection $expected
+     * @param int        $offset
+     * @param int        $count
+     * @param bool       $preserveKeys
+     */
+    public function test_slice_invert_key_preservation(Collection $input, Collection $expected, $offset, $count, $preserveKeys)
+    {
+        // Ignore 0 length arrays or arrays starting from first index (these do not give different keys)
+        if(!$offset || !$count){
+            return;
+        }
+        $beforeSlice = new Collection($input->getAll());
+        $actual = $input->slice($offset, $count, !$preserveKeys);
+        $this->assertNotEquals($expected->getAll(), $actual->getAll());
+
+        // Ensure we didn't mutate operand collections
+        $this->assertEquals($beforeSlice->getAll(), $input->getAll());
+    }
+
+    /**
+     * Ensure result is correct and operand collections not mutated
+     *
+     * @dataProvider provider_slice_multiple
+     * @param Collection $input
+     * @param Collection[] $expectedSlices
+     * @param int[] $offsets
+     * @param int[] $counts
+     */
+    public function test_slice_multi(Collection $input, $expectedSlices, $offsets, $counts){
+
+        // Ensure our test data is correct
+        if(count($expectedSlices) != count($offsets)){
+            throw new LogicException("Argument count mismatch.");
+        }
+
+        $countSlices = count($expectedSlices);
+
+        $beforeSlice = $input->getAll();
+
+        for($i = 0; $i < $countSlices; $i++){
+            $expected = $expectedSlices[$i];
+            $offset   = $offsets[$i];
+            $count    = isset($counts[$i]) ? $counts[$i] : null;
+
+            $actual = $input->slice($offset, $count);
+            $this->assertEquals($expected->getAll(), $actual->getAll());
+        }
+
+        $afterSlice = $input->getAll();
+        $this->assertEquals($beforeSlice, $afterSlice);
+    }
+
+    /**
+     * Ensure result is correct and operand collections not mutated
+     *
+     * @dataProvider provider_merge
+     * @param Collection[] $inputs
+     * @param Collection $expected
+     */
+    public function test_merge($inputs, Collection $expected)
+    {
+        $beforeMerge = [];
+        foreach($inputs as $input){
+            $beforeMerge[] = $input->getAll();
+        }
+
+        $actual = new Collection();
+        foreach($inputs as $input){
+            $actual = $actual->merge($input);
+        }
+
+        $this->assertEquals($expected, $actual);
+
+        for($i = 0; $i < count($inputs); $i++){
+            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+        }
+    }
+
+    /**
+     * Ensure result is correct and operand collections not mutated
+     *
+     * @dataProvider provider_merge_unique
+     * @param Collection[] $inputs
+     * @param Collection $expected
+     */
+    public function test_merge_unique($inputs, Collection $expected)
+    {
+        $beforeMerge = [];
+        foreach($inputs as $input){
+            $beforeMerge[] = $input->getAll();
+        }
+
+        $actual = new Collection();
+        foreach($inputs as $input){
+            $actual = $actual->mergeUnique($input);
+        }
+
+        $this->assertEquals($expected->getAll(), $actual->getAll());
+
+        for($i = 0; $i < count($inputs); $i++){
+            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+        }
+    }
+
+    /**
+     * Ensure result is correct and operand collections not mutated
+     *
+     * @dataProvider provider_merge
+     * @param Collection[] $inputs
+     * @param Collection $expected
+     */
+    public function test_merge_not_unique($inputs, Collection $expected)
+    {
+        $beforeMerge = [];
+        foreach($inputs as $input){
+            $beforeMerge[] = $input->getAll();
+        }
+
+        $actual = new Collection();
+        foreach($inputs as $input){
+            $actual = $actual->mergeUnique($input);
+        }
+
+        $this->assertNotEquals($expected->getAll(), $actual->getAll());
+
+        for($i = 0; $i < count($inputs); $i++){
+            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+        }
+    }
+
+    /**
+     * Limit SHOULD mutate the collection
+     *
+     * @dataProvider provider_limit
+     * @param Collection $input
+     * @param Collection $expected
+     * @param int        $offset
+     * @param int        $count
+     */
+    public function test_limit(Collection $input, Collection $expected, $offset, $count)
+    {
+        $beforeLimit = $input->getAll();
+
+        $actual = $input->limit($offset, $count);
+
+        $message = "Failed asserting that two arrays are equal. \$offset: $offset, \$count: $count";
+
+        $this->assertEquals($expected->getAll(), $actual->getAll(), $message);
+
+        $this->assertNotEquals($beforeLimit, $input->getAll());
+    }
+
+    // ============= Data Providers =============
+
+    public function provider_limit()
+    {
+        $array = [0,1,2,3,4,5,6,7,8,9];
+        $data = [];
+
+        for($i = 0; $i < 9; $i++){
+            for($j = 0; $j < count($array) - $i; $j++ ){
+                $data[] = [new Collection($array), new Collection(array_slice($array, $i, $j)), $i, $j];
+            }
+        }
+
+        return $data;
+    }
+
+    public function provider_merge()
+    {
+        $data = [];
+
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([1]),
+                new Collection([1])
+            ],
+            new Collection([1,1]),
+        ];
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([1]),
+                new Collection([1,2,3,4])
+            ],
+            new Collection([1,1,2,3,4]),
+        ];
+        return $data;
+    }
+
+    public function provider_merge_unique()
+    {
+        $data = [];
+
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([1]),
+                new Collection([1])
+            ],
+            new Collection([1]),
+        ];
+        $data[] = [
+            [
+                new Collection([]),
+                new Collection([1]),
+                new Collection([1,2,3,4])
+            ],
+            new Collection([1,2,3,4]),
+        ];
+        return $data;
+    }
+
+    public function provider_slice_once()
+    {
+        $array = [1,2,3,4,5,6,7,8,9];
+        $input = new Collection($array);
+        $data = [];
+
+        for($i = 0; $i < 9; $i++){
+            for($j = 0; $j < count($array) - $i; $j++ ){
+                $data[] = [$input, new Collection(array_slice($array, $i, $j, true)), $i, $j, true];
+                $data[] = [$input, new Collection(array_slice($array, $i, $j, false)), $i, $j, false];
+            }
+        }
+
+        return $data;
+    }
+
+    public function provider_slice_multiple()
+    {
+        $array = [1,2,3,4,5,6,7,8,9];
+        $input = new Collection($array);
+        $data = [];
+
+        $data[] = [
+            $input,
+            [
+                new Collection([1]),
+                new Collection([2]),
+            ],
+            [0,1],
+            [1,1]
+        ];
+
+        $data[] = [
+            $input,
+            [
+                new Collection([1,2,3,4]),
+                new Collection([2,3,4,5]),
+            ],
+            [0,1],
+            [4,4],
+        ];
+
+        $data[] = [
+            $input,
+            [
+                new Collection([1,2,3,4]),
+                new Collection([5,6,7,8,9]),
+            ],
+            [0,4],
+            [4],
+        ];
+
+        $data[] = [
+            $input,
+            [
+                new Collection([1,2,3,4]),
+                new Collection([5,6,7,8,9]),
+            ],
+            [0,4],
+            [4, null],
+        ];
+
+        $data[] = [
+            $input,
+            [
+                new Collection([1,2,3,4]),
+                new Collection([5,6,7,8,9]),
+            ],
+            [0,4],
+            [4, PHP_INT_MAX],
+        ];
+        return $data;
+    }
+}
