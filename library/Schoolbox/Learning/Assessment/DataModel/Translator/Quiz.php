@@ -37,7 +37,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setAnonymousResult(false)
                 ->setUser($assessment->getCreator())
                 ->setCompletionMessage($assessment->getCompletionMessage())
-                ->setDuration($assessment->getDuration())
+                ->setDuration(is_null($assessment->getDuration()) ? 0 : $assessment->getDuration())
                 ->setMaxAttempts($assessment->getMaxAttempts())
                 ->setMarkVisibility($assessment->getMarkVisibility())
             ;
@@ -58,7 +58,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
                 ->setMaxAttempts($model->getMaxAttempts())
                 ->setMarkVisibility($model->getMarkVisibility())
-                ->setDuration($model->getDuration())
+                ->setDuration(is_null($model->getDuration()) ? 0 : $model->getDuration())
                 ->setCompletionMessage($model->getCompletionMessage())
                 ->setCreator($model->getUser())
             ;
