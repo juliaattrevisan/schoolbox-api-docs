@@ -30,12 +30,13 @@
 
                 <div class="empty-state">
                     <i class="icon-image-slideshow"></i>
-                    <p>No images available!</p>
 
-                    <!-- BEGIN empty_modify -->
-                    <p>
-                        <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}">Post an image</a> or drag one onto this component
-                    </p>
+                    <!-- BEGIN empty_read -->
+                    <p>There are no images to view at this time.</p>
+                    <!-- END empty_read -->
+
+                    <!-- BEGIN empty_write -->
+                    <p><a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}">Post an image</a> or drag and drop multiple images on this component to display as a slideshow.</p>
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
@@ -71,7 +72,7 @@
                             }
                         });
                     </script>
-                    <!-- END empty_modify -->
+                    <!-- END empty_write -->
                 </div>
 
             </div>
