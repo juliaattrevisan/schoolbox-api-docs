@@ -462,7 +462,10 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Limits the collection by count and offset. @see array_slice()
+     * Limits the collection by offset and count. @see array_slice()
+     *
+     * DOES mutate the collection you call this on.
+     * Does NOT preserve keys.
      *
      * @param int $offset
      * @param int $count
@@ -739,7 +742,9 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Slice this collection to a specified size, optionally with an offset
+     * Returns a slice of this collection from the specified offset, length optionally specified.
+     *
+     * Does NOT mutate the original, enabling the caller to cut multiple slices from a Collection.
      *
      * @param int $offset
      * @param int $count
@@ -748,7 +753,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function slice($offset, $count = null, $preserve_keys = false)
     {
-        $copy = clone $this;
+        $copy = $this->emptyClone($this);
         $copy->setStack(array_slice($copy->stack, $offset, $count, $preserve_keys));
         return $copy;
     }
