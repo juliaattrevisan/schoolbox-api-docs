@@ -83,7 +83,6 @@
         <ul data-dropdown-content class="f-dropdown" id="options-task{{ task.id }}">
             {% if task is quiz %}
             <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}" class="icon-progress">View Results</a></li>
-            <li><a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: task.id, userId: user.id}) }}" class="icon-quiz">Previous Attempts</a></li>
             {% endif %}
             {% if task is dueWork %}
             <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: task.id}) }}" class="icon-progress">View Results</a></li>
