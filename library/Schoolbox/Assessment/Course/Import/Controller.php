@@ -759,11 +759,42 @@ class Controller extends Base\Base
                             }
                             $assessmentMapperProxy->save($assessmentImpl);
 
-                            // Did we just clone a Quiz?
-                            if (!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable) {
-                                /** @var Quiz $quizSpec */
-                                $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
-                                $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
+                        // Did we just clone a Project? If so we need to store the dates for each assessment inside it
+                        if ($assessmentImpl instanceof Project){
+                            $projectAssessables = $assessmentImpl->getAssessables();
+                            $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
+
+                            foreach ($pData as $specId => $paData) {
+                                try {
+                                    /** @var Project $assessmentImpl */
+
+                                    foreach ($projectAssessables as $assessableCurrent) {
+                                        if ($assessableCurrent->getSpecificationAssessment()->getId() == $specId) {
+                                            // Set/Update Dates
+                                            foreach ($paData['dates'] as $property => $localShort) {
+                                                $method = "set{$property}At";
+                                                if (!method_exists($assessmentImpl, $method)) {
+                                                    $this->sendError("Invalid date property: $property");
+                                                    return;
+                                                }
+                                                $assessableCurrent->$method(\Alaress_Date_Format::newLocalShort($localShort));
+                                            }
+                                            $assessmentMapperProxy->save($assessableCurrent);
+                                            break;
+                                        }
+                                    }
+
+                                } catch (MapperException $e) {
+                                    // Can't see how we would ever end up here, but I'm sure stranger things have happened... like... Donald Trump?
+                                }
+                            }
+                        }
+
+                        // Did we just clone a Quiz?
+                        if(!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable){
+                            /** @var Quiz $quizSpec */
+                            $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
+                            $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
 
                                 foreach ($quizSpec->getSections() as $section) {
                                     $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
@@ -788,35 +819,6 @@ class Controller extends Base\Base
                                         }
 
                                     }
-                                }
-                            }
-                        }
-
-                        // If this is a project we need to store the dates for each assessment inside it
-
-                        if ($assessmentImpl instanceof Project){
-
-                            $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
-
-                            foreach ($pData as $assessmentId => $aData) {
-
-                                try {
-                                    $assessmentImpl = $assessmentMapperProxy->findById($assessmentId);
-                                    // Set/Update Dates
-                                    foreach ($aData['dates'] as $property => $localShort) {
-                                        $method = "set{$property}At";
-                                        if (!method_exists($assessmentImpl, $method)) {
-                                            $this->sendError("Invalid date property: $property");
-                                            return;
-                                        }
-                                        $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
-                                    }
-
-                                    $assessmentMapperProxy->save($assessmentImpl);
-
-                                } catch (MapperException $e) {
-
-                                    // Can't see how we would ever end up here, but I'm sure stranger things have happened... like... Donald Trump?
                                 }
                             }
                         }
