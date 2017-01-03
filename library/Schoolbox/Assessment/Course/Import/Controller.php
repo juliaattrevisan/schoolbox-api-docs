@@ -764,28 +764,22 @@ class Controller extends Base\Base
                             $projectAssessables = $assessmentImpl->getAssessables();
                             $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
 
-                            foreach ($pData as $specId => $paData) {
-                                try {
-                                    /** @var Project $assessmentImpl */
+                            foreach ($projectAssessables as $assessableCurrent) {
 
-                                    foreach ($projectAssessables as $assessableCurrent) {
-                                        if ($assessableCurrent->getSpecificationAssessment()->getId() == $specId) {
-                                            // Set/Update Dates
-                                            foreach ($paData['dates'] as $property => $localShort) {
-                                                $method = "set{$property}At";
-                                                if (!method_exists($assessmentImpl, $method)) {
-                                                    $this->sendError("Invalid date property: $property");
-                                                    return;
-                                                }
-                                                $assessableCurrent->$method(\Alaress_Date_Format::newLocalShort($localShort));
-                                            }
-                                            $assessmentMapperProxy->save($assessableCurrent);
-                                            break;
+                                // Did user de-select this Assessment ?
+                                if (!isset($pData[$assessableCurrent->getSpecificationAssessment()->getId()])) {
+                                    $this->getAssessmentMapperProxy()->delete($assessableCurrent);
+                                } else {
+                                    // Set/Update Dates
+                                    foreach ($pData[$assessableCurrent->getSpecificationAssessment()->getId()]['dates'] as $property => $localShort) {
+                                        $method = "set{$property}At";
+                                        if (!method_exists($assessmentImpl, $method)) {
+                                            $this->sendError("Invalid date property: $property");
+                                            return;
                                         }
+                                        $assessableCurrent->$method(\Alaress_Date_Format::newLocalShort($localShort));
                                     }
-
-                                } catch (MapperException $e) {
-                                    // Can't see how we would ever end up here, but I'm sure stranger things have happened... like... Donald Trump?
+                                    $assessmentMapperProxy->save($assessableCurrent);
                                 }
                             }
                         }

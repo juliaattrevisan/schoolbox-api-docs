@@ -264,9 +264,9 @@
                                                            name="{{ inputPrefix }}[checked]"
                                                            value="1"
                                                     />
-                                                    <label style="margin-left:30px;padding-top:5px;" for="a_import-{{ assessable.id}}">
+                                                    <label style="margin-left:25px" for="a_import-{{ assessable.id}}" class="checkbox-label">
                                                         <span class="{{ icon.renderClass(assessable) }}"></span>
-                                                        <span style="font-weight:400">{{ assessable.title }}</span>
+                                                        <span>{{ assessable.title }}</span>
                                                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                         {% endif %}
