@@ -12,6 +12,7 @@ namespace Schoolbox;
 use Alaress\Cache;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -304,9 +305,16 @@ abstract class Mapper implements IMapper, Serializable
     protected function initCaches()
     {
         // a cache of SELECT results
-        $this->selectCache = new Cache(function (PDOStatement $statement) {
+        $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
             $statement->execute();
-            return $this->hydrateSelect($statement);
+
+            $modelList = $this->createCollection();
+
+            foreach ($this->iterateStatement($statement) as $row) {
+                $modelList->add($this->performHydration($this->localBodyCache, $this, $row, '', null, $bypassCache));
+            }
+
+            return $modelList;
         });
 
         // a cache of join mappers (for some reason this method is expensive)
@@ -1663,7 +1671,7 @@ abstract class Mapper implements IMapper, Serializable
 
             if (array_key_exists('cache', $options) && $options['cache'] === false) {
                 // cache bypass is EXPLICITLY defined
-                $c = $this->selectCache->fetch([ $statement ]);
+                $c = $this->selectCache->fetch([ $statement, true ]);
 
             } else {
                 $params = $predicate->getParams();
@@ -2184,12 +2192,8 @@ abstract class Mapper implements IMapper, Serializable
         $existingObjects = array();
         if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
-            $collectionIds = array();
-            // retrieve the IDs in a dehydrating fashion, in case they're models
-            foreach ($collection as $object) {
-                $collectionIds[] = $this->getModelProperty($object, $id_property);
-            }
-            foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true]) as $obj) {
+            $collectionIds = $collection->getColumnValues($id_property);
+            foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
             }
@@ -2526,13 +2530,19 @@ abstract class Mapper implements IMapper, Serializable
      * @param array    $row
      * @param string   $alias
      * @param callable $callback
+     * @param bool     $bypassCache
      * @return object
      */
-    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
+    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null, $bypassCache = false)
     {
-        $idKey = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
+        if ($bypassCache) {
+            // fetch direct
+            $model = $cache->fetch([ $mapper, $row, $alias ]);
 
-        $model = $cache->get("{$mapper->getTable()}.{$row[$idKey]}", [ $mapper, $row, $alias ]);
+        } else {
+            // use cached value if available
+            $model = $cache->get($this->getLocalObjectCacheKey($mapper, $row, $alias), [ $mapper, $row, $alias ]);
+        }
 
         // we don't cache this part
         if (is_callable($callback)) {
@@ -2540,6 +2550,24 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         return $model;
+    }
+
+
+    /**
+     * @param Mapper $mapper
+     * @param array  $row
+     * @param string $alias
+     * @return string
+     */
+    private function getLocalObjectCacheKey(Mapper $mapper, array $row, $alias = '')
+    {
+        $idKey = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
+
+        if (array_key_exists($idKey, $row)) {
+            return "{$mapper->getTable()}.{$row[$idKey]}";
+        }
+
+        throw new InvalidArgumentException("Key '$idKey' not defined in row; cannot obtain cache key");
     }
 
 
