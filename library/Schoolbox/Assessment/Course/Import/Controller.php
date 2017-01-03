@@ -523,10 +523,6 @@ class Controller extends Base\Base
 
         $assessmentPairs = $dto->getAssessmentPairs();
 
-        $dates = [];
-
-
-
         foreach ($assessmentPairs as $assessmentPair) {
             foreach ($assessmentPair as $pair) {
                 $specification = $pair->getSpecification();
