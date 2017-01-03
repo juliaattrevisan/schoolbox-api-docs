@@ -508,6 +508,13 @@ class Bootstrap implements BootstrapInterface {
                         )
                     );
 
+                    $twig->addFunction(new Twig_SimpleFunction('clone', function($input) {
+                        if (is_object($input)) {
+                            return clone $input;
+                        }
+                        return $input;
+                    }));
+
                     $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     return $twig;

@@ -120,6 +120,11 @@
     {% set unitAssessmentCount = dto.availableAssessmentCounts[unitSpec.id] %}
     {% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
 
+    {# Have to clone the date, otherwise incrementing one updates both #}
+
+    {% set startDate = clone(unitImpl.openDate) %}
+    {% set endDate = clone(unitImpl.openDate) %}
+
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_impl_id]" value="{{ unitImpl.id }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][open_date]" value="{{ unitImpl.openDate.localShort }}" />
@@ -234,9 +239,19 @@
                                     {# If the assessable is a project allow the user to enter dates for each subassessment #}
 
                                     {% if assessment is project %}
+
                                         {% for assessable in assessment.assessables %}
 
                                             {% set inputPrefix %}unit[{{ unitSpec.id }}][p][{{ assessment.id }}][a][{{ assessable.id }}]{% endset %}
+
+                                            {% if assessable is quiz %}
+
+                                                {# Assuming quizzes need to be completed in one day #}
+
+                                                {% set endDate = endDate.addDays(1) %}
+                                            {% else %}
+                                                {% set endDate = endDate.addDays(assessable.duration) %}
+                                            {% endif %}
 
                                             <li data-type="unit_row" data-assessment-dates="{{ assessment.id }}">
 
@@ -263,7 +278,7 @@
                                                     {# publish date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessment.publishAt,
-                                                    unitDate: unitImpl.openDate,
+                                                    unitDate: startDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync
@@ -273,7 +288,7 @@
                                                     {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
                                                         assessmentDate: assessment.openAt,
-                                                        unitDate: unitImpl.openDate,
+                                                        unitDate: startDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'open',
                                                         dateSyncProperty: 'due'
@@ -285,7 +300,7 @@
                                                     {# due date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessment.dueAt,
-                                                    unitDate: unitImpl.dueDate,
+                                                    unitDate: endDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'due',
                                                     dateSyncProperty: 'late'
@@ -295,7 +310,7 @@
                                                     {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
                                                         assessmentDate: assessment.closeAt,
-                                                        unitDate: unitImpl.dueDate,
+                                                        unitDate: endDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'close',
                                                         dateLabel: 'Late'
@@ -305,6 +320,12 @@
                                                     {% endif %}
                                                 </div>
                                             </li>
+
+                                            {% if assessable is quiz %}
+                                                {% set startDate = startDate.addDays(1) %}
+                                            {% else %}
+                                                {% set startDate = startDate.addDays(assessable.duration) %}
+                                            {% endif %}
 
                                         {% endfor %}
                                     {% endif %}

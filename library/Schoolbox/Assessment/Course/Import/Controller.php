@@ -523,11 +523,17 @@ class Controller extends Base\Base
 
         $assessmentPairs = $dto->getAssessmentPairs();
 
+        $dates = [];
+
+
+
         foreach ($assessmentPairs as $assessmentPair) {
             foreach ($assessmentPair as $pair) {
                 $specification = $pair->getSpecification();
                 if ($specification instanceof Project) {
-                    $specification->setAssessables($this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId()));
+                    $specification->setAssessables(
+                        $this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId())
+                    );
                 }
             }
         }
@@ -541,7 +547,7 @@ class Controller extends Base\Base
             'courseImplId'     => $courseImplId,
             'componentId'      => $componentId,
             'ownerships'       => $post['ownerships'],
-            'dto'              => $dto,
+            'dto'              => $dto
         ]);
     }
 
