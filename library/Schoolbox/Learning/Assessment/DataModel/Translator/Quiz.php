@@ -37,7 +37,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setAnonymousResult(false)
                 ->setUser($assessment->getCreator())
                 ->setCompletionMessage($assessment->getCompletionMessage())
-                ->setDuration(is_null($assessment->getDuration()) ? 0 : $assessment->getDuration())
+                ->setDuration($assessment->getDuration())
                 ->setMaxAttempts($assessment->getMaxAttempts())
                 ->setMarkVisibility($assessment->getMarkVisibility())
             ;
