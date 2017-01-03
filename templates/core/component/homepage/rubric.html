@@ -5,6 +5,23 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
+            <!-- BEGIN empty_state -->
+            <div class="empty-state">
+                <i class="icon-criteria"></i>
+
+                <!-- BEGIN empty_read -->
+                <p>There are no {TPL_LOCAL_RUBRICGROUP_PLURAL} and {TPL_LOCAL_RUBRICCRITERION_PLURAL} to view at this time.</p>
+                <!-- END empty_read -->
+
+                <!-- BEGIN empty_write -->
+                <p><a href="/submission/rubricCriteria/{ID}">Add {TPL_LOCAL_RUBRICGROUP_PLURAL} and {TPL_LOCAL_RUBRICCRITERION_PLURAL}</a> to your course to show the skills students will learn. These will appear for you to use when you create due work with a rubric on your unit pages.</p>
+                <!-- END empty_write -->
+
+            </div>
+            <!-- END empty_state -->
+
+            <!-- BEGIN rubric -->
             <section>
                 <ul class="information-list">
                     <!-- BEGIN rubric_criterion -->
@@ -31,6 +48,8 @@
                 </div>
                 <!-- END modify_rubric -->
             </section>
+            <!-- END rubric -->
+
         </div>
     </div>
 </div>
