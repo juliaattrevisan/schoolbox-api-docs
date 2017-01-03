@@ -7,9 +7,8 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Pastoral\Authorizer\Rule;
+namespace Alaress\Authorizer\Rule;
 
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 

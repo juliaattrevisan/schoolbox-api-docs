@@ -11,12 +11,9 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
-use Schoolbox\Pastoral\Authorizer\Rule\IsParentOfStudent;
 use Schoolbox\Role;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
@@ -71,17 +68,19 @@ class Module extends BaseModule
         $isSuper   = $this->getAuthRule('isSuperuser');
         $loggedIn  = $this->getAuthRule('isLoggedIn');
         $isStaff   = $this->getAuthRule('isStaffOrSuper');
-        $participantView =  new Rule\Any(
-                                new Rule\IsSuperuser(),
-                                new Rule\HasRole(Role::STAFF),
-                                new IsParticipant(),
-                                new IsParentOfStudent()
+
+        $participantView = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new IsParticipant(),
+            new Rule\IsParentOfStudent()
         );
-        $canSubmit =  new Rule\Any(
-                                new Rule\IsSuperuser(),
-                                new Rule\HasRole(Role::STAFF),
-                                new IsParticipant()
-                            );
+
+        $canSubmit = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new IsParticipant()
+        );
 
 
         // pluralise for REST
