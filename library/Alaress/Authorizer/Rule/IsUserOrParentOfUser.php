@@ -26,9 +26,9 @@ class IsUserOrParentOfUser extends Any
         UserMapper $userMapper,
         $paramsKey = 'id'
     ) {
-        $this
-            ->addRule(new IsUser($paramsKey))
-            ->addRule(new IsParentOfUser($externalDb, $userMapper, $paramsKey))
-        ;
+        parent::__construct(
+            new IsUser($paramsKey),
+            new IsParentOfUser($externalDb, $userMapper, $paramsKey)
+        );
     }
 }

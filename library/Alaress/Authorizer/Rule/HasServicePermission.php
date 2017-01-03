@@ -62,10 +62,11 @@ class HasServicePermission extends All
         $this->service           = $service;
         $this->accessLevel       = $accessLevel;
         $this->serviceIdentifier = $serviceIdentifier;
-        $this
-            ->addRule(new IsLoggedIn())
-            ->addRule(new Callback(array($this, 'authorizeMethod')))
-        ;
+
+        parent::__construct(
+            new IsLoggedIn(),
+            new Callback(array($this, 'authorizeMethod'))
+        );
     }
 
     /**
