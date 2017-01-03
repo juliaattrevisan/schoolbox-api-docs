@@ -170,9 +170,10 @@ class Controller extends Base
             ];
         }
 
+        $visibility = new Visibility(Access::getInstance());
+
         // Only show work that isn't yet due
-        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student) {
-            $visibility = new Visibility(Access::getInstance());
+        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student, $visibility) {
             return $visibility->isUpcomingVisibleToUser($assessable, $student);
         });
 
