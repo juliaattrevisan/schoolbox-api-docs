@@ -25,7 +25,7 @@
     ] %}
 {% endif %}
 
-{{ bread.crumbsArray(nodes)}}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 {% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
 
@@ -78,27 +78,16 @@
     </div>
 </div>
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>Grading {{ assessment.title }}</h1>
-        </div>
-        <div class="small-12 columns">
-            <ul class="meta">
-                <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, participant.user) }}">{{ assessment.dueAt.short }}</span></li>
-                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
-            </ul>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Grading {{ assessment.title }}</h1>
     </div>
-    {% set viewRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbook', {class: assessment.context, classId: assessment.context.id}) %}
-    {% if viewRoute %}
-    <nav>
-        <a class="icon-more" title="" data-dropdown="header-options"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a class="icon-approve" href="{{ viewRoute }}">Markbook</a></li>
-    </ul>
-    {% endif %}
+    <div class="small-12 columns">
+        <ul class="meta">
+            <li class="icon-calendar">Due <span class="{{ urgency.datetime(assessment, participant.user) }}">{{ assessment.dueAt.short }}</span></li>
+            <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+        </ul>
+    </div>
 </div>
 
 {% if responseList|length > 1 %}

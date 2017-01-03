@@ -23,6 +23,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 class Factory
 {
