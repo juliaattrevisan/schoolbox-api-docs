@@ -45,7 +45,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-
+        $this->setBlock($templateHandle, 'image_display', 'image_display_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         // get image id
         $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
@@ -59,17 +60,19 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         );
 
         if (!count($fileList)) {
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
-            $this->setBlock($templateHandle, 'image', 'image_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
-
-            $this->setVar('image_block', '');
+            $this->setVar([
+                'image_display_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+            ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("empty_modify_block", "");
+                $this->parse('empty_read_block', 'empty_read');
             } else {
-                $this->parse("empty_modify_block", "empty_modify");
+                $this->parse('empty_write_block', 'empty_write');
             }
 
             $this->parse('empty_state_block', 'empty_state');
@@ -77,9 +80,9 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         } else {
 
             //outputs an custom image and link to the homepage
-            $this->setBlock($templateHandle, "previewimage", "preview_block");
-            $this->setBlock($templateHandle, 'submit_image_randimage', 'submit_image_randimage_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('image_display', "previewimage", "preview_block");
+            $this->setBlock('image_display', 'submit_image_randimage', 'submit_image_randimage_block');
+            $this->setBlock('image_display', 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -98,6 +101,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
             $this->parse("preview_block", "previewimage");
+
+            $this->parse('image_display_block', 'image_display');
         }
 
         return true; // everything went according to plan

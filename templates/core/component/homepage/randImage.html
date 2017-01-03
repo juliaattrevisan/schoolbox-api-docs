@@ -19,11 +19,13 @@
                 </div>
                 <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
                     <i class="icon-random-image"></i>
-                    <p>No images available!</p>
-                    <!-- BEGIN empty_modify -->
-                    <p>
-                        <a href="/cms/file/new/{ID}">Post Image</a> or drag one onto this component
-                    </p>
+
+                    <!-- BEGIN empty_read -->
+                    <p>There are no images to view at this time.</p>
+                    <!-- END empty_read -->
+
+                    <!-- BEGIN empty_write -->
+                    <p><a href="/cms/file/new/{ID}">Post an image</a> or drag and drop multiple images on this component to show one of the images at random each time the someone visits the page.</p>
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
@@ -78,12 +80,12 @@
                             }
                         });
                     </script>
-                    <!-- END empty_modify -->
+                    <!-- END empty_write -->
                 </div>
             </div>
             <!-- END empty_state -->
 
-            <!-- BEGIN image -->
+            <!-- BEGIN image_display -->
             <section>
                 <div class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
@@ -153,7 +155,7 @@
                 </script>
                 <!-- END submit_image_randimage -->
             </section>
-            <!-- END image -->
+            <!-- END image_display -->
 
         </div>
     </div>
