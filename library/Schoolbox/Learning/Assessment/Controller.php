@@ -187,7 +187,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if (!$assessment->isDeleted()) {
             $this->getAssessmentMapper()->delete($assessment);
         }
-        $this->getResponse()->status->setCode(204);
 
         $folder = $assessment->getContext()->getFolder();
         $postReturnUrl = $this->getRequest()->query[Redirect::RETURN_URL];
