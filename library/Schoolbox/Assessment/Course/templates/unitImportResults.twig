@@ -256,7 +256,6 @@
                                             <li data-type="unit_row" data-assessment-dates="{{ assessment.id }}">
 
                                                 <div class="compact card small-12 large-4">
-                                                    <input type="hidden" name="{{ inputPrefix }}[checked]" value="0" />
                                                     <input type="checkbox"
                                                            data-project="{{ assessment.id }}"
                                                            id="a_import-{{ assessable.id}}"
@@ -265,9 +264,9 @@
                                                            name="{{ inputPrefix }}[checked]"
                                                            value="1"
                                                     />
-                                                    <label style="margin-left:25px;" for="a_import-{{ assessable.id}}" class="checkbox-label">
+                                                    <label style="margin-left:30px;padding-top:5px;" for="a_import-{{ assessable.id}}">
                                                         <span class="{{ icon.renderClass(assessable) }}"></span>
-                                                        <span>{{ assessable.title }}</span>
+                                                        <span style="font-weight:400">{{ assessable.title }}</span>
                                                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                         {% endif %}
@@ -281,7 +280,8 @@
                                                     unitDate: startDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'publish',
-                                                    dateSyncProperty: publishDateSync
+                                                    dateSyncProperty: publishDateSync,
+                                                    assessmentId: assessable.id
                                                     } only %}
 
                                                     {# open date is relevant when accepting responses #}
@@ -291,7 +291,8 @@
                                                         unitDate: startDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'open',
-                                                        dateSyncProperty: 'due'
+                                                        dateSyncProperty: 'due',
+                                                        assessmentId: assessable.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -303,7 +304,8 @@
                                                     unitDate: endDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'due',
-                                                    dateSyncProperty: 'late'
+                                                    dateSyncProperty: 'late',
+                                                    assessmentId: assessable.id
                                                     } only %}
 
                                                     {# close (late) date is relevant when accepting responses #}
@@ -313,7 +315,8 @@
                                                         unitDate: endDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'close',
-                                                        dateLabel: 'Late'
+                                                        dateLabel: 'Late',
+                                                        assessmentId: assessable.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
