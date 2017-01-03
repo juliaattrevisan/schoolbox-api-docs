@@ -345,8 +345,6 @@ abstract class AbstractAssessment implements IAssessable
         return $this->getAllParticipants()->count();
     }
 
-
-
     /**
      * Returns the number of Participants who have Responses to this Assessment
      *

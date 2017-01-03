@@ -10,19 +10,17 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
-use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -172,9 +170,11 @@ class Controller extends Base
             ];
         }
 
+        $visibility = new Visibility(Access::getInstance());
+
         // Only show work that isn't yet due
-        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student) {
-            return ($assessable->getDueAt()->isFuture()) && (!$assessable->getParticipant($student)->isResponded());
+        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student, $visibility) {
+            return $visibility->isUpcomingVisibleToUser($assessable, $student);
         });
 
         // TODO Populate $_SESSION[children] properly

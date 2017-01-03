@@ -63,6 +63,16 @@ class Project extends AbstractAssessment implements AssessmentContext
         $this->setSummator($summator);
     }
 
+    /**
+     * Project containers never show
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canCreateResponse(User $user)
+    {
+        return false;
+    }
 
     /**
      * Calculate the final mark for this IAssessable, for a particular User

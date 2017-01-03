@@ -69,6 +69,14 @@ interface IAssessable extends ISoftDeletable
     public function setContext(AssessmentContext $assessmentContext);
 
     /**
+     * Decide whether $user can create a response to this IAssessable
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canCreateResponse(User $user);
+
+    /**
      * Retrieve the specification this assessment was created from, if any.
      *
      * When an assessment is created as part of creating a new unit implementation,

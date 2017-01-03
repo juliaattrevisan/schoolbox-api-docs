@@ -171,6 +171,32 @@ class Model extends AbstractAssessment
         ]);
     }
 
+    /**
+     * Decide whether $user can create a response to this IAssessable
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canCreateResponse(User $user)
+    {
+        /* No Interactions - user can see this task
+         */
+        $participant = $this->getParticipant($user);
+
+        if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
+            return true;
+        }
+
+        /* Some set of interactions exists, but the latest feedback isn't official yet
+         * This might require more finesse due to toggleability of Completions
+         */
+        if (!$participant->hasPublishedFeedback()) {
+            return true;
+        }
+
+        return false;
+    }
+
     /* Getters/Setters
      */
 
