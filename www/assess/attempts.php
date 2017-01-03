@@ -86,9 +86,15 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
     foreach ($allAttempts as $currentAttempt) {
         $i++;
-        $canReview = false;
         $finishDateValue = null;
         $timeTaken = null;
+
+        /* Teacher Review link goes to a different url than the Student Review
+         * Since it's phplib, kinda do it the awkward way
+         */
+        $canReview = false;
+        $canStudentReview = false;
+        $reviewUrl = 'studentReview';
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
@@ -121,16 +127,26 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
 			/* Mostly do nothing
 			 */
-			$canReview = false;
-
 			if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
 				$canReview = true;
 			}
-			else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-				$canReview = true;
+			elseif ($quizVisibility->isStaffStudent()) {
+                if ($groupHandler->isStaff()) {
+                    $canReview = true;
+                    $reviewUrl = 'review';
+                }
+                elseif ($groupHandler->isStudent()) {
+                    $canStudentReview = true;
+                }
 			}
-			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1]))) {
-				$canReview = true;
+			elseif ($quizVisibility->isStaffStudentParent()) {
+                if ($groupHandler->isStaff()) {
+                    $canReview = true;
+                    $reviewUrl = 'review';
+                }
+                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1])) {
+                    $canStudentReview = true;
+                }
 			}
         }
 
@@ -167,13 +183,13 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_REVIEWED_AT' => $reviewed,
             'ATTEMPT_MARKS' => $marks,
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ON_OFF' => $i % 2 ? 'dark' : ''
+            'ATTEMPT_REVIEW_URL' => $reviewUrl
         ));
 
         /* Parse these blocks first
          */
         if ($currentAttempt['finish']) {
-            if ($canReview) {
+            if ($canReview || $canStudentReview) {
                 $this->setVar(array(
                     'attempt_resume_block' => ''
                 ));
