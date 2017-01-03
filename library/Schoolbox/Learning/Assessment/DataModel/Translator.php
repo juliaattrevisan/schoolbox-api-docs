@@ -86,7 +86,6 @@ class Translator
             ->setCloseDate($assessment->getCloseAt())
             ->setDuration($assessment->getDuration())
             ->setWeight($assessment->getWeight())
-            ->setDuration($assessment->getDuration())
             ->setSequence($assessment->getSequence())
             ->setCreatedAt($assessment->getCreatedAt())
             ->setUpdatedAt($assessment->getUpdatedAt())
