@@ -655,7 +655,7 @@ function getActivities($user, $limit, $categories, $visibilities, $is_restricted
         ->merge($assess_mapper->getActivities($user, $limit, $categories))
         ->merge($submit_mapper->getActivities($user, $limit, $categories));
     if (!$is_restricted) {
-        $activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
+        $activities = $activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
     }
     $activities
         ->sortBy('date', 'desc')

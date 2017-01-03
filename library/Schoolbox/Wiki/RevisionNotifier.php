@@ -94,7 +94,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
 		$c = new Collection();
 		foreach($revisions as $revision) {
-			$c->merge(
+			$c = $c->merge(
 				new Collection($this->notifyRevised($roletype, $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimestamp()))
 			);
 		}

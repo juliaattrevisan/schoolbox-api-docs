@@ -290,7 +290,7 @@ class Rubric extends Core\Rubric
         $c = new Collection();
 
         foreach ($this->levels as $level) {
-            $c->merge($level->getAllDescriptors());
+            $c = $c->merge($level->getAllDescriptors());
         }
 
         return $c;

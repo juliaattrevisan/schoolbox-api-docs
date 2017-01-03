@@ -260,7 +260,8 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
                 if(is_array($externalIdArray)) {
                     foreach ($externalIdArray as $extId) {
-                        $this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
+                        $this->teacher_collection = $this->teacher_collection
+                            ->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
                     }
                 }
             }

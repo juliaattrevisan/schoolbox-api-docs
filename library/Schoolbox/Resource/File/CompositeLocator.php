@@ -68,7 +68,7 @@ class CompositeLocator implements ILocator
     {
         $collection = new Collection();
         foreach ($this->locators as $locator) {
-            $collection->merge($locator->findByFolderId($nodeId));
+            $collection = $collection->merge($locator->findByFolderId($nodeId));
         }
         return $collection;
     }

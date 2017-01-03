@@ -143,7 +143,7 @@ class Controller extends Base
         // If the user entered a validly formatted email address- search by email address as well
 
         if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-            $users->merge($this->userMapper->findByEmail($emailAddress));
+            $users = $users->merge($this->userMapper->findByEmail($emailAddress));
         }
 
         // Check if we found any matching users

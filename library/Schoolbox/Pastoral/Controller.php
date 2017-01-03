@@ -315,11 +315,13 @@ class Controller extends Base
         $collection = new Collection();
 
         if (!empty($record->getParent()->getId())) {
-            $collection->merge($this->getPastoralMapper()->findByParentId($record->getParent()->getId()));
-            $collection->add($this->getPastoralMapper()->findById($record->getParent()->getId()));
+            $collection = $collection
+                ->merge($this->getPastoralMapper()->findByParentId($record->getParent()->getId()))
+                ->add($this->getPastoralMapper()->findById($record->getParent()->getId()));
         } else {
-            $collection->merge($this->getPastoralMapper()->findByParentId($record->getId()));
-            $collection->add($record);
+            $collection = $collection
+                ->merge($this->getPastoralMapper()->findByParentId($record->getId()))
+                ->add($record);
         }
 
         $record->setRelatedRecords($collection);
