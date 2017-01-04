@@ -56,24 +56,10 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
 
         } else {
 
-            $this->setBlock($templateHandle, 'chat_state_active', 'chat_state_active_block');
-            $this->setBlock($templateHandle, 'chat_state_inactive', 'chat_state_inactive_block');
             $this->setBlock($templateHandle, 'chat_staff_js', 'chat_staff_js_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
-
-            if ($this->getConfig('state') == 'Active') {
-                $this->setVar('chat_state_inactive_block', '');
-                $this->parse('chat_state_active_block', 'chat_state_active');
-            } else {
-                $this->setVar('chat_state_active_block', '');
-                if ($this->getContentPermission() > 1) {
-                    $this->parse('chat_state_inactive_block', 'chat_state_inactive');
-                } else {
-                    $this->setVar('chat_state_inactive_block', '');
-                }
-            }
 
             if ($this->getUser()->getRole()->isStaff()) {
                 $this->parse('chat_staff_js_block', 'chat_staff_js');
