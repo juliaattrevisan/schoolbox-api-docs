@@ -86,10 +86,12 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getContentPermission() < READ_ACCESS)
+        if ($this->getContentPermission() < READ_ACCESS) {
             $news = null;
-        else
-            $news = $this->newsHandler->getAllForCategory($this->source->getId(), array('size' => $this->getConfig('size')));
+        } else {
+            $news = $this->newsHandler->getAllForCategory($this->source->getId(),
+                array('size' => $this->getConfig('size')));
+        }
 
         $moderate =  $this->getContentPermission() >= UserAccess::ACCESS_FULL;
         $modify =  $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
