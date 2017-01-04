@@ -102,7 +102,7 @@ class Mapper extends \Schoolbox\Mapper
         /* No existing Plagscan found for $dirtyDocument
          * Spawn new and ship it to Plagscan Gateway
          */
-        if (!$this->isEnabled()) {
+        if (!$this->getGateway()) {
             return [];
         }
 
