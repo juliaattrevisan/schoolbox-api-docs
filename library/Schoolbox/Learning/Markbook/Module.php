@@ -6,18 +6,15 @@
  */
 namespace Schoolbox\Learning\Markbook;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Twig_Loader_Chain;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -92,7 +89,7 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
@@ -100,7 +97,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Mapper|FolderMapper
      */
     protected function getFolderMapper()
     {
@@ -108,7 +105,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return TermMapper
+     * @return Mapper|TermMapper
      */
     protected function getTermMapper()
     {
@@ -116,7 +113,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {

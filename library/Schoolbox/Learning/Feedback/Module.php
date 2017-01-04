@@ -6,11 +6,15 @@
  */
 namespace Schoolbox\Learning\Feedback;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use \Twig_Loader_Chain;
 
@@ -131,7 +135,7 @@ class Module extends BaseModule
             }
         }
 
-        throw new \Schoolbox\Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
+        throw new Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
     }
 
     /**
@@ -153,11 +157,11 @@ class Module extends BaseModule
             }
         }
 
-        throw new \Schoolbox\Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+        throw new Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
     }
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     public function getUserDataSource()
     {
@@ -165,7 +169,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\DataModel\MapperProxy
+     * @return object|Assessment\DataModel\MapperProxy
      */
     public function getAssessmentDataSource()
     {
@@ -173,7 +177,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Participant\DataSource
+     * @return object|Participant\DataSource
      */
     public function getParticipantDataSource()
     {
@@ -181,7 +185,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\Response\DataSource
+     * @return object|Assessment\Response\DataSource
      */
     public function getResponseDataSource()
     {
@@ -189,7 +193,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Assessment\Feedback\DataSource
+     * @return object|Assessment\Feedback\DataSource
      */
     public function getFeedbackDataSource()
     {

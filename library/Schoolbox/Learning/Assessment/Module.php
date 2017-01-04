@@ -6,11 +6,15 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -310,7 +314,15 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return IConfigLoader|object
+     */
+    protected function getConfig()
+    {
+        return $this->getInjector()->get('config');
+    }
+
+    /**
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
@@ -318,7 +330,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {
@@ -326,7 +338,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return AssessmentMapperProxy
+     * @return object|AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
     {
@@ -334,27 +346,23 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitImplementationMapper
+     * @return Mapper|UnitImplementationMapper
      */
     protected function getUnitImplementationMapper()
     {
-        /** @var UnitImplementationMapper $unitImplMapper */
-        $unitImplMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
-        return $unitImplMapper;
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
     /**
-     * @return UnitSpecificationMapper
+     * @return Mapper|UnitSpecificationMapper
      */
     protected function getUnitSpecificationMapper()
     {
-        /** @var UnitSpecificationMapper $unitSpecMapper */
-        $unitSpecMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        return $unitSpecMapper;
+        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
 
     /**
-     * @return StudentSubmissionMapper
+     * @return Mapper|StudentSubmissionMapper
      */
     protected function getStudentSubmissionMapper()
     {
@@ -362,7 +370,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return SubmissionReturnMapper
+     * @return Mapper|SubmissionReturnMapper
      */
     protected function getSubmissionReturnMapper()
     {
@@ -370,7 +378,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return StorageMapper
+     * @return Mapper|StorageMapper
      */
     protected function getStorageMapper()
     {
@@ -378,7 +386,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Mapper|FolderMapper
      */
     protected function getFolderMapper()
     {

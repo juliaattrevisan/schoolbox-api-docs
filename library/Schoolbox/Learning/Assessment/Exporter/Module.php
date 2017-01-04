@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Twig_Loader_Chain;
@@ -113,7 +114,7 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
@@ -131,7 +132,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {
@@ -139,7 +140,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return AssessmentMapperProxy
+     * @return object|AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
     {
@@ -147,27 +148,23 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UnitImplementationMapper
+     * @return Mapper|UnitImplementationMapper
      */
     protected function getUnitImplementationMapper()
     {
-        /** @var UnitImplementationMapper $unitImplementationMapper */
-        $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
-        return $unitImplementationMapper;
+        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
     }
 
     /**
-     * @return UnitSpecificationMapper
+     * @return Mapper|UnitSpecificationMapper
      */
     protected function getUnitSpecificationMapper()
     {
-        /** @var UnitSpecificationMapper $unitSpecificationMapper */
-        $unitSpecificationMapper = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        return $unitSpecificationMapper;
+        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
     }
 
     /**
-     * @return StudentSubmissionMapper
+     * @return Mapper|StudentSubmissionMapper
      */
     protected function getStudentSubmissionMapper()
     {
@@ -175,7 +172,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return SubmissionReturnMapper
+     * @return Mapper|SubmissionReturnMapper
      */
     protected function getSubmissionReturnMapper()
     {
@@ -183,7 +180,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return StorageMapper
+     * @return Mapper|StorageMapper
      */
     protected function getStorageMapper()
     {
@@ -191,7 +188,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Mapper|FolderMapper
      */
     protected function getFolderMapper()
     {

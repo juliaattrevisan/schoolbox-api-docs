@@ -6,24 +6,17 @@
  */
 namespace Schoolbox\Learning\Upcoming;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Sub-module for a student's upcoming due work.

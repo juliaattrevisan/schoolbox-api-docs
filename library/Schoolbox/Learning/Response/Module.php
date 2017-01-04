@@ -7,20 +7,19 @@
  */
 namespace Schoolbox\Learning\Response;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Role;
+use OutOfBoundsException;
+use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-
+use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
@@ -304,7 +303,7 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
@@ -312,7 +311,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {
@@ -320,7 +319,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return AssessmentMapperProxy
+     * @return object|AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
     {
@@ -328,7 +327,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ResponseMapperProxy
+     * @return object|ResponseMapperProxy
      */
     protected function getResponseMapperProxy()
     {
@@ -336,7 +335,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FeedbackMapperProxy
+     * @return object|FeedbackMapperProxy
      */
     protected function getFeedbackMapperProxy()
     {
