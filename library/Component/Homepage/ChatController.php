@@ -67,6 +67,8 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             if ($this->getUser()->getRole()->isStaff()) {
                 $this->parse('chat_staff_js_block', 'chat_staff_js');
             }
+
+            $this->parse('chat_block', 'chat');
         }
 
         return true; // everything went according to plan
