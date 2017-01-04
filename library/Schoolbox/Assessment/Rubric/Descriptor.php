@@ -25,7 +25,11 @@ class Descriptor implements Calculable, Twiggable
     /** @var float */
     protected $value;
 
-    /** @var bool */
+    /**
+     * Is this descriptor checked? (to indicate it represents the student's attainment for the criterion)
+     *
+     * @var bool
+     */
     protected $selected;
 
     /** @var Criterion */

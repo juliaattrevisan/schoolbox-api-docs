@@ -331,7 +331,6 @@ class Rubric extends Core\Rubric
             $this->mCache->attach($descriptor,
                 MarkMapper::getInstance()
                  ->createModel()
-                 ->setSubmissionBox($this->getSubmissionBox())
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
                  ->setValid(true)
                  ->setMark(0)

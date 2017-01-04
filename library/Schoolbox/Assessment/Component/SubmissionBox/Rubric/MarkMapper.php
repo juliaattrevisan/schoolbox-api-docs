@@ -41,7 +41,6 @@ class MarkMapper extends Mapper
         $this->uses('valid', self::TYPE_BOOLEAN);
 
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
-        $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, null, 'box');
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, null, 'criterion');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
     }
@@ -55,12 +54,10 @@ class MarkMapper extends Mapper
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('user')},
-                    {$this->getJoinColumnString('box')},
                     {$this->getJoinColumnString('criterion')},
                     {$this->getJoinColumnString('descriptor')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('user')}
-            LEFT JOIN {$this->getJoinSql('box')}
             LEFT JOIN {$this->getJoinSql('criterion')}
             LEFT JOIN {$this->getJoinSql('descriptor')}
         ";
@@ -79,7 +76,6 @@ class MarkMapper extends Mapper
             $model = $this->hydrate($r);
 
             $model->setStudent($this->hydrateJoin($r, 'user'));
-            $model->setSubmissionBox($this->hydrateJoin($r, 'box'));
             $model->setCriterion($this->hydrateJoin($r, 'criterion'));
             $model->setDescriptor($this->hydrateJoin($r, 'descriptor'));
 

@@ -86,27 +86,6 @@ class Mark
         return $this;
     }
 
-
-    /**
-     * @return SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submissionBox;
-    }
-
-
-    /**
-     * @param SubmissionBox $submissionBox
-     * @return static
-     */
-    public function setSubmissionBox($submissionBox)
-    {
-        $this->submissionBox = $submissionBox;
-        return $this;
-    }
-
-
     /**
      * @return Criterion
      */

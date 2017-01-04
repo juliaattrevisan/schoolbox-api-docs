@@ -27,6 +27,7 @@ use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Rubric\Rubric as BaseRubric;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -136,7 +137,7 @@ class RubricMapper
         $in = implode(', :', array_keys($args));
 
         // TODO DI and mapperise
-        $stmt = \Database::getInstance()->query("
+        $stmt = $this->database->query("
             SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
@@ -219,7 +220,9 @@ class RubricMapper
         ]];
 
         // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+        /** @var Rubric $rubric */
+        $rubric = $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode);
+        return $rubric->setSubmissionBox($box);
     }
 
 
@@ -264,12 +267,11 @@ class RubricMapper
 
         // ensure any descriptors already in play get priority
         $stmt = $this->database->query("
-            SELECT DISTINCT c.id, c.grouping, c.name
-            FROM rubric_descriptor d
-            RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
-            WHERE d.submission_box_id = :box_id
-            AND d.valid IS TRUE
-            AND c.deleted_at IS NULL
+            SELECT DISTINCT rc.id, rc.grouping, rc.name
+            FROM rubric_descriptor rd
+            JOIN rubric_level rl ON rl.id = rd.level_id AND rd.valid IS TRUE AND rl.box_id = :box_id
+            RIGHT JOIN rubric_criterion rc ON rd.criterion_id = rc.id
+            WHERE rc.deleted_at IS NULL
         ", [
             'box_id' => $box->getId()
         ]);
@@ -373,10 +375,12 @@ class RubricMapper
      */
     protected function findDescriptors(SubmissionBox $box)
     {
+        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $box->getId());
+
         /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
         $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
-            'submission_box_id' => $box->getId(),
-            'valid'             => true
+            'level_id' => $levelIds,
+            'valid'    => true
         ]);
 
         $descriptors = [];
@@ -418,6 +422,11 @@ class RubricMapper
             // misnomer much
             $resultSetId = $box->getRubricResultSet();
 
+            // TODO. Is this still valid in a post 16.5 world?
+            // I don't think it's possible to have a resultSet set for a subBox, without having an attached rubric.
+            // Instead, the resultSet can be used when creating the rubric, it's never stored against the subBox.
+            // If this is correct, the whole IF construct can get deleted.
+
             if ($resultSetId > 0) {
                 // got a resultSet - we're going to fake that into a descriptor grid
 
@@ -434,7 +443,6 @@ class RubricMapper
                         $levelList[$result->getValue()] = [ 'name' => '' ];
                     }
                 }
-
             }
         }
 
@@ -475,18 +483,22 @@ class RubricMapper
 
         // retrieve marks (descriptor selections for student)
         $stmt = $this->database->query("
-            SELECT descriptor_id
-            FROM rubric_mark
-            WHERE submission_box_id = :boxId
-            AND student_id = :userId
-            AND tstamp = (
+            SELECT rm.descriptor_id
+            FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+            JOIN rubric_level rl ON rl.id = rd.level_id
+            WHERE rl.box_id = :boxId
+            AND rm.student_id = :userId
+            AND rm.tstamp = (
               SELECT MAX(tstamp)
-              FROM rubric_mark
-              WHERE submission_box_id = :boxId
-              AND student_id = :userId
-              AND valid = TRUE
+              FROM rubric_mark rm
+              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.valid IS TRUE
+              JOIN rubric_level rl ON rl.id = rd.level_id
+              WHERE rl.box_id = :boxId
+              AND rm.student_id = :userId
+              AND rm.valid = TRUE
             )
-            AND valid = TRUE
+            AND rm.valid = TRUE
         ", [
             'boxId'  => $grid->getSubmissionBox()->getId(),
             'userId' => $student->getId()
@@ -692,7 +704,9 @@ class RubricMapper
             }
         }
 
-        return $this->factory->buildFromPostData([ 0 => $postdata ], true);
+        /** @var Rubric $rubric */
+        $rubric = $this->factory->buildFromPostData([ 0 => $postdata ], true);
+        return $rubric;
     }
 
     /**
@@ -715,15 +729,12 @@ class RubricMapper
                 /** @var SubmissionBox $submissionBox */
                 $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $participant->getAssessable()->getId());
 
-                $desMap = DescriptorMapper::getInstance();
-
                 $descriptorIds = [];
 
                 foreach ($rubricVars as $criterionId => $levelId) {
                     // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
-                    $descriptorIds[] = $desMap->findIdsByColumnList(
+                    $descriptorIds[] = DescriptorMapper::getInstance()->findIdsByColumnList(
                         [
-                            'submission_box_id' => $submissionBox->getId(),
                             'criterion_id'      => $criterionId,
                             'level_id'          => $levelId
                         ]
@@ -779,7 +790,8 @@ class RubricMapper
         $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
 
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
-        $this->tidyUp(DescriptorMapper::getInstance(), ['submission_box_id' => $submissionBox->getId()], $descIds);
+        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
+        $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
 
@@ -787,13 +799,14 @@ class RubricMapper
      * @param IMapper $mapper
      * @param array $search
      * @param array $exclude
-     * @return Collection
+     * @return bool
      */
     protected function tidyUp($mapper, $search, $exclude)
     {
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
                 function ($model) use ($exclude) {
+                    /** @var Descriptor|Level $model */
                     return !in_array($model->getId(), $exclude);
                 }
             )
@@ -836,16 +849,24 @@ class RubricMapper
         $where = implode(' AND ', $pb->getWhere());
 
         $stmt = $this->database->prepare("
-            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
+            SELECT
+              rc.grouping,
+              rc.name,
+              a.id,
+              a.title,
+              rd.description
             FROM rubric_criterion rc
-            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id
-            INNER JOIN assessment a ON sb.assessment_id = a.id
-            LEFT JOIN rubric_mark rm ON rm.submission_box_id = sb.id AND rm.criterion_id = rc.id AND rm.valid IS TRUE
-            INNER JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+            JOIN rubric_usage ru ON rc.id = ru.criterion_id
+            JOIN submission_box sb ON ru.submission_box_id = sb.id
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN rubric_level rl ON sb.id = rl.box_id
+            JOIN rubric_descriptor rd ON rd.level_id = rl.id AND rd.criterion_id = rc.id AND rd.valid IS TRUE
+            JOIN rubric_mark rm ON rm.descriptor_id = rd.id AND rm.valid IS TRUE
             WHERE {$where}
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC
+            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC, rm.tstamp
         ");
+        // Note that this will return all marks for the given student and subject through time, but because we
+        // have ordered by mark.timestamp, the latter values will overwrite previous marks.
 
         $stmt->execute($pb->getParams());
 
