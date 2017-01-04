@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -66,7 +67,9 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'providerId'            => $this->getConfig('ltiprovider'),
                 'providers'             => $providers,
                 'folderId'              => $this->getContext()->getId(),
-                'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel'))
+                'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
+                'readOnly'              => ($this->getContentPermission() < UserAccess::ACCESS_WRITE),
+                'user'                  => $_SESSION['user']
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );

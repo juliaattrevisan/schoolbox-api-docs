@@ -5,7 +5,15 @@
             <section>
                 <div class="empty-state">
                     <i class="icon-lti"></i>
-                    <p>Before you can add an LTI component your system administrator must configure one or more LTI providers on the admin screen.</p>
+
+                    {% if readOnly %}
+                        <p>There is no embedded learning tool to interact with at this time.</p>
+                    {% elseif user.superUser %}
+                        <p><a href="/adminv2/lti">Add an LTI provider</a> in the Administration system to allow users to embed third party embedded learning tools in this component.</p>
+                    {% else %}
+                        <p>Ask your IT team to add your chosen LTI provider in the LTI Providers list in the Administration system to use this feature.</p>
+                    {% endif %}
+
                 </div>
             </section>
         </div>
@@ -21,7 +29,7 @@
                 <section>
                     <div class="empty-state">
                         <i class="icon-settings"></i>
-                        <p>To use LTI you must first select a provider.</p>
+                        <p>Select a third party embedded learning tool to display in this component for users to interact with.</p>
                         <p>
                             {% set foundLearningField = false %}
                             {% for provider in providers %}
