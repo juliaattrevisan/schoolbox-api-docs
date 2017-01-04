@@ -9,67 +9,44 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Descriptor implements ISoftDeletable
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    use Id;
 
     /**
      * @var Criterion
      */
-    protected $criterion;
+    private $criterion;
 
     /**
-     * @var SubmissionBox
+     * @var Level
      */
-    protected $submission_box;
-
-    /** @var Level */
-    protected $level;
+    private $level;
 
     /**
      * @var int
      */
-    protected $value;
+    private $value;
 
     /**
      * @var string
      */
-    protected $description;
+    private $description;
 
     /**
      * @var bool
      */
-    protected $valid;
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
+    private $valid;
 
     /**
      * @param  Criterion $criterion
      * @return $this
      */
-    public function setCriterion($criterion) {
+    public function setCriterion($criterion)
+    {
         $this->criterion = $criterion;
         return $this;
     }
@@ -77,7 +54,8 @@ class Descriptor implements ISoftDeletable
     /**
      * @return Criterion
      */
-    public function getCriterion() {
+    public function getCriterion()
+    {
         return $this->criterion;
     }
 
@@ -85,7 +63,8 @@ class Descriptor implements ISoftDeletable
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -93,24 +72,9 @@ class Descriptor implements ISoftDeletable
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
-    }
-
-    /**
-     * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
-     * @return $this
-     */
-    public function setSubmissionBox($submission_box) {
-        $this->submission_box = $submission_box;
-        return $this;
-    }
-
-    /**
-     * @return \Schoolbox\Assessment\Component\SubmissionBox
-     */
-    public function getSubmissionBox() {
-        return $this->submission_box;
     }
 
 
@@ -138,7 +102,8 @@ class Descriptor implements ISoftDeletable
      * @param  boolean $valid
      * @return $this
      */
-    public function setValid($valid) {
+    public function setValid($valid)
+    {
         $this->valid = $valid;
         return $this;
     }
@@ -146,15 +111,17 @@ class Descriptor implements ISoftDeletable
     /**
      * @return boolean
      */
-    public function getValid() {
+    public function getValid()
+    {
         return $this->valid;
     }
 
     /**
-     * @param  int   $value
+     * @param  int $value
      * @return $this
      */
-    public function setValue($value) {
+    public function setValue($value)
+    {
         $this->value = $value;
         return $this;
     }
@@ -162,7 +129,8 @@ class Descriptor implements ISoftDeletable
     /**
      * @return int
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->value;
     }
 

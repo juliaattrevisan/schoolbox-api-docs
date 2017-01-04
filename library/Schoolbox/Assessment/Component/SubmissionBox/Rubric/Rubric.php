@@ -267,7 +267,6 @@ class Rubric extends Core\Rubric
 
             $model
                 ->setCriterion($critModel)
-                ->setSubmissionBox($this->box)
                 ->setDescription($descriptor->getText())
                 ->setValue($descriptor->getValue())
                 ->setLevel($lvlModel)
