@@ -1,6 +1,16 @@
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 large-6 columns">
         <h1>My Classes</h1>
+    </div>
+    <div class="small-12 large-6 columns">
+        <div class="context-switch clearfix">
+            {% include '@learning/fragments/semesterSelector.twig' with {
+                terms:       terms,
+                currentTerm: term,
+                route:       'learning.getClasses',
+                routeArgs:   {}
+            } only %}
+        </div>
     </div>
 </div>
 
@@ -9,7 +19,12 @@
         <div class="small-12 island">
             <div class = "empty-state">
                 <i class="icon-class-list"></i>
-                <p>You are currently not enrolled in any class.<br />If you expect to have classes please contact your system administrator.</p>
+                {% if term.contains(now) %}
+                    <p>You are currently not enrolled in any class.</p>
+                {% else %}
+                    <p>You were not enrolled in any classes during {{ term.title }}.</p>
+                {% endif %}
+                <p>If you expect to have classes please contact your system administrator.</p>
             </div>
         </div>
     {% else %}
@@ -28,10 +43,14 @@
                                 <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                                <li><a href="{{ routeLookup('learningMarkbook.getMarkbook', {classId: class.id}) }}" class="icon-curriculum">Markbook</a></li>
+                                {% if term.contains(now) %}
+                                    <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
+                                {% endif %}
+                                <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForTerm', {classId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
                                 <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
-                                <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                                {% if term.contains(now) %}
+                                    <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                                {% endif %}
                             </ul>
                             {% endif %}
                             {%  if currentUser.getRole.isStudent == true %}
@@ -39,7 +58,7 @@
                                 <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                                <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: currentSemester.id, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
+                                <li><a href="{{ routeLookup('learning.getGradesForSubject', {userId: currentUser.id, termCode: term.code, subjectId: class.id}) }}" class="icon-approve">Grades</a></li>
                             </ul>
                             {% endif %}
                         </div>

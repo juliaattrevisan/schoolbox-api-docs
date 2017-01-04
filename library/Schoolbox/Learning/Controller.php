@@ -9,7 +9,6 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Rubric;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -31,48 +30,52 @@ class Controller extends Base
     /**
      * @var ShowcaseMapper
      */
-    protected $showcaseMapper;
+    private $showcaseMapper;
 
     /**
      * @var TermMapper
      */
-    protected $termMapper;
+    private $termMapper;
 
     /**
      * @var GradeGroup
      */
-    protected $defaultGradeGroup;
+    private $defaultGradeGroup;
 
     /**
      * @var FolderMapper
      */
-    protected $folderMapper;
+    private $folderMapper;
 
     /**
      * @var ErrorMapper
      */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * @var AssessmentMapperProxy
      */
-    protected $assessmentMapperProxy;
+    private $assessmentMapperProxy;
     /**
      * @var RubricMapper
      */
     private $rubricMapper;
 
+    /** @var Timetable_ColourMapper */
+    private $timetableColourMapper;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper           $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param FolderMapper          $folderMapper
-     * @param TermMapper            $termMapper
-     * @param GradeGroup            $defaultGradeGroup
-     * @param ShowcaseMapper        $showcaseMapper
-     * @param RubricMapper          $rubricMapper
+     * @param ErrorMapper            $errorMapper
+     * @param AssessmentMapperProxy  $assessmentMapperProxy
+     * @param FolderMapper           $folderMapper
+     * @param TermMapper             $termMapper
+     * @param GradeGroup             $defaultGradeGroup
+     * @param ShowcaseMapper         $showcaseMapper
+     * @param RubricMapper           $rubricMapper
+     * @param Timetable_ColourMapper $timetableColourMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -81,7 +84,8 @@ class Controller extends Base
         TermMapper $termMapper,
         GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
-        RubricMapper $rubricMapper
+        RubricMapper $rubricMapper,
+        Timetable_ColourMapper $timetableColourMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -90,6 +94,7 @@ class Controller extends Base
         $this->setDefaultGradeGroup($defaultGradeGroup);
         $this->setShowcaseMapper($showcaseMapper);
         $this->setRubricMapper($rubricMapper);
+        $this->timetableColourMapper = $timetableColourMapper;
     }
 
     /**
@@ -188,40 +193,61 @@ class Controller extends Base
     /**
      * Displays a list of classes for the current logged in user
      *
-     * @api GET /learning/classes
+     * If the term includes now (ie is current) then we use current enrollment.
+     * Else term is historical, so we display classes for which the user has LMS activity.
+     *
+     * @api GET /learning/classes{/term}
      * @level 165
      *
+     * @param Term $term
      */
-    public function getClasses() {
+    public function getClasses(Term $term)
+    {
+        $folderList = $this->getFolderMapper()->createCollection();
+        $classTypes = [];
+        $now = \Alaress_Date_Format::now();
 
-        /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
-        $colourIndex = 0;
+        // Are we looking at current Classes, or historical ?
+        if($term->contains($now)){
 
-        $folderList = new Collection();
-        $classTypes = Array();
-
-        /* Convert external subjects to folders */
-        foreach($this->getUser()->getSubjectCollection() as $subject ) {
-            try {
-                $folder = FolderMapper::getInstance()->findByCode($subject['code']);
-                if (!$folder->getColour()) {
-                    /* Apply colour from list if no colour exists */
-                    $folder->setColour($colourList[$colourIndex]->getHexColour());
-                    $colourIndex = ($colourIndex + 1) % $colourList->count();
+            /* Convert external subjects to folders */
+            foreach($this->getUser()->getSubjectCollection() as $subject ) {
+                try {
+                    $folder = $this->getFolderMapper()->findByCode($subject['code']);
+                    $folderList->add($folder);
+                    $classTypes[$folder->getId()] = $subject['classType'];
+                } catch (MapperException $e) {
+                    //not found
                 }
-                $folderList->add($folder);
-                $classTypes[$folder->getId()] = $subject['classType'];
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                //not found
+            }
+        } else {
+            // Is user a teacher or student ?
+            if($this->getUser()->getRole()->isStaff()){
+                $folderList = $this->getFolderMapper()->findFoldersWithFeedbacks($this->getUser(), $term);
+            } elseif($this->getUser()->getRole()->isStudent()){
+                $folderList = $this->getFolderMapper()->findFoldersWithResponses($this->getUser(), $term);
             }
         }
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
-            'currentUser'    => $this->getUser(),
-            'currentSemester'=> TermMapper::getInstance()->findForToday(),
-            'classList'      => $folderList,
-            'classTypes'     => $classTypes
 
+        /* Get Timetable colours to use as random colours for null set folders */
+        $colourList = $this->getTimetableColourMapper()->findAll();
+        $colourIndex = 0;
+
+        foreach($folderList as $folder){
+            if (!$folder->getColour()) {
+                /* Apply colour from list if no colour exists */
+                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $colourIndex = ($colourIndex + 1) % $colourList->count();
+            }
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
+            'currentUser' => $this->getUser(),
+            'terms'       => $this->getTermMapper()->findAll(),
+            'now'         => $now,
+            'term'        => $term,
+            'classList'   => $folderList,
+            'classTypes'  => $classTypes,
         ]));
     }
 
@@ -230,10 +256,10 @@ class Controller extends Base
      *
      * @api   GET /learning/grades/{userId}{/termCode}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      * @param Term $term
      */
-    public function getGrades(User $student, Term $term)
+    public function getGrades(User $viewee, Term $term)
     {
         // Storage for each folders markbook
         $markbooks = [];
@@ -241,7 +267,7 @@ class Controller extends Base
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
 
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($student, $term);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
 
         $folders = new Collection();
 
@@ -265,13 +291,13 @@ class Controller extends Base
         foreach ($markbooksFolders as $folderId => $assessments) {
             $markbooks[$folderId] =
                 (new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()))
-                    ->getStudentStatistics()[$student->getId()];
+                    ->getStudentStatistics()[$viewee->getId()];
         }
 
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
-            'student'       => $student,
+            'student'       => $viewee,
             'term'          => $term,
             'terms'         => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'       => $folders,
@@ -285,11 +311,11 @@ class Controller extends Base
      *
      * @api   GET /learning/grades/{userId}/{termCode}/{subjectId}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      * @param Term $term
      * @param Folder $subject
      */
-    public function getGradesForSubject(User $student, Term $term, Folder $subject)
+    public function getGradesForSubject(User $viewee, Term $term, Folder $subject)
     {
         // Despite the fact that this is displaying grades for a single student,
         // ALL participants are still required (because the student is compared
@@ -324,14 +350,14 @@ class Controller extends Base
 
             $showcase[$assessment->getId()] = $this->getShowcaseMapper()->findByColumnList(
                 array(
-                    'uid'               => $student->getId(),
+                    'uid'               => $viewee->getId(),
                     'submission_box_id' => $assessment->getId()
                 )
             );
 
             $graphAssessments[] = $assessment->getTitle();
 
-            $feedback = $assessment->getParticipant($student)->findMostRecentVisibleFeedback($this->getUser());
+            $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
 
             if ($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
@@ -392,15 +418,15 @@ class Controller extends Base
 
         // Grab the students conversation history
 
-        $conversation = new Conversation($student, $subject);
+        $conversation = new Conversation($viewee, $subject);
 
         // Squeeze it on out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/gradesSubject.twig', [
-            'student'           => $student,
+            'student'           => $viewee,
             'term'              => $term,
             'terms'             => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'           => $this->getFolderMapper()->findFoldersWithSubmissions($student, $term),
+            'folders'           => $this->getFolderMapper()->findFoldersWithResponses($viewee, $term),
             'subject'           => $subject,
             'markbook'          => $markbook,
             'graphInfo'         => json_encode($graphInfo),
@@ -412,7 +438,7 @@ class Controller extends Base
             'comments'          => $conversation->getVisibleComments($this->getUser()),
             'showcase'          => $showcase,
             'currentUser'       => $this->getUser(),
-            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $student, $term)
+            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term)
         ]));
     }
 
@@ -563,6 +589,24 @@ class Controller extends Base
     protected function setShowcaseMapper(ShowcaseMapper $showcaseMapper)
     {
         $this->showcaseMapper = $showcaseMapper;
+        return $this;
+    }
+
+    /**
+     * @return Timetable_ColourMapper
+     */
+    public function getTimetableColourMapper()
+    {
+        return $this->timetableColourMapper;
+    }
+
+    /**
+     * @param Timetable_ColourMapper $timetableColourMapper
+     * @return static
+     */
+    public function setTimetableColourMapper(Timetable_ColourMapper $timetableColourMapper)
+    {
+        $this->timetableColourMapper = $timetableColourMapper;
         return $this;
     }
 }

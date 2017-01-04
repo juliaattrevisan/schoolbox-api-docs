@@ -63,7 +63,8 @@ if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPer
 	error(127);
 }
 
-$attempt->setReviewed(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+$attempt->setReviewed(Alaress_Date_Format::now());
+$attempt->setReviewer($sessionUser);
 $attemptMapper->save($attempt);
 
 $assessmentId = $assess->getAssessmentModel()->getId();

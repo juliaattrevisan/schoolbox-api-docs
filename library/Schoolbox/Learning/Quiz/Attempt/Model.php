@@ -28,32 +28,39 @@ class Model implements ISoftDeletable
     /**
      * @var Quiz
      */
-    protected $quiz;
+    private $quiz;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $start;
+    private $start;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $finish;
+    private $finish;
+
+    /**
+     * The teacher who reviewed this attempt. Null if not yet reviewed.
+     *
+     * @var User|null
+     */
+    private $reviewer;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $reviewed;
+    private $reviewed;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $deleted;
+    private $deleted;
 
     /**
      * @var QuizAnswer[]|GenericCollection<QuizAnswer>
@@ -211,6 +218,24 @@ class Model implements ISoftDeletable
     public function setAnswers(GenericCollection $answers)
     {
         $this->answers->replaceWith($answers);
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getReviewer()
+    {
+        return $this->reviewer;
+    }
+
+    /**
+     * @param User|null $reviewer
+     * @return static
+     */
+    public function setReviewer(User $reviewer = null)
+    {
+        $this->reviewer = $reviewer;
         return $this;
     }
 }
