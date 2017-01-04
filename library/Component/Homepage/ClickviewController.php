@@ -23,7 +23,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        if (!strlen(trim($this->getConfig('url')))) {
+        $clickviewSchoolId = Config::get('clickview_school_id');
+
+        if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
 
             $this->setBlock($templateHandle, 'clickview', 'clickview_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
@@ -44,7 +46,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 $this->parse('empty_read_block', 'empty_read');
             } else {
 
-                if (strlen(Config::get('clickview_school_id')) == 0) {
+                if (strlen($clickviewSchoolId) == 0) {
                     if ($this->getUser()->isSuperuser()) {
                         $this->parse('empty_api_admin_block', 'empty_api_admin');
                     } else {
@@ -70,7 +72,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('has_clickview_block', '');
             $this->setVar('online_clickview_block', '');
             $this->setVar('iframe_clickview_block', '');
-            $this->setVar('CLICKVIEW_SCHOOL_ID', Config::get('clickview_school_id'));
+            $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
             /* If no url is specified it might time out -_-
              * So just hide all this instead
