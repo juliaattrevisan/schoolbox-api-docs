@@ -24,15 +24,11 @@ class Mark
     use Id;
     use CreatedAtDate;
 
-
     /** @var User */
     private $student;
 
     /** @var Descriptor */
     private $descriptor;
-
-    /** @var float */
-    private $mark;
 
     /** @var bool */
     private $valid;
@@ -71,24 +67,6 @@ class Mark
     public function setDescriptor($descriptor)
     {
         $this->descriptor = $descriptor;
-        return $this;
-    }
-
-    /**
-     * @return float
-     */
-    public function getMark()
-    {
-        return $this->mark;
-    }
-
-    /**
-     * @param float $mark
-     * @return static
-     */
-    public function setMark($mark)
-    {
-        $this->mark = $mark;
         return $this;
     }
 

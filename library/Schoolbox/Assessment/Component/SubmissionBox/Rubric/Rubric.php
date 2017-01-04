@@ -331,7 +331,6 @@ class Rubric extends Core\Rubric
                  ->createModel()
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
                  ->setValid(true)
-                 ->setMark(0)
             );
         }
 

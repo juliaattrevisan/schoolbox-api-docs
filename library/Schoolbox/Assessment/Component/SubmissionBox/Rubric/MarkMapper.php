@@ -36,7 +36,6 @@ class MarkMapper extends Mapper
         $this->hasModel(Mark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('mark', self::TYPE_DECIMAL);
         $this->uses('valid', self::TYPE_BOOLEAN);
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
@@ -86,6 +85,4 @@ class MarkMapper extends Mapper
 
         return $c;
     }
-
-
 }
