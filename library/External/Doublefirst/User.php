@@ -387,8 +387,15 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS StudentBoarder
+                
+                ''                                                  AS StudentBoarder,
+                pca.CustodyAlert                                    AS CustodyAlert,
+                pca.CustodyNotes                                    AS CustodyNotes,
+                pcad.Description                                    AS CustodyResponsiblePerson
             FROM V_PupilBasicInformation                            p
-            LEFT JOIN PupilMedicalInformation                       m ON m.PupilID = p.PupilID
+            LEFT JOIN PupilCareAuthority pca                        ON pca.PupilID = p.PupilID
+            LEFT JOIN LookupDetails pcad                            ON pcad.LookupID = 3025 AND LookupDetailsID = pca.ResponsibleForCustody
+            LEFT JOIN PupilMedicalInformation m                     ON m.PupilID = p.PupilID                
             LEFT JOIN PupilContacts ec                              ON ec.RelationshipToPupil IN ('{$assignation}') AND ec.PupilID = p.PupilID
             LEFT JOIN ContactMaster ecm                             ON ecm.ContactID = ec.ContactID
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile    ON ecmPhoneMobile.ContactID = ecm.ContactID AND ecmPhoneMobile.TelephoneType = 'M'
