@@ -20,7 +20,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Mark hydrate(array $row, $alias = '', $callback = null)
- * @method Mark createModel()
+ * @method Mark createModel($idValue = null)
  */
 class MarkMapper extends Mapper
 {
