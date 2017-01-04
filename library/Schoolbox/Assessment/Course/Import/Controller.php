@@ -693,80 +693,82 @@ class Controller extends Base\Base
                     $unitImpl->setDueDate($unitImplCloseDate);
                     $this->getUnitImplementationMapper()->save($unitImpl);
 
-                    // Create/Update AssessmentImpls
-                    foreach ($unitPair['a'] as $assessmentId => $aData) {
-                        // Ignore unchecked items. ( If they were already imported, they were deleted above.)
-                        if (!isset($aData['checked'])) {
-                            continue;
-                        }
-
-                        $assessmentMapperProxy = $this->getAssessmentMapperProxy();
-
-                        // Get Spec if cloned, or null if AssessmentImpl created in UnitImpl
-                        try{
-                            $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
-                        } catch (MapperException\Deleted $e){
-                            $assessmentSpec = $e->getDeletedObject();
-                        }
-
-                        // Is this a creation from the spec ?
-                        if (!$aData['impl_id']) {
-                            $assessmentImpl = $assessmentSpec->cloneForCopy();
-                            // TODO need to implement __clone() on DueWork to clone Rubric correctly
-                            $assessmentImpl->setContext($unitImpl);
-                            $unitImpl->getAssessables()->add($assessmentImpl);
-                        } // Else we have been passed the Assessment Impl
-                        else {
-                            // Retrieve AssessmentImpl from UnitImpl
-                            $filter = function ($impl) use ($assessmentId) {
-                                /** @var IAssessable $impl */
-                                return $impl->getId() == $assessmentId;
-                            };
-                            $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
-                        }
-
-                        // Don't forget to set the spec assessment on the impl
-                        $assessmentImpl->setSpecificationAssessment($assessmentSpec);
-
-                        // Set/Update Dates
-                        foreach ($aData['dates'] as $property => $localShort) {
-                            $method = "set{$property}At";
-                            if (!method_exists($assessmentImpl, $method)) {
-                                $this->sendError("Invalid date property: $property");
-                                return;
-                            }
-                            $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
-                        }
-                        $assessmentMapperProxy->save($assessmentImpl);
-
-                        // Did we just clone a Quiz?
-                        if(!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable){
-                            /** @var Quiz $quizSpec */
-                            $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
-                            $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
-
-                            foreach($quizSpec->getSections() as $section){
-                                $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
-                                $section->setQuestions($questions);
+                    if (is_array($unitPair['a'])) {
+                        // Create/Update AssessmentImpls
+                        foreach ($unitPair['a'] as $assessmentId => $aData) {
+                            // Ignore unchecked items. ( If they were already imported, they were deleted above.)
+                            if (!isset($aData['checked'])) {
+                                continue;
                             }
 
-                            // Copy to our implementation
-                            /** @var Quiz $quizImpl */
-                            $quizImpl = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentImpl->getId())->first();
-                            $clone = clone $quizSpec;
-                            $quizImpl->setSections($clone->getSections());
+                            $assessmentMapperProxy = $this->getAssessmentMapperProxy();
 
-                            // Save
-                            foreach($quizImpl->getSections() as $section){
-                                $section->setQuiz($quizImpl);
-                                $this->getQuizSectionMapper()->save($section);
+                            // Get Spec if cloned, or null if AssessmentImpl created in UnitImpl
+                            try {
+                                $assessmentSpec = $aData['spec_id'] ? $assessmentMapperProxy->findById($aData['spec_id']) : null;
+                            } catch (MapperException\Deleted $e) {
+                                $assessmentSpec = $e->getDeletedObject();
+                            }
 
-                                foreach($section->getQuestions() as $question){
-                                    $this->getQuizQuestionMapper()->save($question);
-                                    if($question->getSolution() instanceof QuizSolution){
-                                        $this->getQuizSolutionMapper()->save($question->getSolution());
+                            // Is this a creation from the spec ?
+                            if (!$aData['impl_id']) {
+                                $assessmentImpl = $assessmentSpec->cloneForCopy();
+                                // TODO need to implement __clone() on DueWork to clone Rubric correctly
+                                $assessmentImpl->setContext($unitImpl);
+                                $unitImpl->getAssessables()->add($assessmentImpl);
+                            } // Else we have been passed the Assessment Impl
+                            else {
+                                // Retrieve AssessmentImpl from UnitImpl
+                                $filter = function ($impl) use ($assessmentId) {
+                                    /** @var IAssessable $impl */
+                                    return $impl->getId() == $assessmentId;
+                                };
+                                $assessmentImpl = $unitImpl->getAssessables()->filter($filter)->first();
+                            }
+
+                            // Don't forget to set the spec assessment on the impl
+                            $assessmentImpl->setSpecificationAssessment($assessmentSpec);
+
+                            // Set/Update Dates
+                            foreach ($aData['dates'] as $property => $localShort) {
+                                $method = "set{$property}At";
+                                if (!method_exists($assessmentImpl, $method)) {
+                                    $this->sendError("Invalid date property: $property");
+                                    return;
+                                }
+                                $assessmentImpl->$method(\Alaress_Date_Format::newLocalShort($localShort));
+                            }
+                            $assessmentMapperProxy->save($assessmentImpl);
+
+                            // Did we just clone a Quiz?
+                            if (!$aData['impl_id'] && $assessmentImpl instanceof QuizAssessable) {
+                                /** @var Quiz $quizSpec */
+                                $quizSpec = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentSpec->getId())->first();
+                                $quizSpec->setSections($this->getQuizSectionMapper()->findByColumn('assess_id', $quizSpec->getId()));
+
+                                foreach ($quizSpec->getSections() as $section) {
+                                    $questions = $this->getQuizQuestionMapper()->findByColumn('section_id', $section->getId());
+                                    $section->setQuestions($questions);
+                                }
+
+                                // Copy to our implementation
+                                /** @var Quiz $quizImpl */
+                                $quizImpl = $this->getQuizMapper()->findByColumn('assessment_id', $assessmentImpl->getId())->first();
+                                $clone = clone $quizSpec;
+                                $quizImpl->setSections($clone->getSections());
+
+                                // Save
+                                foreach ($quizImpl->getSections() as $section) {
+                                    $section->setQuiz($quizImpl);
+                                    $this->getQuizSectionMapper()->save($section);
+
+                                    foreach ($section->getQuestions() as $question) {
+                                        $this->getQuizQuestionMapper()->save($question);
+                                        if ($question->getSolution() instanceof QuizSolution) {
+                                            $this->getQuizSolutionMapper()->save($question->getSolution());
+                                        }
+
                                     }
-
                                 }
                             }
                         }
