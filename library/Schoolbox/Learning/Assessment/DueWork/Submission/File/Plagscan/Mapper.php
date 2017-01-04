@@ -58,6 +58,20 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
+     * If the Gateway spawned, plagscan is enabled
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        if ($this->getGateway()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
@@ -68,7 +82,7 @@ class Mapper extends \Schoolbox\Mapper
         /* No existing Plagscan found for $dirtyDocument
          * Spawn new and ship it to Plagscan Gateway
          */
-        if (!$this->getGateway()) {
+        if (!$this->isEnabled()) {
             return [];
         }
 
