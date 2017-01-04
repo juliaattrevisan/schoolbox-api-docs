@@ -157,7 +157,7 @@ class Controller extends Base
 
                 /* Plagscan status
                  */
-                'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled(),
+                'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
                 /* Rubrics data
                  */

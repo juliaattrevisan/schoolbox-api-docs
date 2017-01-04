@@ -11,8 +11,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\User;
 
 class Mapper extends \Schoolbox\Mapper
 {
@@ -58,14 +59,33 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * If the Gateway spawned, plagscan is enabled
+     * If the Gateway spawned, plagscan is enabled for the $user specified
      *
+     * Assuming the Gateway spawned:
+     * - Students and parents can see plagscan results allowed via config
+     * - Staff and Superusers can always see plagscan results
+     *
+     * @param User $user
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(User $user)
     {
+        /* Did the Gateway spawn properly
+         * If so, there is a functioning username/apikey
+         */
         if ($this->getGateway()) {
-            return true;
+
+            /* Staffs and super can always see plagscan results
+             */
+            if ($user->getRole()->isStaff() || $user->isSuperuser()) {
+                return true;
+            }
+
+            /* If the $user is a student or a parent, check a config var too
+             */
+            if (($user->getRole()->isStudent() || $user->getRole()->isParent()) && $this->getConfigLoader()->get('plagscan_student_visible')) {
+                return true;
+            }
         }
 
         return false;
