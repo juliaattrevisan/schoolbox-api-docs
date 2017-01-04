@@ -23,6 +23,8 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
+        $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
+
         $listSyns = null;
 
         if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
