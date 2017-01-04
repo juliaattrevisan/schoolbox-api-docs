@@ -8,13 +8,13 @@
 {% endif %}
 
 {% if assessmentType == 'dueWork' %}
-    {% set teacherMessage = 'to assess your students.' %}
+    {% set teacherMessage = 'to assess your students' %}
     {% set studentMessage = 'There is no due work to complete at this time.' %}
 {% elseif assessmentType == 'quiz'  %}
-    {% set teacherMessage = 'to test your students.' %}
+    {% set teacherMessage = 'to test your students' %}
     {% set studentMessage = 'There are no quizzes to complete at this time.' %}
 {% elseif assessmentType == 'task'  %}
-    {% set teacherMessage = 'for your students to complete.' %}
+    {% set teacherMessage = 'for your students to complete' %}
     {% set studentMessage = 'There are no tasks to complete at this time.' %}
 {% endif %}
 
