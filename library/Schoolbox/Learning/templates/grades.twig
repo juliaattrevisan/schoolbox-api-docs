@@ -65,11 +65,9 @@
                             </div>
                             <div class="small-4 columns no-pad">
                                 <div class="grade content">
-                                    <a href="/learning/feedback/student/{{ student.id }}/{{ term.code }}/{{ folder.id }}">
-                                        <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
-                                            {{ markbooks[folder.id].weightedMean }}
-                                        </span>
-                                    </a>
+                                    <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
+                                        {{ markbooks[folder.id].weightedMean }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
