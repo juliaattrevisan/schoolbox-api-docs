@@ -59,12 +59,12 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 
         if ($showEmpty) {
 
-            $this->setVar('countdown_block', '');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
             $this->setVar([
+                'countdown_block' => '',
                 'empty_read_only_block' => '',
                 'empty_config_block' => '',
                 'empty_invalid_block' => '',
