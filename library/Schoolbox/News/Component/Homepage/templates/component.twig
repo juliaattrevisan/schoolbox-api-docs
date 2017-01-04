@@ -4,10 +4,20 @@
         <i class="icon-news"></i>
 
         {% if modify %}
-            <p><a href="/news/homepage/new/{{ code }}">Post a news article</a> to share new information, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</p>
+
+            {% if showArchive %}
+                <p><a href="/news/homepage/new/{{ code }}">Post a news article</a> to share new information, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</p>
+            {% else %}
+                <p><a href="/news/homepage/new/{{ code }}">Post a news article</a> to share new information.</p>
+            {% endif %}
+
         {% else %}
+
             <p>There is no news to view at this time.</p>
-            <p><a href="/homepage/newsArchive/{{ code }}">View the news archive</a>.</p>
+            {% if showArchive %}
+                <p><a href="/homepage/newsArchive/{{ code }}">View the news archive</a>.</p>
+            {% endif %}
+
         {% endif %}
     </div>
 
@@ -60,13 +70,20 @@
             {% endif %}
 
         </ul>
-        <div class="component-action">
-            <section>
-                <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
-                {% if modify %}
-                    <a href="/news/homepage/new/{{ code }}" class="button">Post News</a>
-                {% endif %}
-            </section>
-        </div>
+
+        {# Component Actions #}
+        {% if showArchive or modify %}
+            <div class="component-action">
+                <section>
+                    {% if showArchive %}
+                        <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
+                    {% endif %}
+                    {% if modify %}
+                        <a href="/news/homepage/new/{{ code }}" class="button">Post News</a>
+                    {% endif %}
+                </section>
+            </div>
+        {% endif %}
+
     </section>
 {% endif %}
