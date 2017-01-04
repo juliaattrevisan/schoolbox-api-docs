@@ -81,12 +81,6 @@
                         </form>
 
                         <div class="chat-error hide"></div>
-
-                        <div id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal" data-reveal>
-                            <h2>Chat Participants</h2>
-                            <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
-                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                        </div>
                     </div>
                     <div class="component-action">
                         <section>
@@ -100,8 +94,7 @@
                     </div>
                     <div class="component-action">
                         <section>
-                            <a class="button" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate
-                                Chat</a>
+                            <a class="button" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate Chat</a>
                             <a href="/homepage/chatArchive/{ID}/" class="button">View Archive</a>
                             <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button">Participants</a>
                         </section>
@@ -109,6 +102,12 @@
                 <!-- END chat_state_inactive -->
             </section>
             <!-- END chat -->
+
+            <div data-reveal id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal">
+                <h2>Chat Participants</h2>
+                <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
 
         </div>
     </div>
