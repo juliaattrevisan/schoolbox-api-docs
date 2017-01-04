@@ -39,6 +39,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
+        $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
+
         /* Get all the students belonging to this category code
          */
         $externalClassHandler = new External_Class();
@@ -48,8 +50,43 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             $this->setBlock($templateHandle, 'class_list', 'class_list_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
+            $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
+            $this->setBlock('empty_state', 'empty_code_admin', 'empty_code_admin_block');
+            $this->setBlock('empty_state', 'empty_students', 'empty_students_block');
+            $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
-            $this->setVar('class_list_block', '');
+            $this->setVar([
+                'class_list_block' => '',
+                'empty_read_block' => '',
+                'empty_is_group_block' => '',
+                'empty_code_block' => '',
+                'empty_code_admin_block' => '',
+                'empty_students_block' => '',
+                'empty_students_admin_block' => '',
+            ]);
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->parse('empty_read_block', 'empty_read');
+            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
+
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_code_admin_block', 'empty_code_admin');
+                } else {
+                    $this->parse('empty_code_block', 'empty_code');
+                }
+
+            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and $this->getSource()->getFolder()->isGroup()) {
+                $this->parse('empty_is_group_block', 'empty_is_group');
+            } else {
+
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_students_admin_block', 'empty_students_admin');
+                } else {
+                    $this->parse('empty_students_block', 'empty_students');
+                }
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
