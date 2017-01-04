@@ -340,6 +340,8 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
         $this->getMenuSideMapper()->deleteByColumn("id", $post["id"]);
+        $this->getResponse()->status->set(204);
+        $this->getResponse()->content->set($this->buildJsonOutput([]));
     }
 
     /**

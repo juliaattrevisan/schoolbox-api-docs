@@ -62,7 +62,7 @@
                     $.post('{{ routeLookup('adminMenuSide.postDelete') }}', {
                         id: id
                     }).success(function (e) {
-                        $(listItem).remove();
+                        window.location.href = '{{ routeLookup('adminMenuSide.getIndex') }}';
                     });
                 }
             });
@@ -85,7 +85,7 @@
         <a class="icon-more" title="Actions" data-dropdown="header-options2" aria-expanded="false"></a>
     </nav>
     <ul id="header-options2" class="f-dropdown" data-dropdown-content>
-        <li><a class="icon-delete" title="Delete Item" data-cancel data-delete="{{ item.id }}">Delete Item</a></li>
+        <li><a class="icon-delete" title="Delete Item" data-delete="{{ item.id }}">Delete Item</a></li>
     </ul>
 </div>
 
