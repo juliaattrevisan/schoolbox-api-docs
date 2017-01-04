@@ -277,8 +277,9 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
         $query = "
             SELECT    id
             FROM      `{$this->getTable()}` `n`
-            WHERE     `n`.`code` = :catId AND
-                      (datetime_published <= CURDATE() OR owner = :userId) AND datetime_expires < CURDATE()
+            WHERE     `n`.`code` = :catId 
+                      AND (datetime_published <= CURDATE() OR owner = :userId) AND datetime_expires < CURDATE()
+                      AND `n`.deleted = 0
             LIMIT     1
         ";
 
