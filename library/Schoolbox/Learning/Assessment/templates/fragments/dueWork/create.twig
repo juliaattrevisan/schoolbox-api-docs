@@ -83,7 +83,8 @@
 
 {% if context.baseContext is unitSpecification %}
 <label>
-    Expected Completion Duration (Days)
+    Activity Duration
+    <span class="hint has-tip tip-top" data-tooltip title="Enter the number of days you expect the activity to take. This will be used to automatically populate due dates when importing this course.">?</span>
     <input type="number" name="duration" value="{{ assessment.duration }}">
 </label>
 {% endif %}

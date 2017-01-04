@@ -124,7 +124,7 @@ class Factory
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
         $this->setWeight(intval($post['weight']));
-        $this->setDuration(intval($post['duration']));
+        $this->setDuration(empty($post['duration']) ? null : intval($post['duration']));
         $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
