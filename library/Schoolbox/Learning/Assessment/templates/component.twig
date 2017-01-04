@@ -7,22 +7,35 @@
     {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
 {% endif %}
 
+{% if assessmentType == 'dueWork' %}
+    {% set teacherMessage = 'to assess your students.' %}
+    {% set studentMessage = 'There is no due work to complete at this time.' %}
+{% elseif assessmentType == 'quiz'  %}
+    {% set teacherMessage = 'to test your students.' %}
+    {% set studentMessage = 'There are no quizzes to complete at this time.' %}
+{% elseif assessmentType == 'task'  %}
+    {% set teacherMessage = 'for your students to complete.' %}
+    {% set studentMessage = 'There are no tasks to complete at this time.' %}
+{% endif %}
+
+{% set indef = (assessmentType == 'dueWork' ? '' : 'a ') %}
+
 {% if assessables is empty %}
 
-<div class="empty-state">
-    <i class="{{ icon }}"></i>
-    <p>No {{ typeLabel | lower }}, yet!</p>
-    {% if user.role.isStudent %}
-        <p>
-            <a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>
-        </p>
-    {% endif %}
-    {% if createRoute %}
-        <p>
-            <a href="{{ createRouteType }}">Create {{ typeLabel }}</a>
-        </p>
-    {% endif %}
-</div>
+    <div class="empty-state">
+        <i class="{{ icon }}"></i>
+
+        {% if readOnly %}
+
+            <p>{{ studentMessage }}</p>
+            <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a></p>
+        {% else %}
+
+            <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not part of your course {{ teacherMessage }}.</p>
+
+        {% endif %}
+
+    </div>
 
 {% else %}
 
