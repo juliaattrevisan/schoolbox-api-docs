@@ -250,19 +250,18 @@ class Rubric extends Core\Rubric
             $critModel = $this->createORMCriterion($descriptor->getCriterion());
             $lvlModel  = $this->createORMLevel($level, $sequence);
 
-            $map = DescriptorMapper::getInstance();
+            $mapper = DescriptorMapper::getInstance();
 
             try {
                 // this is a unique index
-                $model = $map->findOneByColumnList([
+                $model = $mapper->findOneByColumnList([
                     'criterion_id'      => $critModel->getId(),
-                    'submission_box_id' => $this->getSubmissionBox()->getId(),
                     'level_id'          => $lvlModel->getId()
                 ]);
 
             } catch (Mapper\Exception $e) {
                 // that intersection doesn't exist, so we'll use a fresh model
-                $model = $map->createModel();
+                $model = $mapper->createModel();
             }
 
             $model
@@ -333,7 +332,6 @@ class Rubric extends Core\Rubric
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
                  ->setValid(true)
                  ->setMark(0)
-                 ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
             );
         }
 

@@ -1,5 +1,8 @@
 -- Remove redundant fields from 'rubric_mark' table
-ALTER TABLE `rubric_mark` DROP COLUMN `submission_box_id`;
+ALTER TABLE `rubric_mark`
+  DROP COLUMN `submission_box_id`,
+  DROP COLUMN `criterion_id`
+;
 
 -- TODO, drop `criterion_id` and `mark` fields
 
