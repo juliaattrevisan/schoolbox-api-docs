@@ -31,7 +31,18 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->setVar('tweet_block', '');
 
         $emptyState = false;
+        $noApiKey = false;
         $noConfig = false;
+
+        if (
+            strlen(Config::get('twitter_api_consumer_key')) == 0
+            || strlen(Config::get('twitter_api_consumer_secret')) == 0
+            || strlen(Config::get('twitter_api_oauth_token')) == 0
+            || strlen(Config::get('twitter_api_oauth_token_secret')) == 0
+        ) {
+            $emptyState = true;
+            $noApiKey = true;
+        }
 
         /**
          * Check if any username or hashtag has been set
@@ -57,12 +68,16 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
          */
         if ($emptyState) {
 
+            $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
+            $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_config_write', 'empty_config_write_block');
             $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
             $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
 
             $this->setVar([
+                'empty_api_block' => '',
+                'empty_api_admin_block' => '',
                 'twitter_feed_block' => '',
                 'empty_config_block' => '',
                 'empty_config_write_block' => '',
@@ -70,7 +85,15 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 'empty_results_write_block' => '',
             ]);
 
-            if ($noConfig) {
+            if ($noApiKey) {
+
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_api_admin_block', 'empty_api_admin');
+                } else {
+                    $this->parse('empty_api_block', 'empty_api');
+                }
+
+            } else if ($noConfig) {
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_config_block', 'empty_config');
