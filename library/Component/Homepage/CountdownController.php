@@ -66,7 +66,7 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 
             $this->setVar([
                 'empty_read_only_block' => '',
-                'empty_modify_block' => '',
+                'empty_config_block' => '',
                 'empty_invalid_block' => '',
             ]);
 
