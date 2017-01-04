@@ -352,6 +352,7 @@ class External_Doublefirst_User implements External_UserInterface
             SELECT TOP 1
             
                 p.PupilID                                           AS StudentID,
+                p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
                 BirthDate                                           AS StudentBirthDate,                
@@ -687,7 +688,7 @@ class External_Doublefirst_User implements External_UserInterface
                       c.Title AS StudentContactTitle,
                       cm.Greeting AS StudentContactPreferred,
                       c.Surname StudentContactSurname,
-                      '' AS StudentContactDefaultEmail,
+                      ce.HomeEmailAddress AS StudentContactDefaultEmail,
                       1 AS ValidAddressFlag,
                       a.SubDwelling AS StudentContactAddress1,
                       a.Street AS StudentContactAddress2,

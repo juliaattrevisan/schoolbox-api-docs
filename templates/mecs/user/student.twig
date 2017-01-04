@@ -1,5 +1,12 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_studentId %}
+    <dt class="no-margin small-6 medium-3">Admission ID</dt>
+    <dd class="no-margin small-6 medium-9">{{ externalUser.AdmissionNo }}</dd>
+    <dt class="no-margin small-6 medium-3">Engage ID</dt>
+    <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+{% endblock details_studentId %}
+
 {% block contacts %}
     <h2 class="subheader">Contact Information</h2>
     {% if showContactsAlert %}
