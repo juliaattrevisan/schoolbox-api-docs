@@ -24,20 +24,20 @@
 
         {% if readonly %}
 
-            <p>Nothing found.</p>
+            <p>There are no curriculum details to view at this time.</p>
 
         {% else %}
 
             {% if not curriculumTagging %}
 
                 {% if currentUser.isSuperuser %}
-                    <p>Curriculum tagging is not enabled. This needs to be enabled in <a href="/adminv2/setting/LMS+Policy">Adminstration under Settings -> LMS Policy</a> before you can set curriculum codes for this folder.</p>
+                    <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
                 {% else %}
-                    <p>Curriculum tagging is not enabled. This will need to be enabled by a superuser in Administration before you can use this component.</p>
+                    <p>Ask your IT team to turn on the Enable Curriculum Tagging toggle in the LMS Policy Settings in the Administration system to use this feature.</p>
                 {% endif %}
 
             {% else %}
-                <p>Before anything will display here you need to first <a href="/resource/folder/modify/{{ context.id }}">set curriculum codes</a> for this folder.</p>
+                <p><a href="/resource/folder/modify/{{ context.id }}">Enter curriculum codes</a> to link and display the codes, along with matching skill descriptors, that relate to this page. This component works best on course and unit pages.</p>
             {% endif %}
 
         {% endif %}
