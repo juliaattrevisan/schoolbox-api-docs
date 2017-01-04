@@ -27,7 +27,6 @@ Usage:
 
 <div class="empty-state" data-empty-state>
     <i class="icon-course"></i>
-    {% set entity = hasUnitSpec ? 'a unit' : (hasCourseSpec ? 'a course' : 'an invalid context') %}
-    <p>This page is {{ entity }} and cannot have a course outline.</p>
-    <p><a href="#" data-action="delete-component">Remove</a> this component.</p>
+    {% set entity = hasUnitSpec ? 'a unit page' : (hasCourseSpec ? 'a course page' : 'an invalid context') %}
+    <p>This component works on class pages to import courses for students to complete. This page is {{ entity }} so the component doesn't work here. <a href="#" data-action="delete-component">Remove this component</a>.</p>
 </div>
