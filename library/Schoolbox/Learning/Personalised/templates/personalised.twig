@@ -316,7 +316,7 @@
                                 case 'end':
                                     // Output in our configured format
                                     var date = calEvent[valueTag],
-                                        format = dateDisplayFormats.momentJs;
+                                        format = 'dddd, Do MMMM YYYY'
 
                                     if (!calEvent.allDay) {
                                         format = format+', h:mm a'
