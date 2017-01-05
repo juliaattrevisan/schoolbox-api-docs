@@ -849,12 +849,7 @@ class RubricMapper
         $where = implode(' AND ', $pb->getWhere());
 
         $stmt = $this->database->prepare("
-            SELECT
-              rc.grouping,
-              rc.name,
-              a.id,
-              a.title,
-              rd.description
+            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
             FROM rubric_criterion rc
             JOIN rubric_usage ru ON rc.id = ru.criterion_id
             JOIN submission_box sb ON ru.submission_box_id = sb.id
