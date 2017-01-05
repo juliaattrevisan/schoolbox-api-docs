@@ -210,6 +210,9 @@ abstract class Mapper implements IMapper, Serializable
     /** @var IMonitor */
     protected $monitor;
 
+    /** @var bool */
+    private $localBodyCacheBypass = false;
+
     /**
      * Retreives the singleton instance of this class.
      *
@@ -308,13 +311,15 @@ abstract class Mapper implements IMapper, Serializable
         $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
             $statement->execute();
 
-            $modelList = $this->createCollection();
+            // bypass the local body cache if necessary
+            $this->localBodyCacheBypass = $bypassCache;
 
-            foreach ($this->iterateStatement($statement) as $row) {
-                $modelList->add($this->performHydration($this->localBodyCache, $this, $row, '', null, $bypassCache));
-            }
+            $collection = $this->hydrateSelect($statement);
 
-            return $modelList;
+            // turn that cache back on!
+            $this->localBodyCacheBypass = false;
+
+            return $collection;
         });
 
         // a cache of join mappers (for some reason this method is expensive)
@@ -2530,12 +2535,13 @@ abstract class Mapper implements IMapper, Serializable
      * @param array    $row
      * @param string   $alias
      * @param callable $callback
-     * @param bool     $bypassCache
      * @return object
      */
-    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null, $bypassCache = false)
+    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
     {
-        if ($bypassCache) {
+        // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
+        // however, it is not accessible to subclasses
+        if ($mapper->localBodyCacheBypass) {
             // fetch direct
             $model = $cache->fetch([ $mapper, $row, $alias ]);
 
