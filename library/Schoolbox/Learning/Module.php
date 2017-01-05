@@ -10,6 +10,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -31,18 +32,6 @@ class Module extends BaseModule
      */
     protected $basename = 'learning';
 
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var FolderMapper */
-    private $folderMapper;
-
-    /** @var TermMapper */
-    private $termMapper;
-
-    /** @var ErrorMapper */
-    private $errorMapper;
-
     /**
      * @inheritdoc
      */
@@ -50,11 +39,11 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/pending'                                => 'getPendingAssessments',
-                '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
-                '/classes{/termCode}'                     => 'getClasses',
-                '/grades/{userId}{/termCode}'             => 'getGrades',
-                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
+                '/pending'                                => 'getPendingAssessments',        // (no preload)
+                '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
+                '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
+                '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
+                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
             'POST' => []
         ];
@@ -73,28 +62,28 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getPendingAssessments|getClasses)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
-        $ruleRegexp = '(?:getPendingAssessmentsForUser)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
+        $this->addRoutePermission(
+            $authorizer,
+            '(?:getPendingAssessments|getMarkbook)',
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) {
+                return $params['class']->getId();
+            }, Access::getInstance())
+        );
+
+        $this->addRoutePermission(
                 $authorizer,
-                $ruleRegexp,
+                '(?:getPendingAssessmentsForUser)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\IsUser('userId')
                 )
             );
 
-        $ruleRegexp = '(?:getGrades|getGradesForSubject)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
+        $this->addRoutePermission(
                 $authorizer,
-                $ruleRegexp,
+                '(?:getGrades|getGradesForSubject)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -120,25 +109,31 @@ class Module extends BaseModule
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
                     }
                 }
+
                 try {
-                    if($params['termCode']) {
+                    if ($params['termCode']) {
                         $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
-                    }
-                    else {
+                    } else {
                         $args['term'] = $this->getTermMapper()->findForToday();
                     }
+
                 } catch (MapperException $e) {
                     /* If nonexistent term is specified, 404
                      */
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
+
                 if (array_key_exists('subjectId', $params)) {
                     try {
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
+
+                        /* If nonexistent subject is specified, 404
+                         */
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }
+
                 return $args;
             }
         );
@@ -174,46 +169,34 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return Mapper|UserMapper
      */
     protected function getUserMapper()
     {
-        if(!$this->userMapper instanceof UserMapper){
-            $this->userMapper = $this->getMapperFactory()->get(UserMapper::class);
-        }
-        return $this->userMapper;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @return FolderMapper
+     * @return Mapper|FolderMapper
      */
     protected function getFolderMapper()
     {
-        if(!$this->folderMapper instanceof FolderMapper){
-            $this->folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
-        }
-        return $this->folderMapper;
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
     /**
-     * @return TermMapper
+     * @return Mapper|TermMapper
      */
     protected function getTermMapper()
     {
-        if(!$this->termMapper instanceof TermMapper){
-            $this->termMapper = $this->getMapperFactory()->get(TermMapper::class);
-        }
-        return $this->termMapper;
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 
     /**
-     * @return ErrorMapper
+     * @return Mapper|ErrorMapper
      */
     protected function getErrorMapper()
     {
-        if(!$this->errorMapper instanceof ErrorMapper){
-            $this->errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-        }
-        return $this->errorMapper;
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

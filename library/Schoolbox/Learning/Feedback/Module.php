@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Feedback;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
@@ -34,7 +35,19 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // rules
-        $canGiveFeedback = $this->getAuthRule('isLoggedIn');
+        $canGiveFeedbackFromParticipant = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+            if ($params['participant'] instanceof Participant) {
+                return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+            }
+            throw new Forbidden();
+        }, Access::getInstance());
+
+        $canGiveFeedbackFromFeedback    = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+            if ($params['feedback'] instanceof Assessment\IFeedback) {
+                return $params['feedback']->getAssessable()->getContext()->getFolder()->getId();
+            }
+            throw new Forbidden();
+        }, Access::getInstance());
 
         // preloads
         $preloadParticipant = function ($params) {
@@ -60,9 +73,9 @@ class Module extends BaseModule
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback', $canGiveFeedback, $preloadParticipant);
-        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback', $canGiveFeedback, $preloadParticipantAndResponse);
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedback, $preloadFeedback);
+        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
+        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canGiveFeedbackFromFeedback,    $preloadFeedback); // f
     }
 
 

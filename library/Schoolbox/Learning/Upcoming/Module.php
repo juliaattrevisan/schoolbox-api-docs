@@ -48,7 +48,7 @@ class Module extends BaseModule
         $this->register('GET', '', 'getUpcoming', new Rule\IsLoggedIn());
         $this->register(
             'GET',
-            '/{studentId}{/date}',
+            '/{studentId:\d+}{/date}',
             'getUpcomingForStudent',
             $access,
             function ($params) {

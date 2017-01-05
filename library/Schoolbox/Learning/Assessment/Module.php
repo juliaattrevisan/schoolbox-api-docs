@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
@@ -71,14 +70,33 @@ class Module extends BaseModule
         // rules in use
         $isSuper   = $this->getAuthRule('isSuperuser');
         $loggedIn  = $this->getAuthRule('isLoggedIn');
-        $isStaff   = $this->getAuthRule('isStaffOrSuper');
+        $canWrite  = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            function (array $params)
+            {
+                if (isset($params['assessment'])) {
+                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                } elseif (isset($params['context'])) {
+                    $ctx = $params['context']->getFolder()->getId();
+                } else {
+                    throw new NotFound("No assessment or context preloaded");
+                }
+
+                return $ctx;
+            },
+            Access::getInstance()
+        );
 
         $participantView = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasRole(Role::STAFF),
-            new IsParticipant(),
-            new Rule\IsParentOfStudent()
+            new IsParticipant()
         );
+
+        // if parent access is NOT restricted, allow for parents also
+        if ($this->getConfig()->get('restrict_parent_duework_access') == false) {
+            $participantView->addRule(new Rule\IsParentOfStudent());
+        }
 
         $canSubmit = new Rule\Any(
             new Rule\IsSuperuser(),
@@ -98,20 +116,20 @@ class Module extends BaseModule
 
         // register the routes
         $this->register('GET',  "$assListRoute",         'getAssessmentsByContext', $isSuper, $preloadContext);
-        $this->register('POST', "$assListRoute",         'postCreateAssessment',    $isStaff, $preloadContext);
-        $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments',  $isStaff, $preloadContext);
-        $this->register('GET',  "$assListRoute/new",     'getCreateAssessmentForm', $isStaff, $preloadContext);
+        $this->register('POST', "$assListRoute",         'postCreateAssessment',    $canWrite, $preloadContext); // a || c
+        $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments',  $canWrite, $preloadContext); // a || c
+        $this->register('GET',  "$assListRoute/new",     'getCreateAssessmentForm', $canWrite, $preloadContext); // a || c
 
         $this->register('GET',  "$assRoute",        'getAssessment',            $loggedIn, $preloadAssessment);
-        $this->register('POST', "$assRoute",        'postUpdateAssessment',     $isStaff,  $preloadAssessment);
-        $this->register('PATCH', "$assRoute",       'patchUpdateAssessment',    $isStaff,  $preloadAssessment);
-        $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $isStaff,  $preloadAssessment);
-        $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $isStaff,  $preloadAssessment);
-        $this->register('GET',  "$assRoute/status", 'getStatus',                $isStaff,  $preloadAssessment);
+        $this->register('POST', "$assRoute",        'postUpdateAssessment',     $canWrite,  $preloadAssessment); // a || c
+        $this->register('PATCH', "$assRoute",       'patchUpdateAssessment',    $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/modify", 'getUpdateAssessmentForm',  $canWrite,  $preloadAssessment); // a || c
+        $this->register('POST', "$assRoute/delete", 'postDeleteAssessment',     $canWrite,  $preloadAssessment); // a || c
+        $this->register('GET',  "$assRoute/status", 'getStatus',                $canWrite,  $preloadAssessment); // a || c
 
-        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $participantView, $preloadParticipant);
-        $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant);
-        $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant);
+        $this->register('GET',  "$assRoute/$studentParam",        'getSummary',            $participantView, $preloadParticipant); // s || p
+        $this->register('GET',  "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant); // p
+        $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse',    $canSubmit, $preloadParticipant); // p
     }
 
     /**

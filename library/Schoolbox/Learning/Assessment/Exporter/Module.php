@@ -49,7 +49,7 @@ class Module extends BaseModule
         $isStaff = $this->getAuthRule('isStaffOrSuper');
 
         // register the routes
-        $route = "/assessment/{assessmentId:\\d+}";
+        $route = '/assessment/{assessmentId:\d+}';
         $this->register('GET', $route, 'getExportForm', $isStaff, $preloadAssessment);
         $this->register('POST', $route, 'postExport', $isStaff, $preloadAssessment);
     }

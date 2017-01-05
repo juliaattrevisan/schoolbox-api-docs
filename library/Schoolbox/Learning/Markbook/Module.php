@@ -33,7 +33,7 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        // Assuming these are the correct permissions
+        // write access only
         $access = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             function ($params) {
