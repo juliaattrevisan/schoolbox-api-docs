@@ -142,29 +142,30 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
 
-                $this->setVar('video_list_block', '');
-                $this->setVar('video_pending_list_block', '');
-                $this->setVar('default_video_block', '');
+                $this->setVar([
+                    'video_list_block' => '',
+                    'video_pending_list_block' => '',
+                    'default_video_block' => '',
+                ]);
 
                 $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
                 if (count($this->outputList) >= 1) {
                     $j = 0;
                     foreach ($this->outputList as $video) {
-                        $this->setVar(
-                            array(
-                                'VIDEO_LIST_ID' => $video->getFile()->getId(),
-                                'VIDEO_LIST_TITLE' => Scrub::text($video->getFile()->getTitle()),
-                                'VIDEO_LIST_DURATION' => $video->getDuration() >= 3600
-                                    ? gmdate('H:i:s', $video->getDuration())
-                                    : gmdate('i:s', $video->getDuration()),
-                                'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getDescription()),
-                                'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
-                                'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
-                                'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
-                                'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                            )
-                        );
+                        $this->setVar([
+                            'VIDEO_LIST_ID' => $video->getFile()->getId(),
+                            'VIDEO_LIST_TITLE' => Scrub::text($video->getFile()->getTitle()),
+                            'VIDEO_LIST_DURATION' => $video->getDuration() >= 3600
+                                ? gmdate('H:i:s', $video->getDuration())
+                                : gmdate('i:s', $video->getDuration()),
+                            'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getDescription()),
+                            'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
+                            'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
+                            'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
+                        ]);
+
+                        $j++;
 
                         if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                             $this->parse('video_edit_block', 'video_edit', true);
@@ -175,12 +176,10 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                         if ($video->getStatus() == "completed") {
                             $this->parse('video_list_block', 'video_list', true);
                         } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                            $this->setVar(
-                                array(
-                                    'VIDEO_LIST_STATUS' => $video->getStatus(),
-                                    'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
-                                )
-                            );
+                            $this->setVar([
+                                'VIDEO_LIST_STATUS' => $video->getStatus(),
+                                'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
+                            ]);
                             $this->parse('video_pending_list_block', 'video_pending_list', true);
                         }
                     }
