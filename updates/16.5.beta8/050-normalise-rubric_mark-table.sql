@@ -14,12 +14,37 @@ DELETE FROM `rubric_descriptor` WHERE `id` IN (
 );
 
 
+-- Delete descriptors and levels if they are linked (both directly and indirectly via `rubric_level`) to sub boxes that don't exist
+-- These *should* be safe to delete, they are logically the result of deleting a sub box prior to intro of soft-deletion.
+CREATE TABLE temp_descriptors_and_levels(
+  rd_id INT(11) UNSIGNED,
+  rl_id INT(11) UNSIGNED
+);
+-- Get all descriptors and levels that are both linked to the same sub box, but the sub box doesn't exist.
+INSERT INTO temp_descriptors_and_levels (
+  SELECT rd.id, rl.id
+  FROM `rubric_descriptor` rd
+  JOIN `rubric_level` rl ON rl.id = rd.level_id
+  WHERE rd.submission_box_id = rl.box_id
+  AND rd.submission_box_id NOT IN (SELECT DISTINCT id FROM submission_box)
+);
+-- Delete orphan descriptors
+DELETE FROM `rubric_descriptor` WHERE `id` IN (
+  SELECT DISTINCT rd_id FROM temp_descriptors_and_levels
+);
+-- Delete orphan levels
+DELETE FROM `rubric_level` WHERE `id` IN (
+  SELECT DISTINCT rl_id FROM temp_descriptors_and_levels
+);
+-- Drop temp table
+DROP TABLE temp_descriptors_and_levels;
+
 -- Add foreign keys to Rubrics
 
 -- Add foreign keys to 'rubric_criterion'
 ALTER TABLE `rubric_criterion` MODIFY `id` INT(11) UNSIGNED AUTO_INCREMENT;
 
--- Add foreign keys to 'rubric_criterion'
+-- Add foreign keys to 'rubric_descriptor'
 ALTER TABLE `rubric_descriptor`
   DROP INDEX `criterion_id_2`,
   ADD CONSTRAINT `fk_rubric_descriptor_criterion_id`
