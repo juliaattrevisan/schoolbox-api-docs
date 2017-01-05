@@ -106,8 +106,9 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         } else {
 
             //outputs an custom image and link to the homepage
-            $this->setBlock($templateHandle, 'previewimage', 'preview_block');
-            $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
+            $this->setBlock($templateHandle, 'image', 'image_block');
+            $this->setBlock('image', 'previewimage', "preview_block");
+            $this->setBlock('image', 'submit_image', 'submit_image_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar("empty_state_block", "");
@@ -160,6 +161,8 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 $this->setVar("CONTENT_URL_END", "");
             }
             $this->parse("preview_block", "previewimage");
+            $this->parse('image_block', 'image');
+
         }
 
         return true; // everything went according to plan

@@ -45,7 +45,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'image_display', 'image_display_block');
+        $this->setBlock($templateHandle, 'random_image', 'random_image_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         // get image id
@@ -80,9 +80,9 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         } else {
 
             //outputs an custom image and link to the homepage
-            $this->setBlock('image_display', "previewimage", "preview_block");
-            $this->setBlock('image_display', 'submit_image_randimage', 'submit_image_randimage_block');
-            $this->setBlock('image_display', 'empty_state', 'empty_state_block');
+            $this->setBlock('random_image', "previewimage", "preview_block");
+            $this->setBlock('random_image', 'submit_image_randimage', 'submit_image_randimage_block');
+            $this->setBlock('random_image', 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -100,9 +100,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
-            $this->parse("preview_block", "previewimage");
-
-            $this->parse('image_display_block', 'image_display');
+            $this->parse('preview_block', 'previewimage');
+            $this->parse('random_image_block', 'random_image');
         }
 
         return true; // everything went according to plan
