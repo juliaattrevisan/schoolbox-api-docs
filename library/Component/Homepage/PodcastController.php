@@ -86,12 +86,10 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 
                 // Is this the first podcast? output the player if so
                 if ($j === 0) {
-                    $this->setVar(
-                        array(
-                            'DEFAULT_PODCAST_URL'   => Scrub::text($item->enclosure['url']),
-                            'DEFAULT_PODCAST_TITLE' => Scrub::text($item->title),
-                        )
-                    );
+                    $this->setVar([
+                        'DEFAULT_PODCAST_URL'   => Scrub::text($item->enclosure['url']),
+                        'DEFAULT_PODCAST_TITLE' => Scrub::text($item->title),
+                    ]);
                     $this->parse('default_podcast_block', 'default_podcast');
                 }
 
@@ -99,23 +97,24 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 $fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
 
                 if ($fileType->isAudio() || $fileType->isVideo()) {
-                    $this->setVar(
-                        array(
-                            'PODCAST_URL'         => Scrub::text($item->enclosure['url']),
-                            'PODCAST_TITLE'       => Scrub::text($item->title),
-                            'PODCAST_DESCRIPTION' => Scrub::html($item->description),
-                            'ON_OFF'              => ++$j % 2 ? '' : 'dark',
-                            'PODCAST_ID'          => md5($item->title),
-                        )
-                    );
+                    $this->setVar([
+                        'PODCAST_URL'         => Scrub::text($item->enclosure['url']),
+                        'PODCAST_TITLE'       => Scrub::text($item->title),
+                        'PODCAST_DESCRIPTION' => Scrub::html($item->description),
+                        'PODCAST_ID'          => md5($item->title),
+                    ]);
+
+                    $j++;
 
                     $this->parse('podcast_list_block', 'podcast_list', true);
                 }
             }
             // If there are no podcasts in the list
             if ($j == 0) {
-                $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL does not contain any valid audio podcasts');
-                $this->setVar('podcast_list_block', '');
+                $this->setVar([
+                    'PODCAST_COMPONENT_TITLE' => 'Podcast - URL does not contain any valid audio podcasts',
+                    'podcast_list_block' => '',
+                ]);
             }
         }
 
