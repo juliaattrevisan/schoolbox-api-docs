@@ -31,27 +31,42 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
         $emptyState = false;
         $noConfig = false;
 
-        if (strlen(trim($this->getConfig('url'))) == 0) {
+        $url = trim($this->getConfig('url'));
+
+        if (strlen($url) == 0) {
+
             $emptyState = true;
             $noConfig = true;
+
         } else {
 
-            /* Determine whether it's a user profile or a board
-             * Remove domain, check how may parts there are
-             */
-            $url = trim($this->getConfig('url'));
-            $url = preg_replace('#https?://(.*).pinterest.com/?#', '', $url);
-
-            $parts = array_filter(explode('/', $url));
-
-            $partCount = count($parts);
-
             /**
-             * If there's zero or more than two parts -
-             * we can't handle this (most likely invalid url) so show empty state
+             * Check URL is valid
              */
-            if ($partCount != 1 && $partCount != 2) {
+            $urlObject = new Url($url);
+
+            if (!$urlObject->isUrl()) {
                 $emptyState = true;
+            } else {
+
+                /* Determine whether it's a user profile or a board
+                 * Remove domain, check how may parts there are
+                 */
+                $url = trim($this->getConfig('url'));
+                $url = preg_replace('#https?://(.*).pinterest.com/?#', '', $url);
+
+                $parts = array_filter(explode('/', $url));
+
+                $partCount = count($parts);
+
+                /**
+                 * If there's zero or more than two parts -
+                 * we can't handle this (most likely invalid url) so show empty state
+                 */
+                if ($partCount != 1 && $partCount != 2) {
+                    $emptyState = true;
+                }
+
             }
         }
 
