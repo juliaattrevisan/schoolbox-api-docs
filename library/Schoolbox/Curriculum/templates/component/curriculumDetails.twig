@@ -24,7 +24,7 @@
 
         {% if readonly %}
 
-            <p>There are no curriculum details to view at this time.</p>
+            <p>There is no curriculum description to view at this time.</p>
 
         {% else %}
 
@@ -33,11 +33,11 @@
                 {% if currentUser.isSuperuser %}
                     <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
                 {% else %}
-                    <p>Ask your IT team to turn on the Enable Curriculum Tagging toggle in the LMS Policy Settings in the Administration system to use this feature.</p>
+                    <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
                 {% endif %}
 
             {% else %}
-                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Enter curriculum codes</a> to link and display the codes, along with matching skill descriptors, that relate to this page. This component works best on course and unit pages.</p>
+                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or unit page to display the associated description of your curriculum.</p>
             {% endif %}
 
         {% endif %}

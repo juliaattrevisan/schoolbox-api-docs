@@ -48,11 +48,11 @@
                 {% if currentUser.isSuperuser %}
                     <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
                 {% else %}
-                    <p>Ask your IT team to turn on the Enable Curriculum Tagging toggle in the LMS Policy Settings in the Administration system to use this feature.</p>
+                    <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
                 {% endif %}
 
             {% else %}
-                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Enter curriculum codes</a> to link and display the codes and any sub-codes, along with matching skill descriptors, that relate to this page. This component works best on course and unit pages.</p>
+                <p><a href="/resource/folder/modify/{{ context.id }}#curriculum-codes">Map a curriculum code</a> to your course or unit page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
             {% endif %}
 
         {% endif %}
