@@ -158,8 +158,8 @@ class Factory
         Collection $participation
     ) {
         // Find participation
-        $start = $assessable->getPublishAt()->getDatabase();
-        $end   = $assessable->getDueAt()->getDatabase();
+        $start = $assessable->getPublishAt();
+        $end   = $assessable->getDueAt();
         foreach ($participation as $participant) {
             /** @var Participant\Model $participant */
             if ($assessable->getId() == $participant->getAssessment()->getId()) {
