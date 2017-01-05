@@ -1,0 +1,180 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
+
+{# Crumbz: Class > Mastery#}
+{{ bread.crumbs(
+[class.title, '/homepage/'~class.id],
+['Mastery Report', '#']) }}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>{{ class.title }} Mastery Report</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="context-switch">
+            {% include '@learningMastery/fragments/markbookSelector.twig'
+            with {
+            class: class,
+            terms: terms,
+            currentTerm: currentTerm,
+            previousTerm: previousTerm,
+            nextTerm: nextTerm
+            } %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .fail {
+        background-color: rgb(247, 206, 204);
+    }
+    .mastered {
+        background-color: rgb(213, 231, 212);
+    }
+    .notmarked {
+        background-color: rgb(255, 242, 205);
+    }
+</style>
+
+{% set assessments = markbook.assessments.sortBy('dueAt', 'asc') %}
+
+{# Need to only show due work and quizzes only. Would be nice to be able to do markbook.assessments.filterBy('typeName', ['quiz', 'dueWork']) instead #)
+{# but 'dueWork' is not a typename #}
+
+{% set empty = true %}
+{% for assessment in assessments %}
+    {% if assessment is quiz or assessment is dueWork %}
+        {% set empty = false %}
+    {% endif %}
+{% endfor %}
+
+<div class="row">
+    <div class="small-12 island">
+        {% if not empty %}
+            <div class="scrollable">
+                <table>
+                    <thead>
+                    <tr class="rotate-headers">
+                        <th></th>
+                        {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+                            <th>
+                                <div>
+                                    <span>
+                                        <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
+                                        <span class="meta">
+                                            {% if assessment is quiz %}
+                                                Quiz
+                                            {% elseif assessment is dueWork %}
+                                                Due Work
+                                            {% endif %}
+                                        </span>
+                                    </span>
+                                </div>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for student in markbook.students %}
+                        <tr data-id="{{ student.id }}">
+                            <th class="no-pad">
+                                <div class="compact card no-pad small-12">
+                                    <a href="/search/user/{{ student.id }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile"/>
+                                        <p>{{ student.lastname }}, {{ student.firstname }}</p>
+                                    </a>
+                                </div>
+                            </th>
+                            {% set upcomingFound = false %}
+
+                            {% for assessment in assessments if assessment is quiz or assessment is dueWork %}
+
+                                {% set className = '' %}
+                                {% set url = '#' %}
+
+                                {% if assessment.isParticipant(student) %}
+
+                                    {% set humanMark = assessment.getHumanReadableMark(student, true) %}
+                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
+                                    {% set value = assessment.getHumanReadableMark(student, true) | default('–') %}
+                                    {% set participant = assessment.getParticipant(student) %}
+
+                                    {% if participant.isResponded %}
+                                        {% set url = routeLookup('learningAssessment.getSummary', {studentId: student.id, assessmentId: assessment.id}) %}
+                                    {% endif %}
+
+                                {% else %}
+
+                                    {% set humanMark = null %}
+                                    {% set value = '–' %}
+
+                                {% endif %}
+
+                                {% if humanMark is empty %}
+
+                                    {# No mark available #}
+
+                                    {% if not upcomingFound %}
+
+                                        {# Assume the first assessment with no mark is the next one that needs completion and put in a clock icon #}
+
+                                        {% set upcomingFound = true %}
+                                        {% set value = '<i class="icon-clock" title="Next ">' %}
+
+                                    {% else %}
+
+                                        {# Otherwise just leave the cell blank and unstyled #}
+
+                                        {% set className = '' %}
+                                        {% set value = '' %}
+
+                                    {% endif %}
+
+                                {% elseif normalisedMark >= 70 %}
+                                    {% set className = 'mastered' %}
+                                {% else %}
+                                    {% set className = 'fail' %}
+                                {% endif %}
+
+                                {# If student has submitted work but has not received a mark, style the cell appropriately #}
+
+                                {% if participant is not empty %}
+                                    {% if not participant.isMarked and participant.isResponded %}
+                                        {% set className = 'notmarked' %}
+                                    {% endif %}
+                                {% endif %}
+
+                                {# If mastery not achieved and past due date, show clock icon #}
+
+                                {% if className != 'mastered' and assessment.dueAt.isPast %}
+                                    {% set value = '<i class="icon-clock" title="Next ">' %}
+                                {% endif %}
+
+                                <td class="text-center {{ className }}">
+                                    <a href="{{ url }}">{{ value | purify }}</a>
+                                </td>
+
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>No results available this semester.</p>
+            </div>
+
+        {% endif %}
+    </div>
+</div>
