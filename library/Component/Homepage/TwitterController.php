@@ -118,9 +118,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
             $i = 0;
             foreach ($allResults as $currentTweet) {
-                $color = ++$i % 2 ? '' : 'dark';
                 $date  = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
-                //$date  = new Alaress_Date_Format();
 
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);
