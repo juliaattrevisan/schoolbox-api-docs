@@ -265,14 +265,14 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
 
     /**
-     * Checks if there's any archived news items in a category
+     * Checks if there's any archived news items in a folder
      * Used to determine whether to show an archive link or not
      *
-     * @param $categoryId
+     * @param $folderId
      * @param $userId
      * @return bool
      */
-	public function checkArchive($categoryId, $userId)
+	public function checkArchive($folderId, $userId)
     {
         $query = "
             SELECT    id
@@ -286,7 +286,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
         $stmt = $this->database->prepare($query);
 
         $stmt->execute([
-            'catId' => $categoryId,
+            'catId' => $folderId,
             'userId' => $userId
         ]);
 
