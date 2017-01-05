@@ -25,7 +25,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
+        $this->setBlock($templateHandle, 'has_widget', 'has_widget_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $emptyState = false;
@@ -65,7 +65,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
             $this->setVar([
-                'wolfram_block' => '',
+                'has_widget_block' => '',
                 'empty_read_block' => '',
                 'empty_config_block' => '',
                 'empty_invalid_block' => '',
@@ -83,16 +83,10 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 
         } else {
 
-            $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-
-            $this->setVar('empty_state_block', '');
-
-            $this->setVar(
-                array(
-                    'WIDGET_ID' => $matches[2],
-                )
-            );
+            $this->setVar([
+                'empty_state_block' => '',
+                'WIDGET_ID' => $matches[2],
+            ]);
 
             // Allow output type to be set too
             $outputType = 'lightbox';
@@ -101,8 +95,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             }
             $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
 
-            $this->parse('has_wolfram_block', 'has_wolfram');
-
+            $this->parse('has_widget_block', 'has_widget');
         }
 
         return true; // everything went according to plan
