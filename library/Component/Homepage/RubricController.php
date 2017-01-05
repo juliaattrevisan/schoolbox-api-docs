@@ -86,8 +86,12 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $this->setBlock('rubric', 'rubric_criterion', 'rubric_criterion_block');
             $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
             $this->setBlock('rubric', 'modify_rubric', 'modify_rubric_block');
-            $this->setVar('rubric_criterion_block', '');
-            $this->setVar('modify_rubric_block', '');
+
+            $this->setVar([
+                'rubric_criterion_block' => '',
+                'modify_rubric_block' => '',
+            ]);
+
             $i = 0;
 
             /* Create group structure */
@@ -98,13 +102,16 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             }
 
             foreach ($criteriaList as $criterion_group => $criterions) {
-                $this->setVar('CRITERION_GROUP', Scrub::text($criterion_group));
-                $this->setVar('DARK', ($i++ % 2 === 1 ? 'dark' : ''));
-                $this->setVar('rubric_descriptor_block', '');
+                $this->setVar([
+                    'CRITERION_GROUP' => Scrub::text($criterion_group),
+                    'rubric_descriptor_block' => '',
+                ]);
+
                 foreach ($criterions as $crit) {
                     $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
                     $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
                 }
+
                 $this->parse('rubric_criterion_block', 'rubric_criterion', true);
             }
 
