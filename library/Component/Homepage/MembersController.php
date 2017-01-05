@@ -47,33 +47,36 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             $this->setBlock($templateHandle, 'members', 'members_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
+            $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
-            $this->setBlock('empty_state', 'empty_not_group', 'empty_not_group_block');
+            $this->setBlock('empty_state', 'empty_not_group_members', 'empty_not_group_members_block');
+            $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
+            $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
 
             $folderId = $this->getSource()->getFolder()->getId();
 
             $this->setVar([
                 'members_block' => '',
-                'empty_read_block' => '',
+                'empty_read_members_block' => '',
+                'empty_read_managers_block' => '',
                 'empty_class_block' => '',
-                'empty_not_group_block' => '',
+                'empty_not_group_members_block' => '',
+                'empty_not_group_managers_block' => '',
                 'empty_members_block' => '',
+                'empty_managers_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group',
                 'ALT_COMPONENT' => 'class list',
-                'READ_ONLY_MESSAGE' => 'There are no group members added at this time.',
-                'NOT_GROUP_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group members</a> to convert this page to a group to give specific users group membership to this page and display them in this component.',
-                'EMPTY_MEMBERS_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group members</a> to give specific users group membership to this page and display them in this component.',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $block = 'empty_read';
+                $block = 'empty_read_members';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
             } elseif (!$this->getSource()->getFolder()->isGroup()) {
-                $block = 'empty_not_group';
+                $block = 'empty_not_group_members';
             } else {
                 $block = 'empty_members';
             }

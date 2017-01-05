@@ -63,19 +63,16 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group-managers',
                 'ALT_COMPONENT' => 'class teachers',
-                'READ_ONLY_MESSAGE' => 'There are no group managers set at this time.',
-                'NOT_GROUP_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group managers</a>  to convert this page to a group, give specific users group management permissions, and display them in this component.',
-                'EMPTY_MEMBERS_MESSAGE' => '<a href="/group/modify/' . $folderId . '">Add group managers</a> to give specific users group management permissions and display them in this component.',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $block = 'empty_read';
+                $block = 'empty_read_managers';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
             } elseif (!$this->getSource()->getFolder()->isGroup()) {
-                $block = 'empty_not_group';
+                $block = 'empty_not_group_managers';
             } else {
-                $block = 'empty_members';
+                $block = 'empty_managers';
             }
 
             $this->parse($block . '_block', $block);
