@@ -11,10 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractUnit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
@@ -31,11 +27,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
  */
 class Model extends AbstractUnit
 {
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
-
     /**
      * @var CourseSpecification
      */
