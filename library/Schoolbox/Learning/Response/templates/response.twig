@@ -51,7 +51,61 @@
 
             window.location.href = $(this).find('option:selected').attr('data-url');
         });
+
+        $('#header-options').find('[data-delete]').on('click', function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                header: 'Delete Submission',
+                format: 'html',
+                text: 'Are you sure you want to delete this submission? Anything attached to it will also be deleted.',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel',
+                confirmEvent: function() {
+                    $.ajax(element.data('delete'), {
+                        headers: {
+                            'X-HTTP-Method-Override': 'DELETE'
+                        },
+                        dataType: 'json',
+                        type: 'POST'
+                    })
+                    .done(function () {
+
+                        {# If there are no submissions remaining, go to next person
+                         # Otherwise just refresh screen
+                         #}
+                        if ($('#response-selector').find('option').length < 2) {
+                            var destination = '';
+
+                            if (nextUrl.data('value') != undefined) {
+                                destination = nextUrl.data('value');
+                            }
+                            else {
+                                destination = '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}'
+                            }
+
+                            {# Go to next available person in the carousel
+                             # If there is nobody, just visit Status screen
+                             #}
+                            window.location.href = destination;
+                        }
+                        else {
+                            window.location.reload();
+                        }
+                    })
+                    .fail(function () {
+                        $('#toaster').toastTimeout({
+                            text: 'Could not delete this submission',
+                            css: 'pop alert'
+                        });
+                    })
+                }
+            });
+        });
     });
+
 </script>
 
 <div class="row">
@@ -64,7 +118,19 @@
             <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
         </ul>
     </div>
+    {% if response %}
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li>
+            <a class="icon-delete" data-delete="{{ routeLookup('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id }) }}">Delete Submission</a>
+        </li>
+    </ul>
+    {% endif %}
 </div>
+
+<div id='toaster' class="toast" data-alert></div>
 
 {% if responseList|length > 1 %}
 <div class="row">
