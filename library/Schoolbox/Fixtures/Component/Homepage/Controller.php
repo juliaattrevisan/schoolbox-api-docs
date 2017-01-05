@@ -32,7 +32,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @var bool
      */
-    private $fixtureAdmin;
+    private $fixtureAdmin = false;
 
     /**
      * Whether a team has been set in component config
