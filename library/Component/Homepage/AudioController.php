@@ -182,6 +182,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         $this->parse('audio_pending_list_block', 'audio_pending_list', true);
                     }
                 }
+
+                $j++;
             }
 
 
