@@ -23,7 +23,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             return false;
         }
 
-        $this->setBlock($templateHandle, 'rss', 'rss_block');
+        $this->setBlock($templateHandle, 'has_feed', 'has_feed_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $emptyState = false;
@@ -56,7 +56,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
             $this->setVar([
-                'rss_block' => '',
+                'has_feed_block' => '',
                 'empty_config_block' => '',
                 'empty_read_block' => '',
                 'empty_invalid_block' => '',
@@ -74,10 +74,9 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
         } else {
 
-            $this->setBlock($templateHandle, 'rss_stories', 'rss_block');
+            $this->setBlock('has_feed', 'rss_stories', 'rss_stories_block');
             $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
             $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -94,39 +93,39 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             ));
 
             $compactMode = $this->getConfig('compactMode');
-            if (count($allRss)) {
-                $j = 0;
 
-                foreach ($allRss as $currentRss) {
+            $j = 0;
 
-                    $this->setVar(
-                        array(
-                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                            'RSS_TITLE' => Scrub::text($currentRss['title']),
-                            'RSS_URL' => urlencode(base64_encode($currentRss['link'])),
-                            'RSS_BRIEF' => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
-                            'rss_brief_output_block' => '',
-                        )
-                    );
-                    if (!$compactMode) {
-                        $this->parse('rss_brief_output_block', 'rss_brief_output');
-                    }
-                    // If the item has a pubDate
-                    if ($currentRss['pubDate'] instanceof DateTime) {
-                        $postedDate = new Alaress_Date_Format($currentRss['pubDate']);
+            foreach ($allRss as $currentRss) {
 
-                        $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
-                        $this->parse('rss_date_block', 'rss_date');
-                    } else {
-                        $this->setVar('rss_date_block', '');
-                    }
+                $this->setVar([
+                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                    'RSS_TITLE' => Scrub::text($currentRss['title']),
+                    'RSS_URL' => urlencode(base64_encode($currentRss['link'])),
+                    'RSS_BRIEF' => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
+                    'rss_brief_output_block' => '',
+                ]);
 
-                    // Parse the rss item row
-                    $this->parse('rss_block', 'rss_stories', true);
+                if (!$compactMode) {
+                    $this->parse('rss_brief_output_block', 'rss_brief_output');
                 }
-            } else {
-                $this->setVar('rss_block', '');
+
+                // If the item has a pubDate
+                if ($currentRss['pubDate'] instanceof DateTime) {
+                    $postedDate = new Alaress_Date_Format($currentRss['pubDate']);
+
+                    $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
+                    $this->parse('rss_date_block', 'rss_date');
+                } else {
+                    $this->setVar('rss_date_block', '');
+                }
+
+                // Parse the rss item row
+                $this->parse('rss_stories_block', 'rss_stories', true);
             }
+
+            $this->parse('has_feed_block', 'has_feed');
+
         }
 
         /* Need rss name injected here
