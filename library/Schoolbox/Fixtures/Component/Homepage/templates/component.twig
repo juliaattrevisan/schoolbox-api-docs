@@ -40,7 +40,7 @@
             {#
             TODO:   Allow fixture admins to go straight to a create match form
                     Can't happen at the moment because the route needs a division
-                    if fixtureAdmin and !noConfig
+                    if (fixtureAdmin or superuser) and !noConfig
                         <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm') }}">Create a match</a> to show users the upcoming matches for this team.</p>
             #}
 

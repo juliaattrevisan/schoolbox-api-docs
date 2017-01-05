@@ -9,11 +9,13 @@ namespace Schoolbox\Fixtures\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
 use Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
+use Alaress\Authorizer\Rule;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -66,7 +68,12 @@ class Controller extends Component_Homepage_ControllerAbstract
         /**
          * Check if user is a fixture admin
          */
-        $this->fixtureAdmin = (UserAccess::SERVICE_SPORTS_ADMINISTRATOR) ? true : false;
+        /** @var UserAccess $fixturesAccess */
+        $fixtureAccess = $this->getUser()->getAccessList()->getBy('service', UserAccess::SERVICE_SPORTS_ADMINISTRATOR);
+
+        if ((!empty($fixtureAccess) && $fixtureAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) || $this->getUser()->isSuperuser()) {
+            $this->fixtureAdmin = true;
+        }
 
         /**
          * Check if a team has been set in the component config
