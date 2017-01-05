@@ -23,7 +23,7 @@ use UnexpectedValueException;
  * @method User findByIdWithFallback($id)
  * @method User findOneByColumn($columnName, $columnValue, $order = [])
  * @method User findOneByColumnList($columnList, $order = [])
- * @method User hydrate($row, $alias = '', $callback = null)
+ * @method User hydrate(array $row, $alias = '', $callback = null)
  * @method User createModel($idValue = null)
  */
 class UserMapper extends Mapper
@@ -366,15 +366,15 @@ class UserMapper extends Mapper
     protected function getSelectString()
     {
         return "
-            SELECT {$this->getColumnString('user')}, IF(su.id, 1, 0) as `user.superuser`,
+            SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
                     {$this->getJoinColumnString('userCampus', 'c')}, v_c.defaultCampus as `uc.defaultCampus`,
                     {$this->getColumnString('lu')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
-            LEFT JOIN {$this->getJoinSql('role', 'user', 'g')}
-            LEFT JOIN {$this->getJoinSql('userCampus', 'user', 'c')}
-            LEFT JOIN {$this->getJoinSql('user_link', 'user', 'lu')}
+            LEFT JOIN {$this->getJoinSql('role', '', 'g')}
+            LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
+            LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
         ";
     }
 
@@ -393,8 +393,8 @@ class UserMapper extends Mapper
             /** @var Role $role */
             $role = $this->hydrateJoin($row, 'role', 'g');
 
-            return $this->hydrate($row, 'user')
-                ->setSuperuser($row['user.superuser'] == 1)
+            return $this->hydrate($row)
+                ->setSuperuser($row['superuser'] == 1)
                 ->setRole($role);
         });
     }
@@ -411,9 +411,9 @@ class UserMapper extends Mapper
 
         foreach ($statement as $row) {
 
-            $userId = $row['user.id'];
+            $userId = $row['id'];
 
-            $users[$userId] = $this->userCache->get($row['user.id'], [ $row ]);
+            $users[$userId] = $this->userCache->get($userId, [ $row ]);
 
             /** @var Campus $campus */
             $campus = $this->hydrateJoin($row, 'userCampus', 'c');
