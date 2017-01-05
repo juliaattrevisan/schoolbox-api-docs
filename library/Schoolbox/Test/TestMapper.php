@@ -21,7 +21,7 @@ class TestMapper extends Mapper {
     /**
      * @param MapperTest $test
      */
-    public function __construct(MapperTest $test)
+    public function __construct(MapperTest $test = null)
     {
         parent::__construct();
         $this->test = isset($test) ? $test : null;
