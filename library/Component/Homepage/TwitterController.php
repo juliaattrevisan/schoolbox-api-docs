@@ -93,7 +93,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                     $this->parse('empty_api_block', 'empty_api');
                 }
 
-            } else if ($noConfig) {
+            } elseif ($noConfig) {
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_config_block', 'empty_config');

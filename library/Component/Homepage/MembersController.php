@@ -70,9 +70,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $block = 'empty_read';
-            } else if ($this->getSource()->getFolder()->getCodes()->count()) {
+            } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
-            } else if (!$this->getSource()->getFolder()->isGroup()) {
+            } elseif (!$this->getSource()->getFolder()->isGroup()) {
                 $block = 'empty_not_group';
             } else {
                 $block = 'empty_members';

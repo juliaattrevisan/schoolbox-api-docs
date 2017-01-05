@@ -72,7 +72,7 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_only_block', 'empty_read_only');
-            } else if ($invalidDate) {
+            } elseif ($invalidDate) {
                 $this->parse('empty_invalid_block', 'empty_invalid');
             } else {
                 $this->parse('empty_config_block', 'empty_config');

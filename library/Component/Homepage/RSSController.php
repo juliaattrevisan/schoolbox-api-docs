@@ -64,7 +64,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
-            } else if ($noConfig) {
+            } elseif ($noConfig) {
                 $this->parse('empty_config_block', 'empty_config');
             } else {
                 $this->parse('empty_invalid_block', 'empty_invalid');
