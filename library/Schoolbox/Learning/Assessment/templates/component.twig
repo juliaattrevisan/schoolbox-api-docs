@@ -28,7 +28,7 @@
         {% if readOnly %}
 
             <p>{{ studentMessage }}</p>
-            <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a></p>
+            <p><a href="/learning/grades/{{ user.id }}/{{ termCode }}/{{ folder.id }}">View your grades</a>.</p>
         {% else %}
 
             <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not part of your course {{ teacherMessage }}.</p>
