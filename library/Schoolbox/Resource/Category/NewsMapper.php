@@ -266,7 +266,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
     /**
      * Checks if there's any archived news items in a category
-     * Used to determine whether to show an arhive link or not
+     * Used to determine whether to show an archive link or not
      *
      * @param $categoryId
      * @param $userId
