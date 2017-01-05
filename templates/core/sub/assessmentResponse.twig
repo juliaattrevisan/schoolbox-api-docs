@@ -5,7 +5,7 @@
         {% set argList = {assessmentId: response.assessable.id, firstSectionId: response.firstSectionId, responseId: response.id} %}
         {{ routeLookup('learningQuiz.getQuizResponseFirstSection', argList) }}
     {%- elseif response.assessable is dueWork -%}
-        {{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id}) }}
+        {{ routeLookup('learningResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}
     {%- elseif response.assessable is task -%}
         {# no link. Caller should not render a link if assessable is a task #}
     {%- endif -%}

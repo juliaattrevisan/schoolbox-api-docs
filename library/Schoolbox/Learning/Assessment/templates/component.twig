@@ -1,7 +1,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {% set createRoute -%}
-    {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType }) -}}
+    {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType, context: context }) -}}
 {%- endset %}
 {% if createRoute and assessmentType  %}
     {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}

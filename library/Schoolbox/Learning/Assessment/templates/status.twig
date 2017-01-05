@@ -8,7 +8,7 @@
 {% if assessment is quiz %}
 {% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) ~ returnUrlSuffix %}
 {% else %}
-{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) %}
+{% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 {% endif %}
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
@@ -70,7 +70,7 @@
             <ul class="information-list">
             {% for participant in assessment.allParticipants %}
 
-                {% set routeArgs = { assessmentId: assessment.id, studentId: participant.user.id } %}
+                {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, studentId: participant.user.id } %}
 
                 {% set pActionSobo      = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
                 {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}

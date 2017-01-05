@@ -113,7 +113,8 @@ class StudentCarousel
              */
             $urlValue = $this->getRouter()->generate('learningResponse.getParticularResponse', [
                 'assessmentId' => $this->getAssessment()->getId(),
-                'studentId'    => $currentParticipant->getUser()->getId()
+                'studentId'    => $currentParticipant->getUser()->getId(),
+                'assessment'   => $this->getAssessment()
             ]);
 
             $person = [
@@ -147,6 +148,7 @@ class StudentCarousel
         return $this->getRouter()->generate('learningResponse.getParticularResponse', [
             'assessmentId' => $this->getAssessment()->getId(),
             'studentId'    => $this->getStudent()->getId(),
+            'assessment'   => $this->getAssessment()
         ]);
     }
 

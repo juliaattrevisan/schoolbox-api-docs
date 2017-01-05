@@ -70,6 +70,7 @@
             {% endfor %}
 
             <ul class="information-list threaded">
+                {% set showLineActions = user.role.staff %}
                 {% for currentInteraction in timeline %}
 
                     {# There is a submission somewhere in this history
@@ -82,9 +83,9 @@
                     {% endif %}
 
                     {% if currentInteraction is response %}
-                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' with {showLineActions: showLineActions} %}
                     {% elseif currentInteraction is feedback %}
-                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction} %}
+                        {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, showLineActions: showLineActions} %}
                     {% endif %}
                 {% endfor %}
             </ul>

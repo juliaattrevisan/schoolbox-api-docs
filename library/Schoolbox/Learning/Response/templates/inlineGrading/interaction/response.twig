@@ -7,7 +7,7 @@
                 <li class="actions-small-1">
                     {% include '@learning/dueWork/interaction/response/files.twig' %}
                     <nav>
-                        <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, responseId: response.id}) }}?hash={{ currentFile.hash }}" class="icon-next" title="View in Inline Grader"></a>
+                        <a href="{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" class="icon-next" title="View in Inline Grader"></a>
                     </nav>
                 </li>
             {% endfor %}

@@ -37,7 +37,7 @@
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders' }) %}
+        {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders', context: class }) %}
         {% if baseRoute %}
             <li class="separator">Create New Activity</li>
             <li><a href="{{ baseRoute }}?type=dueWork" class='icon-due-work'>Due Work</a></li>
@@ -144,7 +144,7 @@
                     <th class="{{ urgency.marks(meanNormalised) }}-bg">
                         {# TODO use actual selected term code #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
-                           href="{{ routeLookup('learning.getGrades', {userId: student.id, termCode: ''}) }}" title="View students grades">
+                           href="{{ routeLookup('learning.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students grades">
                             {{ studentMean | default('–') }}
                         </a>
                     </th>

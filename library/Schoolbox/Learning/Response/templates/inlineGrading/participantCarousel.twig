@@ -102,7 +102,7 @@
             ize.refreshOptions(false);
 
             if (event.namespace != 'preload') {
-                $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}', {
+                $.ajax('{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}', {
                     headers: {
                         'X-HTTP-Method-Override': 'PATCH'
                     },
@@ -138,7 +138,7 @@
         </div>
     </div>
     <div class="small-12 medium-4 columns">
-        <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id }) }}" method="post">
+        <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
             <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.showSubmittedOnly %}checked="checked"{% endif %} value='1' />

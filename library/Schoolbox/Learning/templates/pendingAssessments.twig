@@ -18,7 +18,7 @@
 
 {{ bread.crumbs(
     ['Learning', routeLookup('learning.getClasses')],
-    ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id })]
+    ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id, viewee: viewee })]
 ) }}
 
 <div class="row">

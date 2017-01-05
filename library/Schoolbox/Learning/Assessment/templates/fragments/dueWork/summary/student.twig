@@ -34,7 +34,7 @@
             <p>{{ submissionsBlocked }}</p>
         </div>
     {% else %}
-        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id}) %}
+        {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable}) %}
         {% if submitRoute %}
             {% set submitText %}{% spaceless %}
                 Create submission

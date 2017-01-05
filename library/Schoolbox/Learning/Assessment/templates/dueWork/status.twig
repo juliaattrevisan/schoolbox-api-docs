@@ -69,7 +69,7 @@
 {% block grading %}
     {% include '@learningMarkScheme/'~markScheme~'.twig' with {
         markScheme: assessment.markScheme,
-        fbUrl: routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id })
+        fbUrl: routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant })
     } %}
 {% endblock %}
 
