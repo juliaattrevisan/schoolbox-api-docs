@@ -1,0 +1,458 @@
+{# Header #}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Personalised learning for {{ student.formatName }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <section>
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
+<div id="unitModal" class="reveal-modal" data-reveal aria-labelledby="unitModalTitle" aria-hidden="true" role="dialog">
+    <h3 class="note" id="unitModalTitle" data-value="text"></h3>
+
+    {# Metadata #}
+    <ul class="meta">
+        <li class="icon-calendar date">
+            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+        </li>
+    </ul>
+
+    {# Buttons #}
+    <dl>
+        <dd>
+            <a class="button icon-homepage" data-value="href" href="#">View Unit Homepage</a>
+        </dd>
+    </dl>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="assessmentModal" class="reveal-modal" data-reveal aria-labelledby="assessmentModalTitle" aria-hidden="true" role="dialog">
+    <h3 class="note" id="assessmentModalTitle" data-value="text"></h3>
+
+    {# Metadata #}
+    <ul class="meta">
+        <li class="icon-calendar date">
+            <time data-value="start"></time>&ndash;<time data-value="end"></time>
+        </li>
+    </ul>
+
+    {# Description? #}
+    <article class="detail" data-value="description"></article>
+
+    {# Buttons #}
+    <dl>
+        <dd>
+            <a class="button icon-due-work" data-value="href" href="#">View More Details</a>
+        </dd>
+    </dl>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{# FullCalendar setup #}
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+<script type="text/javascript">
+    // Do stuff here
+    $(function() {
+        var calendar = $('#calendar');
+
+        /**
+         * Convert duration unit to FullCalendar view type name
+         *
+         * @param durationUnit
+         * @param defaultView
+         * @returns {String}
+         */
+        var convertDurationUnitToViewType = function(durationUnit, defaultView) {
+            switch (durationUnit) {
+                case 'week':
+                    return 'timelineTwoWeek';
+
+                case 'day':
+                    return 'timelineTwoDay';
+
+                case 'month':
+                    return 'timelineTwoMonth';
+
+                default:
+                    return defaultView;
+            }
+        };
+
+        /**
+         * Extract calendar params out of hash
+         *
+         * @param hash
+         * @returns {object} with "date" and "view" keys
+         */
+        var getCalendarParams = function(hash) {
+            // Valid hash: #view/DD/MM/YYYY (URL date format)
+            var hashParts = hash.match(/^#(\w+)\/?(.*)/),
+                viewAlias,
+                calendarDate;
+            if (hashParts) {
+                viewAlias      = hashParts[1];
+                var momentDate = moment(hashParts[2], dateDisplayFormats.momentJs);
+                if (momentDate.isValid()) {
+                    calendarDate = momentDate.toDate();
+                } else {
+                    calendarDate = new Date();
+                }
+            } else {
+                viewAlias    = 'month';
+                calendarDate = new Date();
+            }
+
+            return {
+                date: calendarDate,
+                view: convertDurationUnitToViewType(viewAlias, 'timelineTwoMonth')
+            }
+        };
+
+        /**
+         * Retrieves the duration unit from the type of the custom view.
+         *
+         * @param view
+         * @returns {String}
+         * @throws Error if view type not recognized
+         */
+        var getDurationUnitFromView = function(view) {
+            switch (view.type) {
+                case 'timelineTwoMonth':
+                    return 'month';
+
+                case 'timelineTwoWeek':
+                    return 'week';
+
+                case 'timelineTwoDay':
+                    return 'day';
+            }
+            throw new Error('Unrecognised view type "'+String(view.type)+'"');
+        };
+
+        /**
+         * Update assessment method.
+         *
+         * * Gives event a "loading" style
+         * * Removes that style when update finishes (regardless of result)
+         *
+         * @param calEvent   The event to update
+         * @param delta      The amount of change
+         * @param revertFunc called if update failed for whatever reason.
+         *                   Sets event back to original state.
+         */
+        var updateAssessment = function(calEvent, delta, revertFunc) {
+            var format = 'Y-MM-DD HH:mm:ss';
+            var data = {
+                assessmentId: calEvent.meta.assessmentId,
+                openDate: calEvent.start.format(format),
+                dueDate: calEvent.end.format(format)
+            };
+
+            calEvent.className.push('loading');
+            var post = $.post(
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id})|e('js') }}',
+                data,
+                null,
+                'json'
+            );
+            post.fail(revertFunc)
+                .always(function() {
+                    // Remove the loading class
+                    calEvent.className = calEvent.className.filter(function (value) {
+                        return value != 'loading';
+                    });
+                    calendar.fullCalendar('rerenderEvents');
+                });
+        };
+
+        /**
+         * Push calendar's current state (view + date) to history
+         */
+        var pushCurrentCalendarState = function() {
+            try {
+                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                var date = calendar.fullCalendar('getDate');
+                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
+            } catch (e) {
+                // Can't recognize view - ignore
+            }
+        };
+
+        // On hash change - update calendar based on hash contents
+        $(window).on('hashchange', function() {
+            var calendarParams = getCalendarParams(window.location.hash);
+            calendar.fullCalendar('changeView', convertDurationUnitToViewType(calendarParams.view, 'timelineTwoMonth'));
+            calendar.fullCalendar('gotoDate', calendarParams.date);
+        });
+
+        var previousView   = {};
+        var calendarParams = getCalendarParams(window.location.hash);
+        var c = new Calendar('calendar', 'calendar-bubble', {
+            filter: {
+                enabled: false,
+                listViewButton: false
+            },
+            fullCalendar: {
+                firstHour: 9,
+                allDaySlot: false,
+                defaultDate: calendarParams.date,
+                views: {
+                    timelineTwoMonth: {
+                        type: 'timeline',
+                        duration: { months: 2 },
+                        buttonText: 'Month'
+                    },
+                    timelineTwoWeek: {
+                        type: 'timeline',
+                        duration: { weeks: 2 },
+                        buttonText: 'Week',
+                        slotLabelInterval: {
+                            hours: 6
+                        }
+                    },
+                    timelineTwoDay: {
+                        type: 'timeline',
+                        duration: { days: 2 },
+                        buttonText: 'Day',
+                        slotLabelInterval: {
+                            hours: 3
+                        }
+                    }
+                },
+                height: 'auto',
+                eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
+                firstDay: Number({{ config.calendar_start_day }}),
+                schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
+                defaultView: calendarParams.view,
+                header: {
+                    left: 'prevWindow,today,nextWindow',
+                    center: 'title',
+                    right: 'timelineTwoMonth,timelineTwoWeek,timelineTwoDay'
+                },
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '{{ routeLookup('learningPersonalised.getCalendarForStudent', {studentId: student.id})|e('js') }}',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix())
+                        },
+                        cache: false
+                    })
+                    .done(
+                        function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v && 'end' in v;
+                            }));
+                        }
+                    );
+                },
+
+                eventClick: function(calEvent, jsEvent, view) {
+
+                    if (calEvent.meta && calEvent.meta.type) {
+
+                        var klass = '',
+                            modal;
+                        switch (calEvent.meta.type) {
+                            case 'unit':
+                                klass = 'icon-home';
+                                break;
+
+                            case 'dueWork':
+                                klass = 'icon-due-work';
+                                break;
+
+                            case 'quiz':
+                                klass = 'icon-quiz';
+                                break;
+
+                            case 'task':
+                                klass = 'icon-task';
+                                break;
+
+                            case 'project':
+                                klass = 'icon-project';
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        if (calEvent.meta.type == 'unit') {
+                            modal = $('#unitModal');
+                        } else {
+                            modal = $('#assessmentModal');
+                        }
+
+                        // Update contents
+                        modal.find('[data-value]').each(function() {
+                            var $this = $(this),
+                                valueTag = $this.data('value');
+
+                            switch (valueTag) {
+                                case 'text':
+                                    $this.text(calEvent.title);
+                                    break;
+
+                                case 'description':
+                                    $this.html(calEvent.meta.description);
+                                    break;
+
+                                case 'start':
+                                case 'end':
+                                    // Output in our configured format
+                                    var date = calEvent[valueTag],
+                                        format = 'dddd, Do MMMM YYYY'
+
+                                    if (!calEvent.allDay) {
+                                        format = format+', h:mm a'
+                                    }
+                                    $this
+                                        .text(date.format(format))
+                                        .attr('datetime', date.toISOString());
+                                    break;
+
+                                case 'href':
+                                    $this
+                                        .attr('href', calEvent.meta.link)
+                                        .removeClass('icon-home icon-due-work icon-quiz icon-task icon-project')
+                                        .addClass(klass);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        });
+
+                        modal.foundation('reveal', 'open');
+                    }
+                },
+
+                customButtons: {
+                    prevWindow: {
+                        icon: 'left-single-arrow',
+                        click: function() {
+                            try {
+                                // Step back one window from now
+                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                                var date = calendar.fullCalendar('getDate').clone();
+                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                pushCurrentCalendarState();
+                            } catch (e) {
+                                // Just go to previous step
+                                calendar.fullCalendar('prev');
+                            }
+                        }
+                    },
+                    nextWindow: {
+                        icon: 'right-single-arrow',
+                        click: function() {
+                            try {
+                                // Step forward two windows from now, then back one window from that.
+                                // This ensures that events that are in the next window but not this one get loaded.
+                                var unit = getDurationUnitFromView(calendar.fullCalendar('getView'));
+                                var date = calendar.fullCalendar('getDate').clone();
+                                // Handle pushstate here because this triggers a second viewRender event.
+                                // I don't want to pushstate twice.
+                                calendar.fullCalendar('gotoDate', date.add(2, unit));
+                                calendar.fullCalendar('gotoDate', date.subtract(1, unit));
+                                pushCurrentCalendarState();
+                            } catch (e) {
+                                // Just go to next step
+                                calendar.fullCalendar('next');
+                            }
+                        }
+                    }
+                },
+
+                viewRender: function() {
+                    // Only if the calendar view has changed
+                    var currentView = calendar.fullCalendar('getView');
+                    if (previousView.type != currentView.type) {
+                        pushCurrentCalendarState();
+                    }
+                    previousView = currentView;
+                },
+
+                eventResize: updateAssessment,
+
+                eventDrop: updateAssessment,
+
+                // Resources:
+                // * all of this student's classes
+                // ** Units (any unit imported onto this class)
+                // ** Content Areas (any duework/quiz in one of these units)
+                // ** Projects (any project in one of these units)
+                // ** Activities (any assessment in one of those projects)
+                // * each folder is a resource group
+                // Does FC support nested groups?
+                resources: {
+                    dataType: 'json',
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id})|e('js') }}'
+                },
+                resourceOrder: 'folderTitle',
+                resourceColumns: [{
+                    labelText: 'Assessment',
+                    render: function(resource, el) {
+                        el.find('.fc-cell-text').empty().text(resource.title);
+                    }
+                }],
+
+                eventAfterAllRender: function(view) {
+                    // Any resource whose children contain no events should be collapsed
+                    $.each(view.resourceRowHash, function(key, resourceRow) {
+                        var hasChildren = false;
+                        for (var i in resourceRow.children) {
+                            var childId = resourceRow.children[i].resource.id;
+                            if (view.calendar.getResourceEvents(childId).length > 0) {
+                                hasChildren = true;
+                                break;
+                            }
+                        }
+                        if (hasChildren) {
+                            resourceRow.expand();
+                        } else {
+                            resourceRow.collapse();
+                        }
+                    });
+                },
+
+                loading: function(isLoading) {
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         */
+                        $.magnificPopup.close();
+                    }
+                }
+            },
+            x: false
+        }).init();
+    });
+</script>

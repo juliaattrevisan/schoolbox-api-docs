@@ -98,6 +98,10 @@ class Javascript extends Base
             )
         );
 
+        if ($this->getEvent()->getResourceId()) {
+            $event['resourceId'] = $this->getEvent()->getResourceId();
+        }
+
         return json_encode($event).',';
     }
 }

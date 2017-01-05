@@ -85,17 +85,8 @@
             },
             fullCalendar: {
                 defaultDate: moment('{{ date|escape('js') }}'),
-                columnFormat: {
-                    month:      'ddd',
-                    week:       'ddd D/M',
-                    agendaWeek: 'ddd D/M',
-                    day:        'ddd D/M',
-                    agendaDay:  'ddd D/M',
-                    '':         'ddd D/M'
-                },
                 height: height,
                 defaultView: anchor || 'month',
-                timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: Boolean('{{ config.calendar_collapse_events|escape('js') }}'),
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),

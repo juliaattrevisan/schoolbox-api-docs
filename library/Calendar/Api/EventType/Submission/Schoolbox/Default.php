@@ -119,6 +119,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $event->setTitle($assessment->getTitle());
             $event->setDetail($assessment->getDescription());
             $event->setPublishDate($assessment->getPublishAt());
+            $event->setResourceId($assessment->getId());
 
             // TODO add an author field to assessment
 //            $event->setAuthorId($assessment->get->getId());
