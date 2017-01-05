@@ -56,16 +56,14 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         // Set up component name
-        $this->setVar(
-            array(
-                // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
-                        ? 'Local'
-                        : $this->getSource()->getName(),
-                'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
-            )
-        );
+        $this->setVar([
+            // These are for the Select Alternate Source resourcebrowser
+            'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+                    ? 'Local'
+                    : $this->getSource()->getName(),
+            'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
+        ]);
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->getLinkMapper()->findAllInCategory(
@@ -121,29 +119,29 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
-                $this->setVar('link_block', '');
-
-                $j = 0;
+                $this->setVar([
+                    'source_folder_deleted_block' => '',
+                    'link_block' => '',
+                ]);
 
                 foreach ($allLinks as $currentLink) {
+
                     if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                         continue;
                     }
-                    $this->setVar(
-                        array(
-                            'LINK_ID' => $currentLink->getId(),
-                            'LINK_NAME' => Scrub::text($currentLink->getDescription()),
-                            'LINK_URL' => $currentLink->getHref(),
-                            'LINK_TARGET' => $currentLink->getLinkTarget(),
-                            'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
-                            'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                            'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
-                            'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
-                            'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
-                        )
-                    );
+
+                    $this->setVar([
+                        'LINK_ID' => $currentLink->getId(),
+                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
+                        'LINK_URL' => $currentLink->getHref(),
+                        'LINK_TARGET' => $currentLink->getLinkTarget(),
+                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
+                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
+                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
+                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                    ]);
 
                     // Controls
                     if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -154,8 +152,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
                     $this->parse("link_block", "link", true);
                 }
-
-
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar("submit_link_block", "");
