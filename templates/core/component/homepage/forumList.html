@@ -9,11 +9,19 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-forum"></i>
-                <p><a href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post a thread</a> to open up a conversation with other users.
+
+                <!-- BEGIN empty_read -->
+                <p>There are no forum threads to read at this time.</p>
+                <!-- END empty_read -->
+
+                <!-- BEGIN empty_write -->
+                <p><a href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post a thread</a> to open up a conversation with other users.</p>
+                <!-- END empty_write -->
+
             </div>
             <!-- END empty_state -->
 
-            <!-- BEGIN posts -->
+            <!-- BEGIN has_posts -->
             <section>
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
@@ -53,7 +61,7 @@
 
                 <!-- END source_folder_exists -->
             </section>
-            <!-- END posts -->
+            <!-- END has_posts -->
 
         </div>
     </div>

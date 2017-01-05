@@ -52,6 +52,9 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_posts', 'has_posts_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $forumHandler = new Forum();
         $threadList = $forumHandler->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
 
@@ -64,42 +67,50 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         if (empty($threadList)) {
 
-            $this->setBlock($templateHandle, 'posts', 'posts_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
 
-            $this->setVar('posts_block', '');
-            $this->setVar('COMPONENT_CONFIG_SRC_ID', $this->getSource()->getId());
-            $this->setVar('SOURCE_ID', $this->getSource()->getId());
+            $this->setVar([
+                'has_posts_block' => '',
+                'empty_write_block' => '',
+                'empty_read_block' => '',
+                'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                'SOURCE_ID' => $this->getSource()->getId(),
+            ]);
+
+            if ($is_post_allowed) {
+                $this->parse('empty_write_block', 'empty_write');
+            } else {
+                $this->parse('empty_read_block', 'empty_read');
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_posts', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_posts', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'forum', 'forum_block');
             $this->setBlock('source_folder_exists', 'forum_post', 'forum_post_block');
             $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
 
-            $this->setVar('empty_state_block', '');
-
             // Set up component name
-            $this->setVar(
-                array(
-                    'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
-                    'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
-                    'COMPONENT_HANDLE' => strtolower($templateHandle),
-                    'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                )
-            );
+            $this->setVar([
+                'empty_state_block' => '',
+                'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
+                'COMPONENT_HANDLE' => strtolower($templateHandle),
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+            ]);
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
-                $this->setVar('forum_post_block', '');
+                $this->setVar([
+                    'source_folder_deleted_block' => '',
+                    'forum_post_block' => '',
+                ]);
 
                 if ($is_post_allowed) {
                     $this->parse('forum_post_block', 'forum_post');
@@ -124,19 +135,15 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                         $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
 
-                        $this->setVar(
-                            array(
-                                'THREAD_ID' => $thread['threadID'],
-                                'THREAD_USER' => $userHandler->formatName($user),
-                                'THREAD_USER_ID' => $thread['userID'],
-                                'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
-                                'THREAD_DATE' => $threadTime->getRelativeTime(),
-                                'THREAD_TITLE' => Scrub::text($thread['title']),
-                                'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                            )
-                        );
-
-                        $this->setVar('forum_reply_block', '');
+                        $this->setVar([
+                            'THREAD_ID' => $thread['threadID'],
+                            'THREAD_USER' => $userHandler->formatName($user),
+                            'THREAD_USER_ID' => $thread['userID'],
+                            'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
+                            'THREAD_DATE' => $threadTime->getRelativeTime(),
+                            'THREAD_TITLE' => Scrub::text($thread['title']),
+                            'forum_reply_block' => '',
+                        ]);
 
                         if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= UserAccess::ACCESS_FULL)) {
                             $this->parse('forum_reply_block', 'forum_reply');
@@ -148,6 +155,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                     $this->setVar("forum_block", '');
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
+                $this->parse('has_posts_block', 'has_posts');
             }
         }
 
