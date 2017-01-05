@@ -17,17 +17,9 @@ DELETE FROM `rubric_descriptor` WHERE `id` IN (
 -- Add foreign keys to Rubrics
 
 -- Add foreign keys to 'rubric_criterion'
-ALTER TABLE `rubric_criterion`
-  MODIFY `id` INT(11) UNSIGNED AUTO_INCREMENT,
-  MODIFY `parent_id` INT(11) UNSIGNED,
-  ADD CONSTRAINT `fk_rubric_criterion_parent_id`
-    FOREIGN KEY (`parent_id`)
-    REFERENCES `folder` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION;
+ALTER TABLE `rubric_criterion` MODIFY `id` INT(11) UNSIGNED AUTO_INCREMENT;
 
 -- Add foreign keys to 'rubric_criterion'
-
 ALTER TABLE `rubric_descriptor`
   DROP INDEX `criterion_id_2`,
   ADD CONSTRAINT `fk_rubric_descriptor_criterion_id`
