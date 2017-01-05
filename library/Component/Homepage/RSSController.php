@@ -78,8 +78,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
             $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
 
-            $this->setVar('empty_state_block', '');
-
             $title = Scrub::text($rss->getTitle());
 
             if (strlen($title)) {
@@ -87,10 +85,11 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             }
 
             // Set up feed info
-            $this->setVar(array(
+            $this->setVar([
+                'empty_state_block' => '',
                 'RSS_LINK' => $rss->getLink(),
                 'rss_block' => '',
-            ));
+            ]);
 
             $compactMode = $this->getConfig('compactMode');
 
@@ -99,7 +98,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             foreach ($allRss as $currentRss) {
 
                 $this->setVar([
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                     'RSS_TITLE' => Scrub::text($currentRss['title']),
                     'RSS_URL' => urlencode(base64_encode($currentRss['link'])),
                     'RSS_BRIEF' => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
