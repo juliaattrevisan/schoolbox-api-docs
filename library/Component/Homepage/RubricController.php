@@ -57,36 +57,72 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         $this->parseConfig();
 
-        // Dump out block stuff
-        $this->setBlock($templateHandle, 'rubric_criterion', 'rubric_criterion_block');
-        $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
-        $this->setBlock($templateHandle, 'modify_rubric', 'modify_rubric_block');
-        $this->setVar('rubric_criterion_block', '');
-        $this->setVar('modify_rubric_block', '');
-        $i = 0;
+        $this->setBlock($templateHandle, 'rubric', 'rubric_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        /* Create group structure */
-        $criteriaList = array();
+        if (!$this->criteria->count()) {
 
-        foreach ($this->criteria as $crit) {
-            $criteriaList[$crit->getGrouping()][] = $crit;
-        }
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
-        foreach ($criteriaList as $criterion_group => $criterions) {
-            $this->setVar('CRITERION_GROUP', Scrub::text($criterion_group));
-            $this->setVar('DARK', ($i++ % 2 === 1 ? 'dark' : ''));
-            $this->setVar('rubric_descriptor_block', '');
-            foreach ($criterions as $crit) {
-                $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
-                $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
+            $this->setVar([
+                'rubric_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+            ]);
+
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $this->parse('empty_write_block', 'empty_write');
+            } else {
+                $this->parse('empty_read_block', 'empty_read');
             }
-            $this->parse('rubric_criterion_block', 'rubric_criterion', true);
-        }
 
-        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-            $this->parse('modify_rubric_block', 'modify_rubric');
+            $this->parse('empty_state_block', 'empty_state');
+
         } else {
-            $this->setVar('modify_rubric_block', '');
+
+            $this->setVar('empty_state_block', '');
+
+            $this->setBlock('rubric', 'rubric_criterion', 'rubric_criterion_block');
+            $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
+            $this->setBlock('rubric', 'modify_rubric', 'modify_rubric_block');
+
+            $this->setVar([
+                'rubric_criterion_block' => '',
+                'modify_rubric_block' => '',
+            ]);
+
+            $i = 0;
+
+            /* Create group structure */
+            $criteriaList = array();
+
+            foreach ($this->criteria as $crit) {
+                $criteriaList[$crit->getGrouping()][] = $crit;
+            }
+
+            foreach ($criteriaList as $criterion_group => $criterions) {
+                $this->setVar([
+                    'CRITERION_GROUP' => Scrub::text($criterion_group),
+                    'rubric_descriptor_block' => '',
+                ]);
+
+                foreach ($criterions as $crit) {
+                    $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
+                    $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
+                }
+
+                $this->parse('rubric_criterion_block', 'rubric_criterion', true);
+            }
+
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $this->parse('modify_rubric_block', 'modify_rubric');
+            } else {
+                $this->setVar('modify_rubric_block', '');
+            }
+
+            $this->parse('rubric_block', 'rubric');
+
         }
 
         return true;

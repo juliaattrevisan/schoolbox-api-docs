@@ -42,10 +42,22 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-click-view"></i>
-                <p>No video has been selected for display.</p>
-                <!-- BEGIN empty_modify -->
-                <p>To use Clickview, you must first <a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">select a video</a>.</p>
-                <!-- END empty_modify -->
+
+                <!-- BEGIN empty_read -->
+                <p>There are no Clickview videos to watch at this time.</p>
+                <!-- END empty_read -->
+
+                <!-- BEGIN empty_api -->
+                <p>Ask your System Administrator to configure Clickview to use this feature.</p>
+                <!-- END empty_api -->
+
+                <!-- BEGIN empty_api_admin -->
+                <p><a href="/adminv2/setting/3rd+Party+Services">Enter your school's Clickview API ID</a> in the Administration system to use this feature.</p>
+                <!-- END empty_api_admin -->
+
+                <!-- BEGIN empty_write -->
+                <p><a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Choose a Clickview video</a> to display and play in this component.</p>
+                <!-- END empty_write -->
 
             </div>
             <!-- END empty_state -->

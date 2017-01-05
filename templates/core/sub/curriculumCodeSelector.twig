@@ -4,13 +4,13 @@
 <script type="text/javascript">
     // Set up the curriculum code selection
     $(function(){
-        $('#curriculum-codes').curriculumSelector({
+        $('#curriculum-code-select').curriculumSelector({
             value: {{ codeList|json_encode|raw }}
         });
     });
 </script>
 
-<select id="curriculum-codes" name="curriculumCodes[]" multiple></select>
+<select id="curriculum-code-select" name="curriculumCodes[]" multiple></select>
 
 {# Synchronous: Empty code so that when no code is selected something is actually sent to form.
  # This distinguishes between all codes being cleared and this input not existing at all.

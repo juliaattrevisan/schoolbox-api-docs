@@ -92,7 +92,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         $this->setVar('empty_state_block', '');
 
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
         } else {
             $this->setVar('source_folder_deleted_block', '');
@@ -103,27 +103,30 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
             $this->setBlock($templateHandle, 'audio', 'audio_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
-            $this->setVar('audio_block', '');
-            $this->setVar('SOURCE_ID', $this->getSource()->getId());
+            $this->setVar([
+                'audio_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+                'SOURCE_ID' => $this->getSource()->getId(),
+            ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("empty_modify_block", "");
+                $this->parse('empty_read_block', 'empty_read');
             } else {
-                $this->parse("empty_modify_block", "empty_modify");
+                $this->parse('empty_write_block', 'empty_write');
             }
 
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
-            $this->setVar(
-                array(
-                    'default_audio_block' => '',
-                    'audio_list_block' => '',
-                    'audio_pending_list_block' => '',
-                )
-            );
+            $this->setVar([
+                'default_audio_block' => '',
+                'audio_list_block' => '',
+                'audio_pending_list_block' => '',
+            ]);
 
             $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
 
@@ -146,8 +149,10 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                     );
                     $this->parse('default_audio_block', 'default_audio');
                 }
+
                 if (count($this->outputList) >= 1) {
-                    $output = array(
+
+                    $this->setVar([
                         'AUDIO_LIST_ID' => $file->getId(),
                         'AUDIO_LIST_TITLE' => Scrub::text($file->getTitle()),
                         'AUDIO_LIST_DURATION' => $audio->getDuration() >= 3600
@@ -157,24 +162,25 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'hidden' : '',
                         'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
                         'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                    );
+                    ]);
 
-                    $this->setVar($output);
+                    $j++;
+
                     if ($audio->getStatus() == "completed") {
+
                         if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                             $this->parse('audio_edit_block', 'audio_edit', true);
                         } else {
                             $this->setVar('audio_edit_block', '');
                         }
                         $this->parse('audio_list_block', 'audio_list', true);
+
                     } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                        $this->setVar(
-                            array(
-                                'AUDIO_LIST_STATUS' => $audio->getStatus(),
-                                'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
-                            )
-                        );
+
+                        $this->setVar([
+                            'AUDIO_LIST_STATUS' => $audio->getStatus(),
+                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
+                        ]);
                         $this->parse('audio_pending_list_block', 'audio_pending_list', true);
                     }
                 }

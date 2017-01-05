@@ -17,6 +17,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use SitePage;
+use Schoolbox\Resource\Category\NewsMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -86,10 +87,19 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->getContentPermission() < READ_ACCESS)
+        $newsMapper = new NewsMapper();
+
+        if ($this->getContentPermission() < READ_ACCESS) {
             $news = null;
-        else
-            $news = $this->newsHandler->getAllForCategory($this->source->getId(), array('size' => $this->getConfig('size')));
+        } else {
+            $news = $this->newsHandler->getAllForCategory($this->source->getId(),
+                ['size' => $this->getConfig('size')]);
+        }
+
+        /**
+         * Check if there's any news items in the archive to conditionally show the archive link
+         */
+        $showArchive = $newsMapper->checkArchive($this->source->getId(), $_SESSION['id']);
 
         $moderate =  $this->getContentPermission() >= UserAccess::ACCESS_FULL;
         $modify =  $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
@@ -111,7 +121,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'modify'                => $modify,
                 'moderate'              => $moderate,
                 'code'                  => $this->source->getId(),
-                'compact'               => $this->getConfig('compactMode','value')
+                'compact'               => $this->getConfig('compactMode','value'),
+                'showArchive'           => $showArchive,
             ]
         );
     }

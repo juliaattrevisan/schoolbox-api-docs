@@ -25,7 +25,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'wolfram', 'wolfram_block');
+        $this->setBlock($templateHandle, 'has_widget', 'has_widget_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $emptyState = false;
@@ -60,48 +60,33 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 
         if ($emptyState) {
 
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
-            $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
-            $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
+            $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
-            $this->setVar('wolfram_block', '');
+            $this->setVar([
+                'has_widget_block' => '',
+                'empty_read_block' => '',
+                'empty_config_block' => '',
+                'empty_invalid_block' => '',
+            ]);
 
-            /**
-             * If the user has no write permission just go for a generic nothing found message
-             */
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-
-                $this->setVar('empty_config_block', '');
-                $this->setVar('empty_results_write_block', '');
-                $this->parse('empty_results_block', 'empty_results');
-
+                $this->parse('empty_read_block', 'empty_read');
+            } elseif ($noConfig) {
+                $this->parse('empty_config_block', 'empty_config');
             } else {
-
-                $this->setVar('empty_results_block', '');
-
-                if ($noConfig) {
-                    $this->setVar('empty_results_write_block', '');
-                    $this->parse('empty_config_block', 'empty_config');
-                } else {
-                    $this->setVar('empty_config_block', '');
-                    $this->parse('empty_results_write_block', 'empty_results_write');
-                }
+                $this->parse('empty_invalid_block', 'empty_invalid');
             }
 
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
 
-            $this->setBlock($templateHandle, 'has_wolfram', 'has_wolfram_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-
-            $this->setVar('empty_state_block', '');
-
-            $this->setVar(
-                array(
-                    'WIDGET_ID' => $matches[2],
-                )
-            );
+            $this->setVar([
+                'empty_state_block' => '',
+                'WIDGET_ID' => $matches[2],
+            ]);
 
             // Allow output type to be set too
             $outputType = 'lightbox';
@@ -110,8 +95,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             }
             $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
 
-            $this->parse('has_wolfram_block', 'has_wolfram');
-
+            $this->parse('has_widget_block', 'has_widget');
         }
 
         return true; // everything went according to plan

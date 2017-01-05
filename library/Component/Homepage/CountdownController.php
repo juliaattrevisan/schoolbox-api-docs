@@ -59,24 +59,23 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 
         if ($showEmpty) {
 
-            $this->setVar('countdown_block', '');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
+            $this->setVar([
+                'countdown_block' => '',
+                'empty_read_only_block' => '',
+                'empty_config_block' => '',
+                'empty_invalid_block' => '',
+            ]);
+
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('empty_modify_block', '');
-                $this->setVar('empty_invalid_block', '');
                 $this->parse('empty_read_only_block', 'empty_read_only');
+            } elseif ($invalidDate) {
+                $this->parse('empty_invalid_block', 'empty_invalid');
             } else {
-                $this->setVar('empty_read_only_block', '');
-                if ($invalidDate) {
-                    $this->setVar('empty_modify_block', '');
-                    $this->parse('empty_invalid_block', 'empty_invalid');
-                } else {
-                    $this->setVar('empty_invalid_block', '');
-                    $this->parse('empty_modify_block', 'empty_modify');
-                }
+                $this->parse('empty_config_block', 'empty_config');
             }
 
             $this->parse('empty_state_block', 'empty_state');

@@ -169,7 +169,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
         $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
         $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
-        if($hasUnitSpec || $hasCourseSpec){
+        if (($hasUnitSpec || $hasCourseSpec) && !$this->readOnly){
             return $this->renderContextInvalidEmptyState($templateHandle, $hasUnitSpec, $hasCourseSpec);
         }
 

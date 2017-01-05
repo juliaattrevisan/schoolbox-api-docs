@@ -23,18 +23,39 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        if (!strlen(trim($this->getConfig('url')))) {
+        $clickviewSchoolId = Config::get('clickview_school_id');
+
+        if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
 
             $this->setBlock($templateHandle, 'clickview', 'clickview_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
+            $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
+            $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
 
-            $this->setVar('clickview_block', '');
+            $this->setVar([
+                'clickview_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+                'empty_api_block' => '',
+                'empty_api_admin_block' => '',
+            ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('empty_modify_block', '');
+                $this->parse('empty_read_block', 'empty_read');
             } else {
-                $this->parse('empty_modify_block', 'empty_modify');
+
+                if (strlen($clickviewSchoolId) == 0) {
+                    if ($this->getUser()->isSuperuser()) {
+                        $this->parse('empty_api_admin_block', 'empty_api_admin');
+                    } else {
+                        $this->parse('empty_api_block', 'empty_api');
+                    }
+                } else {
+                    $this->parse('empty_write_block', 'empty_write');
+                }
+
             }
 
             $this->parse('empty_state_block', 'empty_state');
@@ -51,7 +72,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('has_clickview_block', '');
             $this->setVar('online_clickview_block', '');
             $this->setVar('iframe_clickview_block', '');
-            $this->setVar('CLICKVIEW_SCHOOL_ID', Config::get('clickview_school_id'));
+            $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
             /* If no url is specified it might time out -_-
              * So just hide all this instead

@@ -47,13 +47,35 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
             $this->setBlock($templateHandle, 'members', 'members_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
+            $this->setBlock('empty_state', 'empty_not_group', 'empty_not_group_block');
+            $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
+
+            $folderId = $this->getSource()->getFolder()->getId();
 
             $this->setVar([
                 'members_block' => '',
+                'empty_read_block' => '',
+                'empty_class_block' => '',
+                'empty_not_group_block' => '',
+                'empty_members_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
-                'COMPONENT_ICON' => 'group-managers'
+                'COMPONENT_ICON' => 'group-managers',
+                'ALT_COMPONENT' => 'class teachers',
             ]);
 
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $block = 'empty_read_managers';
+            } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
+                $block = 'empty_class';
+            } elseif (!$this->getSource()->getFolder()->isGroup()) {
+                $block = 'empty_not_group_managers';
+            } else {
+                $block = 'empty_managers';
+            }
+
+            $this->parse($block . '_block', $block);
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
@@ -66,12 +88,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
-            $this->setVar('people_hidden_block', '');
-            $this->setVar('MAX_MEMBERS', self::MAX_MANAGERS);
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+                'people_hidden_block' => '',
+                'MAX_MEMBERS' => self::MAX_MANAGERS,
+            ]);
+
 
             /* Display options
              */

@@ -10,22 +10,22 @@
             <div class="empty-state">
                 <i class="icon-rss"></i>
 
+                <!-- BEGIN empty_read -->
+                <p>There is no feed to view at this time.</p>
+                <!-- END empty_read -->
+
                 <!-- BEGIN empty_config -->
-                <p>To use the RSS component you must first <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a URL for the RSS feed</a>.</p>
+                <p><a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a URL for an RSS feed</a> to display a summary of frequently published information from the source.</p>
                 <!-- END empty_config -->
 
-                <!-- BEGIN empty_results -->
-                <p>No feed found.</p>
-                <!-- END empty_results -->
-
-                <!-- BEGIN empty_results_write -->
-                <p>No feed has been found with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different URL</a>.</p>
-                <!-- END empty_results_write -->
+                <!-- BEGIN empty_invalid -->
+                <p>We couldn't find a feed with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">checking your URL is correct</a> or <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">entering a different URL</a>.</p>
+                <!-- END empty_invalid -->
 
             </div>
             <!-- END empty_state -->
 
-            <!-- BEGIN rss -->
+            <!-- BEGIN has_feed -->
             <section>
                 <ul class="action-list">
                     <!-- BEGIN rss_stories -->
@@ -45,7 +45,7 @@
                     <!-- END rss_stories -->
                 </ul>
             </section>
-            <!-- END rss -->
+            <!-- END has_feed -->
 
         </div>
     </div>

@@ -11,16 +11,28 @@
             <div class="empty-state">
                 <i class="icon-twitter"></i>
 
+                <!-- BEGIN empty_api -->
+                <p>Ask your System Administrator to enter your school's Twitter API settings in the 3rd Party Services Settings in the Administration system to use this feature.</p>
+                <!-- END empty_api -->
+
+                <!-- BEGIN empty_api_admin -->
+                <p><a href="/adminv2/setting/3rd+Party+Services">Enter your school's Twitter API settings</a> in the Administration system to use this feature.</p>
+                <!-- END empty_api_admin -->
+
                 <!-- BEGIN empty_config -->
-                <p>To use the twitter component you must <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">enter a hashtag and/or author</a>.</p>
+                <p>There are no tweets available at this time.</p>
                 <!-- END empty_config -->
 
+                <!-- BEGIN empty_config_write -->
+                <p><a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a hashtag and/or author</a> to show a feed of tweets from the last 6 to 9 days.</p>
+                <!-- END empty_config_write -->
+
                 <!-- BEGIN empty_results -->
-                <p>No tweets found in the last 7 days.</p>
+                <p>There are no recent tweets to read at this time.</p>
                 <!-- END empty_results -->
 
                 <!-- BEGIN empty_results_write -->
-                <p>No tweets found in the last 7 days. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">setting a different hashtag or author.</p>
+                <p>There are no tweets to display from the last 6 to 9 days. <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a different hashtag and/or author</a> with recent tweets to show a feed of tweets.</p>
                 <!-- END empty_results_write -->
 
             </div>

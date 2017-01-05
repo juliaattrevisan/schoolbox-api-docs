@@ -39,11 +39,14 @@
 
                 <div class="empty-state">
                     <i class="icon-files"></i>
-                    <p>No files available.</p>
-                    <!-- BEGIN empty_modify -->
+
+                    <!-- BEGIN empty_read -->
+                    <p>There are no files to access at this time.</p>
+                    <!-- END empty_read -->
+
+                    <!-- BEGIN empty_write -->
                     <p>
-                        <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple onto this component
-                    </p>
+                        <a href="/cms/file/new/{FILE_CAT_ID}">Upload a file</a> or drag and drop multiple files onto this component to share resources.</p>
 
                     <script type="text/javascript">
                         $(function () {
@@ -84,7 +87,7 @@
                             });
                         });
                     </script>
-                    <!-- END empty_modify -->
+                    <!-- END empty_write -->
                 </div>
             </div>
             <!-- END empty_state -->

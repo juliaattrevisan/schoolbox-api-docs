@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_TeachersController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -21,6 +23,8 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
+        $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
+
         $listSyns = null;
 
         if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
@@ -28,12 +32,47 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
         }
 
-        if (!is_array($listSyns)) {
+        if (empty($listSyns)) {
 
             $this->setBlock($templateHandle, 'teachers', 'teachers_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
+            $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
+            $this->setBlock('empty_state', 'empty_code_admin', 'empty_code_admin_block');
+            $this->setBlock('empty_state', 'empty_students', 'empty_students_block');
+            $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
-            $this->setVar('teachers_block', '');
+            $this->setVar([
+                'teachers_block' => '',
+                'empty_read_block' => '',
+                'empty_is_group_block' => '',
+                'empty_code_block' => '',
+                'empty_code_admin_block' => '',
+                'empty_students_block' => '',
+                'empty_students_admin_block' => '',
+            ]);
+
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->parse('empty_read_block', 'empty_read');
+            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
+
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_code_admin_block', 'empty_code_admin');
+                } else {
+                    $this->parse('empty_code_block', 'empty_code');
+                }
+
+            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and $this->getSource()->getFolder()->isGroup()) {
+                $this->parse('empty_is_group_block', 'empty_is_group');
+            } else {
+
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_students_admin_block', 'empty_students_admin');
+                } else {
+                    $this->parse('empty_students_block', 'empty_students');
+                }
+            }
 
             $this->parse('empty_state_block', 'empty_state');
 
@@ -45,10 +84,12 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             $this->setBlock('person', 'has_icon', 'has_icon_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+            ]);
 
             $displayOptions = array(
                 'grid' => array(
@@ -62,12 +103,12 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                     'css' => '',
                 ),
             );
+
             $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-            $this->setVar(
-                array(
-                    'LIST_STYLE' => $displayOptions[$display]['css'],
-                )
-            );
+
+            $this->setVar([
+                'LIST_STYLE' => $displayOptions[$display]['css'],
+            ]);
 
             if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
                 $externalClassHandler = new External_Class();
@@ -76,21 +117,19 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
 
                 if (is_array($listSyns)) {
-                    $j = 0;
                     foreach ($listSyns as $synid) {
 
                         try {
                             $teacher = $userMapper->findByExternalId($synid);
 
-                        if($teacher->getRole()->isStaff()) {
-                            $this->setVar(
-                                array(
+                            if ($teacher->getRole()->isStaff()) {
+
+                                $this->setVar([
                                     'PERSON_UID'         => $teacher->getId(),
                                     'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
                                     'PERSON_EXTERNAL_ID' => $synid,
                                     'PERSON_GROUP'       => Scrub::text(empty($teacher->getPositionTitle()) ? $teacher->getRole()->getName() : $teacher->getPositionTitle()),
-                                )
-                            );
+                                ]);
 
                                 /* Don't display images in list view
                                  */
@@ -117,6 +156,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                                 $this->setVar('has_thumbnail_block', '');
                                 $this->setVar('has_icon_block', '');
                             }
+
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             //noop
                         }

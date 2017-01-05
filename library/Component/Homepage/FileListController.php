@@ -117,14 +117,19 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
             $this->setBlock($templateHandle, 'file', 'file_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
-            $this->setVar('file_block', '');
+            $this->setVar([
+                'file_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+            ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("empty_modify_block", "");
+                $this->parse('empty_read_block', 'empty_read');
             } else {
-                $this->parse("empty_modify_block", "empty_modify");
+                $this->parse('empty_write_block', 'empty_write');
             }
 
             $this->parse('empty_state_block', 'empty_state');

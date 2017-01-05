@@ -56,16 +56,14 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         // Set up component name
-        $this->setVar(
-            array(
-                // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
-                        ? 'Local'
-                        : $this->getSource()->getName(),
-                'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
-            )
-        );
+        $this->setVar([
+            // These are for the Select Alternate Source resourcebrowser
+            'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+                    ? 'Local'
+                    : $this->getSource()->getName(),
+            'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
+        ]);
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->getLinkMapper()->findAllInCategory(
@@ -88,15 +86,20 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
             $this->setBlock($templateHandle, 'links', 'links_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
+            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
-            $this->setVar('links_block', '');
-            $this->setVar('SOURCE_ID', $this->getSource()->getId());
+            $this->setVar([
+                'links_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+                'SOURCE_ID' => $this->getSource()->getId(),
+            ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("empty_modify_block", "");
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $this->parse('empty_write_block', 'empty_write');
             } else {
-                $this->parse("empty_modify_block", "empty_modify");
+                $this->parse('empty_read_block', 'empty_read');
             }
 
             $this->parse('empty_state_block', 'empty_state');
@@ -116,29 +119,29 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
-                $this->setVar('link_block', '');
-
-                $j = 0;
+                $this->setVar([
+                    'source_folder_deleted_block' => '',
+                    'link_block' => '',
+                ]);
 
                 foreach ($allLinks as $currentLink) {
+
                     if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                         continue;
                     }
-                    $this->setVar(
-                        array(
-                            'LINK_ID' => $currentLink->getId(),
-                            'LINK_NAME' => Scrub::text($currentLink->getDescription()),
-                            'LINK_URL' => $currentLink->getHref(),
-                            'LINK_TARGET' => $currentLink->getLinkTarget(),
-                            'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
-                            'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                            'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
-                            'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
-                            'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
-                        )
-                    );
+
+                    $this->setVar([
+                        'LINK_ID' => $currentLink->getId(),
+                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
+                        'LINK_URL' => $currentLink->getHref(),
+                        'LINK_TARGET' => $currentLink->getLinkTarget(),
+                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
+                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
+                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
+                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                    ]);
 
                     // Controls
                     if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -149,8 +152,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
                     $this->parse("link_block", "link", true);
                 }
-
-
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar("submit_link_block", "");

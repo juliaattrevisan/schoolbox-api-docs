@@ -3,58 +3,89 @@
     {CONFIGURATION}
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+
         <!-- BEGIN empty_state -->
         <div class="empty-state">
             <i class="icon-{COMPONENT_ICON}"></i>
-            <p>There are no {TYPE_NAME} in this group</p>
+
+            <!-- BEGIN empty_read_members -->
+            <p>There are no group members added at this time.</p>
+            <!-- END empty_read_members -->
+
+            <!-- BEGIN empty_read_managers -->
+            <p>There are no group managers set at this time.</p>
+            <!-- END empty_read_managers -->
+
+            <!-- BEGIN empty_class -->
+            <p>There are no group {TYPE_NAME} as this is a class page. Try adding the {ALT_COMPONENT} component.</p>
+            <!-- END empty_class -->
+
+            <!-- BEGIN empty_not_group_members -->
+            <p><a href="/group/modify/' . $folderId . '">Add group members</a> to convert this page to a group to give specific users group membership to this page and display them in this component.</p>
+            <!-- END empty_not_group_members -->
+
+            <!-- BEGIN empty_not_group_managers -->
+            <p><a href="/group/modify/' . $folderId . '">Add group managers</a>  to convert this page to a group, give specific users group management permissions, and display them in this component.</p>
+            <!-- BEGIN empty_not_group_managers -->
+
+            <!-- BEGIN empty_members -->
+            <p><a href="/group/modify/' . $folderId . '">Add group members</a> to give specific users group membership to this page and display them in this component.</p>
+            <!-- END empty_members -->
+
+            <!-- BEGIN empty_managers -->
+            <p><a href="/group/modify/' . $folderId . '">Add group managers</a> to give specific users group management permissions and display them in this component.</p>
+            <!-- END empty_managers -->
+
         </div>
         <!-- END empty_state -->
-        <!-- BEGIN members -->
-            <section>
-                <ul class="grid small-block-grid-1 {GRID_VIEW_CLASSES}">
-                    <!-- BEGIN person -->
-                    <li>
-                        <div class="card small-12">
-                            <a href="/search/user/{PERSON_UID}" title="View Profile">
-                                <!-- BEGIN has_thumbnail -->
-                                <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64' alt="View Profile" />
-                                <!-- END has_thumbnail -->
-                                <!-- BEGIN has_icon -->
-                                <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64' alt="View Profile" />
-                                <!-- END has_icon -->
-                                <p>{PERSON_NAME}</p>
-                            </a>
-                            <p class="meta">{PERSON_GROUP}</p>
-                        </div>
-                    </li>
-                    <!-- END person -->
-                </ul>
 
-                <!-- BEGIN people_hidden -->
-                <div class="content">
-                    <p class="meta">Showing the first {MAX_MEMBERS} members. A further {HIDDEN_COUNT} member(s) are not shown.</p>
-                </div>
-                <!-- END people_hidden -->
-                <!-- BEGIN member_email -->
-                <div class="component-action">
-                    <section>
-                        <form id="email-all"  action="/mail/createMail.php" method="post">
-                            <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
-                            <input type="hidden" name="bcc" value="{EMAILALL}"/>
-                        </form>
-                        <script>
-                            $(function() {
-                                $('[data-email]').click(function() {
-                                    $('#email-all').submit();
-                                });
+        <!-- BEGIN members -->
+        <section>
+            <ul class="grid small-block-grid-1 {GRID_VIEW_CLASSES}">
+                <!-- BEGIN person -->
+                <li>
+                    <div class="card small-12">
+                        <a href="/search/user/{PERSON_UID}" title="View Profile">
+                            <!-- BEGIN has_thumbnail -->
+                            <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64' alt="View Profile" />
+                            <!-- END has_thumbnail -->
+                            <!-- BEGIN has_icon -->
+                            <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64' alt="View Profile" />
+                            <!-- END has_icon -->
+                            <p>{PERSON_NAME}</p>
+                        </a>
+                        <p class="meta">{PERSON_GROUP}</p>
+                    </div>
+                </li>
+                <!-- END person -->
+            </ul>
+
+            <!-- BEGIN people_hidden -->
+            <div class="content">
+                <p class="meta">Showing the first {MAX_MEMBERS} members. A further {HIDDEN_COUNT} member(s) are not shown.</p>
+            </div>
+            <!-- END people_hidden -->
+            <!-- BEGIN member_email -->
+            <div class="component-action">
+                <section>
+                    <form id="email-all"  action="/mail/createMail.php" method="post">
+                        <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
+                        <input type="hidden" name="bcc" value="{EMAILALL}"/>
+                    </form>
+                    <script>
+                        $(function() {
+                            $('[data-email]').click(function() {
+                                $('#email-all').submit();
                             });
-                        </script>
-                        <a href="#" data-email class="button">Email All</a>
-                    </section>
-                </div>
-                <!-- END member_email -->
-            </section>
-            <!-- END members -->
+                        });
+                    </script>
+                    <a href="#" data-email class="button">Email All</a>
+                </section>
+            </div>
+            <!-- END member_email -->
+        </section>
+        <!-- END members -->
+
         </div>
     </div>
 </div>

@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
 
@@ -100,6 +101,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'contextType'  => AssessmentContextType::TYPE_FOLDER.'s',
             'assessables'  => $this->assessments,
             'termCode'     => $this->getTermMapper()->findForToday()->getCode(),
+            'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
         ];
     }
 

@@ -31,7 +31,18 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->setVar('tweet_block', '');
 
         $emptyState = false;
+        $noApiKey = false;
         $noConfig = false;
+
+        if (
+            strlen(Config::get('twitter_api_consumer_key')) == 0
+            || strlen(Config::get('twitter_api_consumer_secret')) == 0
+            || strlen(Config::get('twitter_api_oauth_token')) == 0
+            || strlen(Config::get('twitter_api_oauth_token_secret')) == 0
+        ) {
+            $emptyState = true;
+            $noApiKey = true;
+        }
 
         /**
          * Check if any username or hashtag has been set
@@ -57,37 +68,44 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
          */
         if ($emptyState) {
 
-            $this->setVar('twitter_feed_block', '');
+            $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
+            $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+            $this->setBlock('empty_state', 'empty_config_write', 'empty_config_write_block');
             $this->setBlock('empty_state', 'empty_results', 'empty_results_block');
             $this->setBlock('empty_state', 'empty_results_write', 'empty_results_write_block');
 
-            if ($noConfig) {
+            $this->setVar([
+                'empty_api_block' => '',
+                'empty_api_admin_block' => '',
+                'twitter_feed_block' => '',
+                'empty_config_block' => '',
+                'empty_config_write_block' => '',
+                'empty_results_block' => '',
+                'empty_results_write_block' => '',
+            ]);
 
-                $this->setVar('empty_results_block', '');
-                $this->setVar('empty_results_write_block', '');
+            if ($noApiKey) {
 
-                /**
-                 * If user is read only just display as no results found
-                 * Otherwise give a link for opening config
-                 */
-                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar('empty_config_block', '');
-                    $this->parse('empty_results_block', 'empty_results');
+                if ($this->getUser()->isSuperuser()) {
+                    $this->parse('empty_api_admin_block', 'empty_api_admin');
                 } else {
-                    $this->setVar('empty_results_block', '');
+                    $this->parse('empty_api_block', 'empty_api');
+                }
+
+            } elseif ($noConfig) {
+
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->parse('empty_config_block', 'empty_config');
+                } else {
+                    $this->parse('empty_config_write_block', 'empty_config_write');
                 }
 
             } else {
 
-                $this->setVar('empty_config_block', '');
-
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar('empty_results_write_block', '');
                     $this->parse('empty_results_block', 'empty_results');
                 } else {
-                    $this->setVar('empty_results_block', '');
                     $this->parse('empty_results_write_block', 'empty_results_write');
                 }
             }
@@ -100,9 +118,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
             $i = 0;
             foreach ($allResults as $currentTweet) {
-                $color = ++$i % 2 ? '' : 'dark';
                 $date  = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
-                //$date  = new Alaress_Date_Format();
 
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);

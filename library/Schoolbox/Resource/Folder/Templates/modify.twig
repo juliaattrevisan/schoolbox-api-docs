@@ -306,7 +306,7 @@
                         {% if user.isSuperuser %}
                             {% set codeTitle = 'If you want this folder to be a subject enter its code here. You may enter multiple codes by separating them with a comma' %}
                         {% else %}
-                            {% set codeTitle = 'Only superusers may adminster Subject Codes' %}
+                            {% set codeTitle = 'Only superusers may administer Subject Codes' %}
                         {% endif %}
 
                         <label>
@@ -329,7 +329,7 @@
 
                 {% endif %}
 
-                <fieldset class="content">
+                <fieldset id="curriculum-codes" class="content">
 
                     {% if curriculumTagging %}
 

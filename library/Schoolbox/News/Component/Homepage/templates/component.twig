@@ -1,17 +1,32 @@
 {% if news is empty %}
+
     <div class="empty-state">
         <i class="icon-news"></i>
-        <p>No news yet!</p>
+
         {% if modify %}
-            <p><a href="/news/homepage/new/{{ code }}">Post a news article</a>, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</p>
+
+            {% if showArchive %}
+                <p><a href="/news/homepage/new/{{ code }}">Post a news article</a> to share new information on this homepage, or <a href="/homepage/newsArchive/{{ code }}">view the news archive</a>.</p>
+            {% else %}
+                <p><a href="/news/homepage/new/{{ code }}">Post a news article</a> to share new information on this homepage.</p>
+            {% endif %}
+
         {% else %}
-            <p><a href="/homepage/newsArchive/{{ code }}">View the news archive</a>.</p>
-        {%endif %}
+
+            <p>There is no news to view at this time.</p>
+            {% if showArchive %}
+                <p><a href="/homepage/newsArchive/{{ code }}">View the news archive</a>.</p>
+            {% endif %}
+
+        {% endif %}
     </div>
+
 {% else %}
     <section>
         <ul class="information-list">
+
             {% if compact %}
+
                 {# Compact view #}
                 {% for item in news %}
                     <li {% if ( moderate or ( modify and config.news_edit_other ) ) %}class="actions-small-1"{% endif %}>
@@ -28,7 +43,9 @@
                         {% endif %}
                     </li>
                {% endfor %}
+
             {% else %}
+
                 {# Non compact view #}
                 {% for item in news %}
                     <li {% if modify %}class="actions-small-1"{% endif %}>
@@ -49,15 +66,24 @@
                         <article>{{ item.body | raw }}</article>
                     </li>
                 {% endfor %}
+
             {% endif %}
+
         </ul>
-        <div class="component-action">
-            <section>
-                <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
-                {% if modify %}
-                    <a href="/news/homepage/new/{{ code }}" class="button">Post News</a>
-                {% endif %}
-            </section>
-        </div>
+
+        {# Component Actions #}
+        {% if showArchive or modify %}
+            <div class="component-action">
+                <section>
+                    {% if showArchive %}
+                        <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
+                    {% endif %}
+                    {% if modify %}
+                        <a href="/news/homepage/new/{{ code }}" class="button">Post News</a>
+                    {% endif %}
+                </section>
+            </div>
+        {% endif %}
+
     </section>
 {% endif %}

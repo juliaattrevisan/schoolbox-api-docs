@@ -47,13 +47,41 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             $this->setBlock($templateHandle, 'members', 'members_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
+            $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
+            $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
+            $this->setBlock('empty_state', 'empty_not_group_members', 'empty_not_group_members_block');
+            $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
+            $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
+            $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
+
+            $folderId = $this->getSource()->getFolder()->getId();
 
             $this->setVar([
                 'members_block' => '',
+                'empty_read_members_block' => '',
+                'empty_read_managers_block' => '',
+                'empty_class_block' => '',
+                'empty_not_group_members_block' => '',
+                'empty_not_group_managers_block' => '',
+                'empty_members_block' => '',
+                'empty_managers_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
-                'COMPONENT_ICON' => 'group'
+                'COMPONENT_ICON' => 'group',
+                'ALT_COMPONENT' => 'class list',
             ]);
 
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $block = 'empty_read_members';
+            } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
+                $block = 'empty_class';
+            } elseif (!$this->getSource()->getFolder()->isGroup()) {
+                $block = 'empty_not_group_members';
+            } else {
+                $block = 'empty_members';
+            }
+
+            $this->parse($block . '_block', $block);
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
@@ -66,12 +94,14 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
-            $this->setVar('people_hidden_block', '');
-            $this->setVar('MAX_MEMBERS', self::MAX_MEMBERS);
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+                'people_hidden_block' => '',
+                'MAX_MEMBERS' => self::MAX_MEMBERS,
+            ]);
 
             /* Display options
              */

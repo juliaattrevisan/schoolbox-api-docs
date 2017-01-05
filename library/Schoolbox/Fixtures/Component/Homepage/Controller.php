@@ -9,10 +9,13 @@ namespace Schoolbox\Fixtures\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
 use Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
+use Alaress\Authorizer\Rule;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -20,6 +23,22 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var ComponentDelegate
      */
     private $delegate;
+
+    /**
+     * @var bool
+     */
+    private $readOnly;
+
+    /**
+     * @var bool
+     */
+    private $fixtureAdmin = false;
+
+    /**
+     * Whether a team has been set in component config
+     * @var bool
+     */
+    private $noConfig;
 
     /**
      * Injectable constructor
@@ -41,6 +60,27 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
+        /*
+         * Check access to this page
+         */
+        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
+
+        /**
+         * Check if user is a fixture admin
+         */
+        /** @var UserAccess $fixturesAccess */
+        $fixtureAccess = $this->getUser()->getAccessList()->getBy('service', UserAccess::SERVICE_SPORTS_ADMINISTRATOR);
+
+        if ((!empty($fixtureAccess) && $fixtureAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) || $this->getUser()->isSuperuser()) {
+            $this->fixtureAdmin = true;
+        }
+
+        /**
+         * Check if a team has been set in the component config
+         */
+        $this->noConfig = $this->getConfig('team') ? false : true;
+
+
         return true;
     }
 
@@ -61,6 +101,9 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
                 'matches'             => $matches,
+                'readOnly'            => $this->readOnly,
+                'fixtureAdmin'        => $this->fixtureAdmin,
+                'noConfig'            => $this->noConfig
             ]
         );
     }

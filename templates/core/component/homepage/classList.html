@@ -9,7 +9,32 @@
             <!-- BEGIN empty_state -->
             <div class="empty-state">
                 <i class="icon-class-list"></i>
-                <p>No students in this class</p>
+
+                <!-- BEGIN empty_read -->
+                <p>There are no students added to the class at this time.</p>
+                <!-- END empty_read -->
+
+                <!-- BEGIN empty_is_group -->
+                <p>There are no students to display as this is not a class page. Try adding the group members component.</p>
+                <!-- END empty_is_group -->
+
+                <!-- BEGIN empty_code -->
+                <p>There are no students to display as this is not a class page. Ask your System Administrator to add a class code to this page to convert it to a class page and display students here.</p>
+                <!-- END empty_code -->
+
+                <!-- BEGIN empty_code_admin -->
+                <p><a href="/resource/folder/modify/{FOLDER_ID}#synergetic-codes">Add a class code from your SIS</a> to give students access to this page and display them here.</p>
+                <!-- END empty_code_admin -->
+
+                <!-- BEGIN empty_students -->
+                <p>There are no students added to the class at this time. Ask your System Administrator to add students to the class to display here.</p>
+                <!-- END empty_students -->
+
+                <!-- BEGIN empty_students_admin -->
+                <p>There are no students added to the class at this time. Please check the class code is correct, and that there are students enrolled in the class in your SIS.</p>
+                <!-- END empty_students_admin -->
+
+
             </div>
             <!-- END empty_state -->
 

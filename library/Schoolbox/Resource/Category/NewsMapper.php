@@ -263,4 +263,38 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		return $news;
 	}
 
+
+    /**
+     * Checks if there's any archived news items in a folder
+     * Used to determine whether to show an archive link or not
+     *
+     * @param $folderId
+     * @param $userId
+     * @return bool
+     */
+	public function checkArchive($folderId, $userId)
+    {
+        $query = "
+            SELECT    COUNT(*)
+            FROM      `{$this->getTable()}` `n`
+            WHERE     `n`.`code` = :catId 
+                      AND (datetime_published <= CURDATE() OR owner = :userId) AND datetime_expires < CURDATE()
+                      AND `n`.deleted = 0
+        ";
+
+        $stmt = $this->database->prepare($query);
+
+        $stmt->execute([
+            'catId' => $folderId,
+            'userId' => $userId
+        ]);
+
+        if ($stmt->fetchColumn() > 0) {
+            return true;
+        }
+
+        return false;
+
+    }
+
 }

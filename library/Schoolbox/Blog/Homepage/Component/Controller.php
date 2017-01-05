@@ -20,6 +20,7 @@ use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
@@ -97,7 +98,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'blogComments'          => $blogComments,
                 'blogImages'            => $blogImages,
                 'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName()
+                'componentClass'        => $this->getComponentName(),
+                'readonly'              => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
