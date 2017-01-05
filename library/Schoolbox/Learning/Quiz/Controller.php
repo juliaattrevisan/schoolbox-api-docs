@@ -323,18 +323,19 @@ class Controller extends AbstractController
      * Marks an attempt as completed
      * @param $attemptId
      */
-    public function postQuizSubmit($attemptId)
+    public function postQuizSubmit()
     {
-        $returnUrl = $this->getRequest()->query['returnUrl'];
+        $post = $this->getRequest()->post;
+
         try {
-            $attempt = $this->quizAttemptMapper->findById($attemptId);
+            $attempt = $this->quizAttemptMapper->findById($post['attemptId']);
             $attempt->setFinish(\Alaress_Date_Format::now());
             $this->quizAttemptMapper->save($attempt);
         } catch (MapperException $e) {
         }
 
         return $this->getResponse()->redirect->to(
-            Redirect::decode($returnUrl)
+            Redirect::decode($post['returnUrl'])
         );
     }
 

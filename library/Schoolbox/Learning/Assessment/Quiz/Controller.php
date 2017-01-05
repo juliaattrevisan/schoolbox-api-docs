@@ -106,6 +106,7 @@ class Controller extends Assessment\Controller
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz
              */
+            'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix,
         ];
 

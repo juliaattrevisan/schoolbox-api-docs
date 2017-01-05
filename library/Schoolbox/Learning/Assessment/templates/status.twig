@@ -13,6 +13,19 @@
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 
+<script>
+    $(function() {
+
+        // Submit incomplete quiz
+
+        $('[data-quiz-submit]').click(function(e) {
+            e.preventDefault();
+            var attemptId = $('[data-quiz-submit]').attr('data-quiz-submit');
+            $('#form-quiz-submit-' + attemptId).submit();
+        });
+    });
+</script>
+
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
@@ -109,12 +122,14 @@
                                     {% if pSobo %}
                                     <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
                                     {% endif %}
-                                    {% if assessment.typeName == 'Quiz' %}
+                                    {% if assessment is quiz %}
                                         {% set attempt = participant.findMostRecentResponse %}
-                                        {% if attempt %}
-                                            {% if not attempt.submitted %}
-                                                <li><a class="icon-tick" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit', {attemptId: attempt.id}) ~ returnUrlSuffix }}" title="Mark As Submitted">Mark As Submitted</a></li>
-                                            {% endif %}
+                                        {% if attempt and not attempt.submitted %}
+                                            <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit') ~ returnUrlSuffix }}">
+                                                <input type="hidden" name="attemptId" value="{{ attempt.id }}">
+                                                <input type="hidden" name="returnUrl" value="{{ returnUrl }}">
+                                            </form>
+                                            <li><a data-quiz-submit="{{ attempt.id }}" class="icon-tick" href="#" title="Mark As Submitted">Mark As Submitted</a></li>
                                         {% endif %}
                                     {% endif %}
                                 {% endspaceless -%}
