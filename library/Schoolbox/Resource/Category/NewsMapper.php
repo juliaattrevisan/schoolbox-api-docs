@@ -275,12 +275,11 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 	public function checkArchive($folderId, $userId)
     {
         $query = "
-            SELECT    id
+            SELECT    COUNT(*)
             FROM      `{$this->getTable()}` `n`
             WHERE     `n`.`code` = :catId 
                       AND (datetime_published <= CURDATE() OR owner = :userId) AND datetime_expires < CURDATE()
                       AND `n`.deleted = 0
-            LIMIT     1
         ";
 
         $stmt = $this->database->prepare($query);
@@ -290,7 +289,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
             'userId' => $userId
         ]);
 
-        if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ($stmt->fetchColumn() > 0) {
             return true;
         }
 
