@@ -162,7 +162,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'hidden' : '',
                         'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
                         'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark'
                     );
 
                     $this->setVar($output);
