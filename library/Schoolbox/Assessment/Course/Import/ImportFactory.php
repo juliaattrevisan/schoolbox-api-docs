@@ -104,6 +104,7 @@ class ImportFactory
         $pb->anyOf('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
         $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $query .= ' ORDER BY sa.sequence';
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
 
