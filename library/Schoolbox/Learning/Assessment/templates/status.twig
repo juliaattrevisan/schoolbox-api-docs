@@ -109,6 +109,14 @@
                                     {% if pSobo %}
                                     <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
                                     {% endif %}
+                                    {% if assessment.typeName == 'Quiz' %}
+                                        {% set attempt = participant.findMostRecentResponse %}
+                                        {% if attempt %}
+                                            {% if not attempt.submitted %}
+                                                <li><a class="icon-tick" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit', {attemptId: attempt.id}) ~ returnUrlSuffix }}" title="Mark As Submitted">Mark As Submitted</a></li>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
                                 {% endspaceless -%}
                             </ul>
                             {% endif %}
