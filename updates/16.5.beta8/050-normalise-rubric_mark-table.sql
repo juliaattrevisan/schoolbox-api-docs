@@ -39,6 +39,18 @@ DELETE FROM `rubric_level` WHERE `id` IN (
 -- Drop temp table
 DROP TABLE temp_descriptors_and_levels;
 
+
+-- DELETE descriptors if belonging to non-existent levels, and not linked to any student marks
+DELETE FROM rubric_descriptor WHERE id IN (
+  SELECT * FROM (
+    SELECT rd.id
+    FROM rubric_descriptor rd
+    LEFT JOIN rubric_level rl ON rd.level_id = rl.id
+    LEFT JOIN rubric_mark rm ON rm.descriptor_id = rd.id
+    WHERE rl.id IS NULL
+    AND rm.id IS NULL) t
+);
+
 -- Add foreign keys to Rubrics
 
 -- Add foreign keys to 'rubric_criterion'
