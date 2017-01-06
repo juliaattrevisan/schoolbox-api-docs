@@ -45,7 +45,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'random_image', 'random_image_block');
+        $this->setBlock($templateHandle, 'has_rand_image', 'has_rand_image_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         // get image id
@@ -64,7 +64,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'image_display_block' => '',
+                'has_rand_image_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
             ]);
@@ -80,15 +80,15 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         } else {
 
             //outputs an custom image and link to the homepage
-            $this->setBlock('random_image', "previewimage", "preview_block");
-            $this->setBlock('random_image', 'submit_image_randimage', 'submit_image_randimage_block');
-            $this->setBlock('random_image', 'empty_state', 'empty_state_block');
+            $this->setBlock('has_rand_image', "preview_image", "preview_image_block");
+            $this->setBlock('has_rand_image', 'submit_image_randimage', 'submit_image_randimage_block');
 
-            $this->setVar('empty_state_block', '');
+            $this->setVar([
+                'empty_state_block' => '',
+                'submit_image_randimage_block' => '',
+            ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('submit_image_randimage_block', '');
-            } else {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('submit_image_randimage_block', 'submit_image_randimage');
             }
 
@@ -100,8 +100,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
-            $this->parse('preview_block', 'previewimage');
-            $this->parse('random_image_block', 'random_image');
+            $this->parse('preview_image_block', 'preview_image');
+            $this->parse('has_rand_image_block', 'has_rand_image');
         }
 
         return true; // everything went according to plan
