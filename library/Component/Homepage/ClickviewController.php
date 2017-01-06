@@ -27,8 +27,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $clickviewSchoolId = Config::get('clickview_school_id');
-
-        if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
+        $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
         // Clickview has different endpoints in NZ to Aus.  No idea if this affects any other countries.
         if (stripos($this->getConfigMapper()->get('date_timezone'), 'Auckland') !== false) {
@@ -36,10 +35,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         } else {
             $this->setVar('CLICKVIEW_URL', 'online.clickview.com.au');
         }
-
-        $clickviewSchoolId = Config::get('clickview_school_id');
-
-        $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
         if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
 
