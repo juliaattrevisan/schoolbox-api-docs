@@ -13,6 +13,8 @@
  * Creates Categorys as required (synonymous with folders)
  */
 
+use \Schoolbox\Error\Mapper as ErrorMapper;
+
 class ZipFileUpload extends DeprecatedModel
 {
 
@@ -105,10 +107,10 @@ class ZipFileUpload extends DeprecatedModel
      */
     public function extract(ZipArchive $archive)
     {
-        $extractedFiles = $archive->extractTo($this->getPath());
+        @$extractedFiles = $archive->extractTo($this->getPath());
 
         if (!$extractedFiles) {
-            die('Could not extract files.');
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_ZIP_EXTRACT);
         }
 
         return opendir($this->getPath());

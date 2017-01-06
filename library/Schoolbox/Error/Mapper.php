@@ -160,6 +160,8 @@ class Mapper extends BaseMapper
     const ERROR_ASSESSMENT_CLOSED = 186;
     const ERROR_ASSESSMENT_NOT_YET_OPEN = 187;
 
+    const ERROR_ZIP_EXTRACT = 188;
+
     public function mapping()
     {
         $this->hasTable('error');
