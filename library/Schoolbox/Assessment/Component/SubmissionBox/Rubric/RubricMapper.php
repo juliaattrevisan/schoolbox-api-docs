@@ -307,7 +307,12 @@ class RubricMapper
      */
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
-        $folderIds = [$box->getCategory()->getId()];
+        $args = [
+            'boxId'    => $box->getId(),
+            'folderId' => $box->getCategory()->getId(),
+        ];
+
+        $in = [ 'folderId' ];
 
         // Retrieve criteria from the box's folder's parent ?
         if($getParentCriteria){
@@ -316,13 +321,13 @@ class RubricMapper
             if (!$parentId) {
                 $parentId = FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
             }
-            $folderIds[] = $parentId;
+
+            $key        = 'parentFolderId';
+            $args[$key] = $parentId;
+            $in[]       = $key;
         }
 
-        $args = [
-            'boxId'     => $box->getId(),
-            'folderIds' => implode(',', $folderIds),
-        ];
+        $in = implode(', :', $in);
 
         $criteriaStatement = $this->database->query("
             SELECT
@@ -343,14 +348,13 @@ class RubricMapper
                 RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
                 WHERE parent_type = 'category'
-                AND parent_id IN (:folderIds)
+                AND parent_id IN (:$in)
                 AND deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
             GROUP BY crit_id
             ORDER BY selected DESC, `sequence` ASC, `grouping` ASC, `name` ASC;
         ", $args);
-
 
         return $criteriaStatement;
     }
