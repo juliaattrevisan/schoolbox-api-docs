@@ -88,6 +88,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
              */
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_file', 'has_file_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $configValue = $this->getConfig('filter');
         $filter = array();
         for ($i = 0; $i < count($this->filterFields); $i++) {
@@ -115,13 +118,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         if (count($fileList) == 0) {
 
-            $this->setBlock($templateHandle, 'file', 'file_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'file_block' => '',
+                'has_file_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
             ]);
@@ -140,9 +141,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
              */
             $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_file', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_file', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'files', 'files_block');
             $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
             $this->setBlock('files', 'file_url', 'file_url_block');
@@ -151,24 +151,24 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
             $this->setVar('empty_state_block', '');
 
-            $this->setVar(
-                array(
-                    // These are for the Select Alternate Source resourcebrowser
-                    'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
-                    'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
-                        ? 'Local'
-                        : $this->getSource()->getName(),
-                    'FILES_CATEGORY_ID' => $this->getSource()->getId(),
-                )
-            );
+            $this->setVar([
+                // These are for the Select Alternate Source resourcebrowser
+                'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+                    ? 'Local'
+                    : $this->getSource()->getName(),
+                'FILES_CATEGORY_ID' => $this->getSource()->getId(),
+            ]);
 
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
-                $this->setVar('files_block', '');
+                $this->setVar([
+                    'source_folder_deleted_block' => '',
+                    'files_block' => '',
+                ]);
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
@@ -177,7 +177,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             continue;
                         }
 
-                        $output = array(
+                        $this->setVar([
                             'FILE_DESCRIPTION' => Scrub::text($file->getTitle()),
                             'FILE_ID' => $file->getId(),
                             'FILE_MIME_IMAGE' => $file->getStorage()->getMimetype()->getIconFile(),
@@ -189,21 +189,21 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             'FILE_MODIFIED_DATE' => $file->getModifiedAt()->getRelativeTime(),
                             'FILE_COMMENT' => nl2br(Scrub::text($file->getDescription())),
                             'HIDDEN' => $file->isHidden() ? 'translucent' : '',
-                        );
-                        $this->setVar($output);
+                        ]);
 
                         if ($this->getConfig('compactMode')) {
-                            $this->setVar(array(
+                            $this->setVar([
                                 'FILE_COMPACT' => 'compact'
-                            ));
+                            ]);
                         }
 
                         //set name
                         if ($file->getFilename() != "") {
-                            $this->setVar('FILE_URL', '/send.php?id=' . $file->getId());
-                            $this->setVar('FILE_TARGET', '_blank');
-
-                            $this->setVar('file_no_url_block', '');
+                            $this->setVar([
+                                'FILE_URL' => '/send.php?id=' . $file->getId(),
+                                'FILE_TARGET' => '_blank',
+                                'file_no_url_block' => '',
+                            ]);
                             $this->parse('file_url_block', 'file_url');
                         } else {
                             $this->setVar('file_url_block', '');
@@ -229,6 +229,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_file_block', 'has_file');
         }
 
         return true;
