@@ -24,7 +24,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->parseConfig();
 
         // Clickview has different endpoints in NZ to Aus.  No idea if this affects any other countries.
-        if(stristr($this->getConfigMapper()->get('date_timezone'),'Auckland')) {
+        if(stripos($this->getConfigMapper()->get('date_timezone'),'Auckland') !== false ) {
             $this->setVar('CLICKVIEW_URL', 'online.clickview.co.nz');
         } else {
             $this->setVar('CLICKVIEW_URL', 'online.clickview.com.au');
