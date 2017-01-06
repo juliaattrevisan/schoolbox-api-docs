@@ -26,7 +26,8 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Rubric\Rubric as BaseRubric;
 
 /**
@@ -200,14 +201,16 @@ class RubricMapper
     /**
      * Given a box ID, return the rubric assigned to it, if any
      *
+     * Unlike createForContext(), this is a data-level method (ie it works on data models).
+     *
      * @param SubmissionBox $box
-     * @param bool          $forceTaskMode - if the box doesn't yet have a task, but you still need the task-level criteria showing
-     * @param bool          $editMode
+     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
+     * @param bool          $editMode          - whether to include criteria not in use on box
      * @return Rubric
      */
-    public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
+    public function findBySubmissionBox($box, $getParentCriteria = false, $editMode = false)
     {
-        list ($groups, $criteria) = $this->findCriteria($box, $forceTaskMode);
+        list ($groups, $criteria) = $this->findCriteria($box, $getParentCriteria);
         $descriptors = $this->findDescriptors($box);
         $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
 
@@ -221,28 +224,51 @@ class RubricMapper
 
         // use the factory to produce the rubric object
         /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode);
+        $rubric = $this->factory->buildFromPostData($postdata, $getParentCriteria || $editMode);
         return $rubric->setSubmissionBox($box);
     }
 
 
     /**
+     * Find all criteria that are available or in use by the $box.
+     *
+     * We would wish to retrieve parent criteria when the $box lives in a UnitSpec, or project
+     * in a UnitSpec. In these cases we need to also retrieve Criteria from the CourseSpec
+     *
      * @param SubmissionBox $box
-     * @param bool          $forceTaskMode
-     * @return array
+     * @param bool          $getParentCriteria - if specified, also get criteria the box's folder's parent
+     * @return array $return
+     * @var array  $return[0]                 Groups
+     * @var array  $return[0][]               A single Criteria-Group
+     * @var string $return[0][]['name']       Name of the Criteria-Group
+     * @var array  $return[1]                 Criteria
+     * @var array  $return[1][]               A single Criterion
+     * @var int    $return[1][]['groupId']    Arbitrary GroupId (not stored in DB, just used to link to a Criteria-Group)
+     * @var bool   $return[1][]['on']         Whether this criteria is selected to be used in the $box
+     * @var string $return[1][]['name']       Name of Criterion
+     * @var bool   $return[1][]['readonly']   Whether user should be prevented from changing name
      */
-    protected function findCriteria(SubmissionBox $box, $forceTaskMode)
+    protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
-        // why 20? because it's not 0.
+        // why 20? because it's not 0. (arbitrary start of group indexes)
         $groupId    = 20;
-        $groupIdMap = $groups = $criteria = [];
 
-        $criteriaStatement = $this->generateCriteriaStatement($box, $forceTaskMode);
+        /** @var array $groupIdMap - indexed by criterion-group name */
+        $groupIdMap = [];
+
+        /** @var array $groups - indexed by groupId */
+        $groups     = [];
+
+        /** @var array $criteria - indexed by criterion.id */
+        $criteria   = [];
+
+        $criteriaStatement = $this->generateCriteriaStatement($box, $getParentCriteria);
 
         while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
 
             $groupName = $r['grouping'];
 
+            // First time we've encountered this Group ?
             if (empty($groupIdMap[$groupName])) {
                 ++$groupId;
 
@@ -259,83 +285,44 @@ class RubricMapper
                 'name'     => $r['name'],
                 'readonly' => $usedElsewhere
             ];
-
         }
 
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
-        // ensure any descriptors already in play get priority
-        $stmt = $this->database->query("
-            SELECT DISTINCT rc.id, rc.grouping, rc.name
-            FROM rubric_descriptor rd
-            JOIN rubric_level rl ON rl.id = rd.level_id AND rd.valid IS TRUE AND rl.box_id = :box_id
-            RIGHT JOIN rubric_criterion rc ON rd.criterion_id = rc.id
-            WHERE rc.deleted_at IS NULL
-        ", [
-            'box_id' => $box->getId()
-        ]);
-
-        while ($r = $stmt->fetch(PDO::FETCH_NUM)) {
-            list ($id, $grouping, $name) = $r;
-
-            if (!empty($criteria[$id])) {
-                // ensure it gets flagged as active... in theory this *should* happen every time
-                $criteria[$id]['on'] = true;
-                continue;
-            }
-
-            if (empty($groupIdMap[$grouping])) {
-                ++$groupId;
-
-                $groupIdMap[$grouping] = $groupId;
-                $groups[$groupId] = [ 'name' => $grouping ];
-            }
-
-            $criteria[$id] = [
-                'groupId'  => $groupId,
-                'on'       => true,
-                'name'     => $name,
-                'readonly' => true // we can only assume at this point...
-            ];
-        }
-
         return [ $groups, $criteria ];
     }
 
     /**
+     * Find all criteria that are available for the $box.
+     *
+     * For each criterion, also get:
+     * * how many boxes are using the criteria,
+     * * whether the specified box is using the criteria
+     *
      * @param SubmissionBox $box
-     * @param bool          $forceTaskMode
+     * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
      * @throws \Schoolbox\Mapper\Exception
      * @return \PDOStatement
      */
-    protected function generateCriteriaStatement(SubmissionBox $box, $forceTaskMode)
+    protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
-        $args = [
-            'boxId' => $box->getId(),
-            'folderId' => $box->getCategory()->getId()
-        ];
+        $folderIds = [$box->getCategory()->getId()];
 
-        $in = [ 'folderId' ];
-
-        // if the box has a task, include parent-folder criteria
-        /*TODO: Fix criteria when submission box part of unitspec
-         *
-         * if ($box->getTask()->getId() || $forceTaskMode) {
-
-            $key      = 'parentFolderId';
+        // Retrieve criteria from the box's folder's parent ?
+        if($getParentCriteria){
             $parentId = $box->getCategory()->getParent()->getId();
-
+            // Is parent not yet hydrated?
             if (!$parentId) {
-                // insufficient hydration
                 $parentId = FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
             }
+            $folderIds[] = $parentId;
+        }
 
-            $args[$key] = $parentId;
-            $in[] = $key;
-        }*/
-
-        $in = implode(', :', $in);
+        $args = [
+            'boxId'     => $box->getId(),
+            'folderIds' => implode(',', $folderIds),
+        ];
 
         $criteriaStatement = $this->database->query("
             SELECT
@@ -356,7 +343,7 @@ class RubricMapper
                 RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
                 WHERE parent_type = 'category'
-                AND parent_id IN (:$in)
+                AND parent_id IN (:folderIds)
                 AND deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
@@ -523,7 +510,7 @@ class RubricMapper
      */
     public function findBySubmissionBoxAndStudent($box, $student)
     {
-        $grid = $this->findBySubmissionBox($box, false, false);
+        $grid = $this->findBySubmissionBox($box);
         return $this->applyStudentMark($grid, $student);
     }
 
@@ -823,13 +810,13 @@ class RubricMapper
      *   - assessment
      *   - descriptor (student result)
      *
-     * @param Folder\Model        $subject
+     * @param Folder              $subject
      * @param User                $student
      * @param Alaress_Date_Format $noEarlierThan
      * @param Alaress_Date_Format $noLaterThan
      * @return array
      */
-    public function getLongitudinal(Folder\Model $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
+    public function getLongitudinal(Folder $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
     {
         $pb = new PredicateBuilder($this->database, '');
 
