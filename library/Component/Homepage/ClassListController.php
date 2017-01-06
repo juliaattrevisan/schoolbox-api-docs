@@ -39,6 +39,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_students', 'has_students_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
 
         /* Get all the students belonging to this category code
@@ -48,8 +51,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
         if (!is_array($allStudents)) {
 
-            $this->setBlock($templateHandle, 'class_list', 'class_list_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
@@ -58,7 +59,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
             $this->setVar([
-                'class_list_block' => '',
+                'has_students_block' => '',
                 'empty_read_block' => '',
                 'empty_is_group_block' => '',
                 'empty_code_block' => '',
@@ -92,21 +93,22 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
         } else {
 
-            $this->setBlock($templateHandle, 'person', 'person_block');
-            $this->setBlock($templateHandle, 'student_email', 'student_email_block');
-            $this->setBlock($templateHandle, 'parent', 'parent_block');
-            $this->setBlock($templateHandle, 'parent_email', 'parent_email_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_students', 'person', 'person_block');
+            $this->setBlock('has_students', 'student_email', 'student_email_block');
+            $this->setBlock('has_students', 'parent', 'parent_block');
+            $this->setBlock('has_students', 'parent_email', 'parent_email_block');
 
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_thumbnail_block', '');
-            $this->setVar('has_icon_block', '');
-            $this->setVar('person_block', '');
-            $this->setVar('student_email_block', '');
-            $this->setVar('parent_email_block', '');
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_thumbnail_block' => '',
+                'has_icon_block' => '',
+                'person_block' => '',
+                'student_email_block' => '',
+                'parent_email_block' => '',
+            ]);
 
             /* Display options
              */
@@ -123,28 +125,24 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 ),
             );
 
-            $this->setVar(
-                array(
-                    'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
-                )
-            );
+            $this->setVar([
+                'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+            ]);
 
-        /* Get all the students belonging to this category code
-         */
-        $externalClassHandler = new External_Class();
-        $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
+            /* Get all the students belonging to this category code
+             */
+            $externalClassHandler = new External_Class();
+            $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
+            $userMapper           = \Schoolbox\UserMapper::getInstance();
+            $allStudentEmails     = array();
 
-        $userMapper           = \Schoolbox\UserMapper::getInstance();
+            if (is_array($allStudents)) {
+                foreach ($allStudents as $currentStudent) {
 
-            $allStudentEmails = array();
+                    try {
+                        $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 
-        if (is_array($allStudents)) {
-            $j = 0;
-            foreach ($allStudents as $currentStudent) {
-                try {
-                    $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
-
-                    $email = $user->getEmail();
+                        $email = $user->getEmail();
 
                         /* Accumulate this for a giant parent-based bcc
                             */
@@ -156,28 +154,26 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             $allStudentEmails[] = $email;
                         }
 
-                    $this->setVar(
-                        array(
+                        $this->setVar([
                             'PERSON_UID'         => $user->getId(),
                             'PERSON_EXTERNAL_ID' => $user->getExternalId(),
                             'PERSON_NAME'        => Scrub::text($user->getFullName()),
                             'PERSON_GROUP'       => Scrub::text(empty($user->getPositionTitle()) ? $user->getRole()->getName() : $user->getPositionTitle()),
-                        )
-                    );
+                        ]);
 
                         /* Don't display images in list view
                             */
                         if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar(array(
+                            $this->setVar([
                                 'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                            ));
+                            ]);
 
                             $this->parse('has_thumbnail_block', 'has_thumbnail');
                             $this->setVar('has_icon_block', '');
                         } else {
-                            $this->setVar(array(
+                            $this->setVar([
                                 'GRID_VIEW_CLASSES' => ''
-                            ));
+                            ]);
 
                             $this->setVar('has_thumbnail_block', '');
                             $this->parse('has_icon_block', 'has_icon');
@@ -185,28 +181,28 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         $this->parse('person_block', 'person', true);
 
-                    /* Clear children after parsing out the parent
-                        */
-                    $this->setVar('has_thumbnail_block', '');
-                    $this->setVar('has_icon_block', '');
+                        /* Clear children after parsing out the parent
+                            */
+                        $this->setVar([
+                            'has_thumbnail_block' => '',
+                            'has_icon_block' => '',
+                        ]);
+                    }
+                    catch (MapperException $e) {
+                        //noop
+                    }
                 }
-                catch (MapperException $e) {
-                    //noop
-                }
-            }
 
 
                 $emailAllStudents = implode(',', $allStudentEmails);
 
-            /* Student bulk email
-              */
-            if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
-                $this->setVar(
-                    array(
+                /* Student bulk email
+                  */
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
+                    $this->setVar([
                         'REPLY_TO'           => $this->getUser()->getEmail(),
                         'EMAIL_ALL_STUDENTS' => $emailAllStudents,
-                    )
-                );
+                    ]);
 
                     $this->parse('student_email_block', 'student_email');
                 } else {
@@ -227,21 +223,24 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     */
                     $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
 
-                $this->setVar(
-                    array(
+                    $this->setVar([
                         'REPLY_TO'          => $this->getUser()->getEmail(),
                         'EMAIL_ALL_PARENTS' => $emailAllParents,
-                    )
-                );
+                    ]);
 
                     $this->parse('parent_email_block', 'parent_email');
                 } else {
                     $this->setVar('parent_email_block', '');
                 }
+
             } else {
-                $this->setVar('student_block', '');
-                $this->setVar('student_email_block', '');
+                $this->setVar([
+                    'student_block' => '',
+                    'student_email_block' => '',
+                ]);
             }
+
+            $this->parse('has_students_block', 'has_students');
         }
 
         return true;
