@@ -4,6 +4,10 @@ ALTER TABLE `submission_return_file`
 ALTER TABLE `submission_return`
   ADD INDEX (`student_submission_id`);
 
+DELETE FROM `task_completion`
+WHERE `student_id` NOT IN (SELECT `id` FROM `user`)
+OR `marking_user_id` NOT IN (SELECT `id` FROM `user`);
+
 ALTER TABLE `task_completion`
   CHANGE `student_id` `student_id` INT(11) UNSIGNED NOT NULL,
   CHANGE `marking_user_id` `marking_user_id` INT(11) UNSIGNED NULL,
