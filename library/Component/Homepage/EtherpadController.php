@@ -69,15 +69,16 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         $padMapper = new \Etherpad\PadMapper();
         $allPads = $padMapper->findByColumn('homepage_id', $this->getSource()->getId(), $options);
 
+        $this->setBlock($templateHandle, 'has_docs', 'has_docs_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         if (count($allPads) == 0) {
 
-            $this->setBlock($templateHandle, 'etherpad', 'etherpad_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'etherpad_block' => '',
+                'has_docs_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
                 'SOURCE_ID' => $this->getSource()->getId(),
@@ -93,27 +94,23 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
         } else {
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_docs', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_docs', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'etherpad_pad', 'etherpad_pad_block');
             $this->setBlock('source_folder_exists', 'etherpad_has_create', 'etherpad_has_create_block');
             $this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
 
-            $this->setVar(
-                array(
-                    'etherpad_pad_block'        => '',
-                    'etherpad_has_create_block' => '',
-                    'etherpad_has_modify_block' => '',
-                )
-            );
-
-            $this->setVar("empty_state_block", "");
+            $this->setVar([
+                'empty_state_block'             => '',
+                'etherpad_pad_block'            => '',
+                'etherpad_has_create_block'     => '',
+                'etherpad_has_modify_block'     => '',
+                'source_folder_deleted_block'   => '',
+            ]);
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
                 /* Optional limits
                  */
@@ -124,14 +121,12 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                 /* Only provide Modify Document button to those with write access
                  */
                 foreach ($allPads as $currentPad) {
-                    $this->setVar(
-                        array(
-                            'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
-                            'ETHERPAD_PAD_ID' => $currentPad->getId(),
-                            'ETHERPAD_NAME' => $currentPad->getDisplayName(),
-                            'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
-                        )
-                    );
+                    $this->setVar([
+                        'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
+                        'ETHERPAD_PAD_ID' => $currentPad->getId(),
+                        'ETHERPAD_NAME' => $currentPad->getDisplayName(),
+                        'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+                    ]);
 
                     if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                         $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
@@ -141,11 +136,9 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
                     /* Clear children after parsing out the parent
                      */
-                    $this->setVar(
-                        array(
-                            'etherpad_has_modify_block' => ''
-                        )
-                    );
+                    $this->setVar([
+                        'etherpad_has_modify_block' => ''
+                    ]);
                 }
 
                 /* Only provide Create Document button to those with write access
@@ -157,6 +150,8 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_docs_block', 'has_docs');
         }
 
         return true;
