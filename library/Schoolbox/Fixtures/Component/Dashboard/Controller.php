@@ -36,6 +36,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->setDelegate(new ComponentDelegate());
     }
 
+    /**
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        return $this->getSitePage()->getDi()->get('config')->get('fixtures_enabled') == '1';
+    }
 
     /**
      * @param String $templateHandle

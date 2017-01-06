@@ -1,9 +1,9 @@
-{% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 
-{% if matches | length %}
+{% if not noInstall and matches | length %}
+    {% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
+
     <div class="small-12 columns no-pad">
         <ul class="action-list">
-
             {% for match in matches %}
                 <li>
                     <div class="list-item">
@@ -25,16 +25,15 @@
             {% endfor %}
         </ul>
     </div>
-
 {% else %}
 
     <div class="empty-state">
         <i class="icon-sport"></i>
 
-        {% if readOnly %}
-
+        {% if noInstall %}
+            <p>The sports fixtures module is currently not installed, please ask your System Administrator about how to enable this component.</p>
+        {% elseif readOnly %}
             <p>There are no upcoming matches to display at this time.</p>
-
         {% else %}
 
             {#
