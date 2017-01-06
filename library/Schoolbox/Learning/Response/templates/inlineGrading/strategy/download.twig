@@ -17,7 +17,7 @@
                             </a>
                             <p class="meta">{{ file.size | bytes }}</p>
 
-                            {% include '@learning/dueWork/plagscan/status.twig' with {currentFile: file} %}
+                            {% include '@learning/dueWork/plagscan/status.twig' with {currentFile: file, plagscanEnabled: plagscanEnabled} %}
                         </div>
                     </div>
                     <nav>

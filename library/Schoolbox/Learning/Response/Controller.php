@@ -25,12 +25,10 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
-
 use DueWork_ErrorMapper;
 
 class Controller extends Base
@@ -156,6 +154,10 @@ class Controller extends Base
                  */
                 'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
                 'participant' => $participant,
+
+                /* Plagscan status
+                 */
+                'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
                 /* Rubrics data
                  */
