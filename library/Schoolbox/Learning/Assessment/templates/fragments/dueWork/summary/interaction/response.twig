@@ -7,6 +7,8 @@
     {% set tooltip = 'Resume Submission' %}
 {% endif %}
 
+{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id }) %}
+
 <li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
     <ul class="action-list">
         <li class="actions-small-1">
@@ -35,12 +37,14 @@
                     {%  endif %}
                 </div>
             </div>
+            {% if deleteRoute %}
             <nav>
-                {% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id }) %}
-                {% if deleteRoute %}
-                    <a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}"></a>
-                {% endif %}
+                <a class="icon-more" title="" data-dropdown="response-options-{{ currentInteraction.id }}"></a>
             </nav>
+            <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
+                <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}">Delete</a></li>
+            </ul>
+            {% endif %}
         </li>
     </ul>
 
