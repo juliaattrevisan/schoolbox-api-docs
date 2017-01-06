@@ -82,7 +82,7 @@ if (is_numeric($_GET['eventID'])) {
      * wasn't useless somehow
      */
     if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-        $publishDate = $event->getPublishDateTime()->getLocalShort();
+        $publishDate = $event->getPublishDateTime()->getDatabase();
     } else {
         $publishDate = '';
     }
@@ -105,7 +105,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_USER_ID'        => $event->getOwner()->getId(),
             'EVENT_AUTHOR_ID'      => $event->getAuthor()->getId(),
             'EVENT_TITLE'          => Scrub::text($event->getTitle()),
-            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
+            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_ATTENDANCE'     => $event->getAttendance() ? 'checked="checked"' : '',
             'EVENT_START_DATE'     => Scrub::text($event->getStartDateTime()->getDatabase()),
@@ -207,7 +207,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_USER_ID'        => $selectedUser->getId(),
             'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
             'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
-            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
+            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_ATTENDANCE'     => '',
             'EVENT_START_DATE'     => $event->getStartDateTime()->getDatabase(),
@@ -228,7 +228,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_END_PM'         => $event->getEndDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_PUBLISH_DATE'   => Alaress_Date_Format::now()->getLocalShort(),
+            'EVENT_PUBLISH_DATE'   => Alaress_Date_Format::now()->getDatabase(),
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(

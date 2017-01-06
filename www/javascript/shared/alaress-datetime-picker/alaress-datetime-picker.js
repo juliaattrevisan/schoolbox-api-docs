@@ -48,6 +48,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     var options = {
         databaseFormat: 'Y-m-d H:i:S',
         displayFormat: 'd/m/Y h:i K',
+        displayFormatDate: 'd/m/Y',
     };
 
     // Override with user any options
@@ -79,9 +80,12 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         // We need to do a bit of shuffling of the DOM. We move the original element over to a hidden form input
         // that will hold the date in a DB friendly format for form submission, and we put a readonly textbox in its place for
         // displaying a friendlier date format to the end users
-
+        var format = options.displayFormat;
+        if($('#allday').val() == 1) {
+            var format = options.displayFormatDate;
+        }
         element.after('<input type="hidden" id="' + originalId + '" name="' + originalName + '" value="' + originalValue + ' ">');
-        element.after('<input data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue, convertFormat(options.databaseFormat)).format(convertFormat(options.displayFormat)) + '">');
+        element.after('<input data-original-id="' + originalId + '" style="cursor:pointer;" type="text" id="pickerDisplay' + window.pickerCount + '" name=pickerDisplay"' + window.pickerCount + '" value="' + moment(originalValue, convertFormat(options.databaseFormat)).format(convertFormat(format)) + '">');
         element.after('<div data-reveal id="picker' + window.pickerCount + '" class="reveal-modal"></div>');
         element.remove();
 
@@ -120,9 +124,13 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                     $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
 
                         // Update the elements value with the selected date
+                        var format = options.displayFormat;
+                        if($('#allday').val() == 1) {
+                            var format = options.displayFormatDate;
+                        }
 
                         var pickerDisplay = $('#pickerDisplay' + pickerId);
-                        pickerDisplay.val(moment(window.pickerInstance[pickerId].altInput.value, convertFormat(options.databaseFormat)).format(convertFormat(options.displayFormat)));
+                        pickerDisplay.val(moment(window.pickerInstance[pickerId].altInput.value, convertFormat(options.databaseFormat)).format(convertFormat(format)));
 
                         var originalField = $('#' + pickerDisplay.data('originalId'));
                         originalField.val(window.pickerInstance[pickerId].altInput.value);

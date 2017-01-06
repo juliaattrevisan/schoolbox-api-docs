@@ -168,6 +168,7 @@
 </div>
 <script>
 
+    var allDaySwitch = ($('#allday').val());
     {# Tabs #}
 
     $('#tab-1-{{ id }}').click(function(){
@@ -353,7 +354,6 @@
         allowInput: true,
         disableMobile: true,
         onReady: function(selectedDates, dateStr, instance) {
-
             var timeDiv = $('#pickerCalendar{{ id }}').closest('#picker{{ id }}').find('.flatpickr-time');
             var calendarDiv = $('#picker{{ id }}').find('.flatpickr-calendar');
             var presetObj = new Date('{{ value }}');
@@ -368,7 +368,8 @@
             );
             
             {# Hide time picker if enableTime option set equals false or no event time set #}
-            if(calendarDiv.hasClass('hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
+//          if(calendarDiv.hasClass('hasTime') && (presetObj.getHours()+presetObj.getMinutes()) === 0) {
+            if($('#allday').val() == 1) {
                 timeDiv.css('display', 'none');
                 calendarDiv.addClass('allDay');
                 calendarDiv.removeClass('hasTime');
@@ -381,12 +382,17 @@
                     timeDiv.css('display', 'none');
                     calendarDiv.addClass('allDay');
                     calendarDiv.removeClass('hasTime');
+                    $('#allday').val(1);
                     {# Set time to 00:00:00#}
                     var allDay = moment(instance.altInput.value, convertFormat('{{ databaseFormat }}')).hours(0).minutes(0).format(convertFormat('{{ databaseFormat }}'));
-                    $('#pickerDisplay{{ id }}').val(allDay);
                     instance.setDate(allDay);
+                    allDay = moment(allDay).format('DD/MM/YYYY');
+                    $('#pickerDisplay{{ id }}').val(allDay);
+                    console.log(allDay);
+
                 }
                 else {
+                    $('#allday').val(0);
                     timeDiv.css('display', 'block');
                     calendarDiv.addClass('hasTime');
                     calendarDiv.removeClass('allDay');

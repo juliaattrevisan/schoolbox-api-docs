@@ -26,7 +26,7 @@
             container: '[data-collapsable-container]'
         });
 
-        $('#startDate, #endDate').alaressDateTimePicker();
+        $('#startDate, #endDate, #publishDate').alaressDateTimePicker();
     });
 </script>
 <!-- END custom_head -->
@@ -57,7 +57,7 @@
         	<input name="id" type="hidden" value="{EVENT_ID}" />
         	<input name="userId" type="hidden" value="{EVENT_USER_ID}" />
         	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
-        	<!--<input name="allday" type="hidden" value="0" />-->
+            <input id="allday" name="allday" type="hidden" value="{EVENT_ALLDAY_CHECKED}">
         	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
         	<input id="efficacy" name="efficacy" type="hidden" value="self" />
         	<input id="action" name="action" type="hidden" value="" />
@@ -135,6 +135,7 @@
                         <!--<input id="allday" name="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED}>-->
                         <!--<label for="allday" class="checkbox-label">All Day</label>-->
                     <!--</div>-->
+
                 </fieldset>
 
                 <fieldset class="content" data-collapsable-container>
