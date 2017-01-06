@@ -1,6 +1,8 @@
-# ALTER TABLE `rubric_descriptor`
-#   DROP INDEX `criterion_id_2`,
-#   ADD CONSTRAINT `fk_rubric_descriptor_criterion_id`
-#     FOREIGN KEY (`criterion_id`) REFERENCES `rubric_criterion` (`id`)
-#       ON DELETE NO ACTION
-#       ON UPDATE NO ACTION;
+ALTER TABLE `rubric_descriptor`
+  DROP INDEX `criterion_id_2`;
+
+ALTER TABLE `rubric_descriptor`
+  ADD CONSTRAINT `fk_rubric_descriptor_criterion_id`
+    FOREIGN KEY (`criterion_id`) REFERENCES `rubric_criterion` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION;
