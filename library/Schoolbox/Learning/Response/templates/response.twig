@@ -85,15 +85,19 @@
                             else {
                                 destination = '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}'
                             }
-
-                            {# Go to next available person in the carousel
-                             # If there is nobody, just visit Status screen
-                             #}
-                            window.location.href = destination;
                         }
                         else {
-                            window.location.reload();
+
+                            {# Reload summary screen to find what is now the most
+                             # recent submission
+                             #}
+                            destination = '{{ routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
                         }
+
+                        {# Go to next available person in the carousel
+                         # If there is nobody, just visit Status screen
+                         #}
+                        window.location.href = destination;
                     })
                     .fail(function () {
                         $('#toaster').toastTimeout({
