@@ -94,18 +94,18 @@ if (!isset($this->arg[1])) {
     $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => 'Submissions',
-            'href'  => '/submission/listSubmission',
+            'text'  => 'Learning',
+            'href'  => '/learning/classes',
             'class' => ''
         ],
         [
             'text'  => $folder->getName(),
-            'href'  => "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}",
+            'href'  => "/learning/markbook/{$folder->getId()}/term/{$term->getCode()}/",
             'class' => ''
         ],
         [
             'text'  => $assess['title'],
-            'href'  => "/assess/results/{$assess['assess_id']}",
+            'href'  => "/learning/assessments/{$assess['assessment_id']}/status",
             'class' => ''
         ],
         [
@@ -121,7 +121,7 @@ if (!isset($this->arg[1])) {
 else if ($this->arg[1] == 'finalise') {
 	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
 
-	$this->localRedir('/assess/results/' . $assess['assess_id']);
+	$this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
 }
 /* Reviewing attempts for a question
  */
@@ -320,18 +320,18 @@ else {
     $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => 'Submissions',
-            'href'  => '/submission/listSubmission',
+            'text'  => 'Learning',
+            'href'  => '/learning/classes',
             'class' => ''
         ],
         [
             'text'  => $folder->getName(),
-            'href'  => "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}",
+            'href'  => "/learning/markbook/{$folder->getId()}/term/{$term->getCode()}/",
             'class' => ''
         ],
         [
             'text'  => $assess['title'],
-            'href'  => "/assess/results/{$assess['assess_id']}",
+            'href'  => "/learning/assessments/{$assess['assessment_id']}/status",
             'class' => ''
         ],
         [

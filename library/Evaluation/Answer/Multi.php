@@ -378,40 +378,47 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      *
      * @param  $attempt_id
      * @param  $question_id
-     * @return mixed
+     * @return array
      */
     public function exportResponseToCSV($attempt_id, $question_id)
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
+        if(!$response){
+            return [
+                'response' => '',
+                'comment'  => '',
+                'mark'     => '',
+            ];
+        }
+
         $postprocessed = [];
 
-        $data = unserialize($response['response']);
+        $data = (array)unserialize($response['response']);
 
-        if (is_array($data)) {
-            /* Answer text to appear in export
-                */
-            if ($this->getUseLongAnswers()) {
-                foreach ($data as $currentAnswer) {
-                    $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
-                }
-            } else {
-                $postprocessed = $data;
-            }
 
-            if ($this->getLegendHTML() !== false) {
-                $data['response'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
-            } else {
-                $data['response'] = strip_tags(implode(', ', $postprocessed));
+        /* Answer text to appear in export
+            */
+        if ($this->getUseLongAnswers()) {
+            foreach ($data as $currentAnswer) {
+                $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
             }
+        } else {
+            $postprocessed = $data;
+        }
+
+        if ($this->getLegendHTML() !== false) {
+            $data['response'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
+        } else {
+            $data['response'] = strip_tags(implode(', ', $postprocessed));
         }
 
         /* Append commentary
-		 */
+         */
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
-           */
+         */
         $data['mark'] = $response['mark'];
 
         return $data;
