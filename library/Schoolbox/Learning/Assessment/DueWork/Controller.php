@@ -134,7 +134,7 @@ class Controller extends Assessment\Controller
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
             'currentUser' => $this->getUser(),
             'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),

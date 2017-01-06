@@ -100,7 +100,7 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment' => $assessment,
 
             /* Need this suffix so we can return to the status screen after

@@ -61,25 +61,28 @@ class Factory
 
         if ($context instanceof Project) {
             $path = $this->router->generate('learningAssessment.getAssessment', ['assessmentId' => $context->getId()]);
-        }
-        elseif ($context instanceof UnitSpecification) {
+
+        } elseif ($context instanceof UnitSpecification) {
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
-        }
-        elseif ($context instanceof UnitImplementation) {
-            if($user->getRole()->isStaff()) {
+
+        } elseif ($context instanceof UnitImplementation) {
+            if ($user->getRole()->isStaff()) {
                 $path = $this->router->generate('learningMarkbook.getMarkbook', ['class' => $context->getFolder(), 'classId' => $context->getFolder()->getId()]);
-            }
-            else if( $user->getRole()->isStudent() ){
+
+            } elseif ($user->getRole()->isStudent()) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
+
             } else {
                 $path = '#';
             }
+
             $trail->add([$context->getFolder()->getTitle(), $path]);
             $path = "/homepage/{$context->getFolder()->getId()}";
-        }
-        else {
+
+        } else {
             $path = "/homepage/{$context->getFolder()->getId()}";
         }
+
         $trail->add([$context->getTitle(), $path]);
 
         /* Additional project node, if you're creating within a project

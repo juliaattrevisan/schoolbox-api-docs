@@ -132,7 +132,7 @@ class Controller extends Base
 
             $data = [
                 'assessment' => $assessment,
-                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment,$this->getUser())
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                     ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
                     ->add(['Inline Grader', '']),
                 'response' => $response,
