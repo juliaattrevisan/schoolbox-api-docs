@@ -1,6 +1,6 @@
 <li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
     <ul class="action-list">
-        <li class="actions-small-1">
+        <li class="actions-small-2">
             <div class="list-item">
                 <div class="card small-12">
                     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -15,12 +15,17 @@
                     </a>
                 </div>
             </div>
-            {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
-            {% if viewRoute %}
             <nav>
+                {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
+                {% if viewRoute %}
                 <a href="{{ viewRoute }}" class="icon-next" title="View in Inline Grader"></a>
+                {% endif %}
+
+                {% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id }) %}
+                {% if deleteRoute %}
+                    <a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}"></a>
+                {% endif %}
             </nav>
-            {% endif %}
         </li>
     </ul>
 
