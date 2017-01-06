@@ -70,7 +70,7 @@
         background: #569ff7;
         color: #fff;
     }
-    .reveal-modal a.picker-submit.close-reveal-modal {
+    .reveal-modal a.picker-submit.close-reveal-modal, .reveal-modal a.timetable-submit.close-reveal-modal {
         border: none;
         color: #fff;
         background-color: #0066b0;
@@ -104,8 +104,9 @@
 
                 </div>
         </div>
-     </div>
-        <div class='content' id="byTimetable-{{ id }}" style="display: none;">
+    </div>
+    <div class='content' id="byTimetable-{{ id }}" style="display: none;">
+            <div class="row">
                 <div class="small-12 medium-4 columns">
 
                     {# Placeholder for timetable ot be rendered in #}
@@ -127,16 +128,15 @@
                         </form>
                         {# Build all, hide, reveal one later #}
                         {% for campus in timetable %}
-                            <table class="timetablePicker" id="timetable-{{ campus.campusId }}" style="display:none;">
+                            <table class="timetablePicker timetablePicker{{ id }}" id="timetable{{ id }}-{{ campus.campusId }}" style="display:none;">
                                 <th>
                                     {% for i in 1..timetable[campus.campusId].dayCount %}
                                         <td class="day-{{ i }}">{{ i }}</td>
                                     {% endfor %}
                                 </th>
-                                {% set k=1 %}
+                                {% set k=0 %}
                             {% for description in timetable[campus.campusId].desc %}
                                 <tr><td class="period-description description-{{ k }}" data-period-number="{{ k }}"  data-period-start="{{ timetable[campus.campusId].start[k] }}" data-period-end="{{ timetable[campus.campusId].end[k]  }}">{{ description }}</td>
-                                    {# TODO on load: highlight pariod according to event date and time #}
                                     {% for i in 1..timetable[campus.campusId].dayCount %}
                                         <td><div class="has-period period-{{ i }}-{{ k }}" data-day="{{ i }}" data-period="{{ k }}" data-selected="0"></div></td>
 
@@ -154,11 +154,18 @@
 
                     <div id="timetableAppointments{{ id }}"></div>
 
-                </div>
-                <div class="submit-calendar"><a href="#" class="button submit timetable-submit close-reveal-modal" >Update</a><div>
-        </div>
-</div>
 
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-4 columns"></div>
+                <div class="small-4 columns"></div>
+                <div class="small-4 columns">
+                    <a href="#" class="button submit timetable-submit close-reveal-modal" >Update</a>
+                </div>
+            </div>
+    </div>
+</div>
 <script>
 
     {# Tabs #}
@@ -178,19 +185,21 @@
     {# Timtable picker #}
 
     {# Build cycles dynamically #}
-    function buildCycles(onFirstLoad) {
+//    function buildCycles(onFirstLoad) {
+    function buildCycles() {
 
         var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
         var termDuration = $('select[name*="term"]').find(':selected').attr('data-duration');
         var optionsHtml = '';
         //Select cycle number on first load
-        if(onFirstLoad === true) {
+//        if(onFirstLoad === true) {
             cycleSelected = parseInt({{ timetableDay.daysUntilDate }}/daysInCycle);
-        }
+//        }
         for (i = 1; i <= (termDuration / daysInCycle); i++) {
             var selected = '';
 
-            if(onFirstLoad && cycleSelected == i ){
+//            if(onFirstLoad && cycleSelected == i ){
+            if(cycleSelected == i ){
                 selected = 'selected';
             }
             optionsHtml += '<option value="' + i + '" ' + selected + '>Week ' + i + '</option>';
@@ -198,15 +207,48 @@
         $('select[name*="cycle"]').empty().append(optionsHtml);
     }
 
+
+    {# Highlight day and period #}
+    function showPeriod() {
+        var daysInCycle = $('select[name*="campus"]').find(':selected').attr('data-days');
+        var isWeekend = {{ timetableDay.isWeekend }};
+        {# Highlight day if it doen't fall on a weekend #}
+        if(isWeekend == 0) {
+            var period = 0;
+            {# Get day of the cycle #}
+            var cycleDay = {{ timetableDay.daysUntilDate }}%daysInCycle;
+            if(cycleDay == 0) {
+                cycleDay = daysInCycle;
+            }
+            $('.day-' + cycleDay).addClass('period-selected');
+
+            $('.period-description').each(function() {
+
+                var s = moment($(this).attr('data-period-start'), 'HH:mmA').format('HHmm');
+                var e = moment($(this).attr('data-period-end'), 'HH:mmA').format('HHmm');
+                var t = moment('{{ value }}').format('HHmm');
+                if((t >= s) && (t < e)) {
+                    $(this).addClass('period-selected');
+                    period = $(this).attr('data-period-number');
+                }
+
+                if((cycleDay > 0) && (period > 0)) {
+                    $('.period-'+cycleDay+'-'+period).addClass('period-selected');
+                }
+            })
+        }
+    }
+
     {# Reveal Timetable#}
     function revealTimetable() {
         var campus = $('select[name*="campus"]').find(':selected').val();
-        $('.timetablePicker').css('display', 'none');
-        $('#timetable-'+campus).css('display', 'table');
+        $('.timetablePicker{{ id }}').css('display', 'none');
+        $('#timetable{{ id }}'+'-'+campus).css('display', 'table');
     }
 
     {# Put cycles on load #}
     buildCycles(true);
+    showPeriod();
     revealTimetable();
 
     {# Update cycles on Campus or Term change #}

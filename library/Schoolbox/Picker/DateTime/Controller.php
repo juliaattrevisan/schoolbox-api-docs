@@ -54,11 +54,10 @@ class Controller extends Base
      * @param string $value Default date to display
      */
     public function getPicker($id, $display, $database, $value) {
+
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
         $timetableDayNumber = $this->getTimetableDay($value);
-
-//        new \Alaress_Probe($timetable);
 
         $this->getResponse()->content->set(
             array(
@@ -176,7 +175,11 @@ class Controller extends Base
 
         $timetableDay = Array();
         $timetableDay['term'] = $term->getId();
-        $timetableDay['daysUntilDate']= $term->getDuration($date);
+        $timetableDay['daysUntilDate'] = $term->getDuration($date);
+        $timetableDay['isWeekend'] = 0;
+        if($date->isWeekend()) {
+            $timetableDay['isWeekend'] = 1;
+        }
 
         return $timetableDay;
     }
