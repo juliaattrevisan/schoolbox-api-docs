@@ -93,6 +93,7 @@ Usage:
 
                     // Update the DOM
                     $mageCreateUnitButton.attr('formaction', data['urlNewUnit']);
+                    $mageSaveCourseButton.parents('form').attr('action', data['urlModifyCourse']);
                 }
                 // Remove the submit row
                 $mageNextButton.closest('[data-mage-submitrow]').slideUp(400, function () {
