@@ -293,20 +293,11 @@ class Module extends BaseModule
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'responseDataSource' => $injector->lazyGet('responseDataSource'),
+                'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
+                    'router' => $injector->lazyGet('router')
+                ]),
             ])
         );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        // abstract controller
-        $ac =& $injector->params[Controller::class];
-        $ac['bakery'] = $injector->lazyNew(BreadcrumbFactory::class, [
-            'router' => $injector->lazyGet('router')
-        ]);
     }
 
     /* Getters / Setters
