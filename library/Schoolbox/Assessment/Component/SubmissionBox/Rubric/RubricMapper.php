@@ -829,7 +829,7 @@ class RubricMapper
             $pb->notLessThan('a.due_date', $noEarlierThan->getDatabase());
         }
 
-        if ($noLaterThan) {
+        if ($noLaterThan && !$noLaterThan instanceof \Alaress_Date_NullDate) {
             $pb->notGreaterThan('a.due_date', $noLaterThan->getDatabase());
         }
 
