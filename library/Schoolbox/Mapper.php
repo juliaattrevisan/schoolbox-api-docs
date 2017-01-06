@@ -2567,13 +2567,38 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function getLocalObjectCacheKey(Mapper $mapper, array $row, $alias = '')
     {
-        $idKey = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
+        $tbl = trim($mapper->getTable());
 
-        if (array_key_exists($idKey, $row)) {
-            return "{$mapper->getTable()}.{$row[$idKey]}";
+        if (empty($tbl)) {
+            // this occurs on pseudo mappers, particularly External_*
+            // just fall back to the classname
+            $tbl = get_class($mapper);
         }
 
-        throw new InvalidArgumentException("Key '$idKey' not defined in row; cannot obtain cache key");
+        $idCol = trim($mapper->getIdentifierColumn());
+
+        if (empty($idCol)) {
+            // this occurs on things that fundamentally are join tables, so lack a single primary key
+            // unfortunately not much we can do but use the whole row as the cache key
+            $key = json_encode($row);
+
+        } else {
+            $idKey = trim("$alias.$idCol", '.');
+
+            if (array_key_exists($idKey, $row)) {
+                $key = $row[$idKey];
+            } else {
+
+                // this is non-fatal; use the whole role as the cache-key (inherently meaning "no cache")
+                $key = json_encode($row);
+
+                // we still want to know in development, though.
+                $this->monitor->error("Key '$idKey' not defined in row$key; cannot obtain cache key");
+            }
+
+        }
+
+        return "$tbl.$key";
     }
 
 
