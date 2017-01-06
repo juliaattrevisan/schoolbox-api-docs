@@ -23,6 +23,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_teachers', 'has_teachers_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $this->setVar('FOLDER_ID', $this->getSource()->getFolder()->getId());
 
         $listSyns = null;
@@ -34,8 +37,6 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
         if (empty($listSyns)) {
 
-            $this->setBlock($templateHandle, 'teachers', 'teachers_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
@@ -44,7 +45,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
             $this->setVar([
-                'teachers_block' => '',
+                'has_teachers_block' => '',
                 'empty_read_block' => '',
                 'empty_is_group_block' => '',
                 'empty_code_block' => '',
@@ -79,10 +80,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         } else {
 
             // gets teachers involved in subject, outputs links to their addressbook page
-            $this->setBlock($templateHandle, "person", "person_block");
+            $this->setBlock('has_teachers', "person", "person_block");
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -163,6 +163,8 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                     }
                 }
             }
+
+            $this->parse('has_teachers_block', 'has_teachers');
         }
 
         return true; // everything went according to plan
