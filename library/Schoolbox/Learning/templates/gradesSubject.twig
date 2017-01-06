@@ -270,12 +270,12 @@
                                 </div>
                             </div>
                             <nav>
-                                {% if (showcase[assessment.id] | length) == 0 and feedback %}
+                                {% if assessment.getFamilyName == 'dueWork' and feedback %}
                                     <a class="icon-showcase" data-publish-to-eportfolio="publish-boxId-{{ assessment.id }}" title="Publish to ePortfolio"></a>
                                     <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="publish-boxId-{{ assessment.id }}">
                                         <input type="hidden" name="action" value="publish">
                                         <input type="hidden" name="userId" value="{{ student.id }}">
-                                        <input type="hidden" name="boxId" value="{{ assessment.id }}">
+                                        <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
                                     </form>
                                     <script type="text/javascript">
                                         $(function() {

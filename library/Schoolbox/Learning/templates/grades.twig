@@ -44,58 +44,56 @@
 
 {# Display subjects the student is involved in for the selected term #}
 
-{% for folder in folders %}
-
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <ul class="information-list">
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                {% for folder in folders %}
                     <li>
-                        <div class="list-item">
-                            <div class="small-8 card">
-                                <a href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: term.code, subjectId: folder.id}) }}" title="View Grades">
-                                    <span class="icon-home size-32" title="{{ folder.name }}"></span>
-                                    <p>{{ folder.name }}</p>
-                                </a>
-                                <p class="meta">
-                                    {% for code in folder.codes %}
-                                        {{ code.code }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                </p>
-                            </div>
-                            <div class="small-4 columns no-pad">
-                                <div class="grade content">
-                                    <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
-                                        {{ markbooks[folder.id].weightedMean }}
-                                    </span>
-                                </div>
+                        <a href="{{ routeLookup('learning.getGradesForSubject', {userId: student.id, termCode: term.code, subjectId: folder.id}) }}" class="link-row" title="View Grades">
+                        <div class="medium-10 small-8 card">
+                                <span class="icon-home size-32" title="{{ folder.name }}"></span>
+                                <p>{{ folder.name }}</p>
+                            <p class="meta">
+                                {% for code in folder.codes %}
+                                    {{ code.code }}{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                        <div class="medium-2 small-4 columns no-pad">
+                            <div class="grade content">
+                                <span class="{{ urgency.marks(markbooks[folder.id].meanNormalised) }}">
+                                    {{ markbooks[folder.id].weightedMean }}
+                                </span>
                             </div>
                         </div>
+                        </a>
                     </li>
                     {% for teacher in folder.teachers %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 card">
-                                    <a href="/search/user/{{ teacher.id }}" title="">
-                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                             alt="{{ teacher.fullName }}"/>
-                                        <p>{{ teacher.fullName }}</p>
-                                    </a>
-                                    <p class="meta">Teacher</p>
-                                </div>
-
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <a href="/search/user/{{ teacher.id }}" title="">
+                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                         alt="{{ teacher.fullName }}"/>
+                                    <p>{{ teacher.fullName }}</p>
+                                </a>
+                                <p class="meta">Teacher</p>
                             </div>
-                            <nav>
-                                <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
-                            </nav>
-                        </li>
+
+                        </div>
+                        <nav>
+                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
+                        </nav>
+                    </li>
                     {% endfor %}
+                {% endfor %}
                 </ul>
             </section>
         </div>
     </div>
 
-{% endfor %}
+
 
 {% if folders | length == 0 %}
 
