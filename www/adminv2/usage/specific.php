@@ -14,7 +14,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 
 if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
 	$userMapper = new \Schoolbox\UserMapper();
-	$user = $userMapper->findById($this->arg[0]);
+	$user = $userMapper->findByIdWithFallback($this->arg[0]);
 }
 else {
 	$user = $_SESSION['user'];

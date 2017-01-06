@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 
 /**
  * FWIW, every protected method in here probably belongs in some other class, since they're all data manipulation
@@ -26,12 +27,23 @@ use Schoolbox\User;
  */
 class Controller extends BaseController
 {
+    /** @var SubmissionFileMapper */
+    protected $submissionFileMapper;
+
+    /**
+     * Controller constructor.
+     * @param SubmissionFileMapper $submissionFileMapper
+     */
+    public function __construct(SubmissionFileMapper $submissionFileMapper)
+    {
+        $this->submissionFileMapper = $submissionFileMapper;
+    }
 
     /**
      * Warning: handlers in use!
      *
      * @param SubmissionBox\Rubric\Rubric $rubric
-     * @param Collection|User[]           $students
+     * @param Collection|User[] $students
      * @return array
      */
     protected function getMarks($rubric, $students)
@@ -99,7 +111,7 @@ class Controller extends BaseController
      */
     protected function getRubricHeaders(SubmissionBox\Rubric\Rubric $rubric)
     {
-        $headers  = [];
+        $headers = [];
 
         foreach ($rubric->getTotalPerGroup() as $group) {
             foreach ($group->getAllCriteria() as $criterion) {
@@ -117,7 +129,7 @@ class Controller extends BaseController
      */
     protected function collateResultSquare(SubmissionBox $box)
     {
-        $rubric   = $this->getRubric($box);
+        $rubric = $this->getRubric($box);
         $students = $this->getStudents($box);
 
         // array inside an array that's *nearly* empty...
@@ -141,10 +153,10 @@ class Controller extends BaseController
 
         foreach ($this->getMarks($rubric, $students) as $studentId => $marks) {
             /** @var User $student */
-            $student     = $studentsGrouped[$studentId]->first();
+            $student = $studentsGrouped[$studentId]->first();
             $studentName = $student->formatName('{lastname}, {firstname}');
 
-            $row = [ $studentName, $student->getExternalId() ];
+            $row = [$studentName, $student->getExternalId()];
             $sum = '';
 
             if (count($marks)) {
@@ -153,8 +165,7 @@ class Controller extends BaseController
                         $row[] = $mark->getText();
                         $row[] = $mark->getValue();
                         $sum += $mark->getValue();
-                    }
-                    else {
+                    } else {
                         $row[] = $mark;
                         $row[] = '';
                     }
@@ -201,19 +212,19 @@ class Controller extends BaseController
     public function viewOverview(SubmissionBox $box)
     {
         $students = $this->getStudents($box);
-        $rubric   = $this->getRubric($box);
+        $rubric = $this->getRubric($box);
 
         $data = [
-            'box'      => $box,
+            'box' => $box,
             'students' => $students,
-            'headers'  => $this->getRubricHeaders($rubric),
-            'marks'    => $this->getMarks($rubric, $students)
+            'headers' => $this->getRubricHeaders($rubric),
+            'marks' => $this->getMarks($rubric, $students)
         ];
 
         $this->getResponse()->content->set([
-            'title'    => 'Overview',
+            'title' => 'Overview',
             'template' => '@submission/overview.twig',
-            'data'     => $data
+            'data' => $data
         ]);
     }
 
@@ -229,8 +240,8 @@ class Controller extends BaseController
     public function downloadOverview(SubmissionBox $box)
     {
         $basename = $this->getSubmissionBoxNameAsSlug($box);
-        $content  = $this->array2csv($this->collateResultSquare($box));
-        $headers  = $this->getResponse()->headers;
+        $content = $this->array2csv($this->collateResultSquare($box));
+        $headers = $this->getResponse()->headers;
 
         $headers->set('Pragma', ' ');
         $headers->set('Cache-Control', ' ');
@@ -242,8 +253,20 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set([
             'format' => 'file',
-            'data'   => $content
+            'data' => $content
         ]);
     }
 
-} 
+    /**
+     * Delete a file from a submission box
+     * @param SubmissionBox $box
+     * @param string $hash
+     */
+    public function deleteFile(SubmissionBox $box, $hash)
+    {
+        $this->submissionFileMapper->deleteByColumnList([
+            'student_submission_id' => $box->getId(),
+            'hash' => $hash
+        ]);
+    }
+}

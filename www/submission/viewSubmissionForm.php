@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 $page = new SitePage();
 $submissionHandler = new Submission();
 $submissionStudent = new SubmissionStudent();
+$submissionFileMapper = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance();
 $subReturn = new SubmissionReturn;
 
 /** @var \Schoolbox\User $sessionUser */
@@ -30,7 +31,10 @@ if (is_numeric($_GET['delete'])) {
 		exit();
 	}
 
-	$submissionStudent->delete($studentSub['id']);
+    $submissionFileMapper->deleteByColumnList([
+        'student_submission_id' => $studentSub['id'],
+        'hash' => $_GET['hash']
+    ]);
 
 	SitePage::localRedir("/submission/inlineGrading/view/{$studentSub['box_id']}/{$studentSub['owner']}");
 }
