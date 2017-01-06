@@ -23,6 +23,13 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'clickview', 'clickview_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
+        $clickviewSchoolId = Config::get('clickview_school_id');
+
+        if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
+
         // Clickview has different endpoints in NZ to Aus.  No idea if this affects any other countries.
         if (stripos($this->getConfigMapper()->get('date_timezone'), 'Auckland') !== false) {
             $this->setVar('CLICKVIEW_URL', 'online.clickview.co.nz');
@@ -43,15 +50,13 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
             $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
 
-            $this->setVar(
-                [
-                    'clickview_block'       => '',
-                    'empty_read_block'      => '',
-                    'empty_write_block'     => '',
-                    'empty_api_block'       => '',
-                    'empty_api_admin_block' => '',
-                ]
-            );
+            $this->setVar([
+                'clickview_block' => '',
+                'empty_read_block' => '',
+                'empty_write_block' => '',
+                'empty_api_block' => '',
+                'empty_api_admin_block' => '',
+            ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
@@ -73,16 +78,17 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
         } else {
 
-            $this->setBlock($templateHandle, 'has_clickview', 'has_clickview_block');
-            $this->setBlock($templateHandle, 'online_clickview', 'online_clickview_block');
-            $this->setBlock($templateHandle, 'iframe_clickview', 'iframe_clickview_block');
-            $this->setBlock($templateHandle, 'select_video', 'select_video_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('clickview', 'has_clickview', 'has_clickview_block');
+            $this->setBlock('clickview', 'online_clickview', 'online_clickview_block');
+            $this->setBlock('clickview', 'iframe_clickview', 'iframe_clickview_block');
+            $this->setBlock('clickview', 'select_video', 'select_video_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('has_clickview_block', '');
-            $this->setVar('online_clickview_block', '');
-            $this->setVar('iframe_clickview_block', '');
+            $this->setVar([
+                'empty_state_block' => '',
+                'has_clickview_block' => '',
+                'online_clickview_block' => '',
+                'iframe_clickview_block' => '',
+            ]);
 
             /* If no url is specified it might time out -_-
              * So just hide all this instead
@@ -117,8 +123,10 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
                 $matches = array();
 
-                $this->setVar('START', "");
-                $this->setVar('END', "");
+                $this->setVar([
+                    'START' => '',
+                    'END' => '',
+                ]);
 
                 if (preg_match($pattern, $this->getConfig('url'), $matches)) {
                     $this->setVar('VIDEO_ID', $matches[2]);
@@ -163,6 +171,8 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             } else {
                 $this->setVar('select_video_block', '');
             }
+
+            $this->parse('clickview_block', 'clickview');
         }
 
         return true; // everything went according to plan
