@@ -16,11 +16,12 @@
 {% extends '@learningAssessment/status.twig' %}
 
 {% block headerOptions %}
-
     <li>
         <a class="icon-class-list" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}">Review horizontally</a>
     </li>
-
+    <li>
+        <a class="icon-download" href="{{ routeLookup('learningQuiz.getExportAttempts', { assessmentId: assessment.id }) }}?format=csv">Download All</a>
+    </li>
     <li class="separator">Bulk Actions</li>
     <li>
         <a class="icon-approve" data-reveal-id="mass-review">Mark attempts as reviewed&hellip;</a>
