@@ -44,6 +44,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
          */
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_video', 'has_video_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $videoResourceMapper = ResourceVideoMapper::getInstance();
 
         /* Sort order
@@ -67,19 +70,17 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
 
         // Set up component name
-        $this->setVar(array(
+        $this->setVar([
             'FILE_CAT_ID' => $this->getSource()->getId(),
-        ));
+        ]);
 
         if ($this->outputList->count() == 0) {
 
-            $this->setBlock($templateHandle, 'video', 'video_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'video_block' => '',
+                'has_video_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
                 'SOURCE_ID' => '',
@@ -95,9 +96,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             
         } else {
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_video', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_video', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'default_video', 'default_video_block');
             $this->setBlock('source_folder_exists', 'video_list', 'video_list_block');
             $this->setBlock('source_folder_exists', 'video_pending_list', 'video_pending_list_block');
@@ -199,6 +199,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_video_block', 'has_video');
+
         }
 
         return true; // everything went according to plan
