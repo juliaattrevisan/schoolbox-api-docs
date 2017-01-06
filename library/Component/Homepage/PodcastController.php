@@ -65,7 +65,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             $this->setBlock('podcast', 'podcast_list', 'podcast_list_block');
             $this->setBlock('podcast', 'default_podcast', 'default_podcast_block');
             $this->setVar('empty_state_block', '');
-            $this->parse('podcast_block', 'podcast');
 
             // Podcasts from xml feed
             $j = 0;
@@ -116,6 +115,8 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                     'podcast_list_block' => '',
                 ]);
             }
+
+            $this->parse('podcast_block', 'podcast');
         }
 
         /* Need the podcast title injected here
