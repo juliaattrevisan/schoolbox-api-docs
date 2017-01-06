@@ -79,18 +79,19 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
          */
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_link', 'has_link_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         //setup block for submission button
         $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
         if (count($allLinks) == 0) {
 
-            $this->setBlock($templateHandle, 'links', 'links_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'links_block' => '',
+                'has_link_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
                 'SOURCE_ID' => $this->getSource()->getId(),
@@ -107,9 +108,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         } else {
 
             //link output
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_link', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_link', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'link', 'link_block');
             $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
@@ -160,6 +160,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_link_block', 'has_link');
         }
 
         return true;
