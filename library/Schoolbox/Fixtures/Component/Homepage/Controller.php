@@ -41,6 +41,12 @@ class Controller extends Component_Homepage_ControllerAbstract
     private $noConfig;
 
     /**
+     * Set to true if
+     * @var bool
+     */
+    private $noInstall;
+
+    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
@@ -78,11 +84,9 @@ class Controller extends Component_Homepage_ControllerAbstract
         /**
          * Check if a team has been set in the component config
          */
-        $this->noInstall = $this->getSitePage()->getDi()->get('config')->get('fixtures_enabled') == '1'  ? true : false;
+        $this->noInstall = $this->getSitePage()->getDi()->get('config')->get('fixtures_enabled') == '1'  ? false : true;
 
         $this->noConfig = $this->getConfig('team')  ? false : true;
-
-
 
         return true;
     }
@@ -107,7 +111,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'readOnly'            => $this->readOnly,
                 'fixtureAdmin'        => $this->fixtureAdmin,
                 'noConfig'            => $this->noConfig,
-                'noInstall'           => $this->noInstall,
+                'noInstall'           => $this->noInstall
             ]
         );
     }

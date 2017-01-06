@@ -39,12 +39,12 @@ class SportsFixtures implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
+        $namespace = 'fixtures';
+
+        $homepageModule = new HomepageModule($di);
+        $homepageModule->init("/$namespace");
+
         if ($di->get('config')->get('fixtures_enabled')) {
-
-            $namespace = 'fixtures';
-
-            $homepageModule = new HomepageModule($di);
-            $homepageModule->init("/$namespace");
 
             $dashboardModule = new DashboardModule($di);
             $dashboardModule->init("/$namespace");
