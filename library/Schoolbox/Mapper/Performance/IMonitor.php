@@ -9,9 +9,10 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
-interface IMonitor
+interface IMonitor extends LoggerInterface
 {
 
     /**

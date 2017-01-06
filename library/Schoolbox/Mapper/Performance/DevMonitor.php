@@ -9,10 +9,13 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
-class DevMonitor implements IMonitor
+class DevMonitor extends AbstractLogger implements IMonitor
 {
     /** @var array */
     protected $indexByIndex = [];
@@ -121,14 +124,14 @@ class DevMonitor implements IMonitor
                     : "Index match for $table($impl)"
                 ;
 
-                $this->debugBar['messages']->debug($msg);
+                $this->getLog()->debug($msg);
                 continue;
             }
 
             // test for full overlap of single keys
             if (array_intersect_key($checks[$table], $this->indexByColumn[$table]) == $checks[$table]) {
                 $impl = implode(', ', $checks[$table]);
-                $this->debugBar['messages']->info("Matched all indices for $table($impl)");
+                $this->getLog()->info("Matched all indices for $table($impl)");
                 continue;
             }
 
@@ -137,9 +140,9 @@ class DevMonitor implements IMonitor
 
                 if (array_key_exists($column, $this->indexByColumn[$table])) {
                     $impl = implode(', ', $checks[$table]);
-                    $this->debugBar['messages']->warning("Partial index match for `$column` within $table($impl)");
+                    $this->getLog()->warning("Partial index match for `$column` within $table($impl)");
                 } else {
-                    $this->debugBar['messages']->error("Searched on unindexed field: $table.$column");
+                    $this->getLog()->error("Searched on unindexed field: $table.$column");
                 }
 
             }
@@ -160,7 +163,7 @@ class DevMonitor implements IMonitor
         $query = $this->deriveQuery($mapper, $predicateBuilder);
         $key   = sha1($query);
 
-        $this->debugBar['time']->startMeasure($key, $query);
+        $this->getTimer()->startMeasure($key, $query);
     }
 
 
@@ -173,7 +176,7 @@ class DevMonitor implements IMonitor
     {
         $key = sha1($this->deriveQuery($mapper, $predicateBuilder));
 
-        $this->debugBar['time']->stopMeasure($key);
+        $this->getTimer()->stopMeasure($key);
     }
 
 
@@ -193,6 +196,38 @@ class DevMonitor implements IMonitor
         }
 
         return str_replace('`', '', $query);
+    }
+
+
+    /**
+     * @return TimeDataCollector
+     */
+    protected function getTimer()
+    {
+        return $this->debugBar['time'];
+    }
+
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLog()
+    {
+        return $this->debugBar['messages'];
+    }
+
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
+     * @return void
+     */
+    public function log($level, $message, array $context = [])
+    {
+        $this->getLog()->log($level, $message, $context);
     }
 
 

@@ -9,9 +9,10 @@
 namespace Schoolbox\Mapper\Performance;
 
 
+use Psr\Log\AbstractLogger;
 use Schoolbox\Mapper;
 
-class LiveMonitor implements IMonitor
+class LiveMonitor extends AbstractLogger implements IMonitor
 {
 
     /**
@@ -56,5 +57,17 @@ class LiveMonitor implements IMonitor
         // noop
     }
 
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
+     * @return void
+     */
+    public function log($level, $message, array $context = [])
+    {
+        // noop
+    }
 
 }
