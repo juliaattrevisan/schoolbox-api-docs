@@ -140,7 +140,7 @@ class Controller extends Assessment\Controller
         $returnUrlSuffix = '?'.Redirect::RETURN_URL.'=' . Redirect::encode($baseUrl);
 
         $twigData = [
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'baseContext'       => $assessment->getBaseContext(),
             'assessment'        => $assessment,
             'participantCounts' => $participantCounts,
@@ -217,7 +217,7 @@ class Controller extends Assessment\Controller
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'currentUser' => $this->getUser(),
             'student'     => $student,
             'assessment'  => $assessment,

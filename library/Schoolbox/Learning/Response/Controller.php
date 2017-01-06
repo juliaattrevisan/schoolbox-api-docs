@@ -29,6 +29,8 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Pla
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+
 use DueWork_ErrorMapper;
 
 class Controller extends Base
@@ -42,17 +44,23 @@ class Controller extends Base
      */
     protected $responseDataSource;
 
+    /** @var BreadcrumbFactory */
+    protected $bakery;
+
 
     /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
      * @param DataSource  $responseDataSource
+     * @param BreadcrumbFactory $bakery
      */
-    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource)
+    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery)
     {
         $this->setErrorMapper($errorMapper);
         $this->responseDataSource = $responseDataSource;
+        $this->bakery = $bakery;
+
     }
 
     /**
@@ -124,6 +132,9 @@ class Controller extends Base
 
             $data = [
                 'assessment' => $assessment,
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                    ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
+                    ->add(['Inline Grader', '']),
                 'response' => $response,
                 'latestFeedback' => $latestFeedback,
                 'attachzone' => $attachZone->getTwigContext(),
@@ -378,5 +389,13 @@ class Controller extends Base
     protected function getResponseDataSource()
     {
         return $this->responseDataSource;
+    }
+
+    /**
+     * @return BreadcrumbFactory
+     */
+    protected function getBakery()
+    {
+        return $this->bakery;
     }
 }

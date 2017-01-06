@@ -19,9 +19,13 @@
 </script>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
+    </div>
+</div>
 
+<div class="row">
+    <div class="small-12 island">
         {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, currentUser: currentUser} %}
 
         {% if assessment.assessables|length %}

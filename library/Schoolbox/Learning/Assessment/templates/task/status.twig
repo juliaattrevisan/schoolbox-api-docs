@@ -16,7 +16,6 @@
 {% extends '@learningAssessment/status.twig' %}
 
 {% block config %}
-
     {% set latestFeedback    = participant.findMostRecentFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}

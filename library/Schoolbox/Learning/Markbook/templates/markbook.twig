@@ -25,12 +25,12 @@
 </script>
 
 {# Crumbz: Class > Markbook #}
-{{ bread.crumbs([class.title, '/homepage/'~class.id], ['Markbook', '#']) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], [class.title]) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Markbook</h1>
+            <h1>Markbook for {{ class.title }}</h1>
         </div>
     </div>
     <nav>

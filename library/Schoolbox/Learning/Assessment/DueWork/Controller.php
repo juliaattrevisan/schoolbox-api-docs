@@ -95,7 +95,7 @@ class Controller extends Assessment\Controller
             'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
         ];
 
@@ -134,7 +134,7 @@ class Controller extends Assessment\Controller
         $allResponses = $participant->getAllResponses();
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment)->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
             'currentUser' => $this->getUser(),
             'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
@@ -246,7 +246,7 @@ class Controller extends Assessment\Controller
         /* Pump into twig land
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
-            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment)->add(['Create Response for ' . $assessment->getTitle(), '']),
+            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
             'currentUser'    => $this->getUser(),

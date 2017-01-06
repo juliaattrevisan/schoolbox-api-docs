@@ -27,6 +27,7 @@ use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Module extends BaseModule
 {
@@ -292,6 +293,9 @@ class Module extends BaseModule
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'responseDataSource' => $injector->lazyGet('responseDataSource'),
+                'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
+                    'router' => $injector->lazyGet('router')
+                ]),
             ])
         );
     }

@@ -67,7 +67,7 @@ class Controller extends Assessment\Controller
         $twigData = [
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
         ];
 
@@ -137,7 +137,7 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($task)->add([ $task->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
             'assessment'  => $task,
             'preview'     => $previewFragment,
             'currentUser' => $this->getUser(),
