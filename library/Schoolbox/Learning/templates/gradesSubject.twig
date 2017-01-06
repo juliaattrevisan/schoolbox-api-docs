@@ -1,4 +1,5 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
 
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
@@ -14,6 +15,8 @@
         });
     });
 </script>
+
+{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', '/learning/grades/' ~ student.id ], [subject.name, '#']) }}
 
 <div class="row">
     <div class="small-12 columns">
