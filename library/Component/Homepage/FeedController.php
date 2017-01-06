@@ -48,23 +48,22 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_activity', 'has_activity_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         if (!$this->feed->count()) {
 
-            $this->setBlock($templateHandle, 'feed', 'feed_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_modify', 'empty_modify_block');
-
-            $this->setVar('feed_block', '');
-
+            $this->setVar('has_activity_block', '');
             $this->parse('empty_state_block', 'empty_state');
+
         } else {
 
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_activity', 'event', 'event_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('USER_TOKEN', $_SESSION['key']);
-
-            $this->setBlock($templateHandle, 'event', 'event_block');
+            $this->setVar([
+                'empty_state_block' => '',
+                'USER_TOKEN' => $_SESSION['key']
+            ]);
 
             if (!$this->feed->count()) {
                 $this->setVar('event_block', '');
@@ -73,17 +72,17 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
             foreach ($this->feed->renderAsFeedArray() as $n) {
                 $date = new Alaress_Date_Format($n['time'], 'U');
-                $this->setVar(
-                    array(
-                        'EVENT_HREF' => $n['href'],
-                        'EVENT_ICON' => $n['icon'],
-                        'EVENT_BODY' => $n['title'],
-                        'EVENT_TIME' => $date->getShort(),
-                        'EVENT_LONGTIME' => $date->getLong(),
-                    )
-                );
+                $this->setVar([
+                    'EVENT_HREF' => $n['href'],
+                    'EVENT_ICON' => $n['icon'],
+                    'EVENT_BODY' => $n['title'],
+                    'EVENT_TIME' => $date->getShort(),
+                    'EVENT_LONGTIME' => $date->getLong(),
+                ]);
                 $this->parse('event_block', 'event', true);
             }
+
+            $this->parse('has_activity_block', 'has_activity');
         }
 
         return true;

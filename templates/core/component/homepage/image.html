@@ -84,7 +84,7 @@
             </div>
             <!-- END empty_state -->
 
-            <!-- BEGIN image -->
+            <!-- BEGIN has_image -->
             <section>
                 <div class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
@@ -99,13 +99,13 @@
                     </div>
 
                     <div data-dz-container>
-                        <!-- BEGIN previewimage -->
+                        <!-- BEGIN preview_image -->
                         <div id="img{COMPONENT_INSTANCE_ID}" class="text-center">
                             {CONTENT_URL_START}
                             <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
                             {CONTENT_URL_END}
                         </div>
-                        <!-- END previewimage -->
+                        <!-- END preview_image -->
                     </div>
                 </div>
 
@@ -174,7 +174,7 @@
                 </script>
                 <!-- END submit_image -->
             </section>
-            <!-- END image -->
+            <!-- END has_image -->
 
         </div>
     </div>

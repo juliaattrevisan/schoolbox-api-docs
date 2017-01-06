@@ -59,6 +59,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_audio', 'has_audio_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         // There's not (yet) any default for the audio player.
         // Just use the first in the list
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
@@ -83,31 +86,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->outputList = new \Schoolbox\Collection(array());
         }
 
-        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-        $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
-        $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
-        $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
-
-        $this->setVar('empty_state_block', '');
-
-        if (!$this->isSourceRenderable()) {
-            return $this->renderSourceUnavailable();
-        } else {
-            $this->setVar('source_folder_deleted_block', '');
-        }
-
-
         if (!count($this->outputList)) {
 
-            $this->setBlock($templateHandle, 'audio', 'audio_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'audio_block' => '',
+                'has_audio_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
                 'SOURCE_ID' => $this->getSource()->getId(),
@@ -122,13 +107,26 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->parse('empty_state_block', 'empty_state');
 
         } else {
+
+            $this->setBlock('has_audio', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_audio', 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock('has_audio', 'empty_state', 'empty_state_block');
+            $this->setBlock('source_folder_exists', 'default_audio', 'default_audio_block');
+            $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
+            $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
+            $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+
             $this->setVar([
+                'empty_state_block' => '',
                 'default_audio_block' => '',
                 'audio_list_block' => '',
                 'audio_pending_list_block' => '',
+                'source_folder_deleted_block' => '',
             ]);
 
-            $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+            if (!$this->isSourceRenderable()) {
+                return $this->renderSourceUnavailable();
+            }
 
             $j = 0;
             foreach ($this->outputList as $audio) {
@@ -197,8 +195,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             }
 
             $this->parse('source_folder_exists_block','source_folder_exists');
+            $this->parse('has_audio_block', 'has_audio');
         }
+
+
 
         return true;
     }
+
+
 }

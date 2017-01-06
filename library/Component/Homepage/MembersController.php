@@ -39,14 +39,15 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_members', 'has_members_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         // Get collection of members
         $userMapper = new UserMapper();
         $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), Array('lastname' => 'asc'));
 
         if (count($userList) == 0) {
 
-            $this->setBlock($templateHandle, 'members', 'members_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
             $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
@@ -55,10 +56,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
             $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
 
-            $folderId = $this->getSource()->getFolder()->getId();
-
             $this->setVar([
-                'members_block' => '',
+                'has_members_block' => '',
                 'empty_read_members_block' => '',
                 'empty_read_managers_block' => '',
                 'empty_class_block' => '',
@@ -69,6 +68,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group',
                 'ALT_COMPONENT' => 'class list',
+                'FOLDER_ID' => $this->getSource()->getFolder()->getId(),
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -87,10 +87,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         } else {
 
             //output users of group
-            $this->setBlock($templateHandle, "member_email", "member_email_block");
-            $this->setBlock($templateHandle, "person", "person_block");
-            $this->setBlock($templateHandle, 'people_hidden', 'people_hidden_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_members', "member_email", "member_email_block");
+            $this->setBlock('has_members', "person", "person_block");
+            $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
@@ -208,15 +207,15 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 if (\Cfg::get('mail_enable')) {
                     $this->parse("member_email_block", "member_email");
                 } else {
-                    $this->setVar(
-                        array(
-                            'member_email_block' => ''
-                        )
-                    );
+                    $this->setVar([
+                        'member_email_block' => '',
+                    ]);
                 }
             } else {
                 $this->setVar('member_email_block', '');
             }
+
+            $this->parse('has_members_block', 'has_members');
         }
 
         return true; // everything went according to plan

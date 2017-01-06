@@ -39,30 +39,36 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_members', 'has_members_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         // Get collection of members
         $userMapper = new UserMapper();
         $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), Array ('lastname' => 'asc'));
 
         if (count($managerList) == 0) {
 
-            $this->setBlock($templateHandle, 'members', 'members_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+            $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
+            $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
-            $this->setBlock('empty_state', 'empty_not_group', 'empty_not_group_block');
+            $this->setBlock('empty_state', 'empty_not_group_members', 'empty_not_group_members_block');
+            $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
-
-            $folderId = $this->getSource()->getFolder()->getId();
+            $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
 
             $this->setVar([
-                'members_block' => '',
-                'empty_read_block' => '',
+                'has_members_block' => '',
+                'empty_read_members_block' => '',
+                'empty_read_managers_block' => '',
                 'empty_class_block' => '',
-                'empty_not_group_block' => '',
+                'empty_not_group_members_block' => '',
+                'empty_not_group_managers_block' => '',
                 'empty_members_block' => '',
+                'empty_managers_block' => '',
                 'TYPE_NAME' => self::TYPE_NAME,
                 'COMPONENT_ICON' => 'group-managers',
                 'ALT_COMPONENT' => 'class teachers',
+                'FOLDER_ID' => $this->getSource()->getFolder()->getId(),
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -81,10 +87,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         } else {
 
             //output users of group
-            $this->setBlock($templateHandle, "member_email", "member_email_block");
-            $this->setBlock($templateHandle, "person", "person_block");
-            $this->setBlock($templateHandle, 'people_hidden', 'people_hidden_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_members', "member_email", "member_email_block");
+            $this->setBlock('has_members', "person", "person_block");
+            $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
 
@@ -114,11 +119,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             );
 
             $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-            $this->setVar(
-                array(
-                    'LIST_STYLE' => $displayOptions[$display]['css'],
-                )
-            );
+            $this->setVar([
+                'LIST_STYLE' => $displayOptions[$display]['css'],
+            ]);
 
 
             $managerListCount = $managerList->count();
@@ -134,78 +137,77 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $userAccessMapper = new UserAccessMapper();
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
-            if ($managerListCount > 0) {
-                $i = 0;
-                foreach ($managerList as $manager) {
+            $i = 0;
+            foreach ($managerList as $manager) {
 
-                    /* Manager bulk email
-                     */
-                    $email = $manager->getEmail();
+                /* Manager bulk email
+                 */
+                $email = $manager->getEmail();
 
-                    if ($email) {
-                        $emailall[] = $email;
-                    }
-
-                    if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
-                        $this->setVar("REPLYTO", $this->getUser()->getEmail());
-                        $this->setVar("EMAILALL", implode(',', $emailall));
-                        $this->parse("member_email_block", "member_email");
-                    } else {
-                        $this->setVar('member_email_block', '');
-                    }
-
-                    /* Manager cards
-                     */
-                    if ($i < self::MAX_MANAGERS) {
-
-                        $name = $manager->getFullName();
-
-                        if ($admin !== null && $manager->getId() === $admin->getId()) {
-                            $name .= " (Group Admin)";
-                        }
-
-                        $this->setVar(
-                            array(
-                                'PERSON_UID'         => $manager->getId(),
-                                'PERSON_NAME'        => \Scrub::text($name),
-                                'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
-                                'PERSON_GROUP'       => \Scrub::text(empty($manager->getPositionTitle()) ? $manager->getRole()->getName() : $manager->getPositionTitle()),
-                            )
-                        );
-
-                        /* Don't display images in list view
-                         */
-                        if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar(array(
-                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                            ));
-
-                            $this->parse('has_thumbnail_block', 'has_thumbnail');
-                            $this->setVar('has_icon_block', '');
-                        } else {
-                            $this->setVar(array(
-                                'GRID_VIEW_CLASSES' => ''
-                            ));
-
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->parse('has_icon_block', 'has_icon');
-                        }
-
-                        $this->parse('person_block', 'person', true);
-
-                        /* Clear children after parsing out the parent
-                         */
-                        $this->setVar('has_thumbnail_block', '');
-                        $this->setVar('has_icon_block', '');
-                    }
-
-                    $i++;
+                if ($email) {
+                    $emailall[] = $email;
                 }
 
-            } else {
-                $this->setVar("person_block", "");
-                $this->setVar('member_email_block', '');
+                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+                    $this->setVar([
+                        "REPLYTO" => $this->getUser()->getEmail(),
+                        "EMAILALL" => implode(',', $emailall),
+                    ]);
+                    $this->parse("member_email_block", "member_email");
+                } else {
+                    $this->setVar('member_email_block', '');
+                }
+
+                /* Manager cards
+                 */
+                if ($i < self::MAX_MANAGERS) {
+
+                    $name = $manager->getFullName();
+
+                    if ($admin !== null && $manager->getId() === $admin->getId()) {
+                        $name .= " (Group Admin)";
+                    }
+
+                    $this->setVar([
+                        'PERSON_UID'         => $manager->getId(),
+                        'PERSON_NAME'        => \Scrub::text($name),
+                        'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
+                        'PERSON_GROUP'       => \Scrub::text(empty($manager->getPositionTitle()) ? $manager->getRole()->getName() : $manager->getPositionTitle()),
+                    ]);
+
+                    /* Don't display images in list view
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->setVar([
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                        ]);
+
+                        $this->parse('has_thumbnail_block', 'has_thumbnail');
+                        $this->setVar('has_icon_block', '');
+                    } else {
+                        $this->setVar([
+                            'GRID_VIEW_CLASSES' => '',
+                            'has_thumbnail_block' => '',
+                        ]);
+
+                        $this->parse('has_icon_block', 'has_icon');
+                    }
+
+                    $this->parse('person_block', 'person', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar([
+                        'has_thumbnail_block' => '',
+                        'has_icon_block' => '',
+                    ]);
+                }
+
+                $i++;
             }
+
+            $this->parse('has_members_block', 'has_members');
+
         }
 
         return true; // everything went according to plan

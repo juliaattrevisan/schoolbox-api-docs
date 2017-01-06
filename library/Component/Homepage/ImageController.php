@@ -78,19 +78,19 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
 
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_image', 'has_image_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         /**
          * Check if query found any image - if not then set empty state
          */
         if (count($images) == 0) {
 
-            $this->setBlock($templateHandle, 'image', 'image_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'image_block' => '',
+                'has_image_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
             ]);
@@ -106,15 +106,15 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         } else {
 
             //outputs an custom image and link to the homepage
-            $this->setBlock($templateHandle, 'previewimage', 'preview_block');
-            $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_image', 'preview_image', "preview_image_block");
+            $this->setBlock('has_image', 'submit_image', 'submit_image_block');
 
-            $this->setVar("empty_state_block", "");
+            $this->setVar([
+                'empty_state_block' => '',
+                'submit_image_block' => '',
+            ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar('submit_image_block', '');
-            } else {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('submit_image_block', 'submit_image');
             }
 
@@ -135,7 +135,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                     $image = $images->first();
                 } else {
                     $this->setComponentName('Image');
-                    $this->setVar('preview_block', '');
+                    $this->setVar('preview_image_block', '');
                     /* Parse the empty/default title even if no images are present/chosen
                      */
                     $this->parseConfig();
@@ -159,7 +159,9 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 $this->setVar("CONTENT_URL_START", "");
                 $this->setVar("CONTENT_URL_END", "");
             }
-            $this->parse("preview_block", "previewimage");
+            $this->parse("preview_image_block", "preview_image");
+            $this->parse('has_image_block', 'has_image');
+
         }
 
         return true; // everything went according to plan

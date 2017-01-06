@@ -48,27 +48,26 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
          */
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_wiki', 'has_wiki_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $wikiHandler = new Wiki();
         $userHandler = new User();
 
         $wikiList = $wikiHandler->getByCategory($this->getSource()->getId(), strtolower($this->getConfig('sort')),
             $this->getConfig('sortdir'), $this->getConfig('size'));
 
-        $this->setVar(
-            array(
-                'WIKI_CATEGORY_ID' => $this->getSource()->getId()
-            )
-        );
+        $this->setVar([
+            'WIKI_CATEGORY_ID' => $this->getSource()->getId(),
+        ]);
 
         if (!is_array($wikiList)) {
 
-            $this->setBlock($templateHandle, 'wiki', 'wiki_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'wiki_block' => '',
+                'has_wiki_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
                 'SOURCE_ID' => $this->getSource()->getId(),
@@ -84,9 +83,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
         } else {
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_wiki', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_wiki', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'wiki_row', 'wiki_row_block');
             $this->setBlock('source_folder_exists', 'submit_wiki', 'submit_wiki_block');
             $this->setBlock('wiki_row', 'compact_hide', 'compact_hide_block');
@@ -126,55 +124,50 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                 }
 
                 // Iterate
-                if (is_array($wikiList)) {
-                    $j = 0;
-                    foreach ($wikiList as $wiki) {
-                        $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
+                foreach ($wikiList as $wiki) {
+                    $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
 
-                        $this->setVar(
-                            array(
-                                'WIKI_ID' => $wiki['wikiID'],
-                                'WIKI_CATEGORYID' => $wiki['categoryID'],
-                                'WIKI_SLUG' => $wiki['slug'],
-                                'WIKI_HEADING' => Scrub::text($wiki['heading']),
-                                'WIKI_AUTHOR' => $userHandler->formatName($wiki),
-                                'WIKI_AUTHOR_ID' => $wiki['userID'],
-                                'WIKI_MODIFIED' => $modifiedTime->getRelativeTime(),
-                                'WIKI_BODY' => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
-                                'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                            )
-                        );
+                    $this->setVar([
+                        'WIKI_ID' => $wiki['wikiID'],
+                        'WIKI_CATEGORYID' => $wiki['categoryID'],
+                        'WIKI_SLUG' => $wiki['slug'],
+                        'WIKI_HEADING' => Scrub::text($wiki['heading']),
+                        'WIKI_AUTHOR' => $userHandler->formatName($wiki),
+                        'WIKI_AUTHOR_ID' => $wiki['userID'],
+                        'WIKI_MODIFIED' => $modifiedTime->getRelativeTime(),
+                        'WIKI_BODY' => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
+                    ]);
 
-                        if ($this->getConfig('compactMode')) {
-                            $this->setVar(array(
-                                'compact_hide_block' => '',
-                                'WIKI_COMPACT' => 'compact'
-                            ));
-                        } else {
-                            $this->setVar(array(
-                                'WIKI_COMPACT' => ''
-                            ));
+                    if ($this->getConfig('compactMode')) {
+                        $this->setVar([
+                            'compact_hide_block' => '',
+                            'WIKI_COMPACT' => 'compact'
+                        ]);
+                    } else {
+                        $this->setVar([
+                            'WIKI_COMPACT' => ''
+                        ]);
 
-                            $this->parse('compact_hide_block', 'compact_hide');
-                        }
-
-                        $this->setVar(
-                            array(
-                                'modify_wiki_block' => ''
-                            )
-                        );
-
-                        if (($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
-                            || $this->getContentPermission() >= UserAccess::ACCESS_WRITE
-                        ) {
-                            $this->parse('modify_wiki_block', 'modify_wiki');
-                        }
-
-                        $this->parse('wiki_row_block', 'wiki_row', true);
+                        $this->parse('compact_hide_block', 'compact_hide');
                     }
+
+                    $this->setVar([
+                        'modify_wiki_block' => '',
+                    ]);
+
+                    if (($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
+                        || $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+                    ) {
+                        $this->parse('modify_wiki_block', 'modify_wiki');
+                    }
+
+                    $this->parse('wiki_row_block', 'wiki_row', true);
                 }
+
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_wiki_block', 'has_wiki');
         }
 
         return true; // everything went according to plan

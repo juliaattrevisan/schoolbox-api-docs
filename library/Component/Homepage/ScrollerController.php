@@ -29,15 +29,16 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
+        $this->setBlock($templateHandle, 'has_images', 'has_images_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         if (count($allFiles) == 0) {
 
-            $this->setBlock($templateHandle, 'scroller', 'scroller_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'scroller_block' => '',
+                'has_images_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
             ]);
@@ -52,14 +53,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
         } else {
 
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+            $this->setBlock('has_images', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_images', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'submit_image_scroller', 'submit_image_scroller_block');
             $this->setBlock('source_folder_exists', 'image_scroller', 'image_scroller_block');
             $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
             $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
             $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -72,13 +72,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
 
-                $this->setVar(
-                    array(
-                        'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
-                        'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                        'COMPONENT_CONFIG_IMAGE_RATIO' => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
-                    )
-                );
+                $this->setVar([
+                    'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
+                    'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
+                    'COMPONENT_CONFIG_IMAGE_RATIO' => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                ]);
 
                 /* Prevent multiple galleries from other categories stacking up in the wrong place
                  * and initialise empty gallery by default
@@ -114,13 +112,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                         }
                     }
 
-                    $this->setVar(
-                        array(
-                            'IMAGE_ID' => $currentFile->getId(),
-                            'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
-                            'IMAGE_URL' => $url
-                        )
-                    );
+                    $this->setVar([
+                        'IMAGE_ID' => $currentFile->getId(),
+                        'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
+                        'IMAGE_URL' => $url,
+                    ]);
 
                     /* Link image */
                     if ($url) {
@@ -142,6 +138,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_images_block', 'has_images');
         }
 
         return true; // everything went according to plan

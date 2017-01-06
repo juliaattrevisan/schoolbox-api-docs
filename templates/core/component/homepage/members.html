@@ -21,25 +21,25 @@
             <!-- END empty_class -->
 
             <!-- BEGIN empty_not_group_members -->
-            <p><a href="/group/modify/' . $folderId . '">Add group members</a> to convert this page to a group to give specific users group membership to this page and display them in this component.</p>
+            <p><a href="/group/modify/{FOLDER_ID}">Add group members</a> to convert this page to a group to give specific users group membership to this page and display them in this component.</p>
             <!-- END empty_not_group_members -->
 
             <!-- BEGIN empty_not_group_managers -->
-            <p><a href="/group/modify/' . $folderId . '">Add group managers</a>  to convert this page to a group, give specific users group management permissions, and display them in this component.</p>
-            <!-- BEGIN empty_not_group_managers -->
+            <p><a href="/group/modify/{FOLDER_ID}">Add group managers</a> to convert this page to a group, give specific users group management permissions, and display them in this component.</p>
+            <!-- END empty_not_group_managers -->
 
             <!-- BEGIN empty_members -->
-            <p><a href="/group/modify/' . $folderId . '">Add group members</a> to give specific users group membership to this page and display them in this component.</p>
+            <p><a href="/group/modify/{FOLDER_ID}">Add group members</a> to give specific users group membership to this page and display them in this component.</p>
             <!-- END empty_members -->
 
             <!-- BEGIN empty_managers -->
-            <p><a href="/group/modify/' . $folderId . '">Add group managers</a> to give specific users group management permissions and display them in this component.</p>
+            <p><a href="/group/modify/{FOLDER_ID}">Add group managers</a> to give specific users group management permissions and display them in this component.</p>
             <!-- END empty_managers -->
 
         </div>
         <!-- END empty_state -->
 
-        <!-- BEGIN members -->
+        <!-- BEGIN has_members -->
         <section>
             <ul class="grid small-block-grid-1 {GRID_VIEW_CLASSES}">
                 <!-- BEGIN person -->
@@ -84,7 +84,7 @@
             </div>
             <!-- END member_email -->
         </section>
-        <!-- END members -->
+        <!-- END has_members -->
 
         </div>
     </div>

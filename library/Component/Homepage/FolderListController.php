@@ -42,6 +42,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'has_folder', 'has_folder_block');
+        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+
         $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
             Folder\Mapper::getInstance(),
             $this->getUser(),
@@ -55,13 +58,11 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         if (count($allFolders) == 0) {
 
-            $this->setBlock($templateHandle, 'folder', 'folder_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
             $this->setVar([
-                'folder_block' => '',
+                'has_folder_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
             ]);
@@ -77,9 +78,8 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         } else {
 
             //file output
-            $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock('has_folder', 'source_folder_deleted', 'source_folder_deleted_block');
+            $this->setBlock('has_folder', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'grid_view', 'grid_view_block');
             $this->setBlock('source_folder_exists', 'list_view', 'list_view_block');
             $this->setBlock('source_folder_exists', "submit_folder", "submit_folder_block");
@@ -186,6 +186,8 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
+
+            $this->parse('has_folder_block', 'has_folder');
         }
 
         return true;
