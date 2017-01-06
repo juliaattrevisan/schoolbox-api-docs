@@ -181,7 +181,12 @@ class Model extends AbstractAssessment
     {
         /* No Interactions - user can see this task
          */
-        $participant = $this->getParticipant($user);
+        try {
+            $participant = $this->getParticipant($user);
+        }
+        catch (\UnexpectedValueException $e) {
+            return false;
+        }
 
         if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
             return true;
