@@ -23,7 +23,16 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
         $this->parseConfig();
 
+        // Clickview has different endpoints in NZ to Aus.  No idea if this affects any other countries.
+        if (stripos($this->getConfigMapper()->get('date_timezone'), 'Auckland') !== false) {
+            $this->setVar('CLICKVIEW_URL', 'online.clickview.co.nz');
+        } else {
+            $this->setVar('CLICKVIEW_URL', 'online.clickview.com.au');
+        }
+
         $clickviewSchoolId = Config::get('clickview_school_id');
+
+        $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
         if (!strlen(trim($this->getConfig('url'))) || !strlen($clickviewSchoolId)) {
 
@@ -34,13 +43,15 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_api', 'empty_api_block');
             $this->setBlock('empty_state', 'empty_api_admin', 'empty_api_admin_block');
 
-            $this->setVar([
-                'clickview_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-                'empty_api_block' => '',
-                'empty_api_admin_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'clickview_block'       => '',
+                    'empty_read_block'      => '',
+                    'empty_write_block'     => '',
+                    'empty_api_block'       => '',
+                    'empty_api_admin_block' => '',
+                ]
+            );
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
@@ -72,7 +83,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('has_clickview_block', '');
             $this->setVar('online_clickview_block', '');
             $this->setVar('iframe_clickview_block', '');
-            $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
 
             /* If no url is specified it might time out -_-
              * So just hide all this instead
