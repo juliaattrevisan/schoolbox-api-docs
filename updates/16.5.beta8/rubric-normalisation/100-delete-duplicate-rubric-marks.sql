@@ -2,8 +2,8 @@
 -- This script gets all the duplicates, then delete's all but one instance
 
 -- Create a temp table.
--- * 'first_mark_id' holds the first ID in a set of duplicates
--- * The other fields will later identify rows in sets of duplicates
+-- * `first_mark_id` holds the first ID in a set of duplicates.
+-- * We will NOT delete the mark with matching ID, so as to retain a single item from each set.
 CREATE TABLE temp_duplicate_marks (
   first_mark_id     INT(11) UNSIGNED,
   student_id        INT(11) UNSIGNED,
