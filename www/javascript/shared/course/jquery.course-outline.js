@@ -227,8 +227,8 @@
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
-                var form = component.find('form.reorder_form');
                 var unit = ui.item.closest('[data-unit]');
+                var form = unit.find('form.reorder_form');
                 var params = form.serializeArray();
                 unit.find('[data-unit-assessment]').each(function() {
                     // Switch dark on/off
