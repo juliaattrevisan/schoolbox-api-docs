@@ -225,7 +225,7 @@
                 handle:               '.grip',
                 axis:                 'y'
             });
-            task_list.bind('sortstop', function(event, ui) {
+            task_list.unbind('sortstop.courseInstance').bind('sortstop.courseInstance', function(event, ui) {
                 // Calculate ordering of all items
                 var unit = ui.item.closest('[data-unit]');
                 var form = unit.find('form.reorder_form');
