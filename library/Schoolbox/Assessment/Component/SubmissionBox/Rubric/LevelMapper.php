@@ -9,6 +9,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -18,7 +19,7 @@ use Schoolbox\Mapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Level hydrate(array $row, $alias = '', $callback = null)
- * @method Level createModel()
+ * @method Level createModel($idValue = null)
  * @method Level findById($id)
  * @method Collection|Level[] findByColumn($columnName, $columnValue, $options = array())
  * @method Collection|Level[] findByColumnList($columnList, $options = array())
@@ -69,7 +70,9 @@ class LevelMapper extends Mapper
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($r);
-            $model->setSubmissionBox($this->hydrateJoin($r, 'box', 'b'));
+            /** @var SubmissionBox $box */
+            $box = $this->hydrateJoin($r, 'box', 'b');
+            $model->setSubmissionBox($box);
 
             $c->add($model);
         }
@@ -100,6 +103,6 @@ class LevelMapper extends Mapper
                 $levels->add($level);
             }
         }
-        $this->create($levels);
+        return $this->create($levels);
     }
 }
