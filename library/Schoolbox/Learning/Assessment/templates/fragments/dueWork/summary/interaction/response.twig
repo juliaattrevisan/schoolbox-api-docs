@@ -1,25 +1,49 @@
+{# If staff, try going to Inline Grader #}
+{% if currentUser.role.isStaff %}
+    {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
+    {% set tooltip = 'View in Inline Grader' %}
+{% elseif currentUser.role.isStudent and not currentInteraction.isSubmitted%}
+    {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id}) %}
+    {% set tooltip = 'Resume Submission' %}
+{% endif %}
+
+{% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: currentInteraction.assessable.id, responseId: currentInteraction.id }) %}
+
 <li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
     <ul class="action-list">
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="card small-12">
-                    <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                    {% if url %}
+                    <a href="{{ url }}" title="{{ tooltip }}">
+                    {% endif %}
                         <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}" class="hide-for-small-only">
-                        <p>{{ participant.user.fullname }}</p>
+                        <h3>
+                            {% if currentInteraction.isSubmitted %}
+                                Submission
+                            {% else %}
+                                Draft Submission
+                            {% endif %}
+                        </h3>
 
                         {% if currentInteraction.isSubmitted %}
-                            <p class="meta">Submitted {{ currentInteraction.submittedAt.short }}</p>
+                            <p class="meta">{{ participant.user.fullname }} on {{ currentInteraction.submittedAt.short }}</p>
                         {% else %}
                             <p class="meta">Draft last updated {{ currentInteraction.updatedAt.short }}</p>
                         {% endif %}
+
+                    {% if url %}
                     </a>
+                    {%  endif %}
                 </div>
             </div>
-            {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id}) %}
-            {% if viewRoute %}
+            {% if deleteRoute %}
             <nav>
-                <a href="{{ viewRoute }}" class="icon-next" title="View in Inline Grader"></a>
+                <a class="icon-more" title="" data-dropdown="response-options-{{ currentInteraction.id }}"></a>
             </nav>
+            <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
+                <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}">Delete</a></li>
+            </ul>
             {% endif %}
         </li>
     </ul>

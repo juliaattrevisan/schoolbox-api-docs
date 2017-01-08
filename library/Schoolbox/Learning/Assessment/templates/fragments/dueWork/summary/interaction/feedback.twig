@@ -1,19 +1,50 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{# Associated Feedback
+ # Go to Inline Grader to resume
+ #
+ # Floating Feedback
+ # Go to Quickmark to resume
+ #}
+{% if currentFeedback.response.id %}
+    {% if not currentFeedback.isPublished %}
+        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: currentFeedback.assessable.id, studentId: currentFeedback.response.submittedOnBehalfOf.id, responseId: responseId}) %}
+        {% set tooltip = 'Resume Inline Grading' %}
+    {% endif %}
+{% else %}
+    {% if not currentFeedback.isPublished %}
+        {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: currentFeedback.assessable.id}) %}
+        {% set tooltip = 'Resume Quickmark' %}
+    {% endif %}
+{% endif %}
+
 <li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
     <div class="list-item">
         <div class="card small-12 medium-8">
-            <a href="/search/user/{{ currentFeedback.reviewer.id}}" title="View Profile">
+            {% if url %}
+            <a href="{{ url }}" title="{{ tooltip }}">
+            {% endif %}
                 <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
-                <p>{{ currentFeedback.reviewer.fullname }}</p>
+                <h3>
+                    {% if currentFeedback.published %}
+                        Feedback
+                    {% else %}
+                        Draft Feedback
+                    {% endif %}
+                </h3>
+
                 <p class="meta">
-                {% if currentFeedback.published %}
-                    Published {{ currentFeedback.publishedAt.short }}
-                {% else %}
-                    (Draft - last updated {{ currentFeedback.updatedAt.short }})
-                {% endif %}
+                    {{ currentFeedback.reviewer.fullname }}
+
+                    {% if currentFeedback.published %}
+                        on {{ currentFeedback.publishedAt.short }}
+                    {% else %}
+                        on {{ currentFeedback.updatedAt.short }}
+                    {% endif %}
                 </p>
+            {% if url %}
             </a>
+            {% endif %}
         </div>
         <div class="small-12 medium-4 columns text-right">
             <div class="grade content">
@@ -47,7 +78,7 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: assessmentId, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
+                            <a href="{{ routeLookup('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>
@@ -61,7 +92,7 @@
                 </div>
                 {% if currentFile.crocodocId|length %}
                 <nav>
-                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: assessmentId, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
+                    <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {assessmentId: currentFeedback.assessable.id, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId}) }}" class="icon-download" title="Download"></a>
                 </nav>
                 {% endif %}
             </li>
