@@ -777,17 +777,14 @@ nav {
 $selector-width: 2rem;
 
 %interaction-li{
-	display: table;
+	display: flex;
+	align-items: center;
 	width: calc(100% + #{$selector-width});
 }
 %interaction-selector{
 	padding: 0 0.75rem;
-	display: table-cell;
-	vertical-align: middle;
 	width: $selector-width;
 	&:before {
-		display: table-cell;
-		vertical-align: middle;
 		padding: 0;
 	}
 }
