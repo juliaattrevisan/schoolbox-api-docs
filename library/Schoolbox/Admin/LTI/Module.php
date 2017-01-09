@@ -11,13 +11,13 @@ namespace Schoolbox\Admin\LTI;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Loader_Chain;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
-use Schoolbox\LTI\Provider\Model as Provider;
+use Alaress\Web\Router\PathMatcher;
+
 
 class Module extends BaseModule
 {
