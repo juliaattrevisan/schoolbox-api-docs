@@ -29,6 +29,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Rubric\Rubric as BaseRubric;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -226,6 +227,21 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData($postdata, $getParentCriteria || $editMode);
         return $rubric->setSubmissionBox($box);
+    }
+
+    /**
+     * Given a DueWork, return the rubric assigned to it, if any
+     *
+     * @param DueWork $dueWork
+     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
+     * @param bool          $editMode          - whether to include criteria not in use on box
+     * @return Rubric
+     */
+    public function findByDueWork(DueWork $dueWork, $getParentCriteria = false, $editMode = false)
+    {
+        /** @var SubmissionBox $box */
+        $box = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $dueWork->getId());
+        return $this->findBySubmissionBox($box, $getParentCriteria, $editMode);
     }
 
 

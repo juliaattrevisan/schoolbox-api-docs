@@ -32,6 +32,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class Controller extends Assessment\Controller
 {
@@ -449,6 +450,9 @@ class Controller extends Assessment\Controller
         ];
 
         // ...append rubric-related data...
+        $getParentCriteria = $assessment->getContext() instanceof UnitSpecification;
+        $editMode = true;
+        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode));
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
 
         // ...and scene.
