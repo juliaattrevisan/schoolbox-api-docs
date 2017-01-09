@@ -223,6 +223,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.sequence       AS 'seq',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
@@ -269,6 +270,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.sequence       AS 'seq',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
@@ -290,7 +292,7 @@ class ImportFactory
         $pbOuter2->anyOf('ui.id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pbOuter2->getWhere());
 
-        $query = "$query1 UNION $query2 ";
+        $query = "$query1 UNION $query2 ORDER BY seq";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array_merge($pbInner1->getParams(), $pbOuter1->getParams(), $pbOuter2->getParams()));
