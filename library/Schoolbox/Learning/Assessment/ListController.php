@@ -218,11 +218,7 @@ class ListController extends Web\Controller\Base
         }
 
         // Save ordering
-        $sequence = 1;
-        foreach ($sortedAssessments as $assessment) {
-            $assessment->setSequence($sequence++);
-            $this->getAssessmentMapper()->save($assessment);
-        }
+        $this->getAssessmentMapper()->sequenceAssessments($sortedAssessments);
 
         // Redirect to a return URL or something
         // If not provided, redirect to somewhere relevant to context
