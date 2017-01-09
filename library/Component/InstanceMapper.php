@@ -234,7 +234,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         $configInstanceCollection   = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
         $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
-        $finalCollection = $finalCollection = $this->createCollection();
+        $finalCollection = $this->createCollection();
 
         // map the definitions into their instances
         foreach ($instanceCollection as $i => $instance) {
@@ -245,7 +245,6 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             * @var $config_def Component_ConfigDefinition
             */
             $definition = $definitionCollection->getOffset($i);
-            $config     = $configInstanceCollection->getOffset($i);
             $config_def = $configDefinitionCollection->getOffset($i);
 
             // if this component has already been processed, just add the config and move on
@@ -269,9 +268,15 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         foreach ($configInstanceCollection as $confInstance) {
             /* @var $confInstance Component_Config */
             if ($confInstance->getId() != null) {
+                // Clone config instead.
+                // Because the select cache stores references to each retrieved object,
+                // each component of the same type's config objects are the same object.
+                // Setting the config value directly affects the config value for this key
+                // for ALL components of this type!
+                $newConfig = clone $finalCollection[$confInstance->getInstanceId()]->getConfig()
+                                                                                   ->getOffset($confInstance->getConfigDefinitionId());
                 $finalCollection[$confInstance->getInstanceId()]->getConfig()
-                    ->getOffset($confInstance->getConfigDefinitionId())
-                    ->setValue($confInstance->getValue());
+                                                                ->setOffset($confInstance->getConfigDefinitionId(), $newConfig->setValue($confInstance->getValue()));
             }
         }
 
