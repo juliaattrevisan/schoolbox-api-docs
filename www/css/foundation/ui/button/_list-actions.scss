@@ -14,6 +14,7 @@
 				padding-right: 0.5 + ($i * $button-size) !important;
 				// https://css-tricks.com/flexbox-truncated-text/
 				min-width: 0;
+				flex: 1;
 			}
 
 			> nav {

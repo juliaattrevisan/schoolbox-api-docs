@@ -774,7 +774,7 @@ nav {
  * Uses .expander, .selector or .grip
  * Use %placeholders to prevent the same CSS getting spat out over and over again.
  */
-$selector-width: 2rem;
+$selector-width: 2.25rem;
 
 %interaction-li{
 	display: flex;
@@ -842,6 +842,12 @@ $selector-width: 2rem;
 	&.expandable,
 	&.expandable-card{
 		@include list-interaction(expander, pointer);
+		li .expander{
+			width: 2.5rem;
+			label{
+				padding: 0 !important;
+			}
+		}
 	}
 	&.card-selectable {
 		@include list-interaction(selector, pointer);
