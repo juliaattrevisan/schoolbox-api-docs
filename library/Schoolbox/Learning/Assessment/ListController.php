@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 use Schoolbox\Learning\AssessmentContext;
@@ -202,18 +203,18 @@ class ListController extends Web\Controller\Base
          * @var IAssessable[] $sortedAssessments
          */
         $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
-        $sortedAssessments = [];
+        $sortedAssessments = new GenericCollection(IAssessable::class);
         foreach ($this->getRequest()->post->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {
                 // Put it in $sortedAssessments in order
-                $sortedAssessments[] = $allAssessments[$assessmentId];
+                $sortedAssessments->add($allAssessments[$assessmentId]);
                 unset($allAssessments[$assessmentId]);
             }
         }
 
         // Anything not explicitly ordered gets pushed to the back of the queue
         foreach ($allAssessments as $assessment) {
-            $sortedAssessments[] = $assessment;
+            $sortedAssessments->add($assessment);
         }
 
         // Save ordering
