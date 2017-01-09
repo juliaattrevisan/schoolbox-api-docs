@@ -258,8 +258,8 @@ class ImportFactory
                 null              AS 'sa.deleted_at',
                 null              AS 'sa.sequence',
                 null              AS 'sdw.id',
-                null              AS 'sdw.accept_submission',
-                null              AS 'sdw.multi_submission',
+                idw.accept_submission AS 'sdw.accept_submission',
+                idw.multi_submission  AS 'sdw.multi_submission',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
                 null              AS 'spr.id',
@@ -447,8 +447,8 @@ class ImportFactory
             $assessmentImpl = new DueWorkAssessment();
             $assessmentImpl = $this->setDueWorkAccepts(
                 $assessmentImpl,
-                $row['sdw.accept_submission'],
-                $row['sdw.multi_submission']
+                $row['idw.accept_submission'],
+                $row['idw.multi_submission']
             );
 
         } elseif ($row['iqz.id']) {
