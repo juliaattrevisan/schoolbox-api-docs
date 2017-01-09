@@ -771,16 +771,23 @@ class Controller extends Base\Base
                         // Did we just clone a Project? If so we need to store the dates for each assessment inside it
                         if ($assessmentImpl instanceof Project){
                             $projectAssessables = $assessmentImpl->getAssessables();
-                            $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
+                            if(is_array($unitImplData[$unitSpec->getId()]['p'][$assessmentImpl->getId()]['a'])) {
+                                $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentImpl->getId()]['a'];
+                            }
+                            else {
+                                $pData = $unitImplData[$unitSpec->getId()]['p'][$assessmentSpec->getId()]['a'];
+                            }
 
                             foreach ($projectAssessables as $assessableCurrent) {
 
+                                $apData = isset($pData[$assessableCurrent->getId()]) ? $pData[$assessableCurrent->getId()] : $pData[$assessableCurrent->getSpecificationAssessment()->getId()];
+
                                 // Did user de-select this Assessment ?
-                                if (!isset($pData[$assessableCurrent->getSpecificationAssessment()->getId()])) {
+                                if (!is_array($apData) ) {
                                     $this->getAssessmentMapperProxy()->delete($assessableCurrent);
                                 } else {
                                     // Set/Update Dates
-                                    foreach ($pData[$assessableCurrent->getSpecificationAssessment()->getId()]['dates'] as $property => $localShort) {
+                                    foreach ($apData['dates'] as $property => $localShort) {
                                         $method = "set{$property}At";
                                         if (!method_exists($assessmentImpl, $method)) {
                                             $this->sendError("Invalid date property: $property");
