@@ -155,11 +155,6 @@
                                                 </h3>
                                             </a>
                                             <p class="meta">
-                                                {% if participant.user.year and participant.user.role.isStudent %}
-                                                    Year {{ participant.user.year }}
-                                                {% endif %}
-                                            </p>
-                                            <p class="meta">
                                                 {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
                                             </p>
                                         </div>

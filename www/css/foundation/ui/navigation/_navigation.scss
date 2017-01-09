@@ -374,26 +374,18 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				span {
 					overflow: hidden;
 					text-overflow: ellipsis;
+					font-weight: $font-weight-semibold;
 					display: table-cell;
-					padding-left: 0.5rem;
 					vertical-align: middle;
-
-					/* Different viewports have different dimensions
-					 * Also, the presence of a scrollbar further restricts you
-					 */
-					@media #{$medium-only} {
-						max-width: 104px;
-					}
-					@media #{$large-up} {
-						max-width: 135px;
-					}
+					width: 122px;
+					max-width: 122px;
 				}
 			}
 			.profile-drop:after {
 				content: "\e901";
 				color: $off-canvas-foreground;
 				display: table-cell;
-				padding: 27px 10px;
+				padding: 0px 10px;
 				vertical-align: middle;
 			}
 			&:hover .profile-drop{
