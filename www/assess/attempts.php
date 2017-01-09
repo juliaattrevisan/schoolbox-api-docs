@@ -129,6 +129,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			 */
 			if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
 				$canReview = true;
+                $reviewUrl = 'review';
 			}
 			elseif ($quizVisibility->isStaffStudent()) {
                 if ($groupHandler->isStaff()) {
