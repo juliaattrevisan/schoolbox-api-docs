@@ -272,7 +272,7 @@
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
                                                 assessmentDate: assessment.publishAt,
-                                                unitDate: displayStartDate,
+                                                unitDate: unitImpl.openDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'publish',
                                                 dateSyncProperty: publishDateSync,
@@ -393,7 +393,7 @@
                                                     {# publish date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessment.publishAt,
-                                                    unitDate: displayStartDate,
+                                                    unitDate: unitImpl.openDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync,
