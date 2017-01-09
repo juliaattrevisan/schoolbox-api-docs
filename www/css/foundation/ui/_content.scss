@@ -779,7 +779,6 @@ $selector-width: 2.25rem;
 %interaction-li{
 	display: flex;
 	align-items: center;
-	width: calc(100% + #{$selector-width});
 }
 %interaction-selector{
 	padding: 0 0.75rem;
