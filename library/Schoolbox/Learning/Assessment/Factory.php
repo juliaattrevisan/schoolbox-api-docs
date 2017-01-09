@@ -126,6 +126,7 @@ class Factory
      * @param $post (an array of post vars from the create/update forms)
      */
     public function __construct(User $creator, $post) {
+
         $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContext($post['context']);
         $this->setTitle(trim($post['title']));
@@ -335,7 +336,7 @@ class Factory
 
         try {
             // attempt to parse the date
-            return Alaress_Date_Format::newLocal($dateString);
+            return Alaress_Date_Format::newDatabaseDate($dateString);
 
         } catch (InvalidArgumentException $e) {
             // unparseable - safely return null
