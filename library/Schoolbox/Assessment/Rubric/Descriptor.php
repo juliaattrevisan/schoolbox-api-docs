@@ -198,7 +198,7 @@ class Descriptor implements Calculable, Twiggable
      * @param Criterion $criterion
      * @return self
      */
-    public function setPosition($level, $criterion)
+    public function setPosition(Level $level, Criterion $criterion)
     {
         $this->level = $level;
         $this->criterion = $criterion;
