@@ -278,8 +278,7 @@
                                                 dateSyncProperty: publishDateSync,
                                                 assessmentId: assessmentSpec.id
                                             } only %}
-{% if assessmentSpec.acceptOnline %}asdf
-                                            {% endif %}
+                                            
                                             {# open date is relevant when accepting responses #}
                                             {% if acceptingResponses %}
                                                 {% include '@course/import/date.twig' with {
