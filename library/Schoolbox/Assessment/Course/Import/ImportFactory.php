@@ -32,11 +32,19 @@ class ImportFactory
     private $database;
 
     /**
+     * All known Assessables, indexed by assessment.id
+     *
+     * @var GenericCollection|IAssessable[] $assessmentCache
+     */
+    private $assessmentCache;
+
+    /**
      * ImportFactory constructor.
      */
     public function __construct()
     {
         $this->database = \Database::getInstance();
+        $this->assessmentCache = new GenericCollection(IAssessable::class);
     }
 
     /**
@@ -124,11 +132,12 @@ class ImportFactory
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             if ($assessmentSpec instanceof IAssessable) {
-                $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+                $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
             }
         }
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
+        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs);
         $dto = new DataTransferObject([], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
 
         return $dto;
@@ -147,8 +156,26 @@ class ImportFactory
      */
     public function buildForImportModify(GenericCollection $unitImpls)
     {
+        /**
+         * Not imported to the specified $unitImpls
+         *
+         * @var GenericCollection $assessmentSpecs
+         */
         $assessmentSpecs = new GenericCollection(GenericCollection::class);
+
+        /**
+         * Created inside the specified $unitImpls (not imported from Spec)
+         *
+         * @var GenericCollection $assessmentImpls
+         */
         $assessmentImpls = new GenericCollection(GenericCollection::class);
+
+
+        /**
+         * Imported from a Spec to the specified $unitImpls
+         *
+         * @var GenericCollection $assessmentPairs
+         */
         $assessmentPairs = new GenericCollection(GenericCollection::class);
 
         /**
@@ -173,15 +200,15 @@ class ImportFactory
 
         // Instantiate empty sets for each UnitSpecId
         foreach($unitImpls as $unitImpl){
-            $courseSpecId = $unitImpl->getSpecification()->getId();
-            $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
-            $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
-            $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
-            $assessmentPairs->setOffset($courseSpecId, new GenericCollection(AssessmentPair::class));
+            $unitSpecId = $unitImpl->getSpecification()->getId();
+            $unitSpecCache[$unitSpecId] = $unitImpl->getSpecification();
+            $assessmentSpecs->setOffset($unitSpecId, new GenericCollection(IAssessable::class));
+            $assessmentImpls->setOffset($unitSpecId, new GenericCollection(IAssessable::class));
+            $assessmentPairs->setOffset($unitSpecId, new GenericCollection(AssessmentPair::class));
 
             // Is this UnitImpl already imported?
             if($unitImpl->getId()){
-                $unitImplIds[$courseSpecId] = $unitImpl->getId();
+                $unitImplIds[$unitSpecId] = $unitImpl->getId();
             }
         }
 
@@ -314,26 +341,237 @@ class ImportFactory
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
+                $assessmentImpl->setSpecificationAssessment($assessmentSpec);
                 $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
             } else if($assessmentSpec instanceof IAssessable) {
                 // Don't add deleted AssessmentSpecs
                 if(!$assessmentSpec->isDeleted()){
-                    $assessmentSpecs->getOffset($unitSpecId)->add($assessmentSpec);
+                    $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
                 }
             } else {
-                $assessmentImpls->getOffset($unitSpecId)->add($assessmentImpl);
+                $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
             }
         }
 
         $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
+        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs);
+        $assessmentImpls = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
+        $assessmentPairs = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
         $dto = new DataTransferObject($assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
         return $dto;
     }
 
     /**
+     * Load all Assessments inside Project Specs
+     *
+     * @param GenericCollection|GenericCollection[] $assessmentSpecs   - Sets of AssessmentSpecs, indexed by UnitSpec.id
+     * @return GenericCollection
+     */
+    protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs)
+    {
+        /** @var Project[] $projectSpecs */
+        $projectSpecs = new GenericCollection(Project::class);
+        foreach($assessmentSpecs as $unitSpecId => $unitAssessmentSpecs){
+            foreach($unitAssessmentSpecs as $specId => $assessmentSpec){
+                if($assessmentSpec instanceof Project){
+                    $projectSpecs->setOffset($specId, $assessmentSpec);
+                }
+            }
+        }
+        if(!$projectSpecs->count()){
+            return $assessmentSpecs;
+        }
+        $query = "
+           SELECT
+                p.assessment_id       AS 'p.assessment_id',
+                sa.id                 AS 'sa.id',
+                sa.title              AS 'sa.title',
+                sa.deleted_at         AS 'sa.deleted_at',
+                sa.sequence           AS 'sa.sequence',
+                sdw.assessment_id     AS 'sdw.id',
+                sdw.accept_submission AS 'sdw.accept_submission',
+                sdw.multi_submission  AS 'sdw.multi_submission',
+                sqz.assessment_id     AS 'sqz.id',
+                stk.assessment_id     AS 'stk.id'
+            FROM project p
+            JOIN project_assessment pa   ON pa.project_id = p.id
+            JOIN assessment sa           ON sa.id = pa.assessment_id
+            LEFT JOIN assessment_course_unit_implementation pui ON pui.assessment_id = p.assessment_id
+            LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
+            LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
+            LEFT JOIN task stk           ON stk.assessment_id = sa.id";
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->equals('p.assessment_id', $projectSpecs->keys());
+        $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $projectAssessmentId = $row['p.assessment_id'];
+            $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
+            /** @var Project $projectSpec */
+            $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
+            $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
+            $assessmentSpec->setContext($projectSpec);
+        }
+
+        return $assessmentSpecs;
+    }
+
+    /**
+     * Load all Assessments inside Project Impls, and links the AssessmentImpls to AssessmentSpecs
+     *
+     * @param GenericCollection $assessmentImpls   - Sets of AssessmentImpls, indexed by UnitSpec.id
+     * @param int[] $assessmentImplToSpecMap
+     * @return GenericCollection
+     */
+    protected function loadProjectImplAssessables(GenericCollection $assessmentImpls, array $assessmentImplToSpecMap)
+    {
+        /**
+         * Indexed by Assessment.id
+         *
+         * @var Project[] $projectImpls
+         */
+        $projectImpls = new GenericCollection(Project::class);
+        foreach($assessmentImpls as $unitSpecId => $unitAssessmentImpls){
+            foreach($unitAssessmentImpls as $implId => $assessmentImpl){
+                if($assessmentImpl instanceof Project){
+                    $projectImpls->setOffset($implId, $assessmentImpl);
+                }
+            }
+        }
+        if(!$projectImpls->count()){
+            return $assessmentImpls;
+        }
+        $query = "
+           SELECT
+                p.assessment_id       AS 'p.assessment_id',
+                asi.specification_assessment_id AS 'asi.specification_assessment_id',
+                ia.id                 AS 'ia.id',
+                ia.title              AS 'ia.title',
+                ia.publish_date       AS 'ia.publish_date',
+                ia.open_date          AS 'ia.open_date',
+                ia.due_date           AS 'ia.due_date',
+                ia.close_date         AS 'ia.close_date',
+                ia.deleted_at         AS 'ia.deleted_at',
+                idw.assessment_id     AS 'idw.id',
+                idw.accept_submission AS 'idw.accept_submission',
+                idw.multi_submission  AS 'idw.multi_submission',
+                iqz.assessment_id     AS 'iqz.id',
+                itk.assessment_id     AS 'itk.id'
+            FROM project p
+            JOIN project_assessment pa   ON pa.project_id = p.id
+            JOIN assessment ia           ON ia.id = pa.assessment_id
+            LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+            LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
+            LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
+            LEFT JOIN task itk           ON itk.assessment_id = ia.id";
+        $pb = new PredicateBuilder($this->database, '');
+        $pb->equals('p.assessment_id', $projectImpls->keys());
+        $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            // Add AssessmentImpl to ProjectImpl
+            $projectAssessmentId = $row['p.assessment_id'];
+            $assessmentImpl = $this->buildAssessmentImplFromRow($row);
+            /** @var Project $projectImpl */
+            $projectImpl = $projectImpls->getOffset($projectAssessmentId);
+            $projectImpl->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
+            $assessmentImpl->setContext($projectImpl);
+
+            // Link AssessmentImpl to AssessmentSpec
+            $assessmentSpecId = $row['asi.specification_assessment_id'];
+            if($assessmentSpecId){
+                $assessmentSpec = $this->assessmentCache->getOffset($assessmentImplToSpecMap[$assessmentImpl->getId()]);
+                $assessmentImpl->setSpecificationAssessment($assessmentSpec);
+            }
+        }
+
+        return $assessmentImpls;
+    }
+
+    /**
+     * Load all Assessment Specs + Impls for Projects that have been imported
+     *
+     * @param GenericCollection|AssessmentPair[][] $assessmentPairs   - Sets of AssessmentPairs, indexed by UnitSpec.id
+     * @param int[] $assessmentImplToSpecMap
+     * @return GenericCollection
+     */
+    protected function loadProjectPairAssessables(GenericCollection $assessmentPairs, array $assessmentImplToSpecMap)
+    {
+        /**
+         * Sets of Project Specs, grouped by UnitSpec.id
+         *
+         * @var GenericCollection[] $unitProjectSpecs
+         */
+        $unitProjectSpecs = new GenericCollection(GenericCollection::class);
+
+        /**
+         * Sets of Project Impls, grouped by UnitSpec.id
+         *
+         * @var GenericCollection[] $unitProjectImpls
+         */
+        $unitProjectImpls = new GenericCollection(GenericCollection::class);
+
+        /**
+         * Indexed by assessment.id
+         *
+         * @var Project[] $projectSpecs
+         */
+        $projectSpecs = new GenericCollection(Project::class);
+
+        /**
+         * Indexed by assessment.id
+         *
+         * @var Project[] $projectImpls
+         */
+        $projectImpls = new GenericCollection(Project::class);
+
+
+        foreach($assessmentPairs as $unitSpecId => $unitAssessmentPairs){
+            $unitProjectSpecs->setOffset($unitSpecId, new GenericCollection(Project::class));
+            $unitProjectImpls->setOffset($unitSpecId, new GenericCollection(Project::class));
+
+            foreach($unitAssessmentPairs as $unitAssessmentPair){
+                $spec = $unitAssessmentPair->getSpecification();
+                $impl = $unitAssessmentPair->getImplementation();
+                if($spec instanceof Project){
+                    $unitProjectSpecs->getOffset($unitSpecId)->setOffset($spec->getId(), $spec);
+                    $projectSpecs->setOffset($spec->getId(), $spec);
+                }
+                if($impl instanceof Project){
+                    $unitProjectImpls->getOffset($unitSpecId)->setOffset($impl->getId(), $impl);
+                    $projectImpls->setOffset($impl->getId(), $impl);
+                }
+            }
+        }
+        if(!$projectSpecs->count()){
+            return $assessmentPairs;
+        }
+
+        // Build the AssessmentSpecs inside the ProjectSpecs
+        $this->loadProjectSpecAssessables($unitProjectSpecs);
+
+        // Build the AssessmentImpls inside the ProjectImpls
+        $this->loadProjectImplAssessables($unitProjectImpls, $assessmentImplToSpecMap);
+
+        return $assessmentPairs;
+    }
+
+
+    /**
      * Get a map of AssessmentImplIds to AssessmentSpecIds for the specified UnitImpls.
      *
      * AssessmentSpecId will be null if AssessmentImpl was created directly in a UnitImpl
+     *
+     * Includes Assessments in:
+     * * UnitImpls, and
+     * * Projects inside UnitImpls
      *
      * DOES include records for deleted Specs.
      * Does NOT include records for deleted Impls.
@@ -343,21 +581,41 @@ class ImportFactory
      */
     protected function getAssessmentImplToSpecMap($unitImplIds)
     {
-        $query = "
+        // Assessments directly in UnitImpls
+        $query1 = "
             SELECT
                 ia.id AS 'ia.id',
                 sa.id AS 'sa.id'
-            FROM course_unit_implementation ui
-            JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
+            FROM assessment_course_unit_implementation aui
             JOIN assessment ia ON ia.id = aui.assessment_id AND ia.deleted_at IS NULL
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
-        $pb = new PredicateBuilder($this->database, '');
-        $pb->equals('ui.id', $unitImplIds);
-        $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
+        $pb1 = new PredicateBuilder($this->database, '');
+        $pb1->equals('aui.course_unit_implementation_id', $unitImplIds);
+        $query1 .= ' WHERE ' . implode(' AND ', $pb1->getWhere());
+
+
+        // Assessments in Projects in UnitImpls (projectImpl not deleted, assessmentImpl not deleted)
+        $query2 = "
+            SELECT
+                ia.id AS 'ia.id',
+                sa.id AS 'sa.id'
+            FROM assessment_course_unit_implementation pui
+            JOIN assessment pa ON pa.id = pui.assessment_id AND pa.deleted_at IS NULL
+            JOIN project p ON p.assessment_id = pa.id
+            JOIN project_assessment pra ON pra.project_id = p.id
+            JOIN assessment ia ON ia.id = pra.assessment_id AND ia.deleted_at IS NULL
+            LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
+            LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
+        ";
+        $pb2 = new PredicateBuilder($this->database, '');
+        $pb2->equals('pui.course_unit_implementation_id', $unitImplIds);
+        $query2 .= ' WHERE ' . implode(' AND ', $pb2->getWhere());
+
+        $query = "$query1 UNION $query2";
         $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
+        $statement->execute(array_merge($pb1->getParams(), $pb2->getParams()));
 
         $assessmentImplToSpecMap = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -426,6 +684,7 @@ class ImportFactory
         } else {
             $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
         }
+        $this->assessmentCache[$assessmentSpec->getId()] = $assessmentSpec;
         return $assessmentSpec;
     }
 
@@ -471,7 +730,7 @@ class ImportFactory
         $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
         $assessmentImpl->setCloseAt($this->createDate($row['ia.close_date']));
         $assessmentImpl->setDeletedAt($this->createDate($row['ia.deleted_at']));
-
+        $this->assessmentCache[$assessmentImpl->getId()] = $assessmentImpl;
         return $assessmentImpl;
     }
 

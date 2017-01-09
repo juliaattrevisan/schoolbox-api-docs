@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Assessment\Course\Import;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -27,10 +28,18 @@ class AssessmentPair
     private $implementation;
 
     /**
+     * Recursive to permit any level of Project nesting
+     *
+     * @var AssessmentPair[]|GenericCollection|null
+     */
+    private $assessmentPairs;
+
+    /**
      * @param IAssessable|null $spec
      * @param IAssessable|null $impl
+     * @param GenericCollection|AssessmentPair[]|null $subPairs
      */
-    public function __construct(IAssessable $spec = null, IAssessable $impl = null)
+    public function __construct(IAssessable $spec = null, IAssessable $impl = null, GenericCollection $subPairs = null)
     {
         // Ensure at least one is present
         if (is_null($spec) && is_null($impl)) {
@@ -57,6 +66,7 @@ class AssessmentPair
 
         $this->specification = $spec;
         $this->implementation = $impl;
+        $this->assessmentPairs = $subPairs;
     }
 
     /**
@@ -73,5 +83,13 @@ class AssessmentPair
     public function getImplementation()
     {
         return $this->implementation;
+    }
+
+    /**
+     * @return GenericCollection|static[]
+     */
+    public function getSubPairs()
+    {
+        return $this->assessmentPairs;
     }
 }

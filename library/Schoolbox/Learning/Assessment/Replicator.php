@@ -48,61 +48,28 @@ class Replicator
      * if the source Assessments are Specifications. This avoids needing to pass the dates in
      * a custom DTO.
      *
-     * @param ICollection|IAssessable[] $assessments the assessments to replicate
-     * @param AssessmentContext         $destination the location into which to replicate the assessments
-     * @throws Mapper\Exception                      if any part of the replication fails
-     * @return ICollection|IAssessable[]             the NEW assessments, as replicated
+     * @param IAssessable       $assessmentSpec  the assessments to replicate
+     * @param AssessmentContext $destination     the location into which to replicate the assessments
+     * @throws Mapper\Exception                  if any part of the replication fails
+     * @return IAssessable                       the NEW assessments, as replicated
      */
-    public function replicateInNewContext(ICollection $assessments, AssessmentContext $destination)
+    public function replicateInNewContext(IAssessable $assessmentSpec, AssessmentContext $destination)
     {
-        $newAssessments = $this->assessmentMapperProxy->createCollection();
+        $newAssessment = $assessmentSpec->cloneForCopy();
+        $newAssessment->setContext($destination);
 
-        foreach($assessments as $assessment){
-            $newAssessment = $assessment->cloneForCopy();
-            $newAssessment->setContext($destination);
+        // TODO SA-1698 need to implement __clone() on DueWork to clone Rubric correctly
+        $this->replicateDueWorkRubric($newAssessment);
 
-            // TODO SA-1698 need to implement __clone() on DueWork to clone Rubric correctly
-            $this->replicateDueWorkRubric($newAssessment);
+        $this->assessmentMapperProxy->save($newAssessment);
 
-            $this->setProjectAssessableDates($newAssessment);
-            $this->assessmentMapperProxy->save($newAssessment);
-
-            // Copy Quiz Sections/Questions/Solutions
-            $this->replicateQuizConstituents($newAssessment);
-
-            $destination->getAssessables()->add($newAssessment);
-            $newAssessments->add($newAssessment);
-        }
-        return $newAssessments;
+        // Copy Quiz Sections/Questions/Solutions
+        $this->replicateQuizConstituents($newAssessment);
+        $destination->getAssessables()->add($newAssessment);
+        return $newAssessment;
     }
 
-    /**
-     * Set the dates on any Assessables inside a Project
-     *
-     * Can recursively handle any project nesting
-     *
-     * @param IAssessable $assessable
-     */
-    protected function setProjectAssessableDates(IAssessable $assessable)
-    {
-        // Base case #1
-        if(!$assessable instanceof Project){
-            return;
-        }
 
-        // Recursive case
-        if($assessable instanceof Project){
-            foreach($assessable->getAssessables() as $subAssessable)
-            {
-                // TODO - SA-1638 - Need to set some to null but out of scope for this PR
-                $subAssessable->setPublishAt($assessable->getPublishAt());
-                $subAssessable->setOpenAt($assessable->getPublishAt());
-                $subAssessable->setDueAt($assessable->getDueAt());
-                $subAssessable->setCloseAt($assessable->getDueAt());
-                $this->setProjectAssessableDates($subAssessable);
-            }
-        }
-    }
 
     /**
      * Copy any Quiz Sections, Questions + Solutions to $assessable from its Specification
@@ -113,19 +80,10 @@ class Replicator
      */
     protected function replicateQuizConstituents(IAssessable $assessable)
     {
-        // Recursive case
-        if($assessable instanceof Project){
-            foreach ($assessable->getAssessables() as $subAssessable) {
-                $this->replicateQuizConstituents($subAssessable);
-            }
-        }
-
-        // Base case #1
         if(!$assessable instanceof Quiz){
             return;
         }
 
-        // Base case #2
         $specId = $assessable->getSpecificationAssessment()->getId();
         $implId = $assessable->getId();
         $this->quizMapper->copyQuizConstituents($specId, $implId);
@@ -140,13 +98,6 @@ class Replicator
      */
     protected function replicateDueWorkRubric(IAssessable $assessable)
     {
-        // Recursive case
-        if($assessable instanceof Project){
-            foreach ($assessable->getAssessables() as $projectAssessable) {
-                $this->replicateDueWorkRubric($projectAssessable);
-            }
-        }
-
         // Base case #1
         if(!$assessable instanceof DueWork){
             return;

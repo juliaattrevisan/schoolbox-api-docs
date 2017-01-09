@@ -98,18 +98,17 @@ class Controller extends BaseController
      *
      * @api POST /learning/export/assessment/:assessmentId
      * @level 165
-     * @param IAssessable $assessment
+     * @param IAssessable $assessmentSpec
      * @var string $_GET['returnUrl']            a URL to return to once done
      * @var int[] $_POST['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
      *                                           value: true/false
      */
-    public function postExport(IAssessable $assessment)
+    public function postExport(IAssessable $assessmentSpec)
     {
         $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
-        $newImplementations      = $this->assessmentDataSource->createCollection();
 
-        foreach ($this->retrieveUnitImplementationsForSpecification($assessment) as $unitImplData) {
+        foreach ($this->retrieveUnitImplementationsForSpecification($assessmentSpec) as $unitImplData) {
             /** @var UnitImplementation $unitImpl */
             $unitImpl = $unitImplData['unit'];
 
@@ -128,22 +127,19 @@ class Controller extends BaseController
                 }
 
                 // clone $assessment for this unitImplData
-                $newImplementation = $assessment->cloneForCopy();
-                $newImplementation
-                    ->setContext($unitImpl)
-                    ->setSpecificationAssessment($assessment)
+                $assessmentSpec
                     // Set sensible defaults for dates
                     ->setPublishAt($unitImpl->getOpenDate())
                     ->setOpenAt($unitImpl->getOpenDate())
                     ->setDueAt($unitImpl->getDueDate())
                     ->setCloseAt($unitImpl->getDueDate())
                 ;
-                // TODO - test if project, and if so need to set dates on its Assessables too
-                $newImplementations->add($newImplementation);
+                $this->replicator->replicateInNewContext($assessmentSpec, $unitImpl);
+
             }
         }
 
-        $this->replicator->replicateInNewContext($newImplementations, $unitImpl);
+
 
         // Decode the return URL, if it was set
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
@@ -152,7 +148,7 @@ class Controller extends BaseController
         } else {
             $returnUrl = $this->getRouter()->generate(
                 'course.modifyCourse',
-                ['id' => $assessment->getContext()->getId(),]
+                ['id' => $assessmentSpec->getContext()->getId(),]
             );
         }
 

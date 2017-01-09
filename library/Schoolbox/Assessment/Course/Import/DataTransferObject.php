@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
@@ -110,36 +111,18 @@ class DataTransferObject
         $this->assessmentSpecToImplMap = @array_flip($assessmentImplToSpecMap);
 
         // Start Building
+        $this->addUnitImplementations($unitImpls);
 
-        // Add UnitImpls
-        foreach($unitImpls as $unitImpl){
-            $this->addUnitImplementation($unitImpl);
-        }
+        // Convert all to AssessmentPairs
+        $this->addAssessmentSpecs($assessmentSpecs);
+        $this->addAssessmentImpls($assessmentImpls);
+        $this->addAssessmentPairs($assessmentPairs);
 
-        // Verify and add AssessmentSpecs that have no corresponding AssessmentImpl
-        foreach($assessmentSpecs as $unitSpecId => $unitSpecAssessmentSpecs){
-            foreach($unitSpecAssessmentSpecs as $assessmentSpec){
-                $this->addAssessmentSpec($unitSpecId, $assessmentSpec);
-            }
-        }
-
-        // Verify and add AssessmentImpls that have no corresponding AssessmentSpec
-        foreach($assessmentImpls as $unitSpecId => $unitSpecAssessmentImpls){
-            foreach($unitSpecAssessmentImpls as $assessmentImpl){
-                $this->addAssessmentImpl($unitSpecId, $assessmentImpl);
-            }
-        }
-
-        // Verify and add pairs of AssessmentSpecs + AssessmentImpls
-        foreach($assessmentPairs as $unitSpecId => $unitSpecAssessmentPairs){
-            foreach($unitSpecAssessmentPairs as $assessmentPair){
-                $this->addAssessmentPair($unitSpecId, $assessmentPair);
-            }
-        }
-
+        // Calculate totals for display
         $this->calculateAvailableAssessmentCounts();
         $this->calculateSelectedAssessmentCounts();
     }
+
     /**
      * Call from TWIG to get a list of UnitImpls to traverse
      *
@@ -182,6 +165,60 @@ class DataTransferObject
     {
         return $this->selectedAssessmentCounts;
     }
+
+
+    /**
+     * @param GenericCollection $unitImpls
+     */
+    protected function addUnitImplementations(GenericCollection $unitImpls)
+    {
+        foreach($unitImpls as $unitImpl){
+            $this->addUnitImplementation($unitImpl);
+        }
+    }
+
+    /**
+     * Verify and add AssessmentSpecs that have no corresponding AssessmentImpl
+     *
+     * @param GenericCollection $assessmentSpecs
+     */
+    protected function addAssessmentSpecs(GenericCollection $assessmentSpecs)
+    {
+        foreach($assessmentSpecs as $unitSpecId => $unitSpecAssessmentSpecs){
+            foreach($unitSpecAssessmentSpecs as $assessmentSpec){
+                $this->addAssessmentSpec($unitSpecId, $assessmentSpec);
+            }
+        }
+    }
+
+    /**
+     * Verify and add AssessmentImpls that have no corresponding AssessmentSpec
+     *
+     * @param GenericCollection $assessmentImpls
+     */
+    protected function addAssessmentImpls(GenericCollection $assessmentImpls)
+    {
+        foreach($assessmentImpls as $unitSpecId => $unitSpecAssessmentImpls){
+            foreach($unitSpecAssessmentImpls as $assessmentImpl){
+                $this->addAssessmentImpl($unitSpecId, $assessmentImpl);
+            }
+        }
+    }
+
+    /**
+     * Verify and add pairs of AssessmentSpecs + AssessmentImpls
+     *
+     * @param GenericCollection $assessmentPairs
+     */
+    protected function addAssessmentPairs(GenericCollection $assessmentPairs)
+    {
+        foreach($assessmentPairs as $unitSpecId => $unitSpecAssessmentPairs){
+            foreach($unitSpecAssessmentPairs as $assessmentPair){
+                $this->addAssessmentPair($unitSpecId, $assessmentPair);
+            }
+        }
+    }
+
 
     /**
      * Calculate how many Assessments are available for selection for each UnitSpec
@@ -235,17 +272,30 @@ class DataTransferObject
      *
      * @param int $unitSpecId
      * @param IAssessable $assessmentSpec
-     * @return bool
+     * @param bool $isNested
+     * @return AssessmentPair
      */
-    protected function addAssessmentSpec($unitSpecId, IAssessable $assessmentSpec)
+    protected function addAssessmentSpec($unitSpecId, IAssessable $assessmentSpec, $isNested = false)
     {
         // Ensure this AssessmentSpec is being added correctly
         if (array_key_exists($assessmentSpec->getId(), $this->assessmentSpecToImplMap)) {
             throw new \DomainException("AssessmentSpec has an Impl. Must be added as a Pair: {$assessmentSpec->getId()}");
         }
         $this->checkUnitSpecCollection($unitSpecId);
-        $this->unitSpecAssessments->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, null));
-        return true;
+
+        // Recurse
+        $subPairs = null;
+        if($assessmentSpec instanceof Project){
+            $subPairs = new GenericCollection(AssessmentPair::class);
+            foreach($assessmentSpec->getAssessables() as $assessable){
+                $subPairs->add($this->addAssessmentSpec($unitSpecId, $assessable, true));
+            }
+        }
+        $pair = new AssessmentPair($assessmentSpec, null, $subPairs);
+        if(!$isNested){
+            $this->unitSpecAssessments->getOffset($unitSpecId)->add($pair);
+        }
+        return $pair;
     }
 
     /**
@@ -253,9 +303,10 @@ class DataTransferObject
      *
      * @param int $unitSpecId
      * @param IAssessable $assessmentImpl
-     * @return bool
+     * @param bool $isNested
+     * @return AssessmentPair
      */
-    protected function addAssessmentImpl($unitSpecId, IAssessable $assessmentImpl)
+    protected function addAssessmentImpl($unitSpecId, IAssessable $assessmentImpl, $isNested = false)
     {
         $implId = $assessmentImpl->getId();
         // Ensure this AssessmentImpl does not have a Spec
@@ -263,8 +314,21 @@ class DataTransferObject
             throw new \DomainException("AssessmentImpl has a Spec. Must be added as a Pair: {$assessmentImpl->getId()}");
         }
         $this->checkUnitSpecCollection($unitSpecId);
-        $this->unitSpecAssessments->getOffset($unitSpecId)->add(new AssessmentPair(null, $assessmentImpl));
-        return true;
+
+        // Recurse
+        $subPairs = null;
+        if($assessmentImpl instanceof Project){
+            $subPairs = new GenericCollection(AssessmentPair::class);
+            foreach($assessmentImpl->getAssessables() as $assessable){
+                $subPairs->add($this->addAssessmentImpl($unitSpecId, $assessable, true));
+            }
+        }
+        $pair = new AssessmentPair($assessmentImpl, null, $subPairs);
+        if(!$isNested){
+            $this->unitSpecAssessments->getOffset($unitSpecId)->add($pair);
+        }
+
+        return $pair;
     }
 
     /**
@@ -272,9 +336,10 @@ class DataTransferObject
      *
      * @param int $unitSpecId
      * @param AssessmentPair $pair
-     * @return bool
+     * @param bool $isNested
+     * @return AssessmentPair
      */
-    protected function addAssessmentPair($unitSpecId, AssessmentPair $pair)
+    protected function addAssessmentPair($unitSpecId, AssessmentPair $pair, $isNested = false)
     {
         $assessmentImpl = $pair->getImplementation();
         $assessmentSpec = $pair->getSpecification();
@@ -286,8 +351,21 @@ class DataTransferObject
             throw new \DomainException("Assessments not a valid pair: Spec: $specId, Impl: $implId");
         }
         $this->checkUnitSpecCollection($unitSpecId);
-        $this->unitSpecAssessments->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
-        return true;
+
+        // Recurse
+        $subPairs = null;
+        if($assessmentImpl instanceof Project){
+            $subPairs = new GenericCollection(AssessmentPair::class);
+            foreach($assessmentImpl->getAssessables() as $impl){
+                $subPair = new AssessmentPair($impl->getSpecificationAssessment(), $impl);
+                $subPairs->add($this->addAssessmentPair($unitSpecId, $subPair, true));
+            }
+        }
+        $pair = new AssessmentPair($assessmentSpec, $assessmentImpl, $subPairs);
+        if(!$isNested){
+            $this->unitSpecAssessments->getOffset($unitSpecId)->add($pair);
+        }
+        return $pair;
     }
 
     /**

@@ -243,11 +243,7 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         /** @var Project $clone */
         $clone = parent::cloneForCopy();
-        $clonedAssessables = new GenericCollection(IAssessable::class);
-        foreach($clone->getAssessables() as $assessable){
-            $clonedAssessables->add($assessable->cloneForCopy());
-        }
-        $clone->setAssessables($clonedAssessables);
+        $clone->assessables = new GenericCollection(IAssessable::class);
         return $clone;
     }
 

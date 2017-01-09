@@ -204,6 +204,7 @@
                                                    data-assessment="{{ assessment.id }}"
                                                    data-checkbox-group="lesson"
                                                    name="{{ inputPrefix }}[checked]"
+                                                   value="1"
                                             />
                                             <label for="a_import-{{ assessment.id}}" class="checkbox-label">
                                                 <span class="{{ icon.renderClass(assessment) }}"></span>
@@ -331,9 +332,15 @@
 
                                     {% if assessment is project %}
 
-                                        {% for assessable in assessment.assessables %}
+                                        {% for subPair in assessmentPair.subPairs %}
+                                            {% set assessmentSpec = subPair.specification %}
+                                            {% set assessmentImpl = subPair.implementation %}
+                                            {% set assessment = assessmentImpl ?: assessmentSpec %}
 
-                                            {% set inputPrefix %}unit[{{ unitSpec.id }}][p][{{ assessment.id }}][a][{{ assessable.id }}]{% endset %}
+                                            {% set inputPrefix = inputPrefix ~ '[a][' ~ assessment.id ~ ']' %}
+
+                                            <input type="hidden" name="{{ inputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
+                                            <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                             {% if assessable.duration is not empty %}
 
@@ -382,7 +389,7 @@
                                                     />
                                                     <label style="margin-left:25px" for="a_import-{{ assessable.id}}" class="checkbox-label">
                                                         <span class="{{ icon.renderClass(assessable) }}"></span>
-                                                        <span>{{ assessable.title }}</span>
+                                                        <span>{{ assessment.title }}</span>
                                                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                                                         {% endif %}
