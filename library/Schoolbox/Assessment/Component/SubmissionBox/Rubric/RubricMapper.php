@@ -332,14 +332,14 @@ class RubricMapper
 
         // Retrieve criteria from the box's folder's parent ?
         if($getParentCriteria){
-            $parentId = $box->getCategory()->getParent()->getId();
+
             // Is parent not yet hydrated?
-            if (!$parentId) {
-                $parentId = FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
+            if (!$box->getCategory()->getParent()) {
+                $box->setCategory(FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId()));
             }
 
             $key        = 'parentFolderId';
-            $args[$key] = $parentId;
+            $args[$key] = $box->getCategory()->getParent()->getId();
             $in[]       = $key;
         }
 
