@@ -181,22 +181,19 @@ class Model extends AbstractAssessment
     {
         /* No Interactions - user can see this task
          */
-        try {
+        if ($this->isParticipant($user)) {
             $participant = $this->getParticipant($user);
-        }
-        catch (\UnexpectedValueException $e) {
-            return false;
-        }
 
-        if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
-            return true;
-        }
+            if (!$participant->isResponded() && !$participant->getAllFeedbacks()->count()) {
+                return true;
+            }
 
-        /* Some set of interactions exists, but the latest feedback isn't official yet
-         * This might require more finesse due to toggleability of Completions
-         */
-        if (!$participant->hasPublishedFeedback()) {
-            return true;
+            /* Some set of interactions exists, but the latest feedback isn't official yet
+             * This might require more finesse due to toggleability of Completions
+             */
+            if (!$participant->hasPublishedFeedback()) {
+                return true;
+            }
         }
 
         return false;
