@@ -450,9 +450,16 @@ class Controller extends Assessment\Controller
         ];
 
         // ...append rubric-related data...
-        $getParentCriteria = $assessment->getContext() instanceof UnitSpecification;
-        $editMode = true;
-        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode));
+        if($assessment->getId()){
+            $getParentCriteria = $assessment->getContext() instanceof UnitSpecification;
+            $editMode = true;
+            $rubric = $this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode);
+        } else {
+            $rubric = $this->rubricMapper->createForContext($assessment->getContext());
+        }
+        $assessment->setRubric($rubric);
+
+
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
 
         // ...and scene.
