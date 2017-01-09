@@ -8,3 +8,14 @@ WHERE id IN (
    WHERE sb.id IS NULL
  ) t
 );
+
+-- If a Level has no Descriptors, delete the Level
+DELETE FROM rubric_level
+WHERE id IN (
+  SELECT * FROM (
+    SELECT rl.id FROM rubric_level rl
+    LEFT JOIN rubric_descriptor rd ON rd.level_id = rl.id
+    WHERE rd.id IS NULL
+  ) t
+);
+
