@@ -18,20 +18,22 @@ namespace Schoolbox\Test;
 use Alaress\IDatabase;
 use PDO;
 use PDOStatement;
+use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
+use Traversable;
 
 class MockDatabase implements IDatabase
 {
 
     /**
      * The test case, required for creating mocks
-     * @var \PHPUnit_Framework_TestCase
+     * @var PHPUnit_Framework_TestCase
      */
     protected $test_case;
 
     /**
      * The mock statement
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var PHPUnit_Framework_MockObject_MockObject|PDOStatement
      */
     protected $mock_statement;
 
@@ -56,19 +58,7 @@ class MockDatabase implements IDatabase
      * Resets this item's mock statement.
      */
     public function resetStatement() {
-        $this->mock_statement = $this->test_case->getMock('\\PDOStatement');
-    }
-
-    /**
-     * Quick method for setting expected result from database statement.
-     *
-     * @param string $method The method to set result on (fetch, fetchAll, etc.)
-     * @param mixed  $result
-     */
-    public function setNextResult($method, $result) {
-        $this->mock_statement->expects($this->test_case->any())
-            ->method($method)
-            ->will($this->test_case->returnValue($result));
+        $this->mock_statement = $this->test_case->getMock(PDOStatement::class);
     }
 
     /**
@@ -77,7 +67,7 @@ class MockDatabase implements IDatabase
      * @param mixed $result
      */
     public function setNextFetch($result) {
-        $this->setNextResult('fetch', $result);
+        $this->setResultSet([ $result ]);
     }
 
     /**
@@ -86,7 +76,39 @@ class MockDatabase implements IDatabase
      * @param mixed $result
      */
     public function setNextFetchAll($result) {
-        $this->setNextResult('fetchAll', $result);
+        $this->setResultSet($result);
+    }
+
+
+    /** @var array|Traversable|null */
+    protected $resultSet;
+
+
+    /**
+     * @param array|Traversable|null $result
+     */
+    protected function setResultSet($result)
+    {
+        $this->resultSet = $result;
+        reset($this->resultSet);
+
+        $this->mock_statement->expects($this->test_case->any())
+                             ->method('fetchAll')
+                             ->will($this->test_case->returnValue($this->resultSet));
+
+        $this->mock_statement->expects($this->test_case->any())
+                             ->method('fetch')
+                             ->will($this->test_case->returnCallback(function () {
+                                 if ($val = current($this->resultSet)) {
+                                     next($this->resultSet);
+                                     return $val;
+                                 }
+                                 return null;
+                             }));
+
+        $this->mock_statement->expects($this->test_case->any())
+                             ->method('execute')
+                             ->will($this->test_case->returnValue(true));
     }
 
     /**
@@ -95,7 +117,7 @@ class MockDatabase implements IDatabase
      * @param string $query Ignored
      * @param array  $args  Ignored
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return PDOStatement|PHPUnit_Framework_MockObject_MockObject
      */
     public function prepare($query, array $args = []) {
         return $this->mock_statement;

@@ -9,9 +9,35 @@
  */
  
 namespace Schoolbox\Column;
+use Alaress\Cache;
 use Schoolbox\Mapper;
 
 class Model implements IColumnType {
+
+    /** @var Cache|object[] */
+    private $cache = [];
+
+
+    /**
+     * Model Column constructor.
+     */
+    public function __construct()
+    {
+        $this->cache = new Cache(function (Mapper $mapper, $value) {
+            $model = $mapper->createModel();
+
+            // Figure out the identifier property to set on the model.
+            $id_property = $this->getIdentifierProperty();
+
+            $identifier_method  = isset($id_property)
+                ? $mapper->getSetMethodName($id_property)
+                : $mapper->getSetIdentifierMethodName();
+
+            $model->$identifier_method($value);
+
+            return $model;
+        });
+    }
 
 	/**
 	 * The property to set on the model when hydrating, or get when dehydrating.
@@ -52,18 +78,10 @@ class Model implements IColumnType {
 	 *
 	 * @return object
 	 */
-	public function hydrate($value, $mapper = null) {
-		/** @var Mapper $mapper */
-		$model = $mapper->createModel();
-		//
-		// Figure out the identifier property to set on the model.
-		$id_property = $this->getIdentifierProperty();
-		$identifier_method  = isset($id_property) ?
-			$mapper->getSetMethodName($id_property):
-			$mapper->getSetIdentifierMethodName();
-		$model->$identifier_method($value);
-		return $model;
-	}
+    public function hydrate($value, $mapper = null)
+    {
+        return $this->cache->get("'{$mapper->getTable()}'.'$value'", [ $mapper, $value ]);
+    }
 
 	/**
 	 * @param mixed             $value

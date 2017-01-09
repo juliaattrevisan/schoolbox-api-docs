@@ -9,16 +9,41 @@
  
 namespace Schoolbox\Column;
 
+use Alaress\Cache;
 use Schoolbox\Mapper;
 
 class Factory implements IFactory
 {
+    /** @var Cache|IColumnType[] */
+    protected $cache;
+
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->cache = new Cache(function ($type) {
+            return $this->get($type);
+        });
+    }
+
+
     /**
     * @param $type
     *
     * @return IColumnType
     */
     public function build($type)
+    {
+        return $this->cache->get($type, [ $type ]);
+    }
+
+
+    /**
+     * @param string $type
+     * @return IColumnType
+     */
+    private function get($type)
     {
         $column = null;
         switch ($type) {

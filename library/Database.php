@@ -9,6 +9,7 @@
  *
  */
 
+use Alaress\Cache;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
@@ -57,6 +58,9 @@ class Database implements IDatabase, Serializable
      */
     private $connection;
 
+    /** @var Cache|PDOStatement[] */
+    private $qCache = [];
+
     /**
      * Returns the singleton instance of Database. If it doesn't exist it is instantiated.
      *
@@ -78,7 +82,18 @@ class Database implements IDatabase, Serializable
 		self::$instance->reconnect();
 	}
 
-	/**
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->qCache = new Cache(function ($statement, array $driverOptions = []) {
+            return $this->connection->prepare($statement, $driverOptions);
+        });
+    }
+
+
+    /**
 	 * Establishes the database connection
 	 *
 	 * @param string $dsn
@@ -164,10 +179,11 @@ class Database implements IDatabase, Serializable
      * @param String $statement
      * @return Integer
      */
-    public function exec($statement) {
-
-        return $this->connection->exec($statement);
-
+    public function exec($statement)
+    {
+        $stmt = $this->prepare($statement);
+        $stmt->execute();
+        return $stmt->rowCount();
     }
 
     /**
@@ -178,10 +194,9 @@ class Database implements IDatabase, Serializable
      * @param array  $driverOptions
      * @return PDOStatement
      */
-    public function prepare($statement, array $driverOptions = array()) {
-
-        return $this->connection->prepare($statement, $driverOptions);
-
+    public function prepare($statement, array $driverOptions = array())
+    {
+        return $this->qCache->get(sha1($statement), [ $statement, $driverOptions ]);
     }
 
     /**
@@ -193,12 +208,14 @@ class Database implements IDatabase, Serializable
      * @param array  $args
      * @return PDOStatement
      */
-    public function query($statement, array $args = null) {
-        if (empty($args)) {
-            return $this->connection->query($statement);
-        }
+    public function query($statement, array $args = null)
+    {
         $stmt = $this->prepare($statement);
-        $stmt->execute($args);
+        if ($args) {
+            $stmt->execute($args);
+        } else {
+            $stmt->execute();
+        }
         return $stmt;
     }
 

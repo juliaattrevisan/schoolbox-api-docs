@@ -11,7 +11,25 @@ namespace Schoolbox\Test;
 use Schoolbox\Mapper;
 
 class TestMapper extends Mapper {
-	protected function mapping() {
+
+    /**
+     * @var MapperTest
+     */
+    private $test;
+
+
+    /**
+     * @param MapperTest $test
+     */
+    public function __construct(MapperTest $test = null)
+    {
+        parent::__construct();
+        $this->test = isset($test) ? $test : null;
+    }
+
+
+    protected function mapping() {
+        $this->hasTable('test_table');
 		$this->hasModel(TestModel::class);
 		$this->hasMap(array(
 			'column'     => 'storage_id',
@@ -44,5 +62,10 @@ class TestMapper extends Mapper {
 			'this_key'  => 'category',
 			'other_key' => 'id',
 		));
+
+		$this->registerCallback(self::CALLBACK_POSTSAVE, function (TestModel $model, TestModel $previous = null) {
+            $this->test->internalTestNotSame($model, $previous);
+            return true;
+        });
 	}
 }
