@@ -213,11 +213,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
             // Add a relation between assessment spec and implementation
             try {
-                $insertAssessmentImplementationRelationQuery->execute([
+                $params = [
                     'assessmentId'   => $assessmentId,
                     'taskInstanceId' => $taskId,
-                ]);
-                $log->debug('Created implementation/specification assessment relation');
+                ];
+                $log->debug(print_r($params, true));
+                $insertAssessmentImplementationRelationQuery->execute($params);
+
+                if ($insertAssessmentImplementationRelationQuery->rowCount() > 0) {
+                    $log->debug('Created implementation/specification assessment relation');
+
+                } else {
+                    $log->warning('No implementation/specification assessment relation was created!');
+                }
+
             } catch (PDOException $e) {
                 $log->warning('Could not create implementation/specification assessment relation!');
                 $log->warning('This is probably because this implementation of an assessment has no specification.');
