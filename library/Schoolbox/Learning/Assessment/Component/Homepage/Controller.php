@@ -93,7 +93,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     private function getTwigContext()
     {
         return [
-            'user'         => $this->getUser(),
             'component_id' => $this->getInstance()->getId(),
             'compact'      => $this->getConfig('compactMode'),
             'context'      => $this->getSource(),

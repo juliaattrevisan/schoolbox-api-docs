@@ -843,7 +843,6 @@ class Controller extends BaseController
             $folderList->add($folder);
         }
         $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
-            'currentUser'         => $this->getUser(),
             'groupList'           => $folderList,
             'userAccess'          => $userAccess
         ]));

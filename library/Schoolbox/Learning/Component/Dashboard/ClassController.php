@@ -111,7 +111,6 @@ class ClassController extends Component_Dashboard_ControllerAbstract
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
-                'currentUser'         => $this->getUser(),
                 'currentSemester'     => TermMapper::getInstance()->findForToday(),
                 'classList'           => $this->getClassList(),
                 'classTypes'          => $this->getClassTypes(),

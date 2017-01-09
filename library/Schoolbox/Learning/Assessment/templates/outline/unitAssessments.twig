@@ -13,7 +13,7 @@
         {% set studentCount       = 0 %}
 
         {# Is this user particpating? #}
-        {% set isParticipant = assessment.isParticipant(currentUser) %}
+        {% set isParticipant = assessment.isParticipant(USER) %}
 
         {# count students which have completed this #}
         {% for participant in assessment.allParticipants %}
@@ -62,7 +62,7 @@
                         {% endif %}
                     {% else %}
                         <p class="meta spaced">
-                            <span class="unit-task-due-date">{{ dueDate.dueDate(task, currentUser) }}</span>
+                            <span class="unit-task-due-date">{{ dueDate.dueDate(task, USER) }}</span>
                         </p>
                     {% endif %}
                 </div>
@@ -78,7 +78,7 @@
                     <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                 {% elseif isParticipant and assessment is task %}
                     {% include '@learningAssessment/task/progressTickForm.twig' with {
-                    participant: assessment.getParticipant(currentUser),
+                    participant: assessment.getParticipant(USER),
                     disabled: false
                     } only %}
                 {% endif %}

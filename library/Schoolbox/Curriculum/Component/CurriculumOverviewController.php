@@ -91,7 +91,6 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'node'     => $this->curriculumNode,
                 'readonly' => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
                 'curriculumTagging' => $this->curriculumTagging,
-                'currentUser' => $_SESSION['user']
             )
         );
     }

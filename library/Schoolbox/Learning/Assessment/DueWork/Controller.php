@@ -106,7 +106,6 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'currentUser' => $this->getUser(),
         ];
 
         $this->getResponse()->content->set(
@@ -151,7 +150,6 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
-            'currentUser' => $this->getUser(),
             'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
 
             /* Plagscan status
@@ -455,7 +453,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
-            'currentUser'    => $this->getUser(),
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,

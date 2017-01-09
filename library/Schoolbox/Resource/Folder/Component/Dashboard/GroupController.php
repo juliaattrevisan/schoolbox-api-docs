@@ -120,7 +120,6 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                 [
                     'componentInstanceId' => $this->getInstance()->getId(),
                     'componentClass'      => $this->getComponentName(),
-                    'currentUser'         => $this->getUser(),
                     'groupList'           => $this->getGroupList(),
                     'userAccess'          => $this->getUserAccess()
                 ]

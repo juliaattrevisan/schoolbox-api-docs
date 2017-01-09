@@ -16,7 +16,7 @@
             {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
-            <p class="meta">{{ dueDate.dueDate(assessable, user) }}</p>
+            <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
     {% if actionCount %}

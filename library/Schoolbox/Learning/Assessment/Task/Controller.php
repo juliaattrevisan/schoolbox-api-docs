@@ -71,7 +71,6 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
-            'currentUser' => $this->getUser(),
         ];
 
         $this->getResponse()->content->set(
@@ -143,7 +142,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
             'assessment'  => $task,
             'preview'     => $previewFragment,
-            'currentUser' => $this->getUser(),
             'student'     => $participant->getUser(),
         ];
 

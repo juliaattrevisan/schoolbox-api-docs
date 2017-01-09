@@ -103,7 +103,6 @@ class Controller extends Assessment\Controller
             'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment' => $assessment,
-            'currentUser' => $this->getUser(),
 
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz

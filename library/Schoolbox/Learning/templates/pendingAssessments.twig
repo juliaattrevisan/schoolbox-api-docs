@@ -23,7 +23,7 @@
 ) }}
 
 <div class="row">
-    <div class="small-12 columns"><h1>{% if viewer.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
+    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
 </div>
 
 <div class="row">
@@ -54,7 +54,7 @@
                                     {#- Dessicator -#}
                                 </h3>
                                 {{ assessmentContext.crumbs(assessment) }}
-                                <p class="meta">{{ dueDate.dueDate(assessment, viewer) }}</p>
+                                <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <div class="small-4 columns hide-for-small-only">
 
@@ -170,7 +170,7 @@
                             </div>
                             <div class="small-6 medium-2 columns text-right">
                                 <p title="{{ assessment.numNoResponseOrFeedback }} of {{ assessment.numParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
-                                <p class="meta">{{ dueDate.dueDate(assessment, viewer) }}</p>
+                                <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
                             </div>
                             <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                                 {% set studentEmails = [] %}

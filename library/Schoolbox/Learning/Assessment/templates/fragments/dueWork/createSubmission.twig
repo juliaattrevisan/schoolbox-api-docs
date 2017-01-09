@@ -177,7 +177,7 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
-            <li class="icon-calendar">{{ dueDate.dueDate(assessment, currentUser) }}</li>
+            <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
             <li class="icon-due-work">{{ assessment.typeName }}</li>
         </ul>
 
@@ -199,7 +199,7 @@
         <div class="row">
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}" enctype="multipart/form-data">
-                    <input type="hidden" name="creatorId" value="{{ currentUser.id }}"/>
+                    <input type="hidden" name="creatorId" value="{{ USER.id }}"/>
                     <input type="hidden" name="studentId" value="{{ student.id }}" />
                     <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
@@ -208,7 +208,7 @@
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if currentUser.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
+                    <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
