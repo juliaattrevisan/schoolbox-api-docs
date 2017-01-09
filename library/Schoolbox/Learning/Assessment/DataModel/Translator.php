@@ -84,6 +84,7 @@ class Translator
             ->setOpenDate($assessment->getOpenAt())
             ->setDueDate($assessment->getDueAt())
             ->setCloseDate($assessment->getCloseAt())
+            ->setDuration($assessment->getDuration())
             ->setWeight($assessment->getWeight())
             ->setSequence($assessment->getSequence())
             ->setCreatedAt($assessment->getCreatedAt())
@@ -170,13 +171,13 @@ class Translator
         if (!$dataModel->getAssessmentModel() instanceof AssessmentModel) {
             throw new UnexpectedValueException('$dataModel has no assessment model');
         }
-
         $assessable
             ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
             ->setSequence($dataModel->getAssessmentModel()->getSequence())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
+            ->setDuration($dataModel->getAssessmentModel()->getDuration())
             ->setWeight($dataModel->getAssessmentModel()->getWeight())
             ->setPublishAt($dataModel->getAssessmentModel()->getPublishDate())
             ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())

@@ -93,6 +93,11 @@ class Model implements ISoftDeletable
     protected $sequence = 0;
 
     /**
+     * @var int
+     */
+    protected $duration = 0;
+
+    /**
      * The task which may or may not be associated with this assessment.
      *
      * Only one of task, due work, quiz or project may be associated with a
@@ -507,6 +512,24 @@ class Model implements ISoftDeletable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     * @return static
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
         return $this;
     }
 

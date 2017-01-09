@@ -82,6 +82,11 @@ class Factory
     protected $weight;
 
     /**
+     * @var int
+     */
+    protected $duration;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -119,6 +124,7 @@ class Factory
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
         $this->setWeight(intval($post['weight']));
+        $this->setDuration(empty($post['duration']) ? null : intval($post['duration']));
         $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
         $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
         $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
@@ -268,6 +274,7 @@ class Factory
             ->setDescription($this->getDescription())
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
+            ->setDuration($this->getDuration())
             ->setMarkVisibility($this->getMarkVisibility())
             ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
             ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -399,6 +406,24 @@ class Factory
     protected function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return float|int
+     */
+    protected function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param float|int $duration
+     * @return $this
+     */
+    protected function setDuration($duration)
+    {
+        $this->duration = $duration;
         return $this;
     }
 

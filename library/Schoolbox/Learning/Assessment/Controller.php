@@ -254,6 +254,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setOpenAt(new Alaress_Date_Format(new \DateTime('00:00:00')))
                 ->setDueAt(new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
                 ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
+                ->setDuration(null)
                 ->setWeight(0);
         }
 

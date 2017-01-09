@@ -83,6 +83,7 @@ class ImportFactory
                 usf.name AS 'usf.name',
                 sa.id AS 'sa.id',
                 sa.title AS 'sa.title',
+                sa.duration AS 'sa.duration',
                 sdw.assessment_id AS 'sdw.id',
                 sdw.accept_submission as 'sdw.accept_submission',
                 sdw.multi_submission as 'sdw.multi_submission',
@@ -103,6 +104,7 @@ class ImportFactory
         $pb->anyOf('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
         $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $query .= ' ORDER BY sa.sequence';
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
 
@@ -221,6 +223,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.sequence       AS 'seq',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
@@ -255,8 +258,8 @@ class ImportFactory
                 null              AS 'sa.deleted_at',
                 null              AS 'sa.sequence',
                 null              AS 'sdw.id',
-                null              AS 'sdw.accept_submission',
-                null              AS 'sdw.multi_submission',
+                idw.accept_submission AS 'sdw.accept_submission',
+                idw.multi_submission  AS 'sdw.multi_submission',
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
                 null              AS 'spr.id',
@@ -267,6 +270,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.sequence       AS 'seq',
                 idw.assessment_id AS 'idw.id',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
@@ -288,7 +292,7 @@ class ImportFactory
         $pbOuter2->anyOf('ui.id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pbOuter2->getWhere());
 
-        $query = "$query1 UNION $query2 ";
+        $query = "$query1 UNION $query2 ORDER BY seq";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array_merge($pbInner1->getParams(), $pbOuter1->getParams(), $pbOuter2->getParams()));
@@ -416,6 +420,7 @@ class ImportFactory
 
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
+        $assessmentSpec->setDuration($row['sa.duration']);
         if(is_null($row['sa.deleted_at'])){
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
         } else {

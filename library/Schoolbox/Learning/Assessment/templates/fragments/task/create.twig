@@ -22,6 +22,7 @@
     Description
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
+
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
@@ -101,5 +102,13 @@
         </div>
     </div>
 </div>
+
+{% if context.baseContext is unitSpecification %}
+    <label>
+        Activity Duration
+        <span class="hint has-tip tip-top" data-tooltip title="Enter the number of days you expect the activity to take. This will be used to automatically populate due dates when importing this course.">?</span>
+        <input type="number" name="duration" value="{{ assessment.duration }}">
+    </label>
+{% endif %}
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
