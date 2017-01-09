@@ -451,28 +451,28 @@
                 var pickerClassList = $('#pickerClassList{{ id }}');
 
                 pickerClassList.html('Loading Student List');
-                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, '529').replace(/{date}/g,  encodeURIComponent(instance.altInput.value)))
+                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(instance.altInput.value)))
 
                         .done(function (data) {
 
-                            if (data.appointments.length == 0) {
+                            if (data.students.length == 0) {
 
                                 {# There we no appointment on the selected date #}
 
-                                pickerAppointments.html('No events found');
+                                pickerClassList.html('No events found');
 
                             } else {
 
                                 {# Clear out any old appointments #}
 
-                                pickerAppointments.html('');
+                                pickerClassList.html('');
 
                                 {# Populate with appointments for the selected date #}
 
-                                for (var i = 0; i < data.appointments.length; i++) {
-                                    pickerAppointments.append(
-                                            data.appointments[i].title + '<br>' +
-                                            data.appointments[i].startDateTime + '<br>'
+                                for (var i = 0; i < data.students.length; i++) {
+                                    pickerClassList.append(
+                                            data.students[i].title + '<br>' +
+                                            data.students[i].startDateTime + '<br>'
                                     )
                                 }
                             }

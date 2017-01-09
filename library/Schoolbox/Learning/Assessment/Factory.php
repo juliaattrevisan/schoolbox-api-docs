@@ -135,10 +135,10 @@ class Factory
         $this->setWeight(intval($post['weight']));
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
-        $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
-        $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
-        $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
-        $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
+        $this->setPublishAt(trim($post['publishDate']));
+        $this->setOpenAt(trim($post['openDate']));
+        $this->setDueAt(trim($post['dueDate']));
+        $this->setCloseAt(trim($post['closeDate']));
 
         /* Projects need this to instantiate
          */
