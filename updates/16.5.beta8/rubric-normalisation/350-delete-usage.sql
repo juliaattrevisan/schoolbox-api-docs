@@ -11,3 +11,16 @@ DELETE FROM rubric_usage WHERE (criterion_id, submission_box_id) IN (
       WHERE (rc.id IS NULL OR sb.id IS NULL)
     ) t
 );
+
+-- If a Usage has no Descriptors, delete the Usage
+-- Inner SELECT finds Usages without any descriptors
+DELETE FROM rubric_usage WHERE (criterion_id, submission_box_id) IN (
+  SELECT * FROM (
+    SELECT ru.criterion_id, ru.submission_box_id
+    FROM rubric_usage ru
+      LEFT JOIN rubric_descriptor rd ON rd.criterion_id = ru.criterion_id
+      LEFT JOIN rubric_level      rl ON rl.id           = rd.level_id
+    WHERE rl.box_id = ru.submission_box_id
+    AND rd.id IS NULL
+  ) t
+);
