@@ -7,9 +7,8 @@
 -- * * AND mark.mark IS NOT NULL
 -- * * AND descriptor.level.subBox = mark.subBox
 
--- Interestingly, for SEDA, there exist 2969 matches. All with `mark`.`tstamp` between 2015-10-07 and 2015-11-20
+-- Interestingly, for ???, there exist 2969 matches. All with `mark`.`tstamp` between 2015-10-07 and 2015-11-20
 -- Also tellingly, of the descriptors that match, none have marks.
-
 
 UPDATE rubric_mark rm
 JOIN rubric_descriptor rd
@@ -21,3 +20,4 @@ JOIN rubric_level rl
   AND rl.box_id            = rm.submission_box_id
 SET rm.descriptor_id = rd.id
 WHERE rm.descriptor_id IS NULL;
+
