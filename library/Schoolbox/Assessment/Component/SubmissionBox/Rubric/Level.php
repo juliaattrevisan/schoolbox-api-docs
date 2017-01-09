@@ -10,11 +10,14 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
-class Level
+class Level implements ISoftDeletable
 {
-    /** @var int */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /** @var SubmissionBox */
     protected $submissionBox;
@@ -24,27 +27,6 @@ class Level
 
     /** @var int */
     protected $sequence;
-
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
 
     /**
      * @return SubmissionBox
@@ -104,8 +86,4 @@ class Level
         $this->sequence = $sequence;
         return $this;
     }
-
-
-
-
 }

@@ -43,6 +43,7 @@ class LevelMapper extends Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
 
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
+        $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
     }
 
 
