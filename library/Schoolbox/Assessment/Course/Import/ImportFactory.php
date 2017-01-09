@@ -445,8 +445,8 @@ class ImportFactory
             $assessmentImpl = new DueWorkAssessment();
             $assessmentImpl = $this->setDueWorkAccepts(
                 $assessmentImpl,
-                $row['idw.accept_submission'],
-                $row['idw.multi_submission']
+                $row['sdw.accept_submission'],
+                $row['sdw.multi_submission']
             );
 
         } elseif ($row['iqz.id']) {

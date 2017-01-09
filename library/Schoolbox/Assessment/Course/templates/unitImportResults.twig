@@ -272,13 +272,14 @@
                                             {# publish date is always relevant #}
                                             {% include '@course/import/date.twig' with {
                                                 assessmentDate: assessment.publishAt,
-                                                unitDate: unitImpl.openDate,
+                                                unitDate: displayStartDate,
                                                 inputPrefix: inputPrefix,
                                                 dateProperty: 'publish',
                                                 dateSyncProperty: publishDateSync,
                                                 assessmentId: assessmentSpec.id
                                             } only %}
-
+{% if assessmentSpec.acceptOnline %}asdf
+                                            {% endif %}
                                             {# open date is relevant when accepting responses #}
                                             {% if acceptingResponses %}
                                                 {% include '@course/import/date.twig' with {
@@ -393,7 +394,7 @@
                                                     {# publish date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
                                                     assessmentDate: assessment.publishAt,
-                                                    unitDate: unitImpl.openDate,
+                                                    unitDate: displayStartDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync,

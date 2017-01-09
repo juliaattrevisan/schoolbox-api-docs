@@ -511,27 +511,36 @@ class Controller extends Base\Base
 
         if ('import' == $action) {
             $dto = $importFactory->buildForNewImport($unitImpls);
-        } elseif ('modify' == $action) {
-            $dto = $importFactory->buildForImportModify($unitImpls);
-        } else {
-            throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
-        }
+            $assessmentPairs = $dto->getAssessmentPairs();
 
-
-        // Don't know that this is right, but the project doesn't have any assessables in it so I'm shoving them in about as elegantly as the
-        // Americans shoved Trump into power...
-
-        $assessmentPairs = $dto->getAssessmentPairs();
-
-        foreach ($assessmentPairs as $assessmentPair) {
-            foreach ($assessmentPair as $pair) {
-                $specification = $pair->getSpecification();
-                if ($specification instanceof Project) {
-                    $specification->setAssessables(
-                        $this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId())
-                    );
+            foreach ($assessmentPairs as $assessmentPair) {
+                foreach ($assessmentPair as $pair) {
+                    $specification = $pair->getSpecification();
+                    if ($specification instanceof Project) {
+                        $specification->setAssessables(
+                            $this->getAssessmentMapperProxy()->findAllByProjectId($specification->getId())
+                        );
+                    }
                 }
             }
+
+        } elseif ('modify' == $action) {
+            $dto = $importFactory->buildForImportModify($unitImpls);
+            $assessmentPairs = $dto->getAssessmentPairs();
+
+            foreach ($assessmentPairs as $assessmentPair) {
+                foreach ($assessmentPair as $pair) {
+                    $implementation = $pair->getImplementation();
+                    if ($implementation instanceof Project) {
+
+                        $implementation->setAssessables(
+                            $this->getAssessmentMapperProxy()->findAllByProjectId($implementation->getId())
+                        );
+                    }
+                }
+            }
+        } else {
+            throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
         }
 
         // respond with stage 4: coursework list
