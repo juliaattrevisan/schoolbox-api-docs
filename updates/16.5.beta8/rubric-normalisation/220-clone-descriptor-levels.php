@@ -1,16 +1,24 @@
 <?php
 /**
- * Copies rubric_levels from AssessmentSpec to AssessmentImpl
+ * Fixes the rubric_descriptor to rubric_level foreign key for two problems:
+ * 1. `descriptor`.`box_id` != `descriptor`.`level`.`box_id`, and
+ * 2. `descriptor`.`level` points to missing Level.
  *
- * There exists corrupt data such that:
- *   `descriptor`.`box_id` != `descriptor`.`level`.`box_id`
+ * These are both thought to be caused by levels not being cloned during course import.
+ * The second item is when the Assessment Spec has been deleted, and therefore the Level Specs were also deleted.
  *
- * This is thought to be caused by levels not being cloned during course import.
+ * A complication for the second case is that we don't have level.name and level.sequence available.
+ * We CANNOT assume LTR or RTL using descriptor.value. Will just have to leave as NULL.
  *
  * The resolution is to:
  * * clone such levels,
  * * link the level to the right box, and
  * * link each descriptor to the new level
+ *
+ * Need to check for following scenario:
+ * * Descriptor X points to Level Y, but Level Y does not exist.
+ * * This script create a new Level with ID = Y
+ * * Descriptor X now points to Level Y, but shouldn't.
  *
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -23,7 +31,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Clone Rubric Descriptor Levels', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Insert Rubric Descriptor Levels', [
     'verbose' => [ false, false, false ],
     'errors'  => E_ALL,
 ]);
@@ -35,18 +43,22 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     // Group descriptors by box and level where `descriptor.level.box` != `descriptor.box`
-    // Also get count to enable sanity check
+    // Also get count to enable sanity check.
+    // Sequence = 0 indicates 'Unknown' (rl.sequence is 1-based)
+    // Don't create levels pointing to missing subBoxes.
     $selectDescriptorsByBoxLevel = $db->prepare("
         SELECT
-          count(*)             'count',
-          rd.submission_box_id 'rd.box_id',
-          rd.level_id          'rl.id',
-          rl.name              'rl.name',
-          rl.sequence          'rl.sequence'
+          count(*)                 'count',
+          rd.submission_box_id     'rd.box_id',
+          rd.level_id              'rl.id',
+          COALESCE(rl.name, '')    'rl.name',
+          COALESCE(rl.sequence, 0) 'rl.sequence'
         FROM rubric_descriptor rd
-        JOIN rubric_level rl ON rl.id = rd.level_id
-        WHERE rl.box_id != rd.submission_box_id
+        LEFT JOIN rubric_level rl ON rl.id = rd.level_id
+        JOIN submission_box sb ON sb.id = rd.submission_box_id
+        WHERE (rl.box_id != rd.submission_box_id OR rl.id IS NULL)
         GROUP BY rd.submission_box_id, rd.level_id
+        ORDER BY rd.submission_box_id, rd.level_id
     ");
 
     $insertLevelQuery = $db->prepare("
