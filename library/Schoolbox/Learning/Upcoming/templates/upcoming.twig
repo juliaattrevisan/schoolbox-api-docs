@@ -88,7 +88,7 @@
                 height: height,
                 defaultView: anchor || 'month',
                 // Event limit: could be configured from session but leave global for now
-                eventLimit: Boolean('{{ config.calendar_collapse_events|escape('js') }}'),
+                eventLimit: false,
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
 
                 /**
@@ -218,7 +218,7 @@
                 {% for child in children %}
                 <li>
                     <div class="card small-12">
-                        <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id}) }}" title="View upcoming work">
+                        <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming work">
                             <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
                             <p>{{ child.formatName }}</p>
                             <p class="meta">{{ child.role.name }}</p>
