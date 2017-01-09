@@ -564,6 +564,16 @@ class MapperProxy
     }
 
     /**
+     * Optimized save method for assessable order.
+     *
+     * @param Collection $assessables A list of assessables to resequence
+     */
+    public function sequenceAssessments(Collection $assessables)
+    {
+        $this->baseMapper->sequenceAssessments($assessables->getColumnValues('id'));
+    }
+
+    /**
      * Helper method for retrieving an assessable data model's primary key value
      * (as distinct from its assessment ID).
      *
