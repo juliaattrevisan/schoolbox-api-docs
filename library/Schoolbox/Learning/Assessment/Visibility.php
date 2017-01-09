@@ -32,6 +32,7 @@ class Visibility
         $this->setAccess($access);
     }
 
+
     /**
      * Determines whether this upcoming IAssessable is visible to $user
      * at its most basic level. For students, the Publish Date must be
@@ -44,14 +45,8 @@ class Visibility
      * @param User $user
      * @return bool
      */
-    public function isUpcomingVisibleToUser(IAssessable $assessment, User $user)
+    public function isVisibleToUser(IAssessable $assessment, User $user)
     {
-        /* Closed IAssessables don't show
-         */
-        if ($assessment->getCloseAt()->isPast()) {
-            return false;
-        }
-
         /* Folder perms
          */
         $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getContext()->getFolder()->getId()]);
@@ -72,6 +67,21 @@ class Visibility
         }
 
         return false;
+    }
+
+    /**
+     * Determines if this is visible and has not passed its relevancy date, generally either close or due
+     *
+     * @param IAssessable $assessment
+     * @param User $user
+     * @return bool
+     */
+    public function isUpcomingVisibleToUser(IAssessable $assessment, User $user)
+    {
+        if ($assessment->getCloseAt()->isPast()) {
+            return false;
+        }
+        return $this->isVisibleToUser($assessment, $user);
     }
 
     /* Getters/Setters
