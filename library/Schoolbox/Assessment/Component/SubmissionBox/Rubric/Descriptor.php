@@ -37,6 +37,8 @@ class Descriptor implements ISoftDeletable
     private $description;
 
     /**
+     * Soft-delete column
+     *
      * @var bool
      */
     private $valid;

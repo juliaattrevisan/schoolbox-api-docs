@@ -20,13 +20,17 @@ class Level implements ISoftDeletable
     use DeletedAtDate;
 
     /** @var SubmissionBox */
-    protected $submissionBox;
+    private $submissionBox;
 
     /** @var string */
-    protected $name;
+    private $name;
 
-    /** @var int */
-    protected $sequence;
+    /**
+     * 1-indexed. 0 indicates unknown (most likely inserted during data-recovery but sequence unknown)
+     *
+     * @var int
+     */
+    private $sequence;
 
     /**
      * @return SubmissionBox
