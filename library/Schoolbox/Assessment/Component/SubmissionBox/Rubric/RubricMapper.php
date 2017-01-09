@@ -797,7 +797,7 @@ class RubricMapper
         $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
 
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
-        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
+        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
         $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
