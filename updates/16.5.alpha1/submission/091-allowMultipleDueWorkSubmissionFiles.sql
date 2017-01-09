@@ -10,6 +10,15 @@ ALTER TABLE `student_submission`
     ADD `deleted_at` DATETIME NULL DEFAULT NULL AFTER `submitted_at`
 ;
 
+-- Populate `created_at`, `updated_at` and `deleted_at`, then clear `submitted_at` if still a draft
+UPDATE `student_submission` `ss`
+    JOIN `submission_box` `sb` ON `ss`.`box_id`        = `sb`.`id`
+    JOIN `assessment`      `a` ON `sb`.`assessment_id` =  `a`.`id`
+SET ss.created_at = ss.submitted_at,
+    ss.updated_at = ss.submitted_at,
+    ss.deleted_at = a.deleted_at,
+    ss.submitted_at = IF(ss.draft, NULL, ss.submitted_at);
+
 -- Submission file table
 CREATE TABLE `student_submission_file` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
