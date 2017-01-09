@@ -844,9 +844,6 @@ $selector-width: 2.25rem;
 		@include list-interaction(expander, pointer);
 		li .expander{
 			width: 2.5rem;
-			label{
-				padding: 0 !important;
-			}
 		}
 	}
 	&.card-selectable {
