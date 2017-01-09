@@ -19,7 +19,7 @@
     <input id="{{ id }}_{{ dateProperty }}_date"
            name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
-           value="{% if assessmentDate.valid %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
+           value="{% if assessmentDate.valid and not assessmentDate.isNull %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
            data-assessment-id="{{ assessmentId }}"

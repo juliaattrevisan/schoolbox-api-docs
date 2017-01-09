@@ -392,18 +392,17 @@
                                                 <div data-assessment-dates="{{ assessable.id }}" {% if not isChecked %} style="display: none;"{% endif %}>
                                                     {# publish date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
-                                                    assessmentDate: assessment.publishAt,
+                                                    assessmentDate: assessable.publishAt,
                                                     unitDate: unitImpl.openDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync,
                                                     assessmentId: assessable.id
                                                     } only %}
-
                                                     {# open date is relevant when accepting responses #}
                                                     {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessment.openAt,
+                                                        assessmentDate: assessable.openAt,
                                                         unitDate: displayStartDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'open',
@@ -413,10 +412,9 @@
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
                                                     {% endif %}
-
                                                     {# due date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
-                                                    assessmentDate: assessment.dueAt,
+                                                    assessmentDate: assessable.dueAt,
                                                     unitDate: displayEndDate,
                                                     inputPrefix: inputPrefix,
                                                     dateProperty: 'due',
@@ -427,7 +425,7 @@
                                                     {# close (late) date is relevant when accepting responses #}
                                                     {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessment.closeAt,
+                                                        assessmentDate: assessable.closeAt,
                                                         unitDate: displayEndDate,
                                                         inputPrefix: inputPrefix,
                                                         dateProperty: 'close',
