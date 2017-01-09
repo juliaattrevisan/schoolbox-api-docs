@@ -4,18 +4,18 @@
     <div class="column small-12 medium-6">
         <label>
             {{ dateTitle }} Date
-            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.localShort }}" data-datepicker {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate="{{ syncEndDate }}"{% endif %} />
+            <input name="{{ dateProperty }}Date" type="text" value="{{ dateValue.database }}" data-datepicker {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate="{{ syncEndDate }}"{% endif %} />
         </label>
     </div>
 
-    <div class="column small-12 medium-6">
-        <div class="timepick">
-            <label>
-                {{ dateTitle }} Time
-                <input name="{{ dateProperty }}Time" type="text" value="{{ dateValue.timeOnly }}" data-timepicker />
-            </label>
-        </div>
-    </div>
+    {#<div class="column small-12 medium-6">#}
+        {#<div class="timepick">#}
+            {#<label>#}
+                {#{{ dateTitle }} Time#}
+                {#<input name="{{ dateProperty }}Time" type="text" value="{{ dateValue.timeOnly }}" data-timepicker />#}
+            {#</label>#}
+        {#</div>#}
+    {#</div>#}
 
 </div>
 {% endmacro %}

@@ -53,7 +53,36 @@ class Controller extends Base
      * @param int $id The ID number of the javascript picker
      * @param string $value Default date to display
      */
-    public function getPicker($id, $display, $database, $value) {
+    public function getPicker($id, $display, $database, $value, $type) {
+
+        $timetable = $this->getTimetable();
+        $terms = $this->getTerms();
+        $timetableDayNumber = $this->getTimetableDay($value);
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@pickerDatetime/picker.twig',
+                'format' => 'nochrome',
+                'data' => [
+                    'id' => $id,
+                    'value' => $value,
+                    'type' => $type,
+                    'displayFormat' => urldecode($display),
+                    'databaseFormat' => urldecode($database),
+                    'timetable' => $timetable,
+                    'terms' => $terms,
+                    'timetableDay' => $timetableDayNumber
+                ]
+            )
+        );
+    }
+
+    /**
+     * Return the HTML picker for injecting into modal
+     * @param int $id The ID number of the javascript picker
+     * @param string $value Default date to display
+     */
+    public function getDueworkPicker($id, $display, $database, $value) {
 
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
@@ -251,8 +280,8 @@ class Controller extends Base
 
         $timezoneUTC = new \DateTimeZone('UTC');
 
-        $start = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC);
-        $end = \Alaress_Date_Format::newUrlDate($date, $timezoneUTC)->addHours(23)->addMinutes(59)->addSeconds(59);
+        $start = \Alaress_Date_Format::newDatabaseDate($date, $timezoneUTC);
+        $end = $start->addHours(23)->addMinutes(59)->addSeconds(59);
 
         // Find out the term this date falls in (needed to locate assessments)
 
@@ -265,7 +294,6 @@ class Controller extends Base
         foreach ($externalStudents as $studentCurrent) {
             $externalIds[] = $studentCurrent['synergy_id'];
         }
-
         $userIdLookup = $this->getUserMapper()->findCheaplyByExternalIds($externalIds);
 
         // Iterate each student in the class
@@ -291,7 +319,7 @@ class Controller extends Base
                 }
             }
 
-            if ($assessmentsDue > 0) {
+//            if ($assessmentsDue > 0) {
                 $students[] = [
                     'id' => $student->getId(),                          // Required for link to student profile
                     'externalId' => $studentCurrent['synergy_id'],      // Required for rendering student photo
@@ -299,7 +327,7 @@ class Controller extends Base
                     'lastname' => $studentCurrent['lastname'],
                     'assessments' => $assessmentsDue                    // Number of assessments they have due on the date
                 ];
-            }
+//            }
         }
 
         // Sort by the number of assignments due

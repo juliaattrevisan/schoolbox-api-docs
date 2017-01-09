@@ -44,19 +44,18 @@ convertFormat = function (format) {
 $.fn.alaressDateTimePicker = function(optionsOverride) {
 
     // Default options
-
+    // Default picker type: event
     var options = {
         databaseFormat: 'Y-m-d H:i:S',
         displayFormat: 'd/m/Y h:i K',
         displayFormatDate: 'd/m/Y',
+        type: event
     };
 
     // Override with user any options
-
     for (var attribute in optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
-
     // Counter for uniquely identifying these things
 
     window.pickerCount = 0;
@@ -115,7 +114,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
                 // if datetime, pass date only
 
                 // AJAX in the modal contents if they haven't already been loaded
-                picker.load('/picker/datetime/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + encodeURI(originalValue), function () {
+                picker.load('/picker/datetime/type/'+options.type+'/display/' + encodeURIComponent(options.displayFormat) + '/database/' + encodeURIComponent(options.databaseFormat) + '/id/' + pickerId + '/value/' + encodeURI(originalValue), function () {
 
                     $('#pickerCalendar' + pickerId).data('dateDisplay', elementClicked.val());
 

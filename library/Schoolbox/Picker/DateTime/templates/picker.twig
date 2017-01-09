@@ -301,6 +301,38 @@
         var term = $('select[name*="term"]').val();
         var cycle = $('select[name*="cycle"]').val();
 
+        {% if type == 'duework'  %}
+        $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
+                .done(function (data) {
+
+                    {# Ajax returned date #}
+                    timetableDate = moment(data.date, convertFormat('{{ databaseFormat }}'));
+
+                    {# Clear out any old appointments #}
+                    timetableAppointments.html('<h3>'+timetableDate.format(convertFormat('l, F J Y h:iK'))+'</h3>');
+
+                    if (data.appointments.length == 0) {
+
+                        timetableAppointments.append('No events found');
+
+                    } else {
+
+                        {# Populate with appointments for the selected date #}
+                        for (var i = 0; i < data.appointments.length; i++) {
+                            timetableAppointments.append(
+                                    data.appointments[i].title + '<br>' +
+                                    data.appointments[i].startDateTime + '<br>'
+                            )
+                        }
+
+                    }
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified period');
+                });
+
+        {% else %}
+        {# Else fetch events #}
         $.get(('{{ routeLookup('pickerDatetime.getByTimetableDay') }}').replace(/{campusId}/g, campus).replace(/{termId}/g, term).replace(/{cycle}/g, cycle).replace(/{day}/g, day))
                 .done(function (data) {
 
@@ -329,6 +361,7 @@
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified period');
                 });
+        {% endif %}
     });
 
     {# Submit timetable datetime #}
@@ -413,6 +446,43 @@
 
             if(newDate !== latestDate) {
 
+                {% if type == 'duework'  %}
+
+                var pickerClassList = $('#pickerClassList{{ id }}');
+
+                pickerClassList.html('Loading Student List');
+                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, '529').replace(/{date}/g,  encodeURIComponent(instance.altInput.value)))
+
+                        .done(function (data) {
+
+                            if (data.appointments.length == 0) {
+
+                                {# There we no appointment on the selected date #}
+
+                                pickerAppointments.html('No events found');
+
+                            } else {
+
+                                {# Clear out any old appointments #}
+
+                                pickerAppointments.html('');
+
+                                {# Populate with appointments for the selected date #}
+
+                                for (var i = 0; i < data.appointments.length; i++) {
+                                    pickerAppointments.append(
+                                            data.appointments[i].title + '<br>' +
+                                            data.appointments[i].startDateTime + '<br>'
+                                    )
+                                }
+                            }
+                        })
+                        .fail(function () {
+                            console.log('Failed to retrieve appointments for specified date');
+                        });
+
+                {% else %}
+
                 {# AJAX in appointments for the selected date #}
 
                 var pickerAppointments = $('#pickerAppointments{{ id }}');
@@ -447,7 +517,7 @@
                         .fail(function () {
                             console.log('Failed to retrieve appointments for specified date');
                         });
-
+                {% endif %}
             }
             latestDate = newDate;
         }
