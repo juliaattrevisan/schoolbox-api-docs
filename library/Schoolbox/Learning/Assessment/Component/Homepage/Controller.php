@@ -82,7 +82,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
             /* De-dupe due to curriculum nodes (maybe there is a better way)
              */
-            $this->assessments = (new Collection())->mergeUnique($temp);
+            $this->assessments = (new Collection())->mergeUnique($temp)->limit($this->getConfig('size'));
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
