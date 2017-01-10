@@ -79,7 +79,7 @@
         line-height: inherit;
     }
 </style>
-<div class="row">
+<div class="row">{{ value }}
     <dl class="tabs" data-tab>
         <dd class=""><a href="#" id="tab-1-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: 4.19999px; left: 4px;"></span>Date</a></dd>
         <dd class=""><a href="#" id="tab-2-{{ id }}"  tabindex="0"><span class="splash animate" style="height: 54px; width: 54px; top: -9.80001px; left: 1.29999px;"></span>Timetable</a></dd>
@@ -381,7 +381,7 @@
         defaultDate: '{{ value }}',
         dateFormat: '{{ displayFormat }}',
         inline: true,
-        altInput: true,
+        altInput: false,
         altFormat: '{{ databaseFormat }}',
         enableTime: true,
         allowInput: true,
@@ -417,10 +417,10 @@
                     calendarDiv.removeClass('hasTime');
                     $('#allday').val(1);
                     {# Set time to 00:00:00#}
-                    var allDay = moment(instance.altInput.value, convertFormat('{{ databaseFormat }}')).hours(0).minutes(0).format(convertFormat('{{ databaseFormat }}'));
+                    var allDay = moment(instance.input.value, convertFormat('{{ databaseFormat }}')).hours(0).minutes(0).format(convertFormat('{{ databaseFormat }}'));
                     instance.setDate(allDay);
                     allDay = moment(allDay).format('DD/MM/YYYY');
-                    $('#pickerDisplay{{ id }}').val(allDay);
+                    $('*[data-pickerid="{{ id }}"]').val(allDay);
                     console.log(allDay);
 
                 }
@@ -451,7 +451,7 @@
                 var pickerClassList = $('#pickerClassList{{ id }}');
 
                 pickerClassList.html('Loading Student List');
-                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(instance.altInput.value)))
+                $.get(('{{ routeLookup('pickerDatetime.getByClassCode') }}').replace(/{classCode}/g, 'CH123').replace(/{date}/g,  encodeURIComponent(instance.input.value)))
 
                         .done(function (data) {
 
@@ -489,7 +489,7 @@
 
                 pickerAppointments.html('Loading events');
 
-                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(instance.altInput.value)))
+                $.get('{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'.replace(/_date_/g, encodeURIComponent(instance.input.value)))
                         .done(function (data) {
 
                             if (data.appointments.length == 0) {

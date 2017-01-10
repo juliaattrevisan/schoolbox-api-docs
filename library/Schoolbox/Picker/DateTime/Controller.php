@@ -53,10 +53,11 @@ class Controller extends Base
      * @param int $id The ID number of the javascript picker
      * @param string $value Default date to display
      */
-    public function getPicker($id, $display, $database, $value, $type) {
+    public function getPicker($id, $value, $type) {
 
         $timetable = $this->getTimetable();
         $terms = $this->getTerms();
+        $value = \Alaress_Date_Format::newLocal(urldecode($value));
         $timetableDayNumber = $this->getTimetableDay($value);
 
         $this->getResponse()->content->set(
@@ -65,10 +66,10 @@ class Controller extends Base
                 'format' => 'nochrome',
                 'data' => [
                     'id' => $id,
-                    'value' => $value,
+                    'value' => $value->getLocal(),
                     'type' => $type,
-                    'displayFormat' => urldecode($display),
-                    'databaseFormat' => urldecode($database),
+//                    'displayFormat' => urldecode($display),
+//                    'databaseFormat' => urldecode($database),
                     'timetable' => $timetable,
                     'terms' => $terms,
                     'timetableDay' => $timetableDayNumber
@@ -194,9 +195,9 @@ class Controller extends Base
         return $date;
     }
 
-    public function getTimetableDay($date) {
+    public function getTimetableDay(\Alaress_Date_Format $date) {
 
-        $date = new \Alaress_Date_Format($date, 'Y-m-d H:i:S');
+//        $date = new \Alaress_Date_Format($date, 'Y-m-d H:i:S');
 
         //Get term for given date
         $term = $this->getTermMapper()->findForDate($date);

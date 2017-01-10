@@ -73,15 +73,15 @@ switch ($_REQUEST['action']) {
             /* Events recur until this time
              */
             if (strlen($_POST['repeat_until'])) {
-                $until = Alaress_Date_Format::newDatabaseDate($_POST['repeat_until'])->endOfDay();
+                $until = Alaress_Date_Format::newDabaseDate($_POST['repeat_until'])->endOfDay();
             }
             /* Start and end dates
              */
-            $startDate = Alaress_Date_Format::newDatabaseDate($_POST['startDate']);
+            $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
 //                ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
 //                ->setMinute($_POST['startMinute'])
 //            ;
-            $endDate = Alaress_Date_Format::newDatabaseDate($_POST['endDate']);
+            $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
 //                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
 //                ->setMinute($_POST['endMinute'])
 //            ;

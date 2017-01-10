@@ -82,7 +82,7 @@ if (is_numeric($_GET['eventID'])) {
      * wasn't useless somehow
      */
     if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-        $publishDate = $event->getPublishDateTime()->getDatabase();
+        $publishDate = $event->getPublishDateTime()->getLocal();
     } else {
         $publishDate = '';
     }
@@ -108,7 +108,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_ATTENDANCE'     => $event->getAttendance() ? 'checked="checked"' : '',
-            'EVENT_START_DATE'     => Scrub::text($event->getStartDateTime()->getDatabase()),
+            'EVENT_START_DATE'     => Scrub::text($event->getStartDateTime()->getLocal()),
             'EVENT_START_HOUR'     => Scrub::text($event->getStartDateTime()->get12Hour()),
             'EVENT_START_MIN'      => Scrub::text($event->getStartDateTime()->getMinute(true)),
             'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
@@ -117,7 +117,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_PM'       => $event->getStartDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_DATE'       => Scrub::text($event->getEndDateTime()->getDatabase()),
+            'EVENT_END_DATE'       => Scrub::text($event->getEndDateTime()->getLocal()),
             'EVENT_END_HOUR'       => Scrub::text($event->getEndDateTime()->get12Hour()),
             'EVENT_END_MIN'        => Scrub::text($event->getEndDateTime()->getMinute(true)),
             'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
@@ -210,7 +210,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_ATTENDANCE'     => '',
-            'EVENT_START_DATE'     => $event->getStartDateTime()->getDatabase(),
+            'EVENT_START_DATE'     => $event->getStartDateTime()->getLocal(),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->get12Hour(),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getMinute(true),
             'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
@@ -219,7 +219,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_PM'       => $event->getStartDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_DATE'       => $event->getEndDateTime()->getDatabase(),
+            'EVENT_END_DATE'       => $event->getEndDateTime()->getLocal(),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->get12Hour(),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getMinute(true),
             'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
