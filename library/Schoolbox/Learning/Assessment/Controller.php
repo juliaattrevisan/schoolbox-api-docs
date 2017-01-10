@@ -269,7 +269,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'breadcrumbs'     => $this->getBakery()->produceFromContext($context, $assessment),
             'assessment'      => $assessment,
             'folder'          => $context->getFolder(),
-            'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
+//            'curriculumNodes' => $context->getFolder()->getCurriculumNodes(),
             'assessmentType'  => AssessmentType::objectToString($assessment),
             'visibility'      => $assessment->getMarkVisibility(),
         ];
