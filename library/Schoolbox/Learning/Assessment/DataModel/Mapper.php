@@ -160,6 +160,21 @@ class Mapper extends BaseMapper
             'specificationAssessment'
         );
 
+        /* Curriculum Nodes
+         */
+        $this->joinsVia(
+            'curriculum_node_for_assessment',
+            \Schoolbox\Curriculum\Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'assessment_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
+
+
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
@@ -365,7 +380,13 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
-                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
+                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_assessment.area.source', 'cnas')}
+
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
@@ -384,6 +405,11 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa')}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment', '', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_assessment.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -452,6 +478,8 @@ class Mapper extends BaseMapper
         $dueWorkIds        = [];
         $quizIds           = [];
         $contextProjectIds = [];
+        $assessmentIds     = [];
+
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
@@ -521,6 +549,11 @@ class Mapper extends BaseMapper
                 // Load context for this project itself
                 $contextProjectIds[] = $row['pa.assessment_id'];
             }
+
+            /* Remember this list so we can augment with curriculum codes later
+             */
+            $assessmentIds[$model->getId()] = $model->getId();
+
             $model->setAssessmentContext($context);
             $modelList->add($model);
         }
@@ -543,6 +576,23 @@ class Mapper extends BaseMapper
 
         return $modelList;
     }
+
+    protected function augmentListWithCurriculumCodes($modelList, $assessmentIds)
+    {
+
+        /* Collect the curriculum codes associated with this Assessment
+         */
+        /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+        $curriculumNode = $this->getJoinMapper('curriculum_node_for_assessment')
+            ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+        if ($curriculumNode->getId()) {
+            $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+        }
+
+        new \Alaress_Probe($row, $curriculumNodes);
+    }
+
+
     /**
      * Augments the list from hydrateSelect() with due work files.
      *
