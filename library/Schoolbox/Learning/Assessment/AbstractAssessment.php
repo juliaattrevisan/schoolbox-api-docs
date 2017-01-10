@@ -69,6 +69,10 @@ abstract class AbstractAssessment implements IAssessable
     protected $weight;
 
     /**
+     * Number of days an AssessmentSpec is expected to take.
+     *
+     * This is used to automatically populate dates when importing CourseSpecs.
+     *
      * @var int
      */
     protected $duration;
