@@ -317,12 +317,12 @@
                                             {# close (late) date is relevant when accepting responses #}
                                             {% if acceptingResponses %}
                                                 {% include '@course/import/date.twig' with {
-                                                assessmentDate: assessment.closeAt,
-                                                unitDate: displayEndDate,
-                                                inputPrefix: inputPrefix,
-                                                dateProperty: 'close',
-                                                dateLabel: 'Late',
-                                                assessmentId: assessmentSpec.id
+                                                    assessmentDate: assessment.closeAt,
+                                                    unitDate: displayEndDate,
+                                                    inputPrefix: inputPrefix,
+                                                    dateProperty: 'close',
+                                                    dateLabel: 'Late',
+                                                    assessmentId: assessmentSpec.id
                                                 } only %}
                                             {% else %}
                                                 <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -349,9 +349,6 @@
                                             {% set assessment = assessmentImpl ?: assessmentSpec %}
                                             {% set subInputPrefix = inputPrefix ~ '[a][' ~ assessment.id ~ ']' %}
                                             {% set subIsChecked = assessmentImpl or 'import' == unitAction %}
-
-                                            <input type="hidden" name="{{ subInputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
-                                            <input type="hidden" name="{{ subInputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                             {% if assessment.duration is not empty %}
 
@@ -387,7 +384,10 @@
                                                 {% set displayEndDate = endDate %}
                                             {% endif %}
 
-                                            <li data-type="assessment_row" data-project="{{ project.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
+                                            <li data-type="assessment_row" data-project="{{ project.id }}"{% if not subIsChecked or not isChecked %} style="display: none;"{% endif %}>
+
+                                                <input type="hidden" name="{{ subInputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
+                                                <input type="hidden" name="{{ subInputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
                                                 <div class="compact card small-12 large-4">
                                                     <input type="checkbox"
@@ -419,12 +419,12 @@
                                                     {# open date is relevant when accepting responses #}
                                                     {% if assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessment.openAt,
-                                                        unitDate: displayStartDate,
-                                                        inputPrefix: subInputPrefix,
-                                                        dateProperty: 'open',
-                                                        dateSyncProperty: 'due',
-                                                        assessmentId: assessment.id
+                                                            assessmentDate: assessment.openAt,
+                                                            unitDate: displayStartDate,
+                                                            inputPrefix: subInputPrefix,
+                                                            dateProperty: 'open',
+                                                            dateSyncProperty: 'due',
+                                                            assessmentId: assessment.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -442,12 +442,12 @@
                                                     {# close (late) date is relevant when accepting responses #}
                                                     {% if assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessment.closeAt,
-                                                        unitDate: displayEndDate,
-                                                        inputPrefix: subInputPrefix,
-                                                        dateProperty: 'close',
-                                                        dateLabel: 'Late',
-                                                        assessmentId: assessment.id
+                                                            assessmentDate: assessment.closeAt,
+                                                            unitDate: displayEndDate,
+                                                            inputPrefix: subInputPrefix,
+                                                            dateProperty: 'close',
+                                                            dateLabel: 'Late',
+                                                            assessmentId: assessment.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
