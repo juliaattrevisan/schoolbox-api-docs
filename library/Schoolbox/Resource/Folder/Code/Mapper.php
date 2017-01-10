@@ -19,37 +19,10 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasModel(Model::class);
         $this->hasTable('folder_code');
-        $this->hasMap(
-            array(
-                'column'   => 'folder_id',
-                'property' => 'folder',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'folder',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'code',
-                'property' => 'code',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasJoin(
-            'folder', array(
-                'mapper'    => FolderMapper::class,
-                'this_key'  => 'folder_id',
-                'other_key' => 'id',
-            )
-        );
 
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('code', self::TYPE_STRING);
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
