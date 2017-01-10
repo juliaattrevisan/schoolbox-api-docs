@@ -274,7 +274,7 @@
                             </div>
                             <nav>
                                 {% if quizzes[assessment.id] is not empty %}
-                                    <a class="icon-view" href="http://192.168.36.10/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
+                                    <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
                                 {% endif %}
                                 {% if assessment.getFamilyName == 'dueWork' and feedback %}
                                     <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
