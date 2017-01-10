@@ -217,11 +217,21 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     'assessmentId'   => $assessmentId,
                     'taskInstanceId' => $taskId,
                 ]);
-                $log->debug('Created implementation/specification assessment relation');
+
+                if ($insertAssessmentImplementationRelationQuery->rowCount() > 0) {
+                    $log->debug('Created implementation/specification assessment relation');
+
+                } else {
+                    $log->warning('No implementation/specification assessment relation was created!');
+                    $log->warning('This is probably because this implementation of an assessment has no specification.');
+                    $log->warning('This is probably okay, because an assessment can be added to an implementation separate from its specification.');
+                    $warningCount++;
+                }
+
             } catch (PDOException $e) {
                 $log->warning('Could not create implementation/specification assessment relation!');
                 $log->warning('This is probably because this implementation of an assessment has no specification.');
-                $log->warning('This is probably okay, because an assessment to be added to an implementation separate from its specification.');
+                $log->warning('This is probably okay, because an assessment can be added to an implementation separate from its specification.');
                 $log->warning($e->getMessage());
                 $warningCount++;
             }

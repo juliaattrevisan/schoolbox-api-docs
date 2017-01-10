@@ -48,11 +48,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
 
     // Update assessment type queries
-    // (Tasks which are related to a due work or quiz get deleted - the quiz gets related directly to the assessment)
     $updateTaskQuery    = $db->prepare("UPDATE task SET assessment_id = :assessmentId WHERE id = :taskId");
     $updateDueWorkQuery = $db->prepare("UPDATE submission_box SET assessment_id = :assessmentId WHERE id = :boxId");
     $updateQuizQuery    = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
-    $deleteTaskQuery    = $db->prepare("DELETE FROM task WHERE id = :taskId");
 
     // Select queries
     $selectTaskQuery = $db->prepare("
@@ -162,16 +160,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created task/assessment relation');
 
             if ($quizId) {
-                // Tasks with a quiz: delete task, and associate quiz with assessment
+                // Tasks with a quiz: associate quiz with assessment
                 $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $quizId]);
-                $deleteTaskQuery->execute(['taskId' => $taskId]);
-                $log->debug('Task has quiz - created quiz/assessment relation, deleted task');
+                $log->debug('Task has quiz - created quiz/assessment relation');
             }
             if ($boxId) {
-                // Tasks with a due work: delete task, and associate due work with assessment
+                // Tasks with a due work: associate due work with assessment
                 $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $boxId]);
-                $deleteTaskQuery->execute(['taskId' => $taskId]);
-                $log->debug('Task has due work - created due work/assessment relation, deleted task');
+                $log->debug('Task has due work - created due work/assessment relation');
             }
 
             // Associate this assessment with the task's course spec
