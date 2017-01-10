@@ -6,21 +6,11 @@
         dto:      DataTransferObject,
 #}
 
-
 {% set unitSpec                    = unitImpl.specification %}
 {% set assessmentPairs             = dto.assessmentPairs[unitSpec.id] %}
 {% set unitAssessmentCount         = dto.availableAssessmentCounts[unitSpec.id] %}
 {% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
 {% set unitAction                  = unitImpl.id ? 'modify' : 'import' %}
-
-{# Have to clone the date, otherwise incrementing one updates both #}
-
-{% set startDate   = clone(unitImpl.openDate) %}
-{% set endDate     = clone(unitImpl.openDate) %}
-
-{# The units due date will be used as the maximum date allowed for the auto-calculation#}
-
-{% set maximumDate = clone(unitImpl.dueDate) %}
 
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_impl_id]" value="{{ unitImpl.id }}" />
@@ -53,9 +43,6 @@
                                     inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
                                     depth:           0,
                                     unitAction:      unitAction,
-                                    startDate:       startDate,
-                                    endDate:         endDate,
-                                    maximumDate:     maximumDate,
                                     project:         null,
                                     hideRows:        false
                                 } only %}

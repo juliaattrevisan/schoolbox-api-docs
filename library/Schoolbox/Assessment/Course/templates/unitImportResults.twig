@@ -77,7 +77,8 @@
                 $assessmentRow      = $input.closest('[data-assessment=' + assessmentId + ']'),
                 $dates              = $assessmentRow.find('[data-assessment-dates=' + assessmentId + ']'),
                 $unit               = $input.closest('[data-unit]'),
-                $projectAssessables = $('[data-project=' + assessmentId + ']'),
+                $subAssessmentList  = $assessmentRow.find('[data-project=' + assessmentId + ']'),
+                $projectAssessments = $subAssessmentList.find('[data-parent-project=' + assessmentId + ']'),
                 $countSelectedElem  = $unit.find('[data-show-count]');
 
             // Update display of how many assessments are currently selected in this unit
@@ -95,15 +96,25 @@
 
             // Show/Hide sub-assessment in Project
             if ($input.prop('checked')) {
-                $projectAssessables.each(function(idx, elem){
-                    console.log(idx);
-                    console.log(elem);
+
+                // Only enable dates for sub-assessments that are selected
+                $projectAssessments.each(function(idx, elem){
+                    var $subRow         = $(elem);
+                    var subAssessmentId = $subRow.data('assessment');
+                    var $checkbox       = $subRow.find('[data-assessment-import=' + subAssessmentId + ']');
+
+                    // Enable all directly-nested checkboxes
+                    $checkbox.prop('disabled', false);
+                    if($checkbox.prop('checked')){
+                        var $dates = $subRow.find('[data-assessment-dates=' + subAssessmentId + ']');
+                        $dates.find('input').prop('disabled', false);
+                    }
                 });
-                $projectAssessables.find('input').prop('disabled', false);
-                $projectAssessables.show();
+                $subAssessmentList.show();
             } else {
-                $projectAssessables.hide();
-                $projectAssessables.find('input').prop('disabled', true);
+                $subAssessmentList.hide();
+                // Disable everything
+                $subAssessmentList.find('input').prop('disabled', true);
             }
         });
     });

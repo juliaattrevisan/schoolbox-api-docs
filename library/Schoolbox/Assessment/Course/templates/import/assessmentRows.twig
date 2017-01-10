@@ -2,19 +2,20 @@
     Recursive template to render assessment rows in the final stage of the Course import/modify screen.
     Recursive so we can render assessments inside projects.
 
-    assessmentPairs: AssessmentPair[]    - The assessments to render
-    inputPrefix:     string              - Recursively build form data
-    depth:           int                 - Level of recursion
-    unitAction:      ['import'|'modify'] - Whether we are importing from UnitSpec, or modifying existing UnitImpl
-    startDate:       ADF
-    endDate:         ADF
-    maximumDate:     ADF
-    project:         Project|null        - If called recusively, the parent Project of the AssessmentPairs
-    hideRows:        bool                - If true, hide the list of Assessments. (eg Project is un-checked)
+    Data:
+        assessmentPairs: AssessmentPair[]    - The assessments to render
+        inputPrefix:     string              - Recursively build form data
+        depth:           int                 - Level of recursion
+        unitAction:      ['import'|'modify'] - Whether we are importing from UnitSpec, or modifying existing UnitImpl
+        startDate:       ADF
+        endDate:         ADF
+        maximumDate:     ADF
+        project:         Project|null        - If called recusively, the parent Project of the AssessmentPairs
+        hideRows:        bool                - If true, hide the list of Assessments. (eg Project is un-checked)
 #}
 {% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
 
-<ul class="information-list {% if depth %}no-pad{% endif %}" style="{% if hideRows %}display: none;{% endif %}">
+<ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
     {% for assessmentPair in assessmentPairs %}
 
         {# decide some things about this assessment #}
@@ -23,25 +24,15 @@
         {% set assessment           = assessmentImpl ?: assessmentSpec %}
         {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
         {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
-        {% set isChecked            = assessmentImpl or 'import' == unitAction %}
 
-        {#{% if assessment.duration is not empty %}#}
-            {#{% if assessment is quiz %}#}
-                {# Assuming quizzes need to be completed in one day #}
-                {#{% set endDate = endDate.addDays(1) %}#}
-            {#{% else %}#}
-                {# Don't try and increment if duration is null #}
-                {#{% if assessment.duration is not empty %}#}
-                    {#{% set endDate = endDate.addDays(assessment.duration) %}#}
-                {#{% endif %}#}
-            {#{% endif %}#}
-            {# Restrict date range #}
-            {#{% if endDate.gt(maximumDate) %}#}
-                {#{% set endDate = clone(maximumDate) %}#}
-            {#{% endif %}#}
-        {#{% endif %}#}
+        {# Check the checkbox if any of following is true:
+         # * Assessment already imported
+         # * New import of this unit
+         # * depth >= 1 && parent not not imported (ie inside a non-imported project)
+         #}
+        {% set isChecked = (assessmentImpl) or ('import' == unitAction) or (depth > 0 and not assessmentPair.parentPair.implementation) %}
 
-        <li data-assessment="{{ assessment.id }}" {% if project %}data-project="{{ project.id }}"{% endif %}>
+        <li data-assessment="{{ assessment.id }}" {% if project %}data-parent-project="{{ project.id }}"{% endif %}>
             <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec.id }}" />
             <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl.id }}" />
 
@@ -65,40 +56,8 @@
             </div>
             <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
 
-                {# If this is a project we need to set the due date appropriately based on its constituent assessments #}
-                {#{% if assessment is project %}#}
-                    {# We need to store the end date we were currently at so we can revert after this calculation #}
-                    {#{% set endDateOriginal = clone(endDate) %}#}
-                    {#{% for assessable in assessment.assessables %}#}
-                        {#{% if assessable.duration is not empty %}#}
-                            {#{% if assessable is quiz %}#}
-                                {# Assuming quizzes need to be completed in one day #}
-                                {#{% set endDate = endDate.addDays(1) %}#}
-                            {#{% else %}#}
-                                {# Don't try and increment if duration is null #}
-                                {#{% if assessable.duration is not empty %}#}
-                                    {#{% set endDate = endDate.addDays(assessable.duration) %}#}
-                                {#{% endif %}#}
-                            {#{% endif %}#}
-                            {# Restrict date range #}
-                            {#{% if endDate.gt(maximumDate) %}#}
-                                {#{% set endDate = clone(maximumDate) %}#}
-                            {#{% endif %}#}
-                        {#{% endif %}#}
-                    {#{% endfor %}#}
-                    {#{% set displayStartDate = startDate %}#}
-                    {#{% set displayEndDate   = endDate %}#}
-                {#{% else %}#}
-                    {#{% if assessment.duration is empty %}#}
-                        {#{% set displayStartDate = unitImpl.openDate %}#}
-                        {#{% set displayEndDate = unitImpl.dueDate %}#}
-                    {#{% else %}#}
-                        {#{% set displayStartDate = startDate %}#}
-                        {#{% set displayEndDate = endDate %}#}
-                    {#{% endif %}#}
-                {#{% endif %}#}
 
-                 {#publish date is always relevant #}
+                {#publish date is always relevant #}
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.publishAt,
                     unitDate: unitImpl.openDate,
@@ -108,7 +67,7 @@
                     assessmentId: assessmentSpec.id
                 } only %}
 
-                 {#open date is relevant when accepting responses#}
+                {#open date is relevant when accepting responses#}
                 {% if acceptingResponses %}
                     {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.openAt,
@@ -122,7 +81,7 @@
                     <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
                 {% endif %}
 
-                 {#due date is always relevant#}
+                {#due date is always relevant#}
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.dueAt,
                     unitDate: displayEndDate,
@@ -132,7 +91,7 @@
                     assessmentId: assessmentSpec.id
                 } only %}
 
-                 {#close (late) date is relevant when accepting responses#}
+                {#close (late) date is relevant when accepting responses#}
                 {% if acceptingResponses %}
                     {% include '@course/import/date.twig' with {
                         assessmentDate: assessment.closeAt,
@@ -146,19 +105,11 @@
                     <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
                 {% endif %}
 
-                {# If this is a project we need to put the end date back so that we can render the dates of #}
-                {# its assessables correctly #}
-
-                {#{% if assessment is project %}#}
-                    {#{% set endDate = endDateOriginal %}#}
-                {#{% endif %}#}
-
             </div>
-        </li>
 
-        {#Recurse #}
-        {% if assessmentPair.subPairs|length %}
-            {% include '@course/import/assessmentRows.twig' with {
+            {#Recurse #}
+            {% if assessmentPair.subPairs|length %}
+                {% include '@course/import/assessmentRows.twig' with {
                 assessmentPairs: assessmentPair.subPairs,
                 inputPrefix:     inputPrefix ~ '[' ~ assessment.id ~ '][a]',
                 depth:           depth + 1,
@@ -168,7 +119,10 @@
                 maximumDate:     maximumDate,
                 project:         assessment,
                 hideRows:        not isChecked
-            } only %}
-        {% endif %}
+                } only %}
+            {% endif %}
+        </li>
+
+
     {% endfor %}
 </ul>

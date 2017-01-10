@@ -35,6 +35,13 @@ class AssessmentPair
     private $assessmentPairs;
 
     /**
+     * If this pair is a sub-pair (ie inside a Project, this points to parent Project pair.
+     *
+     * @var AssessmentPair|null
+     */
+    private $parentPair;
+
+    /**
      * @param IAssessable|null $spec
      * @param IAssessable|null $impl
      * @param GenericCollection|AssessmentPair[]|null $subPairs
@@ -66,7 +73,35 @@ class AssessmentPair
 
         $this->specification = $spec;
         $this->implementation = $impl;
-        $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class) ;
+        $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class);
+        foreach($this->assessmentPairs as $subPair){
+            $subPair->parentPair = $this;
+        }
+    }
+
+    /**
+     * If this pair is a sub-pair of a Project-pair, return the Project-pair.
+     *
+     * @return AssessmentPair|null
+     */
+    public function getParentPair()
+    {
+        return $this->parentPair;
+    }
+
+    public function isSpecOnly()
+    {
+        return $this->specification && !$this->implementation;
+    }
+
+    public function isImplOnly()
+    {
+        return !$this->specification && $this->implementation;
+    }
+
+    public function isPair()
+    {
+        return $this->specification && $this->implementation;
     }
 
     /**

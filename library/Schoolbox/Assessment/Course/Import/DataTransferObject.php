@@ -10,7 +10,9 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Alaress_Date_Format;
 
 /**
  * Provides a consistent interface to transfer import data from DB all the way to twig.
@@ -44,7 +46,7 @@ class DataTransferObject
      * 2. Both AssessmentSpec + AssessmentImpl => UnitSpec imported and AssessmentSpec imported. Spec may be deleted.
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
-     * @var IAssessable[][][] $unitSpecAssessments
+     * @var IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments
      * @var IAssessable|null $unitSpecAssessments [unitSpec.id][]['spec']
      * @var IAssessable|null $unitSpecAssessments [unitSpec.id][]['impl']
      */
@@ -118,10 +120,221 @@ class DataTransferObject
         $this->addAssessmentImpls($assessmentImpls);
         $this->addAssessmentPairs($assessmentPairs);
 
+        // Sort Assessment Pairs
+        $this->sortAssessmentPairsDriver();
+
+        // Add Suggested Dates to Assessment Specs
+        $this->addAssessmentSpecDatesDriver();
+
         // Calculate totals for display
         $this->calculateAvailableAssessmentCounts();
         $this->calculateSelectedAssessmentCounts();
     }
+
+    /**
+     * Recursive driver to sort Assessment Pairs.
+     */
+    protected function sortAssessmentPairsDriver()
+    {
+        foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
+            $this->sortAssessmentPairs($assessmentPairs);
+        }
+    }
+
+    /**
+     * Recursively sort Assessment Pairs.
+     *
+     * Sorts by:
+     * * AssessmentImpl.sequence, then
+     * * AssessmentSpec.sequence
+     *
+     * @param GenericCollection|AssessmentPair[] $assessmentPairs
+     */
+    protected function sortAssessmentPairs(GenericCollection $assessmentPairs)
+    {
+        // Base Case
+        $assessmentPairs->sortByCallback($this->getSortForDisplayCallback());
+
+        // Recursive Case
+        foreach($assessmentPairs as $assessmentPair){
+            $this->sortAssessmentPairs($assessmentPair->getSubPairs());
+        }
+    }
+
+
+    /**
+     * Get a Callback for sorting AssessmentPairs for date assignment
+     *
+     * @return \Closure
+     */
+    protected function getSortForDateAssignmentCallback()
+    {
+        return function(AssessmentPair $leftPair, AssessmentPair $rightPair){
+            $leftImpl  = $leftPair->getImplementation();
+            $leftSpec  = $leftPair->getSpecification();
+            $rightImpl = $rightPair->getImplementation();
+            $rightSpec = $rightPair->getSpecification();
+
+            // Both implemented ?
+            if($leftImpl && $rightImpl){
+                $rightSeq = $rightImpl->getSequence();
+                $leftSeq  = $leftImpl->getSequence();
+                if($leftSeq > $rightSeq){
+                    return 1;
+                }
+                return $leftSeq > $rightSeq ? 1 : ($leftSeq < $rightSeq ? -1 : 0);
+            }
+            // Just the left?
+            if($leftImpl){
+                return -1;
+            }
+            // Just the right?
+            if($rightImpl){
+                return 1;
+            }
+            // Neither
+            $rightSeq = $rightSpec->getSequence();
+            $leftSeq  = $leftSpec->getSequence();
+            return $leftSeq > $rightSeq ? 1 : ($leftSeq < $rightSeq ? -1 : 0);
+        };
+    }
+
+
+    /**
+     * Get a callback to sort AssessmentPairs for display
+     *
+     * @return \Closure
+     */
+    protected function getSortForDisplayCallback()
+    {
+        /* For now, both sorting is the same. But we could alter the display
+         * sorting by inserting a new sort function here.
+         */
+        return $this->getSortForDateAssignmentCallback();
+    }
+
+    /**
+     * Applies suggested dates to AssessmentSpecs.
+     *
+     * Recursive driver
+     */
+    protected function addAssessmentSpecDatesDriver( )
+    {
+        /**
+         * @var int $unitSpecId
+         * @var AssessmentPair[] $assessmentPairs
+         */
+        foreach($this->unitSpecAssessments as $unitSpecId => $assessmentPairs){
+            /** @var UnitImplementation $unitImpl */
+            $unitImpl = $this->unitImplementations->getOffset($unitSpecId);
+            $nextAvailable = clone $unitImpl->getOpenDate();
+            $limit = clone $unitImpl->getDueDate();
+            $this->addAssessmentSpecDates($unitImpl, $assessmentPairs, $nextAvailable, $limit);
+        }
+    }
+
+
+    /**
+     * Recursive function to add suggested dates to AssessmentPairs in the given context.
+     *
+     * If a UnitImpl's Assessments's are partially imported, then un-imported Assessments are scheduled from
+     * the end of the latest due date of already imported Assessments.
+     *
+     * If a Project's Assessments are partially imported, then un-imported Assessments are scheduled from
+     * the open to due dates of the Project.
+     *
+     * @param AssessmentContext|UnitImplementation|Project $context
+     * @param AssessmentPair[]|GenericCollection           $assessmentPairs - Already sorted by assessment.sequence
+     * @param Alaress_Date_Format                          $limit           - Cannot assign dates past this point
+     * @param Alaress_Date_Format                          $nextAvailable   - Next available date to assign to specs
+     * @return Alaress_Date_Format                         $nextAvailable   - The next available date after adding dates
+     */
+    protected function addAssessmentSpecDates(
+        AssessmentContext   $context,
+        GenericCollection   $assessmentPairs,
+        Alaress_Date_Format $nextAvailable,
+        Alaress_Date_Format $limit
+    )
+    {
+        /* Shallow clone collection of pairs to ensure we only start to assign specs from end of latest impl due date
+         * Both original and cloned collections reference same items.
+         * Use the clone for assigning dates, then throw away. Original collection retains its sorting.
+         */
+        $sortedPairs = clone $assessmentPairs;
+        $sortedPairs->sortByCallback($this->getSortForDateAssignmentCallback());
+
+        // TODO up to here - ensure you label this commit as SA-1891
+
+        foreach($sortedPairs as $pair){
+
+            // Is this pair an Impl-only or Impl/Spec pair?
+            if($pair->isImplOnly() || $pair->isPair()){
+
+                // Ensure nextAvailable is not before dueDate of this impl
+                $impl = $pair->getImplementation();
+                if($impl->getDueAt()->gt($nextAvailable)){
+                    $nextAvailable = clone $impl->getDueAt();
+                }
+
+                // Is this a Project Impl/Spec pair?
+                if($pair->isPair() && $impl instanceof Project){
+                    // Apply dates to sub-assessments, but ignore return value
+                    $projectOpen = clone $impl->getPublishAt();
+                    $projectDue  = clone $impl->getDueAt();
+                    $spec = $pair->getSpecification();
+                    $spec->setPublishAt(clone $projectOpen);
+                    $spec->setDueAt(clone $projectDue);
+                    $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $projectOpen, $projectDue);
+                }
+            }
+
+            // Else just a spec. (and therefore if project only contains specs)
+            elseif($pair->isSpecOnly()) {
+                $spec = $pair->getSpecification();
+
+                // Determine parent context
+                $insideUnitImpl    = $context instanceof UnitImplementation;
+                $insideProjectSpec = $context instanceof Project && $pair->getParentPair()->isSpecOnly();
+                $insideProjectImpl = !($insideUnitImpl || $insideProjectSpec);
+
+                // Determine start
+                if($insideUnitImpl || $insideProjectSpec){
+                    // stagger start
+                    $start = clone $nextAvailable;
+                } else {
+                    // align start to projectImpl start
+                    $start = clone $context->getPublishAt();
+                }
+                $spec->setPublishAt($start);
+                $spec->setOpenAt($start);
+
+                // Determine open_span
+                if($insideProjectImpl){
+                    // Ignore default_open_span and set end date to projectImpl end date
+                    $nextAvailable = clone $context->getDueAt();
+                } else {
+                    if(!$spec instanceof Project){
+                        // Base Case
+                        $nextAvailable->addDays($spec->getDefaultOpenSpan());
+                        if($nextAvailable->gt($limit)){
+                            $nextAvailable = $limit;
+                        }
+                    } else {
+                        // Recursive Case
+                        $nextAvailable = $this->addAssessmentSpecDates($spec, $pair->getSubPairs(), $nextAvailable, $limit);
+                    }
+                }
+                $end = clone $nextAvailable;
+                $spec->setDueAt($end);
+                $spec->setCloseAt($end);
+
+            } else {
+                throw new \DomainException('Invalid Pair: ' . print_r($pair, true));
+            }
+        }
+        return $nextAvailable;
+    }
+
 
     /**
      * Call from TWIG to get a list of UnitImpls to traverse
@@ -343,7 +556,7 @@ class DataTransferObject
                 $subPairs->add($this->addAssessmentImpl($unitSpecId, $assessable, true));
             }
         }
-        $pair = new AssessmentPair($assessmentImpl, null, $subPairs);
+        $pair = new AssessmentPair(null, $assessmentImpl, $subPairs);
         if(!$isNested){
             $this->unitSpecAssessments->getOffset($unitSpecId)->add($pair);
         }
