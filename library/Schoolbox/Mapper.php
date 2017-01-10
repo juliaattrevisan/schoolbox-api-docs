@@ -1336,26 +1336,27 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Build a WHERE part using the predicate builder.
-        $pb = $this->getPredicateBuilder();
+        /** @var PredicateBuilder[] $pbs */
+        $pbs = [];
         if ($this->hasIdentifier()) {
-            // Building the query is easy, just set where any
+            // Building the query is easy, just set where any identifier matches
             $idValues = [];
             foreach ($collection as $model) {
                 $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
             }
-            $pb->equals($this->getIdentifierColumn(), $idValues);
+            $pbs[] = $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $idValues);
 
         } else {
             // Building the query is hard - all I can do is compare against each property of each model.
-            $orPb = $this->getPredicateBuilder();
             foreach ($collection as $i => $model) {
-                $modelPb = $this->getPredicateBuilder();
+                // Need a separate PB for each model.
+                // This is because joining them together doesn't know how to re-alias params.
+                $pb = $this->getPredicateBuilder();
                 foreach ($this->map as $column) {
-                    $modelPb->equals($column['column'], $this->getModelProperty($model, $column['property']));
+                    $pb->equals($column['column'], $this->getModelProperty($model, $column['property']));
                 }
-                $orPb->all($modelPb);
+                $pbs[] = $pb;
             }
-            $pb->any($orPb);
         }
 
         // Update property on each model
@@ -1365,26 +1366,27 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
 
-        // Run update query
-        $query     = "
-            UPDATE `{$this->getTable()}`
-            SET `$field` = :value
-            WHERE {$pb->getWhere()[0]}
-        ";
-        $statement = $this->database->prepare($query);
-        $statement->bindValue('value', $value);
-        foreach ($pb->getParams() as $key => $id) {
-            $statement->bindValue($key, $id);
-        }
+        // Run update PRs
         $this->database->beginTransaction();
-        try {
-            if (!($result = $statement->execute())) {
-                $this->database->rollBack();
-                return $result;
+        foreach ($pbs as $pb) {
+            // Build query
+            $query     = "UPDATE `{$this->getTable()}` SET `$field` = :value WHERE ".implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            $statement->bindValue('value', $value);
+            foreach ($pb->getParams() as $key => $id) {
+                $statement->bindValue($key, $id);
             }
-        } catch (PDOException $e) {
-            $this->database->rollBack();
-            throw $e;
+
+            // Run query
+            try {
+                if (!($result = $statement->execute())) {
+                    $this->database->rollBack();
+                    return false;
+                }
+            } catch (PDOException $e) {
+                $this->database->rollBack();
+                throw $e;
+            }
         }
         $this->database->commit();
 
@@ -1394,7 +1396,7 @@ abstract class Mapper implements IMapper, Serializable
                 $this->triggerCallbacks($post_trigger, $model);
             }
         }
-        return $result;
+        return true;
     }
 
     /**
