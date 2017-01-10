@@ -754,7 +754,7 @@ class Controller extends Base\Base
             $assessment = $context->getAssessables()->filter($filter)->first();
         }
 
-        // Base Case #2 - Is item unselected ? (an logically must be imported)
+        // Base Case #2 - Is item unselected ? (and already imported)
         if (!$isChecked) {
             $this->getAssessmentMapperProxy()->delete($assessment);
             return;
@@ -762,14 +762,15 @@ class Controller extends Base\Base
 
         // Item is checked.
 
-        // Apply dates regardless of whether it is a Spec or Impl.
-        // If Impl, all good. If Spec, they will be cloned to the Impl.
+        // Apply dates regardless of whether it is a Spec or Impl. (If Spec, they will be cloned to the Impl)
         $assessment = $this->applyDates($assessment, $dateData);
 
         if(!$implId){
-            // Create Impl from Spec
+            // INSERT - Create Impl from Spec
             $newAssessment = $this->replicator->replicateInNewContext($assessment, $context);
         } else {
+            // UPDATE
+            $newAssessment = null;
             $this->getAssessmentMapperProxy()->save($assessment);
         }
 
@@ -777,7 +778,7 @@ class Controller extends Base\Base
         if($subData){
             foreach($subData as $subDatum){
                 /** @var Project $project */
-                $project = $implId ? $assessment : $newAssessment;
+                $project = $newAssessment ?: $assessment;
                 $this->parseAssessmentForm($project, $subDatum);
             }
         }
