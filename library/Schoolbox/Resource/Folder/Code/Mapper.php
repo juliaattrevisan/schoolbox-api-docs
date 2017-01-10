@@ -21,11 +21,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('folder_code');
         $this->hasMap(
             array(
-                'column'     => 'folder_id',
-                'property'   => 'folder',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'folder',
-                'identifier' => true,
+                'column'   => 'folder_id',
+                'property' => 'folder',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'folder',
             )
         );
         $this->hasMap(
