@@ -175,7 +175,6 @@ try {
 
                 if (xhr.status >= 400) {
                     config.loadedCallback.call($j(this));
-                    console.log(response, status, xhr);
                     $j(this).html("<span>"+JSON.parse(response)+"</span>");
                     return;
                 }
