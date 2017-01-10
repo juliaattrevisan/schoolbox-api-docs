@@ -70,26 +70,35 @@
             }
         });
 
+        // User toggles the checkbox to the left of an assessment
         $(document).on('change', 'input[data-assessment]', function () {
-            var $input = $(this),
-                aid    = $input.data('assessment'),
-                $tgt   = $('[data-assessment-dates=' + aid + ']'),
-                $unit  = $input.closest('[data-unit]'),
-                $p = $('[data-project=' + aid + ']'),
-                $count = $unit.find('[data-show-count]');
+            var $input              = $(this),
+                assessmentId        = $input.data('assessment'),
+                $dates              = $('[data-assessment-dates=' + assessmentId + ']'),
+                $unit               = $input.closest('[data-unit]'),
+                $projectAssessables = $('[data-project=' + assessmentId + ']'),
+                $countSelectedElem  = $unit.find('[data-show-count]');
 
-            $count.attr('data-show-count', $unit.find(':checked').length);
+            // Update display of how many assessments are currently selected in this unit
+            // Includes sub-assessments inside projects
+            $countSelectedElem.attr('data-show-count', $unit.find(':checked').length);
 
+            // Show/Hide assessment's dates
             if ($input.prop('checked')) {
-                $tgt.find('input').prop('disabled', false);
-                $tgt.show();
-                $p.find('input').prop('disabled', false);
-                $p.show();
+                $dates.show();
+                $dates.find('input').prop('disabled', false);
             } else {
-                $tgt.hide();
-                $tgt.find('input').prop('disabled', true);
-                $p.hide();
-                $p.find('input').prop('disabled', true);
+                $dates.hide();
+                $dates.find('input').prop('disabled', true);
+            }
+
+            // Show/Hide sub-assessment in Project
+            if ($input.prop('checked')) {
+                $projectAssessables.find('input').prop('disabled', false);
+                $projectAssessables.show();
+            } else {
+                $projectAssessables.hide();
+                $projectAssessables.find('input').prop('disabled', true);
             }
         });
     });
@@ -193,7 +202,7 @@
 
                                     {% endif %}
 
-                                    <li data-type="unit_row">
+                                    <li data-type="assessment_row">
                                         <input type="hidden" name="{{ inputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
                                         <input type="hidden" name="{{ inputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
@@ -331,6 +340,7 @@
                                     {# If the assessable is a project allow the user to enter dates for each subassessment #}
 
                                     {% if assessment is project %}
+                                        {% set project = assessment %}
 
                                         {% for subPair in assessmentPair.subPairs %}
                                             {% set assessmentSpec = subPair.specification %}
@@ -342,9 +352,9 @@
                                             <input type="hidden" name="{{ subInputPrefix }}[spec_id]" value="{{ assessmentSpec.id }}" />
                                             <input type="hidden" name="{{ subInputPrefix }}[impl_id]" value="{{ assessmentImpl.id }}" />
 
-                                            {% if assessable.duration is not empty %}
+                                            {% if assessment.duration is not empty %}
 
-                                                {% if assessable is quiz %}
+                                                {% if assessment is quiz %}
 
                                                     {# Assuming quizzes need to be completed in one day #}
 
@@ -354,8 +364,8 @@
 
                                                     {# Don't try and increment if duration is null #}
 
-                                                    {% if assessable.duration is not empty %}
-                                                        {% set endDate = endDate.addDays(assessable.duration) %}
+                                                    {% if assessment.duration is not empty %}
+                                                        {% set endDate = endDate.addDays(assessment.duration) %}
                                                     {% endif %}
 
                                                 {% endif %}
@@ -368,7 +378,7 @@
 
                                             {% endif %}
 
-                                            {% if assessable.duration is empty %}
+                                            {% if assessment.duration is empty %}
                                                 {% set displayStartDate = unitImpl.openDate %}
                                                 {% set displayEndDate = unitImpl.dueDate %}
                                             {% else %}
@@ -376,19 +386,18 @@
                                                 {% set displayEndDate = endDate %}
                                             {% endif %}
 
-                                            <li data-type="unit_row" data-assessment-dates="{{ assessment.id }}">
+                                            <li data-type="assessment_row" data-project="{{ project.id }}">
 
                                                 <div class="compact card small-12 large-4">
                                                     <input type="checkbox"
-                                                           data-project="{{ assessment.id }}"
-                                                           id="a_import-{{ assessable.id}}"
+                                                           id="a_import-{{ assessment.id}}"
                                                             {% if isChecked %} checked="checked"{% endif %}
-                                                           data-assessment="{{ assessable.id }}"
+                                                           data-assessment="{{ assessment.id }}"
                                                            name="{{ subInputPrefix }}[checked]"
                                                            value="1"
                                                     />
-                                                    <label style="margin-left:25px" for="a_import-{{ assessable.id}}" class="checkbox-label">
-                                                        <span class="{{ icon.renderClass(assessable) }}"></span>
+                                                    <label style="margin-left:25px" for="a_import-{{ assessment.id}}" class="checkbox-label">
+                                                        <span class="{{ icon.renderClass(assessment) }}"></span>
                                                         <span>{{ assessment.title }}</span>
                                                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                                                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
@@ -396,48 +405,48 @@
                                                     </label>
                                                 </div>
 
-                                                <div data-assessment-dates="{{ assessable.id }}" {% if not isChecked %} style="display: none;"{% endif %}>
+                                                <div data-assessment-dates="{{ assessment.id }}" {% if not isChecked %} style="display: none;"{% endif %}>
                                                     {# publish date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
-                                                    assessmentDate: assessable.publishAt,
+                                                    assessmentDate: assessment.publishAt,
                                                     unitDate: unitImpl.openDate,
                                                     inputPrefix: subInputPrefix,
                                                     dateProperty: 'publish',
                                                     dateSyncProperty: publishDateSync,
-                                                    assessmentId: assessable.id
+                                                    assessmentId: assessment.id
                                                     } only %}
                                                     {# open date is relevant when accepting responses #}
-                                                    {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
+                                                    {% if assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessable.openAt,
+                                                        assessmentDate: assessment.openAt,
                                                         unitDate: displayStartDate,
                                                         inputPrefix: subInputPrefix,
                                                         dateProperty: 'open',
                                                         dateSyncProperty: 'due',
-                                                        assessmentId: assessable.id
+                                                        assessmentId: assessment.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
                                                     {% endif %}
                                                     {# due date is always relevant #}
                                                     {% include '@course/import/date.twig' with {
-                                                    assessmentDate: assessable.dueAt,
+                                                    assessmentDate: assessment.dueAt,
                                                     unitDate: displayEndDate,
                                                     inputPrefix: subInputPrefix,
                                                     dateProperty: 'due',
                                                     dateSyncProperty: 'late',
-                                                    assessmentId: assessable.id
+                                                    assessmentId: assessment.id
                                                     } only %}
 
                                                     {# close (late) date is relevant when accepting responses #}
-                                                    {% if assessable is quiz or (assessable is dueWork and not assessable.acceptNone) %}
+                                                    {% if assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
                                                         {% include '@course/import/date.twig' with {
-                                                        assessmentDate: assessable.closeAt,
+                                                        assessmentDate: assessment.closeAt,
                                                         unitDate: displayEndDate,
                                                         inputPrefix: subInputPrefix,
                                                         dateProperty: 'close',
                                                         dateLabel: 'Late',
-                                                        assessmentId: assessable.id
+                                                        assessmentId: assessment.id
                                                         } only %}
                                                     {% else %}
                                                         <div class="small-12 medium-3 large-2 columns"><p>{# empty column #}</p></div>
@@ -445,9 +454,9 @@
                                                 </div>
                                             </li>
 
-                                            {% if assessable.duration is not empty %}
+                                            {% if assessment.duration is not empty %}
 
-                                                {% if assessable is quiz %}
+                                                {% if assessment is quiz %}
 
                                                     {# Assuming quizzes need to be completed in one day #}
 
@@ -457,8 +466,8 @@
 
                                                     {# Don't try and increment if duration is null #}
 
-                                                    {% if assessable.duration is not empty %}
-                                                        {% set startDate = startDate.addDays(assessable.duration) %}
+                                                    {% if assessment.duration is not empty %}
+                                                        {% set startDate = startDate.addDays(assessment.duration) %}
                                                     {% endif %}
 
                                                 {% endif %}
