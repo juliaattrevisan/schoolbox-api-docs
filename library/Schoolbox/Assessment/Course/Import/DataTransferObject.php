@@ -355,10 +355,28 @@ class DataTransferObject
         // Recurse
         $subPairs = null;
         if($assessmentImpl instanceof Project){
+            /**
+             * Index by assessment.id. (spec.id if spec exists, otherwise impl.id)
+             * @var AssessmentPair[] $subPairs
+             */
             $subPairs = new GenericCollection(AssessmentPair::class);
             foreach($assessmentImpl->getAssessables() as $impl){
-                $subPair = new AssessmentPair($impl->getSpecificationAssessment(), $impl);
-                $subPairs->add($this->addAssessmentPair($unitSpecId, $subPair, true));
+                $spec = $impl->getSpecificationAssessment();
+                if($spec){
+                    $subPair = new AssessmentPair($spec, $impl);
+                    $subPairs->setOffset($spec->getId(), $this->addAssessmentPair($unitSpecId, $subPair, true));
+                } else {
+                    $subPairs->setOffset($impl->getId(), $this->addAssessmentImpl($unitSpecId, $impl, true));
+                }
+
+            }
+            /** @var Project $assessmentSpec */
+            foreach($assessmentSpec->getAssessables() as $spec){
+                // Have we already added this spec as part of a pair?
+                if($subPairs->offsetExists($spec->getId())){
+                    continue;
+                }
+                $subPairs->setOffset($spec->getId(), $this->addAssessmentSpec($unitSpecId, $spec, true));
             }
         }
         $pair = new AssessmentPair($assessmentSpec, $assessmentImpl, $subPairs);
