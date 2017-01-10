@@ -11,6 +11,16 @@ ALTER TABLE `submission_return`
   ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `published_at`
 ;
 
+-- Populate new columns.
+-- * If box is published, then set return's pub date to its create date. (0 == IAssessable::MARK_VISIBILITY_PRIVATE)
+-- * Set updated_at to create date.
+UPDATE submission_return sr
+  JOIN submission_box sb ON sb.id = sr.box_id
+SET
+  sr.published_at = IF(0 = sb.mark_visibility, NULL, sr.created_at),
+  sr.updated_at = sr.created_at;
+
+
 -- ReturnedFile file table
 CREATE TABLE `submission_return_file` (
   `id`                         INT(11) NOT NULL AUTO_INCREMENT,
