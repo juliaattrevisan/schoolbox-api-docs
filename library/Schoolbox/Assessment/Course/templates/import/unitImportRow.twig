@@ -1,0 +1,71 @@
+{#
+    A single UnitImplementation. Displayed in the final stage of the Course import/modify screen.
+
+    Data:
+        unitImpl: UnitImplementation,
+        dto:      DataTransferObject,
+#}
+
+
+{% set unitSpec                    = unitImpl.specification %}
+{% set assessmentPairs             = dto.assessmentPairs[unitSpec.id] %}
+{% set unitAssessmentCount         = dto.availableAssessmentCounts[unitSpec.id] %}
+{% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
+{% set unitAction                  = unitImpl.id ? 'modify' : 'import' %}
+
+{# Have to clone the date, otherwise incrementing one updates both #}
+
+{% set startDate   = clone(unitImpl.openDate) %}
+{% set endDate     = clone(unitImpl.openDate) %}
+
+{# The units due date will be used as the maximum date allowed for the auto-calculation#}
+
+{% set maximumDate = clone(unitImpl.dueDate) %}
+
+<input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />
+<input type="hidden" name="unit[{{ unitSpec.id }}][unit_impl_id]" value="{{ unitImpl.id }}" />
+<input type="hidden" name="unit[{{ unitSpec.id }}][open_date]"    value="{{ unitImpl.openDate.localShort }}" />
+<input type="hidden" name="unit[{{ unitSpec.id }}][close_date]"   value="{{ unitImpl.dueDate.localShort }}" />
+<div class="row" data-unit="{{ unitSpec.id }}">
+    <div class="small-12 columns">
+        <section>
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
+                            {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
+                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
+                        </div>
+                    </div>
+                    <nav>
+                        <a data-collapser="unit-{{ unitSpec.id }}" href="#" class="icon-down-arrow collapse" title="Collapse Content"></a>
+                    </nav>
+                </li>
+            </ul>
+            <div id="unit-{{ unitSpec.id }}" data-start_date="{{ unitImpl.openDate.localShort }}" data-finish_date="{{ unitImpl.dueDate.localShort }}" class="hide">
+                <div class="row">
+                    <div class="small-12 island">
+                        <section>
+                            {% if unitAssessmentCount %}
+                                {% include '@course/import/assessmentRows.twig' with {
+                                    assessmentPairs: assessmentPairs,
+                                    inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
+                                    depth:           0,
+                                    unitAction:      unitAction,
+                                    startDate:       startDate,
+                                    endDate:         endDate,
+                                    maximumDate:     maximumDate,
+                                    project:         null,
+                                    hideRows:        false
+                                } only %}
+                            {% else %}
+                                <p class="content">This unit contains no coursework.</p>
+                            {% endif %}
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
