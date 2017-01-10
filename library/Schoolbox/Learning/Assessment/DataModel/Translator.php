@@ -90,6 +90,7 @@ class Translator
             ->setCreatedAt($assessment->getCreatedAt())
             ->setUpdatedAt($assessment->getUpdatedAt())
             ->setDeletedAt($assessment->getDeletedAt())
+            ->setCurriculumNodes($assessment->getCurriculumNodes())
         ;
 
         // Translate specification assessment if there is one
