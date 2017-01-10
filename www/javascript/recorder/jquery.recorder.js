@@ -564,7 +564,6 @@
             });
         }
         var namespacedEventName = eventName+'.'+PLUGIN_NAME;
-        console.log('Triggering event "'+namespacedEventName+"'");
         this.element.trigger(namespacedEventName, params);
         return this;
     };
