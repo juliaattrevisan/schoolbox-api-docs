@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 use PDOStatement;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -478,7 +479,7 @@ class Mapper extends BaseMapper
         $dueWorkIds        = [];
         $quizIds           = [];
         $contextProjectIds = [];
-        $assessmentIds     = [];
+        $curriculumNodes   = [];
 
         foreach ($statement as $row) {
             /** @var Model $model */
@@ -552,7 +553,14 @@ class Mapper extends BaseMapper
 
             /* Remember this list so we can augment with curriculum codes later
              */
-            $assessmentIds[$model->getId()] = $model->getId();
+            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+            if (isset($row['cn.id']) && empty($curriculumNodes[$model->getId()][$row['cn.id']])) {
+                $curriculumNode = $this->getJoinMapper('curriculum_node_for_assessment')->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+
+                if ($curriculumNode->getId()) {
+                    $curriculumNodes[$model->getId()][$curriculumNode->getId()] = $curriculumNode;
+                }
+            }
 
             $model->setAssessmentContext($context);
             $modelList->add($model);
@@ -574,24 +582,32 @@ class Mapper extends BaseMapper
         // Grade groups
         $modelList = $this->augmentListWithGradeGroups($modelList);
 
+        /* Curriculum Nodes
+         */
+        $modelList = $this->augmentListWithCurriculumNodes($modelList, $curriculumNodes);
+
         return $modelList;
     }
 
-    protected function augmentListWithCurriculumCodes($modelList, $assessmentIds)
+    /**
+     * Augments the list from hydrateSelect() with Curriculum Nodes
+     *
+     * @param $modelList
+     * @param $curriculumNodes
+     */
+    protected function augmentListWithCurriculumNodes($modelList, $curriculumNodes)
     {
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $currentModel */
+        foreach ($modelList as $currentModel) {
+            if (isset($curriculumNodes[$currentModel->getId()])) {
+                $nodes = new Collection(array_values($curriculumNodes[$currentModel->getId()]));
 
-        /* Collect the curriculum codes associated with this Assessment
-         */
-        /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
-        $curriculumNode = $this->getJoinMapper('curriculum_node_for_assessment')
-            ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-        if ($curriculumNode->getId()) {
-            $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+                $currentModel->setCurriculumNodes($nodes);
+            }
         }
 
-        new \Alaress_Probe($row, $curriculumNodes);
+        return $modelList;
     }
-
 
     /**
      * Augments the list from hydrateSelect() with due work files.

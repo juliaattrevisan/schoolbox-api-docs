@@ -150,6 +150,13 @@ abstract class AbstractAssessment implements IAssessable
     private $sequence;
 
     /**
+     * A collection of Curriculum Nodes
+     *
+     * @var Collection
+     */
+    private $curriculumNodes;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
@@ -157,6 +164,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->setAllParticipants(new Collection());
         $this->responses = new Collection();
         $this->feedbacks = new Collection();
+        $this->setCurriculumNodes(new Collection());
     }
 
     /**
@@ -907,6 +915,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCurriculumNodes()
+    {
+        return $this->curriculumNodes;
+    }
+
+    /**
+     * @param Collection $curriculumNodes
+     * @return $this
+     */
+    public function setCurriculumNodes(Collection $curriculumNodes)
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 }

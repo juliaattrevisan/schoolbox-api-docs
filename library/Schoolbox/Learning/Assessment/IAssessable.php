@@ -530,6 +530,21 @@ interface IAssessable extends ISoftDeletable
     public function setFeedbacks(Collection $feedbacks);
 
     /**
+     * A collection of Curriculum Nodes
+     *
+     * @return Collection
+     */
+    public function getCurriculumNodes();
+
+    /**
+     * Set a collection of Curriculum Nodes
+     *
+     * @param Collection $curriculumNodes
+     * @return $this
+     */
+    public function setCurriculumNodes(Collection $curriculumNodes);
+
+    /**
      * Created date
      *
      * @return \Alaress_Date_Format
