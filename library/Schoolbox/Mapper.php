@@ -1335,29 +1335,7 @@ abstract class Mapper implements IMapper, Serializable
             return false;
         }
 
-        // Build a WHERE part using the predicate builder.
-        /** @var PredicateBuilder[] $pbs */
-        $pbs = [];
-        if ($this->hasIdentifier()) {
-            // Building the query is easy, just set where any identifier matches
-            $idValues = [];
-            foreach ($collection as $model) {
-                $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
-            }
-            $pbs[] = $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $idValues);
-
-        } else {
-            // Building the query is hard - all I can do is compare against each property of each model.
-            foreach ($collection as $i => $model) {
-                // Need a separate PB for each model.
-                // This is because joining them together doesn't know how to re-alias params.
-                $pb = $this->getPredicateBuilder();
-                foreach ($this->map as $column) {
-                    $pb->equals($column['column'], $this->getModelProperty($model, $column['property']));
-                }
-                $pbs[] = $pb;
-            }
-        }
+        $pbs = $this->buildPredicateBuildersForCollection($collection);
 
         // Update property on each model
         foreach ($collection as $model) {
@@ -1397,6 +1375,43 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         return true;
+    }
+
+    /**
+     * Creates a set of predicate builders - between them, they will match all
+     * objects in $collection.
+     *
+     * This is used in `updateAll` and `hardDelete`.
+     *
+     * @param Collection $collection A collection of models
+     * @return PredicateBuilder[]
+     */
+    protected function buildPredicateBuildersForCollection(Collection $collection)
+    {
+        // Build a WHERE part using the predicate builder.
+        /** @var PredicateBuilder[] $pbs */
+        $pbs = [];
+        if ($this->hasIdentifier()) {
+            // Building the query is easy, just set where any identifier matches
+            $idValues = [];
+            foreach ($collection as $model) {
+                $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
+            }
+            $pbs[] = $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $idValues);
+
+        } else {
+            // Building the query is hard - all I can do is compare against each property of each model.
+            foreach ($collection as $i => $model) {
+                // Need a separate PB for each model.
+                // This is because joining them together doesn't know how to re-alias params.
+                $pb = $this->getPredicateBuilder();
+                foreach ($this->map as $column) {
+                    $pb->equals($column['column'], $this->getModelProperty($model, $column['property']));
+                }
+                $pbs[] = $pb;
+            }
+        }
+        return $pbs;
     }
 
     /**
