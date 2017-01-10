@@ -16,7 +16,7 @@
     });
 </script>
 
-{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', '/learning/grades/' ~ student.id ], [subject.name, '#']) }}
+{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], ['Grades', routeLookup('learning.getGrades', {userId: student.id}) ], [subject.name, '#']) }}
 
 <div class="row">
     <div class="small-12 columns">
