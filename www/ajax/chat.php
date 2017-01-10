@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,9 +7,6 @@
  * @version     SVN: $Id$
  * 
  */
-
-ini_set('display_errors',1);
-error_reporting(E_ALL & ~E_NOTICE);
 
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
