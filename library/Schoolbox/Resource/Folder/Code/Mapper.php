@@ -9,15 +9,15 @@
 
 namespace Schoolbox\Resource\Folder\Code;
 
-
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Mapper extends \Schoolbox\Mapper
 {
 
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\Folder\\Code\\Model');
+        $this->hasModel(Model::class);
         $this->hasTable('folder_code');
         $this->hasMap(
             array(
@@ -43,7 +43,7 @@ class Mapper extends \Schoolbox\Mapper
         );
         $this->hasJoin(
             'folder', array(
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper'    => FolderMapper::class,
                 'this_key'  => 'folder_id',
                 'other_key' => 'id',
             )
