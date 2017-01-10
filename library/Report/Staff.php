@@ -77,8 +77,19 @@ class Report_Staff extends Report_Abstract
         if (!array_key_exists($staffId, $mergedRecords)) {
             $mergedRecords[$staffId] = $record;
             $mergedRecords[$staffId]['JobPositionDescription'] = array();
+            $mergedRecords[$staffId]['JobPositionDescriptionAlternate'] = array();
         }
-        $mergedRecords[$staffId]['JobPositionDescription'][] = $record['JobPositionDescription'];
+
+        // Only set descriptions that aren't empty and aren't dupes
+        if (!empty($record['JobPositionDescription'])) {
+            $mergedRecords[$staffId]['JobPositionDescription'][$record['JobPositionDescription']]
+                = $record['JobPositionDescription'];
+        }
+        if (!empty($record['JobPositionDescriptionAlternate'])) {
+            $mergedRecords[$staffId]['JobPositionDescriptionAlternate'][$record['JobPositionDescriptionAlternate']]
+                = $record['JobPositionDescriptionAlternate'];
+        }
+
         return $mergedRecords;
     }
 
