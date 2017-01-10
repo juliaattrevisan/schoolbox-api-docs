@@ -68,12 +68,12 @@ switch ($_REQUEST['action']) {
         // Ghetto validation
         try {
             if (strlen($_POST['publishDate'])) {
-                $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
+                $pubDateObject = Alaress_Date_Format::newDatabaseDate($_POST['publishDate']);
             }
             /* Events recur until this time
              */
             if (strlen($_POST['repeat_until'])) {
-                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
+                $until = Alaress_Date_Format::newDatabaseDate($_POST['repeat_until'])->endOfDay();
             }
             /* Start and end dates
              */
