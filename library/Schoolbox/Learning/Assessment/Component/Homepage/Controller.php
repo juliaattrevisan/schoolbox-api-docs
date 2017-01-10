@@ -71,15 +71,18 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
             // Note: findAllByFolderIdForReview retrieves response+feedback for all
             // assessment types, not just tasks (as it did previously).
-            $this->assessments = $this->getAssessmentMapper()
+            $temp = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview($this->getSource()->getId(), $this->getUser())
                 ->filter(
                     function (IAssessable $assessment) use ($visibility)
                     {
                         return $this->filterAssessment($assessment) && $visibility->isUpcomingVisibleToUser($assessment, $this->getUser());
                     }
-                )
-                ->limit($this->getConfig('size'));
+                );
+
+            /* De-dupe due to curriculum nodes (maybe there is a better way)
+             */
+            $this->assessments = (new Collection())->mergeUnique($temp);
 
         } catch (\DomainException $e) {
             // if something goes wrong, this component will not be displayed
